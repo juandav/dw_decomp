@@ -1,0 +1,162 @@
+name: main
+sha1: 31ec666b987d5b007dec40eecc4092d27ed9085b
+options:
+  basename: main
+  target_path: disks/us/SLUS_010.32
+  base_path: ..
+  platform: psx
+  compiler: PSYQ
+
+  asm_path: asm/main
+  src_path: src/main
+  build_path: build
+
+  ld_script_path: build/generated/main.ld
+
+  global_vram_start: 0x80000000
+  global_vram_end: 0x80200000
+
+  find_file_boundaries: True
+  gp_value: 0x8013BB2C
+  ld_gp_expression: main_SDATA_START + 0x8000
+
+  generate_asm_macros_files: True
+
+  section_order: [".text", ".rodata", ".data", ".sdata", ".sbss", ".bss"]
+
+  symbol_addrs_path:
+    - config/symbols.txt
+    - config/symbols_main.txt
+  reloc_addrs_path:
+    - config/relocs_main.txt
+
+  undefined_funcs_auto_path: build/generated/undefined_funcs_auto_main.txt
+  undefined_syms_auto_path: build/generated/undefined_syms_auto_main.txt
+
+  string_encoding: ASCII
+  data_string_encoding: ASCII
+  rodata_string_guesser_level: 2
+  data_string_guesser_level: 2
+
+  use_gp_rel_macro: True
+
+segments:
+  - name: header
+    type: data
+    start: 0x0
+    vram: 0x80090000
+    align: 4
+    subalign: 4
+
+  - name: main
+    type: code
+    start: 0x800
+    vram: 0x80090800
+    align: 4
+    subalign: 4
+    subsegments:
+      - [0x800, asm, psyq/libapi]
+      - [0x1184, asm, psyq/libc]
+      - [0x1B9C, asm, psyq/libetc]
+      - [0x2844, asm, psyq/libgpu]
+      - [0x6C40, asm, psyq/libgs]
+      - [0xA618, asm, psyq/libgte]
+      - [0x10A50, asm, model]
+      - [0x12EF8, asm, world_object]
+      - [0x131F0, asm, file]
+      - [0x136D4, asm, math]
+      - [0x13924, asm, graphics]
+      - [0x14238, asm, entrypoint]
+      - [0x1435C, asm, partner_impl]
+      - [0x197F4, asm, tamer]
+      - [0x1CD64, asm, fade]
+      - [0x1D140, asm, aabb]
+      - [0x1D3F8, asm, efe]
+      - [0x1FD78, asm, psyq/libcd]
+      - [0x23D84, asm, map_impl]
+      - [0x27C28, asm, game_menu]
+      - [0x30A90, asm, map_collision]
+      - [0x310AC, asm, particle]
+      - [0x31734, asm, anim]
+      - [0x32838, asm, ui]
+      - [0x33860, asm, item]
+      - [0x35AD8, asm, sound]
+      - [0x367B4, asm, psyq/libspu]
+      - [0x39C1C, asm, psyq/libsnd]
+      - [0x43078, asm, map]
+      - [0x4AAF8, asm, inventory]
+      - [0x4CE04, asm, clock]
+      - [0x4D7AC, asm, partner]
+      - [0x4F868, asm, entity_text]
+      - [0x4FE48, asm, tmd_object]
+      - [0x52544, asm, evolution]
+      - [0x53674, asm, file_queue]
+      - [0x53C48, asm, graphics2]
+      - [0x54CAC, asm, fish]
+      - [0x55290, asm, swap]
+      - [0x552D8, asm, utils]
+      - [0x56D10, asm, tournament]
+      - [0x57220, asm, evl]
+      - [0x57484, asm, btl]
+      - [0x589C8, asm, kar]
+      - [0x58A00, asm, efe_table]
+      - [0x58B00, asm, sound_async]
+      - [0x59294, asm, psyq/libpress]
+      - [0x59CB0, asm, psyq/libds]
+      - [0x59CE8, asm, butterfly]
+      - [0x59FF4, asm, psyq/libmcrd]
+      - [0x5C520, asm, bubble]
+      - [0x5CE84, asm, battle_ui]
+      - [0x5E800, asm, main]
+      - [0x61AC4, asm, vs]
+      - [0x6A834, asm, script]
+      - [0x7D034, asm, main_menu]
+      - [0x83A60, rodata, entrypoint]
+      - [0x83B0C, rodata, psyq/libc]
+      - [0x83BEC, rodata, psyq/libetc]
+      - [0x83C9C, rodata, psyq/libgpu]
+      - [0x840CC, rodata, psyq/libgs]
+      - [0x8431C, rodata, tamer]
+      - [0x843C8, rodata, particle]
+      - [0x843E4, rodata, psyq/libcd]
+      - [0x848C4, rodata, map_impl]
+      - [0x84928, rodata, game_menu]
+      - [0x84A20, rodata, item]
+      - [0x84A68, rodata, psyq/libspu]
+      - [0x84B38, rodata, psyq/libsnd]
+      - [0x84BC8, rodata, map]
+      - [0x84E68, rodata, psyq/libpress]
+      - [0x84F18, rodata, psyq/libmcrd]
+      - [0x851E8, rodata, battle_ui]
+      - [0x85200, rodata, main]
+      - [0x8521C, rodata, vs]
+      - [0x85258, rodata, script]
+      - [0x85924, rodata, main_menu]
+      - [0x859F4, data, psyq/libapi]
+      - [0x85A34, data, psyq/libc]
+      - [0x85A44, data, psyq/libetc]
+      - [0x85CDC, data, psyq/libgte]
+      - [0x86A74, data, psyq/libetc2]
+      - [0x86B64, data, psyq/libgpu]
+      - [0x86CDC, data, psyq/libgte2]
+      - [0x8C170, data, model]
+      - [0x8D490, data, file]
+      - [0x8FA1C, data, atan_table]
+      - [0x8FE1C, data, file_table]
+      - [0x92480, data, sine_table]
+      - [0x92584, data, graphics]
+      - [0x925A0, data, partner_impl]
+      - [0x92D68, data, tamer]
+      - [0x9344C, data, psyq/libcd]
+      - [0x93860, data, map_impl]
+      - [0x98080, data, psyq/libspu]
+      - [0x9880C, data, psyq/libsnd]
+      - [0x989F4, data, map]
+      - [0x9BBD0, data, psyq/libpress]
+      - [0x9CB40, data, butterfly]
+      - [0x9CB6C, data, psyq/libmcrd]
+      - [0x9CE18, data, bubble]
+      - [0x9CE64, data, main]
+      - [0xA3B2C, sdata]
+
+  - [0xA4C4C]

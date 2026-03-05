@@ -1,0 +1,60 @@
+name: mov
+sha1: fe584076374ee58c7f9466fd75f8e407fc63176b
+options:
+  basename: mov
+  target_path: disks/us/MOV_REL.BIN
+  base_path: ..
+  platform: psx
+  compiler: PSYQ
+
+  asm_path: asm/mov
+  src_path: src/mov
+  build_path: build
+
+  ld_script_path: build/generated/mov.ld
+
+  global_vram_start: 0x80000000
+  global_vram_end: 0x80200000
+
+  find_file_boundaries: True
+  gp_value: 0x8013BB2C
+
+  generate_asm_macros_files: False
+
+  section_order: [".text", ".rodata", ".data", ".sdata", ".sbss", ".bss"]
+
+  symbol_addrs_path:
+    - config/symbols.txt
+    - config/symbols_mov.txt
+  reloc_addrs_path:
+    - config/relocs_mov.txt
+
+  undefined_funcs_auto_path: build/generated/undefined_funcs_auto_mov.txt
+  undefined_syms_auto_path: build/generated/undefined_syms_auto_mov.txt
+
+  string_encoding: ASCII
+  data_string_encoding: ASCII
+  rodata_string_guesser_level: 2
+  data_string_guesser_level: 2
+
+  use_gp_rel_macro: True
+
+segments:
+  - name: header
+    type: rodata
+    start: 0x0
+    vram: 0x80010000
+    align: 4
+    subalign: 4
+
+  - name: mov
+    type: code
+    start: 0x40
+    vram: 0x80010040
+    align: 4
+    subalign: 4
+    subsegments:
+      - [0x40, asm]
+      - [0x94C, data]
+
+  - [0x73428]

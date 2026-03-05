@@ -1,0 +1,60 @@
+name: trn
+sha1: c34f6dd594267c90b909b833478ac112130b1eb8
+options:
+  basename: trn
+  target_path: disks/us/TRN_REL.BIN
+  base_path: ..
+  platform: psx
+  compiler: PSYQ
+
+  asm_path: asm/trn
+  src_path: src/trn
+  build_path: build
+
+  ld_script_path: build/generated/trn.ld
+
+  global_vram_start: 0x80000000
+  global_vram_end: 0x80200000
+
+  find_file_boundaries: True
+  gp_value: 0x8013BB2C
+
+  generate_asm_macros_files: False
+
+  section_order: [".text", ".rodata", ".data", ".sdata", ".sbss", ".bss"]
+
+  symbol_addrs_path:
+    - config/symbols.txt
+    - config/symbols_trn.txt
+  reloc_addrs_path:
+    - config/relocs_trn.txt
+
+  undefined_funcs_auto_path: build/generated/undefined_funcs_auto_trn.txt
+  undefined_syms_auto_path: build/generated/undefined_syms_auto_trn.txt
+
+  string_encoding: ASCII
+  data_string_encoding: ASCII
+  rodata_string_guesser_level: 2
+  data_string_guesser_level: 2
+
+  use_gp_rel_macro: True
+
+segments:
+  - name: header
+    type: rodata
+    start: 0x0
+    vram: 0x80088800
+    align: 4
+    subalign: 4
+
+  - name: trn
+    type: code
+    start: 0x40
+    vram: 0x80088840
+    align: 4
+    subalign: 4
+    subsegments:
+      - [0x40, asm]
+      - [0x6758, data]
+
+  - [0x6BD4]
