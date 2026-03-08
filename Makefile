@@ -45,7 +45,8 @@ SRC := \
 	$(wildcard asm/main/data/psyq/*.s) \
 	$(wildcard asm/main/psyq/*.s) \
 	$(BUILDDIR)/generated/bss.s \
-	$(BUILDDIR)/generated/sbss.s
+	$(BUILDDIR)/generated/sbss.s \
+	src/main/swap.c
 
 OBJ := $(SRC:%=$(BUILDDIR)/%.o)
 DEP := $(OBJ:%.o=%.d)

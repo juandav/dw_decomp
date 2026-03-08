@@ -93,7 +93,7 @@ segments:
       - [0x53674, asm, file_queue]
       - [0x53C48, asm, graphics2]
       - [0x54CAC, asm, fish]
-      - [0x55290, asm, swap]
+      - [0x55290, c, swap]
       - [0x552D8, asm, utils]
       - [0x56D10, asm, tournament]
       - [0x57220, asm, evl]

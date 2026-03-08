@@ -56,7 +56,7 @@ SECTIONS
         build/asm/main/file_queue.s.o(.text);
         build/asm/main/graphics2.s.o(.text);
         build/asm/main/fish.s.o(.text);
-        build/asm/main/swap.s.o(.text);
+        build/src/main/swap.c.o(.text);
         build/asm/main/utils.s.o(.text);
         build/asm/main/tournament.s.o(.text);
         build/asm/main/evl.s.o(.text);
@@ -116,7 +116,7 @@ SECTIONS
         build/asm/main/file_queue.s.o(.rodata);
         build/asm/main/graphics2.s.o(.rodata);
         build/asm/main/fish.s.o(.rodata);
-        build/asm/main/swap.s.o(.rodata);
+        build/src/main/swap.c.o(.rodata);
         build/asm/main/utils.s.o(.rodata);
         build/asm/main/tournament.s.o(.rodata);
         build/asm/main/evl.s.o(.rodata);
@@ -183,7 +183,7 @@ SECTIONS
         build/asm/main/file_queue.s.o(.data);
         build/asm/main/graphics2.s.o(.data);
         build/asm/main/fish.s.o(.data);
-        build/asm/main/swap.s.o(.data);
+        build/src/main/swap.c.o(.data);
         build/asm/main/utils.s.o(.data);
         build/asm/main/tournament.s.o(.data);
         build/asm/main/evl.s.o(.data);
