@@ -51,6 +51,7 @@ SRC := \
 	$(BUILDDIR)/generated/bss.s \
 	$(BUILDDIR)/generated/sbss.s \
 	src/main/aabb.c \
+	src/main/butterfly.c \
 	src/main/kar.c \
 	src/main/particle.c \
 	src/main/swap.c

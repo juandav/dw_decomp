@@ -66,7 +66,7 @@ SECTIONS
         build/asm/main/sound_async.s.o(.text);
         build/asm/main/psyq/libpress.s.o(.text);
         build/asm/main/psyq/libds.s.o(.text);
-        build/asm/main/butterfly.s.o(.text);
+        build/src/main/butterfly.c.o(.text);
         build/asm/main/psyq/libmcrd.s.o(.text);
         build/asm/main/bubble.s.o(.text);
         build/asm/main/battle_ui.s.o(.text);
@@ -126,7 +126,7 @@ SECTIONS
         build/asm/main/sound_async.s.o(.rodata);
         build/asm/main/data/psyq/libpress.rodata.s.o(.rodata);
         build/asm/main/psyq/libds.s.o(.rodata);
-        build/asm/main/butterfly.s.o(.rodata);
+        build/src/main/butterfly.c.o(.rodata);
         build/asm/main/data/psyq/libmcrd.rodata.s.o(.rodata);
         build/asm/main/bubble.s.o(.rodata);
         build/asm/main/data/battle_ui.rodata.s.o(.rodata);
@@ -193,7 +193,7 @@ SECTIONS
         build/asm/main/sound_async.s.o(.data);
         build/asm/main/data/psyq/libpress.data.s.o(.data);
         build/asm/main/psyq/libds.s.o(.data);
-        build/asm/main/data/butterfly.data.s.o(.data);
+        build/src/main/butterfly.c.o(.data);
         build/asm/main/data/psyq/libmcrd.data.s.o(.data);
         build/asm/main/data/bubble.data.s.o(.data);
         build/asm/main/battle_ui.s.o(.data);
