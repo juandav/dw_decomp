@@ -1,0 +1,3 @@
+[submodule "external/psyq_headers"]
+	path = external/psyq_headers
+	url = https://github.com/jype0/psyq_headers.git

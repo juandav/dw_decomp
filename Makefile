@@ -21,7 +21,7 @@ OBJCOPY := $(TOOLCHAIN)objcopy
 
 MWCCWRAP_FLAGS += -gccincludes -lang c -Cpp_exceptions off -RTTI off
 
-INC := -Iinclude
+INC := -Iexternal/psyq_headers/include -Iinclude
 
 LDSCRIPT := \
 	config/overlay.ld \
