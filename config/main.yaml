@@ -70,7 +70,7 @@ segments:
       - [0x1435C, asm, partner_impl]
       - [0x197F4, asm, tamer]
       - [0x1CD64, asm, fade]
-      - [0x1D140, asm, aabb]
+      - [0x1D140, c, aabb]
       - [0x1D3F8, asm, efe]
       - [0x1FD78, asm, psyq/libcd]
       - [0x23D84, asm, map_impl]

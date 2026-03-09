@@ -46,6 +46,7 @@ SRC := \
 	$(wildcard asm/main/psyq/*.s) \
 	$(BUILDDIR)/generated/bss.s \
 	$(BUILDDIR)/generated/sbss.s \
+	src/main/aabb.c \
 	src/main/swap.c
 
 OBJ := $(SRC:%=$(BUILDDIR)/%.o)
