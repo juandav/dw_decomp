@@ -32,6 +32,9 @@ pip3 install -r requirements.txt
 ## Build
 
 ```
+# Update submodules
+git submodule update --init --recursive
+
 # Dump original PSX Digimon World (USA) ISO
 dumpsxiso -x disks/us -s disks/us/us.xml "/path/to/Digimon World (USA).bin"
 
