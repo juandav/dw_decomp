@@ -3,13 +3,12 @@
 #include <dw/entity.h>
 #include <dw/params.h>
 #include <dw/particle.h>
+#include <dw/world_object.h>
 
 #pragma optimization_level 4
 
 // prototypes for functions used below. relocate when appropriate
 void renderFXParticle(SVECTOR *worldPos, int32_t scale, RGB8 *rgb);
-int32_t addObject(int32_t, int32_t, void*, void*);
-void removeObject(int32_t,int32_t);
 int32_t lerp(int32_t, int32_t, int32_t, int32_t, int32_t);
 int32_t rand();
 int32_t _cos(int32_t);
