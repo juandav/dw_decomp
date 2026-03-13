@@ -39,7 +39,7 @@ ARCHFLAGS := -march=r3000 -mtune=r3000 -mabi=32 -EL -mfp32 \
 	     -Xassembler -no-pad-sections
 CFLAGS := -g -Wall -Wextra -Werror -std=c99 -Os -G0 -mno-gpopt $(ARCHFLAGS)
 CPPFLAGS := $(INC)
-DEPFLAGS = -MMD
+DEPFLAGS = -MM -MF $(@:.o=.d) -MT $@
 LDFLAGS := -g $(addprefix -T ,$(CPPLDSCRIPT)) -static \
 	   -Wl,--no-check-sections -Wl,-Map=% -Wl,--build-id=none
 
@@ -278,12 +278,14 @@ $(EXE): $(ELF) $(OVERLAY:%=$(BUILDDIR)/%_REL.BIN)
 
 $(BUILDDIR)/%.c.o: %.c
 	@mkdir -p $(dir $@)
-	$(MWCCGAP) $(MWCCGAP_FLAGS) $< $@ $(MWCCWRAP_FLAGS) $(CPPFLAGS) $(DEPFLAGS)
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEPFLAGS) $<
+	$(MWCCGAP) $(MWCCGAP_FLAGS) $< $@ $(MWCCWRAP_FLAGS) $(CPPFLAGS)
 	@printf '01100000' | xxd -r -p | dd of=$@ bs=1 seek=36 count=4 conv=notrunc
 
 $(BUILDDIR)/%.s.o: %.s
 	@mkdir -p $(dir $@)
-	$(CC) -c $(CFLAGS) $(CPPFLAGS) $(DEPFLAGS) -o $@ $<
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEPFLAGS) $<
+	$(CC) -c $(CFLAGS) $(CPPFLAGS) -o $@ $<
 
 $(BUILDDIR)/generated/bss.s: config/symbols.txt
 	@mkdir -p $(dir $@)
