@@ -1,5 +1,3 @@
-# See LICENSE file for copyright and license details.
-
 .EXTRA_PREREQS := $(abspath $(lastword $(MAKEFILE_LIST)))
 
 -include local.mk
@@ -310,6 +308,6 @@ $(BUILDDIR)/generated/sbss.s: config/symbols.txt
 	tools/gen_sbss.py $< $@
 
 clean:
-	rm -f $(ELF) $(EXE) $(OBJ) $(DEP)
+	rm -rf $(BUILDDIR)
 
 .PHONY: all clean
