@@ -42,29 +42,23 @@ DEPFLAGS = -MM -MF $(@:.o=.d) -MT $@
 LDFLAGS := -g $(addprefix -T ,$(CPPLDSCRIPT)) -static \
 	   -Wl,--no-check-sections -Wl,-Map=% -Wl,--build-id=none
 
-MAIN_C_SRC := \
+MAIN_ASM_SRC := $(shell find asm/main -path '*.s' -not -path 'asm/main/*matchings*')
+
+MAIN_SRC := \
+	$(MAIN_ASM_SRC) \
+	$(BUILDDIR)/generated/bss.s \
+	$(BUILDDIR)/generated/sbss.s \
 	src/main/aabb.c \
 	src/main/butterfly.c \
 	src/main/kar.c \
 	src/main/particle.c \
 	src/main/swap.c
 
-MAIN_C_BASENAMES := $(notdir $(MAIN_C_SRC:.c=))
-MAIN_ASM_FILTERED := $(filter-out $(addprefix asm/main/,$(addsuffix .s,$(MAIN_C_BASENAMES))),$(wildcard asm/main/*.s))
-MAIN_ASM_EXPECTED := $(addprefix asm/main/,$(addsuffix .s,$(MAIN_C_BASENAMES)))
-MAIN_ASM_EXPECTED_OBJ := $(MAIN_ASM_EXPECTED:%=$(BUILDDIR)/%.o)
+MAIN_OBJ := $(MAIN_SRC:%=$(BUILDDIR)/%.o)
+MAIN_DEP := $(MAIN_OBJ:%.o=%.d)
 
-SRC := \
-	$(MAIN_ASM_FILTERED) \
-	$(wildcard asm/main/data/*.s) \
-	$(wildcard asm/main/data/psyq/*.s) \
-	$(wildcard asm/main/psyq/*.s) \
-	$(BUILDDIR)/generated/bss.s \
-	$(BUILDDIR)/generated/sbss.s \
-	$(MAIN_C_SRC)
-
-OBJ := $(SRC:%=$(BUILDDIR)/%.o)
-DEP := $(OBJ:%.o=%.d)
+OBJ += $(MAIN_OBJ)
+DEP += $(MAIN_DEP)
 
 OVERLAY :=
 
@@ -265,7 +259,7 @@ all: $(EXE)
 compare:
 	@tools/cmp_bins.sh
 
-expected: all $(MAIN_ASM_EXPECTED_OBJ)
+expected: $(OBJ)
 	@mkdir -p $(EXPECTEDDIR)
 	mv $(BUILDDIR)/asm $(EXPECTEDDIR)/asm
 	mv $(BUILDDIR)/src $(EXPECTEDDIR)/src
@@ -280,7 +274,7 @@ $(BUILDDIR)/%_REL.BIN: $(ELF) $(CPPLDSCRIPT)
 
 $(ELF): $(OBJ) $(CPPLDSCRIPT)
 	@mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJ) $(LIB)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@
 
 $(EXE): $(ELF) $(OVERLAY:%=$(BUILDDIR)/%_REL.BIN)
 	@mkdir -p $(dir $@)
