@@ -42,7 +42,7 @@ void tickHealingParticles(int32_t instance) {
         return;
     }
 
-    if (particle->frameId < NUM_HEALING_PARTICLES) {
+    if (particle->frameId < 20) {
         entry1 = &entries1[particle->frameId];
         entry1->counter = 17;
 

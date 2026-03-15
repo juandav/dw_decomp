@@ -94,14 +94,14 @@ SECTIONS
         build/asm/main/data/tamer.rodata.s.o(.rodata);
         build/asm/main/fade.s.o(.rodata);
         build/src/main/aabb.c.o(.rodata);
-        build/asm/main/efe.s.o(.rodata);
-        build/asm/main/data/particle2.rodata.s.o(.rodata);
-        build/asm/main/anim.s.o(.rodata);
-        build/asm/main/ui.s.o(.rodata);
+        build/asm/main/data/efe.rodata.s.o(.rodata);
         build/asm/main/data/psyq/libcd.rodata.s.o(.rodata);
         build/asm/main/data/map_impl.rodata.s.o(.rodata);
         build/asm/main/data/game_menu.rodata.s.o(.rodata);
         build/asm/main/map_collision.s.o(.rodata);
+        build/src/main/particle.c.o(.rodata);
+        build/asm/main/anim.s.o(.rodata);
+        build/asm/main/ui.s.o(.rodata);
         build/asm/main/data/item.rodata.s.o(.rodata);
         build/asm/main/sound.s.o(.rodata);
         build/asm/main/data/psyq/libspu.rodata.s.o(.rodata);
