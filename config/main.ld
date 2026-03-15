@@ -27,7 +27,7 @@ SECTIONS
         build/asm/main/model.s.o(.text);
         build/asm/main/world_object.s.o(.text);
         build/asm/main/file.s.o(.text);
-        build/asm/main/math.s.o(.text);
+        build/src/main/math.c.o(.text);
         build/asm/main/graphics.s.o(.text);
         build/asm/main/entrypoint.s.o(.text);
         build/asm/main/partner_impl.s.o(.text);
@@ -89,7 +89,7 @@ SECTIONS
         build/asm/main/model.s.o(.rodata);
         build/asm/main/world_object.s.o(.rodata);
         build/asm/main/file.s.o(.rodata);
-        build/asm/main/math.s.o(.rodata);
+        build/src/main/math.c.o(.rodata);
         build/asm/main/graphics.s.o(.rodata);
         build/asm/main/data/tamer.rodata.s.o(.rodata);
         build/asm/main/fade.s.o(.rodata);
@@ -151,10 +151,10 @@ SECTIONS
         build/asm/main/data/model.data.s.o(.data);
         build/asm/main/world_object.s.o(.data);
         build/asm/main/data/file.data.s.o(.data);
-        build/asm/main/math.s.o(.data);
-        build/asm/main/data/atan_table.data.s.o(.data);
-        build/asm/main/data/file_table.data.s.o(.data);
-        build/asm/main/data/sine_table.data.s.o(.data);
+        build/src/main/math.c.o(.data);
+        build/src/main/atan_table.c.o(.data);
+        build/src/main/file_table.c.o(.data);
+        build/src/main/sine_table.c.o(.data);
         build/asm/main/data/graphics.data.s.o(.data);
         build/asm/main/entrypoint.s.o(.data);
         build/asm/main/data/partner_impl.data.s.o(.data);
