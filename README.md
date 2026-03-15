@@ -44,7 +44,7 @@ tools/splat.sh
 # Create file local.mk with below content
 MWCCWRAP := /path/to/mwccwrap.exe
 MWCCWRAP_FLAGS := -dll "/path/to/cc_mips.dll"
-MWCCGAP_FLAGS += --use-wibo --wibo-path /path/to/wibo
+MWCCGAP_FLAGS := --use-wibo --wibo-path /path/to/wibo
 
 # Build new binaries
 make -j$(nproc)
