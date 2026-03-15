@@ -59,7 +59,7 @@ SECTIONS
         build/src/main/swap.c.o(.text);
         build/asm/main/utils.s.o(.text);
         build/asm/main/tournament.s.o(.text);
-        build/asm/main/evl.s.o(.text);
+        build/src/main/evl.c.o(.text);
         build/asm/main/btl.s.o(.text);
         build/src/main/kar.c.o(.text);
         build/asm/main/efe_table.s.o(.text);
@@ -119,7 +119,7 @@ SECTIONS
         build/src/main/swap.c.o(.rodata);
         build/asm/main/utils.s.o(.rodata);
         build/asm/main/tournament.s.o(.rodata);
-        build/asm/main/evl.s.o(.rodata);
+        build/src/main/evl.c.o(.rodata);
         build/asm/main/btl.s.o(.rodata);
         build/src/main/kar.c.o(.rodata);
         build/asm/main/efe_table.s.o(.rodata);
@@ -186,7 +186,7 @@ SECTIONS
         build/src/main/swap.c.o(.data);
         build/asm/main/utils.s.o(.data);
         build/asm/main/tournament.s.o(.data);
-        build/asm/main/evl.s.o(.data);
+        build/src/main/evl.c.o(.data);
         build/asm/main/btl.s.o(.data);
         build/src/main/kar.c.o(.data);
         build/asm/main/efe_table.s.o(.data);

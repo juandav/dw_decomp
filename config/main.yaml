@@ -96,7 +96,7 @@ segments:
       - [0x55290, c, swap]
       - [0x552D8, asm, utils]
       - [0x56D10, asm, tournament]
-      - [0x57220, asm, evl]
+      - [0x57220, c, evl]
       - [0x57484, asm, btl]
       - [0x589C8, c, kar]
       - [0x58A00, asm, efe_table]

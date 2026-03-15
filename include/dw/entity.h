@@ -4,6 +4,7 @@
 #include <libgte.h>
 #include <libgs.h>
 
+#include <dw/stats.h>
 #include <dw/types.h>
 
 #define ENTITY_MAX		10
@@ -53,6 +54,27 @@ typedef struct {
     uint8_t flatTimer;
 } Entity;
 
+typedef struct {
+	Entity entity;
+	Stats stats;
+	int16_t unk1;
+	uint8_t unk2_1;
+	uint8_t unk2_2;
+	int16_t vabId;
+	uint8_t chargeMode;
+	uint8_t field7_0x57;
+} DigimonEntity;
+
+typedef struct {
+	DigimonEntity digimonEntity;
+	uint32_t learnedMoves[2];
+	uint32_t unk1;
+	uint32_t unk2;
+	uint8_t name[20];
+	int32_t lives;
+} PartnerEntity;
+
 extern Entity *ENTITY_TABLE[ENTITY_MAX];
+extern PartnerEntity PARTNER_ENTITY;
 
 #endif
