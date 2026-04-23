@@ -93,7 +93,7 @@ typedef struct {
 
 typedef struct {
 	Entity entity;
-	uint8_t tamerLevel;
+	int8_t tamerLevel;
 	uint8_t raisedCount;
 	uint16_t padding;
 } TamerEntity;

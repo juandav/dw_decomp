@@ -44,7 +44,7 @@ SECTIONS
         . = ALIGN(., 4);
         build/asm/main/partner_impl.s.o(.text.*)
         . = ALIGN(., 4);
-        build/asm/main/tamer.s.o(.text.*)
+        build/src/main/tamer.c.o(.text.*)
         . = ALIGN(., 4);
         build/src/main/fade.c.o(.text.*)
         . = ALIGN(., 4);
@@ -154,7 +154,7 @@ SECTIONS
         . = ALIGN(., 4);
         build/asm/main/graphics.s.o(.rodata.*)
         . = ALIGN(., 4);
-        build/asm/main/data/tamer.rodata.s.o(.rodata.*)
+        build/src/main/tamer.c.o(.rodata.*);
         . = ALIGN(., 4);
         build/src/main/fade.c.o(.rodata.*)
         . = ALIGN(., 4);
@@ -274,7 +274,7 @@ SECTIONS
         . = ALIGN(., 4);
         build/asm/main/data/partner_impl.data.s.o(.data.*)
         . = ALIGN(., 4);
-        build/asm/main/data/tamer.data.s.o(.data.*)
+        KEEP(build/asm/main/data/tamer.data.s.o(.data.*))
         . = ALIGN(., 4);
         build/src/main/fade.c.o(.data.*)
         . = ALIGN(., 4);
@@ -370,7 +370,7 @@ SECTIONS
         . = ALIGN(., 4);
         build/asm/main/data/partner_impl.sdata.s.o(.sdata.*)
         . = ALIGN(., 4);
-        build/asm/main/data/tamer.sdata.s.o(.sdata.*)
+        KEEP(build/asm/main/data/tamer.sdata.s.o(.sdata.*))
         . = ALIGN(., 4);
         build/asm/main/data/efe.sdata.s.o(.sdata.*)
         . = ALIGN(., 4);
@@ -454,7 +454,7 @@ SECTIONS
         . = ALIGN(., 4);
         build/src/main/world_object.c.o(.bss.*)
         . = ALIGN(., 4);
-        build/build/generated/unk_0x80137A24.bss.s.o(.bss.*)
+        KEEP(build/build/generated/unk_0x80137A24.bss.s.o(.bss.*))
         . = ALIGN(., 4);
         build/src/main/file_queue.c.o(.bss.*)
         . = ALIGN(., 4);
