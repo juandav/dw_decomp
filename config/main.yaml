@@ -79,7 +79,7 @@ segments:
       - [0x31734, asm, anim]
       - [0x32838, c, ui]
       - [0x33860, asm, item]
-      - [0x35AD8, asm, sound]
+      - [0x35AD8, c, sound]
       - [0x367B4, asm, psyq/libspu]
       - [0x39C1C, asm, psyq/libsnd]
       - [0x43078, asm, map]

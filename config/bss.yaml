@@ -8,6 +8,8 @@ subsegments:
   - [0x80137140, model]
   - [0x80137418, world_object]
   - [0x80137A24, unk_0x80137A24]
+  - [0x801484C4, sound]
+  - [0x8014DBEC, unk_0x8014DBEC]
   - [0x80154700, file_queue]
   - [0x80154F80, unk_0x80154F80]
   - [0x80155430, butterfly]

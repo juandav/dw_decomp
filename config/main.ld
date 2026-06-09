@@ -66,7 +66,7 @@ SECTIONS
         . = ALIGN(., 4);
         build/asm/main/item.s.o(.text.*)
         . = ALIGN(., 4);
-        build/asm/main/sound.s.o(.text.*)
+        build/src/main/sound.c.o(.text.*)
         . = ALIGN(., 4);
         KEEP(build/asm/main/psyq/libspu.s.o(.text.*))
         . = ALIGN(., 4);
@@ -176,7 +176,7 @@ SECTIONS
         . = ALIGN(., 4);
         build/asm/main/data/item.rodata.s.o(.rodata.*)
         . = ALIGN(., 4);
-        build/asm/main/sound.s.o(.rodata.*)
+        build/src/main/sound.c.o(.rodata.*)
         . = ALIGN(., 4);
         KEEP(build/asm/main/data/psyq/libspu.rodata.s.o(.rodata.*))
         . = ALIGN(., 4);
@@ -296,7 +296,7 @@ SECTIONS
         . = ALIGN(., 4);
         build/asm/main/item.s.o(.data.*)
         . = ALIGN(., 4);
-        build/asm/main/sound.s.o(.data.*)
+        build/src/main/sound.c.o(.data.*)
         . = ALIGN(., 4);
         KEEP(build/asm/main/data/psyq/libspu.data.s.o(.data.*))
         . = ALIGN(., 4);
@@ -380,7 +380,7 @@ SECTIONS
         . = ALIGN(., 4);
         build/asm/main/data/item.sdata.s.o(.sdata.*)
         . = ALIGN(., 4);
-        build/asm/main/data/sound.sdata.s.o(.sdata.*)
+        build/src/main/sound.c.o(.sdata.*)
         . = ALIGN(., 4);
         build/asm/main/data/map.sdata.s.o(.sdata.*)
         . = ALIGN(., 4);
@@ -429,6 +429,10 @@ SECTIONS
         . = ALIGN(., 4);
         build/build/generated/unk_0x80134CC0.sbss.s.o(.sbss.*)
         . = ALIGN(., 4);
+        build/src/main/sound.c.o(.sbss.*)
+        . = ALIGN(., 4);
+        build/build/generated/unk_0x80134D9C.sbss.s.o(.sbss.*)
+        . = ALIGN(., 4);
         build/src/main/file_queue.c.o(.sbss.*)
         . = ALIGN(., 4);
         build/build/generated/unk_0x80134E68.sbss.s.o(.sbss.*)
@@ -455,6 +459,10 @@ SECTIONS
         build/src/main/world_object.c.o(.bss.*)
         . = ALIGN(., 4);
         KEEP(build/build/generated/unk_0x80137A24.bss.s.o(.bss.*))
+        . = ALIGN(., 4);
+        build/src/main/sound.c.o(.bss.*)
+        . = ALIGN(., 4);
+        KEEP(build/build/generated/unk_0x8014DBEC.bss.s.o(.bss.*))
         . = ALIGN(., 4);
         build/src/main/file_queue.c.o(.bss.*)
         . = ALIGN(., 4);

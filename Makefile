@@ -61,6 +61,7 @@ MAIN_ASM_SRC := $(shell find $(ASM_DIR)/main -path '*.s' \
 MAIN_SBSS := \
 	$(BUILDDIR)/generated/unk_0x80134C4C.sbss.s \
 	$(BUILDDIR)/generated/unk_0x80134CC0.sbss.s \
+	$(BUILDDIR)/generated/unk_0x80134D9C.sbss.s \
 	$(BUILDDIR)/generated/unk_0x80134E68.sbss.s
 
 MAIN_BSS := \
@@ -69,6 +70,7 @@ MAIN_BSS := \
 	$(BUILDDIR)/generated/libgte.bss.s \
 	$(BUILDDIR)/generated/model.bss.s \
 	$(BUILDDIR)/generated/unk_0x80137A24.bss.s \
+	$(BUILDDIR)/generated/unk_0x8014DBEC.bss.s \
 	$(BUILDDIR)/generated/unk_0x80154F80.bss.s \
 	$(BUILDDIR)/generated/butterfly.bss.s \
 	$(BUILDDIR)/generated/libmrcd.bss.s \
@@ -97,6 +99,7 @@ MAIN_SRC := \
 	src/main/file_table.c \
 	src/main/particle.c \
 	src/main/partner.c \
+	src/main/sound.c \
 	src/main/tamer.c \
 	src/main/tournament.c \
 	src/main/ui.c \
