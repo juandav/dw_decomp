@@ -16,8 +16,6 @@ typedef struct {
 	int8_t pad;
 } SoundBuffer;
 
-#define NUM_SOUND_BUFFERS	10
-
 SoundBuffer SOUND_BUFFERS[NUM_SOUND_BUFFERS] = {
 	{ NULL, 0, 1, 0 },
 	{ NULL, 0, 1, 0 },

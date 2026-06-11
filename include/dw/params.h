@@ -3,7 +3,8 @@
 
 #include <dw/types.h>
 
-#define NUM_DIGIMON 180
+#define NUM_DIGIMON		180
+#define NUM_PARTNER_DIGIMON	66
 
 typedef struct {
 	char name[20];
