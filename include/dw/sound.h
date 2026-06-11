@@ -3,6 +3,8 @@
 
 #include <dw/types.h>
 
+#define NUM_SOUND_BUFFERS	10
+
 typedef struct {
 	uint16_t sectorId;
 	uint16_t sectorCount;

@@ -286,6 +286,8 @@ SECTIONS
         . = ALIGN(., 4);
         build/asm/main/data/overworld.data.s.o(.data.*)
         . = ALIGN(., 4);
+        build/src/main/sound.c.o(.data.*)
+        . = ALIGN(., 4);
         build/asm/main/map_collision.s.o(.data.*)
         . = ALIGN(., 4);
         build/src/main/particle.c.o(.data.*)
@@ -295,8 +297,6 @@ SECTIONS
         build/src/main/ui.c.o(.data.*)
         . = ALIGN(., 4);
         build/asm/main/item.s.o(.data.*)
-        . = ALIGN(., 4);
-        build/src/main/sound.c.o(.data.*)
         . = ALIGN(., 4);
         KEEP(build/asm/main/data/psyq/libspu.data.s.o(.data.*))
         . = ALIGN(., 4);
