@@ -1,6 +1,10 @@
 #ifndef DW_FILE_QUEUE_H
 #define DW_FILE_QUEUE_H
 
+#include <libcd.h>
+
+#include <dw/types.h>
+
 typedef int32_t (*FileRequestCallback)(void *param);
 
 void initializeFileReadQueue(void);

@@ -104,7 +104,7 @@ SECTIONS
         . = ALIGN(., 4);
         build/src/main/efe_table.c.o(.text.*)
         . = ALIGN(., 4);
-        build/asm/main/sound_async.s.o(.text.*)
+        build/src/main/sound_async.c.o(.text.*)
         . = ALIGN(., 4);
         KEEP(build/asm/main/psyq/libpress.s.o(.text.*))
         . = ALIGN(., 4);
@@ -214,7 +214,7 @@ SECTIONS
         . = ALIGN(., 4);
         build/src/main/efe_table.c.o(.rodata.*)
         . = ALIGN(., 4);
-        build/asm/main/sound_async.s.o(.rodata.*)
+        build/src/main/sound_async.c.o(.rodata.*)
         . = ALIGN(., 4);
         KEEP(build/asm/main/data/psyq/libpress.rodata.s.o(.rodata.*))
         . = ALIGN(., 4);
@@ -338,7 +338,7 @@ SECTIONS
         . = ALIGN(., 4);
         build/src/main/efe_table.c.o(.data.*)
         . = ALIGN(., 4);
-        build/asm/main/data/sound_async.data.s.o(.data.*);
+        build/src/main/sound_async.c.o(.data.*);
         . = ALIGN(., 4);
         KEEP(build/asm/main/data/psyq/libpress.data.s.o(.data.*))
         . = ALIGN(., 4);
@@ -400,7 +400,7 @@ SECTIONS
         . = ALIGN(., 4);
         build/src/main/efe_table.c.o(.sdata.*);
         . = ALIGN(., 4);
-        build/asm/main/data/sound_async.sdata.s.o(.sdata.*)
+        build/src/main/sound_async.c.o(.sdata.*)
         . = ALIGN(., 4);
         build/asm/main/data/bubble.sdata.s.o(.sdata.*)
         . = ALIGN(., 4);
@@ -436,6 +436,10 @@ SECTIONS
         build/src/main/file_queue.c.o(.sbss.*)
         . = ALIGN(., 4);
         build/build/generated/unk_0x80134E68.sbss.s.o(.sbss.*)
+        . = ALIGN(., 4);
+        build/src/main/sound_async.c.o(.sbss.*)
+        . = ALIGN(., 4);
+        build/build/generated/unk_0x80134E90.sbss.s.o(.sbss.*)
         . = ALIGN(., 4);
         main_SBSS_END = .;
         main_SBSS_SIZE = ABSOLUTE(main_SBSS_END - main_SBSS_START);

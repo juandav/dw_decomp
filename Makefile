@@ -62,7 +62,8 @@ MAIN_SBSS := \
 	$(BUILDDIR)/generated/unk_0x80134C4C.sbss.s \
 	$(BUILDDIR)/generated/unk_0x80134CC0.sbss.s \
 	$(BUILDDIR)/generated/unk_0x80134D9C.sbss.s \
-	$(BUILDDIR)/generated/unk_0x80134E68.sbss.s
+	$(BUILDDIR)/generated/unk_0x80134E68.sbss.s \
+	$(BUILDDIR)/generated/unk_0x80134E90.sbss.s
 
 MAIN_BSS := \
 	$(BUILDDIR)/generated/unk_0x801353F8.bss.s \
@@ -100,6 +101,7 @@ MAIN_SRC := \
 	src/main/particle.c \
 	src/main/partner.c \
 	src/main/sound.c \
+	src/main/sound_async.c \
 	src/main/tamer.c \
 	src/main/tournament.c \
 	src/main/ui.c \
