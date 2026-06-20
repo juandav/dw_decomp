@@ -4,8 +4,8 @@
 #include <libgte.h>
 
 #include <dw/entity.h>
+#include <dw/map_object.h>
 #include <dw/params.h>
-#include <dw/tmd_object.h>
 #include <dw/trigger.h>
 #include <dw/types.h>
 #include <dw/world_object.h>
@@ -42,7 +42,7 @@ int32_t DOORS_DISABLED;
 int8_t DOOR_MODEL_IDS[4];
 int8_t DOOR_ROTATION_TIMER;
 int8_t ACTIVE_DIRT_CART_MODEL;
-int16_t tmd_object_unused_e42;
+int16_t map_object_unused_e42;
 int16_t BIG_BOX_LID_PROGRESS;
 int16_t SMALL_BOX_LID_PROGRESS;
 int8_t TOY_TOWN_SELECTED_BOX;
@@ -130,7 +130,7 @@ void renderTrainingPoop(int32_t instanceId);
 void emptyChests(void);
 int32_t isBoxOffScreen(VECTOR *position, int32_t width, int32_t height);
 
-static void *tmd_object_text_order[] = {
+static void *map_object_text_order[] = {
 	activateMedalTexture,
 	setDirtCartModel,
 	moveAngemonPedestal,
@@ -173,21 +173,21 @@ static void *tmd_object_text_order[] = {
 	clearChests,
 };
 
-static void *tmd_object_sbss_order[] = {
+static void *map_object_sbss_order[] = {
 	&ANGEMON_PEDESTAL_PROGRESS_Z,
 	&ANGEMON_PEDESTAL_PROGRESS_X,
 	&MAIN_D_80134E4A,
 	&TOY_TOWN_SELECTED_BOX,
 	&SMALL_BOX_LID_PROGRESS,
 	&BIG_BOX_LID_PROGRESS,
-	&tmd_object_unused_e42,
+	&map_object_unused_e42,
 	&ACTIVE_DIRT_CART_MODEL,
 	&DOOR_ROTATION_TIMER,
 	DOOR_MODEL_IDS,
 	&DOORS_DISABLED,
 };
 
-static void *tmd_object_bss_order[] = {
+static void *map_object_bss_order[] = {
 	&MEDAL_COORDINATES,
 	&MEDAL_OBJECT,
 	MEDAL_MESH_BUFFER,
@@ -232,7 +232,7 @@ void loadStaticTMD(char *path, char *buffer, GsDOBJ2 *obj,
 	obj->coord2 = coord;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/tmd_object", loadDoors);
+INCLUDE_ASM("asm/main/nonmatchings/map_object", loadDoors);
 
 void renderDoors(int32_t instanceId)
 {
@@ -520,7 +520,7 @@ void initializeMedalModel(void)
 		      &MEDAL_COORDINATES);
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/tmd_object", spawnToyTownBoxes);
+INCLUDE_ASM("asm/main/nonmatchings/map_object", spawnToyTownBoxes);
 
 void renderToyTownBoxes(int32_t instanceId)
 {
@@ -859,7 +859,7 @@ int32_t tickRotateDoor(int32_t instance, int32_t target)
 	return 0;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/tmd_object", isBoxOffScreen);
+INCLUDE_ASM("asm/main/nonmatchings/map_object", isBoxOffScreen);
 
 void drawObject(GsDOBJ2 *obj, GsOT *ot, int32_t flag)
 {

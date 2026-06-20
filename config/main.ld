@@ -82,7 +82,7 @@ SECTIONS
         . = ALIGN(., 4);
         build/asm/main/entity_text.s.o(.text.*)
         . = ALIGN(., 4);
-        build/src/main/tmd_object.c.o(.text.*)
+        build/src/main/map_object.c.o(.text.*)
         . = ALIGN(., 4);
         build/src/main/evolution.c.o(.text.*)
         . = ALIGN(., 4);
@@ -192,7 +192,7 @@ SECTIONS
         . = ALIGN(., 4);
         build/asm/main/entity_text.s.o(.rodata.*)
         . = ALIGN(., 4);
-        build/src/main/tmd_object.c.o(.rodata.*)
+        build/src/main/map_object.c.o(.rodata.*)
         . = ALIGN(., 4);
         build/src/main/evolution.c.o(.rodata.*)
         . = ALIGN(., 4);
@@ -304,7 +304,7 @@ SECTIONS
         . = ALIGN(., 4);
         build/asm/main/data/map.data.s.o(.data.*)
         . = ALIGN(., 4);
-        build/src/main/tmd_object.c.o(.data.*)
+        build/src/main/map_object.c.o(.data.*)
         . = ALIGN(., 4);
         build/asm/main/data/evolution.data.s.o(.data.*)
         . = ALIGN(., 4);
@@ -390,7 +390,7 @@ SECTIONS
         . = ALIGN(., 4);
         build/asm/main/data/entity_text.sdata.s.o(.sdata.*)
         . = ALIGN(., 4);
-        build/src/main/tmd_object.c.o(.sdata.*)
+        build/src/main/map_object.c.o(.sdata.*)
         . = ALIGN(., 4);
         build/src/main/file_queue.c.o(.sdata.*)
         . = ALIGN(., 4);
@@ -433,7 +433,7 @@ SECTIONS
         . = ALIGN(., 4);
         build/build/generated/unk_0x80134D9C.sbss.s.o(.sbss.*)
         . = ALIGN(., 4);
-        KEEP(build/src/main/tmd_object.c.o(.sbss.*))
+        KEEP(build/src/main/map_object.c.o(.sbss.*))
         . = ALIGN(., 4);
         build/build/generated/unk_0x80134E50.sbss.s.o(.sbss.*)
         . = ALIGN(., 4);
@@ -472,7 +472,7 @@ SECTIONS
         . = ALIGN(., 4);
         KEEP(build/build/generated/unk_0x8014DBEC.bss.s.o(.bss.*))
         . = ALIGN(., 4);
-        build/src/main/tmd_object.c.o(.bss.*)
+        build/src/main/map_object.c.o(.bss.*)
         . = ALIGN(., 4);
         build/src/main/file_queue.c.o(.bss.*)
         . = ALIGN(., 4);

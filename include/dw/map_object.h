@@ -1,5 +1,5 @@
-#ifndef DW_TMD_OBJECT_H
-#define DW_TMD_OBJECT_H
+#ifndef DW_MAP_OBJECT_H
+#define DW_MAP_OBJECT_H
 
 #include <libgpu.h>
 #include <libgs.h>
