@@ -89,22 +89,22 @@ MAIN_SRC := \
 	src/main/butterfly.c \
 	src/main/clock.c \
 	src/main/efe_table.c \
+	src/main/evl.c \
 	src/main/evolution.c \
 	src/main/fade.c \
 	src/main/file.c \
 	src/main/file_queue.c \
+	src/main/file_table.c \
 	src/main/fish.c \
-	src/main/evl.c \
 	src/main/kar.c \
+	src/main/map_object.c \
 	src/main/math.c \
 	src/main/model.c \
-	src/main/file_table.c \
 	src/main/particle.c \
 	src/main/partner.c \
 	src/main/sound.c \
 	src/main/sound_async.c \
 	src/main/tamer.c \
-	src/main/tmd_object.c \
 	src/main/tournament.c \
 	src/main/ui.c \
 	src/main/utils.c \
