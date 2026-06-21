@@ -26,7 +26,7 @@ extern Chest CHEST_ARRAY[NUM_CHESTS];
 extern GsDOBJ2 MEDAL_OBJECT;
 extern GsCOORDINATE2 MEDAL_COORDINATES;
 
-void loadDoors(int32_t doorEntryId);
+void loadDoors(int16_t doorEntryId);
 void loadDirtCartModel(void);
 void loadDirtPileModel(void);
 void initializeChest(void);
