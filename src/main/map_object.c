@@ -2,6 +2,7 @@
 #include <libgpu.h>
 #include <libgs.h>
 #include <libgte.h>
+#include <mwinline_n.h>
 
 #include <dw/entity.h>
 #include <dw/map_object.h>
@@ -859,7 +860,39 @@ int32_t tickRotateDoor(int32_t instance, int32_t target)
 	return 0;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/map_object", isBoxOffScreen);
+int32_t isBoxOffScreen(VECTOR *position, int32_t width, int32_t height)
+{
+	SVECTOR corner;
+	DVECTOR screen;
+	int32_t i;
+	int32_t j;
+	int32_t tableIdx;
+	int32_t w;
+	int32_t base;
+
+	GsSetLsMatrix(&GsWSMATRIX);
+
+	base = width;
+	for (i = 0; i < 2; i++) {
+		for (j = 0, tableIdx = 0, w = base, base = w;
+		     j < 4;
+		     j++, tableIdx += 2) {
+			corner.vx = (position->vx + (w * BOX_CORNER_OFFSETS[tableIdx]));
+			corner.vy = position->vy + (i * -height);
+			corner.vz = (position->vz + (w * (&BOX_CORNER_OFFSETS[1])[tableIdx]));
+
+			gte_ldv0(&corner);
+			gte_rtps();
+			gte_stsxy((long *)&screen);
+
+			if (isOffScreen(&screen, 320, 240) == 0) {
+				return 0;
+			}
+		}
+	}
+
+	return 1;
+}
 
 void drawObject(GsDOBJ2 *obj, GsOT *ot, int32_t flag)
 {
