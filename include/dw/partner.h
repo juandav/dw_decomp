@@ -8,7 +8,7 @@ typedef struct
 	uint8_t map;
 	uint8_t x;
 	uint8_t y;
-	uint8_t size;
+	int8_t size;
 } PoopPile;
 
 void tickPartner(int32_t instanceId);

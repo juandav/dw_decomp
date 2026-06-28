@@ -106,6 +106,7 @@ MAIN_SRC := \
 	src/main/model.c \
 	src/main/particle.c \
 	src/main/partner.c \
+	src/main/partner_impl.c \
 	src/main/sound.c \
 	src/main/sound_async.c \
 	src/main/tamer.c \

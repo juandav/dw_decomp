@@ -69,7 +69,7 @@ segments:
       - [0x136D4, c, math]
       - [0x13924, c, graphics]
       - [0x14238, asm, entrypoint]
-      - [0x1435C, asm, partner_impl]
+      - [0x1435C, c, partner_impl]
       - [0x197F4, c, tamer]
       - [0x1CD64, c, fade]
       - [0x1D140, c, aabb]
