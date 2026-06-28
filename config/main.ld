@@ -42,7 +42,7 @@ SECTIONS
         . = ALIGN(., 4);
         KEEP(build/asm/main/entrypoint.s.o(.text.*))
         . = ALIGN(., 4);
-        build/asm/main/partner_impl.s.o(.text.*)
+        build/src/main/partner_impl.c.o(.text.*)
         . = ALIGN(., 4);
         build/src/main/tamer.c.o(.text.*)
         . = ALIGN(., 4);
@@ -132,7 +132,7 @@ SECTIONS
         main_RODATA_START = .;
         KEEP(build/asm/main/data/entrypoint.rodata.s.o(.rodata.*))
         . = ALIGN(., 4);
-        build/asm/main/partner_impl.s.o(.rodata.*)
+        build/src/main/partner_impl.c.o(.rodata.*)
         . = ALIGN(., 4);
         KEEP(build/asm/main/data/psyq/libc.rodata.s.o(.rodata.*))
         . = ALIGN(., 4);
