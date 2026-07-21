@@ -277,7 +277,26 @@ void downloadSomeImage(void)
 
 INCLUDE_ASM("asm/main/nonmatchings/efe", modifySomeImage);
 
-INCLUDE_ASM("asm/main/nonmatchings/efe", findEFEDATFile);
+void findEFEDATFile(void)
+{
+	char path[64];
+	CdlFILE file;
+	uint8_t mode;
+
+	while (CdReadSync(1, NULL) != 0) {
+	}
+
+	mode = 0x80;
+	path[0] = '\\\\';
+	strcpy(&path[1], MAIN_D_8012342C);
+	strcat(path, MAIN_D_80134220);
+
+	while (CdSearchFile(&file, path) == (CdlFILE *)-1) {
+	}
+
+	CdControl(0xE, &mode, NULL);
+	MAIN_D_8012343C[0] = CdPosToInt(&file.pos);
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/efe", initializeEFE);
 
