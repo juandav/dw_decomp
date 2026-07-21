@@ -9,6 +9,10 @@
 #define CUSTOM_RNG_FACTOR	0x41c650ad
 #define CUSTOM_RNG_VALUE	0x3039
 
+/* Not dw/math.h's ABS: that one tests (x) < 0, which branches the other way. */
+#define ABS(x)			(((x) > 0) ? (x) : -(x))
+#define MAX(a, b)		(((a) < (b)) ? (b) : (a))
+
 extern GsOT *ACTIVE_ORDERING_TABLE;
 
 extern uint32_t CUSTOM_RNG_1;
@@ -145,7 +149,44 @@ INCLUDE_ASM("asm/main/nonmatchings/graphics2", getDistance);
 
 INCLUDE_ASM("asm/main/nonmatchings/graphics2", MAIN_func_800E4470);
 
-INCLUDE_ASM("asm/main/nonmatchings/graphics2", matrixToEuler2);
+void matrixToEuler2(MATRIX *matrix, SVECTOR *output)
+{
+	int32_t sinY;
+	int32_t cosY;
+	int32_t sinZ;
+	int32_t cosZ;
+	int32_t largest;
+	int32_t scale;
+
+	if (matrix->m[2][2] == 0 && matrix->m[0][2] == 0) {
+		output->vx = (matrix->m[1][2] > 0) ? -0x400 : 0x400;
+		output->vy = ratan2(-matrix->m[2][0], matrix->m[0][0]);
+		output->vz = 0;
+		return;
+	}
+
+	output->vy = ratan2(matrix->m[0][2], matrix->m[2][2]);
+	output->vz = ratan2(matrix->m[1][0], matrix->m[1][1]);
+
+	sinY = rsin(output->vy);
+	cosY = rcos(output->vy);
+	sinZ = rsin(output->vz);
+	cosZ = rcos(output->vz);
+
+	largest = MAX(MAX(ABS(cosZ), ABS(sinZ)), MAX(ABS(cosY), ABS(sinY)));
+
+	if (largest == ABS(sinY)) {
+		scale = (matrix->m[0][2] << 12) / sinY;
+	} else if (largest == ABS(cosY)) {
+		scale = (matrix->m[2][2] << 12) / cosY;
+	} else if (largest == ABS(sinZ)) {
+		scale = (matrix->m[1][0] << 12) / sinZ;
+	} else if (largest == ABS(cosZ)) {
+		scale = (matrix->m[1][1] << 12) / cosZ;
+	}
+
+	output->vx = ratan2(-matrix->m[1][2], scale);
+}
 
 void calculatePosition(GsCOORDINATE2 *coord, MATRIX *matrix)
 {
