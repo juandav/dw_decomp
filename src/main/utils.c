@@ -11,6 +11,8 @@
 #include "common.h"
 
 void damageTick(FighterData* fighter, Stats* stats);
+void MAIN_func_800D92EC(void);
+void MAIN_thunk_func_800D92EC(void);
 void sortItemsById(uint8_t *data, int32_t count);
 void setMapLayerEnabled(uint8_t enabled);
 int32_t isInvisible(Entity* entity);
@@ -346,7 +348,10 @@ void renderPauseBox(int32_t instanceId)
   renderString(0, (int16_t) ((*new_var).x + 6), (int16_t) ((*new_var).y + 6), 0x2A, 0xC, 0x78, 0xF0, 0, 1);
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/utils", MAIN_thunk_func_800D92EC);
+void MAIN_thunk_func_800D92EC(void)
+{
+	MAIN_func_800D92EC();
+}
 
 void setMapLayerEnabled(uint8_t enabled)
 {

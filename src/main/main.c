@@ -562,7 +562,24 @@ void renderMainMenuBackground(void)
 	GsSetWorkBase((PACKET *)prim);
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/main", view_init);
+void view_init(void)
+{
+	GsSetProjection(0x400);
+
+	GS_VIEWPOINT.vpx = 0;
+	GS_VIEWPOINT.vpy = -0xB73;
+	GS_VIEWPOINT.vpz = -0xB73;
+	GS_VIEWPOINT.vpy = 0;
+	GS_VIEWPOINT.vpz = -0x7D0;
+	GS_VIEWPOINT.vrx = 0;
+	GS_VIEWPOINT.vry = 0;
+	GS_VIEWPOINT.vrz = 0;
+	GS_VIEWPOINT.rz = 0;
+	GS_VIEWPOINT.super = NULL;
+
+	GsSetRefView2(&GS_VIEWPOINT);
+	GsSetNearClip(0x64);
+}
 
 void initializeEffectData(void)
 {
