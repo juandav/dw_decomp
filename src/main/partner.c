@@ -837,6 +837,8 @@ void setPartnerSlowWalking(void)
 
 INCLUDE_ASM("asm/main/nonmatchings/partner", updateConditionAnimation);
 
+
+
 void setPartnerIdle(void)
 {
 	if (((PARTNER_ANIMATION != 1) &&
