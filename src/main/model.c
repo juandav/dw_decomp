@@ -318,12 +318,12 @@ int32_t getEntityType(Entity* entity)
 	}
 
 	switch (i) {
-	case 10:
-		return -1;
-	case 1:
-		return 3;
 	case 0:
 		return 2;
+	case 1:
+		return 3;
+	case 10:
+		return -1;
 	}
 
 	return 0;
