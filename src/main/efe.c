@@ -92,7 +92,7 @@ static inline int16_t *efe_s16ptr(char *arg0)
 void createFlash();
 void tickEFEFlash();
 void renderEFEFlash(int32_t layer);
-void setEFEFlashOffset(int32_t id, int16_t x, int16_t y);
+int32_t setEFEFlashOffset(int32_t id, int16_t x, int16_t y);
 void downloadSomeImage();
 void modifySomeImage(int32_t dim, int16_t stp);
 void findEFEDATFile(void);
@@ -251,10 +251,13 @@ void tickEFEFlash(int32_t id)
 
 INCLUDE_ASM("asm/main/nonmatchings/efe", renderEFEFlash);
 
-void setEFEFlashOffset(int32_t id, int16_t x, int16_t y)
+int32_t setEFEFlashOffset(int32_t id, int16_t x, int16_t y)
 {
 	int16_t *e;
 
+	/* The self-assignment is load-bearing: without it the compiler keeps id
+	   in a different register and the schedule shifts. */
+	id = id;
 	e = (int16_t *)(EFE_FLASH_DATA + (id * 0x28));
 	e[18] = x;
 	e[19] = y;
