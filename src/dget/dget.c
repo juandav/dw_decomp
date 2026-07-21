@@ -534,7 +534,61 @@ void tickTournamentSchedule(void)
 	}
 }
 
-INCLUDE_ASM("asm/dget/nonmatchings/dget", renderTournamentSchedule);
+void renderTournamentSchedule(void)
+{
+	int16_t originX;
+	int16_t originY;
+	int16_t lineX;
+	int16_t colX;
+	int16_t posX;
+	int16_t posY;
+	int16_t rowY;
+	int32_t uvX;
+	int32_t uvY;
+	int32_t i;
+	int32_t j;
+
+	originX = UI_BOX_DATA[2].finalPos.x + 4;
+	originY = UI_BOX_DATA[2].finalPos.y + 3;
+
+	lineX = 0x34;
+	for (i = 0; i < 5; i++) {
+		renderVerticalLine(2, lineX, 2, 0x13);
+		renderVerticalLine(2, lineX, 0x16, 0x64);
+		lineX += 0x33;
+	}
+
+	renderHorizontalLine(2, 3, 0x14, 0xFE);
+
+	renderSelectionCursor(originX + TOURNAMENT_SELECTED_COLUMN * 0x33 + 3,
+			      originY + TOURNAMENT_SELECTED_ROW * 0x10 + 0x16,
+			      0x2A, 0xD, 4);
+
+	posX = originX + 0xC;
+	posY = originY + 2;
+	renderString(0, posX, posY, 0x10, 0xC, 0, 0x6C, 4, 1);
+	renderString(0, posX + 0x33, posY, 0x10, 0xC, 0x10, 0x6C, 4, 1);
+	renderString(0, posX + 0x66, posY, 0x10, 0xC, 0x20, 0x6C, 4, 1);
+	renderString(0, posX + 0x99, posY, 0x10, 0xC, 0x30, 0x6C, 4, 1);
+	renderString(0, posX + 0xCC, posY, 0x10, 0xC, 0x40, 0x6C, 4, 1);
+
+	uvY = 0x78;
+	rowY = originY + 0x18;
+	colX = originX + 0x14;
+	for (i = 0; i < 6; i++) {
+		posX = colX;
+		uvX = 0;
+
+		for (j = 0; j < 5; j++) {
+			renderString(0, posX, rowY, 0xC, 0xC, uvX, uvY, 4, 1);
+			posX += 0x33;
+			uvX = (int16_t)(uvX + 0xC);
+		}
+
+		rowY += 0x10;
+		uvY = (int16_t)(uvY + 0xC);
+	}
+}
 
 void tickTournamentInfo(void)
 {
