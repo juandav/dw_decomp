@@ -22,18 +22,31 @@ Every `wip/` branch carries its analysis in the commit message. They are all
 one or two instructions short, which is register allocation and scheduling
 rather than structure.
 
+## Remotes
+
+```
+origin  git@github.com:jype0/dw_decomp.git      upstream, for git fetch
+fork    git@github.com:juandav/dw_decomp.git    ours
+```
+
+This is the reverse of the usual convention, where `origin` is your fork and
+`upstream` is the original. It is that way round because `origin` was already
+configured; `git remote rename origin upstream && git remote rename fork origin`
+swaps it if you prefer.
+
+`decomp-work` tracks `fork/decomp-work`, so a bare `git push` goes to the fork.
+Everything except `pr16` is pushed - that one is a local copy of someone else's
+PR branch and is already merged upstream.
+
 ## Moving to another machine
 
-Nothing here is on a remote. Push somewhere private first, or copy `.git` by
-hand - the history is the only irreplaceable part.
+The history is on the fork, so this is a clone rather than a copy. Two things
+still have to travel by hand, and neither is in the repository:
 
-What has to travel:
-
-| path | size | why |
-|---|---:|---|
-| `.git` | 8 MB | the work |
-| the disc images | 620 MB | cannot be downloaded |
-| `cc_mips_40.dll` | 744 KB | proprietary, not in `dl_deps.sh` |
+| what | size |
+|---|---:|
+| the disc images | 620 MB |
+| `cc_mips_40.dll` | 744 KB |
 
 Everything else rebuilds: `disks/` from `dumpsxiso`, `bin/` from
 `tools/dl_deps.sh`, `external/` from the submodules, `asm/` and `build/` from
@@ -50,7 +63,13 @@ dedicated install at all.
 ### Setup
 
 ```
-git clone <remote> dw_decomp && cd dw_decomp
+git clone git@github.com:juandav/dw_decomp.git && cd dw_decomp
+
+# Cloning names the fork "origin". Reproduce the layout above so the remote
+# names mean the same thing on every machine.
+git remote rename origin fork
+git remote add origin git@github.com:jype0/dw_decomp.git
+
 git checkout decomp-work
 
 tools/setup.sh              # packages, submodules, venv, downloads
