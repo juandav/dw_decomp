@@ -86,6 +86,7 @@ MAIN_SRC := \
 	$(MAIN_BSS) \
 	$(MAIN_SBSS) \
 	src/main/aabb.c \
+	src/main/anim.c \
 	src/main/bubble.c \
 	src/main/butterfly.c \
 	src/main/clock.c \
@@ -99,8 +100,16 @@ MAIN_SRC := \
 	src/main/fish.c \
 	src/main/graphics.c \
 	src/main/graphics2.c \
+	src/main/item.c \
 	src/main/kar.c \
 	src/main/main.c \
+	src/main/main_menu.c \
+	src/main/inventory.c \
+	src/main/entity_text.c \
+	src/main/efe.c \
+	src/main/btl.c \
+	src/main/battle_ui.c \
+	src/main/map_collision.c \
 	src/main/map_object.c \
 	src/main/math.c \
 	src/main/model.c \
