@@ -1,6 +1,9 @@
 #!/bin/sh
-# Bootstrap the build environment. Safe to re-run; each step is skipped if
-# already done. Pass --force to redo the dependency download.
+# Bootstrap everything a fresh clone needs. Safe to re-run; each step is
+# skipped if already done.
+#
+#   --force        redo the dependency download
+#   --no-graphify  skip the knowledge graph tooling
 
 set -e
 
@@ -8,7 +11,14 @@ TOP="$(dirname "$(dirname "$(readlink -f -- "$0")")")"
 cd "$TOP"
 
 FORCE=0
-[ "$1" = "--force" ] && FORCE=1
+GRAPHIFY=1
+for arg in "$@"; do
+	case "$arg" in
+		--force) FORCE=1 ;;
+		--no-graphify) GRAPHIFY=0 ;;
+		*) echo "unknown option: $arg" >&2; exit 1 ;;
+	esac
+done
 
 APT_PKGS='binutils-mipsel-linux-gnu gcc-mipsel-linux-gnu git make python3 python3-venv unzip wget'
 
@@ -64,34 +74,70 @@ else
 	echo 'Already downloaded (--force to redo).'
 fi
 
-step 'Manual steps'
-STATUS=0
-
-if [ "$HOST_OK" = 0 ]; then
-	echo "glibc $GLIBC is too old for the prebuilt tools — use the container"
-	echo '  (see Host compatibility above).'
-	STATUS=1
+step 'Knowledge graph tooling'
+if [ "$GRAPHIFY" = 0 ]; then
+	echo 'Skipped (--no-graphify).'
+elif .venv/bin/python -c 'import graphify' 2>/dev/null; then
+	echo 'Already installed.'
+else
+	# In the venv rather than user-wide, so tools/graphify_asm.py and the
+	# graphify CLI agree on an interpreter.
+	.venv/bin/pip install -q graphifyy
+	echo 'Installed. Rebuild the graph with:'
+	echo '  .venv/bin/graphify update .'
+	echo '  tools/graphify_asm.py --merge'
+	echo '  .venv/bin/graphify cluster-only .'
 fi
+
+# The prebuilt tools need a newer glibc than this host has, so everything gets
+# built inside the container instead. Have it ready.
+if [ "$HOST_OK" = 0 ]; then
+	step 'Container image'
+	if ! command -v docker >/dev/null 2>&1; then
+		echo 'docker not installed - it is the only way to build on this host.'
+	elif ! docker info >/dev/null 2>&1; then
+		echo 'docker is installed but the daemon is not reachable.'
+	elif [ -n "$(docker images -q dw-build:latest 2>/dev/null)" ]; then
+		echo 'dw-build:latest already built.'
+	else
+		tools/docker_build.sh
+	fi
+fi
+
+# Prefix for anything that has to touch the prebuilt tools.
+if [ "$HOST_OK" = 0 ]; then
+	RUN='tools/docker_run.sh '
+else
+	RUN=''
+fi
+
+step 'What is left'
+STATUS=0
 
 if [ ! -f bin/cc_mips/cc_mips_40.dll ]; then
 	echo 'MISSING bin/cc_mips/cc_mips_40.dll'
 	echo '  Obtain CodeWarrior for PlayStation Release 4 and copy its'
-	echo '  cc_mips.dll to that path.'
+	echo '  cc_mips.dll to that path. It is proprietary, so nothing here'
+	echo '  can fetch it for you.'
 	STATUS=1
 fi
 
 if [ ! -f disks/us/SLUS_010.32 ]; then
 	echo 'MISSING disks/us/'
-	echo '  Dump an original Digimon World (USA) ISO:'
-	echo '  bin/mkpsxiso-2.20-Linux/bin/dumpsxiso -x disks/us \'
+	echo '  Dump an original Digimon World (USA) disc, then extract it:'
+	echo "  ${RUN}bin/mkpsxiso-2.20-Linux/bin/dumpsxiso -x disks/us \\"
 	echo '      -s disks/us/us.xml "/path/to/Digimon World (USA).bin"'
 	STATUS=1
 fi
 
 if [ "$STATUS" = 0 ]; then
-	echo 'None outstanding. Next:'
-	echo '  make -j$(nproc) regenerate  # disassemble originals'
-	echo '  make -j$(nproc) && make compare'
+	echo 'Nothing. Build with:'
+	echo "  ${RUN}make -j\$(nproc) regenerate   # disassemble the originals"
+	echo "  ${RUN}make -j\$(nproc)"
+	echo "  ${RUN}make compare                  # must say binaries match"
+else
+	echo ''
+	echo 'Everything else is ready. Re-run this script once those are in place.'
 fi
 
 exit "$STATUS"

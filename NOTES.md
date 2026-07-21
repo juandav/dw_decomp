@@ -85,8 +85,15 @@ make -j$(nproc) regenerate
 make -j$(nproc) && make compare
 ```
 
-`tools/setup.sh` reports whatever is still missing and says so if the host
-glibc is too old.
+`tools/setup.sh` does the lot: system packages, submodules, the virtualenv,
+the tool downloads, graphify, and the container image when the host glibc is
+too old for the prebuilt binaries. It is idempotent, so re-run it after
+dropping the DLL and the disc dump in place and it will tell you the build
+commands - prefixed with `tools/docker_run.sh` if this host needs the
+container. `--no-graphify` skips the graph tooling.
+
+The only things it cannot do are the two proprietary ones: the compiler DLL
+and the disc dump.
 
 ## Working faster
 
