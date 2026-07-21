@@ -43,13 +43,13 @@ SECTIONS
 			build/asm/dget/data/header.rodata.s.o(.rodata.*);
 			. = ALIGN(., 4);
 
-			build/src/dget/dget.c.o(.text.*);
+			build/src/dget/dget.c.o(.text.* .text);
 			. = ALIGN(., 4);
 
-			build/src/dget/dget.c.o(.rodata.*);
+			build/src/dget/dget.c.o(.rodata.* .rodata);
 			. = ALIGN(., 4);
 
-			build/src/dget/dget.c.o(.data.*);
+			build/src/dget/dget.c.o(.data.* .data);
 			. = ALIGN(., 8);
 		}
 	}

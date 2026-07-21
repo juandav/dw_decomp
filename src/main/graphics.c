@@ -38,10 +38,22 @@ PACKET *GsTMDdivTNG4();
 
 void setRotTransMatrix(MATRIX *m);
 void initializeGsTMDMap(void);
+extern int32_t MAIN_D_80137BE8;
+typedef struct {
+	int32_t f0;
+	int32_t f1;
+	int32_t f2;
+	int32_t f3;
+	int32_t f4;
+	int32_t f5;
+	int32_t f6;
+} AttackObjectData;
+extern AttackObjectData MAIN_D_80122584;
+extern AttackObjectData MAIN_D_80137A24[];
 void initializeAttackObjects(void);
-void addAttackObject(int32_t a);
+int32_t addAttackObject(int32_t a, int32_t b, int16_t *rect, int32_t d, int32_t e, int32_t f);
 void popAttackObject(int32_t a);
-void updateTMDTextureData(int32_t a, int32_t b);
+void updateTMDTextureData(char *tmd, int32_t clutX, int32_t x, int32_t y, int32_t tpage);
 void renderDropShadow(int32_t a, int32_t b, int32_t c);
 
 void setRotTransMatrix(MATRIX *m)
@@ -81,7 +93,20 @@ void initializeGsTMDMap(void)
 	GS_TMD_MAP.nf4[GsDivMODE_NDIV]			= GsTMDfastNF4;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/graphics", initializeAttackObjects);
+
+
+void initializeAttackObjects(void)
+{
+  int32_t i;
+  AttackObjectData tmp;
+  i = 0;
+  tmp = MAIN_D_80122584;
+  for (; i < 0x10; i++)
+  {
+    MAIN_D_80137A24[i] = MAIN_D_80122584;
+  }
+
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/graphics", addAttackObject);
 

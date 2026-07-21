@@ -16,6 +16,8 @@ void loadVLALL();
 
 extern void *MAIN_D_801344F4;
 extern int8_t EVL_LOADING_COMPLETE;
+#include <dw/main.h>
+#include <dw/utils.h>
 
 void* evl_functions[] = {
 	evoSequenceAlwaysTrue,

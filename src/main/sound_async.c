@@ -119,9 +119,82 @@ void loadVHBFile(int32_t vabId, char *path, uint8_t *buffer, int32_t offset,
 				  loadSoundFinishCallback, (void *)vabId);
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/sound_async", loadSoundCompleteCallback);
+int32_t loadSoundCompleteCallback(void *param)
+{
+	SoundBuffer *sb;
+	uint8_t *buffer;
+	uint32_t *words;
+	short vabid;
+	int32_t vabId;
 
-INCLUDE_ASM("asm/main/nonmatchings/sound_async", uploadSoundBuffer);
+	vabId = (int32_t)param;
+	sb = &SOUND_BUFFERS[vabId];
+	buffer = sb->buffer;
+
+	switch (LOAD_SOUND_COMPLETE_STATE) {
+	case 0:
+		sb->vabId = 0;
+		words = (uint32_t *)buffer;
+		memcpy(VHB_HEADER_ADDR[vabId], &buffer[(words[0] >> 2) << 2],
+		       words[1] - words[0]);
+
+		SsVabClose(vabId);
+		if ((sb->vabId = SsVabOpenHeadSticky(VHB_HEADER_ADDR[vabId],
+						     vabId,
+						     VHB_SOUNDBUFFER_START[vabId])) < 0) {
+			sb->vabId = -1;
+			return 0;
+		}
+
+		vabid = sb->vabId;
+		if (SsVabTransBody(&buffer[words[1]], vabid) != vabid) {
+			sb->vabId = -1;
+			return 0;
+		}
+
+		LOAD_SOUND_COMPLETE_STATE = 4;
+		return 1;
+	case 4:
+		if (SsVabTransCompleted(0)) {
+			LOAD_SOUND_COMPLETE_STATE = 5;
+		}
+		return 1;
+	case 5:
+		SsUtGetVBaddrInSB(sb->vabId);
+		return 0;
+	}
+}
+
+void uploadSoundBuffer(int32_t vabId)
+{
+	SoundBuffer *sb;
+	uint8_t *buffer;
+	uint32_t *words;
+	short vabid;
+
+	sb = &SOUND_BUFFERS[vabId];
+	buffer = sb->buffer;
+	sb->vabId = 0;
+	words = (uint32_t *)buffer;
+	memcpy(VHB_HEADER_ADDR[vabId], &buffer[(words[0] >> 2) << 2],
+	       words[1] - words[0]);
+
+	SsVabClose(vabId);
+	if ((sb->vabId = SsVabOpenHeadSticky(VHB_HEADER_ADDR[vabId], vabId,
+					     VHB_SOUNDBUFFER_START[vabId])) < 0) {
+		sb->vabId = -1;
+		return;
+	}
+
+	vabid = sb->vabId;
+	if (SsVabTransBody(&buffer[words[1]], vabid) != vabid) {
+		sb->vabId = -1;
+		return;
+	}
+
+	SsVabTransCompleted(1);
+	SsUtGetVBaddrInSB(sb->vabId);
+}
 
 int32_t isSoundBufferLoading(int32_t vabId)
 {
