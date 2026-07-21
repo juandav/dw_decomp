@@ -7,7 +7,7 @@ extern int8_t MAP_COLLISION_DATA[];
 void getModelTile(VECTOR *pos, int16_t *outTileX, int16_t *outTileY);
 void loadMapCollisionData(int8_t *src);
 int32_t getTileTrigger(VECTOR *pos);
-void setRectImpassible(int32_t x, int32_t y, int32_t w, int32_t h);
+void setRectImpassible(int32_t x, uint8_t y, int32_t w, int32_t h);
 void setRectangleImpassable(int32_t x, int32_t y, int32_t r);
 
 void loadMapCollisionData(int8_t *src)
@@ -69,19 +69,19 @@ void setRectangleImpassable(int32_t x, int32_t y, int32_t r)
 
 	for (row = y - r; row < y + r; row++) {
 		for (col = x - r; col < x + r; col++) {
-			MAP_COLLISION_DATA[row * 0x64 + col] = 0x80;
+			((uint8_t *)MAP_COLLISION_DATA)[row * 0x64 + col] = 0x80;
 		}
 	}
 }
 
-void setRectImpassible(int32_t x, int32_t y, int32_t w, int32_t h)
+void setRectImpassible(int32_t x, uint8_t y, int32_t w, int32_t h)
 {
 	int32_t row;
 	int32_t col;
 
 	for (row = y; row < y + h; row++) {
 		for (col = x; col < x + w; col++) {
-			MAP_COLLISION_DATA[row * 0x64 + col] = 0x80;
+			((uint8_t *)MAP_COLLISION_DATA)[row * 0x64 + col] = 0x80;
 		}
 	}
 }
