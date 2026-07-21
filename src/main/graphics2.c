@@ -14,6 +14,8 @@ extern GsOT *ACTIVE_ORDERING_TABLE;
 extern uint32_t CUSTOM_RNG_1;
 extern uint32_t CUSTOM_RNG_2;
 
+void calculatePosition(GsCOORDINATE2 *coord, MATRIX *matrix);
+
 const uint8_t MAIN_D_80114D68[256] = {
 	0x00, 0x01, 0x01, 0x01, 0x02, 0x02, 0x02, 0x02,
 	0x02, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03,
@@ -111,7 +113,22 @@ void renderLinePrimitive(uint32_t color, int16_t x0, int16_t y0, int16_t x1,
 	setLineBlendingMode(mode, order);
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/graphics2", MAIN_func_800E3FB8);
+extern int32_t MAIN_D_80136F98[];
+void MAIN_func_800E3FB8(int16_t *pos, VECTOR *out);
+
+void MAIN_func_800E3FB8(int16_t *pos, VECTOR *out)
+{
+  MATRIX m;
+  int32_t *new_var;
+  int32_t new_var2;
+  SVECTOR v;
+  int32_t *cam;
+  cam = MAIN_D_80136F98;
+  new_var2 = (new_var = cam)[0];
+ do { v.vx = pos[0] - new_var2; v.vy = pos[1] - new_var[1]; v.vz = pos[2] - new_var[2]; } while (0);
+  TransposeMatrix(&GsWSMATRIX, &m);
+  ApplyMatrix(&m, &v, out);
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/graphics2", MAIN_func_800E4038);
 
@@ -130,7 +147,26 @@ INCLUDE_ASM("asm/main/nonmatchings/graphics2", MAIN_func_800E4470);
 
 INCLUDE_ASM("asm/main/nonmatchings/graphics2", matrixToEuler2);
 
-INCLUDE_ASM("asm/main/nonmatchings/graphics2", calculatePosition);
+void calculatePosition(GsCOORDINATE2 *coord, MATRIX *matrix)
+{
+	GsCOORDINATE2 *stack[100];
+	GsCOORDINATE2 **ptr;
+
+	ptr = stack;
+	*ptr++ = coord;
+	while (coord->super != NULL) {
+		coord = coord->super;
+		*ptr++ = coord;
+	}
+
+	ptr--;
+	*matrix = (*ptr)->coord;
+
+	while (stack < ptr) {
+		ptr--;
+		GsMulCoord3(matrix, &(*ptr)->coord);
+	}
+}
 
 void multiplyRotations(SVECTOR *rotation1, SVECTOR *rotation2)
 {

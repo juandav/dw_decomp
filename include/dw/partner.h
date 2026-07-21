@@ -27,7 +27,7 @@ void tickPartnerDying2(void);
 void tickPartnerWalking(void);;
 int32_t getPartnerTamerCloseness(void);
 void setPartnerSlowWalking(void);
-void updateConditionAnimation(void);;
+void updateConditionAnimation(void);
 void setPartnerIdle(void);
 void setPartnerState(int8_t state);
 int32_t checkEatDistance(int32_t distance);

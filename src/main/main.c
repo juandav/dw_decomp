@@ -1,5 +1,7 @@
 #include <stdlib.h>
 
+#include <libcd.h>
+#include <libetc.h>
 #include <libgpu.h>
 #include <libgs.h>
 
@@ -101,6 +103,21 @@ void GsSetNearClip(long clip);
 
 uint16_t MAIN_func_800F19B0(int32_t param_1, int32_t param_2);
 
+extern GsOT *ACTIVE_ORDERING_TABLE;
+extern int16_t MAIN_D_80134F10;
+extern GsF_LIGHT LIGHT_DATA[3];
+
+void renderMainMenuBackground(void);
+void loadNewgameScene(void);
+void tickNewGameJijimon(int32_t instanceId);
+void setEntityPosition(int32_t entityId, int32_t x, int32_t y, int32_t z);
+void setEntityRotation(int32_t entityId, int16_t x, int16_t y, int16_t z);
+void setupEntityMatrix(int32_t entityId);
+void writePStat(int32_t stat, int32_t value);
+void initializeDigimonObject(int32_t type, int32_t instanceId,
+			     TickFunction tick);
+void *thunkLoadMMD(int32_t digiType, int32_t modelType);
+
 void initializeHeap(void);
 void initializeFramebuffer(void);
 void view_init(void);
@@ -150,7 +167,227 @@ void BTL_buffStats(Entity *entity, int32_t entityId, int32_t amount,
 		   int16_t* valuePtr, uint8_t color, uint8_t icon);
 void BTL_addBuffDiskEffect(Entity *entity);
 
-INCLUDE_ASM("asm/main/nonmatchings/main", main);
+void SsInit(void);
+void PadInit(int32_t mode);
+long MemCardInit(long val);
+long MemCardStart(void);
+void initializeModelComponents(void);
+void initializeGsTMDMap(void);
+void initializeAttackObjects(void);
+void initializeFontCLUT(void);
+void initializeScripts(void);
+void initializeStatusObjects(void);
+void initializeMusic(void);
+void finalizeMusic(void);
+void playMovie(int32_t movieId, dw_bool shouldPlay);
+void loadStackedTIMFile(char *path);
+void runLandingScreen(void);
+void runMainMenu(void);
+void newGameScene(void);
+void MAIN_func_800EF38C(void);
+void recalculatePPandArena(void);
+void gameLoop(void);
+void cleanupGame(void);
+void initializeTamer(int32_t id, int32_t x, int32_t y, int32_t z,
+		     int32_t rx, int32_t ry, int32_t rz);
+void initializePartner(int32_t type, int32_t posX, int32_t posY,
+		       int32_t posZ, int32_t rotX, int32_t rotY,
+		       int32_t rotZ);
+void setDigimonRaised(uint16_t type);
+void MAIN_func_800D56E0(void);
+void runMapHeadScript(int32_t scriptId);
+int32_t readPStat(int32_t id);
+int32_t getTamerState(void);
+void setTamerState(int32_t state);
+void stopGameTime(void);
+void fadeFromBlack(int32_t frames);
+void initializeUIBoxData(void);
+void initializeClockData(void);
+void initializeMedalModel(void);
+void initializeChest(void);
+void addClock(void);
+void initializeFileReadQueue(void);
+void fillEFEXTable(void);
+void initializeFadeData(void);
+int32_t loadTIMFile(char *path, void *buffer);
+
+extern int8_t MAIN_STATE;
+extern int32_t MAIN_D_80134EB0;
+extern char MAIN_D_8012CE64[];
+extern char MAIN_D_8012CE78[];
+extern char MAIN_D_8012CE8C[];
+extern int32_t MAIN_D_80155670[];
+extern uint8_t MAIN_D_80155725[];
+
+int32_t main(void);
+void applyHUDOffset(int32_t offset);
+extern int32_t POLLED_INPUT;
+extern int32_t POLLED_INPUT_PREVIOUS;
+extern int32_t CHANGED_INPUT;
+extern int32_t MAIN_D_80134EA4;
+extern int32_t MAIN_D_80134EA8;
+void pollInputGame(void);
+void pollInputMenu(void);
+void renderPressStartToContinue(void);
+void tickTamerBattle(int32_t instanceId);
+void MAIN_func_800F0B2C(void);
+void MAIN_func_800F1020(void);
+void MAIN_func_800F179C(void *model, int32_t compIdx, int32_t color);
+uint16_t asciiToShiftJIS(uint8_t input);
+
+/* Order anchor (reversed): pins symtab/section order to address order.
+ * Unreferenced; discarded by --gc-sections. */
+void *main_order_anchor[] = {
+	swapShortBytes,
+	asciiToShiftJIS,
+	convertAsciiToJis,
+	isAsciiEncoded,
+	removeBuffModelObject,
+	initializeBuffModelObject,
+	initializeBuffModel,
+	MAIN_func_800F179C,
+	MAIN_func_800F1794,
+	tickBuffModelObject,
+	unloadNewGameScene,
+	loadNewgameScene,
+	tickNewGameJijimon,
+	tickNPCBattle,
+	tickPartnerBattle,
+	tickTamerBattle,
+	MAIN_func_800F1020,
+	MAIN_func_800F0B2C,
+	handleBuffDisks,
+	renderThrownItem,
+	tickThrownItem,
+	startThrowingItem,
+	addThrownItem,
+	initializeInventoryModules,
+	initializeEffectData,
+	view_init,
+	renderMainMenuBackground,
+	renderPressStartToContinue,
+	pollInputMenu,
+	pollInputGame,
+	applyHUDOffset,
+	gameLoop,
+	recalculatePPandArena,
+	MAIN_func_800EF38C,
+	newGameScene,
+	runMainMenu,
+	runLandingScreen,
+	initializeFramebuffer,
+	initializeHeap,
+	main,
+};
+
+int32_t main(void)
+{
+	int32_t partnerId;
+
+	initializeHeap();
+	SsInit();
+	ResetCallback();
+	ResetGraph(0);
+	SetGraphDebug(0);
+	initializeFramebuffer();
+	PadInit(0);
+	CdInit();
+	MemCardInit(1);
+	MemCardStart();
+	initializeModelComponents();
+	initializeWorldObjects();
+	initializeGsTMDMap();
+	initializeFileReadQueue();
+	initializeAttackObjects();
+	initializeFontCLUT();
+	fillEFEXTable();
+	initializeFadeData();
+	initializeScripts();
+	view_init();
+	initializeUIBoxData();
+	initializeEffectData();
+	initializeInventoryModules();
+	initializeMedalModel();
+	initializeClockData();
+	initializeStatusObjects();
+	loadTIMFile(MAIN_D_8012CE64, GENERAL_BUFFER_PTR);
+
+	for (;;) {
+		loadTIMFile(MAIN_D_8012CE78, GENERAL_BUFFER_PTR);
+		MAIN_D_80134EB0 = 0;
+		while (MAIN_D_80134EB0 == 0) {
+			playMovie(0, 1);
+			initializeMusic();
+			runLandingScreen();
+			finalizeMusic();
+		}
+
+		loadStackedTIMFile(MAIN_D_8012CE8C);
+		initializeMusic();
+		runMainMenu();
+
+		switch (MAIN_STATE) {
+		case 0:
+			newGameScene();
+			finalizeMusic();
+			playMovie(1, 1);
+			initializeMusic();
+			loadStackedTIMFile(MAIN_D_8012CE8C);
+			initializeTamer(0, 0, 0, 0, 0, 0, 0);
+			if (readPStat(0xFE) == 0) {
+				partnerId = 0x3;
+			} else {
+				partnerId = 0x11;
+			}
+			initializePartner(partnerId, 0, 0, 0, 0, 0, 0);
+			setDigimonRaised(partnerId);
+			MAIN_func_800D56E0();
+			initializeChest();
+			runMapHeadScript(0xCC);
+			addClock();
+			stopGameTime();
+			break;
+		case 1:
+			loadStackedTIMFile(MAIN_D_8012CE8C);
+			initializeTamer(0, 0, 0, 0, 0, 0, 0);
+			initializePartner(MAIN_D_80155670[0], 0, 0, 0, 0, 0, 0);
+			MAIN_func_800D56E0();
+			initializeChest();
+			runMapHeadScript(MAIN_D_80155725[0]);
+			MAIN_func_800EF38C();
+			addClock();
+			if (getTamerState() != 0) {
+				setTamerState(0);
+			}
+			break;
+		case 2:
+			finalizeMusic();
+			playMovie(2, 1);
+			initializeMusic();
+			loadStackedTIMFile(MAIN_D_8012CE8C);
+			initializeTamer(0, 0, 0, 0, 0, 0, 0);
+			initializePartner(MAIN_D_80155670[0], 0, 0, 0, 0, 0, 0);
+			MAIN_func_800D56E0();
+			initializeChest();
+			runMapHeadScript(MAIN_D_80155725[0]);
+			MAIN_func_800EF38C();
+			addClock();
+			if (getTamerState() != 0) {
+				setTamerState(0);
+			}
+			break;
+		}
+
+		fadeFromBlack(0x28);
+		recalculatePPandArena();
+		while (MAIN_STATE != 3) {
+			gameLoop();
+		}
+		cleanupGame();
+		finalizeMusic();
+		playMovie(3, 1);
+	}
+}
 
 void initializeHeap(void)
 {
@@ -215,15 +452,115 @@ INCLUDE_ASM("asm/main/nonmatchings/main", recalculatePPandArena);
 
 INCLUDE_ASM("asm/main/nonmatchings/main", gameLoop);
 
-INCLUDE_ASM("asm/main/nonmatchings/main", applyHUDOffset);
+void applyHUDOffset(int32_t offset)
+{
+	AddPrim((char *)GS_ORDERING_TABLE[offset].org + 0x80,
+		&DRAW_OFFSETS[offset]);
+}
 
-INCLUDE_ASM("asm/main/nonmatchings/main", pollInputGame);
+void pollInputGame(void)
+{
+	int32_t held;
 
-INCLUDE_ASM("asm/main/nonmatchings/main", pollInputMenu);
+	POLLED_INPUT_PREVIOUS = POLLED_INPUT;
+	POLLED_INPUT = PadRead(0);
+	CHANGED_INPUT = POLLED_INPUT & ~POLLED_INPUT_PREVIOUS;
+	held = POLLED_INPUT & POLLED_INPUT_PREVIOUS & 0xF000F000;
+	if (held != 0) {
+		int32_t count;
+
+		count = MAIN_D_80134EA4 + 1;
+		MAIN_D_80134EA4 = count;
+		if (count >= 5) {
+			MAIN_D_80134EA4 -= 2;
+		} else {
+			held = 0;
+		}
+	} else {
+		MAIN_D_80134EA4 = 0;
+	}
+	CHANGED_INPUT |= held;
+}
+
+void pollInputMenu(void)
+{
+	int32_t held;
+
+	POLLED_INPUT_PREVIOUS = POLLED_INPUT;
+	POLLED_INPUT = PadRead(0);
+	CHANGED_INPUT = POLLED_INPUT & ~POLLED_INPUT_PREVIOUS;
+	held = POLLED_INPUT & POLLED_INPUT_PREVIOUS & 0xF000F000;
+	if (held != 0) {
+		int32_t count;
+
+		count = MAIN_D_80134EA8 + 1;
+		MAIN_D_80134EA8 = count;
+		if (count >= 0xF) {
+			MAIN_D_80134EA8 -= 6;
+		} else {
+			held = 0;
+		}
+	} else {
+		MAIN_D_80134EA8 = 0;
+	}
+	CHANGED_INPUT |= held;
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/main", renderPressStartToContinue);
 
-INCLUDE_ASM("asm/main/nonmatchings/main", renderMainMenuBackground);
+void renderMainMenuBackground(void)
+{
+	GsOT_TAG *ot;
+	POLY_FT4 *prim;
+
+	ot = ACTIVE_ORDERING_TABLE->org;
+	prim = (POLY_FT4 *)GsGetWorkBase();
+
+	SetPolyFT4(prim);
+	prim->x0 = -0xA0;
+	prim->y0 = -0x78;
+	prim->x1 = 0x60;
+	prim->y1 = -0x78;
+	prim->x2 = -0xA0;
+	prim->y2 = 0x78;
+	prim->x3 = 0x60;
+	prim->y3 = 0x78;
+	prim->u0 = 0;
+	prim->v0 = 0;
+	prim->u1 = 0xFF;
+	prim->v1 = 0;
+	prim->u2 = 0;
+	prim->v2 = 0xF0;
+	prim->u3 = 0xFF;
+	prim->v3 = 0xF0;
+	setRGB0(prim, 0x80, 0x80, 0x80);
+	prim->tpage = GetTPage(1, 0, 0x300, 0);
+	prim->clut = GetClut(0, 0x1E0);
+	AddPrim(ot = (GsOT_TAG *)((uint32_t)ot + 0x78), prim++);
+
+	SetPolyFT4(prim);
+	prim->x0 = 0x60;
+	prim->y0 = -0x78;
+	prim->x1 = 0xA0;
+	prim->y1 = -0x78;
+	prim->x2 = 0x60;
+	prim->y2 = 0x78;
+	prim->x3 = 0xA0;
+	prim->y3 = 0x78;
+	prim->u0 = 0;
+	prim->v0 = 0;
+	prim->u1 = 0x40;
+	prim->v1 = 0;
+	prim->u2 = 0;
+	prim->v2 = 0xF0;
+	prim->u3 = 0x40;
+	prim->v3 = 0xF0;
+	setRGB0(prim, 0x80, 0x80, 0x80);
+	prim->tpage = GetTPage(1, 0, 0x380, 0);
+	prim->clut = GetClut(0, 0x1E0);
+	AddPrim(ot, prim++);
+	GsSetWorkBase((PACKET *)prim);
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/main", view_init);
 
@@ -246,7 +583,20 @@ void initializeInventoryModules(void)
 	MAIN_func_800DF804();
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/main", addThrownItem);
+void addThrownItem(int32_t type)
+{
+	MATRIX *workm;
+
+	if (TAMER_ITEM.worldItem.type == 0xFF) {
+		workm = &TAMER_ENTITY.entity.posData[9].posMatrix.workm;
+		TAMER_ITEM.worldItem.spriteLocation.vx = workm->t[0];
+		TAMER_ITEM.worldItem.spriteLocation.vy = workm->t[1];
+		TAMER_ITEM.worldItem.spriteLocation.vz = workm->t[2];
+		TAMER_ITEM.time = 0;
+		TAMER_ITEM.worldItem.type = type;
+		addObject(0x194, 0, tickThrownItem, renderThrownItem);
+	}
+}
 
 void startThrowingItem(void)
 {
@@ -386,7 +736,55 @@ void tickNPCBattle(int32_t instanceId)
 
 INCLUDE_ASM("asm/main/nonmatchings/main", tickNewGameJijimon);
 
-INCLUDE_ASM("asm/main/nonmatchings/main", loadNewgameScene);
+void loadNewgameScene(void)
+{
+	GsRVIEW2 view;
+
+	thunkLoadMMD(0x75, 0);
+	ENTITY_TABLE[2] = &NPC_ENTITIES[0].digimonEntity.entity;
+	initializeDigimonObject(0x75, 2, tickNewGameJijimon);
+	ENTITY_TABLE[2]->isOnMap = 1;
+	ENTITY_TABLE[2]->isOnScreen = 1;
+	MAIN_D_80134F10 = 0;
+	setEntityPosition(2, 0x320, 0x96, 0);
+	setEntityRotation(2, 0, 0x400, 0);
+	setupEntityMatrix(2);
+	startAnimation(ENTITY_TABLE[2], 2);
+	GsSetProjection(0x3E8);
+	view.vpx = 0;
+	view.vpz = -0x1068;
+	view.vpy = 0;
+	view.vrx = 0;
+	view.vry = 0;
+	view.vrz = 0;
+	view.rz = 0;
+	view.super = NULL;
+	GsSetRefView2(&view);
+	DRAWING_OFFSET_X = 0xA0;
+	DRAWING_OFFSET_Y = 0xB9;
+	LIGHT_DATA[0].vx = 0x1E;
+	LIGHT_DATA[0].vy = 0x64;
+	LIGHT_DATA[0].vz = 0x1E;
+	LIGHT_DATA[0].r = 0x40;
+	LIGHT_DATA[0].g = 0x40;
+	LIGHT_DATA[0].b = 0x40;
+	GsSetFlatLight(0, &LIGHT_DATA[0]);
+	LIGHT_DATA[1].vx = -0x1E;
+	LIGHT_DATA[1].vy = 0x64;
+	LIGHT_DATA[1].vz = 0;
+	LIGHT_DATA[1].r = 0x28;
+	LIGHT_DATA[1].g = 0x28;
+	LIGHT_DATA[1].b = 0x28;
+	GsSetFlatLight(1, &LIGHT_DATA[1]);
+	LIGHT_DATA[2].vx = 0;
+	LIGHT_DATA[2].vy = 0x64;
+	LIGHT_DATA[2].vz = -0x1E;
+	LIGHT_DATA[2].r = 0x26;
+	LIGHT_DATA[2].g = 0x26;
+	LIGHT_DATA[2].b = 0x26;
+	GsSetFlatLight(2, &LIGHT_DATA[2]);
+	GsSetAmbient(0x800, 0x800, 0x800);
+}
 
 void unloadNewGameScene(void)
 {
@@ -394,13 +792,63 @@ void unloadNewGameScene(void)
 	thunkUnloadModel(0x75, 0);
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/main", tickBuffModelObject);
+void tickBuffModelObject(int32_t instanceId)
+{
+	MAIN_func_800F179C(BUFF_MODEL[0], 5, buffModelValue[buffModelFrame & 1]);
+	buffModelFrame += 1;
+}
 
 void MAIN_func_800F1794(void)
 {
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/main", MAIN_func_800F179C);
+void MAIN_func_800F179C(void *model, int32_t compIdx, int32_t color)
+{
+  char *p;
+  int32_t new_var;
+  int32_t new_var2;
+  char *comp;
+  int32_t i;
+  int32_t attr;
+  int new_var3;
+  comp = (char *) model;
+  comp = comp + 0xC;
+  comp = comp + (compIdx * 0x1C);
+  new_var = *((int32_t *) (comp + 0x14));
+  new_var3 = 0x10;
+  p = *((char **) (comp + new_var3));
+  for (i = 0; i < new_var; i++)
+  {
+    attr = ((*((int32_t *) p)) >> 0x18) & 0xFF;
+    if (attr & 4)
+    {
+      attr = ((*((int32_t *) p)) >> 0x18) & 0xFF;
+      *((int16_t *) (p + 6)) = (int16_t) color;
+      new_var2 = attr;
+      if (new_var2 & 8)
+      {
+        if (!(attr & new_var3))
+        {
+          p += 0x20;
+        }
+        else
+        {
+          p += 0x2C;
+        }
+      }
+      else
+        if (!(attr & new_var3))
+      {
+        p += 0x1C;
+      }
+      else
+      {
+        p += 0x24;
+      }
+    }
+  }
+
+}
 
 void initializeBuffModel(TMDModel *model)
 {

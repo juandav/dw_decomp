@@ -175,7 +175,23 @@ void setEntityRotation(int32_t entityId, int16_t x, int16_t y, int16_t z)
 
 INCLUDE_ASM("asm/main/nonmatchings/model", renderWireframed);
 
-INCLUDE_ASM("asm/main/nonmatchings/model", resetFlattenGlobal);
+static inline int8_t *model_s8ptr(uint8_t *arg0)
+{
+  return (int8_t *) arg0;
+}
+void resetFlattenGlobal(void)
+{
+  int32_t i;
+  *((int8_t *) (&TAMER_ENTITY.entity.flatSprite)) = -1;
+  PARTNER_ENTITY.digimonEntity.entity.flatTimer = 0;
+  *model_s8ptr(&PARTNER_ENTITY.digimonEntity.entity.flatSprite) = -1;
+  for (i = 0; i < 8; i++)
+  {
+    NPC_ENTITIES[i].digimonEntity.entity.flatTimer = 0;
+    *model_s8ptr(&NPC_ENTITIES[i].digimonEntity.entity.flatSprite) = -1;
+  }
+
+}
 
 void loadDigimonTexture(int32_t digiType, char *path,
 			ModelComponent *component)
