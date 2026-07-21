@@ -203,7 +203,7 @@ def _build(functions, calls, graph):
     return nodes, links
 
 
-def _worklist(functions, calls, limit, started_only):
+def _worklist(functions, calls, limit, started_only, by_size):
     """Rank undecompiled functions by how little they depend on other
     undecompiled functions, then by size. Leaves match fastest."""
     pending = defaultdict(set)
@@ -218,9 +218,17 @@ def _worklist(functions, calls, limit, started_only):
         selected = {name: meta for name, meta in functions.items()
                     if 'nonmatchings' in meta['source_file']}
 
-    ranked = sorted(
-        selected.items(),
-        key=lambda kv: (len(pending[kv[0]]), kv[1]['size_bytes'] or 1 << 30))
+    if by_size:
+        # Progress is measured in bytes, so when chasing a percentage the big
+        # leaves are worth more than the easy ones.
+        ranked = sorted(
+            (kv for kv in selected.items() if not pending[kv[0]]),
+            key=lambda kv: -(kv[1]['size_bytes'] or 0))
+    else:
+        ranked = sorted(
+            selected.items(),
+            key=lambda kv: (len(pending[kv[0]]),
+                            kv[1]['size_bytes'] or 1 << 30))
 
     print('{:<34} {:<8} {:>7} {:>6}'.format(
         'FUNCTION', 'OVERLAY', 'BYTES', 'DEPS'))
@@ -261,6 +269,8 @@ def _parse_args():
                         help='worklist entries to show (default: %(default)s)')
     parser.add_argument('--started', action='store_true',
                         help='only the gaps in files already being decompiled')
+    parser.add_argument('--by-size', action='store_true',
+                        help='biggest leaves first, for chasing a percentage')
 
     return parser.parse_args()
 
@@ -278,7 +288,8 @@ def _main():
         nodes, links = _build(functions, calls, graph)
         _merge(nodes, links, graph)
     else:
-        _worklist(functions, calls, args.limit, args.started)
+        _worklist(functions, calls, args.limit, args.started,
+                  args.by_size)
 
 
 if __name__ == '__main__':

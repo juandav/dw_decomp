@@ -7,3 +7,4 @@ expected/
 local.mk
 objdiff.json
 __pycache__/
+permuter/*/output-*/
