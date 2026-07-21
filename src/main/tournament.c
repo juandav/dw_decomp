@@ -158,7 +158,18 @@ uint8_t *getCupDataJumpTable(uint32_t section, uint32_t id)
 	return getCupDataJumpTableEntry(sectionPtr, id);
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/tournament", getCupDataJumpTableEntry);
+uint8_t *getCupDataJumpTableEntry(uint8_t *scriptPtr, uint32_t id)
+{
+	uint8_t *script;
+	uint32_t offset;
+
+	script = getScript(ACTIVE_MAP_SCRIPT);
+	scriptPtr = scriptPtr + id * 4 + 2;
+	offset = *(uint16_t *)scriptPtr;
+	scriptPtr = script + offset;
+
+	return scriptPtr;
+}
 
 int32_t checkTournamentMedalConditions(void)
 {
