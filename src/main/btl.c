@@ -33,7 +33,7 @@ int32_t isScreenConcave(void);
 void loadBattleData();
 void loadCombatDataTick();
 void handleBattleIdle();
-void MAIN_func_800E7D9C(uint16_t id, int16_t v);
+int32_t MAIN_func_800E7D9C(uint16_t id, int16_t v);
 void MAIN_func_800E7DEC(int32_t instanceId);
 void MAIN_func_800E8470(int32_t id);
 void handleBattleStart();
@@ -102,12 +102,12 @@ void handleBattleIdle(Entity *e)
 	}
 }
 
-void MAIN_func_800E7D9C(uint16_t id, int16_t v)
+int32_t MAIN_func_800E7D9C(uint16_t id, int16_t v)
 {
 	MAIN_D_80154FCC[(id - 2) * 6] = 0;
 	MAIN_D_80154FCE[(id - 2) * 6] = v;
 
-	addObject(0x196, id, NULL, MAIN_func_800E7DEC);
+	return addObject(0x196, id, NULL, MAIN_func_800E7DEC);
 }
 
 INCLUDE_ASM("asm/main/nonmatchings/btl", MAIN_func_800E7DEC);
