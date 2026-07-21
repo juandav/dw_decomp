@@ -10,7 +10,7 @@ extern int16_t MAIN_D_801389B4[];
 extern char *EFE_FLASH_DATA;
 extern uint32_t MAIN_D_8012343C[];
 extern char MAIN_D_8012342C[];
-extern char MAIN_D_80134220[];
+extern char MAIN_D_80134220[4];
 extern int16_t EFE_LOADED_MOVE_DATA[];
 extern char EFE_SCRIPT_MEM1_DATA;
 extern char *EFE_DATA_STACK;
