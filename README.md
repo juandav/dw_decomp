@@ -4,31 +4,36 @@ A work in progress decompilation of Digimon World for PS1.
 
 ## Dependencies
 
-Install the following packages:
 ```
-binutils-mipsel-linux-gnu gcc-mipsel-linux-gnu git make python3 python3-venv unzip wget
-```
-
-Install Python dependencies:
-```
-python3 -m venv .venv
+tools/setup.sh
 . .venv/bin/activate
-pip3 install -r requirements.txt
 ```
 
-Download tools:
+This installs the system packages, checks out the submodules, creates the
+virtualenv and downloads the prebuilt tools. It is safe to re-run and reports
+whatever is still outstanding.
+
+The prebuilt metrowrap and mkpsxiso binaries need glibc 2.39 or newer, which is
+what the Dockerfile (ubuntu:noble) provides. On an older host, setup.sh says so
+and you build in the container instead:
+
 ```
-tools/dl_deps.sh
+tools/docker_build.sh
+tools/docker_run.sh make -j$(nproc)
 ```
 
-Download CodeWarrior for PlayStation Release 4 and copy cc_mips.dll to bin/cc_mips/cc_mips_40.dll.
+Prefix any command in the Build section below with tools/docker_run.sh to run
+it there. Every command is otherwise identical.
+
+Two things it cannot fetch for you:
+
+- CodeWarrior for PlayStation Release 4 — copy its cc_mips.dll to
+  bin/cc_mips/cc_mips_40.dll.
+- An original Digimon World (USA) ISO, dumped to disks/us (see Build below).
 
 ## Build
 
 ```
-# Update submodules
-git submodule update --init --recursive
-
 # Dump original PSX Digimon World (USA) ISO
 bin/mkpsxiso-2.20-Linux/bin/dumpsxiso -x disks/us -s disks/us/us.xml "/path/to/Digimon World (USA).bin"
 
@@ -50,6 +55,39 @@ make compare
 
 # Generate objdiff config
 make objdiff
+```
+
+## Decompiling a function
+
+To pick one, ask for the worklist. It ranks what is still in asm by how little
+it depends on other undecompiled functions, then by size — leaves match
+fastest:
+
+```
+tools/graphify_asm.py
+```
+
+The same script merges the disassembly into the graphify knowledge graph
+(`tools/graphify_asm.py --merge`, then `graphify cluster-only .`), so queries
+cover the whole binary and not just the parts already in C.
+
+Get a first draft from the disassembly with m2c, then hand-match it against
+objdiff. The draft compiles but will not match — it is a reading aid.
+
+```
+# Generate the C context (build/ctx.c) used by m2c and decomp.me
+make ctx
+
+# First draft for one function
+tools/m2c.sh asm/main/nonmatchings/main/someFunction.s
+```
+
+Once a candidate is close, let decomp-permuter search for the last few
+instruction differences:
+
+```
+tools/permute.sh --run src/main/main.c \
+    asm/main/nonmatchings/main/someFunction.s someFunction
 ```
 
 ## Links

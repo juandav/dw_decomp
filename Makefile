@@ -320,6 +320,9 @@ regenerate: reset
 compare:
 	@tools/cmp_bins.sh
 
+ctx:
+	$(PYTHON) tools/m2ctx.py -o $(BUILDDIR)/ctx.c
+
 expected: $(OBJ)
 	rm -rf $(EXPECTEDDIR)
 	@mkdir -p $(EXPECTEDDIR)
@@ -384,4 +387,4 @@ clean:
 reset: clean
 	rm -rf $(ASM_DIR)
 
-.PHONY: all clean
+.PHONY: all clean ctx

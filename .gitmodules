@@ -4,3 +4,6 @@
 [submodule "external/psyq_headers"]
 	path = external/psyq_headers
 	url = https://github.com/jype0/psyq_headers.git
+[submodule "external/m2c"]
+	path = external/m2c
+	url = https://github.com/matt-kempster/m2c.git

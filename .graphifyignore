@@ -1,0 +1,7 @@
+build/
+expected/
+bin/
+disks/
+.venv/
+external/decomp-permuter/
+graphify-out/graph.html

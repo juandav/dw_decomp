@@ -6,3 +6,4 @@ disks/
 expected/
 local.mk
 objdiff.json
+__pycache__/
