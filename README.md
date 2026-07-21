@@ -67,9 +67,16 @@ fastest:
 tools/graphify_asm.py
 ```
 
-The same script merges the disassembly into the graphify knowledge graph
-(`tools/graphify_asm.py --merge`, then `graphify cluster-only .`), so queries
-cover the whole binary and not just the parts already in C.
+The same script merges the disassembly into the graphify knowledge graph, so
+queries cover the whole binary and not just the parts already in C. The graph
+lives in graphify-out/, which is not tracked - it is 22 MB of derived data that
+rewrites itself on every run. Rebuild it in three steps, at no API cost:
+
+```
+graphify update .                     # re-extract the C (AST only)
+tools/graphify_asm.py --merge         # add the disassembly
+graphify cluster-only .               # communities, report, HTML
+```
 
 Get a first draft from the disassembly with m2c, then hand-match it against
 objdiff. The draft compiles but will not match — it is a reading aid.
