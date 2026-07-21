@@ -26,7 +26,7 @@ void renderRectPolyFT4(int32_t posX, int32_t posY,
 		       int32_t zIndex, int32_t flag);
 
 void dailyPStatTrigger(void);
-void updateTimeOfDay(void);
+void updateTimeOfDay();
 int32_t isFishing();
 int32_t readPStat(int32_t id);
 void writePStat(int32_t id, int32_t value);
@@ -191,7 +191,30 @@ void updatePlaytime(int32_t instanceId)
 	}
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/clock", advanceToTime);
+void advanceToTime(int32_t hour, int16_t minute)
+{
+  int32_t new_var;
+  int32_t frame;
+  int new_var2;
+  if ((hour < HOUR) || ((HOUR == hour) && (minute < MINUTE)))
+  {
+    DAY += 1;
+    PARTNER_PARA.age += 1;
+    dailyPStatTrigger();
+    if (DAY >= 0x1E)
+    {
+      DAY = 0;
+      YEAR += 1;
+    }
+  }
+  HOUR = hour % 24;
+  MINUTE = minute;
+  frame = minute * 0x14;
+  new_var2 = HOUR * 0x4B0;
+  CURRENT_FRAME = (new_var = frame) + new_var2;
+  CLOCK_SPRITE.rotate = minute * 0x6000;
+  updateTimeOfDay(frame, minute);
+}
 
 void updateMinuteHand(int32_t hour, int32_t minute)
 {
