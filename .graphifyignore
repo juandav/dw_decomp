@@ -4,4 +4,6 @@ bin/
 disks/
 .venv/
 external/decomp-permuter/
+external/m2c/
+asm/
 graphify-out/graph.html
