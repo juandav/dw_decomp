@@ -251,7 +251,14 @@ void tickEFEFlash(int32_t id)
 
 INCLUDE_ASM("asm/main/nonmatchings/efe", renderEFEFlash);
 
-INCLUDE_ASM("asm/main/nonmatchings/efe", setEFEFlashOffset);
+void setEFEFlashOffset(int32_t id, int16_t x, int16_t y)
+{
+	int16_t *e;
+
+	e = (int16_t *)(EFE_FLASH_DATA + (id * 0x28));
+	e[18] = x;
+	e[19] = y;
+}
 
 void downloadSomeImage(void)
 {

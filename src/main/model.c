@@ -307,7 +307,27 @@ void unloadModel(int32_t digiType, int32_t modelType)
 
 INCLUDE_ASM("asm/main/nonmatchings/model", getEntityModelComponent);
 
-INCLUDE_ASM("asm/main/nonmatchings/model", getEntityType);
+int32_t getEntityType(Entity* entity)
+{
+	int32_t i;
+
+	for (i = 0; i < 10; i++) {
+		if (ENTITY_TABLE[i] == entity) {
+			break;
+		}
+	}
+
+	switch (i) {
+	case 10:
+		return -1;
+	case 1:
+		return 3;
+	case 0:
+		return 2;
+	}
+
+	return 0;
+}
 
 static inline int32_t applyTPageOffset(int32_t tpageOffset,
 				       int32_t pixelOffset)
