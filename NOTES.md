@@ -7,10 +7,12 @@ the rest of the repository.
 ## State
 
 `decomp-work` is the branch to build on. It is green - `make compare` matches
-all 16 binaries - and merged with upstream `main` as of 2026-07-21.
+all 16 binaries - and merged with upstream `main` as of 2026-07-21, through
+`9a148de "Partially match script*.c"`. That merge alone took the count from
+432 to 643: eleven new `script_*.c` files and a `script` rodata subsegment.
 
 ```
-decomp-work            green, 432/3004 functions, 9.0294% of code
+decomp-work            green, 643/3003 functions, 15.0325% of code
 wip/collision          setRectangleImpassable, 30 of 32
 wip/view               view_init, 36 of 36
 wip/three-near-misses  initTournamentInfo, matrixToEuler2, renderTournamentSchedule
@@ -25,17 +27,19 @@ rather than structure.
 
 ## Remotes
 
+The first machine had these reversed - `origin` was `jype0` because it was
+already configured, and the fork was `fork`. A fresh clone names the fork
+`origin`, which is the usual convention, so keep it and add the original as
+`upstream`:
+
 ```
-origin  git@github.com:jype0/dw_decomp.git      upstream, for git fetch
-fork    git@github.com:juandav/dw_decomp.git    ours
+origin    git@github.com:juandav/dw_decomp.git      ours, tracked by decomp-work
+upstream  https://github.com/jype0/dw_decomp.git    the original, for git fetch
 ```
 
-This is the reverse of the usual convention, where `origin` is your fork and
-`upstream` is the original. It is that way round because `origin` was already
-configured; `git remote rename origin upstream && git remote rename fork origin`
-swaps it if you prefer.
+A bare `git push` goes to the fork. Pull upstream work with
+`git fetch upstream && git merge upstream/main`.
 
-`decomp-work` tracks `fork/decomp-work`, so a bare `git push` goes to the fork.
 Everything except `pr16` is pushed - that one is a local copy of someone else's
 PR branch and is already merged upstream.
 
@@ -66,10 +70,8 @@ dedicated install at all.
 ```
 git clone git@github.com:juandav/dw_decomp.git && cd dw_decomp
 
-# Cloning names the fork "origin". Reproduce the layout above so the remote
-# names mean the same thing on every machine.
-git remote rename origin fork
-git remote add origin git@github.com:jype0/dw_decomp.git
+# Cloning names the fork "origin", which is what we want. Add the original.
+git remote add upstream https://github.com/jype0/dw_decomp.git
 
 git checkout decomp-work
 
