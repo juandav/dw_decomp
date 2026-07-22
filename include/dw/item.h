@@ -28,4 +28,7 @@ typedef struct {
 
 extern Item ITEM_PARA[];
 
+int32_t giveItem(uint32_t type, uint8_t amount);
+void removeItem(uint32_t type, uint8_t amount);
+
 #endif

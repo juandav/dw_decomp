@@ -136,8 +136,6 @@ int32_t setCardAmount(int32_t cardId, int32_t value);
 int32_t popScriptStack(StackEntry *entry);
 void MAIN_func_801050C0(void);
 void scriptCompareDate(void);
-int32_t giveItem(uint32_t type, uint8_t amount);
-void removeItem(int32_t type, int32_t amount);
 void readMapTFS(int32_t mapId);
 void handleItemLoss(void);
 void setMovementEnabled(int32_t a0, int32_t a1);

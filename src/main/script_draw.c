@@ -1,5 +1,6 @@
 #include <string.h>
 
+#include <dw/item.h>
 #include <dw/params.h>
 #include <dw/pstat.h>
 #include <dw/script.h>
