@@ -819,7 +819,36 @@ void tickPartnerDying2(void)
 
 INCLUDE_ASM("asm/main/nonmatchings/partner", tickPartnerWalking);
 
-INCLUDE_ASM("asm/main/nonmatchings/partner", getPartnerTamerCloseness);
+int32_t getPartnerTamerCloseness(void)
+{
+	VECTOR *t;
+	VECTOR *p;
+	int32_t dist;
+	int16_t radius;
+	int32_t inner;
+	int32_t outer;
+	int32_t inner2;
+	int32_t outer2;
+
+	t = &TAMER_ENTITY.entity.posData->location;
+	p = &PARTNER_ENTITY.digimonEntity.entity.posData->location;
+	dist = (t->vx - p->vx) * (t->vx - p->vx) +
+	       (t->vz - p->vz) * (t->vz - p->vz);
+
+	radius = DIGIMON_DATA[PARTNER_ENTITY.digimonEntity.entity.type].radius;
+	inner = radius * 5 / 2;
+	inner2 = inner * inner;
+	outer = radius * 7 / 2;
+	outer2 = outer * outer;
+
+	if (outer2 < dist) {
+		return 0;
+	}
+	if (dist >= inner2) {
+		return 1;
+	}
+	return 2;
+}
 
 void setPartnerSlowWalking(void)
 {
