@@ -212,6 +212,7 @@ void initializeFadeData(void);
 int32_t loadTIMFile(char *path, void *buffer);
 
 extern int8_t MAIN_STATE;
+extern int32_t MAIN_D_80134EAC;
 extern int32_t MAIN_D_80134EB0;
 extern char MAIN_D_8012CE64[];
 extern char MAIN_D_8012CE78[];
@@ -506,7 +507,89 @@ void pollInputMenu(void)
 	CHANGED_INPUT |= held;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/main", renderPressStartToContinue);
+void renderPressStartToContinue(void)
+{
+	GsOT_TAG *ot;
+	POLY_FT4 *prim;
+
+	ot = ACTIVE_ORDERING_TABLE->org;
+	prim = (POLY_FT4 *)GsGetWorkBase();
+
+	MAIN_D_80134EAC += 1;
+	if (MAIN_D_80134EB0 == 1) {
+		MAIN_D_80134EAC += 0x1D;
+	}
+	MAIN_D_80134EAC %= 60;
+
+	if (MAIN_D_80134EAC < 0x1E) {
+		SetPolyFT4(prim);
+		prim->x0 = -0x36;
+		prim->y0 = 0x32;
+		prim->x1 = 0x43;
+		prim->y1 = 0x32;
+		prim->x2 = -0x36;
+		prim->y2 = 0x3C;
+		prim->x3 = 0x43;
+		prim->y3 = 0x3C;
+		prim->u0 = 0;
+		prim->v0 = 0xF1;
+		prim->u1 = 0x79;
+		prim->v1 = 0xF1;
+		prim->u2 = 0;
+		prim->v2 = 0xFB;
+		prim->u3 = 0x79;
+		prim->v3 = 0xFB;
+		setRGB0(prim, 0, 0x80, 0);
+		prim->tpage = GetTPage(1, 0, 0x300, 0);
+		prim->clut = GetClut(0, 0x1E0);
+		AddPrim(&ot[0x1E], prim++);
+	}
+
+	SetPolyFT4(prim);
+	prim->x0 = -0xA0;
+	prim->y0 = -0x78;
+	prim->x1 = 0x60;
+	prim->y1 = -0x78;
+	prim->x2 = -0xA0;
+	prim->y2 = 0x78;
+	prim->x3 = 0x60;
+	prim->y3 = 0x78;
+	prim->u0 = 0;
+	prim->v0 = 0;
+	prim->u1 = 0xFF;
+	prim->v1 = 0;
+	prim->u2 = 0;
+	prim->v2 = 0xF0;
+	prim->u3 = 0xFF;
+	prim->v3 = 0xF0;
+	setRGB0(prim, 0x80, 0x80, 0x80);
+	prim->tpage = GetTPage(1, 0, 0x300, 0);
+	prim->clut = GetClut(0, 0x1E0);
+	AddPrim(&ot[0x1E], prim++);
+
+	SetPolyFT4(prim);
+	prim->x0 = 0x60;
+	prim->y0 = -0x78;
+	prim->x1 = 0xA0;
+	prim->y1 = -0x78;
+	prim->x2 = 0x60;
+	prim->y2 = 0x78;
+	prim->x3 = 0xA0;
+	prim->y3 = 0x78;
+	prim->u0 = 0;
+	prim->v0 = 0;
+	prim->u1 = 0x40;
+	prim->v1 = 0;
+	prim->u2 = 0;
+	prim->v2 = 0xF0;
+	prim->u3 = 0x40;
+	prim->v3 = 0xF0;
+	setRGB0(prim, 0x80, 0x80, 0x80);
+	prim->tpage = GetTPage(1, 0, 0x380, 0);
+	prim->clut = GetClut(0, 0x1E0);
+	AddPrim(&ot[0x1E], prim++);
+	GsSetWorkBase((PACKET *)prim);
+}
 
 void renderMainMenuBackground(void)
 {
