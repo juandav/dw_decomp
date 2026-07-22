@@ -94,7 +94,7 @@ void tickEFEFlash();
 void renderEFEFlash(int32_t layer);
 int32_t setEFEFlashOffset(int32_t id, int16_t x, int16_t y);
 void downloadSomeImage();
-void modifySomeImage(int32_t dim, int16_t stp);
+void modifySomeImage(int32_t dim);
 void findEFEDATFile(void);
 void initializeEFE();
 void getEFEDATEntry();
@@ -275,7 +275,45 @@ void downloadSomeImage(void)
 	DrawSync(0);
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/efe", modifySomeImage);
+void modifySomeImage(int32_t dim)
+{
+	int16_t buf[0x700];
+	RECT r;
+	int16_t *src;
+	int16_t *dst;
+	int32_t i;
+	int32_t scale;
+	int16_t p;
+	int16_t cr;
+	int16_t cg;
+	int16_t cb;
+	int16_t ca;
+
+	src = (int16_t *)SOME_IMAGE_DATA;
+	dst = buf;
+	scale = 0xFF - dim;
+
+	for (i = 0; i < 0x700; i++) {
+		p = *src;
+		cr = p & 0x1F;
+		cg = (p >> 5) & 0x1F;
+		cb = (p >> 0xA) & 0x1F;
+		ca = (p >> 0xF) & 1;
+		*dst = cr * scale / 255;
+		*dst += (cg * scale / 255) << 5;
+		*dst += (cb * scale / 255) << 0xA;
+		*dst += ca << 0xF;
+		src++;
+		dst++;
+	}
+
+	r.x = 0x200;
+	r.y = 0xF8;
+	r.w = 0x100;
+	r.h = 7;
+	LoadImage(&r, (u_long *)buf);
+	DrawSync(0);
+}
 
 void findEFEDATFile(void)
 {
