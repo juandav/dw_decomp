@@ -68,7 +68,16 @@ step 'Python virtualenv'
 echo 'Ready: . .venv/bin/activate'
 
 step 'Downloaded tools'
-if [ "$FORCE" = 1 ] || [ ! -d bin/metrowrap ]; then
+# Check every artifact, not just the first one. dl_deps.sh downloads in order
+# and stops at the first failure, so a partial run leaves the early ones in
+# place and the later ones - wibo, which the build needs - missing.
+DEPS='bin/mwccwrap bin/metrowrap bin/mkpsxiso-2.20-Linux
+bin/objdiff-cli-linux-x86_64 bin/objdiff-linux-x86_64 bin/wibo-x86_64'
+INCOMPLETE=0
+for dep in $DEPS; do
+	[ -e "$dep" ] || INCOMPLETE=1
+done
+if [ "$FORCE" = 1 ] || [ "$INCOMPLETE" = 1 ]; then
 	tools/dl_deps.sh
 else
 	echo 'Already downloaded (--force to redo).'
