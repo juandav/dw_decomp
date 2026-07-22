@@ -12,10 +12,10 @@ all 16 binaries - and merged with upstream `main` as of 2026-07-21, through
 432 to 643: eleven new `script_*.c` files and a `script` rodata subsegment.
 
 ```
-decomp-work            green, 649/3003 functions, 15.4605% of code
+decomp-work            green, 650/3003 functions, 15.5098% of code
 wip/view               view_init, one instruction
 wip/tournament         initTournamentInfo, one instruction
-wip/drafts             checkMapCollisionX, modifySomeImage
+wip/drafts             checkMapCollisionX, modifySomeImage, popAttackObject
 wip/three-near-misses  superseded, see below
 main, pr16             historical reference
 ```
@@ -48,7 +48,8 @@ arrangement of the doubled-assignment trick reproduces - and closing it also
 closes `checkMapCollisionY`, the same function on the other axis.
 `modifySomeImage` needs all four channel extractions hoisted above the first
 multiply; the compiler sinks each one back to its use whatever the source
-says.
+says. `popAttackObject` is the closest of the three - every instruction bar
+the first loop, where three registers are rotated against the target.
 
 Every `wip/` branch carries its analysis in the commit message. They are all
 one or two instructions short, which is register allocation and scheduling
