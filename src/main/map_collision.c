@@ -1,4 +1,6 @@
 #include <libgte.h>
+#include <dw/entity.h>
+#include <dw/params.h>
 #include <dw/types.h>
 
 #include "common.h"
@@ -7,6 +9,7 @@ extern int8_t MAP_COLLISION_DATA[];
 void getModelTile(VECTOR *pos, int16_t *outTileX, int16_t *outTileY);
 void loadMapCollisionData(int8_t *src);
 int32_t getTileTrigger(VECTOR *pos);
+int32_t checkMapCollisionX(Entity *entity, int32_t dir);
 void setRectImpassible(int32_t x, uint8_t y, int32_t w, int32_t h);
 void setRectangleImpassable(int32_t x, int32_t y, int32_t r);
 
@@ -46,7 +49,53 @@ int32_t getTileTrigger(VECTOR *pos)
 	}
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/map_collision", checkMapCollisionX);
+int32_t checkMapCollisionX(Entity *entity, int32_t dir)
+{
+	VECTOR *loc;
+	int16_t radius;
+	int32_t half;
+	int16_t tile;
+	int16_t tileEnd;
+	int16_t tileZ;
+	int16_t edge;
+	int32_t idx;
+
+	loc = &entity->posData->location;
+	radius = DIGIMON_DATA[entity->type].radius;
+	half = radius / 2;
+
+	tile = (int16_t)(loc->vx - half) / 100 + 0x32;
+	if ((int16_t)(loc->vx - half) < 0) {
+		tile -= 1;
+	}
+
+	tileEnd = (int16_t)(loc->vx + half) / 100 + 0x32;
+	if ((int16_t)(loc->vx + half) < 0) {
+		tileEnd -= 1;
+	}
+
+	if (dir == 0) {
+		edge = loc->vz + radius;
+	} else {
+		edge = loc->vz - radius;
+	}
+
+	tileZ = 0x31 - edge / 100;
+	if (edge < 0) {
+		tileZ += 1;
+	}
+
+	idx = tile + tileZ * 0x64;
+	while (tile <= tileEnd) {
+		if (((uint8_t *)MAP_COLLISION_DATA)[idx] & 0x80) {
+			return 1;
+		}
+		tile += 1;
+		idx += 1;
+	}
+
+	return 0;
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/map_collision", checkMapCollisionY);
 
