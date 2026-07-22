@@ -39,6 +39,7 @@ PACKET *GsTMDdivTNG4();
 void setRotTransMatrix(MATRIX *m);
 void initializeGsTMDMap(void);
 extern int32_t MAIN_D_80137BE8;
+extern int32_t MAIN_D_80137BE4[];
 typedef struct {
 	int32_t f0;
 	int32_t f1;
@@ -50,9 +51,10 @@ typedef struct {
 } AttackObjectData;
 extern AttackObjectData MAIN_D_80122584;
 extern AttackObjectData MAIN_D_80137A24[];
+extern AttackObjectData MAIN_D_80137A28[];
 void initializeAttackObjects(void);
 int32_t addAttackObject(int32_t a, int32_t b, int16_t *rect, int32_t d, int32_t e, int32_t f);
-void popAttackObject(int32_t a);
+int32_t popAttackObject(int32_t id, AttackObjectData *out);
 void updateTMDTextureData(char *tmd, int32_t clutX, int32_t x, int32_t y, int32_t tpage);
 void renderDropShadow(int32_t a, int32_t b, int32_t c);
 
@@ -110,7 +112,48 @@ void initializeAttackObjects(void)
 
 INCLUDE_ASM("asm/main/nonmatchings/graphics", addAttackObject);
 
-INCLUDE_ASM("asm/main/nonmatchings/graphics", popAttackObject);
+int32_t popAttackObject(int32_t id, AttackObjectData *out)
+{
+	int32_t j;
+	int32_t i;
+	AttackObjectData empty;
+
+	MAIN_D_80137BE4[0] = id;
+
+	for (slot = 0;; slot++) {
+		if (id == MAIN_D_80137A24[slot].f0) {
+			break;
+		}
+	}
+
+	if (slot == 0x10) {
+		return 0;
+	}
+
+	*out = MAIN_D_80137A24[slot];
+	MAIN_D_80137A24[slot] = MAIN_D_80122584;
+	empty = MAIN_D_80122584;
+
+	for (i = 0; i < 0xF; i++) {
+		if (MAIN_D_80137A28[i].f0 == -1) {
+			for (j = i + 1; j < 0x10; j++) {
+				if (MAIN_D_80137A28[j].f0 != -1) {
+					break;
+				}
+			}
+
+			if (j == 0x10) {
+				break;
+			}
+
+			MAIN_D_80137A24[i] = MAIN_D_80137A24[j];
+			empty = MAIN_D_80122584;
+			MAIN_D_80137A24[j] = empty;
+		}
+	}
+
+	return 1;
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/graphics", updateTMDTextureData);
 
