@@ -12,10 +12,11 @@ all 16 binaries - and merged with upstream `main` as of 2026-07-22, through
 inventory.c work brought the count to 656.
 
 ```
-decomp-work            green, 656/3003 functions, 15.7197% of code
+decomp-work            green, 658/3003 functions, 15.7635% of code
 wip/view               view_init, one instruction
 wip/tournament         initTournamentInfo, one instruction
-wip/drafts             checkMapCollisionX, modifySomeImage, popAttackObject
+wip/drafts             checkMapCollisionX, modifySomeImage, popAttackObject,
+                       initializeClockData
 wip/three-near-misses  superseded, see below
 main, pr16             historical reference
 ```
@@ -50,6 +51,9 @@ closes `checkMapCollisionY`, the same function on the other axis.
 multiply; the compiler sinks each one back to its use whatever the source
 says. `popAttackObject` is the closest of the three - every instruction bar
 the first loop, where three registers are rotated against the target.
+`initializeClockData` matches to the opcode - only the live range of the
+constant `8`, shared between `HOUR` and the sprite width, is scheduled
+differently; the colour-store half fell to the permuter's `g = (r = 0x80)`.
 
 Every `wip/` branch carries its analysis in the commit message. They are all
 one or two instructions short, which is register allocation and scheduling
@@ -221,6 +225,20 @@ gap was always types or ordering.
   the `for` statement: `for (i = 0; i < 3; i++, p++, q++)`.
 - Inside a branch the compiler knows the index, write the constant. `root[0]`
   where `i` is provably 0 is one instruction; `root[i]` is two.
+- The compiler squares (or otherwise consumes) a value the moment it has it, so
+  feed it the values in the order it wants them used. Two coordinate
+  differences left inline in a distance expression are subtracted-and-squared
+  one at a time; lifted into `dx`/`dz` locals first they are both subtracted
+  and then both squared. And two thresholds compared later still want their
+  squares materialised in source order now - `getPartnerTamerCloseness`
+  needed `inner2 = inner * inner` right after `inner`, before the `outer`
+  the first comparison actually uses.
+- Reaching a parallel array through the wrong base costs a symbol load. Three
+  consecutive tables (types, amounts, names, 30 bytes each) - the target
+  reads the amount as `&types[i] + 30`, not `amounts[i]`. Materialise the
+  pointer from the index inside the match block and deref the local; a pointer
+  walked alongside `i` as `p[30]` gets strength-reduced into a second
+  induction variable instead. This closed `removeItem`.
 - Writing `0x80` into an `int8_t` array yields `li -128`. Cast through
   `uint8_t` the way `getTileTrigger` already does.
 - Look for the idiom elsewhere in the same file before inventing one. The
@@ -244,6 +262,11 @@ from C on the first try.
   for functions that are not in C, so reverting leaves an undefined reference.
 - Run git from Linux only. Over `\\wsl.localhost` from Windows it cannot see
   the executable bits and reports spurious mode changes on every script.
+- `expected/` is a snapshot, not a build product: `make expected` copies
+  whatever `build/` holds *now*. Run it only while the working tree is clean -
+  captured after editing, every diff against it reports a false MATCH, and
+  the mistake surfaces later as an inexplicable regression. When a diff
+  count jumps for no reason, suspect the snapshot before the source.
 
 ## The `sdata` audit is done
 
