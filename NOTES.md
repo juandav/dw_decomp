@@ -12,7 +12,7 @@ all 16 binaries - and merged with upstream `main` as of 2026-07-21, through
 432 to 643: eleven new `script_*.c` files and a `script` rodata subsegment.
 
 ```
-decomp-work            green, 647/3003 functions, 15.3210% of code
+decomp-work            green, 649/3003 functions, 15.4605% of code
 wip/view               view_init, one instruction
 wip/tournament         initTournamentInfo, one instruction
 wip/three-near-misses  superseded, see below
@@ -190,6 +190,17 @@ gap was always types or ordering.
 - Before starting a function, look for one already matched that does the same
   thing. `MAIN_func_800E4470` is `matrixToEuler2` on different matrix
   elements, and went in almost as written once the macros were there.
+  `renderPressStartToContinue` is `renderMainMenuBackground` with a third
+  quad, and `applyRootMomentum` steps the same counters as `applyMomentum`.
+- Declaration order sets the frame layout as well as the registers. Locals are
+  laid out in the order they are declared, so if every stack offset is out by
+  the size of one local, reorder the declarations rather than hunting the
+  code.
+- The third clause of a `for` runs before anything the body's tail does. If
+  the target bumps the loop counter and then the pointers, they were all in
+  the `for` statement: `for (i = 0; i < 3; i++, p++, q++)`.
+- Inside a branch the compiler knows the index, write the constant. `root[0]`
+  where `i` is provably 0 is one instruction; `root[i]` is two.
 - Writing `0x80` into an `int8_t` array yields `li -128`. Cast through
   `uint8_t` the way `getTileTrigger` already does.
 - Look for the idiom elsewhere in the same file before inventing one. The
