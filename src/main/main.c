@@ -149,7 +149,7 @@ extern TMDModel *BUFF_MODEL[];
 
 void resetFlattenGlobal(void);
 void initializeDroppedItems(void);
-void MAIN_func_800DADDC(void);
+void resetInventoryFlags(void);
 void initializeInventory(void);
 void MAIN_func_800DF804(void);
 void initializeInventoryModules(void);
@@ -577,7 +577,7 @@ void initializeInventoryModules(void)
 	COMBAT_DATA_PTR = &COMBAT_DATA;
 	resetFlattenGlobal();
 	initializeDroppedItems();
-	MAIN_func_800DADDC();
+	resetInventoryFlags();
 	initializeInventory();
 	MAIN_func_800DF804();
 }

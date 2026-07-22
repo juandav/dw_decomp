@@ -8,22 +8,22 @@
 
 #include "common.h"
 
-extern int32_t MAIN_D_80134E04;
-extern int32_t MAIN_D_80134E08;
-extern uint8_t MAIN_D_80134E13;
-extern uint8_t MAIN_D_80134E14;
-extern uint8_t MAIN_D_80134E15;
-extern int32_t MAIN_D_80134E18;
+extern int32_t INVENTORY_STATE;
+extern int32_t INVENTORY_OPEN;
+extern uint8_t ACTION_CURSOR;
+extern uint8_t SORT_TYPE_CURSOR;
+extern uint8_t CONFIRM_CURSOR;
+extern int32_t INPUT_HOLD_FRAMES;
 extern int32_t POLLED_INPUT;
 extern int32_t POLLED_INPUT_PREVIOUS;
 extern TamerItem TAMER_ITEM;
 extern uint8_t INVENTORY_POINTER;
-extern char MAIN_D_8012A9D8[];
+extern char ACTION_LABELS[];
 void clearTextArea(void);
-extern uint8_t MAIN_D_80134E11;
+extern uint8_t INVENTORY_MOVE_SRC;
 extern uint8_t INVENTORY_ITEM_TYPES[30];
 extern uint8_t INVENTORY_ITEM_NAMES[30];
-extern uint8_t MAIN_D_80134E12;
+extern uint8_t INVENTORY_LAST_POINTER;
 extern int8_t GAME_STATE;
 extern char *COMBAT_DATA_PTR;
 extern TamerEntity TAMER_ENTITY;
@@ -32,16 +32,16 @@ void closeTriangleMenu(void);
 void startAnimation(Entity *e, int32_t anim);
 void startFeedingItem(uint8_t type);
 void startThrowingItem(void);
-extern char MAIN_D_801343BC;
-extern char MAIN_D_801343C4;
-extern char MAIN_D_801343CC;
-extern char MAIN_D_801343D4;
-extern char MAIN_D_801343D8;
-extern char MAIN_D_8012A9B4[];
-extern int16_t MAIN_D_80134E0C;
-extern int16_t MAIN_D_80134E0E;
+extern char SORT_LABEL_BATTLE;
+extern char SORT_LABEL_RAISE;
+extern char SORT_LABEL_BASIC;
+extern char CONFIRM_LABEL_YES;
+extern char CONFIRM_LABEL_NO;
+extern char CONFIRM_PROMPT[];
+extern int16_t INVENTORY_SCROLL_ROW;
+extern int16_t INVENTORY_ROW_OFFSET;
 extern int32_t MAIN_D_80134E00;
-extern volatile uint8_t INVENTORY_SIZE[];
+extern uint8_t INVENTORY_SIZE[];
 void getEntityScreenPos(Entity *e, int32_t mode, int16_t *out);
 void renderString(int32_t a, int32_t b, int32_t c, int32_t d, int32_t e,
 		  int32_t f, int32_t g, int32_t h, int32_t i);
@@ -53,10 +53,10 @@ void swapByte(uint8_t *a, uint8_t *b);
 void playSound(int32_t vabId, uint32_t note);
 void sortItems(int16_t mode);
 
-int32_t MAIN_func_800DAAF8(int32_t mode);
-void drawInventoryText();
-void drawInventoryTextLine(int8_t slot);
-void MAIN_func_800DADDC();
+int32_t getActionColor(int32_t mode);
+void drawInventoryText(void);
+void drawInventoryTextLine(uint32_t startSlot);
+void resetInventoryFlags();
 void initializeInventoryObject();
 void tickInventoryObject(int32_t instanceId);
 void closeInventoryBoxes();
@@ -65,54 +65,54 @@ void tickInventoryTop();
 void renderInventoryTop();
 void renderInventoryBottom(int32_t arg);
 void closeInventoryBoxes2();
-void MAIN_func_800DBCE8();
-void MAIN_func_800DBE68();
-void MAIN_func_800DBEA0();
-int32_t MAIN_func_800DBFE8(void);
-void MAIN_func_800DC03C();
-void MAIN_func_800DC150();
-void MAIN_func_800DC160();
-void MAIN_func_800DC2A4();
-void MAIN_func_800DC2D8();
-void MAIN_func_800DC3E4();
-void MAIN_func_800DC47C();
-void MAIN_thunk_func_800DC2A4();
+void openActionMenu(void);
+void tickActionMenu();
+void renderActionMenu();
+int32_t closeActionMenu(void);
+void openSortTypeMenu();
+void tickSortTypeMenu();
+void renderSortTypeMenu();
+void closeSubMenu();
+void openDropConfirm();
+void tickDropConfirm();
+void renderDropConfirm();
+void closeSubMenuThunk();
 void updateItemNames();
 void moveItem();
 void selectSorting();
-void MAIN_func_800DC75C();
-void MAIN_func_800DC788();
-void MAIN_func_800DC918();
+void confirmDrop();
+void selectAction();
+void selectInventoryItem();
 
 void copyItemArray(uint8_t *src, uint8_t *dst, int32_t n);
-void MAIN_func_800DCCD4();
-int32_t MAIN_func_800DCD08(int32_t mask);
-void MAIN_func_800DCD58(uint8_t *p, int32_t unused, int32_t max);
+void updateInputHold();
+int32_t isInputTriggered(int32_t mask);
+void moveMenuCursor(uint8_t *p, int32_t unused, int32_t max);
 
 void *inventory_order_anchor[] = {
-	MAIN_func_800DCD58,
-	MAIN_func_800DCD08,
-	MAIN_func_800DCCD4,
+	moveMenuCursor,
+	isInputTriggered,
+	updateInputHold,
 	copyItemArray,
 	sortItems,
-	MAIN_func_800DC918,
-	MAIN_func_800DC788,
-	MAIN_func_800DC75C,
+	selectInventoryItem,
+	selectAction,
+	confirmDrop,
 	selectSorting,
 	moveItem,
 	updateItemNames,
-	MAIN_thunk_func_800DC2A4,
-	MAIN_func_800DC47C,
-	MAIN_func_800DC3E4,
-	MAIN_func_800DC2D8,
-	MAIN_func_800DC2A4,
-	MAIN_func_800DC160,
-	MAIN_func_800DC150,
-	MAIN_func_800DC03C,
-	MAIN_func_800DBFE8,
-	MAIN_func_800DBEA0,
-	MAIN_func_800DBE68,
-	MAIN_func_800DBCE8,
+	closeSubMenuThunk,
+	renderDropConfirm,
+	tickDropConfirm,
+	openDropConfirm,
+	closeSubMenu,
+	renderSortTypeMenu,
+	tickSortTypeMenu,
+	openSortTypeMenu,
+	closeActionMenu,
+	renderActionMenu,
+	tickActionMenu,
+	openActionMenu,
 	closeInventoryBoxes2,
 	renderInventoryBottom,
 	renderInventoryTop,
@@ -121,13 +121,13 @@ void *inventory_order_anchor[] = {
 	closeInventoryBoxes,
 	tickInventoryObject,
 	initializeInventoryObject,
-	MAIN_func_800DADDC,
+	resetInventoryFlags,
 	drawInventoryTextLine,
 	drawInventoryText,
-	MAIN_func_800DAAF8,
+	getActionColor,
 };
 
-int32_t MAIN_func_800DAAF8(int32_t mode)
+int32_t getActionColor(int32_t mode)
 {
 	Item *item;
 	uint8_t t;
@@ -173,22 +173,35 @@ int32_t MAIN_func_800DAAF8(int32_t mode)
 	}
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/inventory", drawInventoryText);
+void drawInventoryText(void)
+{
+	int32_t i;
+	int32_t slot;
+	int32_t y;
+
+	clearTextArea();
+	for (i = 0, slot = 0; i < (INVENTORY_SIZE[0] / 2); ++i, slot += 2) {
+		drawInventoryTextLine((int16_t)slot);
+	}
+	for (i = 0, y = 0; i < 4; ++i, y += 0xc) {
+		drawString(ACTION_LABELS + i * 8, 0xc0, y);
+	}
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/inventory", drawInventoryTextLine);
 
-void MAIN_func_800DADDC(void)
+void resetInventoryFlags(void)
 {
-	MAIN_D_80134E04 = 0;
-	MAIN_D_80134E08 = 0;
+	INVENTORY_STATE = 0;
+	INVENTORY_OPEN = 0;
 }
 
 void initializeInventoryObject(void)
 {
-	if ((MAIN_D_80134E08 != 1) && (UI_BOX_DATA[0].state == 0) &&
+	if ((INVENTORY_OPEN != 1) && (UI_BOX_DATA[0].state == 0) &&
 	    (TAMER_ITEM.worldItem.type == 0xFF)) {
-		MAIN_D_80134E08 = 1;
-		MAIN_D_80134E04 = 1;
+		INVENTORY_OPEN = 1;
+		INVENTORY_STATE = 1;
 		addObject(0x1A5, 0, tickInventoryObject, 0);
 	}
 }
@@ -199,10 +212,10 @@ void closeInventoryBoxes(void)
 {
   int16_t new_var;
   int i;
-  if (MAIN_D_80134E08 != 0)
+  if (INVENTORY_OPEN != 0)
   {
-    MAIN_D_80134E08 = 0;
-    MAIN_D_80134E04 = 0;
+    INVENTORY_OPEN = 0;
+    INVENTORY_STATE = 0;
     for (i = 0; i < 4; i++)
     {
       if (UI_BOX_DATA[i].state != 0)
@@ -224,10 +237,10 @@ INCLUDE_ASM("asm/main/nonmatchings/inventory", renderInventoryTop);
 void renderInventoryBottom(int32_t arg)
 {
 	if (INVENTORY_ITEM_TYPES[INVENTORY_POINTER] != 0xFF) {
-		if (INVENTORY_POINTER != MAIN_D_80134E12) {
+		if (INVENTORY_POINTER != INVENTORY_LAST_POINTER) {
 			updateItemNames();
 		}
-		MAIN_D_80134E12 = INVENTORY_POINTER;
+		INVENTORY_LAST_POINTER = INVENTORY_POINTER;
 		renderString(9, UI_BOX_DATA[1].finalPos.x + 0x1A,
 			     UI_BOX_DATA[1].finalPos.y + 8, 0xFC, 0xC, 0, 0xB4,
 			     6 - arg, 1);
@@ -252,7 +265,7 @@ void closeInventoryBoxes2(void)
 		}
 		r.x = x;
 		r.y = UI_BOX_DATA[0].finalPos.y + 8 +
-		      ((int16_t)((INVENTORY_POINTER / 2) - MAIN_D_80134E0C) * 0x12);
+		      ((int16_t)((INVENTORY_POINTER / 2) - INVENTORY_SCROLL_ROW) * 0x12);
 		r.w = 0x10;
 		r.h = 0x10;
 		removeAnimatedUIBox(1, &r);
@@ -267,18 +280,55 @@ void closeInventoryBoxes2(void)
 	}
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/inventory", MAIN_func_800DBCE8);
-
-void MAIN_func_800DBE68(void)
+void openActionMenu(void)
 {
-	if (UI_BOX_DATA[3].state == 0) {
-		MAIN_func_800DCD58(&MAIN_D_80134E13, 2, 4);
+	RECT finalPos;
+	RECT startPos;
+	int32_t x;
+	int32_t y;
+	int16_t row;
+
+	if ((UI_BOX_DATA[1].state == 1) &&
+	    (UI_BOX_DATA[2].frame == 0) &&
+	    (INVENTORY_STATE != 5)) {
+		UI_BOX_DATA[2].features = 0;
+		ACTION_CURSOR = 0;
+		if ((INVENTORY_POINTER & 1) != 0) {
+			x = UI_BOX_DATA[0].finalPos.x + 0x9a;
+		} else {
+			x = UI_BOX_DATA[0].finalPos.x + 0xa;
+		}
+		row = (INVENTORY_POINTER / 2) - INVENTORY_SCROLL_ROW;
+		if (row < 5) {
+			y = UI_BOX_DATA[0].finalPos.y + 0x18 + row * 0x12;
+		} else {
+			y = UI_BOX_DATA[0].finalPos.y + 0x20 + (row - 6) * 0x12;
+		}
+		finalPos.x = x;
+		finalPos.y = y;
+		finalPos.w = 0x3a;
+		finalPos.h = 0x54;
+		startPos.x = x - 3;
+		startPos.y = UI_BOX_DATA[0].finalPos.y + 7 +
+			     (INVENTORY_POINTER / 2 - INVENTORY_SCROLL_ROW) * 0x12;
+		startPos.w = 0x8a;
+		startPos.h = 0x12;
+		createAnimatedUIBox(2, 1, 0, &finalPos, &startPos,
+				    (TickFunction)tickActionMenu,
+				    (RenderFunction)renderActionMenu);
 	}
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/inventory", MAIN_func_800DBEA0);
+void tickActionMenu(void)
+{
+	if (UI_BOX_DATA[3].state == 0) {
+		moveMenuCursor(&ACTION_CURSOR, 2, 4);
+	}
+}
 
-int32_t MAIN_func_800DBFE8(void)
+INCLUDE_ASM("asm/main/nonmatchings/inventory", renderActionMenu);
+
+int32_t closeActionMenu(void)
 {
 	if (UI_BOX_DATA[2].frame == 0) {
 		return 1;
@@ -289,86 +339,86 @@ int32_t MAIN_func_800DBFE8(void)
 	return 0;
 }
 
-void MAIN_func_800DC03C(void)
+void openSortTypeMenu(void)
 {
 	RECT r1;
 	RECT r2;
 
 	if ((UI_BOX_DATA[2].state == 1) && (UI_BOX_DATA[3].state == 0)) {
-		drawString(&MAIN_D_801343BC, 0xC0, 0x30);
-		drawString(&MAIN_D_801343C4, 0xC0, 0x3C);
-		drawString(&MAIN_D_801343CC, 0xC0, 0x48);
-		MAIN_D_80134E14 = 0;
+		drawString(&SORT_LABEL_BATTLE, 0xC0, 0x30);
+		drawString(&SORT_LABEL_RAISE, 0xC0, 0x3C);
+		drawString(&SORT_LABEL_BASIC, 0xC0, 0x48);
+		SORT_TYPE_CURSOR = 0;
 		r1.x = UI_BOX_DATA[2].finalPos.x + UI_BOX_DATA[2].finalPos.w;
 		r1.y = UI_BOX_DATA[2].finalPos.y;
 		r1.w = 0x48;
 		r1.h = 0x42;
 		r2.x = UI_BOX_DATA[2].finalPos.x + 9;
-		r2.y = UI_BOX_DATA[2].finalPos.y + 6 + (MAIN_D_80134E13 * 0x12);
+		r2.y = UI_BOX_DATA[2].finalPos.y + 6 + (ACTION_CURSOR * 0x12);
 		r2.w = 0x28;
 		r2.h = 0x10;
 		createAnimatedUIBox(3, 1, 0, &r1, &r2,
-				    (TickFunction)MAIN_func_800DC150,
-				    (RenderFunction)MAIN_func_800DC160);
+				    (TickFunction)tickSortTypeMenu,
+				    (RenderFunction)renderSortTypeMenu);
 	}
 }
 
-void MAIN_func_800DC150(void)
+void tickSortTypeMenu(void)
 {
-	MAIN_func_800DCD58(&MAIN_D_80134E14, 3, 3);
+	moveMenuCursor(&SORT_TYPE_CURSOR, 3, 3);
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/inventory", MAIN_func_800DC160);
+INCLUDE_ASM("asm/main/nonmatchings/inventory", renderSortTypeMenu);
 
-void MAIN_func_800DC2A4(void)
+void closeSubMenu(void)
 {
 	if (UI_BOX_DATA[3].state == 1) {
 		removeAnimatedUIBox(3, NULL);
 	}
 }
 
-void MAIN_func_800DC2D8(void)
+void openDropConfirm(void)
 {
 	RECT r1;
 	RECT r2;
 
 	if ((UI_BOX_DATA[2].state == 1) && (UI_BOX_DATA[3].state == 0)) {
-		drawString(&MAIN_D_801343D4, 0xC5, 0x54);
-		drawString(&MAIN_D_801343D8, 0xC0, 0x60);
-		drawString(MAIN_D_8012A9B4, 0, 0xC0);
+		drawString(&CONFIRM_LABEL_YES, 0xC5, 0x54);
+		drawString(&CONFIRM_LABEL_NO, 0xC0, 0x60);
+		drawString(CONFIRM_PROMPT, 0, 0xC0);
 		r1.x = -0x40;
 		r1.y = -0x26;
 		r1.w = 0x80;
 		r1.h = 0x35;
 		r2.x = UI_BOX_DATA[2].finalPos.x + 9;
-		MAIN_D_80134E15 = 1;
-		r2.y = UI_BOX_DATA[2].finalPos.y + 6 + (MAIN_D_80134E13 * 0x12);
+		CONFIRM_CURSOR = 1;
+		r2.y = UI_BOX_DATA[2].finalPos.y + 6 + (ACTION_CURSOR * 0x12);
 		r2.w = 0x28;
 		r2.h = 0x10;
 		createAnimatedUIBox(3, 1, 0, &r1, &r2,
-				    (TickFunction)MAIN_func_800DC3E4,
-				    (RenderFunction)MAIN_func_800DC47C);
+				    (TickFunction)tickDropConfirm,
+				    (RenderFunction)renderDropConfirm);
 	}
 }
 
-void MAIN_func_800DC3E4(void)
+void tickDropConfirm(void)
 {
-	MAIN_func_800DCCD4();
-	if ((MAIN_func_800DCD08(0x8000) != 0) && (MAIN_D_80134E15 != 0)) {
+	updateInputHold();
+	if ((isInputTriggered(0x8000) != 0) && (CONFIRM_CURSOR != 0)) {
 		playSound(0, 2);
-		MAIN_D_80134E15 -= 1;
+		--CONFIRM_CURSOR;
 	}
-	if ((MAIN_func_800DCD08(0x2000) != 0) && (MAIN_D_80134E15 == 0)) {
+	if ((isInputTriggered(0x2000) != 0) && (CONFIRM_CURSOR == 0)) {
 		playSound(0, 2);
-		MAIN_D_80134E15 += 1;
+		++CONFIRM_CURSOR;
 	}
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/inventory", MAIN_func_800DC47C);
+INCLUDE_ASM("asm/main/nonmatchings/inventory", renderDropConfirm);
 
-void MAIN_thunk_func_800DC2A4(void)
+void closeSubMenuThunk(void)
 {
-	MAIN_func_800DC2A4();
+	closeSubMenu();
 }
 
 void updateItemNames(void)
@@ -389,11 +439,11 @@ void moveItem(void)
 	uint8_t *p;
 
 	p = &INVENTORY_ITEM_TYPES[INVENTORY_POINTER];
-	swapByte(p, &INVENTORY_ITEM_TYPES[MAIN_D_80134E11]);
+	swapByte(p, &INVENTORY_ITEM_TYPES[INVENTORY_MOVE_SRC]);
 	swapByte(&INVENTORY_ITEM_TYPES[INVENTORY_POINTER] + 0x1E,
-		 &INVENTORY_ITEM_TYPES[MAIN_D_80134E11] + 0x1E);
+		 &INVENTORY_ITEM_TYPES[INVENTORY_MOVE_SRC] + 0x1E);
 	swapByte(&INVENTORY_ITEM_TYPES[INVENTORY_POINTER] + 0x3C,
-		 &INVENTORY_ITEM_TYPES[MAIN_D_80134E11] + 0x3C);
+		 &INVENTORY_ITEM_TYPES[INVENTORY_MOVE_SRC] + 0x3C);
 	if (*p != 0xFF) {
 		updateItemNames();
 	}
@@ -401,29 +451,29 @@ void moveItem(void)
 
 void selectSorting(void)
 {
-	if (MAIN_D_80134E04 != MAIN_D_80134E14 + 0xB) {
-		sortItems(MAIN_D_80134E14 + 0xB);
-		MAIN_D_80134E04 = MAIN_D_80134E14 + 0xB;
+	if (INVENTORY_STATE != SORT_TYPE_CURSOR + 0xB) {
+		sortItems(SORT_TYPE_CURSOR + 0xB);
+		INVENTORY_STATE = SORT_TYPE_CURSOR + 0xB;
 	}
 }
 
-void MAIN_func_800DC75C(void)
+void confirmDrop(void)
 {
-	if (MAIN_D_80134E15 == 0) {
-		MAIN_D_80134E04 = 7;
+	if (CONFIRM_CURSOR == 0) {
+		INVENTORY_STATE = 7;
 	} else {
-		MAIN_D_80134E04 = 0xF;
+		INVENTORY_STATE = 0xF;
 	}
 }
 
-void MAIN_func_800DC788(void)
+void selectAction(void)
 {
 	Item *item;
 	uint8_t t;
 
-	if ((MAIN_D_80134E04 != 0xB) && (MAIN_D_80134E04 != 0xC) &&
-	    (MAIN_D_80134E04 != 0xD) && (UI_BOX_DATA[3].state == 0)) {
-		switch (MAIN_D_80134E13) {
+	if ((INVENTORY_STATE != 0xB) && (INVENTORY_STATE != 0xC) &&
+	    (INVENTORY_STATE != 0xD) && (UI_BOX_DATA[3].state == 0)) {
+		switch (ACTION_CURSOR) {
 		case 0:
 			t = INVENTORY_ITEM_TYPES[INVENTORY_POINTER];
 			if (t != 0xFF) {
@@ -432,31 +482,31 @@ void MAIN_func_800DC788(void)
 				case 0:
 					if ((item->itemColor == 0) ||
 					    (item->itemColor == 2)) {
-						MAIN_D_80134E04 = 5;
+						INVENTORY_STATE = 5;
 					}
 					break;
 				case 1:
 					if ((item->itemColor == 1) ||
 					    (item->itemColor == 2)) {
-						MAIN_D_80134E04 = 5;
+						INVENTORY_STATE = 5;
 					}
 					break;
 				}
 			}
 			break;
 		case 1:
-			MAIN_D_80134E04 = 6;
-			MAIN_D_80134E11 = INVENTORY_POINTER;
+			INVENTORY_STATE = 6;
+			INVENTORY_MOVE_SRC = INVENTORY_POINTER;
 			UI_BOX_DATA[0].state = 4;
 			return;
 		case 2:
-			MAIN_D_80134E04 = 8;
+			INVENTORY_STATE = 8;
 			break;
 		case 3:
 			if (GAME_STATE == 0) {
 				t = INVENTORY_ITEM_TYPES[INVENTORY_POINTER];
 				if ((t != 0xFF) && ITEM_PARA[INVENTORY_ITEM_TYPES[INVENTORY_POINTER]].droppable == 1) {
-					MAIN_D_80134E04 = 0xE;
+					INVENTORY_STATE = 0xE;
 				}
 			}
 			break;
@@ -464,25 +514,25 @@ void MAIN_func_800DC788(void)
 	}
 }
 
-void MAIN_func_800DC918(void)
+void selectInventoryItem(void)
 {
-	if ((MAIN_D_80134E04 != 0xB) && (MAIN_D_80134E04 != 0xC) &&
-	    (MAIN_D_80134E04 != 0xD) && (MAIN_D_80134E04 != 5) &&
+	if ((INVENTORY_STATE != 0xB) && (INVENTORY_STATE != 0xC) &&
+	    (INVENTORY_STATE != 0xD) && (INVENTORY_STATE != 5) &&
 	    (UI_BOX_DATA[2].state == 0)) {
 		if (UI_BOX_DATA[0].state == 0) {
-			MAIN_D_80134E04 = 1;
+			INVENTORY_STATE = 1;
 			return;
 		}
-		if (MAIN_D_80134E04 == 6) {
+		if (INVENTORY_STATE == 6) {
 			playSound(0, 4);
 			UI_BOX_DATA[0].state = 1;
-			MAIN_D_80134E04 = 0;
+			INVENTORY_STATE = 0;
 			moveItem();
 			return;
 		}
-		if ((MAIN_D_80134E04 < 5) && (TAMER_ITEM.worldItem.type == 0xFF) &&
+		if ((INVENTORY_STATE < 5) && (TAMER_ITEM.worldItem.type == 0xFF) &&
 		    (UI_BOX_DATA[1].state == 1)) {
-			MAIN_D_80134E04 = 3;
+			INVENTORY_STATE = 3;
 		}
 	}
 }
@@ -493,41 +543,39 @@ void copyItemArray(uint8_t *src, uint8_t *dst, int32_t n)
 {
 	int32_t i;
 
-	i = 0;
-	while (i < n) {
+	for (i = 0; i < n; ++i) {
 		*dst++ = *src++;
-		i += 1;
 	}
 }
 
-void MAIN_func_800DCCD4(void)
+void updateInputHold(void)
 {
 	if (POLLED_INPUT == POLLED_INPUT_PREVIOUS) {
-		MAIN_D_80134E18 += 1;
+		++INPUT_HOLD_FRAMES;
 		return;
 	}
-	MAIN_D_80134E18 = 0;
+	INPUT_HOLD_FRAMES = 0;
 }
 
-int32_t MAIN_func_800DCD08(int32_t mask)
+int32_t isInputTriggered(int32_t mask)
 {
 	if ((mask & (POLLED_INPUT & ~POLLED_INPUT_PREVIOUS)) ||
-	    ((MAIN_D_80134E18 >= 0xB) && (mask & POLLED_INPUT))) {
+	    ((INPUT_HOLD_FRAMES >= 0xB) && (mask & POLLED_INPUT))) {
 		return 1;
 	}
 	return 0;
 }
 
-void MAIN_func_800DCD58(uint8_t *p, int32_t unused, int32_t max)
+void moveMenuCursor(uint8_t *p, int32_t unused, int32_t max)
 {
-	MAIN_func_800DCCD4();
-	if ((MAIN_func_800DCD08(0x1000) != 0) && (*p != 0)) {
+	updateInputHold();
+	if ((isInputTriggered(0x1000) != 0) && (*p != 0)) {
 		playSound(0, 2);
-		*p -= 1;
+		--*p;
 	}
-	if ((MAIN_func_800DCD08(0x4000) != 0) && (*p < max - 1)) {
+	if ((isInputTriggered(0x4000) != 0) && (*p < max - 1)) {
 		playSound(0, 2);
-		*p += 1;
+		++*p;
 	}
 }
 
