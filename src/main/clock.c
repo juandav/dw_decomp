@@ -44,7 +44,37 @@ void* clock_functions[] = {
 	initializeClockData
 };
 
-INCLUDE_ASM("asm/main/nonmatchings/clock", initializeClockData);
+void initializeClockData(void)
+{
+	CURRENT_FRAME = 0x2580;
+	CLOCK_OFFSET_X = -0x87;
+	CLOCK_SPRITE.attribute = 0;
+	CLOCK_SPRITE.x = -0x70;
+	CLOCK_SPRITE.y = -0x42;
+	CLOCK_SPRITE.w = 8;
+	YEAR = 0;
+	DAY = 0;
+	HOUR = 8;
+	MINUTE = 0;
+	PLAYTIME_FRAMES = 0;
+	PLAYTIME_HOURS = 0;
+	PLAYTIME_MINUTES = 0;
+	SUBFRAME_COUNT = 0;
+	CLOCK_SPRITE.h = 0x10;
+	CLOCK_SPRITE.tpage = GetTPage(0, 0, 0x380, 0x1C0);
+	CLOCK_SPRITE.cx = 0x100;
+	CLOCK_SPRITE.cy = 0x1F3;
+	CLOCK_SPRITE.u = 0x78;
+	CLOCK_SPRITE.v = 0xC0;
+	CLOCK_SPRITE.b = 0x80;
+	CLOCK_SPRITE.g = CLOCK_SPRITE.r = 0x80;
+	CLOCK_SPRITE.mx = 3;
+	CLOCK_SPRITE.my = 0xD;
+	CLOCK_SPRITE.scaley = 0x1000;
+	CLOCK_SPRITE.scalex = 0x1000;
+	CLOCK_SPRITE.rotate = MINUTE * 0x6000;
+	IS_GAMETIME_RUNNING = 1;
+}
 
 void addClock(void)
 {
