@@ -12,19 +12,34 @@ all 16 binaries - and merged with upstream `main` as of 2026-07-21, through
 432 to 643: eleven new `script_*.c` files and a `script` rodata subsegment.
 
 ```
-decomp-work            green, 644/3003 functions, 15.0458% of code
+decomp-work            green, 645/3003 functions, 15.1338% of code
 wip/view               view_init, one instruction
-wip/three-near-misses  initTournamentInfo, matrixToEuler2, renderTournamentSchedule
+wip/tournament         initTournamentInfo, one instruction
+wip/three-near-misses  superseded, see below
 main, pr16             historical reference
 ```
 
-`wip/efedat` and `wip/collision` are merged - findEFEDATFile and
-setRectangleImpassable match.
+`wip/efedat` and `wip/collision` are merged. `matrixToEuler2` came off
+`wip/three-near-misses` and is merged too, so what is left of that branch is
+the `initTournamentInfo` and `renderTournamentSchedule` drafts. Both were
+written before upstream renamed the `TextBoxData` fields off their `unk_`
+names, so neither compiles as-is; `wip/tournament` carries the rebased
+`initTournamentInfo`.
 
-`view_init` is down to a single instruction: the target hoists the `lui` for
-the `&GS_VIEWPOINT` argument to `GsSetRefView2` up to just after the first
-store, and this build sinks it to the call. Taking the address into a local
-early does not move it - the compiler sinks that too.
+Two are one instruction away, and in both cases it is a slot, not a value:
+
+- `view_init` - the target hoists the `lui` for the `&GS_VIEWPOINT` argument
+  to `GsSetRefView2` up to just after the first store, and this build sinks it
+  to the call. Taking the address into a local early does not move it; the
+  compiler sinks that too.
+- `initTournamentInfo` - the target fills the load delay after
+  `lbu $v0, %gp_rel(TOURNAMENT_SELECTED_ROW)` with the `sra` that finishes
+  `posX`, this build puts `posY`'s there. Both are legal. Nothing in the
+  source moves it.
+
+`renderTournamentSchedule` is further out than its 209/216 suggested: the
+target holds one more value in a callee-saved register - it saves `s8` and
+this build does not - so the whole allocation is shifted, not just scheduled.
 
 Every `wip/` branch carries its analysis in the commit message. They are all
 one or two instructions short, which is register allocation and scheduling
@@ -155,6 +170,15 @@ gap was always types or ordering.
   and the other two bounds read the copies.
 - The declaration order of locals decides which registers the loop variables
   get. Swapping `row` and `col` was what moved them into `t0` and `a3`.
+- Write `MAX` and `ABS` with `>`, not `<`. `((a) > (b)) ? (a) : (b)` and
+  `((x) > 0) ? (x) : -(x)` are what CodeWarrior compiled here; the `<` forms
+  are the same functions but emit the `slt` operands the other way round and
+  branch `bgez` where the target branches `blez`. `dw/math.h`'s `ABS` is the
+  `<` form, so a local one is needed. That was the last 21 diff lines of
+  `matrixToEuler2`, a 206-instruction function that was otherwise correct.
+- A load into one register and the mask into another - `lbu $a1, 0($v0)` then
+  `andi $v0, $a1, 0x3f` - means the load and the mask were separate statements.
+  `x = p[i] & 0x3F` compiles to a single register.
 - Writing `0x80` into an `int8_t` array yields `li -128`. Cast through
   `uint8_t` the way `getTileTrigger` already does.
 - Look for the idiom elsewhere in the same file before inventing one. The
