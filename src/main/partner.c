@@ -864,7 +864,34 @@ void setPartnerState(int8_t state)
 	PARTNER_SUB_STATE = 0;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/partner", checkEatDistance);
+int32_t checkEatDistance(int32_t distance)
+{
+	PositionData *td;
+	PositionData *pd;
+	int16_t tvx;
+	int16_t tvz;
+	int16_t pvx;
+	int16_t pvz;
+	int32_t dist;
+	int32_t threshold;
+
+	td = TAMER_ENTITY.entity.posData;
+	pd = PARTNER_ENTITY.digimonEntity.entity.posData;
+	threshold = distance * 0xC8 / 10 + 0xA0;
+	tvx = td->location.vx;
+	tvz = td->location.vz;
+	pvx = pd->location.vx;
+	pvz = pd->location.vz;
+	dist = (tvx - pvx) * (tvx - pvx) + (tvz - pvz) * (tvz - pvz);
+	if (dist < 0) {
+		dist = -dist;
+	}
+
+	if (threshold * threshold >= dist) {
+		return 1;
+	}
+	return 0;
+}
 
 void MAIN_func_800DF5A0(void)
 {
