@@ -253,7 +253,60 @@ void buildScheduleEntries(void)
 
 extern void MAIN_func_80101EF8(int32_t, int32_t);
 
-INCLUDE_ASM("asm/dget/nonmatchings/dget", initTournamentInfo);
+void initTournamentInfo(int32_t source)
+{
+	RECT box;
+	RECT origin;
+	int32_t textboxId;
+	int32_t slot;
+	int16_t boxPosY;
+	int16_t posX;
+	int16_t posY;
+	uint8_t tournament;
+	uint8_t *tournamentPtr;
+	uint8_t *saved;
+
+	MAIN_D_801353B0 = source;
+
+	if (source != 0) {
+		textboxId = 0xE1;
+		setupBoxOrigin(readPStat(0xFE), &origin);
+		boxPosY = -0x4F;
+		slot = 8;
+	} else {
+		posX = UI_BOX_DATA[2].finalPos.x + 4;
+		posY = UI_BOX_DATA[2].finalPos.y + 3;
+		posX = posX + TOURNAMENT_SELECTED_COLUMN * 0x33 + 3;
+		posY = posY + TOURNAMENT_SELECTED_ROW * 0x10 + 0x16;
+
+		origin.x = posX;
+		origin.y = posY;
+		origin.w = 0x2A;
+		origin.h = 0xD;
+		textboxId = 0xC1;
+		boxPosY = -0x31;
+		slot = 0;
+	}
+
+	box.x = -0x7E;
+	box.y = boxPosY;
+	box.w = 0xFC;
+	box.h = 0x63;
+
+	createTextbox(3, textboxId, &box, &origin, tickTournamentInfo,
+		      renderTournamentInfo);
+	registerTextbox(3, slot, 7, 0, 0);
+
+	saved = MAIN_D_80134FDC;
+	tournamentPtr = &TOURNAMENT_ARRAY[TOURNAMENT_SELECTED_COLUMN * 6];
+	tournament = tournamentPtr[TOURNAMENT_SELECTED_ROW];
+	tournament &= 0x3F;
+	MAIN_D_80134FDC = (uint8_t *)getCupDataJumpTableEntry(
+		getCupDataJumpTable(10, tournament), 0) + 2;
+	MAIN_func_80101EF8(3, 0xFF);
+	ACTIVE_INSTRUCTION = 0x64;
+	MAIN_D_80134FDC = saved;
+}
 
 int32_t tournamentCheckFair(uint8_t value)
 {
