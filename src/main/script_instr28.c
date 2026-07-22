@@ -1,4 +1,5 @@
 #include <dw/clock.h>
+#include <dw/item.h>
 #include <dw/params.h>
 #include <dw/partner.h>
 #include <dw/script.h>

@@ -6,6 +6,7 @@
 #include <dw/butterfly.h>
 #include <dw/entity.h>
 #include <dw/fade.h>
+#include <dw/item.h>
 #include <dw/main.h>
 #include <dw/map.h>
 #include <dw/math.h>
@@ -86,11 +87,6 @@ extern RECT MAIN_D_8013420C;
 extern int32_t MAIN_D_801386A0[16];
 
 typedef struct {
-	SVECTOR spriteLocation;
-	int32_t type;
-} WorldItem;
-
-typedef struct {
 	WorldItem worldItem;
 	int16_t tileX;
 	int16_t tileY;
@@ -144,17 +140,6 @@ typedef struct {
 
 extern RaiseData RAISE_DATA[66];
 
-typedef struct
-{
-	char name[20];
-	int32_t value;
-	int16_t meritValue;
-	int16_t sortingValue;
-	uint8_t itemColor;
-	uint8_t droppable;
-	uint16_t unk;
-} Item;
-
 void startAnimation(Entity *entity, int32_t animId);
 void tickAnimation(Entity *entity);
 void entityLookAtLocation(Entity *entity, VECTOR *pos);
@@ -181,7 +166,6 @@ void clearTextArea(void);
 void clearTextSubArea(RECT *area);
 void setTextColor(int32_t color);
 void playSound(int32_t vabId, uint32_t note);
-int32_t giveItem(int32_t type, int32_t addToInv);
 void setCameraFollowPlayer(void);
 void unsetCameraFollowPlayer(void);
 void pickupItem(int32_t itemType);
@@ -234,7 +218,6 @@ extern int32_t DRAWING_OFFSET_Y;
 extern GsOT GS_ORDERING_TABLE[2];
 extern uint8_t GS_WORK_BASES[2][81920];
 extern MATRIX GsWSMATRIX;
-extern Item ITEM_PARA[128];
 extern int32_t FADE_PROTECTION;
 int32_t ENDI_tickEnding(Entity *entity, int32_t isInitialized);
 int32_t MURD_tick(Entity *entity, int32_t isInitialized);

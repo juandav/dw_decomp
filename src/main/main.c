@@ -149,13 +149,12 @@ extern TMDModel *BUFF_MODEL[];
 
 void resetFlattenGlobal(void);
 void initializeDroppedItems(void);
-void MAIN_func_800DADDC(void);
+void resetInventoryFlags(void);
 void initializeInventory(void);
 void MAIN_func_800DF804(void);
 void initializeInventoryModules(void);
 
 void startAnimation(Entity *entity, uint8_t animId);
-void removeItem(int32_t type, int32_t amount);
 
 void initializeEFE(void);
 void initializeParticleFX(void);
@@ -661,7 +660,7 @@ void initializeInventoryModules(void)
 	COMBAT_DATA_PTR = &COMBAT_DATA;
 	resetFlattenGlobal();
 	initializeDroppedItems();
-	MAIN_func_800DADDC();
+	resetInventoryFlags();
 	initializeInventory();
 	MAIN_func_800DF804();
 }
