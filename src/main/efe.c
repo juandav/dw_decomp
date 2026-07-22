@@ -35,7 +35,7 @@ extern int32_t DRAWING_OFFSET_X;
 extern int32_t DRAWING_OFFSET_Y;
 void getDrawingOffsetCopy(int32_t *x, int32_t *y);
 int32_t isTamerOnScreen(void);
-extern uint8_t MAIN_D_8013421C[];
+extern uint8_t MAIN_D_8013421C[4];
 extern int32_t VIEWPORT_DISTANCE;
 int32_t lerp(int16_t a, int16_t b, int32_t c, int16_t d, int32_t e);
 void renderParticleFlash(int16_t *params);

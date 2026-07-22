@@ -10,13 +10,14 @@ the rest of the repository.
 all 16 binaries - and merged with upstream `main` as of 2026-07-21.
 
 ```
-decomp-work            green, 431/3004 functions, 9.0131% of code
-wip/efedat             findEFEDATFile, 37 of 39 instructions
+decomp-work            green, 432/3004 functions, 9.0294% of code
 wip/collision          setRectangleImpassable, 30 of 32
 wip/view               view_init, 36 of 36
 wip/three-near-misses  initTournamentInfo, matrixToEuler2, renderTournamentSchedule
 main, pr16             historical reference
 ```
+
+`wip/efedat` is merged - findEFEDATFile matches.
 
 Every `wip/` branch carries its analysis in the commit message. They are all
 one or two instructions short, which is register allocation and scheduling
@@ -128,6 +129,12 @@ gap was always types or ordering.
 - `lui`/`addiu` where the target uses `$gp` means the symbol lives in `.sdata`
   and is declared `extern type X[]` with no size. The compiler cannot tell it
   fits under `-sdata 8`. Give it the size.
+- `addu $r, $r, $zero` after a `lui`/`addiu` pair is an *index*, not a store
+  through a pointer. The compiler proved the index was zero, kept it in
+  `$zero` and still emitted the addition, so write `X[i]` with `i = 0` on the
+  line above. Reaching for a pointer local instead - plain, `volatile` or
+  self-assigned - gets folded straight back to a direct store through `$at`.
+  This closed `findEFEDATFile`.
 - Writing `0x80` into an `int8_t` array yields `li -128`. Cast through
   `uint8_t` the way `getTileTrigger` already does.
 - Look for the idiom elsewhere in the same file before inventing one. The
@@ -152,16 +159,23 @@ from C on the first try.
 - Run git from Linux only. Over `\\wsl.localhost` from Windows it cannot see
   the executable bits and reports spurious mode changes on every script.
 
+## The `sdata` audit is done
+
+It was worth less than it looked. The 22 `sdata` subsegments hold 643 symbols,
+but only 31 are declared in C at all - the rest are referenced solely from
+functions still in asm. Of those 31, exactly two were incomplete arrays, both
+in `efe.c`: `MAIN_D_80134220`, which closed `findEFEDATFile`, and
+`MAIN_D_8013421C`, now `[4]`, which `renderEFEFlash` reaches through `$gp` and
+will need when that function is written.
+
+So there is no backlog of missing sizes waiting to unblock the near misses.
+The check is cheap to repeat as more of each file lands - collect the symbols
+from `asm/main/data/*.sdata.s` and grep the C for `extern` declarations of them
+that end in `[]`.
+
 ## Next
 
-Audit the `sdata` declarations. `config/main.yaml` defines `sdata` subsegments
-for model, file_table, partner_impl, tamer, efe, overworld, ui, item and sound.
-Cross-checking those symbols against their `extern` declarations in the `.c`
-files and filling in the sizes is mechanical work that can unblock several
-functions at once - possibly some of the near misses above, where the permuter
-never moved because the difference is in a declaration rather than in the body.
-
-After that, the worklist:
+The worklist:
 
 ```
 tools/graphify_asm.py --started            # gaps in files already started
