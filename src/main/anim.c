@@ -27,7 +27,7 @@ void readMomentumInstruction(int16_t *delta, int16_t *reload1,
 			     int16_t *divisor);
 int32_t applyMomentum(int32_t base, int16_t reload, int16_t delta,
 		      int16_t *counter, int8_t step, int32_t offset);
-void applyRootMomentum();
+void applyRootMomentum(MomentumData *momentum, Entity *entity);
 
 void *anim_order_anchor[] = {
 	applyRootMomentum,
@@ -136,4 +136,65 @@ int32_t applyMomentum(int32_t base, int16_t reload, int16_t delta,
 	return offset + base;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/anim", applyRootMomentum);
+void applyRootMomentum(MomentumData *momentum, Entity *entity)
+{
+	int32_t i;
+	int16_t *scale1;
+	int16_t *subDelta;
+	int16_t *delta;
+	int16_t *subScale;
+	char *subValue;
+	EntityAnim *anim;
+	PositionData *posData;
+	VECTOR in;
+	VECTOR out;
+	int32_t root[3];
+
+	scale1 = &momentum->scale1[6];
+	subDelta = &momentum->subDelta[6];
+	delta = &momentum->delta[6];
+	subScale = &momentum->subScale[6];
+	anim = &entity->anim;
+	subValue = &momentum->subValue[6];
+
+	for (i = 0; i < 3; i++, delta++, subScale++, subDelta++) {
+		if (i == 0 && (anim->animId == 0x24 || anim->animId == 0x23)) {
+			root[0] = 0;
+		} else if (*subDelta != 0 && (*subScale -= *subDelta, *subScale <= 0)) {
+			root[i] = (*delta + subValue[i]) << 15;
+			*subScale += scale1[i];
+		} else {
+			root[i] = *delta << 15;
+		}
+	}
+
+	if ((entity->anim.animFlag & 2) == 0) {
+		posData = entity->posData;
+
+		in.vx = root[0];
+		in.vy = root[1];
+		in.vz = root[2];
+		ApplyMatrixLV(&posData->posMatrix.coord, &in, &out);
+
+		if ((entity->anim.animFlag & 8) && out.vz < 0) {
+			out.vz = 0;
+		}
+		if ((entity->anim.animFlag & 0x10) && out.vx < 0) {
+			out.vx = 0;
+		}
+		if ((entity->anim.animFlag & 0x20) && out.vz > 0) {
+			out.vz = 0;
+		}
+		if ((entity->anim.animFlag & 0x40) && out.vx > 0) {
+			out.vx = 0;
+		}
+
+		anim->locX = anim->locX + out.vx;
+		anim->locY = anim->locY + out.vy;
+		anim->locZ = anim->locZ + out.vz;
+
+		posData->location.vx = anim->locX >> 15;
+		posData->location.vy = anim->locY >> 15;
+		posData->location.vz = anim->locZ >> 15;
+	}
+}
