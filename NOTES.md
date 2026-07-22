@@ -15,6 +15,7 @@ all 16 binaries - and merged with upstream `main` as of 2026-07-21, through
 decomp-work            green, 649/3003 functions, 15.4605% of code
 wip/view               view_init, one instruction
 wip/tournament         initTournamentInfo, one instruction
+wip/drafts             checkMapCollisionX, modifySomeImage
 wip/three-near-misses  superseded, see below
 main, pr16             historical reference
 ```
@@ -40,6 +41,14 @@ Two are one instruction away, and in both cases it is a slot, not a value:
 `renderTournamentSchedule` is further out than its 209/216 suggested: the
 target holds one more value in a callee-saved register - it saves `s8` and
 this build does not - so the whole allocation is shifted, not just scheduled.
+
+`wip/drafts` holds two that are structurally right and a dozen instructions
+out. `checkMapCollisionX` needs three live copies in the prologue that no
+arrangement of the doubled-assignment trick reproduces - and closing it also
+closes `checkMapCollisionY`, the same function on the other axis.
+`modifySomeImage` needs all four channel extractions hoisted above the first
+multiply; the compiler sinks each one back to its use whatever the source
+says.
 
 Every `wip/` branch carries its analysis in the commit message. They are all
 one or two instructions short, which is register allocation and scheduling
