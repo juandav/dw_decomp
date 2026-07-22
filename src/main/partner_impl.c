@@ -165,7 +165,71 @@ INCLUDE_ASM("asm/main/nonmatchings/partner_impl", initializePartner);
 
 INCLUDE_ASM("asm/main/nonmatchings/partner_impl", setSleepTimes);
 
-INCLUDE_ASM("asm/main/nonmatchings/partner_impl", setFoodTimer);
+void setFoodTimer(int16_t type)
+{
+	int32_t i;
+	int32_t j;
+	uint8_t level;
+
+	level = DIGIMON_DATA[type].level;
+	if (level == 1) {
+		PARTNER_PARA.nextHungerHour = HOUR / 2 * 2 + 2;
+		if (PARTNER_PARA.nextHungerHour >= 0x18) {
+			PARTNER_PARA.nextHungerHour -= 0x18;
+		}
+	} else if (level == 2) {
+		PARTNER_PARA.nextHungerHour = HOUR / 3 * 3 + 3;
+		if (PARTNER_PARA.nextHungerHour >= 0x18) {
+			PARTNER_PARA.nextHungerHour -= 0x18;
+		}
+	} else {
+		for (i = 0; i < 8; i++) {
+			if (HOUR <= PARTNER_PARA.nextHungerHour) {
+				if (PARTNER_PARA.nextHungerHour <
+				    RAISE_DATA[type].hungerTimes[i]) {
+					PARTNER_PARA.nextHungerHour =
+						RAISE_DATA[type].hungerTimes[i];
+					goto done;
+				}
+			} else if (HOUR < RAISE_DATA[type].hungerTimes[i]) {
+				PARTNER_PARA.nextHungerHour =
+					RAISE_DATA[type].hungerTimes[i];
+				goto done;
+			}
+
+			if (RAISE_DATA[type].hungerTimes[i + 1] == -1 || i == 7) {
+				for (j = 0; j < 8; j++) {
+					if (HOUR < RAISE_DATA[type].hungerTimes[j]) {
+						PARTNER_PARA.nextHungerHour =
+							RAISE_DATA[type].hungerTimes[j];
+						goto done;
+					}
+					if (RAISE_DATA[type].hungerTimes[j + 1] == -1 ||
+					    j == 7) {
+						PARTNER_PARA.nextHungerHour =
+							RAISE_DATA[type].hungerTimes[0];
+						goto done;
+					}
+				}
+				goto done;
+			}
+		}
+	}
+
+done:
+	if (HOUR <= PARTNER_PARA.nextHungerHour) {
+		PARTNER_PARA.foodLevel = (PARTNER_PARA.nextHungerHour - HOUR) * 0x3C;
+		if (MINUTE != 0) {
+			PARTNER_PARA.foodLevel -= MINUTE;
+		}
+	} else {
+		PARTNER_PARA.foodLevel = (0x18 - HOUR) * 0x3C;
+		PARTNER_PARA.foodLevel += (int16_t)(PARTNER_PARA.nextHungerHour * 0x3C);
+		if (MINUTE != 0) {
+			PARTNER_PARA.foodLevel -= MINUTE;
+		}
+	}
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/partner_impl", renderPoop);
 
