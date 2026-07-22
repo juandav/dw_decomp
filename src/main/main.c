@@ -155,7 +155,6 @@ void MAIN_func_800DF804(void);
 void initializeInventoryModules(void);
 
 void startAnimation(Entity *entity, uint8_t animId);
-void removeItem(int32_t type, int32_t amount);
 
 void initializeEFE(void);
 void initializeParticleFX(void);

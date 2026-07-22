@@ -23,7 +23,7 @@ typedef struct {
 	int16_t hpDamageBuffer;
 	int16_t mpDamageBuffer;
 	int16_t speedBuffer;
-	int16_t flags;
+	uint16_t flags;
 	uint8_t moveRange;
 	uint8_t targetId;
 	uint8_t queuedAnim;

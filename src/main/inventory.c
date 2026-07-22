@@ -32,7 +32,6 @@ void closeTriangleMenu(void);
 void startAnimation(Entity *e, int32_t anim);
 void startFeedingItem(uint8_t type);
 void startThrowingItem(void);
-void removeItem(int32_t type, uint32_t amount);
 extern char MAIN_D_801343BC;
 extern char MAIN_D_801343C4;
 extern char MAIN_D_801343CC;

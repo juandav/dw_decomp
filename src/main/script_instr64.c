@@ -1,6 +1,7 @@
 #include <dw/clock.h>
 #include <dw/fade.h>
 #include <dw/file_queue.h>
+#include <dw/item.h>
 #include <dw/map_object.h>
 #include <dw/params.h>
 #include <dw/script.h>

@@ -192,6 +192,9 @@ SECTIONS
         . = ALIGN(., 4);
         build/src/main/ui.c.o(.rodata.*)
         . = ALIGN(., 4);
+        /* TODO: figure out why jump table order is inverted */
+        build/src/main/item.c.o(SORT_BY_NAME(.rodata.*))
+        . = ALIGN(., 4);
         build/asm/main/data/item.rodata.s.o(.rodata.*)
         . = ALIGN(., 4);
         build/src/main/sound.c.o(.rodata.*)
