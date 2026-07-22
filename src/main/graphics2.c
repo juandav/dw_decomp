@@ -63,6 +63,7 @@ void renderLinePrimitive(uint32_t color, int16_t x0, int16_t y0, int16_t x1,
 			 int32_t y1, int32_t order, uint32_t mode);
 void rotateVectorYXZ(SVECTOR *rotation, VECTOR *input, VECTOR *output);
 void matrixToEuler2(MATRIX *matrix, SVECTOR *output);
+void MAIN_func_800E4470(MATRIX *matrix, SVECTOR *output);
 void multiplyRotations(SVECTOR *rotation1, SVECTOR *rotation2);
 int32_t customRandom(int32_t min, int32_t max);
 
@@ -147,7 +148,44 @@ INCLUDE_ASM("asm/main/nonmatchings/graphics2", toEulerAngles);
 
 INCLUDE_ASM("asm/main/nonmatchings/graphics2", getDistance);
 
-INCLUDE_ASM("asm/main/nonmatchings/graphics2", MAIN_func_800E4470);
+void MAIN_func_800E4470(MATRIX *matrix, SVECTOR *output)
+{
+	int32_t sinX;
+	int32_t cosX;
+	int32_t sinZ;
+	int32_t cosZ;
+	int32_t largest;
+	int32_t scale;
+
+	if (matrix->m[2][2] == 0 && matrix->m[0][0] == 0) {
+		output->vy = (matrix->m[0][2] > 0) ? 0x400 : -0x400;
+		output->vx = ratan2(matrix->m[2][1], matrix->m[1][1]);
+		output->vz = 0;
+		return;
+	}
+
+	output->vx = ratan2(-matrix->m[1][2], matrix->m[2][2]);
+	output->vz = ratan2(-matrix->m[0][1], matrix->m[0][0]);
+
+	sinX = rsin(output->vx);
+	cosX = rcos(output->vx);
+	sinZ = rsin(output->vz);
+	cosZ = rcos(output->vz);
+
+	largest = MAX(MAX(ABS(sinX), ABS(cosX)), MAX(ABS(sinZ), ABS(cosZ)));
+
+	if (largest == ABS(sinX)) {
+		scale = (-matrix->m[1][2] << 12) / sinX;
+	} else if (largest == ABS(cosX)) {
+		scale = (matrix->m[2][2] << 12) / cosX;
+	} else if (largest == ABS(sinZ)) {
+		scale = (-matrix->m[0][1] << 12) / sinZ;
+	} else if (largest == ABS(cosZ)) {
+		scale = (matrix->m[0][0] << 12) / cosZ;
+	}
+
+	output->vy = ratan2(matrix->m[0][2], scale);
+}
 
 void matrixToEuler2(MATRIX *matrix, SVECTOR *output)
 {
