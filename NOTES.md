@@ -12,7 +12,7 @@ all 16 binaries - and merged with upstream `main` as of 2026-07-21, through
 432 to 643: eleven new `script_*.c` files and a `script` rodata subsegment.
 
 ```
-decomp-work            green, 645/3003 functions, 15.1338% of code
+decomp-work            green, 647/3003 functions, 15.3210% of code
 wip/view               view_init, one instruction
 wip/tournament         initTournamentInfo, one instruction
 wip/three-near-misses  superseded, see below
@@ -179,6 +179,17 @@ gap was always types or ordering.
 - A load into one register and the mask into another - `lbu $a1, 0($v0)` then
   `andi $v0, $a1, 0x3f` - means the load and the mask were separate statements.
   `x = p[i] & 0x3F` compiles to a single register.
+- Where a comparison names the same two values either way round, the operand
+  order in the source decides which value lands in which register. `HOUR <= X`
+  and `X >= HOUR` are the same `slt` with its inputs swapped. When the values
+  are right but the registers are crossed, try the other form before anything
+  else - it closed both the loop test and the tail of `setFoodTimer`.
+- Reading a global twice makes the compiler copy it into a second register for
+  the second read. If the target tests the same register both times, the
+  source had a local.
+- Before starting a function, look for one already matched that does the same
+  thing. `MAIN_func_800E4470` is `matrixToEuler2` on different matrix
+  elements, and went in almost as written once the macros were there.
 - Writing `0x80` into an `int8_t` array yields `li -128`. Cast through
   `uint8_t` the way `getTileTrigger` already does.
 - Look for the idiom elsewhere in the same file before inventing one. The
