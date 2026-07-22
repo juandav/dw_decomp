@@ -165,6 +165,16 @@ gap was always types or ordering.
 - `lui`/`addiu` where the target uses `$gp` means the symbol lives in `.sdata`
   and is declared `extern type X[]` with no size. The compiler cannot tell it
   fits under `-sdata 8`. Give it the size.
+- The same rule runs backwards, and that direction comes up more often. `$gp`
+  where the target uses `lui`/`addiu` means the declaration is *too* precise:
+  a complete type under eight bytes makes the compiler assume `.sdata`. Take
+  the size away - `extern int8_t X[]`, read as `X[0]` - and it addresses the
+  symbol absolutely. Anything in `.bss` needs this; `PARTNER_AREA_RESPONSE`
+  sits at 0x80150C3E, which is not within reach of `$gp` at all.
+- A `b` into the middle of a loop, with the increment at the top of the body,
+  is `for (i = 0; cond; i++)`. Test first and increment at the bottom, with no
+  branch to enter, is `for (i = 0;; i++)` with the exit written as an `if` and
+  a `break` inside.
 - `addu $r, $r, $zero` after a `lui`/`addiu` pair is an *index*, not a store
   through a pointer. The compiler proved the index was zero, kept it in
   `$zero` and still emitted the addition, so write `X[i]` with `i = 0` on the
