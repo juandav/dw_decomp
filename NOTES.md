@@ -7,12 +7,12 @@ the rest of the repository.
 ## State
 
 `decomp-work` is the branch to build on. It is green - `make compare` matches
-all 16 binaries - and merged with upstream `main` as of 2026-07-21, through
-`9a148de "Partially match script*.c"`. That merge alone took the count from
-432 to 643: eleven new `script_*.c` files and a `script` rodata subsegment.
+all 16 binaries - and merged with upstream `main` as of 2026-07-22, through
+`7a87687 "Match more inventory.c functions"`. Upstream's item.c and
+inventory.c work brought the count to 656.
 
 ```
-decomp-work            green, 650/3003 functions, 15.5098% of code
+decomp-work            green, 656/3003 functions, 15.7197% of code
 wip/view               view_init, one instruction
 wip/tournament         initTournamentInfo, one instruction
 wip/drafts             checkMapCollisionX, modifySomeImage, popAttackObject
