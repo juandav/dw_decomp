@@ -54,7 +54,17 @@ SECTIONS
         . = ALIGN(., 4);
         KEEP(build/asm/main/psyq/libcd.s.o(.text.*))
         . = ALIGN(., 4);
-        build/asm/main/overworld.s.o(.text.*)
+        build/src/main/overworld.c.o(.text.*)
+        build/src/main/overworld_evochart_detail.c.o(.text.*)
+        build/src/main/overworld_menu_views.c.o(.text.*)
+        build/src/main/overworld_evochart_view.c.o(.text.*)
+        build/src/main/overworld_status_boxes.c.o(.text.*)
+        build/src/main/overworld_moves_text.c.o(.text.*)
+        build/src/main/overworld_moves_box.c.o(.text.*)
+        build/src/main/overworld_playerinfo_text.c.o(.text.*)
+        build/src/main/overworld_evochart_text.c.o(.text.*)
+        build/src/main/overworld_medal_text.c.o(.text.*)
+        build/src/main/overworld_card_text.c.o(.text.*)
         . = ALIGN(., 4);
         build/src/main/map_collision.c.o(.text.*)
         . = ALIGN(., 4);
@@ -182,7 +192,14 @@ SECTIONS
         . = ALIGN(., 4);
         KEEP(build/asm/main/data/psyq/libcd.rodata.s.o(.rodata.*))
         . = ALIGN(., 4);
-        build/asm/main/data/overworld.rodata.s.o(.rodata.*)
+        build/src/main/overworld.c.o(.rodata.*)
+        build/src/main/overworld_menu_views.c.o(.rodata.*)
+        build/src/main/overworld_moves_box.c.o(.rodata.*)
+        build/src/main/overworld_evochart_view.c.o(.rodata.*)
+        build/src/main/overworld_evochart_detail.c.o(.rodata.*)
+        build/src/main/overworld_moves_text.c.o(.rodata.*)
+        build/src/main/overworld_playerinfo_text.c.o(.rodata.*)
+        build/src/main/overworld_medal_text.c.o(.rodata.*)
         . = ALIGN(., 4);
         build/src/main/map_collision.c.o(.rodata.*)
         . = ALIGN(., 4);

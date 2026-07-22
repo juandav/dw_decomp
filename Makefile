@@ -111,6 +111,17 @@ MAIN_SRC := \
 	src/main/battle_ui.c \
 	src/main/map_collision.c \
 	src/main/map_object.c \
+	src/main/overworld.c \
+	src/main/overworld_evochart_detail.c \
+	src/main/overworld_menu_views.c \
+	src/main/overworld_evochart_view.c \
+	src/main/overworld_status_boxes.c \
+	src/main/overworld_moves_text.c \
+	src/main/overworld_moves_box.c \
+	src/main/overworld_playerinfo_text.c \
+	src/main/overworld_evochart_text.c \
+	src/main/overworld_medal_text.c \
+	src/main/overworld_card_text.c \
 	src/main/math.c \
 	src/main/model.c \
 	src/main/particle.c \
