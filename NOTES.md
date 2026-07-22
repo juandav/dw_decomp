@@ -16,7 +16,7 @@ decomp-work            green, 658/3003 functions, 15.7635% of code
 wip/view               view_init, one instruction
 wip/tournament         initTournamentInfo, one instruction
 wip/drafts             checkMapCollisionX, modifySomeImage, popAttackObject,
-                       initializeClockData
+                       initializeClockData, checkEatDistance
 wip/three-near-misses  superseded, see below
 main, pr16             historical reference
 ```
@@ -54,6 +54,18 @@ the first loop, where three registers are rotated against the target.
 `initializeClockData` matches to the opcode - only the live range of the
 constant `8`, shared between `HOUR` and the sprite width, is scheduled
 differently; the colour-store half fell to the permuter's `g = (r = 0x80)`.
+`checkEatDistance` also matches to the opcode: the argument register frees up
+and the target reuses it for a pointer, giving a register rotation this build
+cannot reproduce without breaking the load scheduling instead.
+
+Three of these five - `initializeClockData`, `checkEatDistance`, and
+`popAttackObject` - match to the opcode multiset and differ only in register
+naming or one value's live range. That is the wall this stretch of the worklist
+keeps hitting: the structure is easy, the register allocation is not, and the
+permuter's source-level randomisation reaches it only slowly. The ones that did
+close (`getPartnerTamerCloseness`, `removeItem`) turned on a specific idiom -
+squaring each value the moment it is computed, deriving a pointer from the
+index rather than walking it - not on grinding the allocation.
 
 Every `wip/` branch carries its analysis in the commit message. They are all
 one or two instructions short, which is register allocation and scheduling
