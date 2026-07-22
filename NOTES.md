@@ -12,14 +12,19 @@ all 16 binaries - and merged with upstream `main` as of 2026-07-21, through
 432 to 643: eleven new `script_*.c` files and a `script` rodata subsegment.
 
 ```
-decomp-work            green, 643/3003 functions, 15.0325% of code
-wip/collision          setRectangleImpassable, 30 of 32
-wip/view               view_init, 36 of 36
+decomp-work            green, 644/3003 functions, 15.0458% of code
+wip/view               view_init, one instruction
 wip/three-near-misses  initTournamentInfo, matrixToEuler2, renderTournamentSchedule
 main, pr16             historical reference
 ```
 
-`wip/efedat` is merged - findEFEDATFile matches.
+`wip/efedat` and `wip/collision` are merged - findEFEDATFile and
+setRectangleImpassable match.
+
+`view_init` is down to a single instruction: the target hoists the `lui` for
+the `&GS_VIEWPOINT` argument to `GsSetRefView2` up to just after the first
+store, and this build sinks it to the call. Taking the address into a local
+early does not move it - the compiler sinks that too.
 
 Every `wip/` branch carries its analysis in the commit message. They are all
 one or two instructions short, which is register allocation and scheduling
@@ -110,6 +115,11 @@ and the disc dump.
   its search space, so go back to the source instead of waiting.
 - Batch the permuter across many functions and leave it running. It is machine
   time, not yours.
+- Read the permuter's best candidate even when it never reaches zero. On
+  `setRectangleImpassable` it stalled at 10 from a base of 115, but the
+  candidate contained `col = (col = y)` - the doubled assignment that survives
+  folding - and that was the whole trick. Its output lives in
+  `permuter/<function>/output-<score>-<n>/source.c`.
 - Check the m2c draft before committing to a function. If it comes back full
   of `M2C_ERROR` or `goto`, it will cost several times as much. GTE code
   (`lwc2`, `rtps`, `swc2`) is written with psyq macros and m2c cannot read it.
@@ -137,6 +147,14 @@ gap was always types or ordering.
   line above. Reaching for a pointer local instead - plain, `volatile` or
   self-assigned - gets folded straight back to a direct store through `$at`.
   This closed `findEFEDATFile`.
+- A redundant `move` of a parameter into another register means the source
+  read that parameter through a local, and the local survived. `rc = r` is
+  folded straight back to the parameter; `rc = (rc = r)` survives. Then check
+  which expressions read the copy and which read the parameter - in
+  `setRectangleImpassable` the row start and column end read the parameters
+  and the other two bounds read the copies.
+- The declaration order of locals decides which registers the loop variables
+  get. Swapping `row` and `col` was what moved them into `t0` and `a3`.
 - Writing `0x80` into an `int8_t` array yields `li -128`. Cast through
   `uint8_t` the way `getTileTrigger` already does.
 - Look for the idiom elsewhere in the same file before inventing one. The
