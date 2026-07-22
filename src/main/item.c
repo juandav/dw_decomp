@@ -416,7 +416,28 @@ int32_t getItemCount(uint8_t type)
 
 INCLUDE_ASM("asm/main/nonmatchings/item", giveItem);
 
-INCLUDE_ASM("asm/main/nonmatchings/item", removeItem);
+void removeItem(uint32_t type, uint8_t amount)
+{
+	int32_t i;
+	uint8_t *a;
+
+	if (type == 0xFF) {
+		return;
+	}
+
+	for (i = 0; i < INVENTORY_SIZE[0]; i++) {
+		if (INVENTORY_ITEM_TYPES.array[i] == type) {
+			a = &INVENTORY_ITEM_TYPES.array[i] + 30;
+			if (amount < *a) {
+				*a -= amount;
+			} else {
+				*a = 0;
+				INVENTORY_ITEM_TYPES.array[i] = 0xFF;
+				INVENTORY_ITEM_NAMES.array[i] = 0xFF;
+			}
+		}
+	}
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/item", pickupItem);
 
