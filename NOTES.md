@@ -168,6 +168,9 @@ Encoded so the loop isn't re-derived each session - see `CLAUDE.md` for the map:
   changed source, and functions upstream newly matched. Read-only; never merges.
 - **Skill `match-function`** - the end-to-end procedure (candidate → triage →
   draft → diff → escalate → land/park).
+- **Skill `quarantine-match`** - when a function byte-matches but breaks
+  `make compare` downstream, preserve it on a blocker-grouped branch instead of
+  discarding it, keep decomp-work green, and register the resume condition.
 - **Skill `decomp-heuristics`** - the signal→cause→fix idiom catalog distilled
   from the section below.
 - **Agent `decomp-triage`** - reads one function's raw asm in its own context
@@ -308,6 +311,27 @@ from C on the first try.
   captured after editing, every diff against it reports a false MATCH, and
   the mistake surfaces later as an inexplicable regression. When a diff
   count jumps for no reason, suspect the snapshot before the source.
+  `tools/dwdiff.sh --verify <file> <func>` checks it for you.
+- A function can `dwdiff` MATCH and still break `make compare`. Functions
+  referenced by overlay data tables shift the overlay `_REL.BIN` symbol
+  resolution when converted (see Quarantine). Always `make compare` all 16
+  before committing, and check the build's exit code - a link error leaves the
+  old green binaries in `build/` and compare passes on stale output.
+
+## Quarantine (matches blocked downstream)
+
+Byte-exact matches that can't land on `decomp-work` because converting them
+regresses something the function itself doesn't touch. Preserved, not discarded;
+see the `quarantine-match` skill. Revisit when the blocker column clears.
+
+| branch | function | blocker | resume when |
+|---|---|---|---|
+| `wip/overlay-blocked` | `getEntityFromScriptId` (tamer.c) | overlay refs to `ENTITY_TABLE`/`startAnimation` resolve 8 bytes low in `TRN_REL`/`VS_REL` when it's C; main stays green | the overlay reloc-pairing mechanism is understood |
+
+The risk class is **functions referenced by overlay data tables**. Before
+converting a `main` function, check `grep -rln <func> asm/{vs,trn,trn2,btl,std}`
+and run `make compare` (all 16), not just `dwdiff`, before committing. dwdiff
+MATCH is necessary but not sufficient.
 
 ## The `sdata` audit is done
 

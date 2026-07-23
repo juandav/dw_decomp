@@ -41,6 +41,10 @@ Read the `.s` once and determine:
 6. **Sibling** — the highest-value hint. Scan the source file for an
    **already-matched** function (one that is C, not `INCLUDE_ASM`) with the same
    shape (same calls, same struct, mirrored math). Name it.
+7. **Overlay reference** — `grep -rln <func> asm/{vs,trn,trn2,btl,std}`. If the
+   function (or the globals it touches) is referenced by an overlay data table,
+   flag it: converting it can shift overlay symbol resolution and break the
+   `_REL.BIN` binaries even when the function byte-matches (quarantine risk).
 
 ## Difficulty class (your headline)
 
@@ -62,9 +66,13 @@ FRAME     -0xNN, saves <regs>
 SIGNALS   <e.g. sll/sra x3 (int16), addiu ptr math, lbu load, gp_rel FOO>
 GLOBALS   <symbol : declared? / needs extern / needs size>
 SIBLING   <matched function to copy, or "none found">
+OVERLAY   <referenced by asm/{vs,trn,...}? yes+which / no>
 APPROACH  <2-4 sentences: the C shape, the idiom to reach for, the trap to
           avoid. Reference decomp-heuristics signals by name.>
-RISK      <the one thing most likely to make it a near-miss>
+RISK      <the one thing most likely to make it a near-miss or a quarantine>
 ```
 
 Be concrete and short. The caller acts on this without opening the `.s`.
+
+If OVERLAY is yes, warn the caller to run `make compare` (all 16), not just
+dwdiff, before landing - the match may need quarantining.

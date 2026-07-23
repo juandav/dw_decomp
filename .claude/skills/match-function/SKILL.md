@@ -95,6 +95,13 @@ into `decomp-work` (that breaks green). Revert the file to `INCLUDE_ASM`, save
 the draft as a patch, and record the finding. Near-misses live on `wip/`
 branches; each carries its analysis in the commit message.
 
+**Byte-matches but `make compare` regresses a binary you didn't touch** (an
+overlay `_REL.BIN`, a symbol shift): the C is correct but the build can't take
+it. Use the **`quarantine-match`** skill — preserve it on a blocker-grouped
+branch, keep decomp-work green, register the resume condition. Don't discard a
+correct match. Risk class: functions referenced by overlay data tables
+(`grep -rln <func> asm/{vs,trn,trn2,btl,std}`).
+
 ## Traps (cost hours if missed)
 
 - **`expected/` is a snapshot.** `make expected` copies whatever `build/` holds

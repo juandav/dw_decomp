@@ -35,6 +35,9 @@ what this project has already learned so it isn't re-derived:
   thread.
 - **Skill `decomp-heuristics`** — the CodeWarrior-asm→C idiom catalog (signal →
   cause → fix). Load when reading a target or explaining a diff.
+- **Skill `quarantine-match`** — when a function byte-matches but breaks
+  `make compare` downstream (overlays, symbol shifts), preserve it on a
+  blocker-grouped branch instead of discarding it. See `NOTES.md` → Quarantine.
 - **`tools/dwdiff.sh <file.c> <func>`** — build one object and diff one function
   against `expected/`: normalised diff, instruction counts, and the opcode
   multiset delta (empty ⇒ pure scheduling/allocation miss ⇒ permuter). Use
@@ -62,6 +65,7 @@ hits zero — the idiom is often in it.
 - `expected/` is a snapshot from the last `make expected`; run it only on a
   clean tree. A count that jumps for no reason ⇒ `tools/dwdiff.sh --verify`.
 - `make compare` can pass on a broken build (keeps old binaries) — check the
-  build exit code.
+  build exit code. And a function can `dwdiff` MATCH yet break `make compare`
+  (overlay symbol shifts) — always compare all 16 before committing.
 - After reverting C→`INCLUDE_ASM`, `make regenerate` before building.
 - Run git from Linux only (WSL loses the exec bit).
