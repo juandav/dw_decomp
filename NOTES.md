@@ -21,6 +21,7 @@ wip/particle-flash     renderParticleFlash, full draft, 985/851 instructions
 wip/rotate-vector      rotateVector, 48/50 instructions, EFE_DATA_STACK pop
 wip/intToStringSJIS    intToStringSJIS, 55/56, loop body exact, reg-alloc
 wip/overlay-blocked    getEntityFromScriptId, matches but breaks overlays
+wip/small-leaf-nearmiss MAIN_func_800DF804 (24/25 move), 800E7D9C (20/20 lui)
 wip/three-near-misses  superseded, see below
 main, pr16             historical reference
 ```
