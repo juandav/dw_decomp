@@ -4,5 +4,6 @@ bin/
 build/
 disks/
 expected/
+permuter/
 local.mk
 objdiff.json
