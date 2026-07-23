@@ -19,6 +19,8 @@ wip/drafts             checkMapCollisionX, modifySomeImage, popAttackObject,
                        initializeClockData, checkEatDistance
 wip/particle-flash     renderParticleFlash, full draft, 985/851 instructions
 wip/rotate-vector      rotateVector, 48/50 instructions, EFE_DATA_STACK pop
+wip/intToStringSJIS    intToStringSJIS, 55/56, loop body exact, reg-alloc
+wip/overlay-blocked    getEntityFromScriptId, matches but breaks overlays
 wip/three-near-misses  superseded, see below
 main, pr16             historical reference
 ```
@@ -78,6 +80,17 @@ deref too (`char*` direct, +1) or CSE-folds the second pop's read (temp
 pointer, -2). `char* -= 4` also emits trapping `addi`; scaled arithmetic
 `p = (char*)((int32_t*)EFE_DATA_STACK - 1)` gives the target's `addiu`. The
 permuter stalled at base score 260. Draft saved on `wip/rotate-vector`.
+
+`intToStringSJIS` (script_common.c, int -> full-width SJIS digits) is 55/56 with
+the loop body matching instruction-for-instruction. Five idioms closed the
+structure: the local array initializer `int32_t divisors[6] = {1,10,...}` is the
+`MAIN_D_80130344` copy; `uint8_t digits` gives the `addiu`+`andi` decrement;
+`base = (base = 0x824F)` hoists the SJIS '0' into a register (a plain constant
+splits into `addi 592`+`addi 32767`); recomputing `i = digits - 1` at the loop
+top kills a strength-reduced pointer walk; and `goto` mirrors the leading-zero
+suppression. The last instruction is register allocation - the target reuses
+ch's register for the output pointer and copies ch first; permuter plateaus at
+435. Draft on `wip/intToStringSJIS`.
 
 Every `wip/` branch carries its analysis in the commit message. They are all
 one or two instructions short, which is register allocation and scheduling
