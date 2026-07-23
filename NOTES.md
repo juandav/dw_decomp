@@ -17,7 +17,8 @@ wip/view               view_init, one instruction
 wip/tournament         initTournamentInfo, one instruction
 wip/drafts             checkMapCollisionX, modifySomeImage, popAttackObject,
                        initializeClockData, checkEatDistance
-wip/particle-flash     renderParticleFlash, full draft, 975/850 instructions
+wip/particle-flash     renderParticleFlash, full draft, 985/851 instructions
+wip/rotate-vector      rotateVector, 48/50 instructions, EFE_DATA_STACK pop
 wip/three-near-misses  superseded, see below
 main, pr16             historical reference
 ```
@@ -67,6 +68,16 @@ permuter's source-level randomisation reaches it only slowly. The ones that did
 close (`getPartnerTamerCloseness`, `removeItem`) turned on a specific idiom -
 squaring each value the moment it is computed, deriving a pointer from the
 index rather than walking it - not on grinding the allocation.
+
+`rotateVector` (efe.c) is the first function to pop the EFE_DATA_STACK, the
+script VM's argument stack. It is structurally exact - the RotMatrixZYX /
+ApplyMatrixSV body matches `initializeParticleFX` - and 48/50 instructions. The
+two-instruction gap is the per-pop reload: the target loads the global once per
+pop and reuses the register for the deref; every source form either reloads the
+deref too (`char*` direct, +1) or CSE-folds the second pop's read (temp
+pointer, -2). `char* -= 4` also emits trapping `addi`; scaled arithmetic
+`p = (char*)((int32_t*)EFE_DATA_STACK - 1)` gives the target's `addiu`. The
+permuter stalled at base score 260. Draft saved on `wip/rotate-vector`.
 
 Every `wip/` branch carries its analysis in the commit message. They are all
 one or two instructions short, which is register allocation and scheduling
@@ -144,6 +155,23 @@ container. `--no-graphify` skips the graph tooling.
 
 The only things it cannot do are the two proprietary ones: the compiler DLL
 and the disc dump.
+
+## Tooling (for the AI workflow)
+
+Encoded so the loop isn't re-derived each session - see `CLAUDE.md` for the map:
+
+- **`tools/dwdiff.sh <file.c> <func>`** - build one object, diff one function
+  vs `expected/`: normalised diff + instruction counts + opcode multiset delta
+  (empty delta ⇒ pure scheduling/allocation miss ⇒ permuter). `--verify` proves
+  `expected/` isn't contaminated; `--raw` keeps offsets.
+- **`tools/check-upstream.sh`** - fetch upstream/main and report new commits,
+  changed source, and functions upstream newly matched. Read-only; never merges.
+- **Skill `match-function`** - the end-to-end procedure (candidate → triage →
+  draft → diff → escalate → land/park).
+- **Skill `decomp-heuristics`** - the signal→cause→fix idiom catalog distilled
+  from the section below.
+- **Agent `decomp-triage`** - reads one function's raw asm in its own context
+  and returns a compact report, keeping the disassembly out of the main thread.
 
 ## Working faster
 
