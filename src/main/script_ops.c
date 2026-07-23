@@ -1037,7 +1037,40 @@ INCLUDE_ASM("asm/main/nonmatchings/script_ops", MAIN_func_80108A98);
 
 INCLUDE_ASM("asm/main/nonmatchings/script_ops", MAIN_func_80108C88);
 
-INCLUDE_ASM("asm/main/nonmatchings/script_ops", MAIN_func_80108DC0);
+void MAIN_func_80108DC0(int32_t a0)
+{
+	int32_t i;
+	ItemMenuBox *box;
+	ItemMenuBox *box2;
+	int32_t row;
+	int32_t d;
+	int32_t n;
+
+	MAIN_D_80134F6C->prevTopRow = MAIN_D_80134F6C->topRow;
+	MAIN_D_80134F6C->prevCursor = MAIN_D_80134F6C->cursor;
+	box = MAIN_D_80134F6C;
+	box2 = box;
+	n = box2->itemCount * 2;
+	for (i = 0; i < n; i += 2) {
+		if (a0 == box->buf[i]) {
+			row = i >> 1;
+			if (row >= box2->topRow && row < box2->topRow + box2->visibleRows) {
+				box2->cursor = row - box2->topRow;
+			} else {
+				d = row - box2->visibleRows;
+				if (d < 0) {
+					box2->topRow = 0;
+					MAIN_D_80134F6C->cursor = row;
+				} else {
+					MAIN_D_80134F6C->topRow = d + 1;
+					MAIN_D_80134F6C->cursor = MAIN_D_80134F6C->visibleRows - 1;
+				}
+			}
+			break;
+		}
+	}
+	MAIN_func_80108610(1);
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/script_ops", MAIN_func_80108EB4);
 
