@@ -17,6 +17,7 @@ wip/view               view_init, one instruction
 wip/tournament         initTournamentInfo, one instruction
 wip/drafts             checkMapCollisionX, modifySomeImage, popAttackObject,
                        initializeClockData, checkEatDistance
+wip/particle-flash     renderParticleFlash, full draft, 975/850 instructions
 wip/three-near-misses  superseded, see below
 main, pr16             historical reference
 ```
@@ -303,4 +304,9 @@ tools/graphify_asm.py --started            # gaps in files already started
 tools/graphify_asm.py --started --by-size  # biggest leaves, for a percentage
 ```
 
-`renderParticleFlash` is 3400 bytes, the largest single jump available.
+`renderParticleFlash` (3400 bytes, the largest single jump) is reverse-
+engineered in full on `wip/particle-flash` - a complete, compiling draft at
+975 instructions to the target's 850. The structure is done and confirmed;
+what remains is matching the target's register economy so params fields stop
+reloading. Resume from that branch, not from m2c. The four quadrant bodies are
+near-identical, so a fix found in one carries to the other three.
