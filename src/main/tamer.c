@@ -4,6 +4,7 @@
 #include <libgte.h>
 
 #include <dw/butterfly.h>
+#include <dw/endi.h>
 #include <dw/entity.h>
 #include <dw/fade.h>
 #include <dw/item.h>
@@ -219,7 +220,6 @@ extern GsOT GS_ORDERING_TABLE[2];
 extern uint8_t GS_WORK_BASES[2][81920];
 extern MATRIX GsWSMATRIX;
 extern int32_t FADE_PROTECTION;
-int32_t ENDI_tickEnding(Entity *entity, int32_t isInitialized);
 int32_t MURD_tick(Entity *entity, int32_t isInitialized);
 int32_t EAB_tick(Entity *entity, int32_t isInitialized);
 int32_t DOOA_tick(PartnerEntity *partner, void *data, int32_t isInitialized);

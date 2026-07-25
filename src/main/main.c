@@ -9,6 +9,7 @@
 #include <dw/entity.h>
 #include <dw/item.h>
 #include <dw/main.h>
+#include <dw/model.h>
 #include <dw/types.h>
 #include <dw/world_object.h>
 
@@ -64,12 +65,6 @@ typedef struct {
 	uint16_t shiftJIS;
 	uint16_t ascii;
 } Ascii2ShiftJIS;
-
-typedef struct {
-	uint32_t id;
-	uint32_t flags;
-	uint32_t nobj;
-} TMDModel;
 
 extern SectionData SECTION_DATA;
 
@@ -170,7 +165,6 @@ void SsInit(void);
 void PadInit(int32_t mode);
 long MemCardInit(long val);
 long MemCardStart(void);
-void initializeModelComponents(void);
 void initializeGsTMDMap(void);
 void initializeAttackObjects(void);
 void initializeFontCLUT(void);

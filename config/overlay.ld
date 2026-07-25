@@ -134,18 +134,16 @@ SECTIONS
 			KEEP(build/asm/endi/data/header.rodata.s.o(.rodata.*));
 			. = ALIGN(., 4);
 
-			KEEP(build/asm/endi/40.s.o(.text.*));
+			build/src/endi/endi.c.o(.text.*);
 			. = ALIGN(., 4);
 
-			KEEP(build/asm/endi/40.s.o(.rodata.*));
+			build/src/endi/endi.c.o(.rodata.*);
 			. = ALIGN(., 4);
 
-			KEEP(build/asm/endi/40.s.o(.data.*));
-			. = ALIGN(., 4);
-			KEEP(build/asm/endi/data/D98.data.s.o(.data.*));
+			build/src/endi/endi.c.o(.data.*);
 			. = ALIGN(., 4);
 
-			KEEP(build/asm/endi/40.s.o(.bss.*));
+			build/src/endi/endi.c.o(.bss.*);
 			. = ALIGN(., 4);
 		}
 	}

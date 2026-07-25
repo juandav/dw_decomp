@@ -7,24 +7,11 @@
 #include <dw/entity.h>
 #include <dw/evl.h>
 #include <dw/file.h>
+#include <dw/model.h>
 #include <dw/params.h>
 #include <dw/world_object.h>
 
 #include "common.h"
-
-typedef struct {
-	uint32_t useCount;
-	void *modelPtr;
-	int32_t *animTablePtr;
-	void *mmdPtr;
-	uint16_t pixelPage;
-	uint16_t clutPage;
-	uint8_t pixelOffsetX;
-	uint8_t pixelOffsetY;
-	int16_t modelId;
-	int16_t digiType;
-	uint16_t pad;
-} ModelComponent;
 
 extern ModelComponent NPC_MODEL[5];
 extern ModelComponent TAMER_MODEL;
@@ -39,7 +26,6 @@ extern char MAIN_D_8011D190[];
 
 void handleNullModel(void);
 void concatStrings(char *dst, char *src1, char *src2);
-void initializeModelComponents(void);
 void initializePosData(PositionData *posData);
 void loadDigimonTexture(int32_t digiType, char *path,
 			ModelComponent *component);
@@ -59,7 +45,6 @@ void initializeDigimonObject(int32_t type, int32_t instanceId,
 void renderDigimon(int32_t instanceId);
 void renderWireframed(GsDOBJ2* obj, int32_t wireFrameShare);
 void resetFlattenGlobal(void);
-ModelComponent *getEntityModelComponent(int32_t instance, int32_t type);
 int32_t getEntityType(Entity* entity);
 void uploadModelTexture(void *textureData, ModelComponent *component);
 void loadMMDAsync(int32_t digimonType, int32_t entityType, uint8_t *buffer,

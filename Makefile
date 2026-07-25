@@ -216,9 +216,13 @@ DEP += $(EAB_DEP)
 
 OVERLAY += EAB
 
+ENDI_ASM_SRC := $(shell find $(ASM_DIR)/endi -path '*.s' \
+		-not -path '$(ASM_DIR)/endi/*matchings*' 2> /dev/null)
+
+
 ENDI_SRC := \
-	$(wildcard $(ASM_DIR)/endi/*.s) \
-	$(wildcard $(ASM_DIR)/endi/data/*.s)
+	$(ENDI_ASM_SRC) \
+	src/endi/endi.c
 
 ENDI_OBJ := $(ENDI_SRC:%=$(BUILDDIR)/%.o)
 ENDI_DEP := $(ENDI_OBJ:%.o=%.d)

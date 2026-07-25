@@ -56,7 +56,7 @@ segments:
     align: 4
     subalign: 4
     subsegments:
-      - [0x40, asm]
-      - [0xD98, data]
+      - [0x40, c, endi]
+      - [0xD98, .data, endi]
 
   - [0x1534]
