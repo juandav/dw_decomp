@@ -1,11 +1,11 @@
 ENDI_D_80060000 = 0x80060000; // size:0x40
-ENDI_saveVramBlock = 0x80060040;
-ENDI_setVramBlockStp = 0x80060088;
+ENDI_downloadClut = 0x80060040;
+ENDI_setClutStp = 0x80060088;
 ENDI_setModelSemiTrans = 0x800601A0;
 ENDI_updateEnding = 0x80060284;
 ENDI_renderEndingObject = 0x80060510;
 ENDI_startParticles = 0x80060518;
-ENDI_fadeVramBlock = 0x80060560;
+ENDI_fadeClut = 0x80060560;
 ENDI_spawnParticle = 0x800606EC;
 ENDI_releaseParticles = 0x800607C8;
 ENDI_getParticleBase = 0x800609BC;
