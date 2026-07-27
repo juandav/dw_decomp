@@ -1,20 +1,6 @@
 #include <dw/graphics.h>
+#include <dw/move.h>
 #include <dw/ui.h>
-
-typedef struct {
-	int32_t distance;
-	int16_t power;
-	uint8_t mpCost;
-	uint8_t iframes;
-	uint8_t range;
-	uint8_t special;
-	uint8_t status;
-	uint8_t accuracy;
-	uint8_t statusChance;
-	uint8_t unk3;
-	uint8_t unk4;
-	uint8_t unk5;
-} MoveData;
 
 typedef struct {
 	int16_t posX;
@@ -38,7 +24,6 @@ extern int8_t SELECTED_CARD;
 extern uint8_t MAIN_D_80134234[4];
 extern int16_t MAIN_D_80134D38;
 extern int16_t MAIN_D_80134D3A;
-extern MoveData MOVE_DATA[];
 extern int16_t TECH_VIEW_LINES1[];
 extern int16_t TECH_VIEW_LINES2[];
 extern int16_t TECH_VIEW_LINES3[];
@@ -114,7 +99,7 @@ void renderDigimonMovesView(void)
 	int32_t iVar6;
 	int32_t j;
 	int32_t iVar7;
-	MoveData *mv;
+	Move *mv;
 	IconRect *icon;
 	StringRect *sr;
 	if (MENU_STATE > 0 && MENU_STATE < 7) {

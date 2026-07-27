@@ -155,7 +155,7 @@ segments:
       - [0x84D68, .rodata, graphics2]
       - [0x84E68, rodata, psyq/libpress]
       - [0x84F18, rodata, psyq/libmcrd]
-      - [0x851E8, rodata, battle_ui]
+      - [0x851E8, .rodata, battle_ui]
       - [0x85200, .rodata, main]
       - [0x8521C, rodata, vs]
       - [0x85258, .rodata, script_common]
@@ -217,7 +217,7 @@ segments:
       - [0xA4438, .sdata, efe_table]
       - [0xA443C, .sdata, sound_async]
       - [0xA445C, sdata, bubble]
-      - [0xA44D0, sdata, battle_ui]
+      - [0xA44D0, .sdata, battle_ui]
       - [0xA44DC, sdata, main]
 
   - [0xA4C4C]

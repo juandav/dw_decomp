@@ -1,5 +1,6 @@
 #include <dw/clock.h>
 #include <dw/evl.h>
+#include <dw/move.h>
 
 typedef struct {
 	int16_t orderValue;
@@ -25,26 +26,10 @@ typedef struct {
 	int8_t transparency;
 } LocalMapObject;
 
-typedef struct {
-	int32_t distance;
-	int16_t power;
-	uint8_t mpCost;
-	uint8_t iframes;
-	uint8_t range;
-	uint8_t special;
-	uint8_t status;
-	uint8_t accuracy;
-	uint8_t statusChance;
-	uint8_t unk3;
-	uint8_t unk4;
-	uint8_t unk5;
-} MoveData;
-
 extern int16_t MAP_OBJECT_INSTANCE_COUNT;
 extern LocalMapObject LOCAL_MAP_OBJECTS[];
 extern int32_t MAP_OBJECT_MOVE_TO_DATA[];
 extern uint8_t MAIN_D_80134234[4];
-extern MoveData MOVE_DATA[];
 
 void renderRectPolyFT4(int16_t posX, int16_t posY, int32_t width,
 		       int32_t height, uint8_t texX, uint8_t texY,

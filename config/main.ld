@@ -264,7 +264,7 @@ SECTIONS
         . = ALIGN(., 4);
         build/src/main/bubble.c.o(.rodata.*)
         . = ALIGN(., 4);
-        build/asm/main/data/battle_ui.rodata.s.o(.rodata.*)
+        build/src/main/battle_ui.c.o(.rodata.*)
         . = ALIGN(., 4);
         build/src/main/main.c.o(.rodata.*)
         . = ALIGN(., 4);
@@ -478,7 +478,7 @@ SECTIONS
         . = ALIGN(., 4);
         build/asm/main/data/bubble.sdata.s.o(.sdata.*)
         . = ALIGN(., 4);
-        build/asm/main/data/battle_ui.sdata.s.o(.sdata.*)
+        build/src/main/battle_ui.c.o(.sdata.*)
         . = ALIGN(., 4);
         build/asm/main/data/main.sdata.s.o(.sdata.*);
         . = ALIGN(., 4);

@@ -68,10 +68,10 @@ typedef struct {
 
 typedef struct {
 	PlayerDataSub unk1[4];
-	int16_t hitCount;
-	int16_t blockedCount;
+	uint16_t hitCount;
+	uint16_t blockedCount;
 	int16_t statusedCount;
-	int16_t unk2;
+	uint16_t unk2;
 	int16_t startingHP;
 	int16_t commandDelay[2];
 	uint8_t currentCommand[2];
