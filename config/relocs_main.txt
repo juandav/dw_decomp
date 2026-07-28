@@ -131,18 +131,18 @@ rom:0x0006187C reloc:MIPS_HI16 symbol:MAIN_func_800F1794
 rom:0x00061894 reloc:MIPS_LO16 symbol:MAIN_func_800F1794
 rom:0x00061DD0 reloc:MIPS_HI16 symbol:VS_D_80071744
 rom:0x00061DD4 reloc:MIPS_LO16 symbol:VS_D_80071744
-rom:0x00061DDC reloc:MIPS_HI16 symbol:VS_D_80071748
-rom:0x00061DE0 reloc:MIPS_LO16 symbol:VS_D_80071748
-rom:0x00061DE4 reloc:MIPS_HI16 symbol:VS_D_8007174C
-rom:0x00061DE8 reloc:MIPS_LO16 symbol:VS_D_8007174C
-rom:0x00061DEC reloc:MIPS_HI16 symbol:VS_D_80071750
-rom:0x00061DF0 reloc:MIPS_LO16 symbol:VS_D_80071750
+rom:0x00061DDC reloc:MIPS_HI16 symbol:VS_D_80071744 addend:0x4
+rom:0x00061DE0 reloc:MIPS_LO16 symbol:VS_D_80071744 addend:0x4
+rom:0x00061DE4 reloc:MIPS_HI16 symbol:VS_D_80071744 addend:0x8
+rom:0x00061DE8 reloc:MIPS_LO16 symbol:VS_D_80071744 addend:0x8
+rom:0x00061DEC reloc:MIPS_HI16 symbol:VS_D_80071744 addend:0xc
+rom:0x00061DF0 reloc:MIPS_LO16 symbol:VS_D_80071744 addend:0xc
 rom:0x00061E04 reloc:MIPS_HI16 symbol:VS_D_80071744
 rom:0x00061E08 reloc:MIPS_LO16 symbol:VS_D_80071744
-rom:0x00061E18 reloc:MIPS_HI16 symbol:VS_D_80071748
-rom:0x00061E1C reloc:MIPS_LO16 symbol:VS_D_80071748
-rom:0x00061E2C reloc:MIPS_HI16 symbol:VS_D_8007174C
-rom:0x00061E30 reloc:MIPS_LO16 symbol:VS_D_8007174C
+rom:0x00061E18 reloc:MIPS_HI16 symbol:VS_D_80071744 addend:0x4
+rom:0x00061E1C reloc:MIPS_LO16 symbol:VS_D_80071744 addend:0x4
+rom:0x00061E2C reloc:MIPS_HI16 symbol:VS_D_80071744 addend:0x8
+rom:0x00061E30 reloc:MIPS_LO16 symbol:VS_D_80071744 addend:0x8
 rom:0x00062420 reloc:MIPS_26 symbol:VS_func_8005A498
 rom:0x00062468 reloc:MIPS_26 symbol:VS_func_8005D6DC
 rom:0x00062490 reloc:MIPS_26 symbol:VS_func_8005D6DC

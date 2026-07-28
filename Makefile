@@ -143,6 +143,7 @@ MAIN_SRC := \
 	src/main/tournament.c \
 	src/main/ui.c \
 	src/main/utils.c \
+	src/main/vs.c \
 	src/main/world_object.c
 
 MAIN_OBJ := $(MAIN_SRC:%=$(BUILDDIR)/%.o)

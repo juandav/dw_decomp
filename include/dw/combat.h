@@ -24,14 +24,14 @@ typedef struct {
 	int16_t mpDamageBuffer;
 	int16_t speedBuffer;
 	uint16_t flags;
-	uint8_t moveRange;
+	int8_t moveRange;
 	uint8_t targetId;
 	uint8_t queuedAnim;
 	uint8_t buffsRemaining;
 	uint8_t buffPrioTimer;
 	uint8_t unk16;
-	uint8_t table1[150];
-	uint8_t table2[150];
+	int8_t table1[150];
+	int8_t table2[150];
 } FighterData;
 
 typedef struct {
@@ -75,8 +75,8 @@ typedef struct {
 	int16_t startingHP;
 	int16_t commandDelay[2];
 	uint8_t currentCommand[2];
-	uint8_t buffereCommand[2];
-	uint8_t hoveredCommand[2];
+	uint8_t bufferedCommand[2];
+	int8_t hoveredCommand[2];
 	uint8_t availableCommands[2][9];
 	uint8_t numCommands[2];
 	uint8_t finisherChargeup[2];

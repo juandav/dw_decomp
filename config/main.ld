@@ -130,7 +130,7 @@ SECTIONS
         . = ALIGN(., 4);
         build/src/main/main.c.o(.text.*)
         . = ALIGN(., 4);
-        build/asm/main/vs.s.o(.text.*)
+        build/src/main/vs.c.o(.text.*)
         . = ALIGN(., 4);
         build/src/main/script_common.c.o(.text.*)
         . = ALIGN(., 4);
@@ -268,7 +268,7 @@ SECTIONS
         . = ALIGN(., 4);
         build/src/main/main.c.o(.rodata.*)
         . = ALIGN(., 4);
-        build/asm/main/data/vs.rodata.s.o(.rodata.*)
+        build/src/main/vs.c.o(.rodata.*)
         . = ALIGN(., 4);
         build/src/main/script_common.c.o(.rodata.*)
         . = ALIGN(., 4);
@@ -410,7 +410,7 @@ SECTIONS
         . = ALIGN(., 4);
         build/asm/main/data/main.data.s.o(.data.*)
         . = ALIGN(., 4);
-        build/asm/main/vs.s.o(.data.*)
+        build/src/main/vs.c.o(.data.*)
         . = ALIGN(., 4);
         build/src/main/script_common.c.o(.data.*)
         . = ALIGN(., 4);
