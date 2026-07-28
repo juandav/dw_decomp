@@ -364,7 +364,8 @@ objdiff: expected
 	$(PYTHON) tools/objdiff/objdiff_generate.py tools/objdiff/config.yaml
 
 report: objdiff
-	$(OBJDIFF) report generate > $(BUILDDIR)/report.json
+	$(OBJDIFF) report generate \
+		--config combineTextSections=false > $(BUILDDIR)/report.json
 
 $(BUILDDIR)/%.ld: %.ld
 	@mkdir -p $(dir $@)
