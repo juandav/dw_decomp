@@ -1,4 +1,4 @@
-ENTRY(EntryPoint)
+ENTRY(__start)
 
 SECTIONS
 {
@@ -40,7 +40,7 @@ SECTIONS
         . = ALIGN(., 4);
         build/src/main/graphics.c.o(.text.*)
         . = ALIGN(., 4);
-        KEEP(build/asm/main/entrypoint.s.o(.text.*))
+        build/src/main/_psstart.c.o(.text.*)
         . = ALIGN(., 4);
         build/src/main/partner_impl.c.o(.text.*)
         . = ALIGN(., 4);
@@ -153,12 +153,85 @@ SECTIONS
         build/src/main/script_draw.c.o(.text.*)
         . = ALIGN(., 4);
         build/src/main/main_menu.c.o(.text.*)
-        . = ALIGN(., 4);
+        . = ALIGN(., 16);
         main_TEXT_END = .;
         main_TEXT_SIZE = ABSOLUTE(main_TEXT_END - main_TEXT_START);
 
         main_RODATA_START = .;
-        KEEP(build/asm/main/data/entrypoint.rodata.s.o(.rodata.*))
+
+        __static_init = .;
+        LONG(0x0)
+        _gp_addr = .;
+        LONG(_gp)
+        _sbss_size = .;
+        LONG(main_SBSS_SIZE)
+        _bss_size = .;
+        LONG(main_BSS_SIZE)
+        _sdata_size = .;
+        LONG(main_SDATA_SIZE)
+        _data_size = .;
+        LONG(main_DATA_SIZE)
+        _rdata_size = .;
+        LONG(main_RODATA_SIZE)
+        _fsbss = .;
+        LONG(main_SBSS_START)
+        _fbss = .;
+        LONG(main_BSS_START)
+        _fsdata = .;
+        LONG(main_SDATA_START)
+        _fdata = .;
+        LONG(main_DATA_START)
+        _frdata = .;
+        LONG(main_RODATA_START)
+        _start_etbl = .;
+        LONG(main_TEXT_START)
+        _nbfunctions = .;
+        LONG(main_TEXT_START)
+        _ftext = .;
+        LONG(main_TEXT_START)
+        _stack_addr = .;
+        LONG(0x801FFF00)
+        _nbtvectors = .;
+        LONG(0x0)
+        _stack_size = .;
+        LONG(0x40)
+        _heap_size = .;
+        LONG(0x400)
+        _etext = .;
+        LONG(main_TEXT_END)
+        _edata = .;
+        LONG(main_SDATA_END)
+        _end = .;
+        LONG(main_BSS_END)
+        _fsdata_ROM = .;
+        LONG(main_SDATA_START)
+        _fdata_ROM = .;
+        LONG(main_DATA_START)
+        _sdata_ROM_size = .;
+        LONG(main_SDATA_SIZE)
+        _data_ROM_size = .;
+        LONG(main_DATA_SIZE)
+        _scratchpad_size = .;
+        LONG(0x0)
+
+        _overlay_section_addresses = .;
+        LONG(main_TEXT_START)
+        LONG(btl_TEXT_START)
+        LONG(std_TEXT_START)
+        LONG(fish_TEXT_START)
+        LONG(evl_TEXT_START)
+        LONG(kar_TEXT_START)
+        LONG(vs_TEXT_START)
+        LONG(mov_TEXT_START)
+        LONG(doo2_TEXT_START)
+        LONG(dooa_TEXT_START)
+        LONG(trn_TEXT_START)
+        LONG(dget_TEXT_START)
+        LONG(trn2_TEXT_START)
+        LONG(murd_TEXT_START)
+        LONG(endi_TEXT_START)
+        LONG(eab_TEXT_START)
+
         . = ALIGN(., 4);
         build/src/main/partner_impl.c.o(.rodata.*)
         . = ALIGN(., 4);
@@ -193,12 +266,19 @@ SECTIONS
         KEEP(build/asm/main/data/psyq/libcd.rodata.s.o(.rodata.*))
         . = ALIGN(., 4);
         build/src/main/overworld.c.o(.rodata.*)
+        . = ALIGN(., 4);
         build/src/main/overworld_menu_views.c.o(.rodata.*)
+        . = ALIGN(., 4);
         build/src/main/overworld_moves_box.c.o(.rodata.*)
+        . = ALIGN(., 4);
         build/src/main/overworld_evochart_view.c.o(.rodata.*)
+        . = ALIGN(., 4);
         build/src/main/overworld_evochart_detail.c.o(.rodata.*)
+        . = ALIGN(., 4);
         build/src/main/overworld_moves_text.c.o(.rodata.*)
+        . = ALIGN(., 4);
         build/src/main/overworld_playerinfo_text.c.o(.rodata.*)
+        . = ALIGN(., 4);
         build/src/main/overworld_medal_text.c.o(.rodata.*)
         . = ALIGN(., 4);
         build/src/main/map_collision.c.o(.rodata.*)
@@ -326,7 +406,7 @@ SECTIONS
         . = ALIGN(., 4);
         build/asm/main/data/graphics.data.s.o(.data.*)
         . = ALIGN(., 4);
-        KEEP(build/asm/main/entrypoint.s.o(.data.*))
+        KEEP(build/src/main/_psstart.c.o(.data.*))
         . = ALIGN(., 4);
         build/asm/main/data/partner_impl.data.s.o(.data.*)
         . = ALIGN(., 4);

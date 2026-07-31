@@ -1,4 +1,4 @@
-rom:0x00000010 reloc:MIPS_32 symbol:EntryPoint
+rom:0x00000010 reloc:MIPS_32 symbol:__start
 rom:0x00000018 reloc:MIPS_32 symbol:main_TEXT_START
 rom:0x0000001C reloc:MIPS_32 symbol:main_ROM_SIZE
 rom:0x00000028 reloc:MIPS_32 symbol:main_SBSS_START

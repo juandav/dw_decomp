@@ -1,5 +1,7 @@
 #include <stdlib.h>
 
+#include <__rts_info_t__.h>
+
 #include <libcd.h>
 #include <libetc.h>
 #include <libgpu.h>
@@ -16,57 +18,9 @@
 #include "common.h"
 
 typedef struct {
-	uint32_t unk1;
-	uint32_t *globalPointer;
-	uint32_t sbssSize;
-	uint32_t bssSize;
-	uint32_t sdataSize1;
-	uint32_t dataSize1;
-	uint32_t rodataSize;
-	uint32_t *sbssPtr;
-	uint32_t *bssPtr;
-	uint32_t *sdataPtr;
-	uint32_t *dataPtr;
-	uint32_t *rodataPtr;
-	uint32_t *unk6;
-	uint32_t *unk7;
-	uint32_t *unk8;
-	uint32_t *stackTop;
-	uint32_t unk9;
-	uint32_t stackFrames;
-	uint32_t scratchpadSize;
-	uint32_t rodataStart;
-	uint32_t sbssStart;
-	uint32_t bssEnd;
-	uint32_t sdataStart;
-	uint32_t dataStart;
-	uint32_t sdataSize2;
-	uint32_t dataSize2;
-	uint32_t unk17;
-	void *mainTextPtr;
-	void *btlTextPtr;
-	void *stdTextPtr;
-	void *fishTextPtr;
-	void *evlTextPtr;
-	void *karTextPtr;
-	void *vsTextPtr;
-	void *movTextPtr;
-	void *doo2TextPtr;
-	void *dooaTextPtr;
-	void *trnTextPtr;
-	void *dgetTextPtr;
-	void *trn2TextPtr;
-	void *murdTextPtr;
-	void *endiTextPtr;
-	void *eabTextPtr;
-} SectionData;
-
-typedef struct {
 	uint16_t shiftJIS;
 	uint16_t ascii;
 } Ascii2ShiftJIS;
-
-extern SectionData SECTION_DATA;
 
 extern GsRVIEW2 GS_VIEWPOINT;
 
@@ -388,9 +342,9 @@ void initializeHeap(void)
 	unsigned long stackTop;
 	unsigned long stackFrames;
 
-	heap = (SECTION_DATA.bssEnd & 0xfffffff0) + 0x10;
-	stackTop = (unsigned long)SECTION_DATA.stackTop;
-	stackFrames = SECTION_DATA.stackFrames;
+	heap = (_end & 0xfffffff0) + 0x10;
+	stackTop = (unsigned long)_stack_addr;
+	stackFrames = _stack_size;
 
 	InitHeap3((unsigned long *)heap,
 		  ((stackTop - (stackFrames * 0x400)) & 0xfffffff0) - heap);
