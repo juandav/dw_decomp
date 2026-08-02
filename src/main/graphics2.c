@@ -113,7 +113,6 @@ void renderLinePrimitive(uint32_t color, int16_t x0, int16_t y0, int16_t x1,
 	setLineBlendingMode(mode, order);
 }
 
-extern int32_t MAIN_D_80136F98[];
 void MAIN_func_800E3FB8(int16_t *pos, VECTOR *out);
 
 void MAIN_func_800E3FB8(int16_t *pos, VECTOR *out)
@@ -123,7 +122,7 @@ void MAIN_func_800E3FB8(int16_t *pos, VECTOR *out)
   int32_t new_var2;
   SVECTOR v;
   int32_t *cam;
-  cam = MAIN_D_80136F98;
+  cam = (int32_t *)GsWSMATRIX.t;
   new_var2 = (new_var = cam)[0];
  do { v.vx = pos[0] - new_var2; v.vy = pos[1] - new_var[1]; v.vz = pos[2] - new_var[2]; } while (0);
   TransposeMatrix(&GsWSMATRIX, &m);

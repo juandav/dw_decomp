@@ -1,6 +1,6 @@
-#include <dw/math.h>
-#include <rand.h>
+#include <stdlib.h>
 
+#include <dw/math.h>
 
 int32_t random(int32_t limit)
 {
@@ -40,8 +40,8 @@ int32_t _atan(int32_t dy, int32_t dx)
         else generalDirection = 0;
     }
 
-    dy = ABS(dy);
-    dx = ABS(dx);
+    dy = DW_ABS(dy);
+    dx = DW_ABS(dx);
 
     if (dy >= dx)
     {

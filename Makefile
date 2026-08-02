@@ -110,6 +110,7 @@ MAIN_SRC := \
 	src/main/efe.c \
 	src/main/btl.c \
 	src/main/battle_ui.c \
+	src/main/map.c \
 	src/main/map_collision.c \
 	src/main/map_object.c \
 	src/main/overworld.c \

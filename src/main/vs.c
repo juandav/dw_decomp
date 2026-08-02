@@ -289,8 +289,8 @@ extern uint8_t VS_D_800716AD[];
 extern Entity *MAIN_D_80134D60;
 extern int32_t MAIN_D_80134F48;
 extern int16_t MAIN_D_80134510[4];
-extern int32_t MAIN_D_80134D88;
-extern int32_t MAIN_D_80134D8C;
+extern int32_t COMBAT_AREA_CENTER_Y;
+extern int32_t COMBAT_AREA_CENTER_X;
 extern char MAIN_D_8012F48C[];
 extern char MAIN_D_8012F4A4[];
 extern char MAIN_D_8012F4B8[];
@@ -2627,8 +2627,8 @@ int32_t combatMain(void)
 	int16_t result;
 
 	MAIN_D_80134F30 = 0;
-	MAIN_D_80134D8C = 0;
-	MAIN_D_80134D88 = 0;
+	COMBAT_AREA_CENTER_X = 0;
+	COMBAT_AREA_CENTER_Y = 0;
 
 	stopBGM();
 	playMusic(MAIN_D_80135274, 2);

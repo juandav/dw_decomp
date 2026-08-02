@@ -4,7 +4,7 @@
 #include <dw/types.h>
 #include <dw/file_table.h>
 
-#define ABS(x) (((x) < 0) ? -(x) : (x))
+#define DW_ABS(x) (((x) < 0) ? -(x) : (x))
 
 int32_t random(int32_t limit);
 int32_t _sin(int32_t input);

@@ -82,7 +82,7 @@ SECTIONS
         . = ALIGN(., 4);
         KEEP(build/asm/main/psyq/libsnd.s.o(.text.*))
         . = ALIGN(., 4);
-        build/asm/main/map.s.o(.text.*)
+        build/src/main/map.c.o(.text.*)
         . = ALIGN(., 4);
         build/src/main/inventory.c.o(.text.*)
         . = ALIGN(., 4);
@@ -302,7 +302,7 @@ SECTIONS
         . = ALIGN(., 4);
         KEEP(build/asm/main/data/psyq/libsnd.rodata.s.o(.rodata.*))
         . = ALIGN(., 4);
-        build/asm/main/data/map.rodata.s.o(.rodata.*)
+        build/asm/main/data/inventory.rodata.s.o(.rodata.*)
         . = ALIGN(., 4);
         build/src/main/inventory.c.o(.rodata.*)
         . = ALIGN(., 4);
