@@ -171,6 +171,7 @@ void modifySomeImage(int32_t dim);
 int32_t addFileReadRequest(char *path, uint8_t *buffer, uint8_t *isRunning, void *callback, void *callbackParam, CdlLOC *loc, int32_t size);
 CdlLOC *getEFEDATEntry(int32_t id);
 char *VS_initializeParticleEmitters(char *base);
+
 void VS_tickEFEEngine(void);
 void VS_renderEFEEngine(void);
 void VS_clearEFESoundChannels(void);
@@ -360,7 +361,7 @@ void VS_renderFinisherAura(int32_t idx);
 void VS_renderFinisherAuraSpark(char *pos, int32_t scale, SVECTOR *dir, uint8_t *col);
 void VS_initializeFinisherAuraModel(char *tim, char *base);
 void VS_removeFinisherAura(int32_t i);
-int16_t VS_tickAuraProjectile(int32_t idx);
+void VS_tickAuraProjectile(int32_t id);
 void VS_renderAuraProjectile(int32_t i);
 char *VS_initializeAuraProjectiles(char *base);
 void setShortWithStride(int16_t *ptr, int16_t value, int32_t count, int32_t stride);
@@ -1606,7 +1607,34 @@ void VS_render3DTexturedQuad(void)
 	add3DSpritePrim(prim, &a, &b, &c, &d);
 }
 
-INCLUDE_ASM("asm/vs/nonmatchings/vs_effect", VS_setTransformToBoneMatrix);
+void VS_setTransformToBoneMatrix(void)
+{
+	MATRIX m;
+	SVECTOR v;
+	SVECTOR out;
+	int32_t *p;
+	int32_t *q;
+
+	p = (int32_t *)((int32_t)EFE_INSTANCE + 4);
+	calculateBoneMatrix(MAIN_D_80134CE8->sourceEntity, MAIN_D_80134CE8->boneOffset->boneId, &m);
+	v.vx = MAIN_D_80134CE8->boneOffset->positionX;
+	v.vy = MAIN_D_80134CE8->boneOffset->positionY;
+	v.vz = MAIN_D_80134CE8->boneOffset->positionZ;
+	ApplyMatrixSV(&m, &v, &out);
+	p[0] = out.vx;
+	p[1] = out.vy;
+	p[2] = out.vz;
+	q = p++;
+	*q = *q + m.t[0];
+	q = p++;
+	*q = *q + m.t[1];
+	q = p++;
+	*q = *q + m.t[2];
+	matrixToEuler2(&m, &out);
+	*p++ = out.vx;
+	*p++ = out.vy;
+	*p = out.vz;
+}
 
 INCLUDE_ASM("asm/vs/nonmatchings/vs_effect", VS_renderWireframeBox);
 
@@ -2427,7 +2455,34 @@ void VS_renderParallaxSprites(void)
 
 INCLUDE_ASM("asm/vs/nonmatchings/vs_effect", VS_renderScrollingBackground);
 
-INCLUDE_ASM("asm/vs/nonmatchings/vs_effect", VS_setTransformToBoneOffset);
+void VS_setTransformToBoneOffset(void)
+{
+	MATRIX m;
+	SVECTOR in;
+	SVECTOR out;
+	int32_t *p;
+	int32_t *q;
+
+	p = (int32_t *)((int32_t)EFE_INSTANCE + 4);
+	calculateBoneMatrix(MAIN_D_80134CE8->sourceEntity,
+	                    MAIN_D_80134CE8->boneOffset->boneId, &m);
+	in.vx = MAIN_D_80134CE8->boneOffset->positionX;
+	in.vy = MAIN_D_80134CE8->boneOffset->positionY;
+	in.vz = MAIN_D_80134CE8->boneOffset->positionZ;
+	ApplyMatrixSV(&m, &in, &out);
+	p[0] = out.vx;
+	p[1] = out.vy;
+	p[2] = out.vz;
+	q = p++;
+	*q = *q + m.t[0];
+	q = p++;
+	*q = *q + m.t[1];
+	q = p++;
+	*q = *q + m.t[2];
+	*p++ = 0;
+	*p++ = MAIN_D_80134CE8->sourceEntity->posData->rotation.vy;
+	*p = 0;
+}
 
 void VS_playEFESound(void)
 {
@@ -4130,7 +4185,50 @@ void VS_removeAllFinisherAuras(void)
 	}
 }
 
-INCLUDE_ASM("asm/vs/nonmatchings/vs_effect", VS_tickAuraProjectile);
+void VS_tickAuraProjectile(int32_t id)
+{
+	AABB box;
+	EfeAura *a;
+	int32_t hit;
+	uint32_t idx;
+	int32_t j;
+	Entity *e;
+	int32_t ent;
+
+	a = &((EfeAura *)MAIN_D_80135300)[id];
+	a->frame++;
+	if (a->frame >= 0x3a) {
+		a->frame = -1;
+		removeObject(0x179, (int16_t)id);
+		return;
+	}
+	a->position.vx += a->velocity.vx;
+	a->position.vy += a->velocity.vy;
+	a->position.vz += a->velocity.vz;
+	box.center = &a->position;
+	box.extent.vx = 0x2d;
+	box.extent.vy = 0xc8;
+	box.extent.vz = 0x2d;
+	hit = findAABBHitEntity(&box, a->owner, 1);
+	idx = hit;
+	if (hit == -1) {
+		return;
+	}
+	e = ENTITY_TABLE[idx];
+	if (((int8_t *)e)[0x53] != 0) {
+		return;
+	}
+	for (j = 1; j < 10; j++) {
+		ent = (int32_t)ENTITY_TABLE[j];
+		if (ent == (int32_t)a->owner) {
+			break;
+		}
+	}
+	((int8_t *)e)[0x53] = 1;
+	addAttackObject(idx, 1, (int16_t *)&a->position, 0x179, 0, j);
+	a->frame = -1;
+	removeObject(0x179, (int16_t)id);
+}
 
 void VS_renderAuraProjectile(int32_t i)
 {

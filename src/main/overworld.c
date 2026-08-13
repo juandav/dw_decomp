@@ -4,6 +4,7 @@
 #include <dw/evl.h>
 #include <dw/fish.h>
 #include <dw/item.h>
+#include <dw/std.h>
 #include <dw/ui.h>
 
 typedef struct {
@@ -170,7 +171,6 @@ void startAnimation(Entity *entity, int32_t animId);
 void thunkLoadMMD(int32_t digiType, int32_t modelType);
 void thunkUnloadModel(int32_t digiType, int32_t modelType);
 void tickNPCBattle(int32_t instanceId);
-void STD_tickNPCTournament(int32_t instanceId);
 void tickWaypointAI(MapDigimonEntity *mapDigimon, Entity *entity,
 		    int32_t instanceId);
 void tickWaypointWait(MapDigimonEntity *mapDigimon, Entity *entity);

@@ -230,7 +230,6 @@ OVERLAY += EAB
 ENDI_ASM_SRC := $(shell find $(ASM_DIR)/endi -path '*.s' \
 		-not -path '$(ASM_DIR)/endi/*matchings*' 2> /dev/null)
 
-
 ENDI_SRC := \
 	$(ENDI_ASM_SRC) \
 	src/endi/endi.c
@@ -303,9 +302,15 @@ DEP += $(MURD_DEP)
 
 OVERLAY += MURD
 
+STD_ASM_SRC := $(shell find $(ASM_DIR)/std -path '*.s' \
+		-not -path '$(ASM_DIR)/std/*matchings*')
+
 STD_SRC := \
-	$(wildcard $(ASM_DIR)/std/*.s) \
-	$(wildcard $(ASM_DIR)/std/data/*.s)
+	$(STD_ASM_SRC) \
+	src/std/std_setup.c \
+	src/std/std_main.c \
+	src/std/std_hud.c \
+	src/std/std_effect.c
 
 STD_OBJ := $(STD_SRC:%=$(BUILDDIR)/%.o)
 STD_DEP := $(STD_OBJ:%.o=%.d)
@@ -340,7 +345,7 @@ DEP += $(TRN_DEP)
 OVERLAY += TRN
 
 VS_ASM_SRC := $(shell find $(ASM_DIR)/vs -path '*.s' \
-	      -not -path '$(ASM_DIR)/vs/*matchings*')
+		-not -path '$(ASM_DIR)/vs/*matchings*')
 
 VS_SRC := \
 	$(VS_ASM_SRC) \

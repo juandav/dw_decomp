@@ -327,18 +327,42 @@ SECTIONS
 			KEEP(build/asm/std/data/header.rodata.s.o(.rodata.*));
 			. = ALIGN(., 4);
 
-			KEEP(build/asm/std/41C8.s.o(.text.*));
+			build/src/std/std_setup.c.o(.text.*);
+			. = ALIGN(., 4);
+			build/src/std/std_main.c.o(.text.*);
+			. = ALIGN(., 4);
+			build/src/std/std_hud.c.o(.text.*);
+			. = ALIGN(., 4);
+			build/src/std/std_effect.c.o(.text.*);
 			. = ALIGN(., 4);
 
-			KEEP(build/asm/std/41C8.s.o(.rodata.*));
+			build/src/std/std_setup.c.o(.rodata.*);
+			. = ALIGN(., 4);
+			build/src/std/std_main.c.o(.rodata.*);
+			. = ALIGN(., 4);
+			build/src/std/std_hud.c.o(.rodata.*);
+			. = ALIGN(., 4);
+			build/src/std/std_effect.c.o(.rodata.*);
 			. = ALIGN(., 4);
 
-			KEEP(build/asm/std/41C8.s.o(.data.*));
+			build/src/std/std_setup.c.o(.data.*);
 			. = ALIGN(., 4);
-			KEEP(build/asm/std/data/26E0C.data.s.o(.data.*));
+			build/src/std/std_main.c.o(.data.*);
+			. = ALIGN(., 4);
+			build/src/std/std_hud.c.o(.data.*);
+			. = ALIGN(., 4);
+			build/src/std/std_effect.c.o(.data.*);
+			. = ALIGN(., 4);
+			KEEP(build/asm/std/data/26E58.data.s.o(.data.*));
 			. = ALIGN(., 4);
 
-			KEEP(build/asm/std/41C8.s.o(.bss.*));
+			build/src/std/std_setup.c.o(.bss.*);
+			. = ALIGN(., 4);
+			build/src/std/std_main.c.o(.bss.*);
+			. = ALIGN(., 4);
+			build/src/std/std_hud.c.o(.bss.*);
+			. = ALIGN(., 4);
+			build/src/std/std_effect.c.o(.bss.*);
 			. = ALIGN(., 4);
 		}
 	}

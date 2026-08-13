@@ -5,6 +5,7 @@
 #include <dw/entity.h>
 #include <dw/math.h>
 #include <dw/move.h>
+#include <dw/params.h>
 #include <dw/types.h>
 #include <dw/vs.h>
 
@@ -35,7 +36,17 @@ int16_t entityGetTechFromAnim(Entity *entity, int32_t anim);
 void swapInt(int32_t *a, int32_t *b);
 int16_t VS_getAttackTech(AttackObject *attack);
 int32_t VS_applyBuffMove(DigimonEntity *digimon, int32_t slot, int32_t anim);
-void VS_applyPartnerStatsToFighter(void);
+
+extern int32_t MAIN_D_80134D74;
+extern int32_t MAIN_D_80135290;
+
+extern int32_t MAIN_D_80134D7C[2];
+extern int32_t MAIN_D_80134D84;
+
+void renderString(int32_t a, int32_t b, int32_t c, int32_t d, int32_t e,
+                  int32_t f, int32_t g, int32_t h, int32_t i);
+
+int16_t VS_applyPartnerStatsToFighter(DigimonEntity *attacker, DigimonEntity *defender, FighterData *fighter, int16_t move);
 void VS_rollAttackOutcome(void);
 void VS_handleHitReaction(Entity *entity, FighterData *fighter, AttackObject *attack, int16_t index);
 void VS_applyMoveStatus(DigimonEntity *digimon, FighterData *fighter, int32_t move);
@@ -43,7 +54,7 @@ int16_t VS_getFighterSlot(int16_t entityId);
 int32_t VS_addBlockedAttack(FighterData *fighter, FighterData *other);
 void VS_buffStats(DigimonEntity *digimon, int32_t slot, int16_t value, int16_t *stat, int16_t color, uint8_t flag);
 void VS_startAttackAnimation(Entity *entity, AttackObject *attack, int32_t anim);
-void VS_updateFighterStatusVisuals(void);
+void VS_updateFighterStatusVisuals(DigimonEntity *digimon, FighterData *fighter);
 void VS_clearStun(DigimonEntity *digimon, FighterData *fighter);
 void VS_applyFlattenScale(VECTOR *scale, int32_t t);
 void VS_addStatusEffectVisual(DigimonEntity *digimon, FighterData *fighter, int32_t kind);
@@ -67,7 +78,7 @@ int32_t VS_calculateElementBonus(int32_t arg0, int32_t arg1);
 int32_t VS_countLivingEnemies(void);
 void VS_calculateScoreRanks(int32_t *values, int32_t *groups, int32_t count);
 uint8_t VS_isFighterDefeated(uint8_t index);
-void VS_renderMoveName(void);
+void VS_renderMoveName(int32_t i);
 void VS_setCommandIconUV(DigimonEntity *digimon, POLY_FT4 *prim, int32_t index);
 void addEntityText(DigimonEntity *digimon, int32_t slot, int16_t color, int32_t value, uint8_t flag);
 void addWithLimit(int16_t *stat, int32_t value, int32_t limit);
@@ -217,7 +228,65 @@ int32_t VS_applyBuffMove(DigimonEntity *digimon, int32_t slot, int32_t anim)
 	return 1;
 }
 
-INCLUDE_ASM("asm/vs/nonmatchings/vs_main", VS_applyPartnerStatsToFighter);
+int16_t VS_applyPartnerStatsToFighter(DigimonEntity *attacker, DigimonEntity *defender, FighterData *fighter, int16_t move)
+{
+	uint32_t anim;
+	int32_t value;
+	int32_t half;
+	int32_t x;
+	int16_t result;
+
+	if (MAIN_D_80135290 != 0) {
+		return 0;
+	}
+
+	if (fighter->flags & 0x200c) {
+		return 100;
+	}
+
+	if (PARTNER_PARA.condition & 0x40) {
+		return 100;
+	}
+
+	if (fighter->speedBuffer <= 0) {
+		return 100;
+	}
+
+	if (defender->entity.anim.animId >= 0x2eU) {
+		return 100;
+	}
+
+	anim = defender->entity.anim.animId;
+	if ((move >= 0x3a) && (move < 0x71)) {
+		if (fighter->flags & 0x80) {
+			fighter->flags &= 0xff7f;
+			fighter->invulnerableTimer = 0;
+		}
+		return 100;
+	}
+
+	if (fighter->flags & 0x80) {
+		return 0;
+	}
+
+	value = defender->stats.base.speed - (attacker->stats.base.speed / 10);
+	half = MOVE_DATA[move].accuracy / 2;
+	x = half * value / 999;
+	if ((anim == 0x21) || (anim == 0x22)) {
+		x = x * 6 / 5;
+	}
+
+	result = MOVE_DATA[move].accuracy - x;
+	if (result < 0) {
+		result = 0;
+	}
+
+	if (result > 100) {
+		result = 100;
+	}
+
+	return result;
+}
 
 INCLUDE_ASM("asm/vs/nonmatchings/vs_main", VS_rollAttackOutcome);
 
@@ -374,7 +443,42 @@ void VS_applyChargeRequirement(DigimonEntity *digimon, FighterData *fighter, int
 
 INCLUDE_ASM("asm/vs/nonmatchings/vs_main", VS_startFighterMove);
 
-INCLUDE_ASM("asm/vs/nonmatchings/vs_main", VS_selectMoveTarget);
+int32_t VS_selectMoveTarget(Entity *entity, FighterData *fighter)
+{
+	int32_t i;
+	int16_t tech;
+	Entity *e;
+	FighterData *f;
+
+	tech = entityGetTechFromAnim(entity, fighter->queuedAnim);
+	if ((MOVE_DATA[tech].unk3 & 2) != 0) {
+		if (entity == ENTITY_TABLE[1]) {
+			if (MAIN_D_80134D7C[1] > 0) {
+				return 1;
+			}
+		} else {
+			if (MAIN_D_80134D84 > 0) {
+				return 1;
+			}
+		}
+		for (i = 0; i <= ENEMY_COUNT; i++) {
+			e = ENTITY_TABLE[COMBAT_DATA_PTR->player.entityIds[i]];
+			f = (FighterData *)((uint8_t *)COMBAT_DATA_PTR + i * 0x168);
+			if (entity == e) {
+				continue;
+			}
+			if ((f->flags & 0x20) == 0) {
+				continue;
+			}
+			tech = entityGetTechFromAnim(e, e->anim.animId);
+			if ((MOVE_DATA[tech].unk3 & 2) == 0) {
+				continue;
+			}
+			return 1;
+		}
+	}
+	return 0;
+}
 
 INCLUDE_ASM("asm/vs/nonmatchings/vs_main", VS_playMoveEffect);
 
@@ -416,7 +520,25 @@ void VS_addFinisherProgress(FighterData *fighter, int16_t amount)
 	}
 }
 
-INCLUDE_ASM("asm/vs/nonmatchings/vs_main", VS_updateFighterStatusVisuals);
+void VS_updateFighterStatusVisuals(DigimonEntity *digimon, FighterData *fighter)
+{
+	VS_resetFighterAction(fighter);
+	if (digimon == (DigimonEntity *)ENTITY_TABLE[1]) {
+		fighter->targetId = 1;
+	} else {
+		fighter->targetId = 0;
+	}
+
+	fighter->flags &= 0xFFFD;
+	fighter->confusionTimer = 0;
+	if (((fighter->flags & 0xC) == 0) && (fighter->flatTimer == 0)) {
+		fighter->flags &= 0xFFBF;
+		VS_removeStatusEffectVisual(digimon, fighter, 2);
+		if (fighter->flags & 1) {
+			VS_addStatusEffectVisual(digimon, fighter, 1);
+		}
+	}
+}
 
 void VS_clearStun(DigimonEntity *digimon, FighterData *fighter)
 {
@@ -535,7 +657,120 @@ void VS_removeStatusEffectVisual(DigimonEntity *digimon, FighterData *fighter, i
 	} while (0);
 }
 
-INCLUDE_ASM("asm/vs/nonmatchings/vs_main", VS_applyMoveResult);
+void VS_applyMoveResult(void)
+{
+	CombatData *combat;
+	PlayerDataSub *sub;
+	Entity *entity;
+	Stats *stats;
+	FighterData *fighter;
+	int32_t dmg;
+	int32_t i;
+
+	combat = COMBAT_DATA_PTR;
+	sub = combat->player.unk1;
+	i = 0;
+
+	for (; ENEMY_COUNT >= i; i++, sub++) {
+		fighter = &combat->fighter[i];
+		if (fighter->flags & 0x8000) {
+			continue;
+		}
+		entity = ENTITY_TABLE[COMBAT_DATA_PTR->player.entityIds[i]];
+		stats = &((DigimonEntity *)entity)->stats;
+		if (fighter->flags & 1) {
+			if (MAIN_D_80134D74 == 0) {
+				fighter->poisonTimer--;
+			}
+			if (fighter->poisonTimer == 0) {
+				fighter->poisonTimer = 100;
+				dmg = stats->base.hp * (random(3) + 1) / 100;
+				fighter->hpDamageBuffer += dmg;
+				if (fighter->hpDamageBuffer >= 0x2710) {
+					fighter->hpDamageBuffer = 0x270f;
+				}
+				if (i != 0) {
+					COMBAT_DATA_PTR->player.unk1[i].unk25 = 0;
+				}
+				addEntityText((DigimonEntity *)entity, i, 0xc, dmg, 0);
+			}
+		}
+		if (fighter->flags & 2) {
+			if ((MAIN_D_80134D74 == 0) && (fighter->confusionTimer != 0)) {
+				fighter->confusionTimer--;
+			}
+			if ((fighter->confusionTimer == 0) && !(combat->fighter[0].flags & 0x20)) {
+				VS_updateFighterStatusVisuals((DigimonEntity *)entity, fighter);
+			}
+		}
+		if (fighter->flags & 4) {
+			if (MAIN_D_80134D74 == 0) {
+				fighter->stunTimer--;
+			}
+			if (fighter->stunTimer == 0) {
+				VS_clearStun((DigimonEntity *)entity, fighter);
+			}
+		}
+		if (fighter->flatTimer <= 0) {
+			continue;
+		}
+		if ((MAIN_D_80134D74 == 0) || (fighter->flatTimer < 0x42)) {
+			fighter->flatTimer--;
+		}
+		VS_applyFlattenScale(&entity->posData->scale, fighter->flatTimer);
+		if (fighter->flags & 8) {
+			switch (fighter->flatTimer) {
+			case 0x40:
+				if ((fighter->flags & 0x10) || (fighter->flags & 0x20)) {
+					fighter->flatTimer++;
+				} else {
+					startAnimation(entity, 0x22);
+					fighter->moveRange = -1;
+					fighter->flags |= 0x40;
+					stats->current.unk2_2 = 1;
+				}
+				break;
+			case 3:
+				*(int8_t *)&entity->flatSprite = -1;
+				break;
+			case 0:
+				fighter->flags &= 0xffb7;
+				stats->current.unk2_2 = 0;
+				if (fighter->flags & 4) {
+					VS_addStatusEffectVisual((DigimonEntity *)entity, fighter, 3);
+					fighter->moveRange = 0;
+				}
+				if (fighter->flags & 2) {
+					VS_addStatusEffectVisual((DigimonEntity *)entity, fighter, 2);
+				}
+				if (fighter->flags & 1) {
+					VS_addStatusEffectVisual((DigimonEntity *)entity, fighter, 1);
+				}
+				fighter->moveRange = 0;
+				VS_resetFighterAction(fighter);
+				break;
+			}
+		} else {
+			switch (fighter->flatTimer) {
+			case 0x40:
+				startAnimation(entity, 0x22);
+				fighter->moveRange = -1;
+				fighter->flags |= 0x40;
+				stats->current.unk2_2 = 1;
+				break;
+			case 3:
+				entity->flatSprite = 0;
+				break;
+			case 0:
+				fighter->flags |= 8;
+				fighter->flatTimer = random(0x51) + 0xe0;
+				stats->current.unk2_2 = 0;
+				fighter->flags &= 0xffbf;
+				break;
+			}
+		}
+	}
+}
 
 void VS_resetFighterAction(FighterData *fighter)
 {

@@ -9,6 +9,7 @@
 #include <dw/params.h>
 #include <dw/partner.h>
 #include <dw/pstat.h>
+#include <dw/std.h>
 #include <dw/ui.h>
 #include <dw/utils.h>
 
@@ -132,7 +133,6 @@ void readMapTFS(int32_t mapId);
 int32_t DOOA_tick(PartnerEntity* partner, void* data, int32_t isInitialized);
 int32_t DOOA_getSequenceState(int32_t unused, int32_t isInitialized);
 
-void STD_tickPartnerTournament(int32_t instanceId);
 
 void KAR_start();
 void * partner_functions[] = {

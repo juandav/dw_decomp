@@ -15,6 +15,7 @@
 #include <dw/params.h>
 #include <dw/partner.h>
 #include <dw/pstat.h>
+#include <dw/std.h>
 #include <dw/types.h>
 #include <dw/ui.h>
 #include <dw/utils.h>
@@ -226,7 +227,6 @@ int32_t EAB_tick(Entity *entity, int32_t isInitialized);
 int32_t DOOA_tick(PartnerEntity *partner, void *data, int32_t isInitialized);
 
 void tickTamerBattle(int32_t instanceId);
-void STD_tickTamerTournament(int32_t instanceId);
 void tickTamerOverworld(int16_t instanceId);
 void tickWalkingState(void);
 void tickChangeMap(void);
