@@ -8,6 +8,8 @@
 #include <dw/sound.h>
 #include <dw/sound_async.h>
 #include <dw/tournament.h>
+#include <dw/trn.h>
+#include <dw/trn2.h>
 #include <dw/ui.h>
 #include <dw/utils.h>
 
@@ -29,17 +31,6 @@ int32_t startBattle(int16_t instanceId);
 void setLoopCountToOne(int32_t a0);
 void MAIN_func_800D9360(int32_t a0);
 void DOO2_func_8007189C(void);
-void TRN2_func_80089134(int32_t mapId);
-void TRN2_func_80089A6C(int32_t mapId);
-void TRN2_func_8008A654(int32_t mapId);
-void TRN2_func_8008A00C(int32_t mapId);
-void TRN2_func_800896B4(int32_t mapId);
-void TRN_func_8008AAF0(int32_t mapId);
-void TRN_func_8008B5E8(int32_t mapId);
-void TRN_func_8008CA04(int32_t mapId);
-void TRN_func_8008C068(int32_t mapId);
-void TRN_func_8008B0D0(int32_t mapId);
-void TRN_func_8008CE90(int32_t mapId);
 void EAB_func_8006148C(Entity *e);
 int32_t loadTextureFile(char *path, uint32_t *outTPage, uint32_t *outClut);
 
@@ -106,40 +97,40 @@ void scriptInstruction64to7E(int32_t op)
 			    (MAIN_D_80134FFE == 0x63)) {
 				switch (byteArg1) {
 				case 0:
-					TRN2_func_80089134(MAIN_D_80134FFE);
+					TRN2_setupHpTraining(MAIN_D_80134FFE);
 					break;
 				case 1:
-					TRN2_func_80089A6C(MAIN_D_80134FFE);
+					TRN2_setupOffenseTraining(MAIN_D_80134FFE);
 					break;
 				case 2:
-					TRN2_func_8008A654(MAIN_D_80134FFE);
+					TRN2_setupSpeedTraining(MAIN_D_80134FFE);
 					break;
 				case 3:
-					TRN2_func_8008A00C(MAIN_D_80134FFE);
+					TRN2_setupDefenseTraining(MAIN_D_80134FFE);
 					break;
 				case 4:
-					TRN2_func_800896B4(MAIN_D_80134FFE);
+					TRN2_setupMpTraining(MAIN_D_80134FFE);
 					break;
 				}
 			} else {
 				switch (byteArg1) {
 				case 0:
-					TRN_func_8008AAF0(MAIN_D_80134FFE);
+					TRN_setupHpTraining(MAIN_D_80134FFE);
 					break;
 				case 1:
-					TRN_func_8008B5E8(MAIN_D_80134FFE);
+					TRN_setupOffenseTraining(MAIN_D_80134FFE);
 					break;
 				case 2:
-					TRN_func_8008CA04(MAIN_D_80134FFE);
+					TRN_setupSpeedTraining(MAIN_D_80134FFE);
 					break;
 				case 3:
-					TRN_func_8008C068(MAIN_D_80134FFE);
+					TRN_setupDefenseTraining(MAIN_D_80134FFE);
 					break;
 				case 4:
-					TRN_func_8008B0D0(MAIN_D_80134FFE);
+					TRN_setupMpTraining(MAIN_D_80134FFE);
 					break;
 				case 5:
-					TRN_func_8008CE90(MAIN_D_80134FFE);
+					TRN_setupBrainsTraining(MAIN_D_80134FFE);
 					break;
 				}
 			}

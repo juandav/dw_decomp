@@ -1,12 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 #include <libcd.h>
 #include <libetc.h>
 #include <libgpu.h>
 #include <libgs.h>
 #include <libgte.h>
-#include <strings.h>
 #include <mwinline_n.h>
 
 #include <dw/aabb.h>

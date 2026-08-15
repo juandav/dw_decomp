@@ -99,7 +99,7 @@ void STD_func_8006BA18(void);
 void STD_func_8006B468(void);
 void tickAnimation(Entity *entity);
 void STD_func_8006AD00(int32_t i);
-void STD_func_80069134(void);
+void STD_func_80069134(int16_t tech);
 void setupModelMatrix(PositionData *posData);
 void GsSortBoxFill(GsBOXF *bp, GsOT *ot, unsigned short pri);
 void STD_func_8006A824(int32_t id);
@@ -147,7 +147,7 @@ static void *std_hud_functions[] = {
 	STD_func_80069134,
 };
 
-void STD_func_80069134(void)
+void STD_func_80069134(int16_t tech)
 {
 	COMBAT_DATA_PTR->player.finisherChargeup[0] = 0;
 	COMBAT_DATA_PTR->player.remainingChargeupTime[0] = 0x50;

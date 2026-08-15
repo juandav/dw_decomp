@@ -58,8 +58,8 @@ typedef struct {
 	int16_t emptyStomachTimer;
 	int16_t remainingLifetime;
 	int16_t age;
-	uint16_t trainBoostFlag;
-	uint16_t trainBoostValue;
+	int16_t trainBoostFlag;
+	int16_t trainBoostValue;
 	uint16_t trainBoostTimer;
 	int16_t careMistakes;
 	int16_t battles;

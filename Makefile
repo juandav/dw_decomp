@@ -320,9 +320,20 @@ DEP += $(STD_DEP)
 
 OVERLAY += STD
 
+TRN2_ASM_SRC := $(shell find $(ASM_DIR)/trn2 -path '*.s' \
+		-not -path '$(ASM_DIR)/trn2/*matchings*')
+
 TRN2_SRC := \
-	$(wildcard $(ASM_DIR)/trn2/*.s) \
-	$(wildcard $(ASM_DIR)/trn2/data/*.s)
+	$(TRN2_ASM_SRC) \
+	src/trn2/trn2_hp_map99.c \
+	src/trn2/trn2_def_map99.c \
+	src/trn2/trn2_hp_map107.c \
+	src/trn2/trn2_mp.c \
+	src/trn2/trn2_off.c \
+	src/trn2/trn2_def_map108.c \
+	src/trn2/trn2_reward.c \
+	src/trn2/trn2_hud.c \
+	src/trn2/trn2_slots.c
 
 TRN2_OBJ := $(TRN2_SRC:%=$(BUILDDIR)/%.o)
 TRN2_DEP := $(TRN2_OBJ:%.o=%.d)
@@ -332,9 +343,20 @@ DEP += $(TRN2_DEP)
 
 OVERLAY += TRN2
 
+TRN_ASM_SRC := $(shell find $(ASM_DIR)/trn -path '*.s' \
+		-not -path '$(ASM_DIR)/trn/*matchings*')
+
 TRN_SRC := \
-	$(wildcard $(ASM_DIR)/trn/*.s) \
-	$(wildcard $(ASM_DIR)/trn/data/*.s)
+	$(TRN_ASM_SRC) \
+	src/trn/trn_reward.c \
+	src/trn/trn_hp.c \
+	src/trn/trn_mp.c \
+	src/trn/trn_off.c \
+	src/trn/trn_def.c \
+	src/trn/trn_speed.c \
+	src/trn/trn_brain.c \
+	src/trn/trn_hud.c \
+	src/trn/trn_slots.c
 
 TRN_OBJ := $(TRN_SRC:%=$(BUILDDIR)/%.o)
 TRN_DEP := $(TRN_OBJ:%.o=%.d)
