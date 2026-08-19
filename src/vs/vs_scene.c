@@ -9,6 +9,8 @@
 #include <dw/types.h>
 #include <dw/vs.h>
 
+extern uint8_t MAIN_D_80135258[2];
+extern uint8_t MAIN_D_8013525A[2];
 extern uint8_t MAIN_D_80135260;
 extern int16_t MAIN_D_8013525C;
 extern int16_t MAIN_D_8013525E;
@@ -123,6 +125,9 @@ void VS_tickFighterCounter(void);
 void VS_renderFighterCounter(void);
 void addObject(int32_t objectId, int32_t instanceId, void *tick, void *render);
 void removeObject(int32_t objectId, int32_t instanceId);
+void renderNumber(int32_t a, int32_t x, int32_t y, int32_t digits, int32_t value, int32_t layer);
+void removeEntity(int32_t type, int32_t entityId);
+void thunkUnloadModel(int32_t digiType, int32_t modelType);
 
 static void *vs_scene_functions[] = {
 	VS_removeFighterCounter,
@@ -199,7 +204,28 @@ void VS_addInputObjects(void)
 
 INCLUDE_ASM("asm/vs/nonmatchings/vs_scene", VS_loadFighterEntities);
 
-INCLUDE_ASM("asm/vs/nonmatchings/vs_scene", VS_unloadFighterEntities);
+void VS_unloadFighterEntities(void)
+{
+	int32_t type;
+
+	PLAYTIME_FRAMES = 0;
+	removeObject(0xFB9, 0);
+	removeObject(0x1B2, 0);
+	removeObject(0x1B2, 1);
+
+	type = ENTITY_TABLE[1]->type;
+	removeEntity(type, 1);
+	thunkUnloadModel(type, 3);
+
+	type = ENTITY_TABLE[2]->type;
+	removeEntity(type, 2);
+	thunkUnloadModel(type, 0);
+
+	VS_unloadArenaAssets();
+
+	ENTITY_TABLE[2] = NULL;
+	ENTITY_TABLE[1] = NULL;
+}
 
 INCLUDE_ASM("asm/vs/nonmatchings/vs_scene", VS_renderVersusFlash);
 
@@ -356,7 +382,16 @@ void VS_applyViewpoint(void)
 	GsSetRefView2(&GS_VIEWPOINT);
 }
 
-INCLUDE_ASM("asm/vs/nonmatchings/vs_scene", VS_setCameraSimple);
+void VS_setCameraSimple(void)
+{
+	MAIN_D_801B1C0E[0] += 2;
+	MAIN_D_801B1C0E[0] &= 0xFFF;
+	MAIN_D_801B1BB8[0] = 0;
+	RotMatrix((SVECTOR *)MAIN_D_801B1C0C, (MATRIX *)MAIN_D_801B1B98);
+	TransMatrix((MATRIX *)MAIN_D_801B1B98, (VECTOR *)MAIN_D_801B1C14);
+	MAIN_D_801B1BBC[0] = 0;
+	GsSetView2((GsVIEW2 *)MAIN_D_801B1B98);
+}
 
 void VS_setCameraParams(int16_t a, int16_t b, int16_t c, int32_t d, int16_t e, int16_t f)
 {
