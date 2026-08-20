@@ -268,18 +268,18 @@ SECTIONS
 			KEEP(build/asm/mov/data/header.rodata.s.o(.rodata.*));
 			. = ALIGN(., 4);
 
-			KEEP(build/asm/mov/40.s.o(.text.*));
+			build/src/mov/mov.c.o(.text.*);
 			. = ALIGN(., 4);
 
-			KEEP(build/asm/mov/40.s.o(.rodata.*));
+			build/src/mov/mov.c.o(.rodata.*);
 			. = ALIGN(., 4);
 
-			KEEP(build/asm/mov/40.s.o(.data.*));
+			build/src/mov/mov.c.o(.data.*);
 			. = ALIGN(., 4);
 			KEEP(build/asm/mov/data/94C.data.s.o(.data.*));
 			. = ALIGN(., 4);
 
-			KEEP(build/asm/mov/40.s.o(.bss.*));
+			build/src/mov/mov.c.o(.bss.*);
 			. = ALIGN(., 4);
 		}
 	}

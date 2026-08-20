@@ -56,7 +56,7 @@ segments:
     align: 4
     subalign: 4
     subsegments:
-      - [0x40, asm]
+      - [0x40, c, mov]
       - [0x94C, data]
 
   - [0x73428]

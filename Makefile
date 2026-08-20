@@ -287,9 +287,12 @@ DEP += $(KAR_DEP)
 
 OVERLAY += KAR
 
+MOV_ASM_SRC := $(shell find $(ASM_DIR)/mov -path '*.s' \
+		-not -path '$(ASM_DIR)/mov/*matchings*' 2> /dev/null)
+
 MOV_SRC := \
-	$(wildcard $(ASM_DIR)/mov/*.s) \
-	$(wildcard $(ASM_DIR)/mov/data/*.s)
+	$(MOV_ASM_SRC) \
+	src/mov/mov.c
 
 MOV_OBJ := $(MOV_SRC:%=$(BUILDDIR)/%.o)
 MOV_DEP := $(MOV_OBJ:%.o=%.d)

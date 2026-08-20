@@ -3,6 +3,7 @@
 #include <dw/clock.h>
 #include <dw/combat.h>
 #include <dw/main.h>
+#include <dw/mov.h>
 #include <dw/params.h>
 #include <dw/entity.h>
 #include <dw/script.h>
@@ -74,7 +75,6 @@ void setEntityTextDigit(POLY_FT4* poly, int32_t x, int32_t y);
 void MAIN_func_800E642C(void);
 int32_t hasMove(int32_t move);
 void learnMove(int32_t move);
-void MOV_func_80010620(int32_t movieId);
 void createPauseBox(void);
 void renderPauseBox(int32_t instanceId);
 void drawString(char *text, int32_t color, int32_t pos);
@@ -354,7 +354,7 @@ void startMovie(int32_t movieId)
 	ResetGraph(0);
 	SetGraphDebug(0);
 	loadDynamicLibrary(MOV_REL, &isComplete, 0, NULL, NULL);
-	MOV_func_80010620(movieId);
+	MOV_playMovie(movieId);
 	ResetGraph(3);
 }
 
