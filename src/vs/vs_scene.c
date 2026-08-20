@@ -227,7 +227,25 @@ void VS_unloadFighterEntities(void)
 	ENTITY_TABLE[1] = NULL;
 }
 
-INCLUDE_ASM("asm/vs/nonmatchings/vs_scene", VS_renderVersusFlash);
+void VS_renderVersusFlash(void)
+{
+	POLY_FT4 *prim;
+	int32_t y;
+
+	prim = (POLY_FT4 *)GsGetWorkBase();
+	SetPolyFT4(prim);
+	prim->r0 = 0x80;
+	prim->g0 = 0x80;
+	prim->b0 = 0x80;
+	prim->tpage = 5;
+	prim->clut = GetClut(0x40, 0x1E9);
+	setUVDataPolyFT4(prim, 0x30, 0x10, 0x4E, 0x18);
+
+	y = MAIN_D_80135261 * 20 - 0x39;
+	setPosDataPolyFT4(prim, -0x27, y, 0x4E, 0x18);
+	AddPrim(ACTIVE_ORDERING_TABLE->org + 0x1E, prim++);
+	GsSetWorkBase((PACKET *)prim);
+}
 
 INCLUDE_ASM("asm/vs/nonmatchings/vs_scene", VS_renderFighterNamePlate);
 
@@ -337,7 +355,20 @@ void VS_unloadArenaAssets(void)
 {
 }
 
-INCLUDE_ASM("asm/vs/nonmatchings/vs_scene", VS_addArenaRenderers);
+void VS_addArenaRenderers(void)
+{
+	switch (VS_D_800716B2[0]) {
+	case 0:
+		addObject(0x1A7, 0, NULL, VS_renderArenaViewLeft);
+		break;
+	case 1:
+		addObject(0x1A7, 0, NULL, VS_renderArenaViewRight);
+		break;
+	case 2:
+		addObject(0x1A7, 0, NULL, VS_renderArenaViewFull);
+		break;
+	}
+}
 
 INCLUDE_ASM("asm/vs/nonmatchings/vs_scene", VS_renderArenaViewLeft);
 
