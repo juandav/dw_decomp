@@ -10,6 +10,7 @@
 #include <dw/aabb.h>
 #include <dw/clock.h>
 #include <dw/combat.h>
+#include <dw/efe.h>
 #include <dw/entity.h>
 #include <dw/math.h>
 #include <dw/model.h>
@@ -19,68 +20,6 @@
 #include <dw/types.h>
 
 #include "common.h"
-
-#define EFE_POP(ptr, type) ((type) * --(ptr))
-#define EFE_PUSH(ptr, type, value) (*(ptr)++ = (int32_t)(type)(value))
-
-#define EFE_POP1(type) EFE_POP(EFE_DATA_STACK, type)
-#define EFE_PUSH1(type, value) EFE_PUSH(EFE_DATA_STACK, type, value)
-#define EFE_DROP1() (--EFE_DATA_STACK)
-
-#define EFE_POP2(type) EFE_POP(MAIN_D_80134CFC, type)
-#define EFE_PUSH2(type, value) EFE_PUSH(MAIN_D_80134CFC, type, value)
-
-#define EFE_SCRATCH ((EfeScratch *)getScratchAddr(0))
-
-typedef struct {
-	int32_t position[3];
-	int32_t rotation[3];
-} EfeTransform;
-
-typedef struct {
-	int32_t frame;
-	EfeTransform transform;
-} EfeInstance;
-
-typedef struct {
-	int16_t boneId;
-	int16_t positionX;
-	int16_t positionY;
-	int16_t positionZ;
-} EfeBoneOffset;
-
-typedef struct {
-	int16_t *inst;
-	int16_t *someInst;
-	EfeInstance *instance;
-	EfeInstance *parentInstance;
-	Entity *sourceEntity;
-	Entity *targetEntity;
-	EfeBoneOffset *boneOffset;
-} EfeSubEffect;
-
-typedef struct {
-	GsDOBJ2 obj;
-	SVECTOR rot;
-	MATRIX m0;
-	MATRIX m1;
-	MATRIX m2;
-	VECTOR *scale;
-	int32_t id;
-} EfeScratch;
-
-typedef struct {
-	int32_t frame;
-	SVECTOR position;
-	SVECTOR rotation;
-	SVECTOR velocity;
-	char *typeData;
-	Entity *owner;
-} EfeAura;
-
-typedef struct {
-	int32_t rotation[3];
-} EfeRot;
 
 typedef struct {
 	uint8_t pad0[0xc];
@@ -94,27 +33,9 @@ typedef struct {
 	int32_t cur;
 } EfeUvAnim;
 
-typedef struct {
-	int16_t state;
-	int16_t pad;
-	int8_t *isLoaded;
-	int16_t *moves;
-	int16_t *effectIds;
-	ModelComponent *model;
-} EfeLoad;
-
-extern int32_t *MAIN_D_80134D0C;
 extern int32_t DRAWING_OFFSET_X;
 extern int32_t DRAWING_OFFSET_Y;
 extern GsOT *ACTIVE_ORDERING_TABLE;
-extern int32_t MAIN_D_80134CEC;
-extern int16_t *MAIN_D_80134D00;
-extern int16_t MAIN_D_80134D04;
-extern int32_t MAIN_D_80134D08;
-extern int32_t MAIN_D_80134D14;
-extern int32_t MAIN_D_80134CD4;
-extern int16_t MAIN_D_80139AB0[];
-extern int32_t *EFE_DATA_STACK;
 extern SVECTOR STD_D_8007FE24[];
 extern int32_t MAIN_D_801351D0;
 extern VECTOR STD_D_8007B028;
@@ -131,35 +52,20 @@ extern VECTOR STD_D_8007B018;
 extern GsSPRITE STD_POISON_BUBBLE_SPRITE;
 extern int8_t MAIN_D_80134914[6];
 extern VECTOR STD_D_8007AF78;
-extern int32_t EFE_SCRIPT_MEM1_DATA[];
-extern int32_t MAIN_D_80139B54[];
-extern int32_t MAIN_D_80134CD0;
 extern int32_t (*STD_D_8007AF08[])(int32_t);
 extern void (*STD_D_8007AE68[][8])(int32_t *);
 extern int32_t MAIN_D_801351C8;
 extern char *MAIN_D_801351D4;
-extern int32_t MAIN_D_80134CF0;
-extern int32_t MAIN_D_80134D18;
 extern int32_t STD_D_8007AB18[];
 extern void *STD_D_8007AB1C[];
-extern int16_t EFE_LOADED_MOVE_DATA[];
-extern int32_t *MAIN_D_80134CFC;
-extern int32_t MAIN_D_80134CE0;
 extern int16_t STD_D_8007FD10[][6];
 extern int16_t STD_D_8007FE14[];
 extern char *MAIN_D_801351CC;
-extern int32_t EFE_PARENT_INSTANCE;
-extern char *MAIN_D_80134D10;
-extern int32_t MAIN_D_80134CE4;
 extern int16_t STD_D_8007FCB0[][4];
-extern EfeSubEffect *MAIN_D_80134CE8;
-extern EfeInstance *EFE_INSTANCE;
 extern int16_t STD_D_8007FCD0[][8];
 extern int16_t STD_D_8007FD4C[][4];
 extern int32_t MAIN_D_80139AD0[][2];
 extern void (*STD_jtbl_8007FA7C[])(void);
-extern char *MAIN_D_80134CCC;
-extern int32_t MAIN_D_80134CD8;
 extern char MAIN_D_801348E4[8];
 extern int16_t STD_D_8007FC20[];
 extern void (*STD_jtbl_8007AE20[])(void);
@@ -167,13 +73,9 @@ extern int32_t MAIN_D_801351B8;
 extern int32_t STD_D_8007FC00[];
 extern int32_t MAIN_D_801351C0;
 extern int32_t MAIN_D_801351C4;
-extern int16_t MAIN_D_80139B20[];
 extern int8_t *MAIN_D_80139B24[];
-extern int32_t MAIN_D_80139B28[];
-extern int32_t MAIN_D_80139B2C[];
 extern int32_t VIEWPORT_DISTANCE;
 extern ModelComponent UNKNOWN_MODEL[16];
-extern GsRVIEW2 MAIN_D_80139B34;
 extern int32_t MAIN_D_801350F4;
 extern PositionData STD_D_8007F528[];
 extern PositionData STD_D_8007C7B0[4];
@@ -1763,15 +1665,11 @@ void STD_loadClutColors(void)
 
 void STD_func_80070EA0(void)
 {
-	typedef struct {
-		int32_t rotation[3];
-	} EfeRot;
-
 	EFE_SCRATCH->scale = EFE_POP1(VECTOR *);
 	EFE_SCRATCH->id = EFE_POP1(int32_t);
-	EFE_SCRATCH->rot.vx = ((EfeRot *)((int32_t)EFE_INSTANCE + 0x10))->rotation[0];
-	EFE_SCRATCH->rot.vy = ((EfeRot *)((int32_t)EFE_INSTANCE + 0x10))->rotation[1];
-	EFE_SCRATCH->rot.vz = ((EfeRot *)((int32_t)EFE_INSTANCE + 0x10))->rotation[2];
+	EFE_SCRATCH->rot.vx = ((int32_t *)((int32_t)EFE_INSTANCE + 0x10))[0];
+	EFE_SCRATCH->rot.vy = ((int32_t *)((int32_t)EFE_INSTANCE + 0x10))[1];
+	EFE_SCRATCH->rot.vz = ((int32_t *)((int32_t)EFE_INSTANCE + 0x10))[2];
 	RotMatrixYXZ(&EFE_SCRATCH->rot, &EFE_SCRATCH->m1);
 	ScaleMatrix(&EFE_SCRATCH->m1, EFE_SCRATCH->scale);
 	EFE_SCRATCH->m1.t[0] = ((EfeTransform *)((int32_t)EFE_INSTANCE + 4))->position[0];

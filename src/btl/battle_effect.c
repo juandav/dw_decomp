@@ -9,61 +9,13 @@
 
 #include <dw/aabb.h>
 #include <dw/btl.h>
+#include <dw/efe.h>
 #include <dw/graphics.h>
 #include <dw/model.h>
 #include <dw/params.h>
 #include <dw/sound.h>
 
 #include "common.h"
-
-#define EFE_POP(ptr, type) ((type) *--(ptr))
-#define EFE_PUSH(ptr, type, value) (*(ptr)++ = (int32_t)(type)(value))
-
-#define EFE_POP1(type) EFE_POP(EFE_DATA_STACK, type)
-#define EFE_PUSH1(type, value) EFE_PUSH(EFE_DATA_STACK, type, value)
-#define EFE_DROP1() (--EFE_DATA_STACK)
-
-#define EFE_POP2(type) EFE_POP(MAIN_D_80134CFC, type)
-#define EFE_PUSH2(type, value) EFE_PUSH(MAIN_D_80134CFC, type, value)
-
-#define EFE_SCRATCH ((EfeScratch *)getScratchAddr(0))
-
-typedef struct {
-	int32_t position[3];
-	int32_t rotation[3];
-} EfeTransform;
-
-typedef struct {
-	int32_t frame;
-	EfeTransform transform;
-} EfeInstance;
-
-typedef struct {
-	int16_t boneId;
-	int16_t positionX;
-	int16_t positionY;
-	int16_t positionZ;
-} EfeBoneOffset;
-
-typedef struct {
-	int16_t *inst;
-	int16_t *someInst;
-	EfeInstance *instance;
-	EfeInstance *parentInstance;
-	Entity *sourceEntity;
-	Entity *targetEntity;
-	EfeBoneOffset *boneOffset;
-} EfeSubEffect;
-
-typedef struct {
-	GsDOBJ2 obj;
-	SVECTOR rot;
-	MATRIX m0;
-	MATRIX m1;
-	MATRIX m2;
-	VECTOR *scale;
-	int32_t id;
-} EfeScratch;
 
 typedef struct {
 	int32_t life;
@@ -104,24 +56,6 @@ typedef struct {
 } EfeBuffDisk;
 
 typedef struct {
-	int32_t frame;
-	SVECTOR position;
-	SVECTOR rotation;
-	SVECTOR velocity;
-	char *typeData;
-	Entity *owner;
-} EfeAura;
-
-typedef struct {
-	int16_t state;
-	int16_t pad;
-	int8_t *isLoaded;
-	int16_t *moves;
-	int16_t *effectIds;
-	ModelComponent *model;
-} EfeLoad;
-
-typedef struct {
 	int16_t velocityX;
 	int16_t velocityY;
 	int16_t velocityZ;
@@ -151,14 +85,6 @@ typedef struct {
 	int16_t z;
 } BtlParticleDrag;
 
-extern int32_t MAIN_D_80134CEC;
-extern int16_t *MAIN_D_80134D00;
-extern int16_t MAIN_D_80134D04;
-extern int32_t MAIN_D_80134D08;
-extern int32_t MAIN_D_80134D14;
-extern int32_t MAIN_D_80134CD4;
-extern int16_t MAIN_D_80139AB0[];
-extern int32_t *EFE_DATA_STACK;
 extern SVECTOR BTL_D_80075244[];
 extern int32_t MAIN_D_801350DC;
 extern VECTOR BTL_D_8007380C;
@@ -176,42 +102,22 @@ extern GsSPRITE BTL_POISON_BUBBLE_SPRITE;
 extern int8_t MAIN_D_801347AC[6];
 extern VECTOR BTL_D_8007375C;
 extern ModelComponent UNKNOWN_MODEL[16];
-extern int32_t EFE_SCRIPT_MEM1_DATA[];
-extern int32_t MAIN_D_80139B54[];
-extern int32_t MAIN_D_80134CD0;
 extern int32_t (*BTL_D_800736EC[])(int32_t);
 extern void (*BTL_D_8007364C[][8])(int32_t *);
 extern int32_t MAIN_D_801350D4;
 extern char *MAIN_D_801350E0;
-extern int32_t MAIN_D_80134CF0;
-extern int16_t MAIN_D_80139B20[];
 extern char *MAIN_D_80139B24[];
-extern int32_t MAIN_D_80139B28[];
-extern int32_t MAIN_D_80139B2C[];
-extern int32_t MAIN_D_80134D18;
 extern int32_t BTL_D_800732FC[];
 extern void *BTL_D_80073300[];
-extern GsRVIEW2 MAIN_D_80139B34;
-extern int16_t EFE_LOADED_MOVE_DATA[];
-extern int32_t *MAIN_D_80134CFC;
-extern int32_t MAIN_D_80134CE0;
 extern int16_t BTL_D_80075130[][6];
 extern int16_t BTL_D_80075234[];
 extern char *MAIN_D_801350D8;
-extern int32_t EFE_PARENT_INSTANCE;
-extern int32_t *MAIN_D_80134D0C;
-extern char *MAIN_D_80134D10;
-extern int32_t MAIN_D_80134CE4;
 extern int16_t BTL_D_800750D0[][4];
-extern EfeSubEffect *MAIN_D_80134CE8;
-extern EfeInstance *EFE_INSTANCE;
 extern int16_t BTL_D_800750F0[][8];
 extern int16_t BTL_D_8007516C[][4];
 extern int32_t MAIN_D_80139AD0[][2];
 extern void (*BTL_D_80074EBC[])(void);
-extern char *MAIN_D_80134CCC;
 extern int32_t VIEWPORT_DISTANCE;
-extern int32_t MAIN_D_80134CD8;
 extern char MAIN_D_8013477C[8];
 extern int16_t BTL_D_80075040[];
 extern void (*BTL_jtbl_80073604[])(void);
@@ -1580,15 +1486,11 @@ void BTL_loadClutColors(void)
 
 void BTL_drawTMDYXZ(void)
 {
-	typedef struct {
-		int32_t rotation[3];
-	} EfeRot;
-
 	EFE_SCRATCH->scale = EFE_POP1(VECTOR *);
 	EFE_SCRATCH->id = EFE_POP1(int32_t);
-	EFE_SCRATCH->rot.vx = ((EfeRot *)((int32_t)EFE_INSTANCE + 0x10))->rotation[0];
-	EFE_SCRATCH->rot.vy = ((EfeRot *)((int32_t)EFE_INSTANCE + 0x10))->rotation[1];
-	EFE_SCRATCH->rot.vz = ((EfeRot *)((int32_t)EFE_INSTANCE + 0x10))->rotation[2];
+	EFE_SCRATCH->rot.vx = ((int32_t *)((int32_t)EFE_INSTANCE + 0x10))[0];
+	EFE_SCRATCH->rot.vy = ((int32_t *)((int32_t)EFE_INSTANCE + 0x10))[1];
+	EFE_SCRATCH->rot.vz = ((int32_t *)((int32_t)EFE_INSTANCE + 0x10))[2];
 	RotMatrixYXZ(&EFE_SCRATCH->rot, &EFE_SCRATCH->m1);
 	ScaleMatrix(&EFE_SCRATCH->m1, EFE_SCRATCH->scale);
 	EFE_SCRATCH->m1.t[0] = ((EfeTransform *)((int32_t)EFE_INSTANCE + 4))->position[0];

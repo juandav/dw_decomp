@@ -1,5 +1,6 @@
 #include <libgte.h>
 #include <libgs.h>
+#include <dw/efe.h>
 #include <dw/entity.h>
 #include <dw/params.h>
 #include <dw/types.h>
@@ -17,12 +18,7 @@ extern char *EFE_FLASH_DATA;
 extern uint32_t MAIN_D_8012343C[];
 extern char MAIN_D_8012342C[];
 extern char MAIN_D_80134220[4];
-extern int16_t EFE_LOADED_MOVE_DATA[];
-extern char EFE_SCRIPT_MEM1_DATA[];
-extern int32_t *EFE_DATA_STACK;
 
-#define EFE_POP(ptr, type) ((type) * --(ptr))
-#define EFE_POP1(type) EFE_POP(EFE_DATA_STACK, type)
 extern u_long SOME_IMAGE_DATA[];
 void setShortWithStride();
 void removeObject(int32_t objectId, int32_t instanceId);
@@ -72,7 +68,7 @@ extern int16_t MAIN_D_80123400[];
 extern uint8_t MAIN_D_8012341C[];
 int32_t worldPosToScreenPos(int16_t *world, int16_t *screen);
 void renderSprite(GsSPRITE *spr, int16_t x, int16_t y, int32_t depth,
-		  int32_t sx, int32_t sy);
+                  int32_t sx, int32_t sy);
 typedef void (*EfeFn)(int32_t);
 int32_t addObject(int32_t objectId, int32_t instanceId, EfeFn tick, EfeFn render);
 
@@ -252,67 +248,67 @@ INCLUDE_ASM("asm/main/nonmatchings/efe", renderCloudFX);
 
 static void rotateVector__garbage__(void)
 {
-        int32_t v0;
-        int32_t v1;
-        int32_t v2;
-        int32_t v3;
-        int32_t v4;
-        int32_t v5;
-        int32_t v6;
-        int32_t v7;
-        int32_t v8;
-        int32_t v9;
-        int32_t v10;
-        int32_t v11;
-        int32_t v12;
-        int32_t v13;
-        int32_t v14;
-        int32_t v15;
-        int32_t v16;
-        int32_t v17;
-        int32_t v18;
-        int32_t v19;
+	int32_t v0;
+	int32_t v1;
+	int32_t v2;
+	int32_t v3;
+	int32_t v4;
+	int32_t v5;
+	int32_t v6;
+	int32_t v7;
+	int32_t v8;
+	int32_t v9;
+	int32_t v10;
+	int32_t v11;
+	int32_t v12;
+	int32_t v13;
+	int32_t v14;
+	int32_t v15;
+	int32_t v16;
+	int32_t v17;
+	int32_t v18;
+	int32_t v19;
 
-        v0 = MAIN_D_80138AA4[0] + 0;
-        v1 = MAIN_D_80138AA4[1] + 1;
-        v2 = MAIN_D_80138AA4[2] + 2;
-        v3 = MAIN_D_80138AA4[0] + 3;
-        v4 = MAIN_D_80138AA4[1] + 4;
-        v5 = MAIN_D_80138AA4[2] + 5;
-        v6 = MAIN_D_80138AA4[0] + 6;
-        v7 = MAIN_D_80138AA4[1] + 7;
-        v8 = MAIN_D_80138AA4[2] + 8;
-        v9 = MAIN_D_80138AA4[0] + 9;
-        v10 = MAIN_D_80138AA4[1] + 10;
-        v11 = MAIN_D_80138AA4[2] + 11;
-        v12 = MAIN_D_80138AA4[0] + 12;
-        v13 = MAIN_D_80138AA4[1] + 13;
-        v14 = MAIN_D_80138AA4[2] + 14;
-        v15 = MAIN_D_80138AA4[0] + 15;
-        v16 = MAIN_D_80138AA4[1] + 16;
-        v17 = MAIN_D_80138AA4[2] + 17;
-        v18 = MAIN_D_80138AA4[0] + 18;
-        v19 = MAIN_D_80138AA4[1] + 19;
-        MAIN_D_80138AA4[0] = (v0 * v1) + v2;
-        MAIN_D_80138AA4[1] = (v1 * v2) + v3;
-        MAIN_D_80138AA4[2] = (v2 * v3) + v4;
-        MAIN_D_80138AA4[0] = (v3 * v4) + v5;
-        MAIN_D_80138AA4[1] = (v4 * v5) + v6;
-        MAIN_D_80138AA4[2] = (v5 * v6) + v7;
-        MAIN_D_80138AA4[0] = (v6 * v7) + v8;
-        MAIN_D_80138AA4[1] = (v7 * v8) + v9;
-        MAIN_D_80138AA4[2] = (v8 * v9) + v10;
-        MAIN_D_80138AA4[0] = (v9 * v10) + v11;
-        MAIN_D_80138AA4[1] = (v10 * v11) + v12;
-        MAIN_D_80138AA4[2] = (v11 * v12) + v13;
-        MAIN_D_80138AA4[0] = (v12 * v13) + v14;
-        MAIN_D_80138AA4[1] = (v13 * v14) + v15;
-        MAIN_D_80138AA4[2] = (v14 * v15) + v16;
-        MAIN_D_80138AA4[0] = (v15 * v16) + v17;
-        MAIN_D_80138AA4[1] = (v16 * v17) + v18;
-        MAIN_D_80138AA4[2] = (v17 * v18) + v19;
-        MAIN_D_80138AA4[0] = (v18 * v19) + v0;
-        MAIN_D_80138AA4[1] = (v19 * v0) + v1;
+	v0 = MAIN_D_80138AA4[0] + 0;
+	v1 = MAIN_D_80138AA4[1] + 1;
+	v2 = MAIN_D_80138AA4[2] + 2;
+	v3 = MAIN_D_80138AA4[0] + 3;
+	v4 = MAIN_D_80138AA4[1] + 4;
+	v5 = MAIN_D_80138AA4[2] + 5;
+	v6 = MAIN_D_80138AA4[0] + 6;
+	v7 = MAIN_D_80138AA4[1] + 7;
+	v8 = MAIN_D_80138AA4[2] + 8;
+	v9 = MAIN_D_80138AA4[0] + 9;
+	v10 = MAIN_D_80138AA4[1] + 10;
+	v11 = MAIN_D_80138AA4[2] + 11;
+	v12 = MAIN_D_80138AA4[0] + 12;
+	v13 = MAIN_D_80138AA4[1] + 13;
+	v14 = MAIN_D_80138AA4[2] + 14;
+	v15 = MAIN_D_80138AA4[0] + 15;
+	v16 = MAIN_D_80138AA4[1] + 16;
+	v17 = MAIN_D_80138AA4[2] + 17;
+	v18 = MAIN_D_80138AA4[0] + 18;
+	v19 = MAIN_D_80138AA4[1] + 19;
+	MAIN_D_80138AA4[0] = (v0 * v1) + v2;
+	MAIN_D_80138AA4[1] = (v1 * v2) + v3;
+	MAIN_D_80138AA4[2] = (v2 * v3) + v4;
+	MAIN_D_80138AA4[0] = (v3 * v4) + v5;
+	MAIN_D_80138AA4[1] = (v4 * v5) + v6;
+	MAIN_D_80138AA4[2] = (v5 * v6) + v7;
+	MAIN_D_80138AA4[0] = (v6 * v7) + v8;
+	MAIN_D_80138AA4[1] = (v7 * v8) + v9;
+	MAIN_D_80138AA4[2] = (v8 * v9) + v10;
+	MAIN_D_80138AA4[0] = (v9 * v10) + v11;
+	MAIN_D_80138AA4[1] = (v10 * v11) + v12;
+	MAIN_D_80138AA4[2] = (v11 * v12) + v13;
+	MAIN_D_80138AA4[0] = (v12 * v13) + v14;
+	MAIN_D_80138AA4[1] = (v13 * v14) + v15;
+	MAIN_D_80138AA4[2] = (v14 * v15) + v16;
+	MAIN_D_80138AA4[0] = (v15 * v16) + v17;
+	MAIN_D_80138AA4[1] = (v16 * v17) + v18;
+	MAIN_D_80138AA4[2] = (v17 * v18) + v19;
+	MAIN_D_80138AA4[0] = (v18 * v19) + v0;
+	MAIN_D_80138AA4[1] = (v19 * v0) + v1;
 }
 
 void rotateVector(void);
@@ -354,7 +350,8 @@ char *initializeFlashData(char *base)
 		*efe_s16ptr((ofs + new_var) + 8) = -1;
 		i += 1;
 		ofs += 0x28;
-		do { } while (0);
+		do {
+		} while (0);
 	}
 	return base + 0x1E0;
 }
@@ -408,12 +405,14 @@ void findEFEDATFile(void)
 	int32_t i;
 
 	i = 0;
-	while (CdReadSync(1, 0) != 0) {}
+	while (CdReadSync(1, 0) != 0) {
+	}
 	mode = 0x80;
 	name[0] = 0x5C;
 	strcpy(&name[1], MAIN_D_8012342C);
 	strcat(name, MAIN_D_80134220);
-	while ((int32_t)CdSearchFile(&file, name) == -1) {}
+	while ((int32_t)CdSearchFile(&file, name) == -1) {
+	}
 	CdControl(0xE, &mode, 0);
 	MAIN_D_8012343C[i] = CdPosToInt(&file.pos);
 }
@@ -421,7 +420,7 @@ void findEFEDATFile(void)
 void initializeEFE(void)
 {
 	setShortWithStride(EFE_LOADED_MOVE_DATA, -1, 0x11, 2);
-	EFE_DATA_STACK = (int32_t *)EFE_SCRIPT_MEM1_DATA;
+	EFE_DATA_STACK = EFE_SCRIPT_MEM1_DATA;
 	findEFEDATFile();
 }
 
@@ -434,4 +433,3 @@ void getEFEDATEntry(int32_t id)
 }
 
 INCLUDE_ASM("asm/main/nonmatchings/efe", renderParticleFlash);
-
