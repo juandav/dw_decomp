@@ -4,26 +4,9 @@
 #include <dw/entity.h>
 #include <dw/math.h>
 #include <dw/params.h>
+#include <dw/partner.h>
 #include <dw/script.h>
 #include <dw/types.h>
-
-typedef struct {
-	int8_t hungerTimes[8];
-	uint8_t energyCap;
-	uint8_t energyThreshold;
-	uint8_t energyUsage;
-	int16_t poopTimer;
-	int16_t unk2;
-	uint8_t poopSize;
-	uint8_t favoriteFood;
-	int8_t sleepCycle;
-	int8_t favoredRegion;
-	uint8_t trainingType;
-	int8_t defaultWeight;
-	int16_t viewX;
-	int16_t viewY;
-	int16_t viewZ;
-} RaiseData;
 
 extern int16_t STATS_GAINS[6];
 extern uint16_t MAIN_D_8013538C;
@@ -32,7 +15,6 @@ extern int16_t MAIN_D_80135390;
 extern int8_t MAIN_D_80135370;
 extern int8_t MAIN_D_80135371;
 extern uint8_t MAIN_D_80135392;
-extern RaiseData RAISE_DATA[66];
 extern uint8_t TRN_D_8008F14C[56];
 extern int8_t TRN_D_8008F184[8][3];
 extern char TRN_D_8008F19C[];

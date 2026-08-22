@@ -3,6 +3,7 @@
 #include <dw/item.h>
 #include <dw/params.h>
 #include <dw/particle.h>
+#include <dw/partner.h>
 #include <dw/script.h>
 #include <dw/types.h>
 #include <dw/world_object.h>
@@ -10,28 +11,9 @@
 #include "common.h"
 
 typedef struct {
-	int8_t hungerTimes[8];
-	uint8_t energyCap;
-	uint8_t energyThreshold;
-	int8_t energyUsage;
-	int16_t poopTimer;
-	int16_t unk2;
-	uint8_t poopSize;
-	uint8_t favoriteFood;
-	int8_t sleepCycle;
-	int8_t favoredRegion;
-	int8_t trainingType;
-	int8_t defaultWeight;
-	int16_t viewX;
-	int16_t viewY;
-	int16_t viewZ;
-} RaiseData;
-
-typedef struct {
 	uint8_t array[30];
 } InventoryTable;
 
-extern RaiseData RAISE_DATA[66];
 extern TamerItem TAMER_ITEM;
 extern TamerItem DROPPED_ITEMS[];
 extern uint8_t INVENTORY_SIZE[];

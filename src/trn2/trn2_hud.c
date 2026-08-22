@@ -4,6 +4,7 @@
 #include <dw/clock.h>
 #include <dw/entity.h>
 #include <dw/params.h>
+#include <dw/partner.h>
 #include <dw/script.h>
 #include <dw/sound.h>
 #include <dw/types.h>
@@ -21,24 +22,6 @@ typedef struct {
 	TrainingSpot *spots;
 } MapTrainingSpots;
 
-typedef struct {
-	int8_t hungerTimes[8];
-	uint8_t energyCap;
-	uint8_t energyThreshold;
-	uint8_t energyUsage;
-	int16_t poopTimer;
-	int16_t unk2;
-	uint8_t poopSize;
-	uint8_t favoriteFood;
-	int8_t sleepCycle;
-	int8_t favoredRegion;
-	uint8_t trainingType;
-	int8_t defaultWeight;
-	int16_t viewX;
-	int16_t viewY;
-	int16_t viewZ;
-} RaiseData;
-
 extern uint16_t MAIN_D_801353CE;
 extern int16_t MAIN_D_801353D0;
 extern int16_t MAIN_D_801353E0[4];
@@ -54,7 +37,6 @@ extern char MAIN_D_80134BE0[8];
 extern char MAIN_D_80124C0C[];
 extern char MAIN_D_80124C54[];
 extern GsOT *ACTIVE_ORDERING_TABLE;
-extern RaiseData RAISE_DATA[66];
 
 void worldPosToScreenPos(TrainingSpot *item, SVECTOR *out);
 void clearTextArea(void);

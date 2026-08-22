@@ -39,25 +39,6 @@ extern GsCOORDINATE2 POOP_COORDINATES;
 extern int8_t PARTNER_STATE;
 extern int8_t PARTNER_SUB_STATE;
 
-typedef struct {
-	int8_t hungerTimes[8];
-	uint8_t energyCap;
-	uint8_t energyThreshold;
-	int8_t energyUsage;
-	int16_t poopTimer;
-	int16_t unk2;
-	uint8_t poopSize;
-	uint8_t favoriteFood;
-	int8_t sleepCycle;
-	int8_t favoredRegion;
-	int8_t trainingType;
-	uint8_t defaultWeight;
-	int16_t viewX;
-	int16_t viewY;
-	int16_t viewZ;
-} RaiseData;
-
-extern RaiseData RAISE_DATA[66];
 
 extern int8_t STOP_DISTANCE_TIMER;
 extern uint8_t CURRENT_SCREEN;

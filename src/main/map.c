@@ -38,24 +38,6 @@ typedef struct {
 } MapState;
 
 typedef struct {
-	int8_t hungerTimes[8];
-	uint8_t energyCap;
-	uint8_t energyThreshold;
-	int8_t energyUsage;
-	int16_t poopTimer;
-	int16_t unk2;
-	uint8_t poopSize;
-	uint8_t favoriteFood;
-	int8_t sleepCycle;
-	int8_t favoredRegion;
-	int8_t trainingType;
-	int8_t defaultWeight;
-	int16_t viewX;
-	int16_t viewY;
-	int16_t viewZ;
-} RaiseData;
-
-typedef struct {
 	int16_t orderValue;
 	int16_t x;
 	int16_t y;
@@ -66,24 +48,6 @@ typedef struct {
 	int8_t currentFrame;
 	int8_t flag;
 } LocalMapObjectInstance;
-
-typedef struct {
-	int8_t hungerTimes[8];
-	uint8_t energyCap;
-	uint8_t energyThreshold;
-	int8_t energyUsage;
-	int16_t poopTimer;
-	int16_t unk2;
-	uint8_t poopSize;
-	uint8_t favoriteFood;
-	int8_t sleepCycle;
-	uint8_t favoredRegion;
-	int8_t trainingType;
-	int8_t defaultWeight;
-	int16_t viewX;
-	int16_t viewY;
-	int16_t viewZ;
-} MapRaiseData;
 
 long RotTransPers3(SVECTOR *v0, SVECTOR *v1, SVECTOR *v2, long *sxy0, long *sxy1, long *sxy2, long *p, long *flag);
 int abs(int x);
@@ -325,7 +289,6 @@ extern int8_t PREVIOUS_EXIT;
 extern uint8_t PREVIOUS_SCREEN;
 extern int8_t PREV_TILE_X;
 extern int8_t PREV_TILE_Y;
-extern MapRaiseData RAISE_DATA[66];
 extern int16_t SCRIPT_MAP_CHANGE_STATE;
 extern int8_t SKIP_DAYTIME_TRANSITION;
 extern int32_t SKIP_MAP_FILE_READ;

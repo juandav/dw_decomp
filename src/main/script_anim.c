@@ -4,25 +4,6 @@
 
 #include "common.h"
 
-typedef struct {
-	int8_t hungerTimes[8];
-	uint8_t energyCap;
-	uint8_t energyThreshold;
-	int8_t energyUsage;
-	int16_t poopTimer;
-	int16_t unk2;
-	uint8_t poopSize;
-	uint8_t favoriteFood;
-	int8_t sleepCycle;
-	int8_t favoredRegion;
-	int8_t trainingType;
-	int8_t defaultWeight;
-	int16_t viewX;
-	int16_t viewY;
-	int16_t viewZ;
-} RaiseData;
-
-extern RaiseData RAISE_DATA[66];
 void setFoodTimer(int32_t type);
 void setActiveAnim(int32_t state);
 

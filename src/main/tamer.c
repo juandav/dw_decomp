@@ -126,25 +126,6 @@ typedef struct {
 
 extern MapWarps MAP_WARPS;
 
-typedef struct {
-        int8_t hungerTimes[8];
-        int8_t energyCap;
-        uint8_t energyThreshold;
-        int8_t energyUsage;
-        int16_t poopTimer;
-        int16_t unk2;
-        int8_t poopSize;
-        int8_t favoriteFood;
-        int8_t sleepCycle;
-        int8_t favoredRegion;
-        int8_t trainingType;
-        int8_t defaultWeight;
-        int16_t viewX;
-        int16_t viewY;
-        int16_t viewZ;
-} RaiseData;
-
-extern RaiseData RAISE_DATA[66];
 
 void startAnimation(Entity *entity, int32_t animId);
 void tickAnimation(Entity *entity);
