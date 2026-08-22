@@ -278,9 +278,12 @@ DEP += $(FISH_DEP)
 
 OVERLAY += FISH
 
+KAR_ASM_SRC := $(shell find $(ASM_DIR)/kar -path '*.s' \
+		-not -path '$(ASM_DIR)/kar/*matchings*' 2> /dev/null)
+
 KAR_SRC := \
-	$(wildcard $(ASM_DIR)/kar/*.s) \
-	$(wildcard $(ASM_DIR)/kar/data/*.s)
+	$(KAR_ASM_SRC) \
+	src/kar/kar.c
 
 KAR_OBJ := $(KAR_SRC:%=$(BUILDDIR)/%.o)
 KAR_DEP := $(KAR_OBJ:%.o=%.d)

@@ -11,6 +11,7 @@
 #include <dw/doo.h>
 #include <dw/fade.h>
 #include <dw/item.h>
+#include <dw/kar.h>
 #include <dw/main.h>
 #include <dw/map.h>
 #include <dw/math.h>
@@ -217,7 +218,6 @@ void tickIdle(void);
 void tickTraining(void);
 void tickPraiseScold(int8_t state, int8_t unused);
 void tickFishing(void);
-void KAR_tick(void);
 void tickOpening(void);
 void tickEnding(void);
 void tickSicknessLostLife(void);

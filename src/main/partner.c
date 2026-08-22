@@ -5,6 +5,7 @@
 #include <dw/evl.h>
 #include <dw/fade.h>
 #include <dw/item.h>
+#include <dw/kar.h>
 #include <dw/main.h>
 #include <dw/map.h>
 #include <dw/params.h>
@@ -131,9 +132,6 @@ void checkShopMap(int32_t mapId);
 void checkArenaMap(int32_t mapId);
 void readMapTFS(int32_t mapId);
 
-
-
-void KAR_start();
 void * partner_functions[] = {
 	MAIN_func_800DF7F8,
 	callDigimonRoutine,

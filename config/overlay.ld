@@ -244,18 +244,18 @@ SECTIONS
 			KEEP(build/asm/kar/data/header.rodata.s.o(.rodata.*));
 			. = ALIGN(., 4);
 
-			KEEP(build/asm/kar/40.s.o(.text.*));
+			build/src/kar/kar.c.o(.text.*);
 			. = ALIGN(., 4);
 
-			KEEP(build/asm/kar/40.s.o(.rodata.*));
+			build/src/kar/kar.c.o(.rodata.*);
 			. = ALIGN(., 4);
 
-			KEEP(build/asm/kar/40.s.o(.data.*));
+			build/src/kar/kar.c.o(.data.*);
 			. = ALIGN(., 4);
 			KEEP(build/asm/kar/data/7310.data.s.o(.data.*));
 			. = ALIGN(., 4);
 
-			KEEP(build/asm/kar/40.s.o(.bss.*));
+			build/src/kar/kar.c.o(.bss.*);
 			. = ALIGN(., 4);
 		}
 	}
