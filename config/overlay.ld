@@ -220,18 +220,20 @@ SECTIONS
 			KEEP(build/asm/fish/data/header.rodata.s.o(.rodata.*));
 			. = ALIGN(., 4);
 
-			KEEP(build/asm/fish/40.s.o(.text.*));
+			build/src/fish/fish.c.o(.text.*);
 			. = ALIGN(., 4);
 
-			KEEP(build/asm/fish/40.s.o(.rodata.*));
+			build/src/fish/fish.c.o(.rodata.*);
+			. = ALIGN(., 4);
+			KEEP(build/asm/fish/data/A1E0.rodata.s.o(.rodata.*));
 			. = ALIGN(., 4);
 
-			KEEP(build/asm/fish/40.s.o(.data.*));
+			build/src/fish/fish.c.o(.data.*);
 			. = ALIGN(., 4);
-			KEEP(build/asm/fish/data/A160.data.s.o(.data.*));
+			KEEP(build/asm/fish/data/A1F4.data.s.o(.data.*));
 			. = ALIGN(., 4);
 
-			KEEP(build/asm/fish/40.s.o(.bss.*));
+			build/src/fish/fish.c.o(.bss.*);
 			. = ALIGN(., 4);
 		}
 	}

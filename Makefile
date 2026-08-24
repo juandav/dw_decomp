@@ -266,9 +266,12 @@ DEP += $(EVL_DEP)
 
 OVERLAY += EVL
 
+FISH_ASM_SRC := $(shell find $(ASM_DIR)/fish -path '*.s' \
+		-not -path '$(ASM_DIR)/fish/*matchings*' 2> /dev/null)
+
 FISH_SRC := \
-	$(wildcard $(ASM_DIR)/fish/*.s) \
-	$(wildcard $(ASM_DIR)/fish/data/*.s)
+	$(FISH_ASM_SRC) \
+	src/fish/fish.c
 
 FISH_OBJ := $(FISH_SRC:%=$(BUILDDIR)/%.o)
 FISH_DEP := $(FISH_OBJ:%.o=%.d)

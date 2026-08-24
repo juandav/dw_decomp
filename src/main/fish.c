@@ -92,7 +92,7 @@ void tickFishing(void)
 {
 	VECTOR loc;
 	if (FISHING_DATA_PTR != NULL) {
-		loc = FISHING_DATA_PTR->hookedLocation;
+		loc = FISHING_DATA_PTR->hooked.fish.pos;
 		if (FISH_tamerTick() != 0) {
 			setFishingDisabled();
 			MAIN_func_800FF900(&loc);

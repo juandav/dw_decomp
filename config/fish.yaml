@@ -56,7 +56,9 @@ segments:
     align: 4
     subalign: 4
     subsegments:
-      - [0x40, asm]
-      - [0xA160, data]
+      - [0x40, c, fish]
+      - [0xA160, rodata, fish]
+      - [0xA1E0, rodata]
+      - [0xA1F4, data]
 
   - [0xD96C]
