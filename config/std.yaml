@@ -95,9 +95,8 @@ segments:
       - [0x59B4, c, std_main]
       - [0x16654, c, std_hud]
       - [0x194D4, c, std_effect]
-      # the jump table here is emitted by mwcc from the C switch in
-      # STD_func_80058684, so splat must not emit it as data too
-      - [0x26E0C, .data]
-      - [0x26E58, data]
+      - [0x26E0C, .rodata]
+      - [0x26E58, rodata]
+      - [0x26ED4, data]
 
   - [0x2D3E8]

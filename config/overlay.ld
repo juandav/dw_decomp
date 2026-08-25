@@ -201,10 +201,12 @@ SECTIONS
 
 			build/src/evl/evl.c.o(.rodata.*);
 			. = ALIGN(., 4);
+			KEEP(build/asm/evl/data/3EE8.rodata.s.o(.rodata.*));
+			. = ALIGN(., 4);
 
 			build/src/evl/evl.c.o(.data.*);
 			. = ALIGN(., 4);
-			KEEP(build/asm/evl/data/3EE8.data.s.o(.data.*));
+			KEEP(build/asm/evl/data/3EFC.data.s.o(.data.*));
 			. = ALIGN(., 4);
 
 			build/src/evl/evl.c.o(.bss.*);
@@ -251,10 +253,12 @@ SECTIONS
 
 			build/src/kar/kar.c.o(.rodata.*);
 			. = ALIGN(., 4);
+			KEEP(build/asm/kar/data/7310.rodata.s.o(.rodata.*));
+			. = ALIGN(., 4);
 
 			build/src/kar/kar.c.o(.data.*);
 			. = ALIGN(., 4);
-			KEEP(build/asm/kar/data/7310.data.s.o(.data.*));
+			KEEP(build/asm/kar/data/7380.data.s.o(.data.*));
 			. = ALIGN(., 4);
 
 			build/src/kar/kar.c.o(.bss.*);
@@ -346,6 +350,8 @@ SECTIONS
 			. = ALIGN(., 4);
 			build/src/std/std_effect.c.o(.rodata.*);
 			. = ALIGN(., 4);
+			KEEP(build/asm/std/data/26E58.rodata.s.o(.rodata.*));
+			. = ALIGN(., 4);
 
 			build/src/std/std_setup.c.o(.data.*);
 			. = ALIGN(., 4);
@@ -355,7 +361,7 @@ SECTIONS
 			. = ALIGN(., 4);
 			build/src/std/std_effect.c.o(.data.*);
 			. = ALIGN(., 4);
-			KEEP(build/asm/std/data/26E58.data.s.o(.data.*));
+			KEEP(build/asm/std/data/26ED4.data.s.o(.data.*));
 			. = ALIGN(., 4);
 
 			build/src/std/std_setup.c.o(.bss.*);
