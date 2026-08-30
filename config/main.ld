@@ -493,7 +493,7 @@ SECTIONS
         . = ALIGN(., 4);
         KEEP(build/asm/main/data/psyq/libmcrd.data.s.o(.data.*))
         . = ALIGN(., 4);
-        build/asm/main/data/bubble.data.s.o(.data.*)
+        build/src/main/bubble.c.o(.data.*)
         . = ALIGN(., 4);
         build/src/main/battle_ui.c.o(.data.*)
         . = ALIGN(., 4);
@@ -565,7 +565,7 @@ SECTIONS
         . = ALIGN(., 4);
         build/src/main/sound_async.c.o(.sdata.*)
         . = ALIGN(., 4);
-        build/asm/main/data/bubble.sdata.s.o(.sdata.*)
+        build/src/main/bubble.c.o(.sdata.*)
         . = ALIGN(., 4);
         build/src/main/battle_ui.c.o(.sdata.*)
         . = ALIGN(., 4);

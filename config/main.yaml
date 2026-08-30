@@ -195,7 +195,7 @@ segments:
       - [0x9BBD0, data, psyq/libpress]
       - [0x9CB40, .data, butterfly]
       - [0x9CB64, data, psyq/libmcrd]
-      - [0x9CE18, data, bubble]
+      - [0x9CB8C, .data, bubble]
       - [0x9CE64, data, main]
       - [0xA3B2C, sdata, model]
       - [0xA40FC, .sdata, file_table]
@@ -216,7 +216,7 @@ segments:
       - [0xA4430, sdata, utils]
       - [0xA4438, .sdata, efe_table]
       - [0xA443C, .sdata, sound_async]
-      - [0xA445C, sdata, bubble]
+      - [0xA445C, .sdata, bubble]
       - [0xA44D0, .sdata, battle_ui]
       - [0xA44DC, sdata, main]
 
