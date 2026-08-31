@@ -20,15 +20,13 @@ typedef struct {
 	int16_t fadeLevel;
 	int16_t eggSlot;
 	DooFlash flash;
-	uint8_t modelData[0x18];
+	int32_t modelData[6];
 	int16_t sparkleIndex;
 	int8_t isModelLoading;
 	int8_t unk_3F;
 } DooSequence;
 
-extern DooSequence DOOA_REINCARNATION_SEQ[];
-
-extern int32_t DOOA_REINCARNATION_MODEL_DATA[];
+extern DooSequence DOOA_REINCARNATION_SEQ;
 
 int32_t DOOA_tick(PartnerEntity *partner, void *buffer, int32_t isInitialized);
 int32_t DOOA_getSequenceState(int32_t unused, int32_t isInitialized);

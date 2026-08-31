@@ -65,7 +65,6 @@ extern Doo2ShardSet DOO2_SHARD_SETS[];
 extern uint8_t *MAIN_D_80135314;
 extern Doo2ModelVertex *MAIN_D_80135318;
 extern int16_t MAIN_D_8013531C[3];
-extern int16_t DOOA_EGG_BOX_PENDING[];
 extern Doo2ShardParams DOO2_SHARD_PARAMS;
 extern Doo2EggIcons EGG_ICONS;
 extern GsSPRITE DOO2_EGG_ICON_SPRITE;
@@ -89,8 +88,8 @@ void DOO2_renderQuadShard(Doo2Shard *fragment, int32_t arg1, int32_t duration,
                           int32_t arg3, Doo2ShardParams *sheet);
 void DOO2_tickEggBox(void);
 void DOO2_renderEggIcons(void);
-void DOO2_uploadModelClut(u_long *pixels);
-void DOO2_uploadClutTile(u_long *pixels, int32_t tile);
+void DOO2_saveModelClut(u_long *pixels);
+void DOO2_saveClutTile(u_long *pixels, int32_t tile);
 void DOO2_fadeClut(int16_t *srcClut, void *entity, int16_t *dstClut, int32_t startFrame, int32_t endFrame, int32_t frame);
 void DOO2_renderWireframeModel(GsDOBJ2 *obj, int32_t wireThreshold);
 void DOO2_resetShardSets(int32_t size);
@@ -112,8 +111,8 @@ static void *doo2_functions[] = {
 	DOO2_renderSparkStreak,
 	DOO2_renderWireframeModel,
 	DOO2_fadeClut,
-	DOO2_uploadClutTile,
-	DOO2_uploadModelClut,
+	DOO2_saveClutTile,
+	DOO2_saveModelClut,
 	DOO2_renderEggIcons,
 	DOO2_tickEggBox,
 	DOO2_renderQuadShard,
@@ -151,7 +150,7 @@ void DOO2_renderShardSet(int32_t index)
 	count = entry->centerCount;
 	MAIN_D_80135314 = (uint8_t *)entry->primitives;
 	MAIN_D_80135318 = (Doo2ModelVertex *)entry->vertices;
-	params.modelData = DOOA_REINCARNATION_MODEL_DATA[0];
+	params.modelData = DOOA_REINCARNATION_SEQ.modelData[0];
 	MAIN_D_8013531C[0] = ((((41 - entry->timer) * 74) / 40) + 54);
 	MAIN_D_8013531C[1] = MAIN_D_8013531C[0];
 	MAIN_D_8013531C[2] = MAIN_D_8013531C[0];
@@ -302,12 +301,12 @@ void DOO2_renderQuadShard(Doo2Shard *fragment, int32_t arg1, int32_t duration,
 
 void DOO2_tickEggBox(void)
 {
-	DOOA_EGG_BOX_PENDING[0] = 0;
+	DOOA_REINCARNATION_SEQ.sparkleIndex = 0;
 }
 
 void DOO2_renderEggIcons(void)
 {
-	DooSequence *panel = DOOA_REINCARNATION_SEQ;
+	DooSequence *panel = &DOOA_REINCARNATION_SEQ;
 	Doo2EggIcons icons;
 	int32_t i = 0;
 
@@ -323,7 +322,7 @@ void DOO2_renderEggIcons(void)
 	GsSortSprite(&DOO2_EGG_CURSOR_SPRITE, ACTIVE_ORDERING_TABLE, 1);
 }
 
-void DOO2_uploadModelClut(u_long *pixels)
+void DOO2_saveModelClut(u_long *pixels)
 {
 	RECT rect;
 
@@ -332,7 +331,7 @@ void DOO2_uploadModelClut(u_long *pixels)
 	DrawSync(0);
 }
 
-void DOO2_uploadClutTile(u_long *pixels, int32_t tile)
+void DOO2_saveClutTile(u_long *pixels, int32_t tile)
 {
 	RECT rect;
 
@@ -700,8 +699,8 @@ void DOO2_openEggBox(void)
 	RECT startPos;
 
 	startPos = MAIN_D_80134B98;
-	DOOA_REINCARNATION_SEQ->eggSlot = 0;
-	DOOA_EGG_BOX_PENDING[0] = -1;
+	DOOA_REINCARNATION_SEQ.eggSlot = 0;
+	DOOA_REINCARNATION_SEQ.sparkleIndex = -1;
 	createAnimatedUIBox(3, 0, 2, &MAIN_D_80134B90, &startPos,
 	                    (TickFunction)DOO2_tickEggBox,
 	                    (RenderFunction)DOO2_renderEggIcons);
@@ -735,10 +734,10 @@ int32_t DOO2_tickEggInput(void)
 	DooSequence *seq;
 	RECT boxRect;
 
-	seq = DOOA_REINCARNATION_SEQ;
+	seq = &DOOA_REINCARNATION_SEQ;
 	boxRect = MAIN_D_80134BA4;
 
-	if (DOOA_EGG_BOX_PENDING[0] != 0) {
+	if (DOOA_REINCARNATION_SEQ.sparkleIndex != 0) {
 		return 0;
 	}
 	if (UI_BOX_DATA[3].state == 0) {

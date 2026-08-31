@@ -90,7 +90,12 @@ SECTIONS
 			. = ALIGN(., 4);
 
 			build/src/dget/dget.c.o(.data.*);
-			. = ALIGN(., 8);
+			. = ALIGN(., 4);
+
+			/* Trailer */
+			LONG(0);
+
+			. = ALIGN(., 4);
 		}
 	}
 
@@ -134,10 +139,16 @@ SECTIONS
 
 			build/src/dooa/dooa.c.o(.data.*);
 			. = ALIGN(., 4);
-			KEEP(build/asm/dooa/data/48D4.data.s.o(.data.*));
-			. = ALIGN(., 4);
 
 			build/src/dooa/dooa.c.o(.bss.*);
+			. = ALIGN(., 4);
+
+			build/src/dooa/dooa_bss.c.o(.data.*);
+			. = ALIGN(., 4);
+
+			/* Trailer */
+			LONG(0);
+
 			. = ALIGN(., 4);
 		}
 	}

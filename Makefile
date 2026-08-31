@@ -211,7 +211,8 @@ DOOA_ASM_SRC := $(shell find $(ASM_DIR)/dooa -path '*.s' \
 
 DOOA_SRC := \
 	$(DOOA_ASM_SRC) \
-	src/dooa/dooa.c
+	src/dooa/dooa.c \
+	src/dooa/dooa_bss.c
 
 DOOA_OBJ := $(DOOA_SRC:%=$(BUILDDIR)/%.o)
 DOOA_DEP := $(DOOA_OBJ:%.o=%.d)
