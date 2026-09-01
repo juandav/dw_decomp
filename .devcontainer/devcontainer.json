@@ -1,8 +1,14 @@
 {
   "name": "DW1 Decomp",
   "build": {
-    "dockerfile": "../Dockerfile"
+    "dockerfile": "../Dockerfile",
+    "options": [
+      "--platform=linux/amd64"
+    ]
   },
+  "runArgs": [
+    "--platform=linux/amd64"
+  ],
   "postCreateCommand": "./tools/dl_deps.sh",
   "customizations": {
     "vscode": {
