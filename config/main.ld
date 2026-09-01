@@ -266,7 +266,7 @@ SECTIONS
         . = ALIGN(., 4);
         build/src/main/aabb.c.o(.rodata.*)
         . = ALIGN(., 4);
-        build/asm/main/data/efe.rodata.s.o(.rodata.*)
+        build/src/main/efe.c.o(.rodata.*)
         . = ALIGN(., 4);
         KEEP(build/asm/main/data/psyq/libcd.rodata.s.o(.rodata.*))
         . = ALIGN(., 4);

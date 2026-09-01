@@ -75,6 +75,42 @@ typedef struct {
 	ModelComponent *model;
 } EfeLoad;
 
+typedef struct {
+	SVECTOR worldPos;
+	int16_t progress;
+	int16_t tMax;
+	int16_t mode;
+	int16_t fixedDepth;
+	int16_t redMin;
+	int16_t greenMin;
+	int16_t blueMin;
+	int16_t redMax;
+	int16_t greenMax;
+	int16_t blueMax;
+	int32_t scaleMin;
+	int32_t scaleMax;
+	int16_t offsetX;
+	int16_t offsetY;
+} EfeFlashData;
+
+typedef struct {
+	DVECTOR screenPos;
+	int16_t depth;
+	int16_t pad;
+	int32_t scale;
+	uint16_t sizeX;
+	uint16_t sizeY;
+	uint16_t tpage;
+	uint8_t uBase;
+	uint8_t vBase;
+	uint16_t clut;
+	uint8_t red;
+	uint8_t green;
+	uint8_t blue;
+	uint8_t colorScale;
+} ParticleFlashData;
+
+extern EfeFlashData *EFE_FLASH_DATA;
 extern int32_t *EFE_DATA_STACK;
 extern int32_t EFE_SCRIPT_MEM1_DATA[];
 extern int16_t EFE_LOADED_MOVE_DATA[];
