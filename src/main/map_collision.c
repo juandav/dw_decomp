@@ -62,6 +62,38 @@ void getModelTile(VECTOR *pos, int16_t *outTileX, int16_t *outTileY)
 	}
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/map_collision", setRectangleImpassable);
+static inline int32_t copyValue(int32_t value)
+{
+	return value;
+}
 
-INCLUDE_ASM("asm/main/nonmatchings/map_collision", setRectImpassible);
+void setRectangleImpassable(int32_t x, int32_t y, int32_t radius)
+{
+	int32_t originalRadius;
+	int32_t originalY;
+	int32_t tileX;
+	int32_t tileY;
+
+	originalRadius = copyValue(radius);
+	originalY = copyValue(y);
+	for (tileY = y - radius;
+	     tileY < originalY + originalRadius;
+	     tileY++) {
+		for (tileX = x - originalRadius; tileX < x + radius; tileX++) {
+			((uint8_t *)MAP_COLLISION_DATA)[tileX + tileY * 100] = 0x80;
+		}
+	}
+}
+
+void setRectImpassible(int32_t x, int32_t y, int32_t width, int32_t height)
+{
+	int32_t originalY;
+	int32_t tileX;
+
+	originalY = copyValue(y);
+	for (; y < originalY + height; y++) {
+		for (tileX = x; tileX < x + width; tileX++) {
+			((uint8_t *)MAP_COLLISION_DATA)[tileX + y * 100] = 0x80;
+		}
+	}
+}
