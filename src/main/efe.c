@@ -1,10 +1,18 @@
-#include <libgte.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include <libcd.h>
 #include <libgs.h>
+#include <libgte.h>
+
 #include <dw/efe.h>
 #include <dw/entity.h>
+#include <dw/math.h>
 #include <dw/params.h>
 #include <dw/types.h>
-#include <libcd.h>
+#include <dw/world_object.h>
+
+#include "common.h"
 
 typedef struct {
 	int16_t state;
@@ -49,39 +57,12 @@ typedef struct {
 	int16_t unkA;
 } EntityParticleFX;
 
-extern int16_t MAIN_D_80138AA4[];
-extern int16_t MAIN_D_801389B4[];
-extern uint32_t MAIN_D_8012343C[];
-extern char MAIN_D_8012342C[];
-extern char MAIN_D_80134220[4];
-
-extern u_long SOME_IMAGE_DATA[];
-void setShortWithStride();
-void removeObject(int32_t objectId, int32_t instanceId);
-char *strcpy(char *dst, char *src);
-char *strcat(char *dst, char *src);
-int32_t rand(void);
-extern uint8_t MAIN_D_801387B8[];
 typedef struct {
 	int16_t v;
 	int16_t pad1;
 	int16_t pad2;
 } EfeParticleField;
-extern EfeParticleField MAIN_D_80138888[];
-extern EfeParticleField MAIN_D_8013888A[];
-extern EfeParticleField MAIN_D_8013888C[];
-int32_t _sin(int32_t a);
-int32_t abs(int32_t x);
-extern GsOT *ACTIVE_ORDERING_TABLE;
-extern int32_t FLASH_INSTANCE;
-extern int32_t DRAWING_OFFSET_X;
-extern int32_t DRAWING_OFFSET_Y;
-void getDrawingOffsetCopy(int32_t *x, int32_t *y);
-int32_t isTamerOnScreen(void);
-extern int32_t VIEWPORT_DISTANCE;
-int32_t lerp(int32_t start, int32_t end, int32_t t0, int32_t t1, int32_t t);
-void renderParticleFlash(int16_t *params);
-void renderFXParticle(SVECTOR *pos, int32_t size, uint8_t *color);
+
 typedef struct {
 	int16_t x;
 	int16_t y;
@@ -98,41 +79,19 @@ typedef struct {
 	int8_t b;
 	int8_t a;
 } FlashParams;
-int32_t _cos(int32_t a);
-extern GsSPRITE CLOUD_FX_SPRITE;
-extern uint8_t MAIN_D_80123370[];
-extern int8_t MAIN_D_80134214[4];
-extern uint8_t MAIN_D_8013421C[4];
-extern int8_t MAIN_D_80134218[4];
-extern int32_t VIEWPORT_DISTANCE;
-extern int8_t MAIN_D_801233CC[];
-extern int16_t MAIN_D_801233DC[];
-extern int16_t MAIN_D_80123400[];
-extern uint8_t MAIN_D_8012341C[];
+
+void setShortWithStride();
+void getDrawingOffsetCopy(int32_t *x, int32_t *y);
+int32_t isTamerOnScreen(void);
+int32_t lerp(int32_t start, int32_t end, int32_t t0, int32_t t1, int32_t t);
+void renderParticleFlash(int16_t *params);
+void renderFXParticle(SVECTOR *pos, int32_t size, uint8_t *color);
 int32_t worldPosToScreenPos(int16_t *world, int16_t *screen);
 void addFXPrim(POLY_FT4 *prim, int32_t x, int32_t y, int16_t width, int16_t height, int32_t depth);
 void renderSprite(GsSPRITE *spr, int16_t x, int16_t y, int32_t depth,
                   int32_t sx, int32_t sy);
-typedef void (*EfeFn)(int32_t);
-int32_t addObject(int32_t objectId, int32_t instanceId, EfeFn tick, EfeFn render);
-
-#include "common.h"
 
 void initializeParticleFX();
-static void createParticleFX__tuner__(void)
-{
-	int32_t t0;
-	int32_t t1;
-	int32_t t2;
-	int32_t t3;
-
-	t0 = MAIN_D_801387B8[0];
-	t1 = MAIN_D_801387B8[1];
-	t2 = MAIN_D_801387B8[2];
-	t3 = MAIN_D_801387B8[3];
-	MAIN_D_801387B8[0] = t0 + t1 + t2 + t3;
-}
-
 void createParticleFX(uint8_t kind, int32_t count, SVECTOR *pos, Entity *entity, int32_t lifetime);
 void tickParticleFX(int32_t id);
 void renderParticleFX();
@@ -146,7 +105,7 @@ void removeAllCloudFX();
 void createCloudFX(int16_t *pos);
 void tickCloudFX();
 void renderCloudFX(int32_t id);
-void rotateVector();
+void rotateVector(void);
 char *initializeFlashData(char *base);
 void createFlash(void);
 void tickEFEFlash();
@@ -159,7 +118,32 @@ void initializeEFE();
 void getEFEDATEntry();
 void renderParticleFlash();
 
-void *efe_order_anchor[] = {
+extern int16_t MAIN_D_80138AA4[];
+extern int16_t MAIN_D_801389B4[];
+extern uint32_t MAIN_D_8012343C[];
+extern char MAIN_D_8012342C[];
+extern char MAIN_D_80134220[4];
+extern u_long SOME_IMAGE_DATA[];
+extern uint8_t MAIN_D_801387B8[];
+extern EfeParticleField MAIN_D_80138888[];
+extern EfeParticleField MAIN_D_8013888A[];
+extern EfeParticleField MAIN_D_8013888C[];
+extern GsOT *ACTIVE_ORDERING_TABLE;
+extern int32_t FLASH_INSTANCE;
+extern int32_t DRAWING_OFFSET_X;
+extern int32_t DRAWING_OFFSET_Y;
+extern int32_t VIEWPORT_DISTANCE;
+extern GsSPRITE CLOUD_FX_SPRITE;
+extern uint8_t MAIN_D_80123370[];
+extern int8_t MAIN_D_80134214[4];
+extern uint8_t MAIN_D_8013421C[4];
+extern int8_t MAIN_D_80134218[4];
+extern int8_t MAIN_D_801233CC[];
+extern int16_t MAIN_D_801233DC[];
+extern int16_t MAIN_D_80123400[];
+extern uint8_t MAIN_D_8012341C[];
+
+static void *efe_functions[] = {
 	renderParticleFlash,
 	getEFEDATEntry,
 	initializeEFE,
@@ -187,6 +171,20 @@ void *efe_order_anchor[] = {
 	createParticleFX,
 	initializeParticleFX,
 };
+
+static void createParticleFX__garbage__(void)
+{
+	int32_t t0;
+	int32_t t1;
+	int32_t t2;
+	int32_t t3;
+
+	t0 = MAIN_D_801387B8[0];
+	t1 = MAIN_D_801387B8[1];
+	t2 = MAIN_D_801387B8[2];
+	t3 = MAIN_D_801387B8[3];
+	MAIN_D_801387B8[0] = t0 + t1 + t2 + t3;
+}
 
 void initializeParticleFX(void)
 {
@@ -302,8 +300,7 @@ void createParticleFX(uint8_t kind, int32_t count, SVECTOR *pos, Entity *entity,
 	addObject(0x600, i, tickParticleFX, renderParticleFX);
 }
 
-
-static void tickParticleFX__tuner__(void)
+static void tickParticleFX__garbage__(void)
 {
 	int32_t t0;
 	int32_t t1;
@@ -401,7 +398,6 @@ void tickParticleFX(int32_t id)
 	}
 }
 
-
 void renderParticleFX(int32_t id)
 {
 	ParticleFX *fx;
@@ -461,7 +457,6 @@ void renderParticleFX(int32_t id)
 	}
 }
 
-
 int32_t addEntityParticleFX(Entity *owner, int16_t timer)
 {
 	EntityParticleFX *fx;
@@ -485,7 +480,6 @@ int32_t addEntityParticleFX(Entity *owner, int16_t timer)
 	addObject(0x502, i, tickEntityParticleFX, renderEntityParticleFX);
 	return i;
 }
-
 
 void initializeEntityParticleFX(void)
 {
@@ -539,7 +533,6 @@ void renderEntityParticleFX(int32_t id)
 	setUVWH(prim, sprite->baseU + (sprite->spanU + 1) * (fx->timer % 4), sprite->baseV, sprite->spanU, sprite->spanV);
 	addFXPrim(prim, screenPos.vx, screenPos.vy, sprite->width, sprite->height, depth);
 }
-
 
 void removeEntityParticleFX(int32_t id)
 {
@@ -613,7 +606,6 @@ void renderCloudFX(int32_t id)
 	             MAIN_D_80123400[cloud->state], MAIN_D_80123400[cloud->state]);
 }
 
-
 static void rotateVector__garbage__(void)
 {
 	int32_t v0;
@@ -678,8 +670,6 @@ static void rotateVector__garbage__(void)
 	MAIN_D_80138AA4[0] = (v18 * v19) + v0;
 	MAIN_D_80138AA4[1] = (v19 * v0) + v1;
 }
-
-void rotateVector(void);
 
 void rotateVector(void)
 {
@@ -784,7 +774,6 @@ void createFlash(void)
 	}
 }
 
-
 void tickEFEFlash(int32_t id)
 {
 	EfeFlashData *data;
@@ -862,7 +851,6 @@ void renderEFEFlash(int32_t id)
 	}
 }
 
-
 int32_t setEFEFlashOffset(int32_t id, int16_t x, int16_t y)
 {
 	EfeFlashData *data;
@@ -915,7 +903,6 @@ void modifySomeImage(int32_t dim)
 	LoadImage(&rect, (u_long *)buffer);
 	DrawSync(0);
 }
-
 
 void findEFEDATFile(void)
 {
