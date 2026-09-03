@@ -41,34 +41,6 @@ typedef struct {
 	int16_t count;
 } TargetSearch;
 
-extern int8_t PARTNER_PREVIOUS_TILE_X;
-extern int8_t PARTNER_PREVIOUS_TILE_Y;
-extern uint8_t MAIN_D_80125F70[][7];
-extern int32_t COMBAT_AREA_CENTER_X;
-extern int32_t COMBAT_AREA_CENTER_Y;
-extern int32_t ACTIVE_FRAMEBUFFER;
-extern GsOT GS_ORDERING_TABLE[];
-extern PACKET GS_WORK_BASES[];
-extern char DRAW_OFFSETS[];
-extern DigimonEntity *MAIN_D_80134EF4;
-extern DigimonEntity *MAIN_D_80134EF8;
-extern uint8_t CURRENT_SCREEN;
-extern uint8_t MAIN_D_80134D64;
-extern int16_t MAIN_D_801346D8[4];
-extern uint8_t MAIN_D_80135094;
-extern int8_t PARTNER_WAYPOINT_COUNT;
-extern int8_t PARTNER_WAYPOINT_CURRENT;
-extern int8_t PARTNER_WAYPOINT_X[];
-extern int8_t PARTNER_WAYPOINT_Y[];
-extern uint8_t BTL_D_80072ED8[];
-extern uint8_t BTL_D_80072ED9[];
-extern uint8_t BTL_D_80072EE8[];
-extern uint8_t BTL_D_80072EE9[];
-extern uint8_t MAIN_D_801346E8[5];
-extern uint8_t MAIN_D_801346EC[4];
-extern uint8_t MAIN_D_801346F0[4];
-extern uint8_t MAIN_D_801346F4[4];
-
 void removeObject(int32_t objectId, int32_t instanceId);
 void addObject(int32_t objectId, int32_t instanceId, void *tick, void *render);
 void getEntityTileFromModel(Entity *entity, int8_t *outTileX, int8_t *outTileY);
@@ -156,7 +128,7 @@ int32_t BTL_addBlockedAttack(FighterData *fighter, FighterData *other);
 void BTL_setupQueuedMove(DigimonEntity *digimon, FighterData *fighter, int16_t arg2, int32_t moveIndex);
 void BTL_tickFighterAction(int32_t arg0);
 int16_t BTL_getStrongestMove(int32_t arg0, int16_t *flags);
-int16_t BTL_getMostEffectiveMove(int32_t arg0, int16_t *flags);
+int16_t BTL_getMostEffectiveMove(int32_t index, int16_t *flags);
 int16_t BTL_getCheapestMove(int32_t arg0, int16_t *flags);
 void BTL_tickHitState(Entity *entity, FighterData *fighter, int32_t arg2);
 int32_t BTL_selectMoveByPower(int32_t arg0, int16_t *flags);
@@ -212,6 +184,34 @@ void removeBuffModelObject(void);
 void BTL_getHighestScoredMove(int16_t *values, int16_t *marks, int16_t *out, int16_t count);
 void BTL_getLowestScoredMove(int16_t *values, int16_t *marks, int16_t *out, int16_t count);
 void BTL_selectConfusedMove(DigimonEntity *digimon, FighterData *fighter, int32_t tech);
+
+extern int8_t PARTNER_PREVIOUS_TILE_X;
+extern int8_t PARTNER_PREVIOUS_TILE_Y;
+extern uint8_t MAIN_D_80125F70[][7];
+extern int32_t COMBAT_AREA_CENTER_X;
+extern int32_t COMBAT_AREA_CENTER_Y;
+extern int32_t ACTIVE_FRAMEBUFFER;
+extern GsOT GS_ORDERING_TABLE[];
+extern PACKET GS_WORK_BASES[];
+extern char DRAW_OFFSETS[];
+extern DigimonEntity *MAIN_D_80134EF4;
+extern DigimonEntity *MAIN_D_80134EF8;
+extern uint8_t CURRENT_SCREEN;
+extern uint8_t MAIN_D_80134D64;
+extern int16_t MAIN_D_801346D8[4];
+extern uint8_t MAIN_D_80135094;
+extern int8_t PARTNER_WAYPOINT_COUNT;
+extern int8_t PARTNER_WAYPOINT_CURRENT;
+extern int8_t PARTNER_WAYPOINT_X[];
+extern int8_t PARTNER_WAYPOINT_Y[];
+extern uint8_t BTL_D_80072ED8[];
+extern uint8_t BTL_D_80072ED9[];
+extern uint8_t BTL_D_80072EE8[];
+extern uint8_t BTL_D_80072EE9[];
+extern uint8_t MAIN_D_801346E8[5];
+extern uint8_t MAIN_D_801346EC[4];
+extern uint8_t MAIN_D_801346F0[4];
+extern uint8_t MAIN_D_801346F4[4];
 
 static void *battle_main_functions[] = {
 	BTL_setCommandIconUV,
@@ -2026,60 +2026,6 @@ void BTL_retargetAfterHit(DigimonEntity *digimon, FighterData *fighter, AttackOb
 
 INCLUDE_ASM("asm/btl/nonmatchings/battle_main", BTL_calculateDamage);
 
-INCLUDE_ASM("asm/btl/nonmatchings/battle_main", BTL_handleHitReaction);
-
-void BTL_applyMoveStatus(DigimonEntity *digimon, FighterData *fighter, int32_t move)
-{
-	int32_t chance;
-
-	if (fighter->flags & 0x100) {
-		return;
-	}
-
-	if (MOVE_DATA[move].statusChance == 0) {
-		return;
-	}
-
-	chance = MOVE_DATA[move].statusChance;
-	if (random(100) < chance) {
-		switch (MOVE_DATA[move].status) {
-		case 1:
-			if (!(fighter->flags & 1)) {
-				fighter->flags |= 1;
-				fighter->poisonTimer = 100;
-				BTL_addPoisonStatusVisual(digimon, fighter);
-			}
-			break;
-		case 2:
-			if (!(fighter->flags & 2)) {
-				fighter->flags |= 2;
-				fighter->confusionTimer = random(0x65) + 200;
-				BTL_addConfusionStatusVisual(digimon, fighter);
-				BTL_resetFighterAction(fighter);
-			}
-			break;
-		case 3:
-			if (!(fighter->flags & 4)) {
-				fighter->flags |= 4;
-				fighter->stunTimer = random(0x29) + 200;
-				BTL_addStunStatusVisual(digimon, fighter);
-				BTL_resetFighterAction(fighter);
-			}
-			break;
-		case 4:
-			if (!(fighter->flags & 8)) {
-				fighter->flatTimer = -1;
-				BTL_removeStatusEffects(digimon, fighter);
-				BTL_resetFighterAction(fighter);
-			}
-			break;
-		}
-		if (fighter == COMBAT_DATA_PTR->fighter) {
-			COMBAT_DATA_PTR->player.statusedCount++;
-		}
-	}
-}
-
 int16_t BTL_getFighterSlot(int16_t entityId)
 {
 	int32_t i;
@@ -3111,6 +3057,60 @@ int16_t BTL_getStrongestMove(int32_t index, int16_t *flags)
 
 INCLUDE_ASM("asm/btl/nonmatchings/battle_main", BTL_getMostEffectiveMove);
 
+INCLUDE_ASM("asm/btl/nonmatchings/battle_main", BTL_handleHitReaction);
+
+void BTL_applyMoveStatus(DigimonEntity *digimon, FighterData *fighter, int32_t move)
+{
+	int32_t chance;
+
+	if (fighter->flags & 0x100) {
+		return;
+	}
+
+	if (MOVE_DATA[move].statusChance == 0) {
+		return;
+	}
+
+	chance = MOVE_DATA[move].statusChance;
+	if (random(100) < chance) {
+		switch (MOVE_DATA[move].status) {
+		case 1:
+			if (!(fighter->flags & 1)) {
+				fighter->flags |= 1;
+				fighter->poisonTimer = 100;
+				BTL_addPoisonStatusVisual(digimon, fighter);
+			}
+			break;
+		case 2:
+			if (!(fighter->flags & 2)) {
+				fighter->flags |= 2;
+				fighter->confusionTimer = random(0x65) + 200;
+				BTL_addConfusionStatusVisual(digimon, fighter);
+				BTL_resetFighterAction(fighter);
+			}
+			break;
+		case 3:
+			if (!(fighter->flags & 4)) {
+				fighter->flags |= 4;
+				fighter->stunTimer = random(0x29) + 200;
+				BTL_addStunStatusVisual(digimon, fighter);
+				BTL_resetFighterAction(fighter);
+			}
+			break;
+		case 4:
+			if (!(fighter->flags & 8)) {
+				fighter->flatTimer = -1;
+				BTL_removeStatusEffects(digimon, fighter);
+				BTL_resetFighterAction(fighter);
+			}
+			break;
+		}
+		if (fighter == COMBAT_DATA_PTR->fighter) {
+			COMBAT_DATA_PTR->player.statusedCount++;
+		}
+	}
+}
+
 int16_t BTL_getCheapestMove(int32_t index, int16_t *flags)
 {
 	MoveRanking rank;
@@ -3243,7 +3243,38 @@ void BTL_getWeakestEnemy(Entity *self, FighterData *fighter, int16_t *outScore, 
 	}
 }
 
-INCLUDE_ASM("asm/btl/nonmatchings/battle_main", BTL_calculateTargetScore);
+int16_t BTL_calculateTargetScore(DigimonEntity *self, DigimonEntity *other)
+{
+	Stats *st;
+	int16_t eff;
+	int16_t mult;
+	int32_t term;
+	int32_t term2;
+
+	st = &self->stats;
+	mult = MAIN_D_80125F70[DIGIMON_DATA[self->entity.type].special[0]]
+	                      [DIGIMON_DATA[other->entity.type].special[0]];
+	eff = mult;
+	switch (eff) {
+	case 20:
+		mult = 2;
+		break;
+	case 15:
+		mult = 5;
+		break;
+	case 5:
+		mult = 15;
+		break;
+	case 2:
+		mult = 20;
+		break;
+	}
+
+	term = mult * (st->base.def * 100 / 999) / 10;
+	term2 = st->current.currentHP * 100 / st->base.hp;
+	mult = term2 + term;
+	return mult;
+}
 
 void BTL_sortScoresDescending(int32_t *values, int32_t *keys, int32_t *groups, int32_t count)
 {

@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include <libcd.h>
 #include <libetc.h>
@@ -17,59 +18,6 @@
 #include <dw/sound.h>
 
 #include "common.h"
-
-extern GsSPRITE BTL_D_80073E54;
-extern GsSPRITE BTL_D_80073E78;
-extern char BTL_END_BOX_TEXTBUFFER[];
-extern int16_t MAIN_D_8013509C;
-extern uint8_t *MAIN_D_801350A4;
-extern uint16_t MAIN_D_801350A8;
-extern uint16_t MAIN_D_801350AA;
-extern uint16_t MAIN_D_801350AC;
-extern int16_t BTL_D_80073E9C[];
-extern char *BTL_D_80072E34[];
-extern int16_t MAIN_D_80135090[2];
-extern int32_t MAIN_D_801350C0;
-extern int16_t BTL_D_80073014[][2];
-extern int16_t BTL_D_80073016[][2];
-extern int8_t MAIN_D_801350BC;
-extern StatsGains STATS_GAINS;
-extern char BTL_D_80072EF8[];
-extern char BTL_D_80072F44[];
-extern char BTL_D_80072F58[];
-extern char BTL_D_80072F70[];
-extern char BTL_D_80072F90[];
-extern char BTL_D_80072FA4[];
-extern char BTL_D_80072FBC[];
-extern char BTL_D_80072FD8[];
-extern char MAIN_D_8013474C[8];
-extern char MAIN_D_80134750[8];
-extern char MAIN_D_80134754[8];
-extern char MAIN_D_80134758[8];
-extern char MAIN_D_8013475C[8];
-extern char ITEM_PARA[][32];
-extern char MAIN_D_80134744[8];
-extern char BTL_D_80072F18[];
-extern char BTL_D_800742A0[];
-extern char BTL_D_80072FE4[];
-extern char MAIN_D_80134740[8];
-extern char BTL_D_80072F2C[];
-extern int16_t MAIN_D_8013509E;
-extern int16_t MAIN_D_801350A0;
-extern int16_t MAIN_D_801350A2;
-extern uint8_t MAIN_D_80134764[8];
-extern uint8_t MAIN_D_8013476C[8];
-extern uint8_t MAIN_D_80134774[8];
-extern int8_t MAIN_D_80135094;
-extern uint8_t MAIN_D_801350C4;
-extern uint8_t MAIN_D_801350C5;
-extern uint8_t MAIN_D_801350C6;
-extern uint8_t MAIN_D_801350C7;
-extern uint8_t MAIN_D_801350C8;
-extern uint8_t MAIN_D_801350C9;
-extern uint8_t MAIN_D_801350CA;
-extern uint8_t MAIN_D_801350CB;
-extern int32_t BTL_D_80073290[12];
 
 void removeObject(int32_t objectId, int32_t instanceId);
 void addObject(int32_t objectId, int32_t instanceId, void *tick, void *render);
@@ -90,9 +38,7 @@ int32_t convertAsciiToJis(uint8_t input);
 int32_t swapShortBytes(int32_t input);
 int32_t drawGlyph(uint16_t glyph, int32_t x, int32_t y);
 void BTL_drawBattleEndText(int32_t a);
-char *strcpy(char *dst, const char *src);
 void swapByte(char *a, char *b);
-char *strcat(char *dst, const char *src);
 void BTL_renderBattleStartTextBurst(void);
 void BTL_scrollBattleEndText(void);
 void BTL_appendItemDroppedText(int32_t *p);
@@ -111,6 +57,62 @@ void BTL_renderPartnerStatusBars(int16_t idx);
 void BTL_tickPartnerStatusBars(void);
 void BTL_renderFinisherGauge(int32_t idx);
 void BTL_renderFinisherGaugeSegment(int16_t i, int32_t idx);
+
+extern GsSPRITE BTL_D_80073E54;
+extern GsSPRITE BTL_D_80073E78;
+extern char BTL_END_BOX_TEXTBUFFER[];
+extern int16_t MAIN_D_8013509C;
+extern uint8_t *MAIN_D_801350A4;
+extern uint16_t MAIN_D_801350A8;
+extern uint16_t MAIN_D_801350AA;
+extern uint16_t MAIN_D_801350AC;
+extern int16_t BTL_D_80073E9C[];
+extern char *BTL_D_80072E34[];
+extern int16_t MAIN_D_80135090[2];
+extern int32_t MAIN_D_801350C0;
+extern GsRVIEW2 GS_VIEWPOINT;
+extern int32_t VIEWPORT_DISTANCE;
+extern int16_t BTL_D_80073014[][2];
+extern int16_t BTL_D_80073016[][2];
+extern uint8_t MAIN_D_801350BC;
+extern StatsGains STATS_GAINS;
+extern char BTL_D_80072EF8[];
+extern char BTL_D_80072F44[];
+extern char BTL_D_80072F58[];
+extern char BTL_D_80072F70[];
+extern char BTL_D_80072F90[];
+extern char BTL_D_80072FA4[];
+extern char BTL_D_80072FBC[];
+extern char BTL_D_80072FD8[];
+extern char MAIN_D_8013474C[8];
+extern char MAIN_D_80134750[8];
+extern char MAIN_D_80134754[8];
+extern char MAIN_D_80134758[8];
+extern char MAIN_D_8013475C[8];
+extern char ITEM_PARA[][32];
+extern char MAIN_D_80134744[8];
+extern char BTL_D_80072F18[];
+extern char BTL_D_800742A0[];
+extern MATRIX BTL_D_80072FF4;
+extern char BTL_D_80072FE4[];
+extern char MAIN_D_80134740[8];
+extern char BTL_D_80072F2C[];
+extern int16_t MAIN_D_8013509E;
+extern int16_t MAIN_D_801350A0;
+extern int16_t MAIN_D_801350A2;
+extern uint8_t MAIN_D_80134764[8];
+extern uint8_t MAIN_D_8013476C[8];
+extern uint8_t MAIN_D_80134774[8];
+extern int8_t MAIN_D_80135094;
+extern uint8_t MAIN_D_801350C4;
+extern uint8_t MAIN_D_801350C5;
+extern uint8_t MAIN_D_801350C6;
+extern uint8_t MAIN_D_801350C7;
+extern uint8_t MAIN_D_801350C8;
+extern uint8_t MAIN_D_801350C9;
+extern uint8_t MAIN_D_801350CA;
+extern uint8_t MAIN_D_801350CB;
+extern int32_t BTL_D_80073290[12];
 
 static void *battle_hud_functions[] = {
 	BTL_removePartnerStatusBars,
@@ -749,7 +751,131 @@ void BTL_initializeBattleStartTextBurst(void)
 	addObject(0x1a6, 0, NULL, BTL_renderBattleStartTextBurst);
 }
 
-INCLUDE_ASM("asm/btl/nonmatchings/battle_hud", BTL_renderBattleStartTextBurst);
+void BTL_renderBattleStartTextBurst(void)
+{
+	POLY_FT4 *ft;
+	POLY_F4 *shadow;
+	char (*p)[20];
+	POLY_FT4 *prim;
+	GsOT_TAG *ot;
+	int32_t i;
+	int32_t dead;
+	int32_t j;
+	int16_t cx;
+	int16_t cy;
+	int32_t otz;
+	SVECTOR corner[4];
+	SVECTOR pts[4];
+	SVECTOR out;
+	MATRIX m;
+
+	GsSetProjection(0x200);
+	GsSetLsMatrix(&BTL_D_80072FF4);
+
+	corner[0].vx = -4;
+	corner[0].vy = -6;
+	corner[0].vz = 0;
+	corner[1].vx = 4;
+	corner[1].vy = -6;
+	corner[1].vz = 0;
+	corner[2].vx = -4;
+	corner[2].vy = 6;
+	corner[2].vz = 0;
+	corner[3].vx = 4;
+	corner[3].vy = 6;
+	corner[3].vz = 0;
+
+	ot = ACTIVE_ORDERING_TABLE->org;
+	dead = 0;
+	p = (char (*)[20])BTL_D_800742A0;
+	prim = (POLY_FT4 *)GsGetWorkBase();
+	for (i = 0; i < 0x9b; i++, p++) {
+		if ((((int16_t *)*p)[6] == 0) && (((int16_t *)*p)[7] == 0)) {
+			dead++;
+			continue;
+		}
+
+		PushMatrix();
+		RotMatrix((SVECTOR *)*p, &m);
+		for (j = 0; j < 4; j++) {
+			ApplyMatrixSV(&m, &corner[j], &out);
+			pts[j].vx = out.vx + ((int16_t *)*p)[4] - 4;
+			pts[j].vy = out.vy + ((int16_t *)*p)[5] - 6;
+			pts[j].vz = out.vz;
+		}
+
+		switch (((uint8_t *)*p)[0x13]) {
+		case 0:
+			((int16_t *)*p)[0] += 0x100;
+			((int16_t *)*p)[1] += 0x100;
+			break;
+		case 1:
+			((int16_t *)*p)[1] += 0x100;
+			((int16_t *)*p)[2] += 0x100;
+			break;
+		case 2:
+			((int16_t *)*p)[0] += 0x100;
+			((int16_t *)*p)[2] += 0x100;
+			break;
+		}
+
+		PopMatrix();
+
+		ft = prim;
+		setEntityTextDigit(prim, 0x100, 0x1e8);
+		prim->r0 = 0x80;
+		prim->g0 = 0x80;
+		prim->b0 = 0x80;
+		prim->clut = GetClut(0x100, 0x1e8);
+		gte_ldv3(&pts[0], &pts[1], &pts[2]);
+		gte_rtpt();
+		gte_stsxy3(&prim->x0, &prim->x1, &prim->x2);
+		gte_stszotz(&otz);
+		gte_ldv0(&pts[3]);
+		gte_rtps();
+		gte_stsxy(&prim->x3);
+		prim->u0 = ((uint8_t *)*p)[0x13] * 8 + 0x80;
+		prim->v0 = 0x80;
+		prim->u1 = ((uint8_t *)*p)[0x13] * 8 + 0x88;
+		prim->v1 = 0x80;
+		prim->u2 = ((uint8_t *)*p)[0x13] * 8 + 0x80;
+		prim->v2 = 0x88;
+		prim->u3 = ((uint8_t *)*p)[0x13] * 8 + 0x88;
+		prim->v3 = 0x88;
+		AddPrim(ot + 5, prim++);
+		shadow = (POLY_F4 *)prim;
+		SetPolyF4(shadow);
+		shadow->r0 = 0;
+		shadow->g0 = 0;
+		shadow->b0 = 0;
+		shadow->x0 = ft->x0 + 2;
+		shadow->y0 = ft->y0 + 2;
+		shadow->x1 = ft->x1 + 2;
+		shadow->y1 = ft->y1 + 2;
+		shadow->x2 = ft->x2 + 2;
+		shadow->y2 = ft->y2 + 2;
+		shadow->x3 = ft->x3 + 2;
+		shadow->y3 = ft->y3 + 2;
+		AddPrim(ot + 6, shadow++);
+		prim = (POLY_FT4 *)shadow;
+
+		cx = ft->x0;
+		cy = ft->y0;
+		if ((cx < -0xb4) || (cx >= 0xb5) || (cy < -0x8c) || (cy >= 0x8d)) {
+			((int16_t *)*p)[6] = 0;
+			((int16_t *)*p)[7] = 0;
+		}
+		((int16_t *)*p)[4] = ((int16_t *)*p)[4] + ((int16_t *)*p)[6];
+		((int16_t *)*p)[5] = ((int16_t *)*p)[5] + ((int16_t *)*p)[7];
+	}
+
+	GsSetWorkBase((PACKET *)prim);
+	if (dead == 0x9b) {
+		MAIN_D_801350C0 = 1;
+	}
+	GsSetProjection(VIEWPORT_DISTANCE);
+	GsSetRefView2(&GS_VIEWPOINT);
+}
 
 void BTL_removeBattleStartTextBurst(void)
 {

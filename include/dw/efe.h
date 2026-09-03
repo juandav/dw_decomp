@@ -5,6 +5,7 @@
 #include <libgte.h>
 
 #include <dw/entity.h>
+#include <dw/graphics.h>
 #include <dw/model.h>
 #include <dw/types.h>
 
@@ -21,8 +22,14 @@
 #define EFE_SCRATCH ((EfeScratch *)getScratchAddr(0))
 
 typedef struct {
-	int32_t position[3];
-	int32_t rotation[3];
+	int32_t vx;
+	int32_t vy;
+	int32_t vz;
+} EfeVector;
+
+typedef struct {
+	EfeVector position;
+	EfeVector rotation;
 } EfeTransform;
 
 typedef struct {
@@ -36,6 +43,24 @@ typedef struct {
 	int16_t positionY;
 	int16_t positionZ;
 } EfeBoneOffset;
+
+typedef struct {
+	int16_t distance;
+	int16_t velocity;
+	SVECTOR direction;
+	SVECTOR position;
+} EfeParticle;
+
+typedef struct {
+	EfeInstance *transform;
+	int16_t frames;
+	int16_t startOffset;
+	int16_t startVelocity;
+	int16_t acceleration;
+	RGB8 color;
+	int8_t type;
+	EfeParticle particles[21];
+} EfeParticleEffect;
 
 typedef struct {
 	int16_t *inst;
@@ -104,9 +129,7 @@ typedef struct {
 	uint8_t uBase;
 	uint8_t vBase;
 	uint16_t clut;
-	uint8_t red;
-	uint8_t green;
-	uint8_t blue;
+	RGB8 color;
 	uint8_t colorScale;
 } ParticleFlashData;
 
@@ -117,7 +140,7 @@ extern int16_t EFE_LOADED_MOVE_DATA[];
 extern EfeInstance *EFE_INSTANCE;
 extern int32_t EFE_PARENT_INSTANCE;
 
-extern char *MAIN_D_80134CCC;
+extern EfeParticleEffect *MAIN_D_80134CCC;
 extern int32_t MAIN_D_80134CD0;
 extern int32_t MAIN_D_80134CD4;
 extern int32_t MAIN_D_80134CD8;

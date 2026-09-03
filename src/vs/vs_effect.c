@@ -519,12 +519,10 @@ static void *vs_effect_functions[] = {
 char *VS_initializeParticleEmitters(char *base)
 {
 	int32_t i;
-	int32_t off;
 
-	MAIN_D_80134CCC = base;
-	for (i = 0, off = 0; i < 4; i++) {
-		*(int32_t *)(MAIN_D_80134CCC + off) = 0;
-		off += 0x1b4;
+	MAIN_D_80134CCC = (EfeParticleEffect *)base;
+	for (i = 0; i < 4; i++) {
+		MAIN_D_80134CCC[i].transform = NULL;
 	}
 
 	return base + 0x23c4;
@@ -743,61 +741,62 @@ void VS_tickParticleEmitters(void)
 {
 	SVECTOR rot;
 	MATRIX m;
-	char *p;
-	char *owner;
+	EfeParticleEffect *e;
+	EfeInstance *owner;
 	int32_t i;
-	int16_t *q;
+	EfeParticle *pt;
 	int32_t k;
 	int32_t t;
 
-	p = MAIN_D_80134CCC;
-	for (i = 0; i < 4; p = (char *)((int32_t)((uint32_t)p + 0x1b4)), i++) {
-		if (*(char **)p == NULL) {
+	e = MAIN_D_80134CCC;
+	for (i = 0; i < 4; e++, i++) {
+		if (e->transform == NULL) {
 			continue;
 		}
-		owner = *(char **)p;
-		if (*(int32_t *)owner == -1) {
-			*(int32_t *)p = 0;
+		owner = e->transform;
+		if (owner->frame == -1) {
+			e->transform = NULL;
 			continue;
 		}
 
 		k = 0;
 		while (1) {
-			if (((int16_t (*)[10])p)[k][8] <= 0) {
+			if (e->particles[k].distance <= 0) {
 				break;
 			}
 			k++;
 		}
 
 		if (k != 0x14) {
-			q = &((int16_t (*)[10])p)[k][8];
-			q[0] = ((int16_t *)p)[3];
-			q[1] = ((int16_t *)p)[4];
+			pt = &e->particles[k];
+			pt->distance = e->startOffset;
+			pt->velocity = e->startVelocity;
 			rot.vx = (((rand() & 0x7f) - 0x40) << 12) / 64;
 			rot.vy = (((rand() & 0x7f) - 0x40) << 12) / 64;
 			rot.vz = (((rand() & 0x7f) - 0x40) << 12) / 64;
-			q[3] = 0;
-			q[2] = 0;
-			q[4] = ((int16_t *)p)[3];
+			pt->direction.vy = 0;
+			pt->direction.vx = 0;
+			pt->direction.vz = e->startOffset;
 			RotMatrixZYX(&rot, &m);
-			ApplyMatrixSV(&m, (SVECTOR *)&q[2], (SVECTOR *)&q[2]);
-			q[6] = *(int32_t *)((int32_t)((uint32_t)(char *)owner + 4));
-			q[7] = *(int32_t *)((int32_t)((uint32_t)(char *)owner + 8));
-			q[8] = *(int32_t *)((int32_t)((uint32_t)(char *)owner + 0xc));
+			ApplyMatrixSV(&m, &pt->direction, &pt->direction);
+
+			pt->position.vx = *(int32_t *)((uint32_t)&owner->transform.position.vx);
+			pt->position.vy = *(int32_t *)((uint32_t)&owner->transform.position.vy);
+			pt->position.vz = *(int32_t *)((uint32_t)&owner->transform.position.vz);
 		}
 
 		for (k = 0; k < 0x14; k++) {
-			if (((int16_t (*)[10])p)[k][8] > 0) {
-				q = &((int16_t (*)[10])p)[k][8];
-				q[0] = q[0] - q[1];
-				q[1] -= ((int16_t *)p)[5];
+			if (e->particles[k].distance > 0) {
+				pt = &e->particles[k];
+				pt->distance = pt->distance - pt->velocity;
+				pt->velocity -= e->acceleration;
 			}
 		}
 
-		t = ((int16_t *)p)[2] - 1;
-		((int16_t *)p)[2] = t;
+		t = e->frames - 1;
+		e->frames = t;
 		if ((int16_t)t <= 0) {
-			*(int32_t *)p = 0;
+			e->transform = NULL;
 		}
 	}
 }
@@ -1072,7 +1071,7 @@ void VS_applyBoxAttackHit(void)
 		r = MAIN_D_80134CD0;
 	}
 
-	center.vx = ((EfeTransform *)((int32_t)EFE_INSTANCE + 4))->position[0];
+	center.vx = ((EfeTransform *)((int32_t)EFE_INSTANCE + 4))->position.vx;
 	center.vy = *(int32_t *)((int32_t)EFE_INSTANCE + 8);
 	center.vz = *(int32_t *)((int32_t)EFE_INSTANCE + 0xc);
 	box.center = &center;
@@ -1123,7 +1122,7 @@ void VS_applyLineAttackHit(void)
 	out = EFE_POP1(int32_t *);
 	arg = EFE_POP1(int32_t *);
 	*out = 0;
-	line[0].vx = ((EfeTransform *)((int32_t)EFE_INSTANCE + 4))->position[0];
+	line[0].vx = ((EfeTransform *)((int32_t)EFE_INSTANCE + 4))->position.vx;
 	line[0].vy = *(int32_t *)((int32_t)EFE_INSTANCE + 0xc);
 	line[1].vx = *(int32_t *)((char *)((int32_t *)(int32_t)MAIN_D_80134CE8->sourceEntity)[1] + 0x78);
 	line[1].vy = *(int32_t *)((char *)((int32_t *)(int32_t)MAIN_D_80134CE8->sourceEntity)[1] + 0x80);
@@ -1272,14 +1271,12 @@ void VS_drawTMDScreenSpace(void)
 {
 	EFE_SCRATCH->scale = EFE_POP1(VECTOR *);
 	EFE_SCRATCH->id = EFE_POP1(int32_t);
-	EFE_SCRATCH->rot.vx = ((VECTOR *)((int32_t)EFE_INSTANCE + 0x10))->vx;
-	EFE_SCRATCH->rot.vy = ((VECTOR *)((int32_t)EFE_INSTANCE + 0x10))->vy;
-	EFE_SCRATCH->rot.vz = ((VECTOR *)((int32_t)EFE_INSTANCE + 0x10))->vz;
+	copyVector(&EFE_SCRATCH->rot, (VECTOR *)((int32_t)EFE_INSTANCE + 0x10));
 	RotMatrixYXZ(&EFE_SCRATCH->rot, &EFE_SCRATCH->m0);
 	ScaleMatrix(&EFE_SCRATCH->m0, EFE_SCRATCH->scale);
-	EFE_SCRATCH->m0.t[0] = ((EfeTransform *)((int32_t)EFE_INSTANCE + 4))->position[0];
-	EFE_SCRATCH->m0.t[1] = ((EfeTransform *)((int32_t)EFE_INSTANCE + 4))->position[1];
-	EFE_SCRATCH->m0.t[2] = ((EfeTransform *)((int32_t)EFE_INSTANCE + 4))->position[2];
+	EFE_SCRATCH->m0.t[0] = ((EfeTransform *)((int32_t)EFE_INSTANCE + 4))->position.vx;
+	EFE_SCRATCH->m0.t[1] = ((EfeTransform *)((int32_t)EFE_INSTANCE + 4))->position.vy;
+	EFE_SCRATCH->m0.t[2] = ((EfeTransform *)((int32_t)EFE_INSTANCE + 4))->position.vz;
 	EFE_SCRATCH->m0.t[0] += -DRAWING_OFFSET_X + 0xa0;
 	EFE_SCRATCH->m0.t[1] += -DRAWING_OFFSET_Y + 0x78;
 	TransposeMatrix(&GsWSMATRIX, &EFE_SCRATCH->m2);
@@ -1334,9 +1331,9 @@ void VS_drawTMDYXZ(void)
 	EFE_SCRATCH->rot.vz = ((int32_t *)((int32_t)EFE_INSTANCE + 0x10))[2];
 	RotMatrixYXZ(&EFE_SCRATCH->rot, &EFE_SCRATCH->m1);
 	ScaleMatrix(&EFE_SCRATCH->m1, EFE_SCRATCH->scale);
-	EFE_SCRATCH->m1.t[0] = ((EfeTransform *)((int32_t)EFE_INSTANCE + 4))->position[0];
-	EFE_SCRATCH->m1.t[1] = ((EfeTransform *)((int32_t)EFE_INSTANCE + 4))->position[1];
-	EFE_SCRATCH->m1.t[2] = ((EfeTransform *)((int32_t)EFE_INSTANCE + 4))->position[2];
+	EFE_SCRATCH->m1.t[0] = ((EfeTransform *)((int32_t)EFE_INSTANCE + 4))->position.vx;
+	EFE_SCRATCH->m1.t[1] = ((EfeTransform *)((int32_t)EFE_INSTANCE + 4))->position.vy;
+	EFE_SCRATCH->m1.t[2] = ((EfeTransform *)((int32_t)EFE_INSTANCE + 4))->position.vz;
 	GsMulCoord0(&GsWSMATRIX, &EFE_SCRATCH->m1, &EFE_SCRATCH->m0);
 	if (EFE_SCRATCH->m0.t[2] < -0x12c) {
 		return;
@@ -1384,21 +1381,13 @@ void VS_convertToViewSpace(void)
 	trans = EFE_POP1(VECTOR *);
 	out2 = EFE_POP1(VECTOR *);
 	out1 = EFE_POP1(VECTOR *);
-	rot.vx = rotIn->vx;
-	rot.vy = rotIn->vy;
-	rot.vz = rotIn->vz;
-	((VECTOR *)m1.t)->vx = trans->vx;
-	((VECTOR *)m1.t)->vy = trans->vy;
-	((VECTOR *)m1.t)->vz = trans->vz;
+	copyVector(&rot, rotIn);
+	copyVector((VECTOR *)m1.t, trans);
 	RotMatrixYXZ(&rot, &m1);
 	GsMulCoord0(&GsWSMATRIX, &m1, &m2);
 	matrixToEuler2(&m2, &rot);
-	out1->vx = ((VECTOR *)m2.t)->vx;
-	out1->vy = ((VECTOR *)m2.t)->vy;
-	out1->vz = ((VECTOR *)m2.t)->vz;
-	out2->vx = rot.vx;
-	out2->vy = rot.vy;
-	out2->vz = rot.vz;
+	copyVector(out1, (VECTOR *)m2.t);
+	copyVector(out2, &rot);
 }
 
 void VS_maskVectorByScalar(void)
@@ -1807,16 +1796,10 @@ void VS_combineRotations(void)
 
 	b = EFE_POP1(VECTOR *);
 	a = EFE_POP1(VECTOR *);
-	r1.vx = a->vx;
-	r1.vy = a->vy;
-	r1.vz = a->vz;
-	r2.vx = b->vx;
-	r2.vy = b->vy;
-	r2.vz = b->vz;
+	copyVector(&r1, a);
+	copyVector(&r2, b);
 	multiplyRotations(&r1, &r2);
-	a->vx = r1.vx;
-	a->vy = r1.vy;
-	a->vz = r1.vz;
+	copyVector(a, &r1);
 }
 
 void VS_normalizeRotationAngles2(void)
@@ -1896,9 +1879,9 @@ void VS_centerTransformOnEntities(void)
 
 	count = 0;
 	sum = (EfeTransform *)((int32_t)EFE_INSTANCE + 4);
-	sum->position[0] = 0;
-	sum->position[1] = 0;
-	sum->position[2] = 0;
+	sum->position.vx = 0;
+	sum->position.vy = 0;
+	sum->position.vz = 0;
 	*(int32_t *)((int32_t)EFE_INSTANCE + 0x10) = 0;
 	*(int32_t *)((int32_t)EFE_INSTANCE + 0x14) = 0;
 	*(int32_t *)((int32_t)EFE_INSTANCE + 0x18) = 0;
@@ -1915,14 +1898,14 @@ void VS_centerTransformOnEntities(void)
 		}
 		count++;
 		p = (int32_t *)(((char **)e)[1] + 0x34);
-		sum->position[0] = sum->position[0] + p[5];
-		sum->position[1] = sum->position[1] + p[6];
-		sum->position[2] = sum->position[2] + p[7];
+		sum->position.vx = sum->position.vx + p[5];
+		sum->position.vy = sum->position.vy + p[6];
+		sum->position.vz = sum->position.vz + p[7];
 	}
 
-	sum->position[0] /= count;
-	sum->position[1] /= count;
-	sum->position[2] /= count;
+	sum->position.vx /= count;
+	sum->position.vy /= count;
+	sum->position.vz /= count;
 }
 
 void VS_shiftVectorsRight(void)
@@ -2058,7 +2041,7 @@ void VS_findHitEntity(void)
 	mode = EFE_POP1(int32_t);
 	out = EFE_POP1(int32_t *);
 	*out = 0;
-	center.vx = ((EfeTransform *)((int32_t)EFE_INSTANCE + 4))->position[0];
+	center.vx = ((EfeTransform *)((int32_t)EFE_INSTANCE + 4))->position.vx;
 	center.vy = *(int32_t *)((int32_t)EFE_INSTANCE + 8);
 	center.vz = *(int32_t *)((int32_t)EFE_INSTANCE + 0xc);
 	box.center = &center;
@@ -2231,7 +2214,7 @@ void VS_checkTargetCollision(void)
 	out2 = EFE_POP1(int32_t *);
 	out = EFE_POP1(int32_t *);
 	tgt = ((char **)(int32_t)MAIN_D_80134CE8->targetEntity)[1] + 0x48;
-	d0 = ((EfeTransform *)((int32_t)EFE_INSTANCE + 4))->position[0] - *(int32_t *)tgt;
+	d0 = ((EfeTransform *)((int32_t)EFE_INSTANCE + 4))->position.vx - *(int32_t *)tgt;
 	d1 = *(int32_t *)((int32_t)EFE_INSTANCE + 0xc) - *(int32_t *)(tgt + 8);
 	if ((r * r) < ((d0 * d0) + (d1 * d1))) {
 		goto zero;
@@ -2261,9 +2244,9 @@ void VS_rotateTransformTowardPoint(void)
 
 	p = EFE_POP1(int32_t *);
 	q = (EfeTransform *)((int32_t)EFE_INSTANCE + 4);
-	angle = _atan(p[0] - q->position[0], p[2] - q->position[2]);
+	angle = _atan(p[0] - q->position.vx, p[2] - q->position.vz);
 	angle = -(angle - 0x400) & 0xfff;
-	*(int32_t *)((int32_t)EFE_INSTANCE + (int32_t)&((EfeInstance *)0)->transform.rotation[1]) = angle;
+	*(int32_t *)((int32_t)EFE_INSTANCE + (int32_t)&((EfeInstance *)0)->transform.rotation.vy) = angle;
 }
 
 void VS_setTransformToSourceBone(void)
@@ -2275,7 +2258,7 @@ void VS_setTransformToSourceBone(void)
 	int32_t s2;
 
 	idx = EFE_POP1(int32_t);
-	p = &((EfeTransform *)((int32_t)EFE_INSTANCE + 4))->position[0];
+	p = &((EfeTransform *)((int32_t)EFE_INSTANCE + 4))->position.vx;
 	src = ((char **)(int32_t)MAIN_D_80134CE8->sourceEntity)[1] + (idx * 136) + 0x34;
 	*p++ = *(int32_t *)(src + 0x14);
 	*p++ = *(int32_t *)(src + 0x18);
@@ -2629,14 +2612,14 @@ void VS_addParticleEmitter(void)
 	int32_t a;
 	int32_t b;
 	int32_t i;
-	char *p;
+	EfeParticleEffect *e;
 
 	a = EFE_POP1(int32_t);
 	vec = EFE_POP1(int32_t *);
 	n = EFE_POP1(int32_t);
 	b = EFE_POP1(int32_t);
 	for (i = 0; i < 4; i++) {
-		if (((int32_t (*)[0x6d])MAIN_D_80134CCC)[i][0] == 0) {
+		if (MAIN_D_80134CCC[i].transform == NULL) {
 			break;
 		}
 	}
@@ -2645,20 +2628,20 @@ void VS_addParticleEmitter(void)
 		return;
 	}
 
-	p = *(char **)&MAIN_D_80134CCC + (i * 0x1b4);
-	p[0xf] = b;
+	e = &MAIN_D_80134CCC[i];
+	e->type = b;
 	for (i = 0; i < 0x15; i++) {
-		((int16_t (*)[10])p + i)[0][8] = 0;
+		e->particles[i].distance = 0;
 	}
 
-	*(int32_t *)p = (int32_t)EFE_INSTANCE;
-	*(int16_t *)(p + 4) = a;
-	p[0xc] = vec[0];
-	p[0xd] = vec[1];
-	p[0xe] = vec[2];
-	*(int16_t *)(p + 6) = n * 16;
-	*(int16_t *)(p + 8) = n / 8 * 16;
-	*(int16_t *)(p + 0xa) = n / 160 * 16;
+	e->transform = EFE_INSTANCE;
+	e->frames = a;
+	e->color.r = vec[0];
+	e->color.g = vec[1];
+	e->color.b = vec[2];
+	e->startOffset = n * 16;
+	e->startVelocity = n / 8 * 16;
+	e->acceleration = n / 160 * 16;
 }
 
 void VS_setEFEModelObjectColor(void)
@@ -2730,9 +2713,9 @@ void VS_steerTransformTowardPoint(void)
 	rot.vx = 0;
 	rot.vy = -*(int32_t *)((int32_t)EFE_INSTANCE + 0x14);
 	rot.vz = 0;
-	in.vx = target[0] - pos->position[0];
+	in.vx = target[0] - pos->position.vx;
 	in.vy = 0;
-	in.vz = target[2] - pos->position[2];
+	in.vz = target[2] - pos->position.vz;
 	RotMatrixZYX(&rot, &m);
 	ApplyMatrixSV(&m, &in, &out);
 	d = _atan(out.vx, out.vz);
@@ -2760,9 +2743,9 @@ void VS_steerTransformTowardPoint(void)
 	rot.vz = *(int32_t *)((int32_t)EFE_INSTANCE + 0x18);
 	RotMatrixZYX(&rot, &m);
 	ApplyMatrixSV(&m, &in, &out);
-	pos->position[0] += out.vx >> 3;
-	pos->position[1] += out.vy >> 3;
-	pos->position[2] += out.vz >> 3;
+	pos->position.vx += out.vx >> 3;
+	pos->position.vy += out.vy >> 3;
+	pos->position.vz += out.vz >> 3;
 }
 
 void VS_interpolateVector(void)
@@ -2840,7 +2823,7 @@ void VS_addAttackObjectToTarget(void)
 		return;
 	}
 
-	pos[0] = ((EfeTransform *)((int32_t)EFE_INSTANCE + 4))->position[0];
+	pos[0] = ((EfeTransform *)((int32_t)EFE_INSTANCE + 4))->position.vx;
 	pos[1] = *(int32_t *)((int32_t)EFE_INSTANCE + 8);
 	pos[2] = *(int32_t *)((int32_t)EFE_INSTANCE + 0xc);
 	for (i = 1; i < 10; i++) {
@@ -2871,7 +2854,7 @@ void VS_setTransformToTargetBone(void)
 
 	r = EFE_POP1(int32_t);
 	idx = EFE_POP1(int32_t);
-	p = &((EfeTransform *)((int32_t)EFE_INSTANCE + 4))->position[0];
+	p = &((EfeTransform *)((int32_t)EFE_INSTANCE + 4))->position.vx;
 	src = ((char **)(int32_t)MAIN_D_80134CE8->targetEntity)[1] + (idx * 136) + 0x34;
 	*p++ = *(int32_t *)(src + 0x14);
 	*p++ = *(int32_t *)(src + 0x18);
@@ -2908,7 +2891,7 @@ void VS_initializeEFETransform(void)
 	int32_t *dst;
 	int32_t *chk;
 
-	dst = &((EfeTransform *)((int32_t)EFE_INSTANCE + 4))->position[0];
+	dst = &((EfeTransform *)((int32_t)EFE_INSTANCE + 4))->position.vx;
 	chk = (int32_t *)EFE_PARENT_INSTANCE;
 	if (chk == NULL) {
 		VS_setTransformToBoneOffset();
@@ -2933,9 +2916,9 @@ void VS_drawTMD(void)
 	EFE_SCRATCH->rot.vz = ((int32_t *)((int32_t)EFE_INSTANCE + 0x10))[2];
 	RotMatrix(&EFE_SCRATCH->rot, &EFE_SCRATCH->m1);
 	ScaleMatrix(&EFE_SCRATCH->m1, EFE_SCRATCH->scale);
-	EFE_SCRATCH->m1.t[0] = ((EfeTransform *)((int32_t)EFE_INSTANCE + 4))->position[0];
-	EFE_SCRATCH->m1.t[1] = ((EfeTransform *)((int32_t)EFE_INSTANCE + 4))->position[1];
-	EFE_SCRATCH->m1.t[2] = ((EfeTransform *)((int32_t)EFE_INSTANCE + 4))->position[2];
+	EFE_SCRATCH->m1.t[0] = ((EfeTransform *)((int32_t)EFE_INSTANCE + 4))->position.vx;
+	EFE_SCRATCH->m1.t[1] = ((EfeTransform *)((int32_t)EFE_INSTANCE + 4))->position.vy;
+	EFE_SCRATCH->m1.t[2] = ((EfeTransform *)((int32_t)EFE_INSTANCE + 4))->position.vz;
 	GsMulCoord0(&GsWSMATRIX, &EFE_SCRATCH->m1, &EFE_SCRATCH->m0);
 	if (EFE_SCRATCH->m0.t[2] < -0x12c) {
 		return;

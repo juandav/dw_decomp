@@ -428,9 +428,9 @@ void renderParticleFX(int32_t id)
 			flash.uBase = 0x40;
 			flash.vBase = 0xc0;
 			flash.clut = getClut(0, 487);
-			flash.red = fx->r;
-			flash.green = fx->g;
-			flash.blue = fx->b;
+			flash.color.r = fx->r;
+			flash.color.g = fx->g;
+			flash.color.b = fx->b;
 			flash.colorScale = 0x80;
 			flash.scale = (uint32_t)(fx->spread[3][i] * (VIEWPORT_DISTANCE * 8)) / (uint32_t)depth;
 			flash.depth = depth >> 4;
@@ -832,9 +832,9 @@ void renderEFEFlash(int32_t id)
 	green = lerp(data->greenMin, data->greenMax, 0, data->tMax, data->progress);
 	blue = lerp(data->blueMin, data->blueMax, 0, data->tMax, data->progress);
 	factor = _sin(lerp(0x80, 0x14, 0, data->tMax, data->progress));
-	flash.red = (red * factor) >> 12;
-	flash.green = (green * factor) >> 12;
-	flash.blue = (blue * factor) >> 12;
+	flash.color.r = (red * factor) >> 12;
+	flash.color.g = (green * factor) >> 12;
+	flash.color.b = (blue * factor) >> 12;
 	flash.colorScale = 0x80;
 	flash.scale = (uint32_t)(VIEWPORT_DISTANCE * lerp(data->scaleMin, data->scaleMax, 0, data->tMax, data->progress) * 10) / (uint32_t)depth;
 	flash.scale += ((_sin(lerp(0, 0x1eb, 0, 0x17, data->progress)) * 300) >> 12) + 1;
