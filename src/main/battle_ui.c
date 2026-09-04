@@ -1,4 +1,5 @@
 #include <libgs.h>
+#include <dw/item.h>
 
 #include <dw/combat.h>
 #include <dw/entity.h>
@@ -40,7 +41,6 @@ void BTL_appendMPBonusText(void);
 void BTL_appendMoveLearnedText(int32_t arg0);
 void BTL_drawBattleEndText(int32_t a);
 int32_t BTL_isEndBoxTextFinished(void);
-void spawnDroppedItems(Entity *e, int32_t item);
 void setEntityTextDigit(POLY_FT4 *poly, int32_t x, int32_t y);
 
 void initBitBox();

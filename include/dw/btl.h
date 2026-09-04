@@ -10,7 +10,6 @@
 #include <dw/types.h>
 
 extern int16_t ENEMY_COUNT;
-extern int32_t TAMER_ITEM[];
 extern int16_t MAIN_D_80134D66;
 extern int16_t MAIN_D_80134D68;
 extern Entity *MAIN_D_80134D60;

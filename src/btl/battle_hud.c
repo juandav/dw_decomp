@@ -11,6 +11,7 @@
 
 #include <dw/aabb.h>
 #include <dw/btl.h>
+#include <dw/item.h>
 #include <dw/combat.h>
 #include <dw/graphics.h>
 #include <dw/model.h>
@@ -89,7 +90,6 @@ extern char MAIN_D_80134750[8];
 extern char MAIN_D_80134754[8];
 extern char MAIN_D_80134758[8];
 extern char MAIN_D_8013475C[8];
-extern char ITEM_PARA[][32];
 extern char MAIN_D_80134744[8];
 extern char BTL_D_80072F18[];
 extern char BTL_D_800742A0[];
@@ -381,7 +381,7 @@ void BTL_tickDeathCountdown(void)
 	int32_t scale;
 	uint8_t vpos;
 
-	if (TAMER_ITEM[2] == 0xff) {
+	if (TAMER_ITEM.worldItem.type == 0xff) {
 		base = &BTL_D_80073E54;
 		spin = &BTL_D_80073E78;
 		do {
@@ -483,7 +483,8 @@ void BTL_appendItemDroppedText(int32_t *p)
 	strcat(BTL_END_BOX_TEXTBUFFER, MAIN_D_80134740);
 	strcat(BTL_END_BOX_TEXTBUFFER, DIGIMON_DATA[p[0]].name);
 	strcat(BTL_END_BOX_TEXTBUFFER, BTL_D_80072F18);
-	strcat(BTL_END_BOX_TEXTBUFFER, ITEM_PARA[DIGIMON_DATA[p[0]].dropItem]);
+	strcat(BTL_END_BOX_TEXTBUFFER,
+	       ITEM_PARA[DIGIMON_DATA[p[0]].dropItem].name);
 	strcat(BTL_END_BOX_TEXTBUFFER, MAIN_D_80134744);
 	MAIN_D_801350B0 += 2;
 }

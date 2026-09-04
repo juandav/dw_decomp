@@ -1,4 +1,5 @@
 #include <memory.h>
+#include <dw/item.h>
 
 #include <dw/clock.h>
 #include <dw/fish.h>
@@ -6,19 +7,7 @@
 #include <dw/utils.h>
 #include <dw/world_object.h>
 
-typedef struct
-{
-	uint8_t name[20];
-	int32_t value;
-	int16_t meritValue;
-	int16_t sortingValue;
-	uint8_t itemColor;
-	uint8_t droppable;
-	uint16_t unk;
-} Item;
-
 extern uint8_t INVENTORY_ITEM_TYPES[];
-extern Item ITEM_PARA[];
 
 extern int32_t MAIN_D_801349E0;
 

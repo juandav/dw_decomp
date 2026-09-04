@@ -45,7 +45,6 @@ extern int32_t MEMORY_CARD_ID;
 extern int32_t MEMORY_CARD_SLOT;
 extern int32_t CHECKED_MEMORY_CARD;
 
-extern TamerItem TAMER_ITEM;
 extern VECTOR STORED_TAMER_POS;
 
 typedef void (*ItemFunction)(int16_t);
@@ -104,7 +103,6 @@ void handlePraiseScold();
 void startAnimationTamer(int32_t animId);
 int32_t partnerWillRefuseItem();
 void removeOneSelectedItem();
-void removeTamerItem();
 void partnerHandleFoodFeed(int32_t type);
 void createCameraMovement(VECTOR* pos, int32_t instanceId);
 int32_t tickEntityWalkTo(uint8_t scriptId1, uint8_t scriptId2,

@@ -16,7 +16,6 @@
 
 #include "common.h"
 
-extern TamerItem TAMER_ITEM;
 extern int8_t PARTNER_ANIMATION;
 extern int32_t NANIMON_TRIGGER;
 extern uint8_t POOP_TO_EAT;

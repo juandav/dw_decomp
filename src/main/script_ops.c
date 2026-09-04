@@ -9,7 +9,6 @@
 
 #include "common.h"
 
-int32_t getItemCount(int32_t itemId);
 uint8_t *padWithSpaces(uint8_t *str, int32_t width, int32_t used);
 void terminateString(uint8_t *str, int32_t flag);
 void drawString2(uint8_t *str, int16_t x, int16_t y, int32_t flag);

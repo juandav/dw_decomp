@@ -22,7 +22,6 @@ void createMeramonShake(void);
 void createNinjamonEffect(void);
 void openSaveMachine(void);
 void gameClearSave(void);
-void spawnItem(int32_t type, int16_t x, int16_t y);
 void spawnSpriteAtLocation(int16_t x, int16_t y, int16_t z, int16_t w,
 			   int32_t type);
 void spawnSpriteAtEntity(int32_t entId, int32_t sprite, int32_t param);

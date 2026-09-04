@@ -31,7 +31,6 @@ typedef struct {
 
 extern GsRVIEW2 GS_VIEWPOINT;
 
-extern TamerItem TAMER_ITEM;
 
 extern uint8_t INVENTORY_ITEM_TYPES[30];
 extern uint8_t INVENTORY_POINTER;
@@ -88,7 +87,6 @@ int32_t removeBuffModelObject(void);
 uint16_t convertAsciiToJis(uint8_t input);
 int32_t swapShortBytes(int32_t input);
 int32_t isAsciiEncoded(const char *value);
-void renderOverworldItem(TamerItem *item);
 void tickAnimation(Entity *entity);
 void removeEntity(int32_t type, int32_t entityId);
 void thunkUnloadModel(int32_t id, int32_t modelType);
@@ -104,9 +102,7 @@ extern int32_t buffModelFrame;
 extern TMDModel *BUFF_MODEL[];
 
 void resetFlattenGlobal(void);
-void initializeDroppedItems(void);
 void resetInventoryFlags(void);
-void initializeInventory(void);
 void MAIN_func_800DF804(void);
 void initializeInventoryModules(void);
 
@@ -622,7 +618,7 @@ INCLUDE_ASM("asm/main/nonmatchings/main", tickThrownItem);
 
 void renderThrownItem(int32_t instanceId)
 {
-	renderOverworldItem(&TAMER_ITEM);
+	renderOverworldItem(&TAMER_ITEM.worldItem);
 }
 
 void handleBuffDisks(int32_t type)

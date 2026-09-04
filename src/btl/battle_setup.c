@@ -1,4 +1,5 @@
 #include <dw/btl.h>
+#include <dw/item.h>
 #include <dw/combat.h>
 #include <dw/params.h>
 
@@ -357,7 +358,7 @@ int32_t BTL_isBattleFinished(void)
 	}
 
 	if ((entity->anim.animId == 0x2b) && !(entity->anim.animFlag & 1)) {
-		if (TAMER_ITEM[2] == 0xff) {
+		if (TAMER_ITEM.worldItem.type == 0xff) {
 			MAIN_D_80134D6A++;
 		}
 		if (MAIN_D_80134D6A == 0x14) {

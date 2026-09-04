@@ -1,4 +1,5 @@
 #include <string.h>
+#include <dw/item.h>
 
 #include <libcd.h>
 
@@ -7,7 +8,6 @@
 #include <dw/script.h>
 #include <dw/ui.h>
 
-void setInventorySize(uint8_t v);
 
 static void *script_instr10_functions[] = {
 	scriptInstruction10to27,

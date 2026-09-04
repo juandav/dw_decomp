@@ -93,13 +93,6 @@ extern RECT MAIN_D_80134204;
 extern RECT MAIN_D_8013420C;
 extern int32_t MAIN_D_801386A0[16];
 
-typedef struct {
-	WorldItem worldItem;
-	int16_t tileX;
-	int16_t tileY;
-} DroppedItem;
-
-extern DroppedItem DROPPED_ITEMS[11];
 
 typedef struct {
 	VECTOR location;
@@ -156,7 +149,6 @@ void setTextColor(int32_t color);
 void playSound(int32_t vabId, uint32_t note);
 void setCameraFollowPlayer(void);
 void unsetCameraFollowPlayer(void);
-void pickupItem(int32_t itemType);
 int16_t entityCheckCollision(Entity *a, Entity *b, int32_t c, int32_t d);
 void collisionGrace(int32_t a, Entity *b, int32_t c, int32_t d);
 void setTrigger(uint16_t trigger);

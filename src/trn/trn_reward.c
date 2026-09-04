@@ -1,4 +1,5 @@
 #include <string.h>
+#include <dw/item.h>
 
 #include <dw/clock.h>
 #include <dw/entity.h>
@@ -37,7 +38,6 @@ void tickConditionBoundaries(void);
 void createCloudFX(int16_t *pos);
 int32_t hasMove(int32_t moveId);
 void learnMove(int32_t moveId);
-int32_t getItemCount(int32_t itemId);
 void createMenuBox(int32_t a, int32_t b, int32_t c, int32_t d, int32_t e, int32_t f, void (*tick)(void), void (*render)(void));
 void TRN_saveTrainingStartTime(void);
 void TRN_startSlotSessionIfEnabled(int16_t arg);

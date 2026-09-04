@@ -14,6 +14,7 @@
 #include <dw/combat.h>
 #include <dw/entity.h>
 #include <dw/evl.h>
+#include <dw/item.h>
 #include <dw/math.h>
 #include <dw/model.h>
 #include <dw/move.h>
@@ -200,7 +201,6 @@ int32_t STD_func_80061AA8(DigimonEntity *digimon, DigimonEntity *target, Fighter
 int32_t STD_tickMeleeAttack(DigimonEntity *digimon, DigimonEntity *target, FighterData *fighter, int16_t arg3);
 void STD_func_80065540(DigimonEntity *digimon, DigimonEntity *target, FighterData *fighter);
 int16_t STD_getMostEffectiveMove(int32_t arg0, int16_t *flags);
-void addWithLimit(int16_t *stat, int32_t value, int32_t limit);
 void addEntityText(DigimonEntity *digimon, int32_t slot, int16_t color, int32_t value, uint8_t flag);
 int32_t entityGetTechFromAnim(Entity *entity, int32_t anim);
 void STD_removeStatusEffectVisual(DigimonEntity *digimon, FighterData *fighter, int32_t arg2);

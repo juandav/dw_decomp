@@ -1,4 +1,5 @@
 #include <string.h>
+#include <dw/item.h>
 
 #include <libgpu.h>
 #include <libgs.h>
@@ -60,7 +61,6 @@ int32_t checkMapCollisionX(Entity *entity, int32_t direction);
 int32_t checkMapCollisionY(Entity *entity, int32_t direction);
 void checkMapInteraction(void);
 void checkShopMap(uint8_t mapId);
-void clearDroppedItems(void);
 void clearMapDigimon(void);
 void clearMapObjects(uint8_t *instances);
 void clearTextArea(void);

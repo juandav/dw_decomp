@@ -116,7 +116,6 @@ extern char *MAIN_D_801247B8[];
 extern uint8_t GAME_MENU_SPRITES[];
 extern uint8_t INVENTORY_ITEM_TYPES[];
 extern uint8_t INVENTORY_POINTER;
-extern TamerItem TAMER_ITEM;
 
 void clearTextSubArea(RECT *area);
 int32_t isTriggerSet(int32_t triggerId);
@@ -136,7 +135,6 @@ void renderEvoChartView(void);
 void renderPlayerInfoView(void);
 void renderString();
 void renderMenuTab(int32_t a, int32_t b, int32_t c);
-void renderOverworldItem(TamerItem *item);
 
 void setCameraFollowPlayer(void);
 void handleGameMenuSelection(int32_t selection);
@@ -265,7 +263,6 @@ void renderDateDigits(void);
 void renderTriangleCursor(void);
 int32_t isUIBoxAvailable(int32_t id);
 void setSleepDisabled(int32_t arg);
-void removeItem(int32_t type, uint32_t amount);
 void startFeedingItem(int32_t arg);
 void removeOneSelectedItem(void);
 void renderFeedingItem(int32_t arg);
@@ -1793,7 +1790,7 @@ void renderFeedingItem(int32_t arg)
 	TAMER_ITEM.worldItem.spriteLocation.vy = m->t[1];
 	TAMER_ITEM.worldItem.spriteLocation.vz = m->t[2];
 
-	renderOverworldItem(&TAMER_ITEM);
+	renderOverworldItem(&TAMER_ITEM.worldItem);
 }
 
 INCLUDE_ASM("asm/main/nonmatchings/overworld", getEquippedSlot);

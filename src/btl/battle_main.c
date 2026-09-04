@@ -5,6 +5,7 @@
 
 #include <dw/btl.h>
 #include <dw/combat.h>
+#include <dw/item.h>
 #include <dw/move.h>
 #include <dw/params.h>
 #include <dw/sound.h>
@@ -133,7 +134,6 @@ int16_t BTL_getCheapestMove(int32_t arg0, int16_t *flags);
 void BTL_tickHitState(Entity *entity, FighterData *fighter, int32_t arg2);
 int32_t BTL_selectMoveByPower(int32_t arg0, int16_t *flags);
 int32_t BTL_selectMoveByMpCost(int32_t arg0, int16_t *flags);
-void addWithLimit(int16_t *stat, int32_t value, int32_t limit);
 void addEntityText(DigimonEntity *digimon, int32_t slot, int16_t color, int32_t value, uint8_t flag);
 void BTL_buffStats(DigimonEntity *digimon, int32_t slot, int16_t value, int16_t *stat, int16_t color, uint8_t flag);
 int16_t BTL_getRandomUsableMove(int16_t *flags);

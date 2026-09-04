@@ -16,7 +16,6 @@ extern uint8_t CONFIRM_CURSOR;
 extern int32_t INPUT_HOLD_FRAMES;
 extern int32_t POLLED_INPUT;
 extern int32_t POLLED_INPUT_PREVIOUS;
-extern TamerItem TAMER_ITEM;
 extern uint8_t INVENTORY_POINTER;
 extern char ACTION_LABELS[];
 void clearTextArea(void);
