@@ -114,7 +114,6 @@ typedef struct {
 extern PlayerTabs MAIN_D_801342A4;
 extern char *MAIN_D_801247B8[];
 extern uint8_t GAME_MENU_SPRITES[];
-extern uint8_t INVENTORY_ITEM_TYPES[];
 extern uint8_t INVENTORY_POINTER;
 
 void clearTextSubArea(RECT *area);
@@ -1775,7 +1774,7 @@ void startFeedingItem(int32_t arg)
 
 void removeOneSelectedItem(void)
 {
-	removeItem(INVENTORY_ITEM_TYPES[INVENTORY_POINTER], 1);
+	removeItem(INVENTORY.types.array[INVENTORY_POINTER], 1);
 }
 
 void renderFeedingItem(int32_t arg)

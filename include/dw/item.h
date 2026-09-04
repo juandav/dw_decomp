@@ -33,8 +33,20 @@ typedef struct {
 	int16_t tileY;
 } DroppedItem;
 
+typedef struct {
+	uint8_t array[30];
+} InventoryTable;
+
+typedef struct {
+	InventoryTable types;
+	InventoryTable amounts;
+	InventoryTable names;
+	uint8_t size;
+} Inventory;
+
 extern Item ITEM_PARA[];
 extern TamerItem TAMER_ITEM;
+extern Inventory INVENTORY;
 extern DroppedItem DROPPED_ITEMS[11];
 
 void initializeInventory(void);

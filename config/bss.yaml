@@ -8,6 +8,8 @@ subsegments:
   - [0x80137140, model]
   - [0x80137418, world_object]
   - [0x80137A24, unk_0x80137A24]
+  - [0x8013D474, item]
+  - [0x8013D590, unk_0x8013D590]
   - [0x8013DCC4, sound]
   - [0x8014DBEC, unk_0x8014DBEC]
   - [0x80150F00, map_object]

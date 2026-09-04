@@ -1,4 +1,5 @@
 #include <libetc.h>
+#include <dw/item.h>
 #include <libgs.h>
 #include <mwinline_n.h>
 
@@ -62,7 +63,6 @@ extern int32_t ACTIVE_FRAMEBUFFER;
 extern GsOT GS_ORDERING_TABLE[];
 extern PACKET GS_WORK_BASES[];
 extern char DRAW_OFFSETS[];
-extern uint8_t INVENTORY_ITEM_TYPES[];
 extern uint8_t FLEE_BUBBLE_SCALE[];
 extern uint8_t BATTLE_MUSIC[];
 extern uint8_t FLEE_CHANCE_TABLE[];
@@ -275,11 +275,11 @@ int32_t handleBattleStart(int32_t id)
 		chance = random(100);
 		hasB = 0;
 		hasA = 0;
-		for (j = 0; j < INVENTORY_SIZE[0]; j++) {
-			if (INVENTORY_ITEM_TYPES[j] == 0x23) {
+		for (j = 0; j < INVENTORY.size; j++) {
+			if (INVENTORY.types.array[j] == 0x23) {
 				hasA = 1;
 			}
-			if (INVENTORY_ITEM_TYPES[j] == 0x24) {
+			if (INVENTORY.types.array[j] == 0x24) {
 				hasB = 1;
 			}
 		}

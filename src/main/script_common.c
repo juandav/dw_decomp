@@ -176,8 +176,6 @@ extern int16_t MAIN_D_8012FE68[];
 extern int32_t MAIN_D_80134F88;
 extern int16_t MAIN_D_801345BC[2];
 extern uint32_t POLLED_INPUT_PREVIOUS;
-extern uint8_t INVENTORY_ITEM_TYPES[];
-extern uint8_t INVENTORY_ITEM_AMOUNTS[];
 extern uint16_t MAIN_D_801BE950[];
 extern int32_t MAIN_D_801BE948[];
 extern int32_t MAIN_D_801BE94C[];
@@ -347,9 +345,9 @@ int32_t MAIN_func_800FAA68(void)
 	buf = MAIN_D_80134F6C->buf;
 	MAIN_D_80134F6C->itemCount = 0;
 
-	for (i = 0; i < INVENTORY_SIZE[0]; i++) {
-		type = INVENTORY_ITEM_TYPES[i];
-		amount = INVENTORY_ITEM_AMOUNTS[i];
+	for (i = 0; i < INVENTORY.size; i++) {
+		type = INVENTORY.types.array[i];
+		amount = INVENTORY.amounts.array[i];
 
 		if (type != 0xff) {
 			if (ITEM_PARA[type].droppable != 0) {
@@ -816,12 +814,12 @@ void handleItemLoss(void)
 	uint8_t recycleId;
 	int32_t idx;
 
-	size = INVENTORY_SIZE[0];
+	size = INVENTORY.size;
 	pool = allocateArray(size);
 	k = 0;
 	count = 0;
 	while (k < size) {
-		if (INVENTORY_ITEM_TYPES[k] != 0xff) {
+		if (INVENTORY.types.array[k] != 0xff) {
 			pool[count] = k;
 			count += 1;
 		}
@@ -839,7 +837,7 @@ void handleItemLoss(void)
 		k = 0;
 		count = 0;
 		while (k < size) {
-			if (INVENTORY_ITEM_TYPES[k] != 0xff) {
+			if (INVENTORY.types.array[k] != 0xff) {
 				pool[count] = k;
 				count += 1;
 			}
@@ -847,18 +845,18 @@ void handleItemLoss(void)
 		}
 
 		slot = pool[random(count)];
-		recycleId = INVENTORY_ITEM_TYPES[slot];
+		recycleId = INVENTORY.types.array[slot];
 		recycleId = getRecycleId(recycleId);
 		if (recycleId != 0xff) {
 			SCRIPT_STATE_PTR->smth[recycleId + 6] +=
-				INVENTORY_ITEM_AMOUNTS[slot];
+				INVENTORY.amounts.array[slot];
 			idx = recycleId + 6;
 			if (SCRIPT_STATE_PTR->smth[idx] >= 0x64) {
 				SCRIPT_STATE_PTR->smth[idx] = 0x63;
 			}
 		}
 
-		removeItem(INVENTORY_ITEM_TYPES[slot], 0x63);
+		removeItem(INVENTORY.types.array[slot], 0x63);
 	}
 
 	freeArray((uint32_t *)pool);
@@ -1026,7 +1024,7 @@ void MAIN_func_800FC508(void)
 		initializeItemMenuBox(&MAIN_D_80134F68, 0x100, 6, 0xb2, 0x18,
 				      6, 0x5a);
 		initializeItemMenuBox(&MAIN_D_80134F6C,
-				      INVENTORY_SIZE[0] << 1, 6, 0xd2, 0x18,
+				      INVENTORY.size << 1, 6, 0xd2, 0x18,
 				      6, 0x5a);
 		MAIN_D_80134F70 = 0;
 
@@ -1212,7 +1210,7 @@ void MAIN_func_800FCB3C(void)
 	switch (SELECTION_MENU_STATE) {
 	case 0:
 		initializeItemMenuBox(&MAIN_D_80134F6C,
-				      INVENTORY_SIZE[0] << 1, 6, 0x9a, 0x18,
+				      INVENTORY.size << 1, 6, 0x9a, 0x18,
 				      6, 0x5a);
 
 		if (MAIN_func_800FAA68()) {

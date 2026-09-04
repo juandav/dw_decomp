@@ -32,7 +32,6 @@ typedef struct {
 extern GsRVIEW2 GS_VIEWPOINT;
 
 
-extern uint8_t INVENTORY_ITEM_TYPES[30];
 extern uint8_t INVENTORY_POINTER;
 
 extern StatsGains INITIAL_COMBAT_STATS[];
@@ -610,8 +609,8 @@ void addThrownItem(int32_t type)
 void startThrowingItem(void)
 {
 	startAnimation(ENTITY_TABLE[0], 6);
-	addThrownItem(INVENTORY_ITEM_TYPES[INVENTORY_POINTER]);
-	removeItem(INVENTORY_ITEM_TYPES[INVENTORY_POINTER], 1);
+	addThrownItem(INVENTORY.types.array[INVENTORY_POINTER]);
+	removeItem(INVENTORY.types.array[INVENTORY_POINTER], 1);
 }
 
 INCLUDE_ASM("asm/main/nonmatchings/main", tickThrownItem);

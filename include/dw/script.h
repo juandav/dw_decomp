@@ -97,7 +97,6 @@ extern int16_t MAIN_D_80135002;
 extern int16_t MAIN_D_80135004;
 extern int32_t MAIN_D_80134F70;
 extern int32_t MAIN_D_80134F74;
-extern uint8_t INVENTORY_SIZE[];
 extern uint8_t MAIN_D_8012FE78[];
 extern int32_t MAIN_D_8013500C;
 extern uint16_t SELECTION_MENU_STATE;

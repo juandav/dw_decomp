@@ -20,8 +20,6 @@ extern uint8_t INVENTORY_POINTER;
 extern char ACTION_LABELS[];
 void clearTextArea(void);
 extern uint8_t INVENTORY_MOVE_SRC;
-extern uint8_t INVENTORY_ITEM_TYPES[30];
-extern uint8_t INVENTORY_ITEM_NAMES[30];
 extern uint8_t INVENTORY_LAST_POINTER;
 extern int8_t GAME_STATE;
 extern char *COMBAT_DATA_PTR;
@@ -40,7 +38,6 @@ extern char CONFIRM_PROMPT[];
 extern int16_t INVENTORY_SCROLL_ROW;
 extern int16_t INVENTORY_ROW_OFFSET;
 extern int32_t MAIN_D_80134E00;
-extern uint8_t INVENTORY_SIZE[];
 void getEntityScreenPos(Entity *e, int32_t mode, int16_t *out);
 void renderString(int32_t a, int32_t b, int32_t c, int32_t d, int32_t e,
 		  int32_t f, int32_t g, int32_t h, int32_t i);
@@ -134,7 +131,7 @@ int32_t getActionColor(int32_t mode)
 	if ((mode == 1) || (mode == 2)) {
 		return 9;
 	}
-	t = INVENTORY_ITEM_TYPES[INVENTORY_POINTER];
+	t = INVENTORY.types.array[INVENTORY_POINTER];
 	if (mode == 0) {
 		if (t != 0xFF) {
 			item = &ITEM_PARA[t];
@@ -179,7 +176,7 @@ void drawInventoryText(void)
 	int32_t y;
 
 	clearTextArea();
-	for (i = 0, slot = 0; i < (INVENTORY_SIZE[0] / 2); ++i, slot += 2) {
+	for (i = 0, slot = 0; i < (INVENTORY.size / 2); ++i, slot += 2) {
 		drawInventoryTextLine((int16_t)slot);
 	}
 	for (i = 0, y = 0; i < 4; ++i, y += 0xc) {
@@ -205,7 +202,6 @@ void initializeInventoryObject(void)
 	}
 }
 
-extern uint8_t INVENTORY_ITEM_AMOUNTS[30];
 
 static void tickInventoryObject__garbage__(void)
 {
@@ -214,17 +210,16 @@ static void tickInventoryObject__garbage__(void)
         int32_t v2;
         int32_t v3;
 
-        v0 = INVENTORY_ITEM_AMOUNTS[0] + 0;
-        v1 = INVENTORY_ITEM_AMOUNTS[1] + 1;
-        v2 = INVENTORY_ITEM_AMOUNTS[2] + 2;
-        v3 = INVENTORY_ITEM_AMOUNTS[3] + 3;
-        INVENTORY_ITEM_AMOUNTS[0] = (uint8_t)((v0 * v1) + v2);
-        INVENTORY_ITEM_AMOUNTS[1] = (uint8_t)((v1 * v2) + v3);
-        INVENTORY_ITEM_AMOUNTS[2] = (uint8_t)((v2 * v3) + v0);
-        INVENTORY_ITEM_AMOUNTS[3] = (uint8_t)((v3 * v0) + v1);
+        v0 = INVENTORY.amounts.array[0] + 0;
+        v1 = INVENTORY.amounts.array[1] + 1;
+        v2 = INVENTORY.amounts.array[2] + 2;
+        v3 = INVENTORY.amounts.array[3] + 3;
+        INVENTORY.amounts.array[0] = (uint8_t)((v0 * v1) + v2);
+        INVENTORY.amounts.array[1] = (uint8_t)((v1 * v2) + v3);
+        INVENTORY.amounts.array[2] = (uint8_t)((v2 * v3) + v0);
+        INVENTORY.amounts.array[3] = (uint8_t)((v3 * v0) + v1);
 }
 
-extern uint8_t INVENTORY_ITEM_AMOUNTS[30];
 
 void tickInventoryObject(int32_t instanceId)
 {
@@ -331,7 +326,7 @@ void tickInventoryObject(int32_t instanceId)
       {
         if (GAME_STATE == 0)
         {
-          startFeedingItem(INVENTORY_ITEM_TYPES[INVENTORY_POINTER]);
+          startFeedingItem(INVENTORY.types.array[INVENTORY_POINTER]);
           INVENTORY_STATE = 0;
         }
         else
@@ -356,7 +351,7 @@ void tickInventoryObject(int32_t instanceId)
       else
       {
         INVENTORY_STATE = 0;
-        it = &INVENTORY_ITEM_TYPES[INVENTORY_POINTER];
+        it = &INVENTORY.types.array[INVENTORY_POINTER];
         removeItem(it[0], it[0x1E]);
       }
         break;
@@ -430,7 +425,7 @@ INCLUDE_ASM("asm/main/nonmatchings/inventory", renderInventoryTop);
 
 void renderInventoryBottom(int32_t arg)
 {
-	if (INVENTORY_ITEM_TYPES[INVENTORY_POINTER] != 0xFF) {
+	if (INVENTORY.types.array[INVENTORY_POINTER] != 0xFF) {
 		if (INVENTORY_POINTER != INVENTORY_LAST_POINTER) {
 			updateItemNames();
 		}
@@ -624,7 +619,7 @@ void updateItemNames(void)
 	area.w = 0xFC;
 	area.h = 0xC;
 	clearTextSubArea(&area);
-	drawString(ITEM_DESC_PTR[INVENTORY_ITEM_TYPES[INVENTORY_POINTER]], 0, 0xB4);
+	drawString(ITEM_DESC_PTR[INVENTORY.types.array[INVENTORY_POINTER]], 0, 0xB4);
 	DrawSync(0);
 }
 
@@ -632,12 +627,12 @@ void moveItem(void)
 {
 	uint8_t *p;
 
-	p = &INVENTORY_ITEM_TYPES[INVENTORY_POINTER];
-	swapByte(p, &INVENTORY_ITEM_TYPES[INVENTORY_MOVE_SRC]);
-	swapByte(&INVENTORY_ITEM_TYPES[INVENTORY_POINTER] + 0x1E,
-		 &INVENTORY_ITEM_TYPES[INVENTORY_MOVE_SRC] + 0x1E);
-	swapByte(&INVENTORY_ITEM_TYPES[INVENTORY_POINTER] + 0x3C,
-		 &INVENTORY_ITEM_TYPES[INVENTORY_MOVE_SRC] + 0x3C);
+	p = &INVENTORY.types.array[INVENTORY_POINTER];
+	swapByte(p, &INVENTORY.types.array[INVENTORY_MOVE_SRC]);
+	swapByte(&INVENTORY.types.array[INVENTORY_POINTER] + 0x1E,
+		 &INVENTORY.types.array[INVENTORY_MOVE_SRC] + 0x1E);
+	swapByte(&INVENTORY.types.array[INVENTORY_POINTER] + 0x3C,
+		 &INVENTORY.types.array[INVENTORY_MOVE_SRC] + 0x3C);
 	if (*p != 0xFF) {
 		updateItemNames();
 	}
@@ -669,9 +664,9 @@ void selectAction(void)
 	    (INVENTORY_STATE != 0xD) && (UI_BOX_DATA[3].state == 0)) {
 		switch (ACTION_CURSOR) {
 		case 0:
-			t = INVENTORY_ITEM_TYPES[INVENTORY_POINTER];
+			t = INVENTORY.types.array[INVENTORY_POINTER];
 			if (t != 0xFF) {
-				item = &ITEM_PARA[INVENTORY_ITEM_TYPES[INVENTORY_POINTER]];
+				item = &ITEM_PARA[INVENTORY.types.array[INVENTORY_POINTER]];
 				switch (GAME_STATE) {
 				case 0:
 					if ((item->itemColor == 0) ||
@@ -698,8 +693,8 @@ void selectAction(void)
 			break;
 		case 3:
 			if (GAME_STATE == 0) {
-				t = INVENTORY_ITEM_TYPES[INVENTORY_POINTER];
-				if ((t != 0xFF) && ITEM_PARA[INVENTORY_ITEM_TYPES[INVENTORY_POINTER]].droppable == 1) {
+				t = INVENTORY.types.array[INVENTORY_POINTER];
+				if ((t != 0xFF) && ITEM_PARA[INVENTORY.types.array[INVENTORY_POINTER]].droppable == 1) {
 					INVENTORY_STATE = 0xE;
 				}
 			}

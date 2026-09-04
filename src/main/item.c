@@ -18,10 +18,6 @@
 
 #include "common.h"
 
-typedef struct {
-	uint8_t array[30];
-} InventoryTable;
-
 void deleteDroppedItem(int16_t itemId);
 void setUVDataPolyFT4(POLY_FT4 *p, int32_t u, int32_t v, int32_t w, int32_t h);
 void setPosDataPolyFT4(POLY_FT4 *prim, int32_t posX, int32_t posY, int32_t width,
@@ -58,21 +54,23 @@ void handleItemSickness(int16_t arg);
 void addTamerLevel(int32_t chance, int32_t amount);
 
 extern uint8_t MAP_LAYER_ENABLED;
-extern InventoryTable INVENTORY_ITEM_TYPES;
-extern InventoryTable INVENTORY_ITEM_AMOUNTS;
-extern InventoryTable INVENTORY_ITEM_NAMES;
 extern InventoryTable DEFAULT_ITEM_AMOUNTS;
 extern InventoryTable DEFAULT_ITEM_TYPES;
 extern int32_t VIEWPORT_DISTANCE;
-extern char MAIN_D_80134368;
 extern char MAIN_D_80125F64[];
 extern uint8_t MAIN_D_80127C5C[];
 extern int16_t EVOLUTION_TARGET;
 extern uint8_t HAS_USED_EVOITEM;
-extern int16_t MAIN_D_8013435C[4];
-extern uint8_t MAIN_D_80134364[8];
 
-void *item_order_anchor[] = {
+Inventory INVENTORY;
+TamerItem TAMER_ITEM;
+DroppedItem DROPPED_ITEMS[11];
+
+int16_t MAIN_D_8013435C[4] = { 500, 1500, 5000, 9999 };
+uint8_t MAIN_D_80134364[4] = { 0, 0, 1, 1 };
+char MAIN_D_80134368[] = "%s";
+
+void *item_text_order[] = {
 	handleItemSickness,
 	setTrainingBoost,
 	decreasePoopLevel,
@@ -108,6 +106,12 @@ void *item_order_anchor[] = {
 	handleChips,
 	handleFood,
 	handleEvoItems,
+};
+
+static void *item_bss_order[] = {
+	DROPPED_ITEMS,
+	&TAMER_ITEM,
+	&INVENTORY,
 };
 
 static void handleEvoItems__garbage__(void)
@@ -351,7 +355,7 @@ void handleHPHealingItem(unsigned char idx)
 
 void setInventorySize(uint8_t size)
 {
-	INVENTORY_SIZE[0] = size;
+	INVENTORY.size = size;
 }
 
 void initializeDroppedItems(void)
@@ -551,10 +555,10 @@ int32_t getItemCount(int32_t type)
 	int32_t i;
 	uint8_t size;
 
-	size = INVENTORY_SIZE[0];
+	size = INVENTORY.size;
 	for (i = 0; i < size; i++) {
-		if (INVENTORY_ITEM_TYPES.array[i] == type) {
-			return INVENTORY_ITEM_AMOUNTS.array[i];
+		if (INVENTORY.types.array[i] == type) {
+			return INVENTORY.amounts.array[i];
 		}
 	}
 
@@ -570,9 +574,9 @@ int32_t giveItem(uint32_t item, uint8_t amount)
 	uint8_t *p;
 	uint8_t *q;
 
-	for (i = 0; i < (n = *(volatile uint8_t *)INVENTORY_SIZE); i++) {
-		if (INVENTORY_ITEM_TYPES.array[i] == item) {
-			q = &INVENTORY_ITEM_TYPES.array[i] + 0x1e;
+	for (i = 0; i < (n = ((volatile uint8_t *)&INVENTORY)[0x5A]); i++) {
+		if (INVENTORY.types.array[i] == item) {
+			q = &INVENTORY.types.array[i] + 0x1e;
 			p = q - 0x1e;
 			if (q[0] != 0x63) {
 				q[0] += amount;
@@ -585,21 +589,21 @@ int32_t giveItem(uint32_t item, uint8_t amount)
 		}
 	}
 	for (i = 0; i < n; i++) {
-		if (INVENTORY_ITEM_TYPES.array[i] == 0xff) {
-			p = &INVENTORY_ITEM_TYPES.array[i];
+		if (INVENTORY.types.array[i] == 0xff) {
+			p = &INVENTORY.types.array[i];
 			p[0] = item;
-			INVENTORY_ITEM_AMOUNTS.array[i] = amount;
-			for (j = 0; j < INVENTORY_SIZE[0]; j++) {
+			INVENTORY.amounts.array[i] = amount;
+			for (j = 0; j < INVENTORY.size; j++) {
 				used[j] = 0;
 			}
-			for (j = 0; j < INVENTORY_SIZE[0]; j++) {
-				if (INVENTORY_ITEM_NAMES.array[j] != 0xff) {
-					used[INVENTORY_ITEM_NAMES.array[j]] = 1;
+			for (j = 0; j < INVENTORY.size; j++) {
+				if (INVENTORY.names.array[j] != 0xff) {
+					used[INVENTORY.names.array[j]] = 1;
 				}
 			}
-			for (j = 0; j < INVENTORY_SIZE[0]; j++) {
+			for (j = 0; j < INVENTORY.size; j++) {
 				if (used[j] == 0) {
-					INVENTORY_ITEM_NAMES.array[i] = j;
+					INVENTORY.names.array[i] = j;
 					break;
 				}
 			}
@@ -619,11 +623,11 @@ void removeItem(int32_t type, uint32_t amount)
 	{
 		return;
 	}
-	for (i = 0; i < INVENTORY_SIZE[0]; i++)
+	for (i = 0; i < INVENTORY.size; i++)
 	{
-		if (INVENTORY_ITEM_TYPES.array[i] == type)
+		if (INVENTORY.types.array[i] == type)
 		{
-			amt = (&INVENTORY_ITEM_TYPES.array[i]) + 0x1e;
+			amt = (&INVENTORY.types.array[i]) + 0x1e;
 			new_var2 = amt;
 			new_var = amount < (*new_var2);
 			if (new_var)
@@ -633,8 +637,8 @@ void removeItem(int32_t type, uint32_t amount)
 			else
 			{
 				*new_var2 = 0;
-				INVENTORY_ITEM_TYPES.array[i] = 0xff;
-				INVENTORY_ITEM_NAMES.array[i] = 0xff;
+				INVENTORY.types.array[i] = 0xff;
+				INVENTORY.names.array[i] = 0xff;
 			}
 		}
 	}
@@ -661,22 +665,22 @@ void initializeInventory(void)
 	int32_t i;
 
 	for (i = 0; i < 0x1e; ++i) {
-		INVENTORY_ITEM_TYPES.array[i] = 0xff;
-		INVENTORY_ITEM_AMOUNTS.array[i] = 0;
-		INVENTORY_ITEM_NAMES.array[i] = 0xff;
+		INVENTORY.types.array[i] = 0xff;
+		INVENTORY.amounts.array[i] = 0;
+		INVENTORY.names.array[i] = 0xff;
 	}
 
-	INVENTORY_SIZE[0] = 10;
+	INVENTORY.size = 10;
 	amounts = DEFAULT_ITEM_AMOUNTS;
 	types = DEFAULT_ITEM_TYPES;
 
 	for (i = 0; i < 0x1e; ++i) {
-		INVENTORY_ITEM_TYPES.array[i] = types.array[i];
-		INVENTORY_ITEM_AMOUNTS.array[i] = amounts.array[i];
-		INVENTORY_ITEM_NAMES.array[i] = i;
+		INVENTORY.types.array[i] = types.array[i];
+		INVENTORY.amounts.array[i] = amounts.array[i];
+		INVENTORY.names.array[i] = i;
 	}
 
-	INVENTORY_SIZE[0] = 0x1e;
+	INVENTORY.size = 0x1e;
 }
 
 void removeTamerItem(void)
@@ -818,7 +822,7 @@ void handleItemSickness(int16_t chance)
 		setTamerState(0x14);
 		clearTextArea();
 		setTextColor(0xa);
-		sprintf(buf, &MAIN_D_80134368, PARTNER_ENTITY.name);
+		sprintf(buf, MAIN_D_80134368, PARTNER_ENTITY.name);
 		strcat(buf, MAIN_D_80125F64);
 		drawString(buf, 0, 0x78);
 	}

@@ -56,7 +56,6 @@ extern int32_t MAIN_D_80135038;
 extern int8_t MAIN_D_8013172B[];
 extern char *MOVE_NAMES[];
 extern TamerEntity TAMER_ENTITY;
-extern uint8_t INVENTORY_ITEM_TYPES[30];
 extern int16_t HOUR;
 extern int16_t MINUTE;
 extern int16_t DAY;

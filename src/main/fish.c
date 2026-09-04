@@ -7,7 +7,6 @@
 #include <dw/utils.h>
 #include <dw/world_object.h>
 
-extern uint8_t INVENTORY_ITEM_TYPES[];
 
 extern int32_t MAIN_D_801349E0;
 
@@ -30,8 +29,8 @@ int32_t hasFoodItem(void)
 {
 	int32_t i;
 	for (i = 0; (uint32_t)i < 30u; i++) {
-		if (INVENTORY_ITEM_TYPES[i] != 0xFF) {
-			if (ITEM_PARA[INVENTORY_ITEM_TYPES[i]].sortingValue == 2) {
+		if (INVENTORY.types.array[i] != 0xFF) {
+			if (ITEM_PARA[INVENTORY.types.array[i]].sortingValue == 2) {
 				return 1;
 			}
 		}

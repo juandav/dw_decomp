@@ -153,7 +153,6 @@ extern uint8_t MAIN_D_801349B0[8];
 extern uint8_t MAIN_D_801349B8[8];
 extern int8_t PARTNER_STATE;
 extern uint8_t TEXTBOX_OPEN_TIMER;
-extern uint8_t INVENTORY_ITEM_TYPES[30];
 extern int32_t VIEWPORT_DISTANCE;
 extern GsOT *ACTIVE_ORDERING_TABLE;
 extern SVECTOR MAIN_D_8013498C;
@@ -758,7 +757,7 @@ void FISH_drawBaitMenuRow(int32_t row)
 	for (i = 0; i < 2; i++) {
 		item = m->unk14[row * 2 + i];
 		if (item != -1) {
-			item = INVENTORY_ITEM_TYPES[item];
+			item = INVENTORY.types.array[item];
 			if (item != 0xFF) {
 				rect.x = i * 0x60;
 				rect.y = (row % m->unk54) * 12;
@@ -803,7 +802,7 @@ void FISH_renderBaitMenu(int32_t boxId)
 			if (item == -1) {
 				continue;
 			}
-			q = INVENTORY_ITEM_TYPES[item];
+			q = INVENTORY.types.array[item];
 			if (q == 0xFF) {
 				continue;
 			}
@@ -840,7 +839,7 @@ void FISH_renderBaitMenu(int32_t boxId)
 
 			MAIN_func_800E58A4(0, 2, x + ((col != 0) ? 0x116 : 0x86),
 			                   y + 0x12 + row * 0x12,
-			                   (INVENTORY_ITEM_TYPES + item)[0x1E], layer);
+			                   (INVENTORY.types.array + item)[0x1E], layer);
 		}
 	}
 
@@ -874,10 +873,10 @@ int32_t FISH_openBaitMenu(void)
 
 	n = 0;
 	for (i = 0; i < 30U; i++) {
-		if (INVENTORY_ITEM_TYPES[i] == 0xFF) {
+		if (INVENTORY.types.array[i] == 0xFF) {
 			continue;
 		}
-		if (ITEM_PARA[INVENTORY_ITEM_TYPES[i]].sortingValue != 2) {
+		if (ITEM_PARA[INVENTORY.types.array[i]].sortingValue != 2) {
 			continue;
 		}
 		m->unk14[n++] = i;
@@ -2768,7 +2767,7 @@ stateDispatch:
 biteTaken:
 	FISH_bobberCommand(&FISHING_DATA_PTR->swimmerLoc, 0xB);
 	FISHING_DATA_PTR->rod.itemTaken = 1;
-	removeItem(INVENTORY_ITEM_TYPES[FISHING_DATA_PTR->rod.itemSlot], 1);
+	removeItem(INVENTORY.types.array[FISHING_DATA_PTR->rod.itemSlot], 1);
 	h->fish.target = 0x14;
 	h->fish.unk28 = -1;
 	goto tick;

@@ -361,7 +361,7 @@ void MAIN_func_8010BF68(void)
 		initializeItemMenuBox(&MAIN_D_80134F68, 0x100, 5, 0x88, 0x28,
 				      6, 0x4a);
 		initializeItemMenuBox(&MAIN_D_80134F6C,
-				      INVENTORY_SIZE[0] << 1, 5, 0x88, 0x28,
+				      INVENTORY.size << 1, 5, 0x88, 0x28,
 				      6, 0x4a);
 		showMapHeadTextbox(0, owner, 0, 0x4d5);
 		SELECTION_MENU_STATE = 1;
