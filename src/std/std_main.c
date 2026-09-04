@@ -1849,7 +1849,7 @@ void STD_func_80060EBC(void)
 }
 void STD_faintDigimon(DigimonEntity *digimon, FighterData *fighter, int16_t arg2)
 {
-	*(int8_t *)&digimon->stats.current.unk2_2 = 1;
+	digimon->stats.current.isHit = 1;
 	fighter->flags |= 0x8000;
 	startAnimation(&digimon->entity, 0x2b);
 	STD_resetFlatten(arg2);
@@ -2463,7 +2463,7 @@ void STD_tickFighterAction(int32_t index)
 			digimon->entity.flatSprite = 0;
 		}
 		if (!(fighter->flags & 0x20)) {
-			digimon->stats.current.unk2_2 = 0;
+			digimon->stats.current.isHit = 0;
 		}
 		if (fighter->flags & 0x80) {
 			fighter->flags &= 0xff7f;
@@ -3354,10 +3354,10 @@ void STD_removeMoveEffect(DigimonEntity *digimon, FighterData *fighter)
 	id = fighter->unk11;
 	do {
 		if (id != -1) {
-			STD_stopEFESubEffect(id, *(int8_t *)&digimon->stats.current.unk2_1);
+			STD_stopEFESubEffect(id, digimon->stats.current.efeSubEffect);
 		}
 	} while (0);
-	*(int8_t *)&digimon->stats.current.unk2_1 = -1;
+	digimon->stats.current.efeSubEffect = -1;
 	fighter->unk11 = -1;
 }
 
@@ -3453,7 +3453,7 @@ void STD_applyMoveResult(void)
 					startAnimation(entity, 0x22);
 					fighter->moveRange = -1;
 					fighter->flags |= 0x40;
-					stats->current.unk2_2 = 1;
+					stats->current.isHit = 1;
 				}
 				break;
 			case 3:
@@ -3461,7 +3461,7 @@ void STD_applyMoveResult(void)
 				break;
 			case 0:
 				fighter->flags &= 0xffb7;
-				stats->current.unk2_2 = 0;
+				stats->current.isHit = 0;
 				if (fighter->flags & 4) {
 					STD_addStatusEffectVisual((DigimonEntity *)entity, fighter, 3);
 					fighter->moveRange = 0;
@@ -3482,7 +3482,7 @@ void STD_applyMoveResult(void)
 				startAnimation(entity, 0x22);
 				fighter->moveRange = -1;
 				fighter->flags |= 0x40;
-				stats->current.unk2_2 = 1;
+				stats->current.isHit = 1;
 				break;
 			case 3:
 				entity->flatSprite = 0;
@@ -3490,7 +3490,7 @@ void STD_applyMoveResult(void)
 			case 0:
 				fighter->flags |= 8;
 				fighter->flatTimer = random(0x51) + 0xe0;
-				stats->current.unk2_2 = 0;
+				stats->current.isHit = 0;
 				fighter->flags &= 0xffbf;
 				break;
 			}

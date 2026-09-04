@@ -1284,7 +1284,7 @@ void BTL_isTargetUnhit(void)
 	int32_t *out;
 
 	out = EFE_POP1(int32_t *);
-	if (((int8_t *)(int32_t)MAIN_D_80134CE8->targetEntity)[0x53] == 0) {
+	if (((DigimonEntity *)MAIN_D_80134CE8->targetEntity)->stats.current.isHit == 0) {
 		*out = 1;
 	} else {
 		*out = 0;
@@ -1384,14 +1384,14 @@ void BTL_applyBoxAttackHit(void)
 		}
 		idx = (*(int32_t *)&MAIN_D_80134CD8);
 		e = ENTITY_TABLE[idx];
-		if (((int8_t *)e)[0x53] == 0) {
+		if (((DigimonEntity *)e)->stats.current.isHit == 0) {
 			for (j = 1; j < 10; j++) {
 				ent = (int32_t)ENTITY_TABLE[j];
 				if (ent == (int32_t)MAIN_D_80134CE8->sourceEntity) {
 					break;
 				}
 			}
-			((int8_t *)ENTITY_TABLE[idx])[0x53] = 1;
+			((DigimonEntity *)ENTITY_TABLE[idx])->stats.current.isHit = 1;
 
 			addAttackObject(MAIN_D_80134CD8, 1, (int16_t *)&center, (int32_t)((uint32_t)(char *)MAIN_D_80134CD4), r, j);
 			*out = 1;
@@ -1431,10 +1431,10 @@ void BTL_applyLineAttackHit(void)
 		if (e == NULL) {
 			continue;
 		}
-		if (((int8_t *)e)[0x53] != 0) {
+		if (((DigimonEntity *)e)->stats.current.isHit != 0) {
 			continue;
 		}
-		if (((int8_t *)e)[0x34] == 0) {
+		if (e->isOnMap == 0) {
 			continue;
 		}
 		r = DIGIMON_DATA[*(int32_t *)e].radius;
@@ -1454,7 +1454,7 @@ void BTL_applyLineAttackHit(void)
 				break;
 			}
 		}
-		((int8_t *)ENTITY_TABLE[MAIN_D_80134CD8])[0x53] = 1;
+		((DigimonEntity *)ENTITY_TABLE[MAIN_D_80134CD8])->stats.current.isHit = 1;
 		BTL_calculateAttackHitPosition(&pos, (int32_t *)e, ((int32_t **)MAIN_D_80134CE8)[4], DIGIMON_DATA[*(int32_t *)e].radius);
 		pos.vy = *(int32_t *)((int32_t)EFE_INSTANCE + 8);
 		addAttackObject(MAIN_D_80134CD8, 1, (int16_t *)&pos, (int32_t)((uint32_t)(char *)MAIN_D_80134CD4), MAIN_D_80134CD0, j);
@@ -2317,7 +2317,7 @@ void BTL_centerTransformOnEntities(void)
 		if (e == MAIN_D_80134CE8->sourceEntity) {
 			continue;
 		}
-		if (((int8_t *)e)[0x34] == 0) {
+		if (e->isOnMap == 0) {
 			continue;
 		}
 		count++;
@@ -2482,7 +2482,7 @@ void BTL_findHitEntity(void)
 		switch (mode) {
 		case 0:
 			idx = (*(int32_t *)&MAIN_D_80134CD8);
-			if (((int8_t *)ENTITY_TABLE[idx])[0x53] == 0) {
+			if (((DigimonEntity *)ENTITY_TABLE[idx])->stats.current.isHit == 0) {
 				*out = 1;
 				return;
 			}
@@ -3201,10 +3201,10 @@ void BTL_selectNextTargetEntity(void)
 		if (e == MAIN_D_80134CE8->sourceEntity) {
 			continue;
 		}
-		if (((int8_t *)e)[0x34] == 0) {
+		if (e->isOnMap == 0) {
 			continue;
 		}
-		if (((int8_t *)e)[0x35] == 0) {
+		if (e->isOnScreen == 0) {
 			continue;
 		}
 		if (((int16_t *)e)[0x26] > 0) {
@@ -3435,7 +3435,7 @@ void BTL_addAttackObjectToTarget(void)
 	int32_t j;
 	int32_t e;
 
-	if (((int8_t *)(int32_t)MAIN_D_80134CE8->targetEntity)[0x53] != 0) {
+	if (((DigimonEntity *)MAIN_D_80134CE8->targetEntity)->stats.current.isHit != 0) {
 		return;
 	}
 
@@ -3448,7 +3448,7 @@ void BTL_addAttackObjectToTarget(void)
 		}
 	}
 
-	((int8_t *)(int32_t)MAIN_D_80134CE8->targetEntity)[0x53] = 1;
+	((DigimonEntity *)MAIN_D_80134CE8->targetEntity)->stats.current.isHit = 1;
 	for (j = 1; j < 10; j++) {
 		e = (int32_t)ENTITY_TABLE[j];
 		if (e == (int32_t)MAIN_D_80134CE8->sourceEntity) {
@@ -4877,7 +4877,7 @@ void BTL_tickAuraProjectile(int32_t id)
 		return;
 	}
 	e = ENTITY_TABLE[idx];
-	if (((int8_t *)e)[0x53] != 0) {
+	if (((DigimonEntity *)e)->stats.current.isHit != 0) {
 		return;
 	}
 	for (j = 1; j < 10; j++) {
@@ -4886,7 +4886,7 @@ void BTL_tickAuraProjectile(int32_t id)
 			break;
 		}
 	}
-	((int8_t *)e)[0x53] = 1;
+	((DigimonEntity *)e)->stats.current.isHit = 1;
 	addAttackObject(idx, 1, (int16_t *)&a->position, 0x179, 0, j);
 	a->frame = -1;
 	removeObject(0x179, (int16_t)id);

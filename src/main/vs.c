@@ -919,7 +919,7 @@ void VS__combatInit(void)
 	fighter = COMBAT_DATA_PTR->fighter;
 	for (i = 0; i <= ENEMY_COUNT; ++i) {
 		stats = &((DigimonEntity *)ENTITY_TABLE[COMBAT_DATA_PTR->player.entityIds[i]])->stats;
-		stats->current.unk2_2 = 0;
+		stats->current.isHit = 0;
 
 		fighter->targetId = (i + 1) & 1;
 		fighter->hpDamageBuffer = 0;
@@ -1049,7 +1049,7 @@ void VS__func_800F34F0(void)
 	for (i = 0; i <= ENEMY_COUNT; ++i) {
 		entity = (DigimonEntity *)ENTITY_TABLE[COMBAT_DATA_PTR->player.entityIds[i]];
 		entity->stats.current.unk1 = -1;
-		*(int8_t *)&entity->stats.current.unk2_1 = -1;
+		entity->stats.current.efeSubEffect = -1;
 
 		for (j = 0; j < 4; ++j) {
 			if ((move = entity->stats.base.moves[j]) != 0xff) {
@@ -1689,7 +1689,7 @@ void VS__func_800F4F9C(void)
 void VS__faintDigimon(DigimonEntity *entity, FighterData *fighter,
 		     uint8_t fighterId)
 {
-	entity->stats.current.unk2_2 = 1;
+	entity->stats.current.isHit = 1;
 	fighter->flags |= 0x8000;
 
 	startAnimation(&entity->entity, 0x2b);
@@ -2385,7 +2385,7 @@ void VS__tickFighterAction(int32_t fighterId)
 		}
 
 		if ((fighter->flags & 0x20) == 0) {
-			entity->stats.current.unk2_2 = 0;
+			entity->stats.current.isHit = 0;
 		}
 
 		if (fighter->flags & 0x80) {

@@ -1594,7 +1594,7 @@ void BTL_tickFighterAction(int32_t index)
 			digimon->entity.flatSprite = 0;
 		}
 		if (!(fighter->flags & 0x20)) {
-			digimon->stats.current.unk2_2 = 0;
+			digimon->stats.current.isHit = 0;
 		}
 		if (fighter->flags & 0x80) {
 			fighter->flags &= 0xff7f;
@@ -1683,7 +1683,7 @@ void BTL_increaseSpeedBuffer(FighterData *fighter, Stats *stats)
 
 void BTL_faintDigimon(DigimonEntity *digimon, FighterData *fighter, int16_t arg2)
 {
-	*(int8_t *)&digimon->stats.current.unk2_2 = 1;
+	digimon->stats.current.isHit = 1;
 	fighter->flags |= 0x8000;
 	startAnimation(&digimon->entity, 0x2b);
 	BTL_resetFlatten(arg2);
@@ -2104,12 +2104,12 @@ void BTL_tickAttackHits(void)
 		moveIdx = entity->anim.animId - 0x2e;
 		if (DIGIMON_DATA[entity->type].moves[moveIdx] == 0x2d) {
 			if (COMBAT_DATA_PTR->player.entityIds[fighter->targetId] == attack.casterId) {
-				((DigimonEntity *)entity)->stats.current.unk2_2 = 0;
+				((DigimonEntity *)entity)->stats.current.isHit = 0;
 				continue;
 			}
 		}
 		if (BTL_applyBuffMove((DigimonEntity *)entity, (int16_t)i, (int16_t)tech) != 0) {
-			((DigimonEntity *)entity)->stats.current.unk2_2 = 0;
+			((DigimonEntity *)entity)->stats.current.isHit = 0;
 			continue;
 		}
 		BTL_removeMoveEffect((DigimonEntity *)entity, fighter);
@@ -2163,7 +2163,7 @@ void BTL_tickAttackHits(void)
 						BTL_startQueuedMove((DigimonEntity *)entity, (DigimonEntity *)attacker, fighter);
 						attacker->anim.animFlag &= 0xfe;
 						handled = 1;
-						((DigimonEntity *)entity)->stats.current.unk2_2 = 0;
+						((DigimonEntity *)entity)->stats.current.isHit = 0;
 						break;
 					}
 				}
@@ -2210,7 +2210,7 @@ void BTL_tickAttackHits(void)
 		entity->anim.animFlag &= 0xfe;
 blocked:
 		fighter->invulnerableTimer = 3;
-		((DigimonEntity *)entity)->stats.current.unk2_2 = 0;
+		((DigimonEntity *)entity)->stats.current.isHit = 0;
 	}
 }
 
@@ -2542,7 +2542,7 @@ void BTL_setupMoveExecution(DigimonEntity *digimon, DigimonEntity *target, Fight
 	}
 
 	if (i != 4) {
-		digimon->stats.current.unk2_1 = BTL_startEFE(fighter->effectSlot[i]);
+		digimon->stats.current.efeSubEffect = BTL_startEFE(fighter->effectSlot[i]);
 		fighter->unk11 = fighter->effectSlot[i];
 	}
 
@@ -2563,10 +2563,10 @@ void BTL_removeMoveEffect(DigimonEntity *digimon, FighterData *fighter)
 	id = fighter->unk11;
 	do {
 		if (id != -1) {
-			BTL_stopEFESubEffect(id, *(int8_t *)&digimon->stats.current.unk2_1);
+			BTL_stopEFESubEffect(id, digimon->stats.current.efeSubEffect);
 		}
 	} while (0);
-	*(int8_t *)&digimon->stats.current.unk2_1 = -1;
+	digimon->stats.current.efeSubEffect = -1;
 	fighter->unk11 = -1;
 }
 
@@ -2839,7 +2839,7 @@ void BTL_tickStatusEffects(void)
 					startAnimation(entity, 0x22);
 					fighter->moveRange = -1;
 					fighter->flags |= 0x40;
-					stats->current.unk2_2 = 1;
+					stats->current.isHit = 1;
 				}
 				break;
 			case 3:
@@ -2847,7 +2847,7 @@ void BTL_tickStatusEffects(void)
 				break;
 			case 0:
 				fighter->flags &= 0xffb7;
-				stats->current.unk2_2 = 0;
+				stats->current.isHit = 0;
 				if (fighter->flags & 4) {
 					BTL_addStatusEffectVisual((DigimonEntity *)entity, fighter, 3);
 					fighter->moveRange = 0;
@@ -2873,7 +2873,7 @@ void BTL_tickStatusEffects(void)
 				startAnimation(entity, 0x22);
 				fighter->moveRange = -1;
 				fighter->flags |= 0x40;
-				stats->current.unk2_2 = 1;
+				stats->current.isHit = 1;
 				break;
 			case 3:
 				entity->flatSprite = 0;
@@ -2881,7 +2881,7 @@ void BTL_tickStatusEffects(void)
 			case 0:
 				fighter->flags |= 8;
 				fighter->flatTimer = random(0x51) + 0xe0;
-				stats->current.unk2_2 = 0;
+				stats->current.isHit = 0;
 				fighter->flags &= 0xffbf;
 				break;
 			}

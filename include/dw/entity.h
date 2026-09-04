@@ -72,8 +72,8 @@ typedef struct {
 	int16_t currentHP;
 	int16_t currentMP;
 	int16_t unk1;
-	uint8_t unk2_1;
-	uint8_t unk2_2;
+	int8_t efeSubEffect;
+	int8_t isHit;
 	int16_t vabId;
 	uint8_t chargeMode;
 	uint8_t field7_0x57;

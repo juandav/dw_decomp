@@ -73,7 +73,7 @@ void BTL_initializeCombat(void)
 
 	for (i = 0; ENEMY_COUNT >= i; i++) {
 		stats = &((DigimonEntity *)ENTITY_TABLE[COMBAT_DATA_PTR->player.entityIds[i]])->stats;
-		stats->current.unk2_2 = 0;
+		stats->current.isHit = 0;
 		f->targetId = 0xff;
 		f->hpDamageBuffer = 0;
 		f->mpDamageBuffer = 0;
@@ -334,7 +334,7 @@ int32_t BTL_isBattleFinished(void)
 		MAIN_D_80134D6A = 0;
 		if (!(entity->anim.animFlag & 1)) {
 			COMBAT_DATA_PTR->fighter[0].flags &= 0x7fff;
-			PARTNER_ENTITY.digimonEntity.stats.current.unk2_2 = 0;
+			PARTNER_ENTITY.digimonEntity.stats.current.isHit = 0;
 			if (MAIN_D_80134D74 != 0) {
 				sound = MAIN_D_8013507C;
 				do {

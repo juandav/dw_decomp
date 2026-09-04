@@ -489,10 +489,10 @@ void VS_removeMoveEffect(DigimonEntity *digimon, FighterData *fighter)
 	id = fighter->unk11;
 	do {
 		if (id != -1) {
-			VS_stopEFESubEffect(id, *(int8_t *)&digimon->stats.current.unk2_1);
+			VS_stopEFESubEffect(id, digimon->stats.current.efeSubEffect);
 		}
 	} while (0);
-	*(int8_t *)&digimon->stats.current.unk2_1 = -1;
+	digimon->stats.current.efeSubEffect = -1;
 	fighter->unk11 = -1;
 }
 
@@ -727,7 +727,7 @@ void VS_applyMoveResult(void)
 					startAnimation(entity, 0x22);
 					fighter->moveRange = -1;
 					fighter->flags |= 0x40;
-					stats->current.unk2_2 = 1;
+					stats->current.isHit = 1;
 				}
 				break;
 			case 3:
@@ -735,7 +735,7 @@ void VS_applyMoveResult(void)
 				break;
 			case 0:
 				fighter->flags &= 0xffb7;
-				stats->current.unk2_2 = 0;
+				stats->current.isHit = 0;
 				if (fighter->flags & 4) {
 					VS_addStatusEffectVisual((DigimonEntity *)entity, fighter, 3);
 					fighter->moveRange = 0;
@@ -756,7 +756,7 @@ void VS_applyMoveResult(void)
 				startAnimation(entity, 0x22);
 				fighter->moveRange = -1;
 				fighter->flags |= 0x40;
-				stats->current.unk2_2 = 1;
+				stats->current.isHit = 1;
 				break;
 			case 3:
 				entity->flatSprite = 0;
@@ -764,7 +764,7 @@ void VS_applyMoveResult(void)
 			case 0:
 				fighter->flags |= 8;
 				fighter->flatTimer = random(0x51) + 0xe0;
-				stats->current.unk2_2 = 0;
+				stats->current.isHit = 0;
 				fighter->flags &= 0xffbf;
 				break;
 			}
