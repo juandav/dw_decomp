@@ -36,9 +36,9 @@ rom:0x00034778 reloc:MIPS_26 symbol:BTL_healStatusEffect
 rom:0x00034798 reloc:MIPS_26 symbol:BTL_healStatusEffect
 rom:0x00034854 reloc:MIPS_26 symbol:BTL_removeDeathCountdown
 rom:0x000348D0 reloc:MIPS_26 symbol:BTL_healStatusEffect
-rom:0x00035F2C reloc:MIPS_HI16 symbol:GENERAL_BUFFER addend:0x8
-rom:0x00035F30 reloc:MIPS_LO16 symbol:GENERAL_BUFFER addend:0x8
-rom:0x00035F34 reloc:MIPS_LO16 symbol:GENERAL_BUFFER addend:0xC
+rom:0x00035F2C reloc:MIPS_NONE symbol:NONE
+rom:0x00035F30 reloc:MIPS_NONE symbol:NONE
+rom:0x00035F34 reloc:MIPS_NONE symbol:NONE
 rom:0x0004D850 reloc:MIPS_26 symbol:STD_tickPartnerTournament
 rom:0x0004E7BC reloc:MIPS_26 symbol:DOOA_tick
 rom:0x0004E800 reloc:MIPS_26 symbol:DOOA_tick
@@ -59,8 +59,10 @@ rom:0x00054F70 reloc:MIPS_LO16 symbol:FISHING_DATA
 rom:0x00054FB0 reloc:MIPS_HI16 symbol:FISHING_MAP_DATA
 rom:0x00054FC4 reloc:MIPS_LO16 symbol:FISHING_MAP_DATA
 rom:0x00054FD4 reloc:MIPS_26 symbol:FISH_init
-rom:0x000562B0 reloc:MIPS_26 symbol:MOV_func_80010620
-rom:0x000565EC reloc:MIPS_LO16 symbol:GENERAL_BUFFER addend:0x4
+rom:0x000562B0 reloc:MIPS_26 symbol:MOV_playMovie
+rom:0x000565EC reloc:MIPS_NONE symbol:NONE
+rom:0x000565D4 reloc:MIPS_NONE symbol:NONE
+rom:0x0005668C reloc:MIPS_NONE symbol:NONE
 rom:0x00056C14 reloc:MIPS_26 symbol:STD_func_800579D8
 rom:0x000572D8 reloc:MIPS_26 symbol:EVL_initEvoSequence
 rom:0x00057854 reloc:MIPS_26 symbol:BTL_initializeBattleItemParticles
@@ -351,6 +353,7 @@ rom:0x0009B974 reloc:MIPS_32 symbol:FISH_D_80070000
 rom:0x0009B978 reloc:MIPS_32 symbol:EVL_D_80060000
 rom:0x0009B97C reloc:MIPS_32 symbol:KAR_D_80053800
 rom:0x0009B980 reloc:MIPS_32 symbol:VS_D_80052AE0
+rom:0x0009B984 reloc:MIPS_NONE symbol:NONE
 rom:0x0009B988 reloc:MIPS_32 symbol:DOO2_D_80070000
 rom:0x0009B98C reloc:MIPS_32 symbol:DOOA_D_80080000
 //rom:0x0009B994 reloc:MIPS_32 symbol:SHOP_D_80080800
@@ -358,9 +361,11 @@ rom:0x0009B998 reloc:MIPS_32 symbol:DGET_D_80080800
 rom:0x0009B9A0 reloc:MIPS_32 symbol:MURD_D_8007C000
 rom:0x0009B9A4 reloc:MIPS_32 symbol:ENDI_D_80060000
 rom:0x0009B9A8 reloc:MIPS_32 symbol:EAB_D_80060000
+rom:0x000A44F4 reloc:MIPS_NONE symbol:NONE
 rom:0x000A48D8 reloc:MIPS_32 symbol:STD_D_8007AAB0
 rom:0x000A4A20 reloc:MIPS_32 symbol:KAR_D_8005ABB8
 rom:0x000A4B10 reloc:MIPS_32 symbol:VS_D_80070B1C
+rom:0x000A4C1C reloc:MIPS_NONE symbol:NONE
 //rom:0x000A4C28 reloc:MIPS_32 symbol:MAIN_D_80058000
 rom:0x000151E8 reloc:MIPS_HI16 symbol:DOOA_REINCARNATION_SEQ addend:0x24
 rom:0x000151F8 reloc:MIPS_LO16 symbol:DOOA_REINCARNATION_SEQ addend:0x24
