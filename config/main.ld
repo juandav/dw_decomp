@@ -104,6 +104,8 @@ SECTIONS
         . = ALIGN(., 4);
         build/src/main/utils.c.o(.text.*)
         . = ALIGN(., 4);
+        build/src/main/utils2.c.o(.text.*)
+        . = ALIGN(., 4);
         build/src/main/tournament.c.o(.text.*)
         . = ALIGN(., 4);
         build/src/main/evl.c.o(.text.*)

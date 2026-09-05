@@ -425,7 +425,7 @@ void openJukebox(void)
 	case 2:
 		destroyItemMenuBox(&MAIN_D_80134F68);
 		playBGM(ACTIVE_BGM_FONT);
-		readMapTFS(MAIN_D_80134FFE);
+		readMapTFS(CURRENT_MAP_ID);
 		ACTIVE_INSTRUCTION = 0;
 		break;
 	case 3:

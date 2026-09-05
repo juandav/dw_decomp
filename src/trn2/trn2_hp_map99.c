@@ -27,7 +27,7 @@ void loadMapObjectPosition(int16_t *xData, int16_t *yData, int16_t startIndex, i
 int32_t moveMapObjectsWithLimit(int16_t startIndex, int16_t count, int16_t dx, int16_t dy, int16_t limitX, int16_t limitY);
 int32_t tickEntityWalkTo(uint8_t scriptId1, uint8_t scriptId2, int32_t targetX, int32_t targetZ, int8_t withCamera);
 void TRN2_awardHpTrainingGains(int32_t a, int32_t b, int32_t c);
-void setMapObjectsFlag(int16_t startIndex, int16_t count, int32_t flag);
+void setMapObjectsFlag(int16_t start, int16_t count, int32_t flag);
 void TRN2_tickHpTrainingMap99(int32_t instanceId);
 void TRN2_startSlotSessionIfEnabled(int16_t arg);
 void TRN2_func_8008AA84(int8_t arg);

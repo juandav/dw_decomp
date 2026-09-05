@@ -33,7 +33,7 @@ int32_t moveMapObjectsWithLimit(int16_t startIndex, int16_t count, int16_t dx, i
 int32_t tickEntityWalkTo(uint8_t scriptId1, uint8_t scriptId2, int32_t targetX, int32_t targetZ, int8_t withCamera);
 void setCameraFollowPlayer(void);
 void unsetCameraFollowPlayer(void);
-void setMapObjectsFlag(int16_t startIndex, int16_t count, int32_t flag);
+void setMapObjectsFlag(int16_t start, int16_t count, int32_t flag);
 void createParticleFX(uint8_t kind, int32_t count, void *arg2, Entity *entity, int32_t arg4);
 void resetMapObjectAnimation(int16_t startIndex, int32_t count);
 void TRN_saveTrainingStartTime(void);

@@ -19,8 +19,6 @@ extern int32_t MAIN_func_801138B0(void);
 extern int32_t MAIN_func_80113A20(void);
 extern int32_t isTrainingComplete(void);
 extern void setCameraFollowPlayer(void);
-extern void MAIN_func_80100258(int32_t a0);
-extern void lostAllLives(void);
 
 extern uint8_t MAIN_D_80134FE4;
 extern uint8_t MAIN_D_80134FE9;
@@ -406,8 +404,6 @@ void writePStat(int32_t index, uint8_t value)
 }
 
 void setMapHeadActive(void);
-extern uint16_t MAIN_D_80134FFE;
-extern int32_t MAIN_D_80134FEC;
 void MAIN_func_800D634C(int32_t param_1, int32_t param_2);
 
 void returnFromScriptFile(void)
@@ -424,8 +420,8 @@ void returnFromScriptFile(void)
 			break;
 		}
 		if (type == 3) {
-			readMapTFS(MAIN_D_80134FFE);
-			MAIN_func_800D634C(MAIN_D_80134FFE, 0);
+			readMapTFS(CURRENT_MAP_ID);
+			MAIN_func_800D634C(CURRENT_MAP_ID, 0);
 			MAIN_D_80134FEC = 0;
 			script = getScript(CURRENT_SCRIPT_ID);
 			section = getScriptSection(script, 0xFE);

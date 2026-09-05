@@ -9,7 +9,7 @@ void skipHours(int32_t hours);
 void scriptSetDigimon(int32_t a0, int32_t a1, int32_t a2);
 void scriptUnloadEntity(int32_t a0);
 void resetEntityOrigin(int32_t a0);
-void setMapObjectsFlag(int32_t a0, int32_t a1, int32_t a2);
+void setMapObjectsFlag(int32_t start, int32_t count, int32_t flag);
 
 extern uint8_t MAIN_D_801BE6B4[];
 

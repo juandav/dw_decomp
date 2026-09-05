@@ -23,7 +23,7 @@ void createCameraMovement(VECTOR *pos, int32_t speed);
 void startAnimation(Entity *entity, int32_t animId);
 int32_t tickEntityWalkTo(uint8_t scriptId1, uint8_t scriptId2, int32_t targetX, int32_t targetZ, int8_t withCamera);
 void TRN2_awardHpTrainingGains(int32_t a, int32_t b, int32_t c);
-void setMapObjectsFlag(int16_t startIndex, int16_t count, int32_t flag);
+void setMapObjectsFlag(int16_t start, int16_t count, int32_t flag);
 void setCameraFollowPlayer(void);
 void unsetCameraFollowPlayer(void);
 void TRN2_awardOffenseTrainingGains(int32_t a, int16_t b, int32_t c);

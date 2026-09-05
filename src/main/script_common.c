@@ -3537,7 +3537,7 @@ void scriptInstructionFBtoFF(int32_t op)
 		return;
 	}
 
-	skipOneReadTwoShort(&CURRENT_SCRIPT_ID, &MAIN_D_80134FFE);
+	skipOneReadTwoShort(&CURRENT_SCRIPT_ID, &CURRENT_MAP_ID);
 
 	entry.smth[0] = 3;
 	pushScriptStack(&entry);
@@ -3545,7 +3545,7 @@ void scriptInstructionFBtoFF(int32_t op)
 	MAIN_D_80134FEC = 1;
 
 	resetBGM();
-	loadMap(MAIN_D_80134FFE);
+	loadMap(CURRENT_MAP_ID);
 	longjmp(SCRIPT_JMP_BUF, 1);
 }
 

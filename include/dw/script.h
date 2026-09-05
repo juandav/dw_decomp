@@ -73,7 +73,7 @@ extern uint8_t MAIN_D_80134FE6;
 extern uint16_t MAIN_D_80134FC6;
 extern int16_t MAIN_D_8013027C[];
 extern uint16_t CURRENT_SCRIPT_ID;
-extern uint16_t MAIN_D_80134FFE;
+extern uint16_t CURRENT_MAP_ID;
 extern int32_t MAIN_D_80134FEC;
 extern jmp_buf SCRIPT_JMP_BUF;
 extern uint8_t MAIN_D_80134FE5;

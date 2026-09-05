@@ -237,7 +237,7 @@ void moveMapObjects(uint8_t startIndex, int32_t count, int16_t dx,
 		    int16_t dy);
 int32_t moveMapObjectsWithLimit(uint8_t startIndex, int32_t count, int16_t dx,
 				int16_t dy, int16_t limitX, int16_t limitY);
-void setMapObjectsFlag(uint8_t startIndex, int32_t count, int32_t flag);
+void setMapObjectsFlag(uint8_t start, int32_t count, int32_t flag);
 void resetMapObjectAnimation(uint8_t startIndex, int32_t count);
 void clearMapAITable(int32_t index);
 void removeMapEntities(void);
@@ -784,13 +784,13 @@ void moveMapObjects(uint8_t startIndex, int32_t count, int16_t dx, int16_t dy)
 	}
 }
 
-void setMapObjectsFlag(uint8_t startIndex, int32_t count, int32_t flag)
+void setMapObjectsFlag(uint8_t start, int32_t count, int32_t flag)
 {
 	long idx;
 	int32_t i;
 
 	for (i = 0; i < count; i++) {
-		idx = startIndex + i;
+		idx = start + i;
 		LOCAL_MAP_OBJECT_INSTANCE[idx].flag = flag;
 	}
 }

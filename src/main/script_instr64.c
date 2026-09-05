@@ -90,46 +90,46 @@ void scriptInstruction64to7E(int32_t op)
 			longjmp(SCRIPT_JMP_BUF, 2);
 		case 0x07:
 			byteArg1 = readPStat(0xfe);
-			if ((MAIN_D_80134FFE == 0x6b) ||
-			    (MAIN_D_80134FFE == 0x6c) ||
-			    (MAIN_D_80134FFE == 0xa5) ||
-			    (MAIN_D_80134FFE == 0x63)) {
+			if ((CURRENT_MAP_ID == 0x6b) ||
+			    (CURRENT_MAP_ID == 0x6c) ||
+			    (CURRENT_MAP_ID == 0xa5) ||
+			    (CURRENT_MAP_ID == 0x63)) {
 				switch (byteArg1) {
 				case 0:
-					TRN2_setupHpTraining(MAIN_D_80134FFE);
+					TRN2_setupHpTraining(CURRENT_MAP_ID);
 					break;
 				case 1:
-					TRN2_setupOffenseTraining(MAIN_D_80134FFE);
+					TRN2_setupOffenseTraining(CURRENT_MAP_ID);
 					break;
 				case 2:
-					TRN2_setupSpeedTraining(MAIN_D_80134FFE);
+					TRN2_setupSpeedTraining(CURRENT_MAP_ID);
 					break;
 				case 3:
-					TRN2_setupDefenseTraining(MAIN_D_80134FFE);
+					TRN2_setupDefenseTraining(CURRENT_MAP_ID);
 					break;
 				case 4:
-					TRN2_setupMpTraining(MAIN_D_80134FFE);
+					TRN2_setupMpTraining(CURRENT_MAP_ID);
 					break;
 				}
 			} else {
 				switch (byteArg1) {
 				case 0:
-					TRN_setupHpTraining(MAIN_D_80134FFE);
+					TRN_setupHpTraining(CURRENT_MAP_ID);
 					break;
 				case 1:
-					TRN_setupOffenseTraining(MAIN_D_80134FFE);
+					TRN_setupOffenseTraining(CURRENT_MAP_ID);
 					break;
 				case 2:
-					TRN_setupSpeedTraining(MAIN_D_80134FFE);
+					TRN_setupSpeedTraining(CURRENT_MAP_ID);
 					break;
 				case 3:
-					TRN_setupDefenseTraining(MAIN_D_80134FFE);
+					TRN_setupDefenseTraining(CURRENT_MAP_ID);
 					break;
 				case 4:
-					TRN_setupMpTraining(MAIN_D_80134FFE);
+					TRN_setupMpTraining(CURRENT_MAP_ID);
 					break;
 				case 5:
-					TRN_setupBrainsTraining(MAIN_D_80134FFE);
+					TRN_setupBrainsTraining(CURRENT_MAP_ID);
 					break;
 				}
 			}
@@ -221,10 +221,10 @@ void scriptInstruction64to7E(int32_t op)
 			MAIN_func_800FF9AC();
 			break;
 		case 0x24:
-			readMapTFS(MAIN_D_80134FFE);
+			readMapTFS(CURRENT_MAP_ID);
 			break;
 		case 0x27:
-			MAIN_func_800D9360(MAIN_D_80134FFE);
+			MAIN_func_800D9360(CURRENT_MAP_ID);
 			break;
 		case 0x30:
 			openSaveMachine();
