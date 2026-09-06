@@ -551,7 +551,7 @@ SECTIONS
         . = ALIGN(., 4);
         build/asm/main/data/inventory.sdata.s.o(.sdata.*)
         . = ALIGN(., 4);
-        build/asm/main/data/clock.sdata.s.o(.sdata.*)
+        build/src/main/clock.c.o(.sdata.*)
         . = ALIGN(., 4);
         build/asm/main/data/entity_text.sdata.s.o(.sdata.*)
         . = ALIGN(., 4);

@@ -209,7 +209,7 @@ segments:
       - [0xA436C, .sdata, sound]
       - [0xA4398, sdata, map]
       - [0xA43BC, sdata, inventory]
-      - [0xA43DC, sdata, clock]
+      - [0xA43DC, .sdata, clock]
       - [0xA43EC, sdata, entity_text]
       - [0xA43F4, .sdata, map_object]
       - [0xA4428, .sdata, file_queue]
