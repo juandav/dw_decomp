@@ -3,10 +3,11 @@
 #include <libgpu.h>
 #include <libgs.h>
 #include <libgte.h>
+#include <mwinline_n.h>
 
+#include <dw/btl.h>
 #include <dw/entity.h>
 #include <dw/file.h>
-#include <dw/graphics.h>
 #include <dw/kar.h>
 #include <dw/script.h>
 #include <dw/sound.h>
@@ -91,6 +92,7 @@ typedef struct {
 	int32_t x;
 	int32_t y;
 	int32_t z;
+	int32_t pad;
 } KarPos;
 
 typedef struct {
@@ -123,69 +125,13 @@ typedef struct {
 	} glyph[11];
 } KarDigits;
 
-extern GsOT_TAG KAR_D_800637CC[];
-extern GsOT_TAG KAR_D_8006384C[];
-extern GsOT KAR_D_800638CC[];
-extern KarStoneRow KAR_D_8005B5A0[];
-extern KarZones KAR_D_8005B438;
-extern int32_t ACTIVE_FRAMEBUFFER;
-extern int32_t VIEWPORT_DISTANCE;
-extern GsOT GS_ORDERING_TABLE[];
-extern GsRVIEW2 GS_VIEWPOINT;
-extern GsRVIEW2 KAR_D_8005B580;
-extern uint16_t MAIN_D_80135252;
-extern KarModelIds KAR_D_8005AB80;
-extern KarOffTbl KAR_D_8005AB8C;
-extern KarSpawnX KAR_D_8005AB98;
-extern KarWeightTbl MAIN_D_80134A08;
-extern int32_t KAR_D_80063914[];
-extern RECT MAIN_D_80134A10;
-extern RECT MAIN_D_80134A18;
-extern KarStrPair MAIN_D_80134A20;
-extern RECT MAIN_D_80134A28;
-extern RECT MAIN_D_80134A30;
-extern uint8_t MAIN_D_8013522C;
-extern uint32_t POLLED_INPUT_PREVIOUS;
-extern KarStrTbl KAR_D_8005AF58;
-extern KarOffTbl KAR_D_8005B04C;
-extern KarStrTbl KAR_D_8005B318;
-extern KarOffTbl KAR_D_8005B40C;
-extern KarShotPlan KAR_D_8005B418;
-extern KarSprite KAR_D_8005B48C;
-extern KarDigits KAR_D_8005B4A0;
-extern KarSpritePair KAR_D_8005B4CC;
-extern int16_t MAIN_D_8013523E;
-extern KarSpriteSet KAR_D_8005B4F4;
-extern KarSprite KAR_D_8005B558;
-extern KarSprite KAR_D_8005B478;
-extern KarSprite KAR_D_8005B56C;
-extern uint8_t MAIN_D_80135220;
-extern char KAR_D_8005ABA4[];
-extern u_long KAR_D_8005BFCC[];
-extern u_long *MAIN_D_80135240;
-extern int32_t MAIN_D_80135244;
-extern uint8_t MAIN_D_80135248;
-extern KarStone *KAR_D_800639C0[];
-extern int16_t MAIN_D_8013523A;
-extern int8_t MAIN_D_80135256;
-extern KarPeggedModelIds MAIN_D_80134A4C;
-extern int8_t MAIN_D_80134A4F[1];
-extern GsOT *ACTIVE_ORDERING_TABLE;
-extern uint32_t POLLED_INPUT;
-extern int8_t MAIN_D_80135250;
-extern int8_t MAIN_D_8013523C;
-extern int32_t MAIN_D_8013524C;
-
 void renderSelectionCursor(int32_t a, int32_t b, int32_t c, int32_t d, int32_t e);
 void clearTextArea(void);
 void renderString(int32_t a, int32_t b, int32_t c, int32_t d, int32_t e, int32_t f, int32_t g, int32_t h, int32_t i);
 void renderUIBox(int32_t id);
-void setTextColor(int32_t color);
-void drawString(char *text, int32_t color, int32_t pos);
-void startAnimation(Entity *entity, int32_t animId);
 
-int32_t KAR_tickMatchState(void);
-int32_t KAR_renderAimArrow(void);
+void KAR_tickMatchState(void);
+void KAR_renderAimArrow(void);
 void KAR_updateRingMarkers(void);
 void KAR_checkStonesStopped(void);
 int32_t KAR_distance(int32_t x, int32_t y);
@@ -228,15 +174,69 @@ int32_t KAR_drawHintPagePenguinmon(int32_t idx, int8_t n);
 int32_t KAR_drawHintPageMetalMamemon(int32_t idx, int8_t n);
 void KAR_renderPowerMeter(void);
 int32_t KAR_computeThrowPower(int32_t a, int32_t b, int32_t c);
+void MAIN_func_800D8AC8(int32_t diffX, int32_t diffY);
 void KAR_setOpponentShot(int32_t row, int32_t val, int32_t b, int32_t c);
 void KAR_rotatePoint(SVECTOR *p, int32_t ang);
 int32_t KAR_aimBankShot(KarStone *stone, int32_t x, int32_t z);
 void KAR_placeAtContact(KarStone *stone, KarPos p);
 void KAR_handleAimScroll(void);
-int32_t KAR_findClearShotAngle(int16_t x, int16_t z);
+int32_t KAR_findClearShotAngle(int32_t x, int32_t z);
 int32_t KAR_aimAtStoneInRing(int32_t player, int32_t key, int16_t *outX, int16_t *outZ);
 void KAR_renderNamePlates(void);
 void KAR_beginThrow(void);
+
+extern GsOT_TAG KAR_D_800637CC[];
+extern GsOT_TAG KAR_D_8006384C[];
+extern GsOT KAR_D_800638CC[];
+extern KarStoneRow KAR_D_8005B5A0[];
+extern KarZones KAR_D_8005B438;
+extern int32_t ACTIVE_FRAMEBUFFER;
+extern int32_t VIEWPORT_DISTANCE;
+extern GsOT GS_ORDERING_TABLE[];
+extern GsRVIEW2 GS_VIEWPOINT;
+extern GsRVIEW2 KAR_D_8005B580;
+extern uint16_t MAIN_D_80135252;
+extern KarModelIds KAR_D_8005AB80;
+extern KarOffTbl KAR_D_8005AB8C;
+extern KarSpawnX KAR_D_8005AB98;
+extern KarWeightTbl MAIN_D_80134A08;
+extern int32_t KAR_D_80063914[];
+extern RECT MAIN_D_80134A10;
+extern RECT MAIN_D_80134A18;
+extern KarStrPair MAIN_D_80134A20;
+extern RECT MAIN_D_80134A28;
+extern RECT MAIN_D_80134A30;
+extern uint8_t MAIN_D_8013522C;
+extern KarStrTbl KAR_D_8005AF58;
+extern KarOffTbl KAR_D_8005B04C;
+extern KarStrTbl KAR_D_8005B318;
+extern KarOffTbl KAR_D_8005B40C;
+extern KarShotPlan KAR_D_8005B418;
+extern KarSprite KAR_D_8005B48C;
+extern KarDigits KAR_D_8005B4A0;
+extern KarSpritePair KAR_D_8005B4CC;
+extern int16_t MAIN_D_8013523E;
+extern KarSpriteSet KAR_D_8005B4F4;
+extern KarSprite KAR_D_8005B558;
+extern KarSprite KAR_D_8005B478;
+extern KarSprite KAR_D_8005B56C;
+extern uint8_t MAIN_D_80135220;
+extern char KAR_D_8005ABA4[];
+extern u_long KAR_D_8005BFCC[];
+extern u_long *MAIN_D_80135240;
+extern int32_t MAIN_D_80135244;
+extern uint8_t MAIN_D_80135248;
+extern KarStone *KAR_D_800639C0[];
+extern int16_t MAIN_D_8013523A;
+extern int8_t MAIN_D_80135256;
+extern KarPeggedModelIds MAIN_D_80134A4C;
+extern int8_t MAIN_D_80134A4F[1];
+extern int8_t MAIN_D_80135250;
+extern int8_t MAIN_D_8013523C;
+extern int16_t MAIN_D_80135254;
+
+extern int32_t MAIN_D_8013524C;
+extern uint16_t MAIN_D_80135238;
 
 static void *kar_functions[] = {
 	KAR_renderSprite,
@@ -617,7 +617,134 @@ void KAR_tick(void)
 
 INCLUDE_ASM("asm/kar/nonmatchings/kar", KAR_tickMatchState);
 
-INCLUDE_ASM("asm/kar/nonmatchings/kar", KAR_renderAimArrow);
+void KAR_renderAimArrow(void)
+{
+	MATRIX m;
+	SVECTOR out;
+	SVECTOR prev;
+	SVECTOR vec;
+	int32_t otz;
+	DVECTOR sxy;
+	SVECTOR pts[4];
+	POLY_FT4 *prim;
+	GsOT_TAG *ot;
+	int32_t i;
+	int32_t j;
+	int32_t angle;
+	int32_t rot;
+	int32_t shade;
+	int32_t k;
+	int8_t player;
+	uint32_t tmp;
+	int16_t w;
+
+	player = (MAIN_D_8013523C != 0) ? MAIN_D_80135248 : 0;
+
+	if (MAIN_D_80135244 < 6) {
+		return;
+	}
+	if (MAIN_D_80135244 >= 8) {
+		return;
+	}
+
+	ot = ACTIVE_ORDERING_TABLE->org;
+
+	if (MAIN_D_80135244 >= 2) {
+		if (MAIN_D_80135252-- != 0) {
+			MAIN_D_80135252 += 0xBF;
+		}
+		if (MAIN_D_80135238++ >= 0x28) {
+			MAIN_D_80135238 = 0;
+		}
+	} else {
+		MAIN_D_80135238 = 0;
+	}
+
+	for (i = 0, j = 1, angle = 0; i < 0xF; i++, angle += 0xBF, j++) {
+		j = j;
+		vec.vx = 0;
+		vec.vy = 0;
+		vec.vz = j * -200;
+		RotMatrix(&ENTITY_TABLE[player]->posData->rotation, &m);
+		ApplyMatrixSV(&m, &vec, &out);
+		out.vx += KAR_D_8005B5A0[MAIN_D_8013523C].stones[MAIN_D_8013523A].pos.vx;
+		out.vz += KAR_D_8005B5A0[MAIN_D_8013523C].stones[MAIN_D_8013523A].pos.vz;
+		tmp = (MAIN_D_80135252 + (angle / 15)) & 0xFF;
+		shade = tmp;
+		if (tmp >= 0xBF) {
+			shade = (shade - 0xBFU) & 0xFF;
+		}
+		while ((out.vx < -0x2EE) || (out.vx >= 0x2EF)) {
+			if (out.vx < -0x2EE) {
+				w = out.vx;
+				if (!otz) {
+								}
+				w = w + 0x2EE;
+				out.vx = out.vx - (int16_t)(w * 2);
+			}
+			if (out.vx >= 0x2EF) {
+				w = out.vx;
+				if (!otz) {
+								}
+				w = w - 0x2EE;
+				w = w * 2;
+				out.vx = out.vx - w;
+			}
+		}
+		prim = (POLY_FT4 *)GsGetWorkBase();
+		SetPolyFT4(prim);
+		GsSetLsMatrix(&GsWSMATRIX);
+		setRGB0(prim, shade + 0x40, shade + 0x40, shade + 0x40);
+		gte_ldv0(&out);
+		gte_rtps();
+		gte_stsxy(&sxy);
+		gte_stszotz(&otz);
+		if (i < 0xE) {
+			setUV4(prim, 0x18, 0x38, 0x28, 0x38, 0x18, 0x28, 0x28, 0x28);
+			setXY4(prim, sxy.vx - 8, sxy.vy + 8, sxy.vx + 8, sxy.vy + 8, sxy.vx - 8,
+			       sxy.vy - 8, sxy.vx + 8, sxy.vy - 8);
+		} else {
+			rot = ratan2(prev.vz - out.vz, prev.vx - out.vx);
+			rot = rot - 0xC00;
+			rot = rot % 0x1000;
+			pts[0].vx = -8;
+			pts[0].vy = 0;
+			pts[0].vz = 8;
+			pts[1].vx = 8;
+			pts[1].vy = 0;
+			pts[1].vz = 8;
+			pts[2].vx = -8;
+			pts[2].vy = 0;
+			pts[2].vz = -8;
+			pts[3].vx = 8;
+			pts[3].vy = 0;
+			rot = -rot;
+			pts[3].vz = -8;
+			for (k = 0; k < 4; k++) {
+				KAR_rotatePoint(&pts[k], rot);
+			}
+			for (k = 0; k < 4; k++) {
+				pts[k].vx += sxy.vx;
+				pts[k].vz += sxy.vy;
+			}
+			if (rot == 0x800) {
+				setUV4(prim, 0x28, 0x28, 0x38, 0x28, 0x28, 0x38, 0x38, 0x38);
+			} else {
+				setUV4(prim, 0x28, 0x28, 0x37, 0x28, 0x28, 0x37, 0x37, 0x37);
+			}
+			setXY4(prim, pts[0].vx, pts[0].vz, pts[1].vx, pts[1].vz, pts[2].vx,
+			       pts[2].vz, pts[3].vx, pts[3].vz);
+		}
+		setClut(prim, 0x80, 0x1E6);
+		prim->tpage = getTPage(0, 0, 640, 0);
+		if (i != (MAIN_D_80135238 / 3)) {
+			AddPrim(ot + otz, prim);
+		}
+		prim++;
+		GsSetWorkBase((PACKET *)prim);
+		prev = out;
+	}
+}
 
 void KAR_renderStoneCursor(void)
 {
@@ -744,11 +871,82 @@ void KAR_renderNamePlates(void)
 	}
 }
 
-INCLUDE_ASM("asm/kar/nonmatchings/kar", KAR_handleAimScroll);
+void KAR_handleAimScroll(void)
+{
+	int16_t dx;
+	int16_t dy;
+
+	if (MAIN_D_80135244 != 6) {
+		return;
+	}
+	dx = 0;
+	dy = 0;
+	if (MAIN_D_8013523C != 0) {
+		return;
+	}
+	if ((MAIN_D_80135254 >= 10) || (MAIN_D_80135254 < -9) ||
+	    (MAIN_D_80135250 != 0)) {
+		if (POLLED_INPUT & 0x8000) {
+			dx -= 8;
+		}
+		if (POLLED_INPUT & 0x2000) {
+			dx += 8;
+		}
+	}
+	if (POLLED_INPUT & 0x1000) {
+		dy -= 10;
+	}
+	if (POLLED_INPUT & 0x4000) {
+		dy += 10;
+	}
+	if ((dx != 0) || (dy != 0)) {
+		MAIN_func_800D8AC8(dx, dy);
+	}
+}
 
 INCLUDE_ASM("asm/kar/nonmatchings/kar", KAR_updateRingMarkers);
 
-INCLUDE_ASM("asm/kar/nonmatchings/kar", KAR_checkStonesStopped);
+void KAR_checkStonesStopped(void)
+{
+	int32_t p;
+	int32_t n;
+	int32_t moving;
+	KarStone *stone;
+	KarStone *stone2;
+
+	moving = 0;
+	if (MAIN_D_80135244 != 0xB) {
+		return;
+	}
+	for (p = 0; p < 3; p++) {
+		p = p;
+		stone = KAR_D_8005B5A0[p].stones;
+		for (n = 0; n < 5; n++, stone++) {
+			if (stone->state > 0) {
+				if (stone->speed > 0) {
+					moving = 1;
+					break;
+				}
+				stone->speed = 0;
+			}
+		}
+	}
+	if (moving == 0) {
+		MAIN_D_80135244 = 0xC;
+	}
+	for (p = 0; p < 3; p++) {
+		stone2 = KAR_D_8005B5A0[p].stones;
+		for (n = 0; n < 5; n++, stone2++) {
+			if (stone2->state > 0) {
+				if (stone2->pos.vz >= 0xBE) {
+					if (stone2->speed <= 0) {
+						stone2->state = -0x65;
+					}
+				}
+			}
+		}
+	}
+}
 
 void KAR_updateCollisions(void)
 {
@@ -832,7 +1030,66 @@ void KAR_updateCollisions(void)
 	}
 }
 
-INCLUDE_ASM("asm/kar/nonmatchings/kar", KAR_bounceOffWall);
+void KAR_bounceOffWall(void)
+{
+	KarPos contact;
+	KarStoneRow *row;
+	KarStone *stone;
+	int32_t p;
+	int32_t n;
+	int16_t zone;
+
+	for (p = 0; p < 3; p++) {
+		stone = KAR_D_8005B5A0[p].stones;
+		for (n = 0; n < 5; n++, stone++) {
+			if (stone->state <= 0) {
+				continue;
+			}
+			if (stone->speed == 0) {
+				continue;
+			}
+			zone = KAR_getWallZone(stone->pos.vx, stone->pos.vz);
+			if ((zone > 0) && (zone < 6)) {
+				playSound2(8, 3);
+			}
+			switch (zone) {
+			case 1:
+				stone->pos.vx = stone->pos.vx -
+						(int16_t)(stone->pos.vx + 0x2d5) * 2;
+				stone->angle = 0x800 - stone->angle;
+				break;
+			case 2:
+				stone->angle = 0x1800 - stone->angle;
+				stone->pos.vx = stone->pos.vx -
+						(int16_t)(stone->pos.vx - 0x2d5) * 2;
+				break;
+			case 3:
+				KAR_findWallContact((VECTOR *)&contact, stone, 0);
+				KAR_reflectOffDiagonal((int32_t *)stone, 0);
+				KAR_placeAtContact(stone, contact);
+				break;
+			case 4:
+				KAR_findWallContact((VECTOR *)&contact, stone, 1);
+				KAR_reflectOffDiagonal((int32_t *)stone, 1);
+				KAR_placeAtContact(stone, contact);
+				break;
+			case 5:
+				stone->angle = -stone->angle;
+				stone->pos.vz = stone->pos.vz +
+						(int16_t)(-0x9dd - stone->pos.vz) * 2;
+				break;
+			case 6:
+				if (stone->target.vz < 0x465) {
+					playSound2(8, 3);
+					stone->angle = -stone->angle;
+					stone->pos.vz = stone->pos.vz -
+							(int16_t)(stone->pos.vz - 0x465) * 2;
+				}
+				break;
+			}
+		}
+	}
+}
 
 int32_t KAR_distance(int32_t x, int32_t y)
 {
@@ -1424,7 +1681,54 @@ int32_t KAR_drawHintPageMetalMamemon(int32_t idx, int8_t n)
 	return (int8_t)((offs.start[idx + 1] - offs.start[idx]) / 4);
 }
 
-INCLUDE_ASM("asm/kar/nonmatchings/kar", KAR_findClearShotAngle);
+int32_t KAR_findClearShotAngle(int32_t x, int32_t z)
+{
+	PositionData *pd;
+	KarStone *stone;
+	int32_t ang;
+	int32_t p;
+	int32_t n;
+	int32_t px;
+	int32_t pz;
+	int16_t step;
+
+	pd = ENTITY_TABLE[MAIN_D_80135248]->posData;
+	px = (int16_t)pd->location.vx;
+	pz = (int16_t)pd->location.vz;
+	if (MAIN_D_80135248 != 2) {
+		px = (int16_t)pd[4].posMatrix.workm.t[0];
+		pz = (int16_t)pd[4].posMatrix.workm.t[2];
+	}
+	ang = ratan2(z - pz, x - px);
+	if (MAIN_D_80135248 == 2) {
+		step = 30;
+	} else {
+		step = 10;
+	}
+	while (z < pz) {
+		px = (int16_t)(px + (int16_t)((step * rcos(ang)) / 4096));
+		pz = (int16_t)(pz + (int16_t)((step * rsin(ang)) / 4096));
+		for (p = 0; p < 3; p++) {
+			p = p;
+			stone = KAR_D_8005B5A0[p].stones;
+			for (n = 0; n < 5; n++, stone++) {
+				if (stone->state > 0) {
+					if (KAR_distance(px - stone->pos.vx, pz - stone->pos.vz) < 0x97) {
+						if (MAIN_D_80135248 == 2) {
+							return -1;
+						}
+						return ratan2(stone->pos.vz - z, stone->pos.vx - x);
+						/* scheduling barrier: mwcc needs the extra
+						 * block here to colour the loop registers */
+						do {
+						} while (0);
+					}
+				}
+			}
+		}
+	}
+	return ang;
+}
 
 int32_t KAR_aimAtStoneInRing(int32_t player, int32_t key, int16_t *outX, int16_t *outZ)
 {
@@ -1533,7 +1837,29 @@ int32_t KAR_findUnusedStoneOfType(int32_t key)
 	return -1;
 }
 
-INCLUDE_ASM("asm/kar/nonmatchings/kar", KAR_computeThrowPower);
+int32_t KAR_computeThrowPower(int32_t a, int32_t b, int32_t c)
+{
+	int32_t dist;
+	uint32_t acc;
+	uint32_t value;
+	uint32_t cur;
+
+	dist = KAR_distance(0x190 - b, 0x578 - c);
+	acc = 0;
+	cur = a;
+	value = a * 100;
+	while (acc < dist) {
+		acc += cur / a;
+		value = value * 100 / 98;
+		cur = value / 100;
+	}
+	if (MAIN_D_80135248 == 2) {
+		cur -= 0x258;
+	} else {
+		cur -= 0x1F4;
+	}
+	return cur;
+}
 
 void KAR_registerThrownStone(void)
 {
@@ -1558,27 +1884,11 @@ void KAR_renderSprite(KarSprite *sp)
 
 	p = (POLY_FT4 *)GsGetWorkBase();
 	SetPolyFT4(p);
-	p->tpage = 0xa;
-	p->r0 = sp->r;
-	p->g0 = sp->g;
-	p->b0 = sp->b;
-	p->clut = GetClut(sp->clutX, sp->clutY);
-	p->u0 = sp->u;
-	p->v0 = sp->v;
-	p->u1 = sp->u + sp->w;
-	p->v1 = sp->v;
-	p->u2 = sp->u;
-	p->v2 = sp->v + sp->h;
-	p->u3 = sp->u + sp->w;
-	p->v3 = sp->v + sp->h;
-	p->x0 = sp->x;
-	p->y0 = sp->y;
-	p->x1 = sp->x + sp->w;
-	p->y1 = sp->y;
-	p->x2 = sp->x;
-	p->y2 = sp->y + sp->h;
-	p->x3 = sp->x + sp->w;
-	p->y3 = sp->y + sp->h;
+	p->tpage = getTPage(0, 0, 640, 0);
+	setRGB0(p, sp->r, sp->g, sp->b);
+	setClut(p, sp->clutX, sp->clutY);
+	setUVWH(p, sp->u, sp->v, sp->w, sp->h);
+	setXYWH(p, sp->x, sp->y, sp->w, sp->h);
 	AddPrim(ACTIVE_ORDERING_TABLE->org + 0xa, p++);
 	GsSetWorkBase((PACKET *)p);
 }

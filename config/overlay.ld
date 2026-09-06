@@ -264,7 +264,7 @@ SECTIONS
 
 			build/src/kar/kar.c.o(.rodata.*);
 			. = ALIGN(., 4);
-			KEEP(build/asm/kar/data/7310.rodata.s.o(.rodata.*));
+			KEEP(build/asm/kar/data/732C.rodata.s.o(.rodata.*));
 			. = ALIGN(., 4);
 
 			build/src/kar/kar.c.o(.data.*);
