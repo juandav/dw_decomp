@@ -1,13 +1,16 @@
+#include <stdlib.h>
+
 #include <libgpu.h>
 #include <libgs.h>
 #include <libgte.h>
 
-#include <dw/btl.h>
 #include <dw/entity.h>
 #include <dw/evl.h>
 #include <dw/graphics.h>
 #include <dw/model.h>
+#include <dw/params.h>
 #include <dw/types.h>
+#include <dw/world_object.h>
 
 #include "common.h"
 
@@ -22,13 +25,13 @@ typedef struct {
 
 typedef struct {
 	int16_t timer;
-	int16_t pad;
+	int16_t primCount;
 	int32_t centers;
 	int32_t *model;
 	int32_t vertices;
 	int32_t primitives;
 	int16_t centerCount;
-	int16_t pad2;
+	int16_t bone;
 } EvlShardSet;
 
 typedef struct {
@@ -42,6 +45,49 @@ typedef struct {
 	int16_t timer;
 	Entity *entity;
 } EvlSpark;
+
+void MAIN_func_800D9B60(int16_t *clut);
+void MAIN_func_800D9E68(char *base);
+char *initializeFlashData(char *base);
+int32_t customRandom(int32_t a, int32_t b);
+void MAIN_func_80092B60(POLY_FT4 *prim);
+void addScreenPolyFT3(void *prim, SVECTOR *v0, SVECTOR *v1, SVECTOR *v2);
+int32_t add3DSpritePrim(POLY_FT4 *poly, SVECTOR *v0, SVECTOR *v1, SVECTOR *v2, SVECTOR *v3);
+int32_t getEntityType(Entity *entity);
+void calculateBoneMatrix(Entity *entity, int32_t boneId, MATRIX *out);
+
+void EVL_setScratchTop(int32_t size);
+void EVL_resetParticles(void);
+void EVL_resetSparks(void);
+void EVL_storeClutBank1(u_long *pixels);
+void EVL_releaseAllParticles(void);
+void EVL_tickParticle(int32_t id);
+void EVL_storeDigimonClut(uint16_t *buffer, Entity *entity);
+void EVL_storeClutBank0(u_long *pixels);
+void EVL_setOtherEntitiesVisible(int32_t restore);
+int32_t EVL_spawnParticle(VECTOR *position, RGB8 *color);
+void EVL_renderParticle(int32_t id);
+
+char *EVL_initShardSets(char *base);
+void EVL_tickEvoSequence(int32_t instanceId);
+void EVL_fadeClutBank0(int16_t *srcClut, void *entity, int16_t *dstClut, int32_t startFrame, int32_t endFrame, int32_t frame);
+void EVL_fadeClutBank1(int16_t *srcClut, void *entity, int16_t *dstClut, int32_t startFrame, int32_t endFrame, int32_t frame);
+void EVL_updateEvoCamera(Entity *entity, int32_t unused, int32_t frame);
+void EVL_brightenDigimonClut(int16_t *clut, Entity *entity, int16_t *dst, int32_t start,
+			     int32_t end, int32_t t);
+int32_t EVL_buildShardSet(Entity *entity, int32_t objIndex, int32_t bone);
+int32_t EVL_spawnSpark(void *owner, int32_t timer, int32_t param);
+void EVL_calculateCameraVectors(VECTOR *viewRef, VECTOR *viewPos, Entity *entity, SVECTOR *rotation, int32_t distance, int32_t height);
+void EVL_tickShardSet(int32_t id);
+void EVL_renderShardSet(int32_t index);
+void EVL_renderTriShard(EvlModelVertex *drift, int32_t unused1, int16_t speed, int16_t timer, ModelComponent *model);
+void EVL_renderQuadShard(EvlModelVertex *drift, int32_t unused1, int16_t speed, int16_t timer, ModelComponent *model);
+void EVL_renderSparkStreak(int32_t id);
+void EVL_tickSpark(int32_t id);
+void EVL_applyEvolution(Entity *entity, Stats *stats, PartnerPara *para, int32_t digimonId);
+void EVL_scaleBaseStats(Stats *stats, int16_t pct, int32_t unused);
+void EVL_clampBaseStats(void);
+void EVL_renderEvoSequence(void);
 
 extern int32_t MAIN_D_8013520C;
 extern uint8_t *MAIN_D_80135210;
@@ -66,53 +112,6 @@ extern char EVL_D_80066274[];
 extern char EVL_D_800677B0[];
 extern int16_t EVL_D_80067992[];
 extern int16_t EVL_D_80067994[];
-
-int32_t rand(void);
-void MAIN_func_800D9B60(int16_t *clut);
-void MAIN_func_800D9E68(char *base);
-char *initializeFlashData(char *base);
-int32_t customRandom(int32_t a, int32_t b);
-int32_t lerp(int32_t start, int32_t end, int32_t t0, int32_t t1, int32_t t);
-int32_t worldPosToScreenPos(SVECTOR *pos, DVECTOR *out);
-void MAIN_func_80092B60(POLY_FT4 *prim);
-void addScreenPolyFT3(void *prim, SVECTOR *v0, SVECTOR *v1, SVECTOR *v2);
-int32_t add3DSpritePrim(POLY_FT4 *poly, SVECTOR *v0, SVECTOR *v1, SVECTOR *v2, SVECTOR *v3);
-int32_t getEntityType(Entity *entity);
-void calculateBoneMatrix(Entity *entity, int32_t boneId, MATRIX *out);
-void removeObject(int32_t objectId, int32_t instanceId);
-
-void EVL_setScratchTop(int32_t size);
-void EVL_resetParticles(void);
-void EVL_resetSparks(void);
-void EVL_storeClutBank1(u_long *pixels);
-void EVL_releaseAllParticles(void);
-void EVL_tickParticle(int32_t id);
-void EVL_storeDigimonClut(uint16_t *buffer, Entity *entity);
-void EVL_storeClutBank0(u_long *pixels);
-void EVL_setOtherEntitiesVisible(int32_t restore);
-int32_t EVL_spawnParticle(VECTOR *position, RGB8 *color);
-void EVL_renderParticle(int32_t id);
-void addObject(int32_t objectId, int32_t instanceId, void *tick, void *render);
-
-char *EVL_initShardSets(char *base);
-void EVL_tickEvoSequence(void);
-void EVL_fadeClutBank0(int16_t *srcClut, void *entity, int16_t *dstClut, int32_t startFrame, int32_t endFrame, int32_t frame);
-void EVL_fadeClutBank1(int16_t *srcClut, void *entity, int16_t *dstClut, int32_t startFrame, int32_t endFrame, int32_t frame);
-void EVL_updateEvoCamera(void);
-void EVL_brightenDigimonClut(void);
-void EVL_buildShardSet(void);
-int32_t EVL_spawnSpark(void *owner, int32_t timer, int32_t param);
-void EVL_calculateCameraVectors(VECTOR *viewRef, VECTOR *viewPos, Entity *entity, SVECTOR *rotation, int32_t distance, int32_t height);
-void EVL_tickShardSet(int32_t id);
-void EVL_renderShardSet(int32_t index);
-void EVL_renderTriShard(EvlModelVertex *drift, int32_t unused1, int16_t speed, int16_t timer, ModelComponent *model);
-void EVL_renderQuadShard(EvlModelVertex *drift, int32_t unused1, int16_t speed, int16_t timer, ModelComponent *model);
-void EVL_renderSparkStreak(int32_t id);
-void EVL_tickSpark(int32_t id);
-void EVL_applyEvolution(void);
-void EVL_scaleBaseStats(Stats *stats, int16_t pct);
-void EVL_clampBaseStats(void);
-void EVL_renderEvoSequence(void);
 
 static void *evl_functions[] = {
 	EVL_clampBaseStats,
@@ -154,10 +153,7 @@ void EVL_storeDigimonClut(uint16_t *buffer, Entity *entity)
 	RECT rect;
 
 	model = getEntityModelComponent(entity->type, getEntityType(entity));
-	rect.x = (model->clutPage & 0x3f) << 4;
-	rect.y = model->clutPage >> 6;
-	rect.w = 0x10;
-	rect.h = 0x18;
+	setRECT(&rect, (model->clutPage & 0x3f) << 4, model->clutPage >> 6, 0x10, 0x18);
 	StoreImage(&rect, (u_long *)buffer);
 
 	DrawSync(0);
@@ -278,10 +274,7 @@ void EVL_fadeClutBank0(int16_t *srcClut, void *entity, int16_t *dstClut, int32_t
 		*dst++ += (int16_t)(stp << 15);
 	}
 
-	rect.x = 0;
-	rect.y = 488;
-	rect.w = 16;
-	rect.h = 24;
+	setRECT(&rect, 0, 488, 16, 24);
 	LoadImage(&rect, (u_long *)dstClut);
 }
 
@@ -326,10 +319,7 @@ void EVL_fadeClutBank1(int16_t *srcClut, void *entity, int16_t *dstClut, int32_t
 		*dst++ += (int16_t)(stp << 15);
 	}
 
-	rect.x = 32;
-	rect.y = 488;
-	rect.w = 48;
-	rect.h = 24;
+	setRECT(&rect, 32, 488, 48, 24);
 	LoadImage(&rect, (u_long *)dstClut);
 }
 
@@ -510,17 +500,10 @@ void EVL_renderTriShard(EvlModelVertex *drift, int32_t unused1, int16_t speed, i
 	prim = (POLY_FT4 *)GsGetWorkBase();
 	MAIN_func_80092B60(prim);
 	SetSemiTrans(prim, 1);
-	prim->r0 = MAIN_D_80135218[0];
-	prim->g0 = MAIN_D_80135218[1];
-	prim->b0 = MAIN_D_80135218[2];
+	setRGB0(prim, MAIN_D_80135218[0], MAIN_D_80135218[1], MAIN_D_80135218[2]);
 	prim->tpage = model->pixelPage;
 	prim->clut = tri->clut;
-	prim->u0 = tri->tu0;
-	prim->v0 = tri->tv0;
-	prim->u1 = tri->tu1;
-	prim->v1 = tri->tv1;
-	prim->u2 = tri->tu2;
-	prim->v2 = tri->tv2;
+	setUV3(prim, tri->tu0, tri->tv0, tri->tu1, tri->tv1, tri->tu2, tri->tv2);
 
 	dx = drift->vx * timer / speed;
 	dy = drift->vy * timer / speed;
@@ -559,19 +542,11 @@ void EVL_renderQuadShard(EvlModelVertex *drift, int32_t unused1, int16_t speed, 
 	prim = (POLY_FT4 *)GsGetWorkBase();
 	SetPolyFT4(prim);
 	SetSemiTrans(prim, 1);
-	prim->r0 = MAIN_D_80135218[0];
-	prim->g0 = MAIN_D_80135218[1];
-	prim->b0 = MAIN_D_80135218[2];
+	setRGB0(prim, MAIN_D_80135218[0], MAIN_D_80135218[1], MAIN_D_80135218[2]);
 	prim->tpage = model->pixelPage;
 	prim->clut = tri->clut;
-	prim->u0 = tri->tu0;
-	prim->v0 = tri->tv0;
-	prim->u1 = tri->tu1;
-	prim->v1 = tri->tv1;
-	prim->u2 = tri->tu2;
-	prim->v2 = tri->tv2;
-	prim->u3 = tri->tu3;
-	prim->v3 = tri->tv3;
+	setUV4(prim, tri->tu0, tri->tv0, tri->tu1, tri->tv1, tri->tu2, tri->tv2, tri->tu3,
+	       tri->tv3);
 
 	dx = drift->vx * timer / speed;
 	dy = drift->vy * timer / speed;
@@ -647,17 +622,10 @@ void EVL_renderSparkStreak(int32_t id)
 	prim = (POLY_FT4 *)GsGetWorkBase();
 	MAIN_func_80092B60(prim);
 	SetSemiTrans(prim, 1);
-	prim->tpage = 0x3c;
-	prim->clut = 0x7a4c;
-	prim->u0 = 0x5f;
-	prim->v0 = 0xa0;
-	prim->u1 = 0x5f;
-	prim->v1 = 0xa7;
-	prim->u2 = 0x30;
-	prim->v2 = 0xa0;
-	prim->r0 = (rand() % 128) + 10;
-	prim->g0 = prim->r0;
-	prim->b0 = prim->r0;
+	prim->tpage = getTPage(0, 1, 768, 256);
+	prim->clut = getClut(192, 489);
+	setUV3(prim, 0x5f, 0xa0, 0x5f, 0xa7, 0x30, 0xa0);
+	setRGB0(prim, (rand() % 128) + 10, prim->r0, prim->r0);
 	addScreenPolyFT3(prim, &c, &a, &b);
 }
 
@@ -724,12 +692,12 @@ void EVL_initEvoSequence(void)
 		order[best] = 0x1000;
 	}
 
-	addObject(0x80a, 0, EVL_tickEvoSequence, EVL_renderEvoSequence);
+	addObject(0x80a, 0, EVL_tickEvoSequence, (RenderFunction)EVL_renderEvoSequence);
 }
 
 INCLUDE_ASM("asm/evl/nonmatchings/evl", EVL_applyEvolution);
 
-void EVL_scaleBaseStats(Stats *stats, int16_t pct)
+void EVL_scaleBaseStats(Stats *stats, int16_t pct, int32_t unused)
 {
 	if (HAS_USED_EVOITEM != 0) {
 		return;
