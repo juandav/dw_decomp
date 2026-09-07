@@ -26,6 +26,30 @@
 
 #include "common.h"
 
+uint8_t MAIN_D_80122D68[24] = "I can't hold anymore.";
+uint8_t MAIN_D_80122D80[20] = "Hey! It's empty!";
+uint8_t MAIN_D_80122D94[24] = "Tamer level went up!!!";
+uint8_t MAIN_D_80122DAC[28] = "Tamer level went down!!!";
+uint8_t MAIN_D_80122DC8[20] = "Congratulations!";
+uint8_t MAIN_D_80122DDC[24] = "To recognize your great";
+uint8_t MAIN_D_80122DF4[28] = "recors, they sent a Medal!";
+
+static void *tamer_data_order[] = {
+	MAIN_D_80122DF4,
+	MAIN_D_80122DDC,
+	MAIN_D_80122DC8,
+	MAIN_D_80122DAC,
+	MAIN_D_80122D94,
+	MAIN_D_80122D80,
+	MAIN_D_80122D68,
+};
+
+RECT MAIN_D_801341F4 = {0, 12, 256, 200};
+uint8_t MAIN_D_801341FC[8] = "Woah!";
+RECT MAIN_D_80134204 = {0, 12, 256, 200};
+RECT MAIN_D_8013420C = {0, 12, 256, 200};
+
+
 extern int8_t GAME_STATE;
 extern int8_t TAMER_STATE;
 extern int8_t TAMER_SUBSTATE;
@@ -39,6 +63,7 @@ extern uint8_t TEXTBOX_OPEN_TIMER;
 extern int8_t INTERACTED_CHEST_STATE;
 extern uint8_t TARGET_MAP;
 extern uint8_t CURRENT_EXIT;
+extern uint8_t PREVIOUS_EXIT;
 extern VECTOR STORED_TAMER_POS;
 extern GsRVIEW2 GS_VIEWPOINT;
 extern int32_t MAIN_D_80185BB0[3];
@@ -62,16 +87,16 @@ extern uint8_t MAIN_D_80134DF9;
 extern int16_t MAIN_D_801386A4[16];
 extern uint32_t POLLED_INPUT;
 extern uint32_t CHANGED_INPUT;
-extern int8_t IS_SCRIPT_PAUSED;
+extern int32_t IS_SCRIPT_PAUSED;
 extern int8_t ITEM_SCOLD_FLAG;
 extern int8_t FADE_PROTECTION_FULL;
-extern int16_t CURRENT_SCRIPT_ID;
+extern uint16_t CURRENT_SCRIPT_ID;
 extern uint8_t CURRENT_SCREEN;
 extern uint8_t ACTIVE_BGM_FONT;
 extern int32_t ACTIVE_FRAMEBUFFER;
 extern void *ACTIVE_ORDERING_TABLE;
 extern uint8_t SKIP_DAYTIME_TRANSITION;
-extern uint8_t HAS_ROTATION_DATA[8];
+extern int8_t HAS_ROTATION_DATA[8];
 extern uint8_t UNKNOWN_TAMER_DATA[10];
 extern uint16_t CURRENT_FRAME;
 extern int16_t MINUTE;
@@ -80,18 +105,7 @@ extern int16_t DAY;
 extern uint8_t YEAR;
 extern int32_t MONEY;
 extern int32_t NPC_IS_WALKING_TOWARDS[8];
-extern uint8_t MAIN_D_801341FC[6];
-extern uint8_t MAIN_D_80122D80[];
-extern uint8_t MAIN_D_80122D68[];
-extern uint8_t MAIN_D_80122D94[];
-extern uint8_t MAIN_D_80122DAC[];
-extern uint8_t MAIN_D_80122DC8[];
-extern uint8_t MAIN_D_80122DDC[];
-extern uint8_t MAIN_D_80122DF4[];
-extern RECT MAIN_D_801341F4;
-extern RECT MAIN_D_80134204;
-extern RECT MAIN_D_8013420C;
-extern int32_t MAIN_D_801386A0[16];
+extern VECTOR MAIN_D_801386A0[8];
 
 
 typedef struct {
@@ -114,8 +128,8 @@ typedef struct {
 	int16_t spawnY[10];
 	int16_t spawnZ[10];
 	int16_t rotation[10];
-	uint16_t targetMap[10];
-	uint16_t targetExit[10];
+	int16_t targetMap[10];
+	int16_t targetExit[10];
 } MapWarps;
 
 extern MapWarps MAP_WARPS;
@@ -124,7 +138,6 @@ extern MapWarps MAP_WARPS;
 void startAnimation(Entity *entity, int32_t animId);
 void tickAnimation(Entity *entity);
 void entityLookAtLocation(Entity *entity, VECTOR *pos);
-void setEntityPosition(int32_t entityId, int32_t x, int32_t y, int32_t z);
 void setEntityRotation(int32_t entityId, int32_t rx, int32_t ry, int32_t rz);
 void setupEntityMatrix(int32_t entityId);
 void stopGameTime(void);
@@ -242,12 +255,12 @@ int32_t isTrainingComplete(void);
 int32_t tickEntityWalkTo(uint8_t scriptId1, uint8_t scriptId2,
 			 int32_t targetX, int32_t targetZ,
 			 int8_t withCamera);
-int32_t tickLookAtEntity(uint32_t scriptId1, uint32_t scriptId2);
-int32_t tickEntityMoveTo(uint32_t scriptId1, uint32_t scriptId2,
-			 int32_t targetX, int32_t targetZ, int32_t speed,
-			 int32_t withCamera);
-int32_t tickEntityMoveToAxis(uint32_t scriptId, int32_t target, int32_t axis,
-			     int32_t speed, int32_t withCamera);
+int32_t tickLookAtEntity(uint8_t scriptId1, uint8_t scriptId2);
+int32_t tickEntityMoveTo(uint8_t scriptId1, uint8_t scriptId2,
+			 int32_t targetX, int32_t targetZ, int8_t speed,
+			 int8_t withCamera);
+int32_t tickEntityMoveToAxis(uint8_t scriptId, int32_t target, int32_t axis,
+			     int32_t speed, int8_t withCamera);
 void loadMapEntities(uint8_t *data, int32_t mapId, int32_t warpIdx);
 void tickPickupItem(void);
 void tickTakeChest(void);
@@ -264,9 +277,56 @@ void tickBattleLostLife(void);
 void tickIdle(void);
 void tickTraining(void);
 
+static void *tamer_functions[] = {
+	renderAwardSomethingTextbox,
+	isTrainingComplete,
+	addTamerLevel,
+	checkChestCollision,
+	worldPosToScreenPos2,
+	tickEntityMoveToAxis,
+	tickEntityMoveTo,
+	tickEntitySetRotation,
+	tickLookAtEntity,
+	getEntityFromScriptId,
+	tickEntityWalkTo,
+	startAnimationTamer,
+	getTamerState,
+	setFullState,
+	advanceBattleTime,
+	startBattle,
+	renderItemPickupTextbox,
+	checkPendingAwards,
+	checkMedalConditions,
+	checkMapInteraction,
+	checkItemPickup,
+	setTamerDirection,
+	getMapRotation,
+	tickAwardSomething,
+	tickBattleLostLife,
+	tickMachinedramonSpawn,
+	tickSicknessLostLife,
+	tickEnding,
+	tickOpening,
+	tickPraiseScold,
+	tickTraining,
+	tickIdle,
+	tickTakeChest,
+	tickPickupItem,
+	tickChangeMap,
+	setTamerState,
+	tickWalkingState,
+	tickTamerOverworld,
+	setupTamerOnWarp,
+	loadMapEntities,
+	tickTamer,
+	initializeTamer,
+};
+
 void initializeTamer(int32_t id, int32_t x, int32_t y, int32_t z,
                      int32_t rx, int32_t ry, int32_t rz)
 {
+	extern void setEntityPosition(int32_t entityId, int32_t x, int32_t y,
+	                              int32_t z);
 	int32_t i;
 
 	PLAYER_SHADOW_ENABLED = 1;
@@ -347,6 +407,9 @@ void loadMapEntities(uint8_t *data, int32_t mapId, int32_t warpIdx)
 
 void setupTamerOnWarp(int32_t x, int32_t y, int32_t z, int32_t rotationY)
 {
+	extern void setEntityPosition(int32_t entityId, int32_t x, int32_t y,
+	                              int32_t z);
+
 	setEntityPosition(0, x, y, z);
 	setEntityRotation(0, TAMER_ENTITY.entity.posData->rotation.vx, rotationY,
 	                  TAMER_ENTITY.entity.posData->rotation.vz);
@@ -437,6 +500,88 @@ void tickTamerOverworld(int16_t instanceId)
 	tickAnimation(&TAMER_ENTITY.entity);
 }
 
+void tickWalkingState(void)
+{
+	int16_t rawRotation;
+	int32_t mapRotation;
+	int32_t originalRotation;
+
+	tickTamerWaypoints();
+	if ((isKeyDown(0x10) != 0) &&
+	    (IS_SCRIPT_PAUSED == 1) &&
+	    (FADE_PROTECTION == 0) &&
+	    (UI_BOX_DATA[0].state != 1) &&
+	    (UI_BOX_DATA[0].frame == 0)) {
+		addGameMenu();
+		setTamerState(1);
+		startAnimation(&TAMER_ENTITY.entity, 0);
+		unsetCameraFollowPlayer();
+		STORED_TAMER_POS.vx = TAMER_ENTITY.entity.posData->location.vx;
+		STORED_TAMER_POS.vy = TAMER_ENTITY.entity.posData->location.vy;
+		STORED_TAMER_POS.vz = TAMER_ENTITY.entity.posData->location.vz;
+		IS_IN_MENU = 1;
+		stopGameTime();
+		setPartnerIdling();
+		return;
+	}
+
+	if (((POLLED_INPUT & 0x1000) != 0) ||
+	    ((POLLED_INPUT & 0x4000) != 0) ||
+	    ((POLLED_INPUT & 0x8000) != 0) ||
+	    ((POLLED_INPUT & 0x2000) != 0)) {
+		if (((POLLED_INPUT & 8) != 0) ||
+		    ((POLLED_INPUT & 0x10) != 0)) {
+			if (TAMER_ENTITY.entity.anim.animId != 2) {
+				startAnimation(&TAMER_ENTITY.entity, 2);
+			}
+		} else if (TAMER_ENTITY.entity.anim.animId != 3) {
+			startAnimation(&TAMER_ENTITY.entity, 3);
+		}
+		ITEM_SCOLD_FLAG = 0;
+	} else if (TAMER_ENTITY.entity.anim.animId != 0) {
+		startAnimation(&TAMER_ENTITY.entity, 0);
+	}
+
+	rawRotation = getMapRotation();
+	mapRotation = rawRotation;
+	originalRotation = mapRotation;
+	mapRotation = (int16_t)(mapRotation / 0x200);
+	if ((originalRotation % 0x200) >= 0x100) {
+		mapRotation = (int16_t)(mapRotation + 1);
+	}
+	mapRotation = (int16_t)(mapRotation * 0x200);
+
+	if ((POLLED_INPUT & 0x1000) != 0) {
+		if ((POLLED_INPUT & 0x8000) != 0) {
+			setTamerDirection((int16_t)(mapRotation + 0x600));
+		} else if ((POLLED_INPUT & 0x2000) != 0) {
+			setTamerDirection((int16_t)(mapRotation + 0xa00));
+		} else {
+			setTamerDirection((int16_t)(mapRotation + 0x800));
+		}
+	} else if ((POLLED_INPUT & 0x4000) != 0) {
+		if ((POLLED_INPUT & 0x8000) != 0) {
+			setTamerDirection((int16_t)(mapRotation + 0x200));
+		} else if ((POLLED_INPUT & 0x2000) != 0) {
+			setTamerDirection((int16_t)(mapRotation + 0xe00));
+		} else {
+			setTamerDirection((int16_t)mapRotation);
+		}
+	} else if ((POLLED_INPUT & 0x8000) != 0) {
+		setTamerDirection((int16_t)(mapRotation + 0x400));
+	} else if ((POLLED_INPUT & 0x2000) != 0) {
+		setTamerDirection((int16_t)(mapRotation + 0xc00));
+	}
+
+	checkItemPickup();
+	checkMapInteraction();
+	checkMedalConditions();
+	checkPendingAwards();
+	STORED_TAMER_POS.vx = TAMER_ENTITY.entity.posData->location.vx;
+	STORED_TAMER_POS.vy = TAMER_ENTITY.entity.posData->location.vy;
+	STORED_TAMER_POS.vz = TAMER_ENTITY.entity.posData->location.vz;
+}
+
 int16_t getMapRotation(void)
 {
 	int16_t dz;
@@ -456,9 +601,112 @@ void setTamerDirection(int32_t direction)
 	TAMER_ENTITY.entity.posData->rotation.vy = (int16_t)direction;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/tamer", checkItemPickup);
+void checkItemPickup(void)
+{
+	DroppedItem *item;
+	int32_t i;
+	int16_t tileX;
+	int16_t tileY;
 
-INCLUDE_ASM("asm/main/nonmatchings/tamer", checkMapInteraction);
+	getModelTile(&TAMER_ENTITY.entity.posData->location, &tileX, &tileY);
+	PICKUP_ITEM_TYPE = 0xff;
+
+	item = DROPPED_ITEMS;
+	i = 0;
+	while (i < 11) {
+		if (item->worldItem.type != 0xff) {
+			goto populated;
+		}
+		item++;
+		goto increment;
+
+	populated:
+		if ((item->tileX < tileX - 1) ||
+		    (tileX + 1 < item->tileX)) {
+			goto next;
+		}
+		if ((item->tileY < tileY - 1) ||
+		    (tileY + 1 < item->tileY)) {
+			goto next;
+		}
+
+		PICKUP_ITEM_TYPE = i;
+		if (IS_STANDING_ON_DROP != 1) {
+			setTamerState(7);
+			IS_STANDING_ON_DROP = 1;
+		}
+		break;
+
+	next:
+		item++;
+	increment:
+		i++;
+	}
+
+	if (PICKUP_ITEM_TYPE == 0xff) {
+		IS_STANDING_ON_DROP = 0;
+	}
+}
+
+void checkMapInteraction(void)
+{
+	int16_t collision;
+	uint8_t trigger;
+
+	collision = entityCheckCollision(&PARTNER_ENTITY.digimonEntity.entity,
+	                                 &TAMER_ENTITY.entity, 0, 0);
+	if ((collision >= 2) && (collision < 10)) {
+		TAMER_ENTITY.entity.anim.animFlag |= 2;
+		if (((NPC_ENTITIES[collision - 2].autotalk == 1) ||
+		     ((NPC_ENTITIES[collision - 2].autotalk == 0) &&
+		      ((CHANGED_INPUT & 0x40) != 0))) &&
+		    (IS_SCRIPT_PAUSED == 1)) {
+			TALKED_TO_ENTITY = collision;
+			removeTriangleMenu();
+			closeInventoryBoxes();
+			removeUIBox1();
+			callScriptSection(CURRENT_SCRIPT_ID,
+			                  NPC_ENTITIES[TALKED_TO_ENTITY - 2].scriptId, 1);
+		}
+	} else if (collision == 10) {
+		collisionGrace(0, ENTITY_TABLE[0], 0, 0);
+	}
+
+	if (TAMER_STATE != 0) {
+		return;
+	}
+
+	trigger = getTileTrigger(&ENTITY_TABLE[0]->posData->location);
+	if (trigger == 120) {
+		if (((PARTNER_PARA.condition & 8) != 0) &&
+		    (IS_SCRIPT_PAUSED == 1)) {
+			callScriptSection(0, 0x4e2, 0);
+		}
+	} else if ((trigger >= 110) && (trigger < 120)) {
+		TARGET_MAP = MAP_WARPS.targetMap[trigger - 110];
+		MAIN_D_80134DF9 = trigger - 110;
+		CURRENT_EXIT = MAP_WARPS.targetExit[trigger - 110];
+		PREVIOUS_EXIT = trigger - 110;
+		setTamerState(5);
+		unsetCameraFollowPlayer();
+		stopGameTime();
+	} else if ((trigger > 50) && (trigger < 80)) {
+		if (IS_SCRIPT_PAUSED == 1) {
+			callScriptSection(CURRENT_SCRIPT_ID, trigger, 0);
+		}
+	} else if ((trigger >= 80) && (trigger < 110)) {
+		if (((CHANGED_INPUT & 0x40) != 0) &&
+		    (IS_SCRIPT_PAUSED == 1)) {
+			callScriptSection(CURRENT_SCRIPT_ID, trigger, 0);
+		}
+	}
+
+	trigger = checkChestCollision();
+	if ((trigger != 0xff) && ((CHANGED_INPUT & 0x40) != 0)) {
+		INTERACTED_CHEST = trigger;
+		setTamerState(14);
+	}
+}
 
 void checkMedalConditions(void)
 {
@@ -751,9 +999,49 @@ int32_t tickEntityWalkTo(uint8_t scriptId, uint8_t targetId, int32_t x, int32_t 
 	return 0;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/tamer", getEntityFromScriptId);
+int32_t tickLookAtEntity(uint8_t scriptId1, uint8_t scriptId2)
+{
+	Entity *value;
+	int8_t entityId;
+	int32_t i;
+	int16_t rotX;
+	int16_t rotZ;
+	int16_t rotY;
 
-INCLUDE_ASM("asm/main/nonmatchings/tamer", tickLookAtEntity);
+	if (scriptId1 == 0xfd) {
+		entityId = 0;
+	} else if (scriptId1 == 0xfc) {
+		entityId = 1;
+	} else {
+		for (i = 0; i < 8; i++) {
+			if (scriptId1 == NPC_ENTITIES[i].scriptId) {
+				entityId = i + 2;
+				break;
+			}
+		}
+	}
+
+	value = 0;
+	switch (HAS_ROTATION_DATA[entityId]) {
+	case 0:
+		MAIN_D_801386A0[entityId] =
+			getEntityFromScriptId(&scriptId2)->posData->location;
+		HAS_ROTATION_DATA[entityId] = 1;
+		break;
+	case 1:
+		value = getEntityFromScriptId(&scriptId1);
+		getRotationDifference(value->posData,
+		                      &MAIN_D_801386A0[entityId],
+		                      &rotX, &rotY, &rotZ);
+		value = (Entity *)rotateEntity(&value->posData->rotation, &rotX,
+		                               &rotY, &rotZ, 0x200);
+		if ((int32_t)value == 1) {
+			HAS_ROTATION_DATA[entityId] = 0;
+		}
+		break;
+	}
+	return (int32_t)value;
+}
 
 int32_t tickEntitySetRotation(uint32_t scriptId, int16_t rotationY)
 {
@@ -764,9 +1052,150 @@ int32_t tickEntitySetRotation(uint32_t scriptId, int16_t rotationY)
 	return 1;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/tamer", tickEntityMoveTo);
+int32_t tickEntityMoveTo(uint8_t scriptId1, uint8_t scriptId2,
+			 int32_t targetX, int32_t targetZ, int8_t speed,
+			 int8_t withCamera)
+{
+	extern void setEntityPosition(int32_t entityId, int32_t x, long y,
+	                              int32_t z);
+	Entity *entity;
+	Entity *targetEntity;
+	PositionData *position;
+	int8_t finishedX;
+	int8_t finishedZ;
+	int32_t destinationX;
 
-INCLUDE_ASM("asm/main/nonmatchings/tamer", tickEntityMoveToAxis);
+	destinationX = targetX;
+	entity = getEntityFromScriptId(&scriptId1);
+	if (PREVIOUS_CAMERA_POS_INITIALIZED == 0) {
+		if (scriptId2 == 0xff) {
+			MOVE_TO_DELTA_X =
+				(targetX - entity->posData->location.vx) / speed;
+			MAIN_D_80134C9A =
+				(targetZ - entity->posData->location.vz) / speed;
+		} else {
+			targetEntity = getEntityFromScriptId(&scriptId2);
+			MOVE_TO_DELTA_X =
+				(targetEntity->posData->location.vx -
+				 entity->posData->location.vx) / speed;
+			MAIN_D_80134C9A =
+				(targetEntity->posData->location.vz -
+				 entity->posData->location.vz) / speed;
+		}
+		PREVIOUS_CAMERA_POS_INITIALIZED = 1;
+		PREVIOUS_CAMERA_POS = entity->posData->location;
+	} else {
+		position = entity->posData;
+		setEntityPosition(scriptId1,
+		                  position->location.vx + MOVE_TO_DELTA_X,
+		                  position->location.vy,
+		                  position->location.vz + MAIN_D_80134C9A);
+		setupEntityMatrix(scriptId1);
+
+		finishedX = finishedZ = 0;
+		if (MOVE_TO_DELTA_X < 0) {
+			if (entity->posData->location.vx <= destinationX) {
+				entity->posData->location.vx = destinationX;
+				finishedX = 1;
+			}
+		} else if (entity->posData->location.vx >= destinationX) {
+			entity->posData->location.vx = destinationX;
+			finishedX = 1;
+		}
+
+		if (MAIN_D_80134C9A < 0) {
+			if (entity->posData->location.vz <= targetZ) {
+				entity->posData->location.vz = targetZ;
+				finishedZ = 1;
+			}
+		} else if (entity->posData->location.vz >= targetZ) {
+			entity->posData->location.vz = targetZ;
+			finishedZ = 1;
+		}
+
+		if ((finishedX == 1) && (finishedZ == 1)) {
+			PREVIOUS_CAMERA_POS_INITIALIZED = 0;
+			return 1;
+		}
+	}
+
+	if (withCamera == 1) {
+		moveCameraByDiff(&PREVIOUS_CAMERA_POS,
+		                 &entity->posData->location);
+		PREVIOUS_CAMERA_POS = entity->posData->location;
+	}
+	return 0;
+}
+
+int32_t tickEntityMoveToAxis(uint8_t scriptId, int32_t target, int32_t axis,
+			     int32_t speed, int8_t withCamera)
+{
+	extern void setEntityPosition(int32_t entityId, int32_t x, int32_t y,
+	                              int32_t z);
+	Entity *entity;
+	long *axisValue;
+
+	entity = getEntityFromScriptId(&scriptId);
+	if (axis == 0) {
+		axisValue = &entity->posData->location.vx;
+	} else if (axis == 1) {
+		axisValue = &entity->posData->location.vy;
+	} else {
+		axisValue = &entity->posData->location.vz;
+	}
+
+	if (PREVIOUS_CAMERA_POS_INITIALIZED == 0) {
+		MOVE_TO_DELTA_X = (target - *axisValue) / speed;
+		PREVIOUS_CAMERA_POS = entity->posData->location;
+		PREVIOUS_CAMERA_POS_INITIALIZED = 1;
+	} else {
+		*axisValue += MOVE_TO_DELTA_X;
+		setEntityPosition(scriptId, entity->posData->location.vx,
+		                  entity->posData->location.vy,
+		                  entity->posData->location.vz);
+		setupEntityMatrix(scriptId);
+
+		if (MOVE_TO_DELTA_X < 0) {
+			if (*axisValue <= target) {
+				*axisValue = target;
+				PREVIOUS_CAMERA_POS_INITIALIZED = 0;
+				return 1;
+			}
+		} else if (*axisValue >= target) {
+			*axisValue = target;
+			PREVIOUS_CAMERA_POS_INITIALIZED = 0;
+			return 1;
+		}
+	}
+
+	if (withCamera == 1) {
+		moveCameraByDiff(&PREVIOUS_CAMERA_POS,
+		                 &entity->posData->location);
+		PREVIOUS_CAMERA_POS = entity->posData->location;
+	}
+	return 0;
+}
+
+Entity *getEntityFromScriptId(uint8_t *scriptId)
+{
+	int32_t i;
+
+	if (*scriptId == 0xfd) {
+		*scriptId = 0;
+		return ENTITY_TABLE[0];
+	}
+	if (*scriptId == 0xfc) {
+		*scriptId = 1;
+		return ENTITY_TABLE[1];
+	}
+	for (i = 0; i < 8; i++) {
+		if ((ENTITY_TABLE[i + 2] != 0) &&
+		    (*scriptId == NPC_ENTITIES[i].scriptId)) {
+			*scriptId = i + 2;
+			return ENTITY_TABLE[i + 2];
+		}
+	}
+}
 
 static inline int16_t tamer_s16(int16_t a)
 {
@@ -857,8 +1286,6 @@ void renderAwardSomethingTextbox(int32_t instanceId)
 	renderUIBox(1);
 	++TEXTBOX_OPEN_TIMER;
 }
-
-INCLUDE_ASM("asm/main/nonmatchings/tamer", tickWalkingState);
 
 void setTamerState(int8_t state)
 {

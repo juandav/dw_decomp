@@ -92,6 +92,7 @@ MAIN_SRC := \
 	src/main/bubble.c \
 	src/main/butterfly.c \
 	src/main/clock.c \
+	src/main/door_mapdata.c \
 	src/main/efe_table.c \
 	src/main/evl.c \
 	src/main/evolution.c \
@@ -143,6 +144,7 @@ MAIN_SRC := \
 	src/main/sound.c \
 	src/main/sound_async.c \
 	src/main/tamer.c \
+	src/main/toilet_data.c \
 	src/main/tournament.c \
 	src/main/ui.c \
 	src/main/utils.c \

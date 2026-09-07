@@ -80,6 +80,59 @@ typedef struct {
 	int8_t a;
 } FlashParams;
 
+uint8_t MAIN_D_80123370[56] = {
+	0x78, 0x50, 0x80, 0x80, 0x0f, 0x0f, 0x78, 0x50,
+	0xc0, 0x80, 0x0f, 0x0f, 0xc8, 0x50, 0x80, 0x90,
+	0x1f, 0x07, 0xc8, 0x96, 0x80, 0x80, 0x0f, 0x0f,
+	0xc8, 0x96, 0xc0, 0x80, 0x0f, 0x0f, 0xfa, 0x64,
+	0x80, 0x90, 0x1f, 0x07, 0x64, 0x64, 0x80, 0x80,
+	0x0f, 0x0f, 0x64, 0x64, 0xc0, 0x80, 0x0f, 0x0f,
+	0xc8, 0x64, 0x80, 0x90, 0x1f, 0x07, 0x00, 0x00,
+};
+
+GsSPRITE CLOUD_FX_SPRITE = {
+	0x50000000,
+	0, 0,
+	32, 32,
+	0x3c,
+	0, 128,
+	192, 488,
+	128, 128, 128,
+	16, 16,
+	0, 0,
+	0,
+};
+
+int8_t MAIN_D_801233CC[16] = {
+	0x00, 0x00, 0x20, 0x20, 0x20, 0x40, 0x40, 0x40,
+	0x40, 0x40, 0x60, 0x60, 0x60, 0x60, 0x00, 0x00,
+};
+int16_t MAIN_D_801233DC[18] = {
+	-50, -54, -58, -62, -66, -70, -74, -78, -82,
+	-86, -90, -93, -96, -99, -50, -50, -50, -994,
+};
+int16_t MAIN_D_80123400[14] = {
+	0x2000, 0x2ee0, 0x3840, 0x4000, 0x4000, 0x5000, 0x5000,
+	0x5000, 0x5000, 0x5400, 0x5800, 0x5c00, 0x6000, 0x6400,
+};
+uint8_t MAIN_D_8012341C[16] = {
+	0x80, 0x80, 0x80, 0x80, 0x79, 0x73, 0x6c, 0x66,
+	0x60, 0x59, 0x53, 0x4c, 0x46, 0x40, 0x00, 0x00,
+};
+char MAIN_D_8012342C[16] = "ETCHI\\EFEDAT.EFE";
+uint32_t MAIN_D_8012343C[4] = {0};
+
+static void *efe_data_order[] = {
+	MAIN_D_8012343C,
+	MAIN_D_8012342C,
+	MAIN_D_8012341C,
+	MAIN_D_80123400,
+	MAIN_D_801233DC,
+	MAIN_D_801233CC,
+	&CLOUD_FX_SPRITE,
+	MAIN_D_80123370,
+};
+
 void setShortWithStride();
 void getDrawingOffsetCopy(int32_t *x, int32_t *y);
 int32_t isTamerOnScreen(void);
@@ -120,8 +173,6 @@ void renderParticleFlash();
 
 extern int16_t MAIN_D_80138AA4[];
 extern int16_t MAIN_D_801389B4[];
-extern uint32_t MAIN_D_8012343C[];
-extern char MAIN_D_8012342C[];
 extern char MAIN_D_80134220[4];
 extern u_long SOME_IMAGE_DATA[];
 extern uint8_t MAIN_D_801387B8[];
@@ -133,15 +184,9 @@ extern int32_t FLASH_INSTANCE;
 extern int32_t DRAWING_OFFSET_X;
 extern int32_t DRAWING_OFFSET_Y;
 extern int32_t VIEWPORT_DISTANCE;
-extern GsSPRITE CLOUD_FX_SPRITE;
-extern uint8_t MAIN_D_80123370[];
 extern int8_t MAIN_D_80134214[4];
 extern uint8_t MAIN_D_8013421C[4];
 extern int8_t MAIN_D_80134218[4];
-extern int8_t MAIN_D_801233CC[];
-extern int16_t MAIN_D_801233DC[];
-extern int16_t MAIN_D_80123400[];
-extern uint8_t MAIN_D_8012341C[];
 
 static void *efe_functions[] = {
 	renderParticleFlash,

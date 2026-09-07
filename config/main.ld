@@ -421,13 +421,14 @@ SECTIONS
         . = ALIGN(., 4);
         build/asm/main/data/partner_impl.data.s.o(.data.*)
         . = ALIGN(., 4);
-        KEEP(build/asm/main/data/tamer.data.s.o(.data.*))
+        build/src/main/tamer.c.o(.data.*)
+        build/src/main/toilet_data.c.o(.data.*)
+        build/src/main/door_mapdata.c.o(.data.*)
+        build/src/main/efe.c.o(.data.*)
         . = ALIGN(., 4);
         build/src/main/fade.c.o(.data.*)
         . = ALIGN(., 4);
         build/src/main/aabb.c.o(.data.*)
-        . = ALIGN(., 4);
-        build/src/main/efe.c.o(.data.*)
         . = ALIGN(., 4);
         KEEP(build/asm/main/data/psyq/libcd.data.s.o(.data.*))
         . = ALIGN(., 4);
@@ -535,7 +536,7 @@ SECTIONS
         . = ALIGN(., 4);
         build/asm/main/data/partner_impl.sdata.s.o(.sdata.*)
         . = ALIGN(., 4);
-        KEEP(build/asm/main/data/tamer.sdata.s.o(.sdata.*))
+        build/src/main/tamer.c.o(.sdata.*)
         . = ALIGN(., 4);
         build/asm/main/data/efe.sdata.s.o(.sdata.*)
         . = ALIGN(., 4);
