@@ -1,6 +1,7 @@
 #include <libgpu.h>
 #include <libgte.h>
 
+#include <dw/attack_object.h>
 #include <dw/combat.h>
 #include <dw/entity.h>
 #include <dw/item.h>
@@ -9,15 +10,6 @@
 #include <dw/params.h>
 #include <dw/types.h>
 #include <dw/vs.h>
-
-typedef struct {
-	int32_t victimId;
-	int32_t unk1;
-	SVECTOR position;
-	int32_t effectId;
-	int32_t unk3;
-	int32_t casterId;
-} AttackObject;
 
 typedef struct {
 	int16_t score[5];

@@ -4,6 +4,7 @@
 #include <libgs.h>
 #include <mwinline_n.h>
 
+#include <dw/attack_object.h>
 #include <dw/combat.h>
 #include <dw/entity.h>
 #include <dw/main.h>
@@ -86,7 +87,6 @@ void removeStaticUIBox(int32_t id);
 void VS_initializeVS(void);
 void loadStackedTIMFile(char *path);
 void resetFlattenGlobal(void);
-void initializeAttackObjects(void);
 void removeEntityText(int32_t id);
 void VS_addFighterCounter(int32_t seconds);
 void VS_addFighterStatusBars(int32_t id);

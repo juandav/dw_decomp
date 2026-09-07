@@ -9,6 +9,7 @@
 #include <mwinline_n.h>
 
 #include <dw/aabb.h>
+#include <dw/attack_object.h>
 #include <dw/btl.h>
 #include <dw/efe.h>
 #include <dw/graphics.h>
@@ -121,7 +122,6 @@ CdlLOC *getEFEDATEntry(int32_t id);
 int32_t addFileReadRequest(char *path, uint8_t *buffer, uint8_t *isRunning, void *callback, void *callbackParam, CdlLOC *loc, int32_t size);
 void BTL_renderPoisonBubble(int32_t i);
 void unloadModel(int32_t id, int32_t flag);
-int32_t addAttackObject(int32_t a, int32_t b, int16_t *rect, int32_t d, int32_t e, int32_t f);
 int32_t MAIN_func_800DA740(int16_t *rect, DVECTOR *line);
 void BTL_applyLineAttackHit(void);
 void BTL_renderRadialWaves(void);
@@ -1393,7 +1393,7 @@ void BTL_applyBoxAttackHit(void)
 			}
 			((DigimonEntity *)ENTITY_TABLE[idx])->stats.current.isHit = 1;
 
-			addAttackObject(MAIN_D_80134CD8, 1, (int16_t *)&center, (int32_t)((uint32_t)(char *)MAIN_D_80134CD4), r, j);
+			addAttackObject(MAIN_D_80134CD8, 1, &center, (int32_t)((uint32_t)(char *)MAIN_D_80134CD4), r, j);
 			*out = 1;
 			return;
 		}
@@ -1457,7 +1457,7 @@ void BTL_applyLineAttackHit(void)
 		((DigimonEntity *)ENTITY_TABLE[MAIN_D_80134CD8])->stats.current.isHit = 1;
 		BTL_calculateAttackHitPosition(&pos, (int32_t *)e, ((int32_t **)MAIN_D_80134CE8)[4], DIGIMON_DATA[*(int32_t *)e].radius);
 		pos.vy = *(int32_t *)((int32_t)EFE_INSTANCE + 8);
-		addAttackObject(MAIN_D_80134CD8, 1, (int16_t *)&pos, (int32_t)((uint32_t)(char *)MAIN_D_80134CD4), MAIN_D_80134CD0, j);
+		addAttackObject(MAIN_D_80134CD8, 1, &pos, (int32_t)((uint32_t)(char *)MAIN_D_80134CD4), MAIN_D_80134CD0, j);
 		*out = 1;
 		return;
 	}
@@ -3456,7 +3456,7 @@ void BTL_addAttackObjectToTarget(void)
 		}
 	}
 
-	addAttackObject(i, 1, pos, MAIN_D_80134CD4, MAIN_D_80134CD0, j);
+	addAttackObject(i, 1, (SVECTOR *)pos, MAIN_D_80134CD4, MAIN_D_80134CD0, j);
 }
 
 void BTL_setTransformToTargetBone(void)
@@ -4887,7 +4887,7 @@ void BTL_tickAuraProjectile(int32_t id)
 		}
 	}
 	((DigimonEntity *)e)->stats.current.isHit = 1;
-	addAttackObject(idx, 1, (int16_t *)&a->position, 0x179, 0, j);
+	addAttackObject(idx, 1, &a->position, 0x179, 0, j);
 	a->frame = -1;
 	removeObject(0x179, (int16_t)id);
 }

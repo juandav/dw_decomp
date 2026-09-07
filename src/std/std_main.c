@@ -10,6 +10,7 @@
 #include <mwinline_n.h>
 
 #include <dw/aabb.h>
+#include <dw/attack_object.h>
 #include <dw/clock.h>
 #include <dw/combat.h>
 #include <dw/entity.h>
@@ -25,15 +26,6 @@
 #include <dw/world_object.h>
 
 #include "common.h"
-
-typedef struct {
-	int32_t victimId;
-	int32_t unk1;
-	SVECTOR position;
-	int32_t effectId;
-	int32_t unk3;
-	int32_t casterId;
-} AttackObject;
 
 typedef struct {
 	int16_t score[5];
@@ -401,7 +393,6 @@ void STD_func_80064FCC(unsigned short count);
 int16_t BTL_calculateHitChance(DigimonEntity *attacker, DigimonEntity *defender, FighterData *fighter, int16_t move);
 void BTL_retargetAfterHit(DigimonEntity *digimon, FighterData *fighter, AttackObject attack);
 void BTL_startQueuedMove(DigimonEntity *digimon, DigimonEntity *target, FighterData *fighter);
-int32_t popAttackObject(uint8_t entityId, AttackObject *out);
 int32_t STD_isPositionNearEntity(Entity *entity, VECTOR *pos);
 int32_t BTL_isMoveOnCooldown(Entity *entity, FighterData *fighter);
 void BTL_setupMoveExecution(DigimonEntity *digimon, DigimonEntity *target, FighterData *fighter);

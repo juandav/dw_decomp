@@ -8,6 +8,7 @@
 #include <libgte.h>
 
 #include <dw/aabb.h>
+#include <dw/attack_object.h>
 #include <dw/clock.h>
 #include <dw/combat.h>
 #include <dw/efe.h>
@@ -104,7 +105,6 @@ int32_t add3DSpritePrim(POLY_FT4 *poly, SVECTOR *v0, SVECTOR *v1, SVECTOR *v2, S
 void renderSprite(GsSPRITE *sprite, int16_t x, int16_t y, int32_t distance, int32_t width, int32_t height);
 void translateConditionFXToEntity(Entity *entity, SVECTOR *out);
 void unloadModel(int32_t id, int32_t flag);
-int32_t addAttackObject(int32_t a, int32_t b, int16_t *rect, int32_t d, int32_t e, int32_t f);
 int32_t MAIN_func_800DA740(int16_t *rect, DVECTOR *line);
 char *initializeFlashData(char *base);
 void renderParticleFlash(int16_t *params);
@@ -1434,7 +1434,7 @@ void STD_applyBoxAttackHit(void)
 			}
 			((int8_t *)ENTITY_TABLE[idx])[0x53] = 1;
 
-			addAttackObject(MAIN_D_80134CD8, 1, (int16_t *)&center, (int32_t)((uint32_t)(char *)MAIN_D_80134CD4), r, j);
+			addAttackObject(MAIN_D_80134CD8, 1, &center, (int32_t)((uint32_t)(char *)MAIN_D_80134CD4), r, j);
 			*out = 1;
 			return;
 		}
@@ -1498,7 +1498,7 @@ void STD_applyLineAttackHit(void)
 		((int8_t *)ENTITY_TABLE[MAIN_D_80134CD8])[0x53] = 1;
 		STD_calculateAttackHitPosition(&pos, (int32_t *)e, ((int32_t **)MAIN_D_80134CE8)[4], DIGIMON_DATA[*(int32_t *)e].radius);
 		pos.vy = *(int32_t *)((int32_t)EFE_INSTANCE + 8);
-		addAttackObject(MAIN_D_80134CD8, 1, (int16_t *)&pos, (int32_t)((uint32_t)(char *)MAIN_D_80134CD4), MAIN_D_80134CD0, j);
+		addAttackObject(MAIN_D_80134CD8, 1, &pos, (int32_t)((uint32_t)(char *)MAIN_D_80134CD4), MAIN_D_80134CD0, j);
 		*out = 1;
 		return;
 	}
@@ -3176,7 +3176,7 @@ void STD_addAttackObjectToTarget(void)
 		}
 	}
 
-	addAttackObject(i, 1, pos, MAIN_D_80134CD4, MAIN_D_80134CD0, j);
+	addAttackObject(i, 1, (SVECTOR *)pos, MAIN_D_80134CD4, MAIN_D_80134CD0, j);
 }
 
 void STD_setTransformToTargetBone(void)
@@ -4437,7 +4437,7 @@ void STD_tickAuraProjectile(int32_t id)
 		}
 	}
 	((int8_t *)e)[0x53] = 1;
-	addAttackObject(idx, 1, (int16_t *)&a->position, 0x179, 0, j);
+	addAttackObject(idx, 1, &a->position, 0x179, 0, j);
 	a->frame = -1;
 	removeObject(0x179, (int16_t)id);
 }

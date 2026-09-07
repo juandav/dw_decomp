@@ -3,6 +3,7 @@
 #include <libgte.h>
 #include <mwinline_n.h>
 
+#include <dw/attack_object.h>
 #include <dw/btl.h>
 #include <dw/combat.h>
 #include <dw/item.h>
@@ -19,15 +20,6 @@ typedef struct {
 	int16_t enemies[5];
 	int16_t count;
 } TargetChoice;
-
-typedef struct {
-	int32_t victimId;
-	int32_t unk1;
-	SVECTOR position;
-	int32_t effectId;
-	int32_t unk3;
-	int32_t casterId;
-} AttackObject;
 
 typedef struct {
 	int16_t score[5];
@@ -112,7 +104,6 @@ void BTL_startQueuedMove(DigimonEntity *digimon, DigimonEntity *target, FighterD
 void addPartnerWaypoint(int16_t index, int8_t x, int8_t y);
 void MAIN_func_800D39F8(void);
 void BTL_removeFinisherAura(int32_t arg0);
-int32_t popAttackObject(uint8_t entityId, AttackObject *out);
 int32_t isFiveTileWidePathOpen(int32_t x1, int32_t y1, int32_t x2, int32_t y2);
 void BTL_addAuraProjectile(Entity *entity);
 void BTL_handleHitReaction(Entity *entity, FighterData *fighter, AttackObject *attack, int16_t index);

@@ -7,6 +7,7 @@
 #include <libgpu.h>
 #include <libgs.h>
 
+#include <dw/attack_object.h>
 #include <dw/combat.h>
 #include <dw/entity.h>
 #include <dw/item.h>
@@ -122,7 +123,6 @@ void PadInit(int32_t mode);
 long MemCardInit(long val);
 long MemCardStart(void);
 void initializeGsTMDMap(void);
-void initializeAttackObjects(void);
 void initializeFontCLUT(void);
 void initializeScripts(void);
 void initializeStatusObjects(void);
