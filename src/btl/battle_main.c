@@ -880,7 +880,7 @@ void BTL_resetFlatten(int16_t index)
 
 	entity = ENTITY_TABLE[COMBAT_DATA_PTR->player.entityIds[index]];
 	fighter = &COMBAT_DATA_PTR->fighter[index];
-	*(int8_t *)&entity->flatSprite = -1;
+	entity->flatSprite = -1;
 	fighter->flags &= 0xfff7;
 	fighter->flatTimer = 0;
 	if (entity->type != 0x71) {
@@ -2834,7 +2834,7 @@ void BTL_tickStatusEffects(void)
 				}
 				break;
 			case 3:
-				*(int8_t *)&entity->flatSprite = -1;
+				entity->flatSprite = -1;
 				break;
 			case 0:
 				fighter->flags &= 0xffb7;

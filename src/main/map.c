@@ -12,6 +12,7 @@
 #include <dw/file.h>
 #include <dw/map.h>
 #include <dw/math.h>
+#include <dw/model.h>
 #include <dw/params.h>
 #include <dw/partner.h>
 #include <dw/script.h>
@@ -81,7 +82,6 @@ int32_t loadMapSounds(int32_t mapSoundId);
 void loadTrainingPoop(void);
 void loadWarpCrystals(int32_t mapId);
 int32_t readFile(char *path, void *dest);
-void removeEntity(int32_t type, int32_t entityId);
 void removeMapEntities(void);
 void renderMapOverlays(int8_t *instances, int32_t screenX, int16_t screenY);
 void renderPoop(int32_t instanceId);
@@ -90,7 +90,6 @@ void runMapHeadScript(int32_t section);
 void setPosDataPolyFT4(POLY_FT4 *prim, int16_t posX, int16_t posY, int16_t width, int16_t height);
 void setUVDataPolyFT4(POLY_FT4 *prim, int32_t uPos, int32_t vPos, int32_t width, int32_t height);
 void startBattleIdleAnimation(DigimonEntity *entity, Stats *stats, int32_t flags);
-void thunkUnloadModel(int32_t id, int32_t modelType);
 void tickFileReadQueue(int32_t instanceId);
 void unloadMapParts(void);
 

@@ -110,7 +110,6 @@ typedef struct {
 
 void setRotTransMatrix(MATRIX *m);
 void setMapLayerEnabled(int32_t enabled);
-void removeObject(int32_t objectId, int32_t instanceId);
 void GsGetTimInfo(unsigned long *tim, GsIMAGE *img);
 void MAIN_func_80092B60(POLY_FT4 *prim);
 void addScreenPolyFT3(void *prim, SVECTOR *v0, SVECTOR *v1, SVECTOR *v2);
@@ -121,7 +120,6 @@ void translateConditionFXToEntity(Entity *entity, SVECTOR *out);
 CdlLOC *getEFEDATEntry(int32_t id);
 int32_t addFileReadRequest(char *path, uint8_t *buffer, uint8_t *isRunning, void *callback, void *callbackParam, CdlLOC *loc, int32_t size);
 void BTL_renderPoisonBubble(int32_t i);
-void unloadModel(int32_t id, int32_t flag);
 int32_t MAIN_func_800DA740(int16_t *rect, DVECTOR *line);
 void BTL_applyLineAttackHit(void);
 void BTL_renderRadialWaves(void);
@@ -155,7 +153,6 @@ int32_t customRandom(int32_t a, int32_t b);
 int32_t BTL_addPoisonBubble(int32_t arg);
 int32_t getDistance(int32_t x, int32_t y, int32_t z);
 void createCloudFX(int16_t *pos);
-void addObject(int32_t objectId, int32_t instanceId, void *tick, void *render);
 void BTL_removeFinisherAura(int32_t index);
 int32_t addEntityParticleFX(int32_t *typePtr, int32_t timer);
 void setShortWithStride(int16_t *ptr, int16_t value, int32_t count, int32_t stride);
@@ -397,7 +394,6 @@ extern VECTOR BTL_D_800737FC;
 extern GsSPRITE BTL_POISON_BUBBLE_SPRITE;
 extern int8_t MAIN_D_801347AC[6];
 extern VECTOR BTL_D_8007375C;
-extern ModelComponent UNKNOWN_MODEL[16];
 extern int32_t (*BTL_D_800736EC[])(int32_t);
 extern void (*BTL_D_8007364C[][8])(int32_t *);
 extern int32_t MAIN_D_801350D4;
@@ -1207,7 +1203,7 @@ char *BTL_initializeEFEEngine(char *base)
 	base = (char *)((int32_t)base + (4 - ((int32_t)base & 3)));
 	MAIN_D_80134D18 = (int32_t)base;
 	MAIN_D_80134D14 = (int32_t)base;
-	addObject(0x500, 0, BTL_tickEFEEngine, BTL_renderEFEEngine);
+	addObject(0x500, 0, (TickFunction)BTL_tickEFEEngine, (RenderFunction)BTL_renderEFEEngine);
 	BTL_initializeEFESubOpcodeTable();
 	base = (char *)((int32_t)base + 0x41000);
 	BTL_clearEFESoundChannels();
@@ -4310,7 +4306,7 @@ int32_t BTL_addPoisonEffect(int32_t arg)
 	p = BTL_D_800750D0[i];
 	p[0] = 0;
 	*(int32_t *)&p[2] = arg;
-	addObject(0x808, i, BTL_tickPoisonEffect, BTL_renderPoisonEffect);
+	addObject(0x808, i, BTL_tickPoisonEffect, (RenderFunction)BTL_renderPoisonEffect);
 
 	return i;
 }

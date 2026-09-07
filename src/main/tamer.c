@@ -15,6 +15,7 @@
 #include <dw/main.h>
 #include <dw/map.h>
 #include <dw/math.h>
+#include <dw/model.h>
 #include <dw/murd.h>
 #include <dw/params.h>
 #include <dw/partner.h>
@@ -70,7 +71,6 @@ extern int32_t MAIN_D_80185BB0[3];
 extern int32_t MAIN_D_80185BB4[3];
 extern int32_t MAIN_D_80185BBC[3];
 
-extern int32_t PLAYER_SHADOW_ENABLED;
 extern uint8_t PICKUP_ITEM_TYPE;
 extern uint8_t RECEIVED_ITEM_TYPE;
 extern int8_t INTERACTED_CHEST;
@@ -138,7 +138,6 @@ extern MapWarps MAP_WARPS;
 void startAnimation(Entity *entity, int32_t animId);
 void tickAnimation(Entity *entity);
 void entityLookAtLocation(Entity *entity, VECTOR *pos);
-void setEntityRotation(int32_t entityId, int32_t rx, int32_t ry, int32_t rz);
 void setupEntityMatrix(int32_t entityId);
 void stopGameTime(void);
 void startGameTime(void);
@@ -146,15 +145,12 @@ void fadeToBlack(int32_t frames);
 void fadeFromBlack(int32_t frames);
 void changeMap(uint8_t mapId, uint8_t exitId);
 void addMapNameObject(uint8_t mapId);
-int32_t removeObject(int32_t objectId, int32_t instanceId);
 void checkMapInteraction(void);
 void renderString(int32_t, int32_t, int32_t, int32_t, int32_t, int32_t,
                   int32_t, int32_t, int32_t);
 void renderUIBox(int32_t id);
 void setMapLayerEnabled(int32_t enabled);
 int32_t isSoundLoaded(int32_t isAsync, int32_t soundId);
-void thunkLoadMMD(int32_t id, int32_t type);
-void initializeDigimonObject(int32_t id, int32_t type, TickFunction tick);
 void drawString(char *text, int32_t color, int32_t pos);
 void clearTextArea(void);
 void clearTextSubArea(RECT *area);
@@ -188,8 +184,6 @@ void getRotationDifference(PositionData *data, VECTOR *target,
 int32_t rotateEntity(SVECTOR *rot, int16_t *outX, int16_t *outY,
                      int16_t *outZ, int32_t speed);
 void tickTamerWaypoints(void);
-int32_t addObject(int32_t id, int32_t instance, TickFunction tick,
-                  RenderFunction render);
 void loadMapDigimon(uint8_t *data, int32_t a);
 void tickTamerBattle(int32_t instanceId);
 void tickConditionBoundaries(void);

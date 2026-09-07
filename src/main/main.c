@@ -65,13 +65,7 @@ extern GsF_LIGHT LIGHT_DATA[3];
 void renderMainMenuBackground(void);
 void loadNewgameScene(void);
 void tickNewGameJijimon(int32_t instanceId);
-void setEntityPosition(int32_t entityId, int32_t x, int32_t y, int32_t z);
-void setEntityRotation(int32_t entityId, int16_t x, int16_t y, int16_t z);
-void setupEntityMatrix(int32_t entityId);
 void writePStat(int32_t stat, int32_t value);
-void initializeDigimonObject(int32_t type, int32_t instanceId,
-			     TickFunction tick);
-void *thunkLoadMMD(int32_t digiType, int32_t modelType);
 
 void initializeHeap(void);
 void initializeFramebuffer(void);
@@ -88,8 +82,6 @@ uint16_t convertAsciiToJis(uint8_t input);
 int32_t swapShortBytes(int32_t input);
 int32_t isAsciiEncoded(const char *value);
 void tickAnimation(Entity *entity);
-void removeEntity(int32_t type, int32_t entityId);
-void thunkUnloadModel(int32_t id, int32_t modelType);
 void tickPartnerBattle(int32_t instanceId);
 void tickNPCBattle(int32_t instanceId);
 void unloadNewGameScene(void);
@@ -101,7 +93,6 @@ extern int32_t buffModelValue[2];
 extern int32_t buffModelFrame;
 extern TMDModel *BUFF_MODEL[];
 
-void resetFlattenGlobal(void);
 void resetInventoryFlags(void);
 void MAIN_func_800DF804(void);
 void initializeInventoryModules(void);

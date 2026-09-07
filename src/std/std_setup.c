@@ -51,7 +51,6 @@ extern int32_t DRAWING_OFFSET_X;
 extern int32_t DRAWING_OFFSET_Y;
 extern char STD_D_80079CA8[];
 
-void removeObject(int32_t objectId, int32_t instanceId);
 void STD_func_80058488(void);
 void STD_func_80056E2C(int32_t a, int16_t b, int32_t c);
 void STD_loadTIMToVRAM(char *path);
@@ -61,7 +60,6 @@ void STD_func_80058254(void);
 void STD_func_80057FC4(void);
 void STD_func_80057778(void);
 void STD_func_80057FD0(int32_t which);
-void addObject(int32_t objectId, int32_t instanceId, void *tick, void *render);
 int16_t STD_func_80057510(int32_t a, int32_t b);
 void STD_func_80058E28(int32_t arg);
 int32_t STD_func_8006314C(Entity *entity, int32_t arg);
@@ -301,10 +299,10 @@ void STD_func_80057FD0(int32_t which)
 {
 	switch (which) {
 	case 0:
-		addObject(0x1A7, 0, 0, STD_func_80058030);
+		addObject(0x1A7, 0, (TickFunction)0, (RenderFunction)STD_func_80058030);
 		break;
 	case 1:
-		addObject(0x1A7, 0, 0, STD_func_80058254);
+		addObject(0x1A7, 0, (TickFunction)0, (RenderFunction)STD_func_80058254);
 		break;
 	}
 }

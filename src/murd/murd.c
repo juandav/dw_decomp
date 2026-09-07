@@ -66,7 +66,6 @@ void setMapLayerEnabled(int32_t enabled);
 int32_t lerp(int32_t start, int32_t end, int32_t t0, int32_t t1, int32_t t);
 int32_t worldPosToScreenPos(SVECTOR *pos, DVECTOR *out);
 int32_t getDistance(int32_t x, int32_t y, int32_t z);
-int32_t getEntityType(Entity *entity);
 void renderParticleFlash(int16_t *params);
 void renderDropShadow(Entity *entity);
 void setFullState(int32_t state, int32_t value);

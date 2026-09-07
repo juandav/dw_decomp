@@ -339,8 +339,6 @@ void STD_func_800615D8(DigimonEntity *digimon, FighterData *fighter);
 void STD_func_8005DF94(int32_t mode);
 int32_t playMusic(int32_t font, int32_t track);
 void STD_func_8005DEEC(int32_t track);
-void setEntityPosition(int32_t entityId, int16_t x, int32_t y, int32_t z);
-void setEntityRotation(int32_t entityId, int32_t x, int32_t y, int32_t z);
 void STD_func_80058494(int32_t which);
 void STD_func_8005E5E0(void);
 void STD_func_80058504(int32_t which);
@@ -1728,7 +1726,7 @@ void STD_resetFlatten(int16_t index)
 
 	entity = ENTITY_TABLE[COMBAT_DATA_PTR->player.entityIds[index]];
 	fighter = &COMBAT_DATA_PTR->fighter[index];
-	*(int8_t *)&entity->flatSprite = -1;
+	entity->flatSprite = -1;
 	fighter->flags &= 0xfff7;
 	fighter->flatTimer = 0;
 	if (entity->type != 0x71) {
@@ -3448,7 +3446,7 @@ void STD_applyMoveResult(void)
 				}
 				break;
 			case 3:
-				*(int8_t *)&entity->flatSprite = -1;
+				entity->flatSprite = -1;
 				break;
 			case 0:
 				fighter->flags &= 0xffb7;

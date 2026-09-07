@@ -15,6 +15,7 @@
 #include <dw/file_queue.h>
 #include <dw/main.h>
 #include <dw/math.h>
+#include <dw/model.h>
 #include <dw/params.h>
 #include <dw/partner.h>
 #include <dw/script.h>
@@ -35,11 +36,6 @@ typedef struct {
 	int8_t unk_10[3];
 	int8_t boneId;
 } DooaSparkle;
-
-typedef struct {
-	int8_t objIndex;
-	int8_t parentIndex;
-} SkeletonBone;
 
 typedef struct {
 	int16_t vx;
@@ -119,14 +115,11 @@ int32_t MAIN_func_800DA9F4(void);
 int32_t DOOA_updateShards(int32_t instanceId);
 int32_t DOOA_renderShards(int32_t instanceId);
 int32_t DOOA_initShardEffect(Entity *entity, intptr_t addr, int32_t size);
-int32_t getEntityType(Entity *entity);
 void DOOA_saveEntityClut(u_long *pixels, Entity *entity);
 void DOOA_saveModelClut(u_long *pixels);
 void renderDropShadow(Entity *entity);
 void createFlash(void);
 void setMapLayerEnabled(int32_t enabled);
-void setEntityPosition(int32_t entityId, int32_t x, int32_t y, int32_t z);
-void loadMMDAsync(int32_t digimonType, int32_t entityType, uint8_t *buffer, void *modelData, int8_t *readComplete);
 int32_t DOO2_buildShardSet(VECTOR *outRef, void *modelList, int32_t modelIndex);
 void DOO2_resetShardSets(int32_t size);
 void DOO2_releaseAllShardSets(void);
@@ -141,7 +134,6 @@ void DOOA_spawnShardWave(int32_t wireIndex);
 void MAIN_func_80092B60(POLY_FT4 *prim);
 void addScreenPolyFT3(void *prim, SVECTOR *v0, SVECTOR *v1, SVECTOR *v2);
 int32_t add3DSpritePrim(POLY_FT4 *poly, SVECTOR *v0, SVECTOR *v1, SVECTOR *v2, SVECTOR *v3);
-void setupEntityMatrix(int32_t id);
 void tickCameraMovement(int32_t mode);
 void setEFEFlashOffset(int32_t instance, int32_t x, int32_t y);
 void MAIN_func_800D91FC(int32_t mode);
@@ -167,8 +159,6 @@ extern int16_t MAIN_D_80135324;
 extern int32_t ACTIVE_FRAMEBUFFER;
 extern void *DOO2_D_80071EE4[];
 extern int16_t EGG_DIGIMON_TYPES[4];
-extern SkeletonBone *DIGIMON_SKELETONS[];
-extern int8_t WIREFRAME_RNG_TABLE[];
 extern SVECTOR MAIN_D_80135338;
 extern int32_t MAIN_D_80135340;
 extern u_long DOO2_D_80071B5C[];
@@ -176,9 +166,6 @@ extern u_long DOO2_D_80071BE0[];
 extern u_long DOO2_D_80071EE8[];
 extern VECTOR CAMERA_TARGET;
 extern int8_t CAMERA_REACHED_TARGET;
-extern int32_t PARTNER_WIREFRAME_TOTAL;
-extern int16_t WIREFRAME_COLOR_MIN;
-extern int16_t WIREFRAME_COLOR_MAX;
 extern int32_t FLASH_INSTANCE;
 extern int8_t DOO2_LOADING_COMPLETE;
 extern int32_t MAIN_D_80135328;
@@ -1018,7 +1005,8 @@ void DOOA_tickRebirth(int32_t instanceId)
 		seq->phase = 0xce;
 		DOOA_removeShardEffect();
 		loadVLALL(EGG_DIGIMON_TYPES[seq->eggSlot], GENERAL_BUFFER_PTR);
-		loadMMDAsync(EGG_DIGIMON_TYPES[seq->eggSlot], 3, DOOA_MMD_BUFFER, seq->modelData, &seq->isModelLoading);
+		loadMMDAsync(EGG_DIGIMON_TYPES[seq->eggSlot], 3, DOOA_MMD_BUFFER, (EvoModelData *)seq->modelData,
+			     (uint8_t *)&seq->isModelLoading);
 		DOO2_resetShardSets(DOOA_SHARD_BUFFER);
 		playSound(8, 6);
 		break;
@@ -1367,7 +1355,7 @@ int32_t DOOA_updateShards(int32_t instanceId)
 				shard->targetRadius = shard->radius;
 			}
 			if (shard->delay > 0) {
-				shard->delay--;
+				--shard->delay;
 			} else {
 				shard->radius -= (shard->targetRadius / 10) + 1;
 				if (shard->radius < 0) {

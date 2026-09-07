@@ -723,7 +723,7 @@ void VS_applyMoveResult(void)
 				}
 				break;
 			case 3:
-				*(int8_t *)&entity->flatSprite = -1;
+				entity->flatSprite = -1;
 				break;
 			case 0:
 				fighter->flags &= 0xffb7;

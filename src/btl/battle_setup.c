@@ -2,6 +2,7 @@
 #include <dw/btl.h>
 #include <dw/item.h>
 #include <dw/combat.h>
+#include <dw/model.h>
 #include <dw/params.h>
 
 extern int8_t MAIN_D_80134D64;
@@ -15,7 +16,6 @@ extern int8_t TAMER_WAYPOINT_COUNT;
 extern int8_t TAMER_WAYPOINT_X[];
 extern int8_t TAMER_WAYPOINT_Y[];
 
-void resetFlattenGlobal(void);
 void drawInventoryText(void);
 void BTL_removeFinisherAura(int32_t arg0);
 int32_t isInvisible(Entity *entity);

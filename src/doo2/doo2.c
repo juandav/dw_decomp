@@ -5,6 +5,7 @@
 
 #include <dw/btl.h>
 #include <dw/doo.h>
+#include <dw/model.h>
 #include <dw/sound.h>
 #include <dw/types.h>
 #include <dw/ui.h>
@@ -69,9 +70,6 @@ extern Doo2ShardParams DOO2_SHARD_PARAMS;
 extern Doo2EggIcons EGG_ICONS;
 extern GsSPRITE DOO2_EGG_ICON_SPRITE;
 extern GsSPRITE DOO2_EGG_CURSOR_SPRITE;
-extern int16_t WIREFRAME_COLOR_MIN;
-extern int16_t WIREFRAME_COLOR_MAX;
-extern int8_t WIREFRAME_RNG_TABLE[];
 extern RECT MAIN_D_80134B90;
 extern RECT MAIN_D_80134B98;
 extern RECT MAIN_D_80134BA4;

@@ -53,7 +53,6 @@ int32_t customRandom(int32_t a, int32_t b);
 void MAIN_func_80092B60(POLY_FT4 *prim);
 void addScreenPolyFT3(void *prim, SVECTOR *v0, SVECTOR *v1, SVECTOR *v2);
 int32_t add3DSpritePrim(POLY_FT4 *poly, SVECTOR *v0, SVECTOR *v1, SVECTOR *v2, SVECTOR *v3);
-int32_t getEntityType(Entity *entity);
 void calculateBoneMatrix(Entity *entity, int32_t boneId, MATRIX *out);
 
 void EVL_setScratchTop(int32_t size);

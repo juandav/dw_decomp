@@ -88,7 +88,6 @@ extern int32_t MAIN_D_801351C0;
 extern int32_t MAIN_D_801351C4;
 extern int8_t *MAIN_D_80139B24[];
 extern int32_t VIEWPORT_DISTANCE;
-extern ModelComponent UNKNOWN_MODEL[16];
 extern int32_t MAIN_D_801350F4;
 extern PositionData STD_D_8007F528[];
 extern PositionData STD_D_8007C7B0[4];
@@ -123,7 +122,6 @@ void renderLinePrimitive(uint32_t color, int32_t x0, int32_t y0, int32_t x1, int
 int32_t add3DSpritePrim(POLY_FT4 *poly, SVECTOR *v0, SVECTOR *v1, SVECTOR *v2, SVECTOR *v3);
 void renderSprite(GsSPRITE *sprite, int16_t x, int16_t y, int32_t distance, int32_t width, int32_t height);
 void translateConditionFXToEntity(Entity *entity, SVECTOR *out);
-void unloadModel(int32_t id, int32_t flag);
 int32_t MAIN_func_800DA740(int16_t *rect, DVECTOR *line);
 char *initializeFlashData(char *base);
 void renderParticleFlash(int16_t *params);
@@ -153,8 +151,6 @@ void STD_renderParallelLines(SVECTOR *a, SVECTOR *b, int32_t n, SVECTOR *from, S
 void STD_renderStunEffect(int32_t idx);
 void downloadSomeImage();
 void modifySomeImage(int32_t dim);
-void addObject(int32_t objectId, int32_t instanceId, void *tick, void *render);
-void removeObject(int32_t objectId, int32_t instanceId);
 void STD_addEnemyHPBars(void);
 void STD_func_8006C6D0(void);
 void STD_func_8006CCD4(void);
@@ -610,7 +606,7 @@ static void *std_effect_functions[] = {
 void STD_func_8006BFB4(void)
 {
 	MAIN_D_801350F4 = 0;
-	addObject(0x19D, 0, STD_func_8006BFD4, STD_renderVersusModelScene2);
+	addObject(0x19D, 0, (TickFunction)STD_func_8006BFD4, (RenderFunction)STD_renderVersusModelScene2);
 }
 
 INCLUDE_ASM("asm/std/nonmatchings/std_effect", STD_func_8006BFD4);
@@ -646,7 +642,7 @@ void STD_func_8006C630(void)
 
 void STD_addEnemyHPBars(void)
 {
-	addObject(0x1AE, 0, NULL, STD_func_8006C67C);
+	addObject(0x1AE, 0, NULL, (RenderFunction)STD_func_8006C67C);
 }
 
 void STD_func_8006C67C(void)
@@ -683,7 +679,7 @@ void STD_func_8006C6DC(void)
 		STD_D_8007FA08[i] = 0;
 	}
 
-	addObject(0x19d, 0, STD_func_8006C7D4, STD_func_8006CB10);
+	addObject(0x19d, 0, (TickFunction)STD_func_8006C7D4, (RenderFunction)STD_func_8006CB10);
 }
 
 void STD_func_8006C7D4(void)
@@ -815,7 +811,7 @@ void STD_func_8006CCE0(void)
 		STD_D_8007F528[i].rotation.vz = 0;
 		setupModelMatrix(p);
 	}
-	addObject(0x19d, 0, STD_func_8006CE68, STD_func_8006D018);
+	addObject(0x19d, 0, (TickFunction)STD_func_8006CE68, (RenderFunction)STD_func_8006D018);
 }
 void STD_func_8006CE68(void)
 {
@@ -1320,7 +1316,7 @@ char *STD_initializeEFEEngine(char *base)
 	base = (char *)((int32_t)base + (4 - ((int32_t)base & 3)));
 	MAIN_D_80134D18 = (int32_t)base;
 	MAIN_D_80134D14 = (int32_t)base;
-	addObject(0x500, 0, STD_tickEFEEngine, STD_renderEFEEngine);
+	addObject(0x500, 0, (TickFunction)STD_tickEFEEngine, (RenderFunction)STD_renderEFEEngine);
 	STD_initializeEFESubOpcodeTable();
 	base = (char *)((int32_t)base + 0x41000);
 	STD_clearEFESoundChannels();
@@ -4340,7 +4336,7 @@ int32_t STD_func_80077664(int32_t arg)
 	p = STD_D_8007FCB0[i];
 	p[0] = 0;
 	*(int32_t *)&p[2] = arg;
-	addObject(0x808, i, STD_tickPoisonEffect, STD_func_80077620);
+	addObject(0x808, i, STD_tickPoisonEffect, (RenderFunction)STD_func_80077620);
 
 	return i;
 }

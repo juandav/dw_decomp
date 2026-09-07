@@ -80,8 +80,6 @@ void setUVDataPolyFT4(POLY_FT4 *prim, int32_t u, int32_t v, int32_t w, int32_t h
 void setPosDataPolyFT4(POLY_FT4 *prim, int32_t x, int32_t y, int32_t w, int32_t h);
 void swapByte(char *a, char *b);
 void STD_renderBattleStartTextBurst(void);
-void addObject(int32_t objectId, int32_t instanceId, void *tick, void *render);
-void removeObject(int32_t objectId, int32_t instanceId);
 void STD_tickFinisherChargeup(void);
 void STD_renderFinisherChargeup(void);
 void STD_removeFinisherChargeup(void);
@@ -162,7 +160,7 @@ void STD_func_80069134(int16_t tech)
 	COMBAT_DATA_PTR->player.bufferedCommand[0] = 3;
 	MAIN_D_8013518C[0] = -0x8C;
 	MAIN_D_8013518E = -0x4A;
-	addObject(0x19A, 0, STD_tickFinisherChargeup, STD_renderFinisherChargeup);
+	addObject(0x19A, 0, (TickFunction)STD_tickFinisherChargeup, (RenderFunction)STD_renderFinisherChargeup);
 }
 
 void STD_tickFinisherChargeup(void)
@@ -361,7 +359,7 @@ void STD_initializeBattleStartText(void)
 		((int16_t *)*p)[2] = 0;
 	}
 
-	addObject(0x1a6, 0, NULL, STD_renderBattleStartText);
+	addObject(0x1a6, 0, NULL, (RenderFunction)STD_renderBattleStartText);
 }
 
 INCLUDE_ASM("asm/std/nonmatchings/std_hud", STD_renderBattleStartText);
@@ -374,7 +372,7 @@ void STD_func_8006A044(void)
 void STD_initializeBattleStartTextBurst(void)
 {
 	MAIN_D_80135194 = 0;
-	addObject(0x1a6, 0, NULL, STD_renderBattleStartTextBurst);
+	addObject(0x1a6, 0, NULL, (RenderFunction)STD_renderBattleStartTextBurst);
 }
 
 void STD_renderBattleStartTextBurst(void)
@@ -692,7 +690,7 @@ void STD_func_8006AD00(int32_t id)
 	MAIN_D_8013519E[n] = 0;
 	MAIN_D_801351A0[n] = 0;
 	MAIN_D_801351A2[n] = 0;
-	addObject(0x19c, id, NULL, STD_func_8006AD68);
+	addObject(0x19c, id, NULL, (RenderFunction)STD_func_8006AD68);
 }
 
 INCLUDE_ASM("asm/std/nonmatchings/std_hud", STD_func_8006AD68);
@@ -736,7 +734,7 @@ void STD_func_8006B2BC(void)
 
 void STD_func_8006B468(void)
 {
-	addObject(0x19D, 0, STD_tickVersusModelScene, STD_renderVersusModelScene);
+	addObject(0x19D, 0, (TickFunction)STD_tickVersusModelScene, (RenderFunction)STD_renderVersusModelScene);
 }
 
 void STD_tickVersusModelScene(void)

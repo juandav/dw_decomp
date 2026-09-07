@@ -1,6 +1,7 @@
 #include <libgs.h>
 #include <string.h>
 
+#include <dw/model.h>
 #include <dw/types.h>
 #include <dw/clock.h>
 #include <dw/bubble.h>
@@ -227,16 +228,9 @@ extern int32_t BUTTERFLY_ID;
 extern int32_t IS_SCRIPT_PAUSED;
 extern Stats DEATH_STATS;
 
-void applyMMD(int32_t digimonType, int32_t entityType,
-	      EvoModelData *modelData);
-void initializeDigimonObject(int32_t type, int32_t instanceId,
-			     TickFunction tick);
 int32_t getTamerState(void);
 void writePStat(int32_t id, uint8_t value);
 void callScriptSection(int32_t a, int32_t b, int32_t c);
-void setEntityPosition(int32_t entityId, int32_t x, int32_t y, int32_t z);
-void setEntityRotation(int32_t entityId, int32_t x, int32_t y, int32_t z);
-void setupEntityMatrix(int32_t entityId);
 void startAnimation(Entity *entity, int32_t animId);
 ModelComponent *thunkLoadMMD(int32_t digiType, int32_t modelType);
 void learnMove(int32_t move);

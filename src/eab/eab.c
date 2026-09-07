@@ -7,6 +7,7 @@
 #include <dw/entity.h>
 #include <dw/graphics.h>
 #include <dw/math.h>
+#include <dw/model.h>
 #include <dw/sound.h>
 #include <dw/types.h>
 
@@ -61,12 +62,9 @@ extern RGB8 MAIN_D_80134C3C;
 extern SVECTOR MAIN_D_80134C40;
 extern uint8_t MAIN_D_80134C48;
 extern EabHudState MAIN_D_801353F0;
-extern int32_t ENTITY1_WIREFRAME_TOTAL;
 extern GsRVIEW2 GS_VIEWPOINT;
 extern int32_t *EFE_DATA_STACK;
 
-int32_t addObject(int32_t objectId, int32_t instanceId, void *tick, void *render);
-void removeObject(int32_t objectId, int32_t instanceId);
 void setMapLayerEnabled(int32_t enabled);
 int32_t lerp(int32_t start, int32_t end, int32_t t0, int32_t t1, int32_t t);
 int32_t worldPosToScreenPos(SVECTOR *pos, DVECTOR *out);
@@ -678,7 +676,7 @@ void EAB_startBuildup(Entity *entity)
 	MAIN_D_801353F0.frame = 0;
 	MAIN_D_801353F0.phase = 0;
 	MAIN_D_801353F0.entity = entity;
-	addObject(0x60b, 0, EAB_tickBuildup, EAB_renderBuildup);
+	addObject(0x60b, 0, (TickFunction)EAB_tickBuildup, (RenderFunction)EAB_renderBuildup);
 	EAB_initializeRings();
 	entity->isOnMap = 0;
 	playSound2(8, 0);
@@ -700,7 +698,7 @@ int32_t EAB_tick(Entity *entity, int32_t isInitialized)
 	state->phase = 0;
 	state->entity = entity;
 	state->location = entity->posData->location;
-	addObject(0x60c, 0, EAB_tickSpawn, EAB_renderSpawn);
+	addObject(0x60c, 0, EAB_tickSpawn, (RenderFunction)EAB_renderSpawn);
 	EAB_initializeParticles();
 	initializeFlashData(EAB_D_80061800);
 	for (i = 0; i < 9; i++) {

@@ -38,7 +38,6 @@ typedef struct {
 extern RGB8 ENDI_PARTICLE_COLOR;
 extern u_long *ENDI_CLUT_BUFFER;
 extern u_long *ENDI_FADE_CLUT_BUFFER;
-extern int32_t PLAYER_SHADOW_ENABLED;
 
 int32_t lerp(int32_t a, int32_t b, int32_t c, int32_t d, int32_t t);
 void renderFXParticle(SVECTOR *p, int32_t a, RGB8 *c);

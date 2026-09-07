@@ -9,6 +9,7 @@
 #include <dw/entity.h>
 #include <dw/main.h>
 #include <dw/math.h>
+#include <dw/model.h>
 #include <dw/move.h>
 #include <dw/params.h>
 #include <dw/types.h>
@@ -27,8 +28,6 @@ typedef struct {
 	uint8_t y;
 } VsUISprite;
 
-void setEntityPosition(int32_t entityId, int32_t x, int32_t y, int32_t z);
-void setEntityRotation(int32_t entityId, int16_t x, int16_t y, int16_t z);
 void startAnimation(Entity *entity, uint8_t animId);
 void clearTextArea(void);
 void drawString(char *text, int32_t color, int32_t pos);
@@ -86,7 +85,6 @@ void fadeToBlack(int32_t frames);
 void removeStaticUIBox(int32_t id);
 void VS_initializeVS(void);
 void loadStackedTIMFile(char *path);
-void resetFlattenGlobal(void);
 void removeEntityText(int32_t id);
 void VS_addFighterCounter(int32_t seconds);
 void VS_addFighterStatusBars(int32_t id);
@@ -1558,7 +1556,7 @@ void VS__resetFlatten(int16_t combatId)
 	entity = ENTITY_TABLE[COMBAT_DATA_PTR->player.entityIds[combatId]];
 	fighter = &COMBAT_DATA_PTR->fighter[combatId];
 
-	*(int8_t *)&entity->flatSprite = -1;
+	entity->flatSprite = -1;
 	fighter->flags &= 0xfff7;
 	fighter->flatTimer = 0;
 	entity->posData->scale.vx = 0x1000;

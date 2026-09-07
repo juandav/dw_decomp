@@ -59,7 +59,6 @@ extern int32_t MAIN_D_801352F4;
 extern char *MAIN_D_801352F8;
 extern int32_t MAIN_D_801352FC;
 extern char *MAIN_D_80135300;
-extern ModelComponent UNKNOWN_MODEL[16];
 extern int32_t VS_D_80070B44[];
 extern void *VS_D_80070B48[];
 extern void (*VS_D_80070E94[][8])(int32_t *);
@@ -308,7 +307,6 @@ void matrixToEuler2(MATRIX *m, SVECTOR *out);
 void toEulerAngles(SVECTOR *out, int32_t x, int32_t y, int32_t z);
 void multiplyRotations(SVECTOR *a, SVECTOR *b);
 int32_t lerp(int32_t start, int32_t end, int32_t t0, int32_t t1, int32_t t);
-void unloadModel(int32_t id, int32_t flag);
 int32_t getOriginalType(int32_t type);
 int32_t worldPosToScreenPos(SVECTOR *pos, DVECTOR *out);
 void calculateBoneMatrix(Entity *entity, int32_t boneId, MATRIX *out);
@@ -325,7 +323,6 @@ void translateConditionFXToEntity(Entity *entity, SVECTOR *out);
 void renderSprite(GsSPRITE *sprite, int16_t x, int16_t y, int32_t distance, int32_t width, int32_t height);
 void GsGetTimInfo(unsigned long *tim, GsIMAGE *img);
 void setMapLayerEnabled(int32_t enabled);
-void addObject(int32_t objectId, int32_t instanceId, void *tick, void *render);
 void VS_stopEFESubEffect(int32_t a, int32_t b);
 int32_t VS_addPoisonEffect(DigimonEntity *digimon);
 void VS_removePoisonEffect(int32_t i, DigimonEntity *digimon);
@@ -333,7 +330,6 @@ int32_t VS_addConfusionEffect(DigimonEntity *digimon);
 void VS_removeConfusionEffect(int32_t i, DigimonEntity *digimon);
 int32_t VS_addStunEffect(DigimonEntity *digimon, int32_t val);
 void VS_removeStunEffect(int32_t i, DigimonEntity *digimon);
-void removeObject(int32_t objectId, int32_t instanceId);
 
 static void *vs_effect_functions[] = {
 	VS_removeAllAuraProjectiles,
@@ -1040,7 +1036,7 @@ char *VS_initializeEFEEngine(char *base)
 	base = (char *)((int32_t)base + (4 - ((int32_t)base & 3)));
 	MAIN_D_80134D18 = (int32_t)base;
 	MAIN_D_80134D14 = (int32_t)base;
-	addObject(0x500, 0, VS_tickEFEEngine, VS_renderEFEEngine);
+	addObject(0x500, 0, (TickFunction)VS_tickEFEEngine, (RenderFunction)VS_renderEFEEngine);
 	VS_initializeEFESubOpcodeTable();
 	base = (char *)((int32_t)base + 0x41000);
 	VS_clearEFESoundChannels();
@@ -4018,7 +4014,7 @@ int32_t VS_addPoisonEffect(DigimonEntity *digimon)
 	p = VS_D_80073050[i];
 	p[0] = 0;
 	*(int32_t *)&p[2] = (int32_t)digimon;
-	addObject(0x808, i, VS_tickPoisonEffect, VS_renderPoisonEffect);
+	addObject(0x808, i, VS_tickPoisonEffect, (RenderFunction)VS_renderPoisonEffect);
 
 	return i;
 }

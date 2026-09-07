@@ -33,7 +33,6 @@ int32_t applyMomentum(int32_t base, int16_t reload, int16_t delta,
 		      int16_t *counter, int8_t step, int32_t offset);
 void applyRootMomentum(MomentumData *momentum, Entity *entity);
 
-int32_t getEntityType(Entity *entity);
 
 void *anim_order_anchor[] = {
 	applyRootMomentum,

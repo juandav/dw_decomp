@@ -4,6 +4,7 @@
 #include <dw/clock.h>
 #include <dw/main.h>
 #include <dw/math.h>
+#include <dw/model.h>
 #include <dw/params.h>
 #include <dw/sound.h>
 #include <dw/types.h>
@@ -123,11 +124,7 @@ void VS_applyEntityViewpoint(void);
 void VS_renderCounterDigits(int32_t x, int32_t y, int32_t digits, int32_t value, int32_t layer);
 void VS_tickFighterCounter(void);
 void VS_renderFighterCounter(void);
-void addObject(int32_t objectId, int32_t instanceId, void *tick, void *render);
-void removeObject(int32_t objectId, int32_t instanceId);
 void renderNumber(int32_t a, int32_t x, int32_t y, int32_t digits, int32_t value, int32_t layer);
-void removeEntity(int32_t type, int32_t entityId);
-void thunkUnloadModel(int32_t digiType, int32_t modelType);
 
 static void *vs_scene_functions[] = {
 	VS_removeFighterCounter,
@@ -196,10 +193,10 @@ INCLUDE_ASM("asm/vs/nonmatchings/vs_scene", VS_loadVSAssets);
 
 void VS_addInputObjects(void)
 {
-	addObject(0x1b2, 0, VS__tickInput, NULL);
-	addObject(0x1b2, 1, VS__tickInput, NULL);
+	addObject(0x1b2, 0, (TickFunction)VS__tickInput, NULL);
+	addObject(0x1b2, 1, (TickFunction)VS__tickInput, NULL);
 	PLAYTIME_FRAMES = 0;
-	addObject(0xfb9, 0, VS_tickPlaytime, NULL);
+	addObject(0xfb9, 0, (TickFunction)VS_tickPlaytime, NULL);
 }
 
 INCLUDE_ASM("asm/vs/nonmatchings/vs_scene", VS_loadFighterEntities);
@@ -359,13 +356,13 @@ void VS_addArenaRenderers(void)
 {
 	switch (VS_D_800716B2[0]) {
 	case 0:
-		addObject(0x1A7, 0, NULL, VS_renderArenaViewLeft);
+		addObject(0x1A7, 0, NULL, (RenderFunction)VS_renderArenaViewLeft);
 		break;
 	case 1:
-		addObject(0x1A7, 0, NULL, VS_renderArenaViewRight);
+		addObject(0x1A7, 0, NULL, (RenderFunction)VS_renderArenaViewRight);
 		break;
 	case 2:
-		addObject(0x1A7, 0, NULL, VS_renderArenaViewFull);
+		addObject(0x1A7, 0, NULL, (RenderFunction)VS_renderArenaViewFull);
 		break;
 	}
 }
@@ -436,7 +433,7 @@ void VS_setCameraParams(int16_t a, int16_t b, int16_t c, int32_t d, int16_t e, i
 
 void VS_setVSPhase(int32_t arg)
 {
-	addObject(0x1a8, 0, VS_tickVSPhase, NULL);
+	addObject(0x1a8, 0, (TickFunction)VS_tickVSPhase, NULL);
 	MAIN_D_80135268 = arg;
 	MAIN_D_8013529C = 0;
 }
@@ -818,7 +815,7 @@ void VS_addFighterCounter(uint8_t arg)
 {
 	if ((MAIN_D_801352A8 == 0) && (arg != 0)) {
 		MAIN_D_80135288 = arg;
-		addObject(0x1ac, 0, VS_tickFighterCounter, VS_renderFighterCounter);
+		addObject(0x1ac, 0, (TickFunction)VS_tickFighterCounter, (RenderFunction)VS_renderFighterCounter);
 		MAIN_D_801352A8 = 1;
 	}
 }

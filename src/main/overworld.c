@@ -5,6 +5,7 @@
 #include <dw/fish.h>
 #include <dw/item.h>
 #include <dw/map.h>
+#include <dw/model.h>
 #include <dw/move.h>
 #include <dw/std.h>
 #include <dw/sound.h>
@@ -247,10 +248,7 @@ void buildMapOverlayPrim(POLY_FT4 *prim, LocalMapObjectInstance *inst,
 void buildSnowflakePrim(POLY_FT4 *prim, LocalMapObjectInstance *inst,
 			LocalMapObject *obj);
 Entity *getEntityFromScriptId(uint8_t *scriptId);
-void removeEntity(int32_t type, int32_t entityId);
 void startAnimation(Entity *entity, int32_t animId);
-void thunkLoadMMD(int32_t digiType, int32_t modelType);
-void thunkUnloadModel(int32_t digiType, int32_t modelType);
 void tickNPCBattle(int32_t instanceId);
 void tickWaypointAI(MapDigimonEntity *mapDigimon, Entity *entity,
 		    int32_t instanceId);
@@ -325,17 +323,10 @@ void resetEntityOrigin(int32_t scriptId);
 void loadMapDigimon(int16_t *data, int32_t mapId);
 void initializeLoadedNPCModels(void);
 int32_t scriptSetDigimon(uint8_t type, uint8_t slot, uint8_t autotalk);
-void initializeDigimonObject(int32_t type, int32_t instanceId,
-			     void (*tick)(int32_t));
-void setEntityPosition(int32_t entityId, int32_t x, int32_t y, int32_t z);
-void setEntityRotation(int32_t entityId, int32_t x, int32_t y, int32_t z);
-void setupEntityMatrix(int32_t entityId);
 int32_t tickMoveObjectTo(uint8_t objectIndex, uint8_t moveIndex,
 			 int8_t steps, int16_t targetX, int16_t targetY);
 void setMovementEnabled(int32_t id, int32_t enabled);
 void setPartnerState(int32_t state);
-int32_t addObject(int32_t objectId, int32_t instanceId, void (*tick)(int32_t),
-		  void (*render)(int32_t));
 void addGameMenu(void);
 void renderDateDigits(void);
 void renderTriangleCursor(int32_t selection, int16_t yOffset);

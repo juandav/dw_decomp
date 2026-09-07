@@ -1,4 +1,5 @@
 #include <dw/entity.h>
+#include <dw/model.h>
 #include <dw/params.h>
 #include <dw/partner.h>
 #include <dw/script.h>
@@ -18,7 +19,6 @@ extern int16_t MAIN_D_8013537C;
 void createCameraMovement(VECTOR *pos, int32_t speed);
 void startAnimation(Entity *entity, int32_t animId);
 int32_t tickEntityWalkTo(uint8_t scriptId1, uint8_t scriptId2, int32_t targetX, int32_t targetZ, int8_t withCamera);
-void setupEntityMatrix(int32_t id);
 void setCameraFollowPlayer(void);
 void unsetCameraFollowPlayer(void);
 void TRN_saveTrainingStartTime(void);

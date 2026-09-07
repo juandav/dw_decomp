@@ -20,8 +20,6 @@
 
 #include "common.h"
 
-void removeObject(int32_t objectId, int32_t instanceId);
-void addObject(int32_t objectId, int32_t instanceId, void *tick, void *render);
 void renderString(int32_t a, int32_t b, int32_t c, int32_t d, int32_t e, int32_t f, int32_t g, int32_t h, int32_t i);
 int16_t entityGetTechFromAnim(Entity *entity, int32_t anim);
 void BTL_tickDeathCountdown(void);
@@ -222,7 +220,7 @@ void BTL_initializeFinisherChargeup(void)
 		MAIN_D_80135090[1] = -0x64;
 	}
 
-	addObject(0x19a, 0, BTL_tickFinisherChargeup, BTL_renderFinisherChargeup);
+	addObject(0x19a, 0, (TickFunction)BTL_tickFinisherChargeup, (RenderFunction)BTL_renderFinisherChargeup);
 }
 
 void BTL_tickFinisherChargeup(void)
@@ -369,7 +367,7 @@ void BTL_addDeathCountdown(Entity *entity)
 			BTL_D_80073E54.y = py;
 			sp->y = py;
 		} while (0);
-		addObject(0x197, 0, BTL_tickDeathCountdown, BTL_renderDeathCountdown);
+		addObject(0x197, 0, (TickFunction)BTL_tickDeathCountdown, (RenderFunction)BTL_renderDeathCountdown);
 	}
 }
 
@@ -736,7 +734,7 @@ void BTL_initializeBattleStartText(void)
 		((int16_t *)*p)[2] = 0;
 	}
 
-	addObject(0x1a6, 0, NULL, BTL_renderBattleStartText);
+	addObject(0x1a6, 0, NULL, (RenderFunction)BTL_renderBattleStartText);
 }
 
 INCLUDE_ASM("asm/btl/nonmatchings/battle_hud", BTL_renderBattleStartText);
@@ -749,7 +747,7 @@ void BTL_removeBattleStartText(void)
 void BTL_initializeBattleStartTextBurst(void)
 {
 	MAIN_D_801350C0 = 0;
-	addObject(0x1a6, 0, NULL, BTL_renderBattleStartTextBurst);
+	addObject(0x1a6, 0, NULL, (RenderFunction)BTL_renderBattleStartTextBurst);
 }
 
 void BTL_renderBattleStartTextBurst(void)
@@ -1068,7 +1066,7 @@ void BTL_initializePartnerStatusBars(void)
 	MAIN_D_801350C9 = 0;
 	MAIN_D_801350CA = 0;
 	MAIN_D_801350CB = 0;
-	addObject(0x19c, 0, BTL_tickPartnerStatusBars, BTL_renderPartnerStatusBars);
+	addObject(0x19c, 0, (TickFunction)BTL_tickPartnerStatusBars, (RenderFunction)BTL_renderPartnerStatusBars);
 }
 
 void BTL_tickPartnerStatusBars(void)

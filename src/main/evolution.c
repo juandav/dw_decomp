@@ -4,15 +4,13 @@
 #include <dw/entity.h>
 #include <dw/evl.h>
 #include <dw/math.h>
+#include <dw/model.h>
 #include <dw/params.h>
 #include <dw/types.h>
 
 
 int32_t getTamerState(void);
 void setTamerState(int32_t state);
-void removeEntity(int32_t type, int32_t entityId);
-void thunkUnloadModel(int32_t id, int32_t modelType);
-void unloadModel(int32_t id, int32_t modelType);
 void initializeReincarnatedPartner(int32_t type, int32_t posX, int32_t posY,
                                    int32_t posZ, int32_t rotX, int32_t rotY,
                                    int32_t rotZ);
