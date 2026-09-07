@@ -6,6 +6,7 @@
 #include <libgpu.h>
 #include <libgs.h>
 #include <libgte.h>
+#include <mwinline_n.h>
 
 #include <dw/aabb.h>
 #include <dw/attack_object.h>
@@ -23,15 +24,26 @@
 #include "common.h"
 
 typedef struct {
-	uint8_t pad0[0xc];
-	int16_t frameCount;
+	int16_t frames;
+	int8_t deltaU;
+	int8_t deltaV;
+} EfeUvKeyframe;
+
+typedef struct {
+	int16_t unk0;
+	int16_t unk2;
+	int16_t unk4;
+	int16_t unk6;
+	int16_t unk8;
+	int16_t unkA;
+	int16_t numKeyframes;
+	int16_t keyframe;
+	int16_t uvFrame;
 	int16_t frame;
-	int16_t timer;
-	int16_t unk12;
-	int16_t unk14;
-	int16_t unk16;
-	int32_t start;
-	int32_t cur;
+	int16_t numFrames;
+	int16_t pad;
+	EfeUvKeyframe *uvData;
+	EfeUvKeyframe *uv;
 } EfeUvAnim;
 
 extern int32_t DRAWING_OFFSET_X;
@@ -94,6 +106,13 @@ extern int16_t STD_D_8007CC78[];
 extern int16_t STD_D_8007CCA4[];
 extern int16_t STD_D_8007CCD0[];
 extern int16_t STD_D_8007CCFC[];
+extern GsSPRITE STD_D_8007AFD0;
+extern GsSPRITE STD_D_8007AFF4;
+extern GsSPRITE STD_D_8007AF88;
+extern GsSPRITE STD_D_8007AFAC;
+extern DigimonEntity *MAIN_D_80134EF4;
+extern DigimonEntity *MAIN_D_80134EF8;
+extern int16_t MAIN_D_80134CDC;
 
 void startAnimation(Entity *entity, int32_t animId);
 void entityLookAtLocation(Entity *entity, VECTOR *pos);
@@ -128,6 +147,7 @@ void setShortWithStride(int16_t *ptr, int16_t value, int32_t count, int32_t stri
 void setFileReadCallback2(void *callback, int32_t arg);
 void STD_setupLoadedEFEFile(void);
 void STD_renderParticleEmitters(void);
+void renderFXParticle(SVECTOR *worldPos, int32_t scale, RGB8 *rgb);
 void STD_renderProjectedSprite(void);
 void STD_renderParallelLines(SVECTOR *a, SVECTOR *b, int32_t n, SVECTOR *from, SVECTOR *to, int32_t *col);
 void STD_renderStunEffect(int32_t idx);
@@ -148,7 +168,7 @@ void STD_unloadEFESlot(int32_t idx);
 void STD_runEFESlotScript(int32_t idx);
 void STD_handleEFEFileLoaded(int32_t arg);
 void STD_tickParticleEmitters(void);
-int16_t STD_offsetEFEPrimitiveUVs(char *base, int32_t idx, int32_t du, int32_t dv);
+int16_t STD_offsetEFEPrimitiveUVs(char *base, int32_t idx, int8_t du, int8_t dv);
 char *STD_initializeEFEEngine(char *base);
 void STD_removeEFEEngine(void);
 void STD_loadMoveEFE(int16_t *moves, int16_t *effectIds, int8_t *isLoaded);
@@ -1027,7 +1047,31 @@ void STD_handleEFEFileLoaded(int32_t arg)
 	setFileReadCallback2(STD_setupLoadedEFEFile, arg);
 }
 
-INCLUDE_ASM("asm/std/nonmatchings/std_effect", STD_tickEFEUVAnimation);
+void STD_tickEFEUVAnimation(int32_t idx)
+{
+	EfeUvAnim *anim;
+
+	anim = (EfeUvAnim *)&((int32_t *)MAIN_D_80134D0C[8])[idx * 8];
+	if (anim->numKeyframes != 0) {
+		++anim->uvFrame;
+		if (anim->uvFrame >= anim->uv->frames) {
+			anim->uvFrame = 0;
+			anim->keyframe = anim->keyframe + 1;
+			if (anim->keyframe >= anim->numKeyframes) {
+				anim->uv = anim->uvData;
+				anim->keyframe = 0;
+			} else {
+				anim->uv = anim->uv + 1;
+			}
+
+			STD_offsetEFEPrimitiveUVs((char *)((int32_t *)MAIN_D_80134D0C[6])[1], idx,
+			                          *(int8_t *)((uint32_t)anim->uv + 2),
+			                          *(int8_t *)((uint32_t)anim->uv + 3));
+		}
+		anim->frame = anim->frame + 1;
+		anim->frame = anim->frame % anim->numFrames;
+	}
+}
 
 void STD_tickParticleEmitters(void)
 {
@@ -1093,9 +1137,90 @@ void STD_tickParticleEmitters(void)
 	}
 }
 
-INCLUDE_ASM("asm/std/nonmatchings/std_effect", STD_renderParticleEmitters);
+void STD_renderParticleEmitters(void)
+{
+	int32_t f0;
+	int32_t f1;
+	int32_t mode;
+	SVECTOR a;
+	SVECTOR b;
+	int32_t z;
+	DVECTOR s0v;
+	DVECTOR s1v;
+	EfeParticleEffect *e;
+	EfeParticle *pt;
+	int32_t i;
+	int32_t k;
+	int32_t kind;
+	int8_t kb;
+	int32_t depth;
 
-int16_t STD_offsetEFEPrimitiveUVs(char *base, int32_t idx, int32_t du, int32_t dv)
+	e = MAIN_D_80134CCC;
+	for (i = 0; i < 4; e++, i++) {
+		if (e->transform == NULL) {
+			continue;
+		}
+
+		kb = kind = e->type;
+		for (k = 0; k < 0x14; k++) {
+			if (e->particles[k].distance <= 0) {
+				continue;
+			}
+
+			pt = &e->particles[k];
+			mode = kb & 1;
+			switch (kind) {
+			case 0:
+				f0 = pt->distance << 4;
+				f1 = (pt->distance + 7) << 4;
+				break;
+			case 1:
+				f0 = pt->distance << 4;
+				f1 = pt->distance << 2;
+				break;
+			case 3:
+				f0 = (e->startOffset - pt->distance) << 4;
+				f1 = (e->startOffset - pt->distance) << 2;
+				break;
+			case 2:
+				f0 = (e->startOffset - pt->distance) << 4;
+				f1 = ((e->startOffset - pt->distance) - 5) << 4;
+				break;
+			}
+
+			f0 = f0 / e->startOffset;
+			f1 = f1 / e->startOffset;
+			a.vx = pt->position.vx + ((pt->direction.vx * f0) >> 8);
+			a.vy = pt->position.vy + ((pt->direction.vy * f0) >> 8);
+			a.vz = pt->position.vz + ((pt->direction.vz * f0) >> 8);
+			b.vx = pt->position.vx + ((pt->direction.vx * f1) >> 8);
+			b.vy = pt->position.vy + ((pt->direction.vy * f1) >> 8);
+			b.vz = pt->position.vz + ((pt->direction.vz * f1) >> 8);
+			depth = worldPosToScreenPos(&a, &s0v);
+			depth = depth >> 2;
+			if (depth < 0x3e8) {
+				goto modeTest;
+			}
+		drawLine:
+				gte_ldv0(&b);
+				gte_rtps();
+				gte_stsxy(&s1v);
+				gte_stszotz(&z);
+				renderLinePrimitive(e->color.r | (e->color.g << 8) | (e->color.b << 16),
+				                    s0v.vx, s0v.vy, s1v.vx, s1v.vy,
+				                    (depth + z) >> 3, 0);
+			goto nextParticle;
+		modeTest:
+			if (mode == 1) {
+				goto drawLine;
+			}
+				renderFXParticle(&a, 0x19, &e->color);
+		nextParticle:;
+		}
+	}
+}
+
+int16_t STD_offsetEFEPrimitiveUVs(char *base, int32_t idx, int8_t du, int8_t dv)
 {
 	uint8_t code;
 	char *p;
@@ -1111,15 +1236,15 @@ int16_t STD_offsetEFEPrimitiveUVs(char *base, int32_t idx, int32_t du, int32_t d
 			goto setpath;
 		}
 		if (code & 4) {
-			p[4] = p[4] + du;
-			p[5] = p[5] + dv;
-			p[8] = p[8] + du;
-			p[9] = p[9] + dv;
-			p[0xc] = p[0xc] + du;
-			p[0xd] = p[0xd] + dv;
+			p[4] += du;
+			p[5] += dv;
+			p[8] += du;
+			p[9] += dv;
+			p[0xc] += du;
+			p[0xd] += dv;
 			if (code & 8) {
-				p[0x10] = p[0x10] + du;
-				p[0x11] = p[0x11] + dv;
+				p[0x10] += du;
+				p[0x11] += dv;
 				if (code & 0x10) {
 					goto s1;
 				}
@@ -1142,15 +1267,15 @@ s2:
 		goto next;
 setpath:
 		if (code & 4) {
-			p[4] = p[4] + du;
-			p[5] = p[5] + dv;
-			p[8] = p[8] + du;
-			p[9] = p[9] + dv;
-			p[0xc] = p[0xc] + du;
-			p[0xd] = p[0xd] + dv;
+			p[4] += du;
+			p[5] += dv;
+			p[8] += du;
+			p[9] += dv;
+			p[0xc] += du;
+			p[0xd] += dv;
 			if (code & 8) {
-				p[0x10] = p[0x10] + du;
-				p[0x11] = p[0x11] + dv;
+				p[0x10] += du;
+				p[0x11] += dv;
 				if (code & 0x10) {
 					goto s3;
 				}
@@ -1553,7 +1678,45 @@ INCLUDE_ASM("asm/std/nonmatchings/std_effect", STD_renderRingTube);
 
 INCLUDE_ASM("asm/std/nonmatchings/std_effect", STD_renderRibbonStrip);
 
-INCLUDE_ASM("asm/std/nonmatchings/std_effect", STD_tickRibbonPoints);
+void STD_tickRibbonPoints(void)
+{
+	SVECTOR *q;
+	int32_t i;
+	int32_t t;
+	int32_t v;
+	int16_t w;
+
+	q = EFE_POP1(SVECTOR *);
+	*(int32_t *)0x1F800200 = EFE_INSTANCE->frame;
+	for (i = 0; i < 10; i++) {
+		if (((*(int32_t *)0x1F800200 + i * 8) % 10) == 0) {
+			q[i].pad = customRandom(-0xF, 0xF);
+		}
+		q[i].vy += q[i].pad;
+		w = q[i].vy;
+		t = w;
+		if (w < -0x96) {
+			t = -0x96;
+		} else if (t >= 0x97) {
+			t = 0x96;
+		} else {
+			t = t;
+		}
+		q[i].vy = t;
+		q[i].vz += q[i].pad;
+		v = q[i].vz;
+		w = v;
+		t = w;
+		if (w < -0x96) {
+			t = -0x96;
+		} else if (t >= 0x97) {
+			t = 0x96;
+		} else {
+			t = t;
+		}
+		q[i].vz = t;
+	}
+}
 
 void STD_initializeRibbonPoints(void)
 {
@@ -2519,7 +2682,121 @@ void STD_func_800734B4(void)
 	out[2] = radius;
 }
 
-INCLUDE_ASM("asm/std/nonmatchings/std_effect", STD_applyHomingMovement);
+void STD_applyHomingMovement(void)
+{
+	SVECTOR d;
+	SVECTOR rot;
+	SVECTOR out;
+	MATRIX m;
+	int32_t limit;
+	int32_t *speed;
+	int32_t maxSpeed;
+	int32_t minSpeed;
+	int32_t *target;
+	int32_t *pos;
+	int32_t ang;
+	int32_t dy;
+	int32_t dp;
+	int32_t v;
+	int32_t w;
+	int32_t lim2;
+
+	limit = EFE_POP1(int32_t);
+	speed = EFE_POP1(int32_t *);
+	EFE_DROP1();
+	maxSpeed = EFE_POP1(int32_t);
+	minSpeed = EFE_POP1(int32_t);
+	target = EFE_POP1(int32_t *);
+
+	pos = (int32_t *)((int32_t)EFE_INSTANCE + 4);
+	d.vx = target[0] - pos[0];
+	d.vy = target[1] - pos[1];
+	d.vz = target[2] - pos[2];
+	rot.vx = 0;
+	rot.vy = -*(int32_t *)((int32_t)EFE_INSTANCE + 0x14);
+	rot.vz = 0;
+	RotMatrixZYX(&rot, &m);
+	ApplyMatrixSV(&m, &d, &out);
+
+	ang = -(_atan(out.vx, out.vz) - 0x400) & 0xfff;
+	if (ang >= 0x801) {
+		ang -= 0x1000;
+	}
+	if (ang > 0) {
+		if (ang < limit) {
+			dy = ang;
+		} else {
+			dy = limit;
+		}
+	} else {
+		if (-ang < limit) {
+			dy = ang;
+		} else {
+			dy = -limit;
+		}
+	}
+	*(int32_t *)((int32_t)EFE_INSTANCE + 0x14) += dy;
+
+	ang = _atan(out.vy, out.vz);
+	ang = (ang - 0x400 -
+	       *(int32_t *)((int32_t)EFE_INSTANCE + 0x18)) & 0xfff;
+	if (ang >= 0x801) {
+		ang -= 0x1000;
+	}
+	if (ang > 0) {
+		if (ang < limit) {
+			dp = ang;
+		} else {
+			dp = limit;
+		}
+	} else {
+		if (-ang < limit) {
+			dp = ang;
+		} else {
+			dp = -limit;
+		}
+	}
+	*(int32_t *)((int32_t)EFE_INSTANCE + 0x18) += dp;
+
+	w = *(int32_t *)((int32_t)EFE_INSTANCE + 0x18);
+	v = w;
+	w = w & 0xfff;
+	if ((w >= 0x400) && (w < 0xc00)) {
+		*(int32_t *)((int32_t)EFE_INSTANCE + 0x18) = 0x800 - v;
+	}
+
+	lim2 = limit * 40 / 100;
+	if (lim2 >= abs(dp) + abs(dy)) {
+		*speed = *speed * 130;
+		*speed = *speed / 100;
+		if (*speed > maxSpeed) {
+			*speed = maxSpeed;
+		}
+	} else {
+		*speed = *speed * 82;
+		*speed = *speed / 100;
+		if (*speed < minSpeed) {
+			*speed = minSpeed;
+		}
+	}
+
+	d.vx = 0;
+	d.vy = 0;
+	d.vz = -*speed << 3;
+	rot.vx = *(int32_t *)((int32_t)EFE_INSTANCE + 0x18);
+	rot.vy = 0;
+	rot.vz = 0;
+	RotMatrixZYX(&rot, &m);
+	ApplyMatrixSV(&m, &d, &out);
+	rot.vx = 0;
+	rot.vy = *(int32_t *)((int32_t)EFE_INSTANCE + 0x14);
+	rot.vz = 0;
+	RotMatrixZYX(&rot, &m);
+	ApplyMatrixSV(&m, &out, &out);
+	pos[0] += out.vx >> 3;
+	pos[1] += out.vy >> 3;
+	pos[2] += out.vz >> 3;
+}
 
 void STD_getUVAnimTimer(void)
 {
@@ -2672,7 +2949,82 @@ void STD_renderParallaxSprites(void)
 	GsSetWorkBase((PACKET *)prim);
 }
 
-INCLUDE_ASM("asm/std/nonmatchings/std_effect", STD_renderScrollingBackground);
+void STD_renderScrollingBackground(void)
+{
+	int16_t tx;
+	int16_t ux;
+	char *tiles;
+	int32_t color;
+	int16_t ux0;
+	int16_t uy;
+	int16_t bx;
+	int16_t ty;
+	int32_t sy;
+	int32_t sx;
+	int16_t *pal;
+	ModelComponent *model;
+	POLY_FT4 *prim;
+	int16_t x0;
+	int16_t y0;
+	int16_t row;
+	int16_t col;
+
+	color = EFE_POP1(int32_t);
+	sy = EFE_POP1(int32_t);
+	sx = EFE_POP1(int32_t);
+	pal = EFE_POP1(int16_t *);
+	tiles = EFE_POP1(char *);
+
+	sx = sx % 0x140;
+	tx = (sx >> 5) % 11;
+	if (sx < 0) {
+		sx += 0x140;
+		tx += 10;
+	}
+
+	sy = sy % 0x100;
+	ty = (sy >> 5) % 9;
+	if (sy < 0) {
+		sy += 0x100;
+		ty += 8;
+	}
+
+	model = (ModelComponent *)MAIN_D_80134D0C[6];
+	prim = (POLY_FT4 *)GsGetWorkBase();
+	y0 = (sy & 0x1f) - 0x98;
+	for (row = 0; row < 9; row++) {
+		bx = (sx & 0x1f) - 0xc0;
+		x0 = bx;
+		uy = ((ty + row) % 9) * 11;
+		ux0 = tx;
+		for (col = 0; col < 11; col++) {
+			ux = (ux0 + col) % 11;
+			SetPolyFT4(prim);
+			SetSemiTrans(prim, 1);
+			prim->code |= 2;
+			prim->b0 = color;
+			prim->g0 = color;
+			prim->r0 = color;
+			prim->tpage = model->pixelPage | 0x20;
+			prim->clut = model->clutPage;
+			prim->u0 = model->pixelOffsetX + pal[tiles[uy + ux]];
+			prim->v0 = model->pixelOffsetY;
+			prim->u1 = model->pixelOffsetX + pal[tiles[uy + ux]] + 0x1f;
+			prim->v1 = model->pixelOffsetY;
+			prim->u2 = model->pixelOffsetX + pal[tiles[uy + ux]];
+			prim->v2 = model->pixelOffsetY + 0x1f;
+			prim->u3 = model->pixelOffsetX + pal[tiles[uy + ux]] + 0x1f;
+			prim->v3 = model->pixelOffsetY + 0x1f;
+			setXYWH(prim, x0, y0, 0x20, 0x20);
+			AddPrim(ACTIVE_ORDERING_TABLE->org + 0x1e, prim);
+			prim++;
+			x0 += 0x20;
+		}
+		y0 += 0x20;
+	}
+
+	GsSetWorkBase((PACKET *)prim);
+}
 
 void STD_setTransformToBoneOffset(void)
 {
@@ -3344,7 +3696,67 @@ void STD_checkTechCompatibility(void)
 	MAIN_D_80134CE8->boneOffset = (EfeBoneOffset *)MAIN_D_80134CF0;
 }
 
-INCLUDE_ASM("asm/std/nonmatchings/std_effect", STD_spawnEFESubEffect);
+void STD_spawnEFESubEffect(void)
+{
+	int16_t stride;
+	int16_t i;
+	int16_t n;
+	Entity *src;
+	EfeSubEffect *sub;
+	int32_t *p;
+	int16_t *ip;
+	Entity *tgt;
+
+	MAIN_D_80134CE0 = 1;
+	ip = MAIN_D_80134D00;
+	n = ip[1];
+	p = (int32_t *)(ip[2] + MAIN_D_80134D08);
+	stride = ip[4];
+	for (i = 0; i < n; i++) {
+		if (*p == -1) {
+			break;
+		}
+		p = (int32_t *)((int32_t)p + stride);
+	}
+
+	if (i == n) {
+		STD_returnFromEFESubroutine();
+		return;
+	}
+
+	if (MAIN_D_80134CE4 == -1) {
+		MAIN_D_80134CE4 = i;
+	}
+
+	sub = MAIN_D_80134CE8;
+	src = sub->sourceEntity;
+	tgt = sub->targetEntity;
+	for (;;) {
+		if (MAIN_D_80134CE8->inst == NULL) {
+			break;
+		}
+		MAIN_D_80134CE8++;
+		if ((int32_t)MAIN_D_80134CE8 >= ((int32_t *)MAIN_D_80134D0C[6])[1]) {
+			STD_returnFromEFESubroutine();
+			return;
+		}
+	}
+
+	EFE_PARENT_INSTANCE = (int32_t)EFE_INSTANCE;
+	EFE_INSTANCE = (EfeInstance *)p;
+	MAIN_D_80134CE8->instance = (EfeInstance *)p;
+	MAIN_D_80134CE8->parentInstance = (EfeInstance *)EFE_PARENT_INSTANCE;
+	if (EFE_PARENT_INSTANCE == 0) {
+		MAIN_D_80134CE8->sourceEntity = (Entity *)MAIN_D_80134EF8;
+		MAIN_D_80134CE8->targetEntity = (Entity *)MAIN_D_80134EF4;
+	} else {
+		MAIN_D_80134CE8->sourceEntity = src;
+		MAIN_D_80134CE8->targetEntity = tgt;
+	}
+
+	MAIN_D_80134CDC = 1;
+	MAIN_D_80134D00 = (int16_t *)((int32_t)MAIN_D_80134D00 + 0xC);
+}
 
 void STD_popEFEValueToVariable(void)
 {
@@ -4091,7 +4503,75 @@ void STD_tickStunEffect(int32_t i)
 	}
 }
 
-INCLUDE_ASM("asm/std/nonmatchings/std_effect", STD_renderStunEffect);
+void STD_renderStunEffect(int32_t idx)
+{
+	SVECTOR pos;
+	DVECTOR screen;
+	int16_t *p;
+	int32_t scale;
+	int32_t value;
+	int32_t cy;
+
+	p = STD_D_8007FD10[idx];
+	switch (p[2]) {
+	case 0:
+		value = (p[1] - p[0]) * 100 / 20;
+		scale = 0x1000;
+		cy = 0;
+		break;
+	case 1:
+		value = 0;
+		scale = 0x1000;
+		cy = p[0] % 2;
+		break;
+	case 2:
+		value = 0;
+		scale = lerp(0x1000, 0xcc, 0, 5, p[0]);
+		cy = 0;
+		break;
+	}
+
+	pos.vx = ((Entity *)((int32_t *)p)[2])->posData->location.vx;
+	pos.vy = -DIGIMON_DATA[((Entity *)((int32_t *)p)[2])->type].height * 113 / 100;
+	pos.vz = ((Entity *)((int32_t *)p)[2])->posData->location.vz;
+	worldPosToScreenPos(&pos, &screen);
+
+	STD_D_8007AFD0.x = screen.vx;
+	STD_D_8007AFD0.y = screen.vy;
+	STD_D_8007AFD0.scalex = scale;
+	STD_D_8007AFD0.scaley = scale;
+	STD_D_8007AFD0.mx = 0xe;
+	STD_D_8007AFD0.u = (value / 1000 % 10) * 8;
+	GsSortSprite(&STD_D_8007AFD0, ACTIVE_ORDERING_TABLE, 0x22);
+	STD_D_8007AFD0.mx = 7;
+	STD_D_8007AFD0.u = (value / 100 % 10) * 8;
+	GsSortSprite(&STD_D_8007AFD0, ACTIVE_ORDERING_TABLE, 0x22);
+
+	STD_D_8007AFF4.x = screen.vx;
+	STD_D_8007AFF4.y = screen.vy;
+	STD_D_8007AFF4.scalex = scale;
+	STD_D_8007AFF4.scaley = scale;
+	STD_D_8007AFF4.mx = -2;
+	STD_D_8007AFF4.u = (value / 10 % 10) * 4;
+	GsSortSprite(&STD_D_8007AFF4, ACTIVE_ORDERING_TABLE, 0x22);
+	STD_D_8007AFF4.mx = -8;
+	STD_D_8007AFF4.u = (value % 10) * 4;
+	GsSortSprite(&STD_D_8007AFF4, ACTIVE_ORDERING_TABLE, 0x22);
+
+	STD_D_8007AF88.x = screen.vx;
+	STD_D_8007AF88.y = screen.vy;
+	STD_D_8007AF88.cy = cy + 0x1e0;
+	STD_D_8007AF88.scalex = scale;
+	STD_D_8007AF88.scaley = scale;
+	GsSortSprite(&STD_D_8007AF88, ACTIVE_ORDERING_TABLE, 0x22);
+
+	STD_D_8007AFAC.x = screen.vx;
+	STD_D_8007AFAC.y = screen.vy;
+	STD_D_8007AFAC.cy = cy + 0x1e0;
+	STD_D_8007AFAC.scalex = scale;
+	STD_D_8007AFAC.scaley = scale;
+	GsSortSprite(&STD_D_8007AFAC, ACTIVE_ORDERING_TABLE, 0x22);
+}
 
 void STD_removeAllStunSubEffects(void)
 {

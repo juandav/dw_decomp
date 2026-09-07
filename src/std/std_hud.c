@@ -6,6 +6,7 @@
 #include <libgpu.h>
 #include <libgs.h>
 #include <libgte.h>
+#include <mwinline_n.h>
 
 #include <dw/aabb.h>
 #include <dw/clock.h>
@@ -66,6 +67,7 @@ extern int32_t STD_D_8007A9A4[];
 extern uint8_t MAIN_D_801348C0[8];
 extern uint8_t MAIN_D_801348C8[8];
 extern uint8_t MAIN_D_801348D0[8];
+extern MATRIX STD_D_8007A718;
 
 void STD_func_8006B1F0(uint32_t *tmd, int32_t vofs, int32_t nofs, int32_t objIdx);
 void STD_func_8006B6F4(void);
@@ -375,7 +377,131 @@ void STD_initializeBattleStartTextBurst(void)
 	addObject(0x1a6, 0, NULL, STD_renderBattleStartTextBurst);
 }
 
-INCLUDE_ASM("asm/std/nonmatchings/std_hud", STD_renderBattleStartTextBurst);
+void STD_renderBattleStartTextBurst(void)
+{
+	POLY_FT4 *ft;
+	POLY_F4 *shadow;
+	char (*p)[20];
+	POLY_FT4 *prim;
+	GsOT_TAG *ot;
+	int32_t i;
+	int32_t dead;
+	int32_t j;
+	int16_t cx;
+	int16_t cy;
+	int32_t otz;
+	SVECTOR corner[4];
+	SVECTOR pts[4];
+	SVECTOR out;
+	MATRIX m;
+
+	GsSetProjection(0x200);
+	GsSetLsMatrix(&STD_D_8007A718);
+
+	corner[0].vx = -4;
+	corner[0].vy = -6;
+	corner[0].vz = 0;
+	corner[1].vx = 4;
+	corner[1].vy = -6;
+	corner[1].vz = 0;
+	corner[2].vx = -4;
+	corner[2].vy = 6;
+	corner[2].vz = 0;
+	corner[3].vx = 4;
+	corner[3].vy = 6;
+	corner[3].vz = 0;
+
+	ot = ACTIVE_ORDERING_TABLE->org;
+	dead = 0;
+	p = (char (*)[20])STD_D_8007BB94;
+	prim = (POLY_FT4 *)GsGetWorkBase();
+	for (i = 0; i < 0x9b; i++, p++) {
+		if ((((int16_t *)*p)[6] == 0) && (((int16_t *)*p)[7] == 0)) {
+			dead++;
+			continue;
+		}
+
+		PushMatrix();
+		RotMatrix((SVECTOR *)*p, &m);
+		for (j = 0; j < 4; j++) {
+			ApplyMatrixSV(&m, &corner[j], &out);
+			pts[j].vx = out.vx + ((int16_t *)*p)[4] - 4;
+			pts[j].vy = out.vy + ((int16_t *)*p)[5] - 6;
+			pts[j].vz = out.vz;
+		}
+
+		switch (((uint8_t *)*p)[0x13]) {
+		case 0:
+			((int16_t *)*p)[0] += 0x100;
+			((int16_t *)*p)[1] += 0x100;
+			break;
+		case 1:
+			((int16_t *)*p)[1] += 0x100;
+			((int16_t *)*p)[2] += 0x100;
+			break;
+		case 2:
+			((int16_t *)*p)[0] += 0x100;
+			((int16_t *)*p)[2] += 0x100;
+			break;
+		}
+
+		PopMatrix();
+
+		ft = prim;
+		setEntityTextDigit(prim, 0x100, 0x1e8);
+		prim->r0 = 0x80;
+		prim->g0 = 0x80;
+		prim->b0 = 0x80;
+		prim->clut = GetClut(0x100, 0x1e8);
+		gte_ldv3(&pts[0], &pts[1], &pts[2]);
+		gte_rtpt();
+		gte_stsxy3(&prim->x0, &prim->x1, &prim->x2);
+		gte_stszotz(&otz);
+		gte_ldv0(&pts[3]);
+		gte_rtps();
+		gte_stsxy(&prim->x3);
+		prim->u0 = ((uint8_t *)*p)[0x13] * 8 + 0x80;
+		prim->v0 = 0x80;
+		prim->u1 = ((uint8_t *)*p)[0x13] * 8 + 0x88;
+		prim->v1 = 0x80;
+		prim->u2 = ((uint8_t *)*p)[0x13] * 8 + 0x80;
+		prim->v2 = 0x88;
+		prim->u3 = ((uint8_t *)*p)[0x13] * 8 + 0x88;
+		prim->v3 = 0x88;
+		AddPrim(ot + 5, prim++);
+		shadow = (POLY_F4 *)prim;
+		SetPolyF4(shadow);
+		shadow->r0 = 0;
+		shadow->g0 = 0;
+		shadow->b0 = 0;
+		shadow->x0 = ft->x0 + 2;
+		shadow->y0 = ft->y0 + 2;
+		shadow->x1 = ft->x1 + 2;
+		shadow->y1 = ft->y1 + 2;
+		shadow->x2 = ft->x2 + 2;
+		shadow->y2 = ft->y2 + 2;
+		shadow->x3 = ft->x3 + 2;
+		shadow->y3 = ft->y3 + 2;
+		AddPrim(ot + 6, shadow++);
+		prim = (POLY_FT4 *)shadow;
+
+		cx = ft->x0;
+		cy = ft->y0;
+		if ((cx < -0xb4) || (cx >= 0xb5) || (cy < -0x8c) || (cy >= 0x8d)) {
+			((int16_t *)*p)[6] = 0;
+			((int16_t *)*p)[7] = 0;
+		}
+		((int16_t *)*p)[4] = ((int16_t *)*p)[4] + ((int16_t *)*p)[6];
+		((int16_t *)*p)[5] = ((int16_t *)*p)[5] + ((int16_t *)*p)[7];
+	}
+
+	GsSetWorkBase((PACKET *)prim);
+	if (dead == 0x9b) {
+		MAIN_D_80135194 = 1;
+	}
+	GsSetProjection(VIEWPORT_DISTANCE);
+	GsSetRefView2(&GS_VIEWPOINT);
+}
 
 void STD_func_8006A508(void)
 {
