@@ -50,7 +50,7 @@ extern VECTOR STORED_TAMER_POS;
 typedef void (*ItemFunction)(int16_t);
 extern ItemFunction ITEM_FUNCTIONS[128];
 
-extern int8_t ITEM_TAKE_DISTANCE[67];
+extern int8_t ITEM_TAKE_DISTANCE[68];
 
 void tickMainMenu(int32_t instanceId);
 void renderMainMenu(int32_t instanceId);
@@ -110,7 +110,7 @@ int32_t tickEntityWalkTo(uint8_t scriptId1, uint8_t scriptId2,
 			 int8_t withCamera);
 void handleToilet();
 void getModelTile(VECTOR *pos, int16_t *outTileX, int16_t *outTileY);
-int32_t createPoopPile(int32_t tileX, int32_t tileY);
+int32_t createPoopPile(int16_t tileX, int16_t tileY);
 void handleWildPoop();
 void deinitializeFishing();
 void removeTriangleMenu();

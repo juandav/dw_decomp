@@ -12,7 +12,7 @@ typedef struct {
 	int16_t unk2;
 	uint8_t poopSize;
 	uint8_t favoriteFood;
-	int8_t sleepCycle;
+	uint8_t sleepCycle;
 	uint8_t favoredRegion;
 	uint8_t trainingType;
 	uint8_t defaultWeight;

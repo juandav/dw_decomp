@@ -181,7 +181,7 @@ void addGameMenu(void);
 void setPartnerIdling(void);
 int32_t getTileTrigger(VECTOR *pos);
 void getModelTile(VECTOR *pos, int16_t *outTileX, int16_t *outTileY);
-int32_t createPoopPile(int32_t tileX, int32_t tileY);
+int32_t createPoopPile(int16_t tileX, int16_t tileY);
 void moveCameraByDiff(VECTOR *prev, VECTOR *cur);
 void getRotationDifference(PositionData *data, VECTOR *target,
                            int16_t *outX, int16_t *outY, int16_t *outZ);

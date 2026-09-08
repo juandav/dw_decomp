@@ -419,7 +419,7 @@ SECTIONS
         . = ALIGN(., 4);
         KEEP(build/src/main/_psstart.c.o(.data.*))
         . = ALIGN(., 4);
-        build/asm/main/data/partner_impl.data.s.o(.data.*)
+        build/src/main/partner_impl.c.o(.data.*)
         . = ALIGN(., 4);
         build/src/main/tamer.c.o(.data.*)
         build/src/main/toilet_data.c.o(.data.*)
@@ -534,7 +534,7 @@ SECTIONS
         . = ALIGN(., 4);
         build/src/main/file_table.c.o(.sdata.*)
         . = ALIGN(., 4);
-        build/asm/main/data/partner_impl.sdata.s.o(.sdata.*)
+        build/src/main/partner_impl.c.o(.sdata.*)
         . = ALIGN(., 4);
         build/src/main/tamer.c.o(.sdata.*)
         . = ALIGN(., 4);
