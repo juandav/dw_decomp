@@ -97,6 +97,9 @@ segments:
       - [0x194D4, c, std_effect]
       - [0x26E0C, .rodata]
       - [0x26E58, rodata]
+      - [0x26E78, bin]
+      - [0x26E8C, rodata]
+      - [0x26EAC, bin]
       - [0x26ED4, data]
 
   - [0x2D3E8]

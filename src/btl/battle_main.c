@@ -3049,7 +3049,57 @@ int16_t BTL_getStrongestMove(int32_t index, int16_t *flags)
 
 INCLUDE_ASM("asm/btl/nonmatchings/battle_main", BTL_getMostEffectiveMove);
 
-INCLUDE_ASM("asm/btl/nonmatchings/battle_main", BTL_handleHitReaction);
+void BTL_handleHitReaction(Entity *entity, FighterData *fighter, AttackObject *attack, int16_t index)
+{
+	VECTOR *loc;
+	int16_t *rotY;
+	int32_t ax;
+	int32_t az;
+	int32_t dx;
+	int32_t dz;
+	int32_t nx;
+	int16_t ang;
+
+	loc = &entity->posData->location;
+	rotY = &entity->posData->rotation.vy;
+	ax = ax = attack->position.vx;
+	az = az = attack->position.vz;
+	dx = loc->vx - ax;
+	dz = loc->vz - az;
+	nx = nx = -dx;
+	ang = _atan(-dz, nx);
+	if (fighter->flags & 8) {
+		*rotY = ang;
+		entity->flatSprite = 3;
+		startAnimation(entity, 0x28);
+		return;
+	}
+	if (*rotY >= 0x400 && *rotY < 0xc00) {
+		if (*rotY - 0x400 <= ang && *rotY + 0x400 >= ang) {
+			*rotY = ang;
+			BTL_startHitAnimation(entity, attack, 0x28);
+		} else {
+			*rotY = _atan(dz, dx);
+			BTL_startHitAnimation(entity, attack, 0x29);
+		}
+	} else if (!(0 > *rotY) && *rotY < 0x400) {
+		if ((!(0 > ang) && ang <= *rotY + 0x400) || (ang >= *rotY + 0xc00 && ang < 0x1000)) {
+			*rotY = ang;
+			BTL_startHitAnimation(entity, attack, 0x28);
+		} else {
+			*rotY = _atan(dz, dx);
+			BTL_startHitAnimation(entity, attack, 0x29);
+		}
+	} else {
+		if ((*rotY - 0x400 <= ang && ang < 0x1000) || (!(0 > ang) && *rotY - 0xc00 >= ang)) {
+			*rotY = ang;
+			BTL_startHitAnimation(entity, attack, 0x28);
+		} else {
+			*rotY = _atan(dz, dx);
+			BTL_startHitAnimation(entity, attack, 0x29);
+		}
+	}
+}
 
 void BTL_applyMoveStatus(DigimonEntity *digimon, FighterData *fighter, int32_t move)
 {
@@ -3245,7 +3295,7 @@ int16_t BTL_calculateTargetScore(DigimonEntity *self, DigimonEntity *other)
 
 	st = &self->stats;
 	mult = MAIN_D_80125F70[DIGIMON_DATA[self->entity.type].special[0]]
-	                      [DIGIMON_DATA[other->entity.type].special[0]];
+			      [DIGIMON_DATA[other->entity.type].special[0]];
 	eff = mult;
 	switch (eff) {
 	case 20:

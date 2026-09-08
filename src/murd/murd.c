@@ -1,3 +1,4 @@
+#include <libetc.h>
 #include <libgpu.h>
 #include <libgs.h>
 #include <libgte.h>
@@ -458,7 +459,7 @@ void MURD_renderDigimon(Entity *entity, int32_t depth)
 			GsSetLightMatrix(&m);
 			GsGetLs(pos->obj.coord2, &m);
 			GsSetLsMatrix(&m);
-			GsSortObject4(&pos->obj, &MURD_ORDERING_TABLES[ACTIVE_FRAMEBUFFER], 3, (u_long *)0x1f800000);
+			GsSortObject4(&pos->obj, &MURD_ORDERING_TABLES[ACTIVE_FRAMEBUFFER], 3, getScratchAddr(0));
 		}
 	}
 

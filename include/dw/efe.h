@@ -20,6 +20,12 @@
 #define EFE_PUSH2(type, value) EFE_PUSH(MAIN_D_80134CFC, type, value)
 
 #define EFE_SCRATCH ((EfeScratch *)getScratchAddr(0))
+#define EFE_SPRITE_SCRATCH ((EfeSpriteScratch *)getScratchAddr(0))
+#define EFE_PROJ_SCRATCH ((EfeProjScratch *)getScratchAddr(42))
+#define EFE_WAVE_SCRATCH ((EfeWaveScratch *)getScratchAddr(34))
+#define EFE_RIBBON_SCRATCH ((EfeRibbonScratch *)getScratchAddr(42))
+
+#define EFE_SORT_WORKSPACE getScratchAddr(44)
 
 typedef struct {
 	int32_t vx;
@@ -81,6 +87,51 @@ typedef struct {
 	VECTOR *scale;
 	int32_t id;
 } EfeScratch;
+
+typedef struct {
+	long sxy;
+	long otz;
+	long p;
+	long flag;
+	VECTOR *position;
+	SVECTOR point;
+	GsSPRITE sprite;
+} EfeSpriteScratch;
+
+typedef struct {
+	long p;
+	long flag;
+	long otz;
+} EfeProjScratch;
+
+typedef struct {
+	int32_t ring;
+	uint32_t unk8C;
+	int32_t halfWidth;
+	int32_t height;
+	int32_t radius;
+	int32_t prevHalfWidth;
+	int32_t prevHeight;
+	int32_t prevRadius;
+	EfeProjScratch proj;
+	int32_t phase;
+	uint16_t tpage;
+	uint16_t clut;
+	SVECTOR quad[4];
+} EfeWaveScratch;
+
+typedef struct {
+	EfeProjScratch proj;
+	SVECTOR edge[10][4];
+	uint16_t tpage;
+	uint16_t clut;
+	RGB8 color;
+	uint8_t pad0;
+	RGB8 colorHalf;
+	uint8_t pad1;
+	int32_t frame;
+	int32_t width;
+} EfeRibbonScratch;
 
 typedef struct {
 	int32_t frame;

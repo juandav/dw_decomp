@@ -369,6 +369,7 @@ void BTL_tickBuffRings(int32_t idx);
 void BTL_renderBuffRingsSpark(char *pos, int32_t scale, SVECTOR *dir, uint8_t *col);
 void BTL_initializeUnk2(void);
 int32_t BTL_addBuffRingsEffect(uint8_t idx, Entity *e);
+long RotTransPers4(SVECTOR *v0, SVECTOR *v1, SVECTOR *v2, SVECTOR *v3, long *sxy0, long *sxy1, long *sxy2, long *sxy3, long *p, long *flag);
 
 extern SVECTOR BTL_D_80075244[];
 extern uint8_t BTL_D_80073704[];
@@ -434,6 +435,10 @@ extern EfeTrailEffect BTL_D_80075CA0[];
 extern EfeBuffRings BTL_D_80075E0C[];
 extern BtlItemParticleEffect BTL_D_800753AC[];
 extern EfeBuffDisk BTL_D_80075C7C[];
+extern uint8_t BTL_D_80073714[];
+extern int16_t BTL_D_8007371C[];
+extern int16_t BTL_D_80073724[];
+extern int32_t MAIN_D_801347A0;
 
 static void *battle_effect_functions[] = {
 	BTL_removeAllBuffRingsEffects,
@@ -1084,21 +1089,21 @@ void BTL_renderParticleEmitters(void)
 			if (depth < 0x3e8) {
 				goto modeTest;
 			}
-		drawLine:
-				gte_ldv0(&b);
-				gte_rtps();
-				gte_stsxy(&s1v);
-				gte_stszotz(&z);
-				renderLinePrimitive(e->color.r | (e->color.g << 8) | (e->color.b << 16),
-				                    s0v.vx, s0v.vy, s1v.vx, s1v.vy,
-				                    (depth + z) >> 3, 0);
+drawLine:
+			gte_ldv0(&b);
+			gte_rtps();
+			gte_stsxy(&s1v);
+			gte_stszotz(&z);
+			renderLinePrimitive(e->color.r | (e->color.g << 8) | (e->color.b << 16),
+			                    s0v.vx, s0v.vy, s1v.vx, s1v.vy,
+			                    (depth + z) >> 3, 0);
 			goto nextParticle;
-		modeTest:
+modeTest:
 			if (mode == 1) {
 				goto drawLine;
 			}
-				renderFXParticle(&a, 0x19, &e->color);
-		nextParticle:;
+			renderFXParticle(&a, 0x19, &e->color);
+nextParticle:;
 		}
 	}
 }
@@ -1397,7 +1402,63 @@ void BTL_applyBoxAttackHit(void)
 	}
 }
 
-INCLUDE_ASM("asm/btl/nonmatchings/battle_effect", BTL_applyRadiusAttackHit);
+void BTL_applyRadiusAttackHit(void)
+{
+	SVECTOR pos;
+	int32_t *hitFlag;
+	int32_t r;
+	int32_t i;
+	Entity *e;
+	Entity *e2;
+	int32_t dx;
+	int32_t dz;
+	int32_t radius;
+	int32_t lx;
+	int32_t lz;
+
+	hitFlag = EFE_POP1(int32_t *);
+	r = EFE_POP1(int32_t);
+	r = r * r;
+	*hitFlag = 0;
+	MAIN_D_80134CD8 = 1;
+	while (MAIN_D_80134CD8 < 10) {
+		e = ENTITY_TABLE[(*(int32_t *)&MAIN_D_80134CD8)];
+		e2 = ENTITY_TABLE[(*(int32_t *)&MAIN_D_80134CD8)];
+		if (e == MAIN_D_80134CE8->sourceEntity) {
+			goto next;
+		}
+		if (e == NULL) {
+			goto next;
+		}
+		if (((DigimonEntity *)e)->stats.current.isHit != 0) {
+			goto next;
+		}
+		if (e->isOnMap == 0) {
+			goto next;
+		}
+		radius = DIGIMON_DATA[e->type].radius;
+		radius = radius * radius;
+		lx = e->posData->location.vx;
+		dx = *(int32_t *)((int32_t)EFE_INSTANCE + 4) - lx;
+		lz = e->posData->location.vz;
+		dz = *(int32_t *)((int32_t)EFE_INSTANCE + 0xc) - lz;
+		if (radius + r < dz * dz + dx * dx) {
+			goto next;
+		}
+		for (i = 1; i < 10; i++) {
+			if (ENTITY_TABLE[i] == MAIN_D_80134CE8->sourceEntity) {
+				break;
+			}
+		}
+		((DigimonEntity *)e2)->stats.current.isHit = 1;
+		BTL_calculateAttackHitPosition(&pos, (int32_t *)e, (int32_t *)MAIN_D_80134CE8->sourceEntity, DIGIMON_DATA[e->type].radius);
+		pos.vy = -DIGIMON_DATA[e->type].height / 2;
+		addAttackObject(MAIN_D_80134CD8, 1, &pos, (int32_t)((uint32_t)(char *)MAIN_D_80134CD4), MAIN_D_80134CD0, i);
+		*hitFlag = 1;
+next:
+		MAIN_D_80134CD8++;
+	}
+}
 
 void BTL_applyLineAttackHit(void)
 {
@@ -1517,9 +1578,9 @@ void BTL_tickRibbonPoints(void)
 	int16_t w;
 
 	q = EFE_POP1(SVECTOR *);
-	*(int32_t *)0x1F800200 = EFE_INSTANCE->frame;
+	EFE_RIBBON_SCRATCH->frame = EFE_INSTANCE->frame;
 	for (i = 0; i < 10; i++) {
-		if (((*(int32_t *)0x1F800200 + i * 8) % 10) == 0) {
+		if (((EFE_RIBBON_SCRATCH->frame + i * 8) % 10) == 0) {
 			q[i].pad = customRandom(-0xF, 0xF);
 		}
 		q[i].vy += q[i].pad;
@@ -1563,7 +1624,107 @@ void BTL_initializeRibbonPoints(void)
 	}
 }
 
-INCLUDE_ASM("asm/btl/nonmatchings/battle_effect", BTL_renderRadialWaves);
+void BTL_renderRadialWaves(void)
+{
+	POLY_FT4 *prim;
+	int16_t *uv;
+	int16_t *t38;
+	int16_t *t40;
+	int32_t i;
+	int32_t w;
+
+	for (i = 0; i < 0x18U; i += 2) {
+		BTL_D_80073714[i] += ((ModelComponent *)MAIN_D_80134D0C[6])->pixelOffsetX;
+		BTL_D_80073714[i + 1] += ((ModelComponent *)MAIN_D_80134D0C[6])->pixelOffsetY;
+	}
+	EFE_WAVE_SCRATCH->tpage = ((ModelComponent *)MAIN_D_80134D0C[6])->pixelPage | 0x20;
+	EFE_WAVE_SCRATCH->clut = ((ModelComponent *)MAIN_D_80134D0C[6])->clutPage + 0x40;
+	EFE_SCRATCH->scale = EFE_POP1(VECTOR *);
+	EFE_SCRATCH->rot.vx = ((int32_t *)((int32_t)EFE_INSTANCE + 0x10))[0];
+	EFE_SCRATCH->rot.vy = ((int32_t *)((int32_t)EFE_INSTANCE + 0x10))[1];
+	EFE_SCRATCH->rot.vz = ((int32_t *)((int32_t)EFE_INSTANCE + 0x10))[2];
+	EFE_SCRATCH->m1.t[0] = ((int32_t *)((int32_t)EFE_INSTANCE + 4))[0];
+	EFE_SCRATCH->m1.t[1] = ((int32_t *)((int32_t)EFE_INSTANCE + 4))[1];
+	EFE_SCRATCH->m1.t[2] = ((int32_t *)((int32_t)EFE_INSTANCE + 4))[2];
+	EFE_WAVE_SCRATCH->phase = EFE_INSTANCE->frame * -400;
+
+	for (EFE_WAVE_SCRATCH->ring = 0; EFE_WAVE_SCRATCH->ring < 6; (EFE_WAVE_SCRATCH->ring)++) {
+		EFE_SCRATCH->rot.vy = EFE_SCRATCH->rot.vy + 0x2aa;
+		RotMatrixYXZ(&EFE_SCRATCH->rot, &EFE_SCRATCH->m1);
+		ScaleMatrix(&EFE_SCRATCH->m1, EFE_SCRATCH->scale);
+		GsMulCoord0(&GsWSMATRIX, &EFE_SCRATCH->m1, &EFE_SCRATCH->m0);
+		GsSetLightMatrix(&EFE_SCRATCH->m1);
+		GsSetLsMatrix(&EFE_SCRATCH->m0);
+		EFE_WAVE_SCRATCH->radius = 0xc8;
+		t38 = BTL_D_8007371C;
+		t40 = BTL_D_80073724;
+		for (; EFE_WAVE_SCRATCH->radius < 0xbb8;
+		     EFE_WAVE_SCRATCH->radius += 0x64) {
+			w = (EFE_WAVE_SCRATCH->radius < 0x2ef)
+			            ? BTL_interpolateClamped(0xc8, 0x2ee, *(uint32_t *)&EFE_WAVE_SCRATCH->radius, 0xc8, 0xfa)
+			    : (EFE_WAVE_SCRATCH->radius < 0x8cb)
+			            ? BTL_interpolateClamped(0x2ee, 0x8ca, *(uint32_t *)&EFE_WAVE_SCRATCH->radius, 0xfa, 0x7d)
+			            : BTL_interpolateClamped(0x8ca, 0xbb8, *(uint32_t *)&EFE_WAVE_SCRATCH->radius, 0x7d, 0xa);
+			EFE_WAVE_SCRATCH->height = w;
+			i = EFE_WAVE_SCRATCH->phase + EFE_WAVE_SCRATCH->radius * 4 +
+			    EFE_WAVE_SCRATCH->ring * 0x309;
+			EFE_WAVE_SCRATCH->height =
+				((EFE_WAVE_SCRATCH->height * rsin(i)) >> 12) -
+				EFE_WAVE_SCRATCH->height - 0xc8;
+			EFE_WAVE_SCRATCH->halfWidth = EFE_WAVE_SCRATCH->radius / 5;
+			if (EFE_WAVE_SCRATCH->radius != 0xc8) {
+				prim = (POLY_FT4 *)GsGetWorkBase();
+				EFE_WAVE_SCRATCH->quad[0].vx = -EFE_WAVE_SCRATCH->halfWidth;
+				EFE_WAVE_SCRATCH->quad[0].vy = EFE_WAVE_SCRATCH->height;
+				EFE_WAVE_SCRATCH->quad[0].vz = EFE_WAVE_SCRATCH->radius;
+				EFE_WAVE_SCRATCH->quad[1].vx = EFE_WAVE_SCRATCH->halfWidth;
+				EFE_WAVE_SCRATCH->quad[1].vy = EFE_WAVE_SCRATCH->height;
+				EFE_WAVE_SCRATCH->quad[1].vz = EFE_WAVE_SCRATCH->radius;
+				EFE_WAVE_SCRATCH->quad[2].vx = -EFE_WAVE_SCRATCH->prevHalfWidth;
+				EFE_WAVE_SCRATCH->quad[2].vy = EFE_WAVE_SCRATCH->prevHeight;
+				EFE_WAVE_SCRATCH->quad[2].vz = EFE_WAVE_SCRATCH->prevRadius;
+				EFE_WAVE_SCRATCH->quad[3].vx = EFE_WAVE_SCRATCH->prevHalfWidth;
+				EFE_WAVE_SCRATCH->quad[3].vy = EFE_WAVE_SCRATCH->prevHeight;
+				EFE_WAVE_SCRATCH->quad[3].vz = EFE_WAVE_SCRATCH->prevRadius;
+				EFE_PROJ_SCRATCH->otz = RotTransPers4(
+					&EFE_WAVE_SCRATCH->quad[0], &EFE_WAVE_SCRATCH->quad[1], &EFE_WAVE_SCRATCH->quad[2],
+					&EFE_WAVE_SCRATCH->quad[3], (long *)&prim->x0, (long *)&prim->x1,
+					(long *)&prim->x2, (long *)&prim->x3, &EFE_PROJ_SCRATCH->p,
+					&EFE_PROJ_SCRATCH->flag);
+				if ((EFE_PROJ_SCRATCH->flag & 0x80000000) == 0) {
+					((int32_t *)prim)[1] = MAIN_D_801347A0;
+					prim->clut = EFE_WAVE_SCRATCH->clut;
+					prim->tpage = EFE_WAVE_SCRATCH->tpage;
+					if (EFE_WAVE_SCRATCH->radius == 0x12c) {
+						uv = t38;
+					} else if (EFE_WAVE_SCRATCH->radius >= 0xb54) {
+						uv = t40;
+					} else {
+						uv = (int16_t *)BTL_D_80073714;
+					}
+					*(int16_t *)&prim->u0 = uv[0];
+					*(int16_t *)&prim->u1 = uv[1];
+					*(int16_t *)&prim->u2 = uv[2];
+					*(int16_t *)&prim->u3 = uv[3];
+					setlen(prim, 9);
+					prim->code = 0x2c;
+					prim->code |= 2;
+					prim->code = prim->code & 0xfffffffe;
+					addPrim(ACTIVE_ORDERING_TABLE->org + (EFE_PROJ_SCRATCH->otz >> 2),
+					        prim);
+					GsSetWorkBase((PACKET *)(prim + 1));
+				}
+			}
+			EFE_WAVE_SCRATCH->prevHalfWidth = EFE_WAVE_SCRATCH->halfWidth;
+			EFE_WAVE_SCRATCH->prevHeight = EFE_WAVE_SCRATCH->height;
+			EFE_WAVE_SCRATCH->prevRadius = EFE_WAVE_SCRATCH->radius;
+		}
+	}
+	for (i = 0; i < 0x18U; i += 2) {
+		BTL_D_80073714[i] -= ((ModelComponent *)MAIN_D_80134D0C[6])->pixelOffsetX;
+		BTL_D_80073714[i + 1] -= ((ModelComponent *)MAIN_D_80134D0C[6])->pixelOffsetY;
+	}
+}
 
 void BTL_getViewportDistance(void)
 {
@@ -1617,7 +1778,7 @@ void BTL_drawTMDScreenSpace(void)
 	GsLinkObject4((unsigned long)(((char **)MAIN_D_80134D0C[6])[1] + 0xc), &EFE_SCRATCH->obj, EFE_SCRATCH->id);
 	EFE_SCRATCH->obj.coord2 = NULL;
 	EFE_SCRATCH->obj.attribute = 0;
-	GsSortObject4(&EFE_SCRATCH->obj, ACTIVE_ORDERING_TABLE, 2, getScratchAddr(0x2c));
+	GsSortObject4(&EFE_SCRATCH->obj, ACTIVE_ORDERING_TABLE, 2, EFE_SORT_WORKSPACE);
 }
 
 void BTL_loadClutColors(void)
@@ -1679,7 +1840,7 @@ void BTL_drawTMDYXZ(void)
 	GsLinkObject4((unsigned long)(((char **)MAIN_D_80134D0C[6])[1] + 0xc), &EFE_SCRATCH->obj, EFE_SCRATCH->id);
 	EFE_SCRATCH->obj.coord2 = NULL;
 	EFE_SCRATCH->obj.attribute = 0;
-	GsSortObject4(&EFE_SCRATCH->obj, ACTIVE_ORDERING_TABLE, 2, getScratchAddr(0x2c));
+	GsSortObject4(&EFE_SCRATCH->obj, ACTIVE_ORDERING_TABLE, 2, EFE_SORT_WORKSPACE);
 }
 
 void BTL_getCameraRotation(void)
@@ -1696,7 +1857,33 @@ void BTL_getCameraRotation(void)
 	out[2] = rot.vz;
 }
 
-INCLUDE_ASM("asm/btl/nonmatchings/battle_effect", BTL_selectRandomTargetEntity);
+void BTL_selectRandomTargetEntity(void)
+{
+	Entity *entity;
+	int32_t excludeSelf;
+	int32_t n;
+
+	excludeSelf = *--EFE_DATA_STACK;
+	for (n = rand() % 8; n >= 0; n--) {
+		MAIN_D_80134CE0++;
+		while (1) {
+			while (MAIN_D_80134CE0 < 10) {
+				entity = ENTITY_TABLE[MAIN_D_80134CE0];
+				if (entity != NULL && entity->isOnMap != 0 && ((DigimonEntity *)entity)->stats.current.currentHP > 0) {
+					if (excludeSelf != 0 || entity != MAIN_D_80134CE8->sourceEntity) {
+						goto next;
+					}
+				}
+				MAIN_D_80134CE0++;
+			}
+			if (++MAIN_D_80134CE0 >= 10) {
+				MAIN_D_80134CE0 = 1;
+			}
+		}
+next:;
+	}
+	MAIN_D_80134CE8->targetEntity = entity;
+}
 
 void BTL_convertToViewSpace(void)
 {
@@ -2657,8 +2844,7 @@ void BTL_applyHomingMovement(void)
 	*(int32_t *)((int32_t)EFE_INSTANCE + 0x14) += dy;
 
 	ang = _atan(out.vy, out.vz);
-	ang = (ang - 0x400 -
-	       *(int32_t *)((int32_t)EFE_INSTANCE + 0x18)) & 0xfff;
+	ang = (ang - 0x400 - *(int32_t *)((int32_t)EFE_INSTANCE + 0x18)) & 0xfff;
 	if (ang >= 0x801) {
 		ang -= 0x1000;
 	}
@@ -3543,7 +3729,7 @@ void BTL_drawTMD(void)
 	GsLinkObject4((unsigned long)(((char **)MAIN_D_80134D0C[6])[1] + 0xc), &EFE_SCRATCH->obj, EFE_SCRATCH->id);
 	EFE_SCRATCH->obj.coord2 = NULL;
 	EFE_SCRATCH->obj.attribute = 0;
-	GsSortObject4(&EFE_SCRATCH->obj, ACTIVE_ORDERING_TABLE, 2, getScratchAddr(0x2c));
+	GsSortObject4(&EFE_SCRATCH->obj, ACTIVE_ORDERING_TABLE, 2, EFE_SORT_WORKSPACE);
 }
 
 void BTL_initializeSubEffectInstructions(void)

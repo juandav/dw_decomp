@@ -1,5 +1,6 @@
 #include <stdlib.h>
 
+#include <libetc.h>
 #include <libgpu.h>
 #include <libgs.h>
 #include <libgte.h>
@@ -342,7 +343,7 @@ void KAR_setupMatch(int32_t mode)
 		KAR_D_8005B5A0[p].unk2 = 0;
 		KAR_D_8005B5A0[p].unk4 = 0;
 
-		for (i = 0; i < 5; ) {
+		for (i = 0; i < 5;) {
 			models = KAR_D_8005AB80;
 			weights = MAIN_D_80134A08;
 			types = KAR_D_8005AB8C;
@@ -494,7 +495,7 @@ void KAR_renderScene(int32_t instanceId)
 	for (p = 0; p < 3; p++) {
 		stone = KAR_D_8005B5A0[p].stones;
 
-		for (i = 0; i < 5; ) {
+		for (i = 0; i < 5;) {
 			if ((p == 1) && (MAIN_D_80135244 != 3) && (MAIN_D_80135244 < 0x10)) {
 				if (MAIN_D_80135250 != 0) {
 					goto next;
@@ -553,14 +554,14 @@ void KAR_renderScene(int32_t instanceId)
 				if (stone->state < -0x64) {
 					goto next;
 				}
-				GsSortObject4(&stone->obj, &KAR_D_800638CC[ACTIVE_FRAMEBUFFER], 5, (u_long *)0x1f800000);
+				GsSortObject4(&stone->obj, &KAR_D_800638CC[ACTIVE_FRAMEBUFFER], 5, getScratchAddr(0));
 			} else {
 				if (stone->state >= 0x65) {
 					goto next;
 				}
-				GsSortObject4(&stone->obj, &GS_ORDERING_TABLE[ACTIVE_FRAMEBUFFER], 2, (u_long *)0x1f800000);
+				GsSortObject4(&stone->obj, &GS_ORDERING_TABLE[ACTIVE_FRAMEBUFFER], 2, getScratchAddr(0));
 			}
-		next:
+next:
 			i++;
 			stone++;
 		}
@@ -679,14 +680,14 @@ void KAR_renderAimArrow(void)
 			if (out.vx < -0x2EE) {
 				w = out.vx;
 				if (!otz) {
-								}
+				}
 				w = w + 0x2EE;
 				out.vx = out.vx - (int16_t)(w * 2);
 			}
 			if (out.vx >= 0x2EF) {
 				w = out.vx;
 				if (!otz) {
-								}
+				}
 				w = w - 0x2EE;
 				w = w * 2;
 				out.vx = out.vx - w;
@@ -986,7 +987,7 @@ void KAR_updateCollisions(void)
 		for (p = 0; p < 3; p++) {
 			stone = KAR_D_8005B5A0[p].stones;
 
-			for (i = 0; i < 5; ) {
+			for (i = 0; i < 5;) {
 				if (stone->state > 0) {
 					tz1 = stone->target.vz * (10 - step);
 					tz2 = stone->pos.vz * step;
@@ -1009,10 +1010,10 @@ void KAR_updateCollisions(void)
 							collided = 1;
 							if (step == 0) {
 								KAR_resolveStoneCollision(&KAR_D_8005B5A0[b / 5].stones[b % 5], cur[b],
-											  &KAR_D_8005B5A0[a / 5].stones[a % 5], cur[a]);
+								                          &KAR_D_8005B5A0[a / 5].stones[a % 5], cur[a]);
 							} else {
 								KAR_resolveStoneCollision(&KAR_D_8005B5A0[b / 5].stones[b % 5], prev[b],
-											  &KAR_D_8005B5A0[a / 5].stones[a % 5], prev[a]);
+								                          &KAR_D_8005B5A0[a / 5].stones[a % 5], prev[a]);
 							}
 						}
 					}
@@ -1056,13 +1057,13 @@ void KAR_bounceOffWall(void)
 			switch (zone) {
 			case 1:
 				stone->pos.vx = stone->pos.vx -
-						(int16_t)(stone->pos.vx + 0x2d5) * 2;
+				                (int16_t)(stone->pos.vx + 0x2d5) * 2;
 				stone->angle = 0x800 - stone->angle;
 				break;
 			case 2:
 				stone->angle = 0x1800 - stone->angle;
 				stone->pos.vx = stone->pos.vx -
-						(int16_t)(stone->pos.vx - 0x2d5) * 2;
+				                (int16_t)(stone->pos.vx - 0x2d5) * 2;
 				break;
 			case 3:
 				KAR_findWallContact((VECTOR *)&contact, stone, 0);
@@ -1077,14 +1078,14 @@ void KAR_bounceOffWall(void)
 			case 5:
 				stone->angle = -stone->angle;
 				stone->pos.vz = stone->pos.vz +
-						(int16_t)(-0x9dd - stone->pos.vz) * 2;
+				                (int16_t)(-0x9dd - stone->pos.vz) * 2;
 				break;
 			case 6:
 				if (stone->target.vz < 0x465) {
 					playSound2(8, 3);
 					stone->angle = -stone->angle;
 					stone->pos.vz = stone->pos.vz -
-							(int16_t)(stone->pos.vz - 0x465) * 2;
+					                (int16_t)(stone->pos.vz - 0x465) * 2;
 				}
 				break;
 			}

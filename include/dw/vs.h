@@ -7,20 +7,13 @@
 #include <dw/entity.h>
 #include <dw/types.h>
 
-extern uint8_t VS_D_8006FF20[][14];
-extern uint8_t VS_D_800716A8[];
-extern uint8_t VS_D_800716AD[];
-extern uint8_t VS_D_800716B2[];
-extern uint8_t VS_D_800716B3[];
-extern VECTOR VS_D_80071744;
-
 int32_t VS_addAuraProjectile(Entity *e);
 void VS_addCommandMenu(uint8_t index);
 void VS_addFighterCounter(uint8_t arg);
 void VS_addFighterStatusBars(int32_t id);
 int32_t VS_addFinisherAura(int32_t arg, int32_t val);
 void VS_addFinisherProgress(FighterData *fighter, int16_t amount);
-void VS_addTargetCursor(void);
+void VS_addTargetCursor(int16_t id, int32_t tech);
 void VS_addVersusModelScene(void);
 void VS_applyChargeRequirement(DigimonEntity *digimon, FighterData *fighter, int16_t tech);
 void VS_applyMoveResult(void);
@@ -34,8 +27,8 @@ int32_t VS_isMoveUsable(DigimonEntity *digimon, FighterData *fighter, int16_t sl
 int32_t VS_isVersusModelSceneFinished(void);
 void VS_loadMoveEFE(int16_t *moves, int16_t *effectIds, int8_t *isLoaded);
 void VS_loadVersusSceneModel(void);
-void VS_playMoveEffect(void);
-void VS_queueRandomMove(void);
+void VS_playMoveEffect(DigimonEntity *digimon, DigimonEntity *target, FighterData *fighter);
+void VS_queueRandomMove(DigimonEntity *digimon, FighterData *fighter, int32_t tech);
 void VS_removeAllAuraProjectiles(void);
 void VS_removeAllFinisherAuras(void);
 void VS_removeAllPoisonEffects(void);
@@ -55,13 +48,20 @@ void VS_resolveAttack(void);
 int32_t VS_selectMoveByMpCost(int32_t arg0, int16_t *flags);
 int32_t VS_selectMoveByPower(int32_t arg0, int16_t *flags);
 int32_t VS_selectMoveTarget(Entity *entity, FighterData *fighter);
-void VS_selectPartnerMove(void);
-void VS_selectRandomCamera(void);
+void VS_selectPartnerMove(DigimonEntity *digimon, FighterData *fighter, int16_t index);
+void VS_selectRandomCamera(DigimonEntity *entity, int32_t mode, int32_t sub);
 void VS_setRandomViewpoint(Entity *entity, int32_t idx);
 void VS_setupQueuedMove(DigimonEntity *digimon, FighterData *fighter, int16_t arg2, int32_t moveIndex);
-void VS_startCameraChase(void);
-void VS_startFighterMove(void);
+void VS_startCameraChase(Entity *entity, int32_t dx, int32_t side);
+void VS_startFighterMove(DigimonEntity *digimon, DigimonEntity *target, FighterData *fighter);
 void VS_tickFrame(void);
 void VS_unloadAllEFESlots(void);
+
+extern uint8_t VS_D_8006FF20[][14];
+extern uint8_t VS_D_800716A8[];
+extern uint8_t VS_D_800716AD[];
+extern uint8_t VS_D_800716B2[];
+extern uint8_t VS_D_800716B3[];
+extern VECTOR VS_D_80071744;
 
 #endif

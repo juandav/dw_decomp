@@ -1,12 +1,13 @@
+#include <malloc.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 #include <libcd.h>
 #include <libetc.h>
 #include <libgpu.h>
 #include <libgs.h>
 #include <libgte.h>
-#include <malloc.h>
 
 #include <dw/aabb.h>
 #include <dw/clock.h>
@@ -22,6 +23,62 @@
 #include <dw/types.h>
 
 #include "common.h"
+
+void STD_func_80058488(void);
+void STD_func_80056E2C(int32_t type, int16_t slot, int32_t tier);
+void initializeDigimonObject(int32_t type, int32_t instanceId, void (*tick)(int32_t));
+int32_t entityGetTechFromAnim(Entity *entity, int32_t anim);
+void scriptLoadModel(int32_t modelId);
+void swapByte(uint8_t *a, uint8_t *b);
+void STD_loadTIMToVRAM(char *path);
+void STD_func_8005D9F4(uint8_t *out, uint8_t *arg);
+void STD_initializeCamera(void);
+void STD_func_80058254(void);
+void STD_func_80057FC4(void);
+void STD_func_80057778(void);
+void STD_func_80057FD0(int16_t which);
+int16_t STD_func_80057510(int32_t a, int16_t b);
+void STD_func_80058E28(int32_t arg);
+int32_t STD_func_8006314C(Entity *entity, int32_t arg);
+void STD_removeCameraIntro(void);
+void GsGetTimInfo(unsigned long *tim, GsIMAGE *img);
+void readFile(char *path, void *dest);
+void STD_loadArenaTIMToVRAM(char *path, int32_t count);
+void STD_func_800577B4();
+int32_t STD_func_8005DFF8(void);
+void STD_func_80058030(void);
+void STD_func_80057E5C(int32_t id);
+void STD_initializeFinisherAuraModel(char *tim, char *base);
+void STD_initializePoisonBubble(void);
+void STD_initializeConfusionEffect(char *base);
+void STD_initializeStunEffect(char *base);
+void initializeBuffModel(TMDModel *model);
+void STD_battleTickFrame(void);
+int32_t loadTIMFile(char *path, void *buffer);
+void removeMapEntities(void);
+void STD_func_8006B6F4(void);
+void STD_func_80056CA8(int32_t arena, uint8_t *arg);
+void STD_func_8005A550(void);
+void fadeToBlack(int32_t mode);
+void STD_func_80057628(void);
+void STD_addEnemyHPBars(void);
+void STD_func_8005D964(void);
+void STD_func_8005DEEC(int32_t track);
+void STD_func_8005DF94(int32_t mode);
+void STD_func_8005E5E0(void);
+void STD_func_8005E898(void);
+void STD_func_80064FCC(unsigned short count);
+void STD_func_8006BA18(void);
+void STD_func_8006BE64(void);
+void STD_func_8006BFB4(void);
+void STD_func_8006C630(void);
+void STD_func_8006C6D0(void);
+void STD_func_8006CCD4(void);
+void STD_func_8006D15C(void);
+void STD_setVSPhase(int32_t arg);
+void fadeFromBlack(int32_t frames);
+int32_t loadMapSounds(int32_t mapSoundId);
+uint32_t lookupFileSize(char *path);
 
 extern int32_t MAIN_D_801350EC;
 extern void *MAIN_D_80135130;
@@ -50,40 +107,18 @@ extern uint8_t MAIN_D_801350F8;
 extern int32_t DRAWING_OFFSET_X;
 extern int32_t DRAWING_OFFSET_Y;
 extern char STD_D_80079CA8[];
-
-void STD_func_80058488(void);
-void STD_func_80056E2C(int32_t a, int16_t b, int32_t c);
-void STD_loadTIMToVRAM(char *path);
-void STD_func_8005D9F4(uint8_t *out, uint8_t *arg);
-void STD_initializeCamera(void);
-void STD_func_80058254(void);
-void STD_func_80057FC4(void);
-void STD_func_80057778(void);
-void STD_func_80057FD0(int32_t which);
-int16_t STD_func_80057510(int32_t a, int32_t b);
-void STD_func_80058E28(int32_t arg);
-int32_t STD_func_8006314C(Entity *entity, int32_t arg);
-void STD_removeCameraIntro(void);
-void GsGetTimInfo(unsigned long *tim, GsIMAGE *img);
-void readFile(char *path, void *dest);
-void STD_loadArenaTIMToVRAM(char *path, int32_t count);
-void STD_func_800577B4();
-int32_t STD_func_8005DFF8(void);
-void STD_func_80058030(void);
-void STD_func_80057E5C(int32_t id);
-void STD_initializeFinisherAuraModel(char *tim, char *base);
-void STD_initializePoisonBubble(void);
-void STD_initializeConfusionEffect(char *base);
-void STD_initializeStunEffect(char *base);
-void initializeBuffModel(TMDModel *model);
-void STD_battleTickFrame(void);
-int32_t loadTIMFile(char *path, void *buffer);
-void removeMapEntities(void);
-void STD_func_8006B6F4(void);
-void STD_func_80056CA8(int32_t arena, uint8_t *arg);
-void STD_func_8005A550(void);
-void fadeToBlack(int32_t mode);
-void STD_func_80057628(void);
+extern int16_t STD_D_800799B4[];
+extern int16_t MAIN_D_801350E4;
+extern int32_t MAIN_D_801350F0;
+extern uint8_t CURRENT_SCREEN;
+extern Entity *MAIN_D_801350E8;
+extern int32_t MAIN_D_801350F4;
+extern char *STD_D_8007A338[];
+extern char *STD_D_8007A304[];
+extern char *STD_D_8007A358[];
+extern uint8_t MAIN_D_801347FE[2];
+extern uint8_t MAIN_D_801347FC[2];
+extern int8_t MAP_COLLISION_DATA[];
 
 static void *std_setup_functions[] = {
 	STD_func_80058488,
@@ -140,9 +175,120 @@ void STD_func_80056CA8(int32_t arena, uint8_t *arg)
 	initializeBuffModel((TMDModel *)0x80055328);
 }
 
-INCLUDE_ASM("asm/std/nonmatchings/std_setup", STD_func_80056E2C);
+void STD_func_80056E2C(int32_t type, int16_t slot, int32_t tier)
+{
+	uint8_t listB[16];
+	uint8_t listA[16];
+	Stats *stats;
+	int32_t base;
+	int32_t mul;
+	int32_t div;
+	int32_t i;
+	int32_t nb;
+	int32_t na;
+	int32_t tech;
+	uint32_t m;
 
-int16_t STD_func_80057510(int32_t a, int32_t b)
+	base = STD_D_800799B4[tier];
+	scriptLoadModel(type);
+	ENTITY_TABLE[slot + 2] = (Entity *)&NPC_ENTITIES[slot];
+	initializeDigimonObject(type, slot + 2, STD_tickNPCTournament);
+	switch (DIGIMON_DATA[ENTITY_TABLE[slot + 2]->type].level) {
+	case 3:
+		mul = div = 1;
+		break;
+	case 4:
+		div = 1;
+		mul = 2;
+		break;
+	case 5:
+		div = 10;
+		mul = 25;
+		break;
+	}
+	stats = &NPC_ENTITIES[slot].digimonEntity.stats;
+	stats->base.off = mul * (base + base * (0x1e - random(0x3d)) / 100) / div;
+	stats->base.def = mul * (base + base * (0x1e - random(0x3d)) / 100) / div;
+	stats->base.speed = mul * (base + base * (0x1e - random(0x3d)) / 100) / div;
+	stats->base.brain = mul * (base + base * (0x1e - random(0x3d)) / 100) / div;
+	base = base * 10;
+	stats->base.hp = mul * (base + base * (0x1e - random(0x3d)) / 100) / div;
+	stats->base.mp = mul * (base + base * (0x1e - random(0x3d)) / 100) / div;
+	if (stats->base.off >= 0x3e8) {
+		stats->base.off = 0x3e7;
+	}
+	if (stats->base.def >= 0x3e8) {
+		stats->base.def = 0x3e7;
+	}
+	if (stats->base.speed >= 0x3e8) {
+		stats->base.speed = 0x3e7;
+	}
+	if (stats->base.brain >= 0x3e8) {
+		stats->base.brain = 0x3e7;
+	}
+	if (stats->base.hp >= 0x2710) {
+		stats->base.hp = 0x270f;
+	}
+	if (stats->base.mp >= 0x2710) {
+		stats->base.mp = 0x270f;
+	}
+	stats->current.currentHP = stats->base.hp;
+	stats->current.currentMP = stats->base.mp;
+	stats->current.chargeMode = 0;
+	ENTITY_TABLE[slot + 2]->isOnMap = 1;
+	ENTITY_TABLE[slot + 2]->isOnScreen = 1;
+	nb = 0;
+	na = 0;
+	for (i = 0; i < 0xf; i++) {
+		tech = (int16_t)entityGetTechFromAnim(ENTITY_TABLE[slot + 2], i + 0x2e);
+		if (tech == 0xff) {
+			continue;
+		}
+		if (tech >= 0x3a && tech < 0x71) {
+			continue;
+		}
+		if (stats->base.mp / 10 < MOVE_DATA[tech].mpCost * 3) {
+			continue;
+		}
+		if (MOVE_DATA[tech].range == 4 || tech == 0x2d) {
+			listA[na++] = i;
+		}
+		listB[nb++] = i;
+	}
+	if (nb != 0) {
+		for (i = 0; i < nb; i++) {
+			swapByte(&listB[i], &listB[random(nb)]);
+		}
+		for (i = 0; i < 3; i++) {
+			stats->base.moves[i] = 0xff;
+			if (i <= nb - 1) {
+				stats->base.moves[i] = listB[i] + 0x2e;
+			}
+		}
+	} else {
+		stats->base.moves[0] = 0x2e;
+		stats->base.moves[1] = 0xff;
+		stats->base.moves[2] = 0xff;
+	}
+	if (na != 0) {
+		for (i = 0; i < na; i++) {
+			swapByte(&listA[i], &listA[random(na)]);
+		}
+		if (random(0xa) == 0) {
+			stats->base.moves[3] = listA[0] + 0x2e;
+		}
+	}
+	stats->base.moves[3] = 0xff;
+	for (i = 0; i < 0x10; i++) {
+		if (DIGIMON_DATA[ENTITY_TABLE[slot + 2]->type].moves[i] >= 0x3a &&
+		    DIGIMON_DATA[ENTITY_TABLE[slot + 2]->type].moves[i] < 0x71) {
+			stats->base.moves[3] = i + 0x2e;
+			return;
+		}
+	}
+}
+
+int16_t STD_func_80057510(int32_t a, int16_t b)
 {
 	int16_t result;
 
@@ -172,6 +318,7 @@ void STD_initializeCamera(void)
 	MAIN_D_801B1BBC[0] = 0;
 	GsSetView2((GsVIEW2 *)MAIN_D_801B1B98);
 }
+
 void STD_func_80057628(void)
 {
 	RECT rect;
@@ -246,6 +393,7 @@ void STD_func_800577B4(void)
 	GsSetAmbient(0x400, 0x400, 0x400);
 	GsSetLightMode(0);
 }
+
 void STD_loadTIMToVRAM(char *path)
 {
 	GsIMAGE img;
@@ -266,7 +414,102 @@ void STD_loadTIMToVRAM(char *path)
 	}
 }
 
-INCLUDE_ASM("asm/std/nonmatchings/std_setup", STD_func_800579D8);
+int16_t STD_func_800579D8(uint8_t *arg)
+{
+	uint8_t local[4];
+	int32_t n;
+	int32_t m;
+	int32_t i;
+	int32_t j;
+	int16_t arena;
+
+	for (n = 1; n < 8; n++) {
+		if (arg[n] == 0x40) {
+			arg[n] = 0x36;
+		}
+		if (arg[n] == 0x3f) {
+			arg[n] = 0x30;
+		}
+		if (arg[n] == 0x41) {
+			arg[n] = 0x2a;
+		}
+	}
+	fadeToBlack(5);
+	STD_func_80064FCC(5);
+	loadMapSounds(0x10);
+	if (CURRENT_SCREEN == 0x6a) {
+		arena = 1;
+	} else {
+		arena = 0;
+	}
+	STD_func_80056CA8(arena, arg);
+	STD_func_8005D964();
+	STD_func_8005D9F4(local, arg);
+	STD_setVSPhase(0xa);
+	STD_func_80057FD0(arena);
+	STD_func_8005E5E0();
+	fadeFromBlack(5);
+	STD_func_80064FCC(0x78);
+	STD_func_8005E898();
+	MAIN_D_801350E4 = 0;
+	i = 0;
+	j = 0;
+	while (MAIN_D_801350E4 != -1 && i != 3) {
+		STD_func_8005DEEC(1);
+		loadMapSounds(0x10);
+		while (STD_func_8005DFF8() == 0) {
+			STD_battleTickFrame();
+		}
+		STD_func_8005DF94(1);
+		STD_func_80056E2C(local[i], (int16_t)i, arg[0]);
+		MAIN_D_801350E8 = (ENTITY_TABLE + 2)[i];
+		MAIN_D_801350E4 = STD_func_80057510((int32_t)ENTITY_TABLE[i + 2], arena);
+		j++;
+		if (MAIN_D_801350E4 == 1) {
+			loadMapSounds(0x10);
+			STD_func_8006D15C();
+			STD_initializeCamera();
+			MAIN_D_801350EC = 0xa;
+		} else {
+			STD_func_8006CCD4();
+		}
+		removeMapEntities();
+		GAME_STATE = 5;
+		i++;
+	}
+	if (MAIN_D_801350E4 == 1) {
+		STD_func_8006BA18();
+		STD_func_8005DEEC(2);
+		while (STD_func_8005DFF8() == 0) {
+			STD_battleTickFrame();
+		}
+		fadeToBlack(0xa);
+		for (m = 0; m < 0xb; m++) {
+			STD_battleTickFrame();
+		}
+		STD_func_8005DF94(2);
+		STD_addEnemyHPBars();
+		STD_func_8006BE64();
+		STD_battleTickFrame();
+		STD_battleTickFrame();
+		fadeFromBlack(0xf);
+		for (m = 0; m < 0x10 || MAIN_D_801350F0 > 0; m++) {
+			STD_battleTickFrame();
+		}
+		STD_func_8006BFB4();
+		while (MAIN_D_801350F4 == 0) {
+			STD_battleTickFrame();
+		}
+		STD_func_8006C6D0();
+		STD_func_8006C630();
+	}
+	STD_func_80057628();
+	if (MAIN_D_801350E4 == 1) {
+		return i;
+	}
+
+	return i - 1;
+}
 
 void STD_loadArenaTIMToVRAM(char *path, int32_t count)
 {
@@ -288,14 +531,32 @@ void STD_loadArenaTIMToVRAM(char *path, int32_t count)
 	}
 }
 
-INCLUDE_ASM("asm/std/nonmatchings/std_setup", STD_func_80057E5C);
+// clang-format off
+void STD_func_80057E5C(id)
+	uint8_t id;
+// clang-format on
+{
+	int32_t i;
+
+	STD_loadArenaTIMToVRAM(STD_D_8007A338[id], MAIN_D_801347FE[id]);
+	MAIN_D_80135130 = malloc3(((int32_t)lookupFileSize(STD_D_8007A304[id]) + 0x7ff) & ~0x7ff);
+	readFile(STD_D_8007A304[id], MAIN_D_80135130);
+	GsMapModelingData((u_long *)MAIN_D_80135130 + 1);
+	for (i = 0; i < MAIN_D_801347FC[id]; i++) {
+		GsLinkObject4((u_long)((char *)MAIN_D_80135130 + 0xc), &STD_D_8007B97C[i], i);
+		GsInitCoordinate2(NULL, &STD_D_8007B83C[i]);
+		STD_D_8007B97C[i].attribute = 0;
+		STD_D_8007B97C[i].coord2 = &STD_D_8007B83C[i];
+	}
+	readFile(STD_D_8007A358[id], MAP_COLLISION_DATA);
+}
 
 void STD_func_80057FC4(void)
 {
 	free3(MAIN_D_80135130);
 }
 
-void STD_func_80057FD0(int32_t which)
+void STD_func_80057FD0(int16_t which)
 {
 	switch (which) {
 	case 0:
@@ -344,6 +605,7 @@ void STD_func_80058030(void)
 	GsSortOt(&STD_D_8007B684[ACTIVE_FRAMEBUFFER], ACTIVE_ORDERING_TABLE);
 	GsSortOt(&STD_D_8007B6AC[ACTIVE_FRAMEBUFFER], ACTIVE_ORDERING_TABLE);
 }
+
 void STD_func_80058254(void)
 {
 	MATRIX m;
@@ -381,6 +643,7 @@ void STD_func_80058254(void)
 	GsSortOt(&STD_D_8007B684[ACTIVE_FRAMEBUFFER], ACTIVE_ORDERING_TABLE);
 	GsSortOt(&STD_D_8007B6AC[ACTIVE_FRAMEBUFFER], ACTIVE_ORDERING_TABLE);
 }
+
 void STD_func_80058488(void)
 {
 	removeObject(0x1a7, 0);

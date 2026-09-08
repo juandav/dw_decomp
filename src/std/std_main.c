@@ -9,8 +9,8 @@
 #include <libgte.h>
 #include <mwinline_n.h>
 
-#include <dw/anim.h>
 #include <dw/aabb.h>
+#include <dw/anim.h>
 #include <dw/attack_object.h>
 #include <dw/clock.h>
 #include <dw/combat.h>
@@ -27,6 +27,13 @@
 #include <dw/world_object.h>
 
 #include "common.h"
+
+typedef struct {
+	int16_t x;
+	int16_t y;
+	uint8_t owner;
+	uint8_t flag;
+} StdUnkBB64;
 
 typedef struct {
 	int16_t score[5];
@@ -69,6 +76,284 @@ typedef struct {
 	uint8_t pad11[0x7];
 } StdSrcA598;
 
+typedef struct {
+	int16_t timer;
+	int8_t phase;
+	int8_t side;
+} CameraChase;
+
+void STD_initializeBattleStartText(void);
+void STD_func_8006A044(void);
+void STD_initializeBattleStartTextBurst(void);
+void STD_func_8006A508(void);
+int32_t STD_func_8006A514(void);
+char *STD_initializeEFEEngine(char *base);
+void STD_loadMoveEFE(int16_t *moves, int16_t *effectIds, int8_t *isLoaded);
+void tickFileReadQueue(int32_t instanceId);
+void entityLookAtLocation(Entity *entity, VECTOR *pos);
+int32_t entityCheckCollision(Entity *a, Entity *entity, int32_t c, int32_t d);
+void handleBattleIdle(DigimonEntity *entity, Stats *stats, int32_t flags);
+void createParticleFX();
+void collisionGrace(Entity *a, Entity *entity, int32_t c, int32_t d);
+int32_t STD_func_80061AA8(DigimonEntity *digimon, DigimonEntity *target, FighterData *fighter);
+int32_t STD_tickMeleeAttack(DigimonEntity *digimon, DigimonEntity *target, FighterData *fighter, int16_t arg3);
+void STD_func_80065540(DigimonEntity *digimon, DigimonEntity *target, FighterData *fighter);
+int16_t STD_getMostEffectiveMove(int32_t arg0, int16_t *flags);
+void addEntityText(DigimonEntity *digimon, int32_t slot, int16_t color, int32_t value, uint8_t flag);
+int32_t entityGetTechFromAnim(Entity *entity, int32_t anim);
+void STD_removeStatusEffectVisual(DigimonEntity *digimon, FighterData *fighter, int32_t arg2);
+void STD_addStatusEffectVisual(DigimonEntity *digimon, FighterData *fighter, int32_t arg2);
+void swapInt(int32_t *a, int32_t *b);
+void STD_renderCounterDigits(int32_t x, int32_t y, int32_t digits, int32_t value, int32_t layer);
+void STD_func_80058898(int32_t i);
+void STD_setViewpointRotationFromEntity(void);
+void STD_applyViewpoint(void);
+void STD_func_8005B688(Entity *a, Entity *b);
+void STD_func_8006CCE0(int32_t a);
+void STD_func_8006C6DC(void);
+void STD_removeFinisherChargeup(void);
+void STD_removeFinisherAura(int32_t id);
+void STD_setCameraParams(int16_t a, int16_t b, int16_t c, int16_t d, int16_t e, int16_t f);
+void STD_setVSPhase(int32_t arg);
+void STD_func_8005A550(void);
+int32_t STD_func_8005ADFC(int32_t lo, int32_t hi, int32_t t, int32_t start, int32_t end);
+void STD_removeCameraIntro(void);
+void STD_addFighterCounter(uint8_t arg);
+void STD_renderFighterCounter(void);
+void STD_removeFighterCounter(void);
+void STD_func_8005D7A8(int32_t i);
+void STD_func_8005D7B4(int32_t i);
+void STD_func_8005DF64(void);
+int32_t STD_func_8005DFF8(void);
+void STD_func_8005E898(void);
+void STD_resetFlatten(int16_t index);
+void STD_faintDigimon(DigimonEntity *digimon, FighterData *fighter, int16_t arg2);
+void STD_tickAttackState(Entity *entity, DigimonEntity *target, int32_t id);
+void STD_tickHitState(Entity *entity, FighterData *fighter, int32_t arg2);
+void STD_tickFlatState(DigimonEntity *digimon, DigimonEntity *target, FighterData *fighter, int32_t arg3);
+void STD_tickStunState(Entity *entity);
+void STD_tickConfusedState(DigimonEntity *digimon, DigimonEntity *target, FighterData *fighter, int32_t arg3);
+void STD_tickChargeState(DigimonEntity *digimon, DigimonEntity *target, FighterData *fighter);
+void STD_tickCooldownState(DigimonEntity *digimon, DigimonEntity *target, FighterData *fighter);
+void STD_tickQueuedMove(DigimonEntity *digimon, DigimonEntity *target, FighterData *fighter, int32_t arg3);
+uint32_t STD_getMoveWithHighestDistance(DigimonEntity *digimon);
+void STD_setWalking(Entity *entity, Stats *stats, uint16_t flags);
+void STD_backAwayFromTarget(DigimonEntity *digimon, DigimonEntity *target, FighterData *fighter);
+void STD_moveTowardLocation(DigimonEntity *digimon, VECTOR *target, int16_t dx, int16_t dy);
+void STD_tickFighterAction(int32_t index);
+void STD_confusedRotate(Entity *entity);
+void STD_maintainTargetDistance(DigimonEntity *attacker, DigimonEntity *target, FighterData *fighter);
+void STD_maintainDistanceRange(DigimonEntity *attacker, DigimonEntity *target, FighterData *fighter, uint32_t nearLimit, uint32_t farLimit);
+int32_t STD_getContactRangeSquared(int32_t *a, int32_t *b);
+void STD_increaseSpeedBuffer(FighterData *fighter, Stats *stats);
+int32_t STD_func_80062BD8(int16_t *out, uint8_t index);
+void STD_startWalkingAnimation(Entity *entity, Stats *stats, uint16_t flags);
+void STD_clearBlockedAttacks(FighterData *fighter);
+void STD_findUnblockedRotation(Entity *entity, int16_t *rot, int16_t hit, int16_t orig);
+void STD_startWalkingAnimation2(Entity *entity, Stats *stats, uint16_t flags);
+int16_t STD_getAttackTech(AttackObject *attack);
+int32_t STD_applyBuffMove(DigimonEntity *digimon, int32_t slot, int32_t anim);
+void STD_applyMoveStatus(DigimonEntity *digimon, FighterData *fighter, int32_t move);
+int16_t STD_getFighterSlot(int16_t entityId);
+int32_t STD_addBlockedAttack(FighterData *fighter, FighterData *other);
+void STD_buffStats(DigimonEntity *digimon, int32_t slot, int16_t value, int16_t *stat, int16_t color, uint8_t flag);
+void STD_startHitAnimation(Entity *entity, AttackObject *attack, int32_t animId);
+void STD_battleTickFrame(void);
+int32_t STD_isMoveUsable(DigimonEntity *digimon, FighterData *fighter, int16_t slot);
+int32_t STD_getDistanceSquared(Entity *a, Entity *b);
+void STD_setupQueuedMove(DigimonEntity *digimon, FighterData *fighter, int16_t arg2, int32_t moveIndex);
+void STD_applyChargeRequirement(DigimonEntity *digimon, FighterData *fighter, int16_t tech);
+void STD_removeMoveEffect(DigimonEntity *digimon, FighterData *fighter);
+void STD_addFinisherProgress(FighterData *fighter, int16_t amount);
+void STD_clearStun(DigimonEntity *digimon, FighterData *fighter);
+void STD_applyFlattenScale(VECTOR *scale, int32_t t);
+void STD_applyStretchScale(VECTOR *scale, int32_t angle);
+void STD_applySquashScale(VECTOR *scale, int32_t angle);
+void STD_resetFighterAction(FighterData *fighter);
+void STD_addPoisonStatusVisual(DigimonEntity *digimon, FighterData *fighter);
+void STD_addConfusionStatusVisual(DigimonEntity *digimon, FighterData *fighter);
+void STD_addStunStatusVisual(DigimonEntity *digimon, FighterData *fighter);
+void STD_removeStatusEffects(DigimonEntity *digimon, FighterData *fighter);
+int32_t STD_func_80066A50(int16_t *out, int16_t index);
+void STD_setFighterCooldown(DigimonEntity *digimon, FighterData *fighter);
+int16_t STD_getRandomUsableMove(int16_t *flags);
+int16_t STD_getStrongestMove(int32_t index, int16_t *flags);
+int16_t STD_getCheapestMove(int32_t index, int16_t *flags);
+void STD_getHighestScoredMove(int16_t *values, int16_t *marks, int16_t *out, int16_t count);
+void STD_getLowestScoredMove(int16_t *values, int16_t *marks, int16_t *out, int16_t count);
+int16_t STD_getNpcEntityIndex(Entity *entity);
+void STD_sortScoresDescending(int32_t *values, int32_t *keys, int32_t *groups, int32_t count);
+void STD_sortScoresAscending(int32_t *values, int32_t *keys, int32_t *groups, int32_t count);
+int32_t STD_calculateElementBonus(int32_t arg0, int32_t arg1);
+int32_t STD_countLivingEnemies(void);
+void STD_calculateScoreRanks(int32_t *values, int32_t *groups, int32_t count);
+void STD_getRemainingEnemies(Entity *self, int16_t *out, int16_t *count);
+int32_t STD_func_800675E8(int32_t arg0, int16_t *flags);
+int32_t STD_func_80067660(int32_t arg0, int16_t *flags);
+uint8_t STD_isFighterDefeated(uint8_t index);
+void STD_setCommandIconUV(DigimonEntity *digimon, POLY_FT4 *prim, uint8_t index);
+void STD_tickCommandMenu(uint8_t i);
+void STD_removeCommandMenu(int32_t i);
+void STD_stopEFESubEffect(int32_t a, int32_t b);
+int32_t STD_addAuraProjectile(Entity *e);
+void STD_func_80058684(Entity *entity, int32_t id);
+int32_t readVBALLSection(int32_t vabId, int32_t idx);
+int32_t isSoundLoaded(int32_t mode, int32_t vabId);
+void STD_func_80058E28(int32_t mode);
+void STD_func_80059908(void);
+void STD_func_8005A1BC(void);
+void STD_func_8005A55C(DigimonEntity *entity, int32_t type, int32_t value);
+void STD_tickCameraChase(void);
+void STD_func_8005C1E4(void);
+void STD_func_8005CE9C(void);
+void STD_func_8005D398(int16_t i, int32_t owner, int32_t flag);
+void STD_func_8005D9F4(uint8_t *out, uint8_t *list);
+void STD_func_8005E124(int32_t id);
+void STD_func_8005E1E4(int32_t id);
+void STD_func_8005EF84(void);
+void STD_func_8005F650(void);
+void STD_func_8005FDDC(void);
+void STD_func_800602A8(void);
+void STD_func_80060C14(uint8_t hasLostP1, uint8_t hasLostP2);
+void STD_func_80060EBC(void);
+void STD_func_80063508(int32_t id);
+int16_t STD_applyPartnerStatsToFighter(DigimonEntity *attacker, DigimonEntity *defender, FighterData *fighter, int16_t move);
+int32_t STD_calculateDamage(DigimonEntity *attacker, DigimonEntity *defender, int16_t move);
+void STD_handleHitReaction(Entity *entity, FighterData *fighter, AttackObject *attack, int16_t index);
+void STD_func_800647F8(void);
+void STD_applyMoveResult(void);
+void STD_func_80067744(DigimonEntity *digimon, FighterData *fighter, int16_t index);
+void STD_func_80067A30(DigimonEntity *digimon, FighterData *fighter, int16_t index);
+void STD_renderCommandMenu(uint8_t id);
+void STD_addCommandMenu(uint8_t index);
+int32_t STD_addStunEffect(DigimonEntity *digimon, int16_t arg1);
+int32_t STD_addConfusionEffect(DigimonEntity *digimon, FighterData *fighter);
+int32_t STD_func_80077664(DigimonEntity *digimon, FighterData *fighter);
+void STD_removeStunEffect(int32_t id, DigimonEntity *digimon);
+void STD_removeConfusionEffect(int32_t id, DigimonEntity *digimon);
+void STD_removePoisonEffect(int32_t id, DigimonEntity *digimon);
+int32_t STD_addFinisherAura(Entity *entity, int32_t arg1);
+void STD_func_80069134(int16_t tech);
+void STD_func_800658B4(DigimonEntity *digimon, DigimonEntity *target, FighterData *fighter);
+int32_t STD_selectMoveTarget(Entity *entity, FighterData *fighter);
+void STD_func_8005D538(int32_t i);
+void STD_func_8005DF6C(void);
+void STD_func_800588A4(int32_t i);
+void STD_func_80060AA0(void);
+int32_t STD_func_80061124(int32_t value);
+void STD_func_80062D14(void);
+int16_t STD_func_80058634(Entity *entity);
+int16_t STD_func_80062D5C(Entity *entity);
+void STD_func_800615D8(DigimonEntity *digimon, FighterData *fighter);
+void STD_func_8005DF94(int32_t mode);
+int32_t playMusic(int32_t font, int32_t track);
+void STD_func_8005DEEC(int32_t track);
+void STD_func_80058494(int32_t which);
+void STD_func_8005E5E0(void);
+void STD_func_80058504(int32_t which);
+void STD_func_8005E660(void);
+void setUVDataPolyFT4(POLY_FT4 *prim, int32_t uvX, int32_t uvY, int32_t width, int32_t height);
+void setPosDataPolyFT4(POLY_FT4 *prim, int32_t posX, int32_t posY, int32_t width, int32_t height);
+void STD_func_8005E6E4(void);
+void STD_func_8006324C(void);
+void STD_func_80058958(int32_t idx, int32_t value);
+void STD_func_8005E004(int32_t i);
+void convertValueToDigits(int32_t n, int32_t value, int32_t *outCount, int32_t *digits);
+int32_t getDistance(int32_t x, int32_t y, int32_t z);
+int32_t STD_getFighterDistance(VECTOR *self, VECTOR *other, VECTOR *target);
+void clearTextArea(void);
+void drawString(char *text, int32_t color, int32_t pos);
+int32_t STD_func_80060B98(void);
+void STD_tickFighterCounter(void);
+void STD_applyEntityViewpoint(void);
+void STD_updateFighterStatusVisuals(DigimonEntity *digimon, FighterData *fighter);
+void handlePause(void);
+void MAIN_func_800E642C(void);
+int16_t STD_func_80060620(int32_t a, int32_t b);
+int32_t STD_func_8005F354(void);
+void STD_func_8005E8A4(Entity *entity, Entity *other);
+int16_t STD_func_8006314C(Entity *entity, int32_t arg);
+void STD_func_800587F0(Entity *entity);
+void STD_func_8005D964(void);
+int16_t STD_getNearestEnemy(Entity *self, int16_t *flags);
+void STD_func_800588D4(Entity *entity, int32_t id);
+void STD_func_80060998(void);
+void STD_selectConfusedMove(DigimonEntity *digimon, FighterData *fighter, int32_t tech);
+void renderString(int32_t a, int32_t b, int32_t c, int32_t d, int32_t e, int32_t f, int32_t g, int32_t h, int32_t i);
+void STD_func_80063300(int32_t id);
+void MAIN_func_80092BB0(POLY_GT4 *prim);
+uint32_t playSound(int32_t vabId, int32_t val);
+void STD_func_80061F44(DigimonEntity *entity, DigimonEntity *other, FighterData *data, int16_t move);
+void STD_func_80059658(int32_t id);
+void STD_func_80059524(int32_t id);
+void STD_func_800593D0(int32_t x, int32_t y, int32_t digits, int32_t value, int32_t layer);
+void STD_func_80059204(int32_t id);
+void STD_func_80059080(int32_t id);
+void STD_func_80058A60(int16_t x, int16_t y, int16_t size, uint8_t character);
+void STD_func_8005858C(void);
+int32_t BTL_getDistanceSquared(Entity *a, Entity *b);
+int32_t BTL_getUsableMoves(int16_t *out, int16_t index);
+void VS__func_800F1E9C(Entity *entity, int32_t id);
+void BTL_clearConfusion(DigimonEntity *digimon, FighterData *fighter);
+void STD_func_8005A44C(void);
+void STD_func_80064FCC(unsigned short count);
+int16_t BTL_calculateHitChance(DigimonEntity *attacker, DigimonEntity *defender, FighterData *fighter, int16_t move);
+void BTL_retargetAfterHit(DigimonEntity *digimon, FighterData *fighter, AttackObject attack);
+void BTL_startQueuedMove(DigimonEntity *digimon, DigimonEntity *target, FighterData *fighter);
+int32_t STD_isPositionNearEntity(Entity *entity, VECTOR *pos);
+int32_t BTL_isMoveOnCooldown(Entity *entity, FighterData *fighter);
+void BTL_setupMoveExecution(DigimonEntity *digimon, DigimonEntity *target, FighterData *fighter);
+void STD_func_8005D7C0(POLY_FT4 *prim, int32_t a, int32_t b, int32_t h);
+void VS__func_800F4CB4(uint8_t hasLostP1, uint8_t hasLostP2);
+int32_t STD_isVersusModelSceneFinished(void);
+void VS_selectRandomCamera(DigimonEntity *entity, int32_t type, int32_t value);
+void STD_func_8006B2BC(void);
+void STD_func_8006B468(void);
+void STD_func_8006B6E8(void);
+void STD_func_80059DBC(void);
+void STD_func_8005A830(void);
+void calculateBoneMatrix(Entity *entity, int32_t boneId, MATRIX *out);
+void STD_setViewpointFromBone(Entity *entity, SVECTOR *offset, SVECTOR *rot, int32_t dist);
+void STD_setRandomViewpoint(Entity *entity, int32_t idx);
+void STD_func_8005D814(int32_t x, int32_t y, int32_t n, int32_t size);
+int32_t _atan(int32_t y, int32_t x);
+int16_t STD_getMostEffectiveMove(int32_t index, int16_t *flags);
+int32_t lerp(int32_t a, int32_t b, int32_t lo, int32_t hi, int32_t t);
+void STD_updateCameraLerp(int32_t t, int32_t flip);
+int32_t STD_func_8005ADFC(int32_t a, int32_t b, int32_t c, int32_t d, int32_t e);
+int32_t MAIN_func_800DA63C(int32_t a, int32_t b, int16_t *c, int16_t *d, int16_t *e);
+void STD_tickCameraIntro(void);
+void STD_startCameraChase(Entity *entity, int32_t dx, int32_t side);
+void STD_setCameraToEntity(void);
+void STD_func_8005A054(void);
+void swapShort(int16_t *a, int16_t *b);
+void STD_func_8005D550(int16_t i);
+void clearTextSubArea(RECT *rect);
+void STD_func_80068388(int32_t i);
+void STD_func_80059B70(void);
+void STD_removeAllStunEffects(void);
+void STD_func_800791E0(void);
+void STD_removeAllPoisonEffects(void);
+void STD_func_80079874(void);
+void STD_unloadAllEFESlots(void);
+void STD_removeEFEEngine(void);
+int32_t STD_renderCommandMenu__garbage__(int32_t i);
+int32_t loadSB(void);
+int32_t customRandom(int32_t lo, int32_t hi);
+void MAIN_func_800DA60C(int32_t n, int16_t *a, int16_t *b, int16_t *c);
+void STD_func_8005D814(int32_t x, int32_t y, int32_t n, int32_t size);
+void swapByte(uint8_t *a, uint8_t *b);
+void STD_func_8006AD00(int32_t id);
+void resetFlattenGlobal(void);
+void initializeAttackObjects(void);
+int32_t STD_func_80060B98(void);
+void STD_func_8005A55C(DigimonEntity *entity, int32_t type, int32_t value);
+void STD_selectFighterTarget(DigimonEntity *digimon, FighterData *fighter, uint8_t target, int32_t arg3);
+void removeEntityText(int32_t id);
+void STD_func_8006B1E4(int32_t i);
+int32_t STD_startEFE(int32_t i);
+
+extern StdUnkBB64 STD_D_8007BB64[8];
 extern StdCameraPreset STD_D_8007A390[];
 extern StdUnkBAF4 STD_D_8007BAF4[8];
 extern StdSrcA598 STD_D_8007A598[8];
@@ -78,6 +363,8 @@ extern Entity *MAIN_D_80134D60;
 extern int32_t MAIN_D_80134D74;
 extern int32_t MAIN_D_80135118;
 extern int32_t MAIN_D_80135174;
+extern uint8_t *GENERAL_BUFFER_PTR;
+extern int16_t MAIN_D_8013511C;
 extern int8_t GAME_STATE;
 extern int32_t DRAWING_OFFSET_X;
 extern int32_t DRAWING_OFFSET_Y;
@@ -100,7 +387,7 @@ extern uint8_t MAIN_D_80135186[2];
 extern int8_t MAIN_D_8013518A[2];
 extern int32_t MAIN_D_801350EC;
 extern char **MAIN_D_80135128;
-extern int8_t MAIN_D_8013512C;
+extern uint8_t MAIN_D_8013512C;
 extern int16_t MAIN_D_801B1C0C[];
 extern int16_t MAIN_D_801B1C0E[];
 extern int16_t MAIN_D_801B1C10[];
@@ -183,245 +470,86 @@ extern int16_t STD_D_8007BA44[];
 extern int16_t STD_D_8007BA9C[];
 extern char *MOVE_NAMES[];
 extern char *STD_D_8007A688[];
-
-void entityLookAtLocation(Entity *entity, VECTOR *pos);
-int32_t entityCheckCollision(Entity *a, Entity *entity, int32_t c, int32_t d);
-void handleBattleIdle(DigimonEntity *entity, Stats *stats, int32_t flags);
-void createParticleFX();
-void collisionGrace(Entity *a, Entity *entity, int32_t c, int32_t d);
-int32_t STD_func_80061AA8(DigimonEntity *digimon, DigimonEntity *target, FighterData *fighter);
-int32_t STD_tickMeleeAttack(DigimonEntity *digimon, DigimonEntity *target, FighterData *fighter, int16_t arg3);
-void STD_func_80065540(DigimonEntity *digimon, DigimonEntity *target, FighterData *fighter);
-int16_t STD_getMostEffectiveMove(int32_t arg0, int16_t *flags);
-void addEntityText(DigimonEntity *digimon, int32_t slot, int16_t color, int32_t value, uint8_t flag);
-int32_t entityGetTechFromAnim(Entity *entity, int32_t anim);
-void STD_removeStatusEffectVisual(DigimonEntity *digimon, FighterData *fighter, int32_t arg2);
-void STD_addStatusEffectVisual(DigimonEntity *digimon, FighterData *fighter, int32_t arg2);
-void swapInt(int32_t *a, int32_t *b);
-void STD_renderCounterDigits(int32_t x, int32_t y, int32_t digits, int32_t value, int32_t layer);
-void STD_func_80058898(int32_t i);
-void STD_setViewpointRotationFromEntity(void);
-void STD_applyViewpoint(void);
-void STD_func_8005B688(Entity *a, Entity *b);
-void STD_func_8006CCE0(int32_t a);
-void STD_func_8006C6DC(void);
-void STD_setCameraParams(int16_t a, int16_t b, int16_t c, int16_t d, int16_t e, int16_t f);
-void STD_setVSPhase(int32_t arg);
-void STD_func_8005A550(void);
-int32_t STD_func_8005ADFC(int32_t lo, int32_t hi, int32_t t, int32_t start, int32_t end);
-void STD_removeCameraIntro(void);
-void STD_addFighterCounter(uint8_t arg);
-void STD_renderFighterCounter(void);
-void STD_removeFighterCounter(void);
-void STD_func_8005D7A8(int32_t i);
-void STD_func_8005D7B4(int32_t i);
-void STD_func_8005DF64(void);
-int32_t STD_func_8005DFF8(void);
-void STD_func_8005E898(void);
-void STD_resetFlatten(int16_t index);
-void STD_faintDigimon(DigimonEntity *digimon, FighterData *fighter, int16_t arg2);
-void STD_tickAttackState(Entity *entity, DigimonEntity *target, int32_t id);
-void STD_tickHitState(Entity *entity, FighterData *fighter, int32_t arg2);
-void STD_tickFlatState(DigimonEntity *digimon, DigimonEntity *target, FighterData *fighter, int32_t arg3);
-void STD_tickStunState(Entity *entity);
-void STD_tickConfusedState(DigimonEntity *digimon, DigimonEntity *target, FighterData *fighter, int32_t arg3);
-void STD_tickChargeState(DigimonEntity *digimon, DigimonEntity *target, FighterData *fighter);
-void STD_tickCooldownState(DigimonEntity *digimon, DigimonEntity *target, FighterData *fighter);
-void STD_tickQueuedMove(DigimonEntity *digimon, DigimonEntity *target, FighterData *fighter, int32_t arg3);
-uint32_t STD_getMoveWithHighestDistance(DigimonEntity *digimon);
-void STD_setWalking(Entity *entity, Stats *stats, uint16_t flags);
-void STD_backAwayFromTarget(DigimonEntity *digimon, DigimonEntity *target, FighterData *fighter);
-void STD_moveTowardLocation(DigimonEntity *digimon, VECTOR *target, int16_t dx, int16_t dy);
-void STD_tickFighterAction(int32_t index);
-void STD_confusedRotate(Entity *entity);
-void STD_maintainTargetDistance(DigimonEntity *attacker, DigimonEntity *target, FighterData *fighter);
-void STD_maintainDistanceRange(DigimonEntity *attacker, DigimonEntity *target, FighterData *fighter, uint32_t nearLimit, uint32_t farLimit);
-int32_t STD_getContactRangeSquared(int32_t *a, int32_t *b);
-void STD_increaseSpeedBuffer(FighterData *fighter, Stats *stats);
-int32_t STD_func_80062BD8(int16_t *out, uint8_t index);
-void STD_startWalkingAnimation(Entity *entity, Stats *stats, uint16_t flags);
-void STD_clearBlockedAttacks(FighterData *fighter);
-void STD_findUnblockedRotation(Entity *entity, int16_t *rot, int16_t hit, int16_t orig);
-void STD_startWalkingAnimation2(Entity *entity, Stats *stats, uint16_t flags);
-int16_t STD_getAttackTech(AttackObject *attack);
-int32_t STD_applyBuffMove(DigimonEntity *digimon, int32_t slot, int32_t anim);
-void STD_applyMoveStatus(DigimonEntity *digimon, FighterData *fighter, int32_t move);
-int16_t STD_getFighterSlot(int16_t entityId);
-int32_t STD_addBlockedAttack(FighterData *fighter, FighterData *other);
-void STD_buffStats(DigimonEntity *digimon, int32_t slot, int16_t value, int16_t *stat, int16_t color, uint8_t flag);
-void STD_startHitAnimation(Entity *entity, AttackObject *attack, int32_t animId);
-void STD_battleTickFrame(void);
-int32_t STD_isMoveUsable(DigimonEntity *digimon, FighterData *fighter, int16_t slot);
-int32_t STD_getDistanceSquared(Entity *a, Entity *b);
-void STD_setupQueuedMove(DigimonEntity *digimon, FighterData *fighter, int16_t arg2, int32_t moveIndex);
-void STD_applyChargeRequirement(DigimonEntity *digimon, FighterData *fighter, int16_t tech);
-void STD_removeMoveEffect(DigimonEntity *digimon, FighterData *fighter);
-void STD_addFinisherProgress(FighterData *fighter, int16_t amount);
-void STD_clearStun(DigimonEntity *digimon, FighterData *fighter);
-void STD_applyFlattenScale(VECTOR *scale, int32_t t);
-void STD_applyStretchScale(VECTOR *scale, int32_t angle);
-void STD_applySquashScale(VECTOR *scale, int32_t angle);
-void STD_resetFighterAction(FighterData *fighter);
-void STD_addPoisonStatusVisual(DigimonEntity *digimon, FighterData *fighter);
-void STD_addConfusionStatusVisual(DigimonEntity *digimon, FighterData *fighter);
-void STD_addStunStatusVisual(DigimonEntity *digimon, FighterData *fighter);
-void STD_removeStatusEffects(DigimonEntity *digimon, FighterData *fighter);
-int32_t STD_func_80066A50(int16_t *out, int16_t index);
-void STD_setFighterCooldown(DigimonEntity *digimon, FighterData *fighter);
-int16_t STD_getRandomUsableMove(int16_t *flags);
-int16_t STD_getStrongestMove(int32_t index, int16_t *flags);
-int16_t STD_getCheapestMove(int32_t index, int16_t *flags);
-void STD_getHighestScoredMove(int16_t *values, int16_t *marks, int16_t *out, int16_t count);
-void STD_getLowestScoredMove(int16_t *values, int16_t *marks, int16_t *out, int16_t count);
-int16_t STD_getNpcEntityIndex(Entity *entity);
-void STD_sortScoresDescending(int32_t *values, int32_t *keys, int32_t *groups, int32_t count);
-void STD_sortScoresAscending(int32_t *values, int32_t *keys, int32_t *groups, int32_t count);
-int32_t STD_calculateElementBonus(int32_t arg0, int32_t arg1);
-int32_t STD_countLivingEnemies(void);
-void STD_calculateScoreRanks(int32_t *values, int32_t *groups, int32_t count);
-void STD_getRemainingEnemies(Entity *self, int16_t *out, int16_t *count);
-int32_t STD_func_800675E8(int32_t arg0, int16_t *flags);
-int32_t STD_func_80067660(int32_t arg0, int16_t *flags);
-uint8_t STD_isFighterDefeated(uint8_t index);
-void STD_setCommandIconUV(DigimonEntity *digimon, POLY_FT4 *prim, int32_t index);
-void STD_tickCommandMenu(uint8_t i);
-void STD_removeCommandMenu(int32_t i);
-void STD_stopEFESubEffect(int32_t a, int32_t b);
-int32_t STD_addAuraProjectile(Entity *e);
-void STD_func_80058684(Entity *entity, int32_t id);
-int32_t readVBALLSection(int32_t vabId, int32_t idx);
-int32_t isSoundLoaded(int32_t mode, int32_t vabId);
-void STD_func_80058E28(int32_t mode);
-void STD_func_80059908(void);
-void STD_func_8005A1BC(void);
-void STD_func_8005A55C(DigimonEntity *entity, int32_t type, int32_t value);
-void STD_tickCameraChase(void);
-void STD_func_8005C1E4(void);
-void STD_func_8005CE9C(void);
-void STD_func_8005D398(int32_t i, int32_t owner, int32_t flag);
-void STD_func_8005D9F4(void);
-void STD_func_8005E124(void);
-void STD_func_8005EF84(void);
-void STD_func_8005F650(void);
-void STD_func_8005FDDC(void);
-void STD_func_800602A8(void);
-void STD_func_80060C14(uint8_t hasLostP1, uint8_t hasLostP2);
-void STD_func_80060EBC(void);
-void STD_func_80063508(int32_t id);
-int16_t STD_applyPartnerStatsToFighter(DigimonEntity *attacker, DigimonEntity *defender, FighterData *fighter, int16_t move);
-int32_t STD_calculateDamage(DigimonEntity *attacker, DigimonEntity *defender, int16_t move);
-void STD_handleHitReaction(Entity *entity, FighterData *fighter, AttackObject *attack, int16_t index);
-void STD_func_800647F8(void);
-void STD_applyMoveResult(void);
-void STD_func_80067744(DigimonEntity *digimon, FighterData *fighter, int16_t index);
-void STD_func_80067A30(DigimonEntity *digimon, FighterData *fighter, int16_t index);
-void STD_renderCommandMenu(void);
-void STD_addCommandMenu(uint8_t index);
-int32_t STD_addStunEffect(DigimonEntity *digimon, int16_t arg1);
-int32_t STD_addConfusionEffect(DigimonEntity *digimon, FighterData *fighter);
-int32_t STD_func_80077664(DigimonEntity *digimon, FighterData *fighter);
-void STD_removeStunEffect(int32_t id, DigimonEntity *digimon);
-void STD_removeConfusionEffect(int32_t id, DigimonEntity *digimon);
-void STD_removePoisonEffect(int32_t id, DigimonEntity *digimon);
-int32_t STD_addFinisherAura(Entity *entity, int32_t arg1);
-void STD_func_80069134(int16_t tech);
-void STD_func_800658B4(DigimonEntity *digimon, DigimonEntity *target, FighterData *fighter);
-int32_t STD_selectMoveTarget(Entity *entity, FighterData *fighter);
-void STD_func_8005D538(int32_t i);
-void STD_func_8005DF6C(void);
-void STD_func_800588A4(int32_t i);
-void STD_func_80060AA0(void);
-int32_t STD_func_80061124(int32_t value);
-void STD_func_80062D14(void);
-int16_t STD_func_80058634(Entity *entity);
-int16_t STD_func_80062D5C(Entity *entity);
-void STD_func_800615D8(DigimonEntity *digimon, FighterData *fighter);
-void STD_func_8005DF94(int32_t mode);
-int32_t playMusic(int32_t font, int32_t track);
-void STD_func_8005DEEC(int32_t track);
-void STD_func_80058494(int32_t which);
-void STD_func_8005E5E0(void);
-void STD_func_80058504(int32_t which);
-void STD_func_8005E660(void);
-void setUVDataPolyFT4(POLY_FT4 *prim, int32_t uvX, int32_t uvY, int32_t width, int32_t height);
-void setPosDataPolyFT4(POLY_FT4 *prim, int32_t posX, int32_t posY, int32_t width, int32_t height);
-void STD_func_8005E6E4(void);
-void STD_func_8006324C(void);
-void STD_func_80058958(int32_t idx, int32_t value);
-void STD_func_8005E004(int32_t i);
-void convertValueToDigits(int32_t n, int32_t value, int32_t *outCount, int32_t *digits);
-int32_t getDistance(int32_t x, int32_t y, int32_t z);
-int32_t STD_getFighterDistance(VECTOR *self, VECTOR *other, VECTOR *target);
-void clearTextArea(void);
-void drawString(char *text, int32_t color, int32_t pos);
-int32_t STD_func_80060B98(void);
-void STD_tickFighterCounter(void);
-void STD_applyEntityViewpoint(void);
-void STD_updateFighterStatusVisuals(DigimonEntity *digimon, FighterData *fighter);
-void handlePause(void);
-void MAIN_func_800E642C(void);
-int16_t STD_func_80060620(int32_t a, int32_t b);
-int32_t STD_func_8005F354(void);
-void STD_func_8005E8A4(Entity *entity, int32_t arg);
-int16_t STD_func_8006314C(Entity *entity, int32_t arg);
-void STD_func_800587F0(Entity *entity);
-void STD_func_8005D964(void);
-int16_t STD_getNearestEnemy(Entity *self, int16_t *flags);
-void STD_func_800588D4(Entity *entity, int32_t id);
-void STD_func_80060998(void);
-void STD_selectConfusedMove(DigimonEntity *digimon, FighterData *fighter, int32_t tech);
-void renderString(int32_t a, int32_t b, int32_t c, int32_t d, int32_t e, int32_t f, int32_t g, int32_t h, int32_t i);
-void STD_func_80063300(int32_t id);
-void MAIN_func_80092BB0(POLY_GT4 *prim);
-uint32_t playSound(int32_t vabId, int32_t val);
-void STD_func_80061F44(DigimonEntity *entity, DigimonEntity *other, FighterData *data, int16_t move);
-void STD_func_80059658(int32_t id);
-void STD_func_80059524(int32_t id);
-void STD_func_800593D0(int32_t x, int32_t y, int32_t digits, int32_t value, int32_t layer);
-void STD_func_80059204(int32_t id);
-void STD_func_80059080(int32_t id);
-void STD_func_80058A60(int16_t x, int16_t y, int16_t size, uint8_t character);
-void STD_func_8005858C(void);
-int32_t BTL_getDistanceSquared(Entity *a, Entity *b);
-int32_t BTL_getUsableMoves(int16_t *out, int16_t index);
-void VS__func_800F1E9C(Entity *entity, int32_t id);
-void BTL_clearConfusion(DigimonEntity *digimon, FighterData *fighter);
-void STD_func_8005A44C(void);
-void STD_func_80064FCC(unsigned short count);
-int16_t BTL_calculateHitChance(DigimonEntity *attacker, DigimonEntity *defender, FighterData *fighter, int16_t move);
-void BTL_retargetAfterHit(DigimonEntity *digimon, FighterData *fighter, AttackObject attack);
-void BTL_startQueuedMove(DigimonEntity *digimon, DigimonEntity *target, FighterData *fighter);
-int32_t STD_isPositionNearEntity(Entity *entity, VECTOR *pos);
-int32_t BTL_isMoveOnCooldown(Entity *entity, FighterData *fighter);
-void BTL_setupMoveExecution(DigimonEntity *digimon, DigimonEntity *target, FighterData *fighter);
-void STD_func_8005D7C0(POLY_FT4 *prim, int16_t a, int16_t b, int32_t h);
-void VS__func_800F4CB4(uint8_t hasLostP1, uint8_t hasLostP2);
-int32_t STD_isVersusModelSceneFinished(void);
-void VS_selectRandomCamera(DigimonEntity *entity, int32_t type, int32_t value);
-void STD_func_8006B2BC(void);
-void STD_func_8006B468(void);
-void STD_func_8006B6E8(void);
-void STD_func_80059DBC(void);
-void STD_func_8005A830(void);
-void calculateBoneMatrix(Entity *entity, int32_t boneId, MATRIX *out);
-void STD_setViewpointFromBone(Entity *entity, SVECTOR *offset, SVECTOR *rot, int32_t dist);
-void STD_setRandomViewpoint(Entity *entity, int32_t idx);
-void STD_func_8005D814(int32_t x, int32_t y, int32_t tile);
-int32_t _atan(int32_t y, int32_t x);
-int16_t STD_getMostEffectiveMove(int32_t index, int16_t *flags);
-int32_t lerp(int32_t a, int32_t b, int32_t lo, int32_t hi, int32_t t);
-void STD_updateCameraLerp(int32_t t, int32_t flip);
-int32_t STD_func_8005ADFC(int32_t a, int32_t b, int32_t c, int32_t d, int32_t e);
-int32_t MAIN_func_800DA63C(int32_t a, int32_t b, int16_t *c, int16_t *d, int16_t *e);
-void STD_tickCameraIntro(void);
-void STD_startCameraChase(Entity *entity, int32_t dx, int32_t side);
-void STD_setCameraToEntity(void);
-void STD_func_8005A054(void);
-void swapShort(int16_t *a, int16_t *b);
-void STD_func_8005D550(int32_t i);
-void clearTextSubArea(RECT *rect);
-void STD_func_80068388(int32_t i);
-void STD_func_80059B70(void);
+extern uint8_t MAIN_D_80134888[4];
+extern uint8_t MAIN_D_8013488C[4];
+extern uint8_t MAIN_D_80134890[4];
+extern int16_t MAIN_D_801350FC;
+extern int16_t MAIN_D_801350FE;
+extern int16_t MAIN_D_80135180[2];
+extern uint8_t MAIN_D_80135188[2];
+extern uint8_t MAIN_D_801348B0[8];
+extern uint8_t MAIN_D_801348B8[8];
+extern uint8_t STD_D_8007A6A8[][10];
+extern int32_t MAIN_D_80135108;
+extern int16_t MAIN_D_8013511C;
+extern int32_t MAIN_D_8013510C;
+extern int32_t MAIN_D_801B1BC0[];
+extern int32_t MAIN_D_801B1BC0[];
+extern int32_t STD_D_8007B704[];
+extern int32_t STD_D_8007B708[];
+extern int32_t STD_D_8007B70C[];
+extern int32_t STD_D_8007B710[];
+extern SVECTOR MAIN_D_80134818;
+extern SVECTOR MAIN_D_80134820;
+extern int32_t STD_D_8007B704[];
+extern int32_t STD_D_8007B708[];
+extern int32_t STD_D_8007B70C[];
+extern int8_t MAIN_D_80135147;
+extern SVECTOR MAIN_D_80134828;
+extern SVECTOR MAIN_D_80134830;
+extern int16_t STD_D_8007B9D0[];
+extern int16_t STD_D_8007B9D2[];
+extern Entity *STD_D_8007B9D8[];
+extern int32_t STD_D_8007B9F0[];
+extern int32_t STD_D_8007B9F4[];
+extern int32_t STD_D_8007B9F8[];
+extern int32_t STD_D_8007B9FC[];
+extern int32_t STD_D_8007BAA0[];
+extern int32_t STD_D_8007BAA4[];
+extern int32_t STD_D_8007BAA8[];
+extern int32_t STD_D_8007BAAC[];
+extern SVECTOR MAIN_D_80134848;
+extern SVECTOR MAIN_D_80134850;
+extern uint8_t MAIN_D_8013514D;
+extern uint8_t MAIN_D_80135158[4];
+extern uint8_t MAIN_D_8013515C;
+extern uint8_t MAIN_D_8013515D;
+extern int8_t STD_D_8007A474[];
+extern int16_t MAIN_D_801350E4;
+extern uint8_t MAIN_D_80135150[8];
+extern uint8_t MAIN_D_80135150[8];
+extern uint8_t STD_D_8007A49C[];
+extern uint8_t MAIN_D_8013514D;
+extern uint8_t MAIN_D_80135150[8];
+extern uint8_t MAIN_D_80135151[7];
+extern uint8_t MAIN_D_80135158[4];
+extern uint8_t MAIN_D_80135159;
+extern uint8_t MAIN_D_8013515A;
+extern uint8_t MAIN_D_8013515B;
+extern uint8_t MAIN_D_8013515C;
+extern uint8_t MAIN_D_8013515D;
+extern uint8_t STD_D_8007A58C[][3];
+extern uint8_t MAIN_D_80135150[8];
+extern uint8_t STD_D_8007A50C[];
+extern uint8_t STD_D_8007A57C[];
+extern int16_t MAIN_D_80135170;
+extern uint8_t MAIN_D_80135168;
+extern int32_t MAIN_D_80135104;
+extern int8_t MAIN_D_80134D64;
+extern uint8_t MAIN_D_80134880[5];
+extern int16_t INITIAL_COMBAT_STATS[][6];
+extern int32_t MAIN_D_80135118;
+extern uint8_t MAIN_D_80135168;
+extern uint8_t MAIN_D_80135168;
+extern int16_t MAIN_D_80135170;
+extern int32_t MAIN_D_80135104;
+extern int16_t INITIAL_COMBAT_STATS[][6];
+extern DigimonEntity *MAIN_D_80134EF4;
+extern DigimonEntity *MAIN_D_80134EF8;
+extern int16_t MAIN_D_80135180[2];
+extern uint8_t MAIN_D_80135188[2];
+extern int16_t MAIN_D_80135180[2];
+extern uint8_t MAIN_D_80135188[2];
 
 static void *std_main_functions[] = {
 	STD_removeCommandMenu,
@@ -539,6 +667,7 @@ static void *std_main_functions[] = {
 	STD_func_8005E6E4,
 	STD_func_8005E660,
 	STD_func_8005E5E0,
+	STD_func_8005E1E4,
 	STD_func_8005E124,
 	STD_func_8005E004,
 	STD_func_8005DFF8,
@@ -606,6 +735,28 @@ static void *std_main_functions[] = {
 	STD_func_80058504,
 	STD_func_80058494,
 };
+
+void STD_func_80060998(void)
+{
+	int32_t i;
+	Entity *entity;
+
+	if (ENTITY_TABLE[COMBAT_DATA_PTR->player.entityIds[0]]->type == ENTITY_TABLE[COMBAT_DATA_PTR->player.entityIds[1]]->type) {
+		STD_func_80060AA0();
+	}
+	STD_removeAllStunEffects();
+	STD_func_800791E0();
+	STD_removeAllPoisonEffects();
+	STD_func_80079874();
+
+	for (i = 0; i <= ENEMY_COUNT; ++i) {
+		entity = ENTITY_TABLE[COMBAT_DATA_PTR->player.entityIds[i]];
+		STD_removeMoveEffect((DigimonEntity *)entity, &COMBAT_DATA_PTR->fighter[i]);
+	}
+
+	STD_unloadAllEFESlots();
+	STD_removeEFEEngine();
+}
 
 void STD_func_80058494(int32_t which)
 {
@@ -775,6 +926,170 @@ void STD_func_80058958(int32_t idx, int32_t value)
 	GsSetWorkBase((PACKET *)prim);
 }
 
+int32_t STD_renderCommandMenu__garbage__(int32_t i)
+{
+	int32_t v0;
+	int32_t v1;
+	int32_t v2;
+	int32_t v3;
+	int32_t v4;
+	int32_t v5;
+	int32_t v6;
+	int32_t v7;
+	int32_t v8;
+	int32_t v9;
+	int32_t v10;
+	int32_t v11;
+	int32_t v12;
+	int32_t v13;
+	int32_t v14;
+	int32_t v15;
+	int32_t v16;
+
+	v0 = i + 0;
+	v1 = i + 1;
+	v2 = i + 2;
+	v3 = i + 3;
+	v4 = i + 4;
+	v5 = i + 5;
+	v6 = i + 6;
+	v7 = i + 7;
+	v8 = i + 8;
+	v9 = i + 9;
+	v10 = i + 10;
+	v11 = i + 11;
+	v12 = i + 12;
+	v13 = i + 13;
+	v14 = i + 14;
+	v15 = i + 15;
+	v16 = i + 16;
+	return v0 + v1 + v2 + v3 + v4 + v5 + v6 + v7 + v8 + v9 + v10 + v11 + v12 + v13 + v14 + v15 + v16;
+}
+
+void STD_renderCommandMenu(uint8_t id)
+{
+	POLY_FT4 *prim;
+	int32_t i;
+	int32_t off;
+	int16_t base;
+	int16_t count;
+	int16_t x;
+	int32_t y;
+	int16_t rowY;
+	int16_t width;
+
+	base = (id * 0xa6) - 0x8c + ((COMBAT_DATA_PTR->player.numCommands[id] - 1) * 0xe);
+	if (GAME_STATE == 4) {
+		STD_func_80068388(id);
+	}
+
+	prim = (POLY_FT4 *)GsGetWorkBase();
+	count = COMBAT_DATA_PTR->player.numCommands[id] - 1;
+
+	if (GAME_STATE == 4) {
+		x = base - (COMBAT_DATA_PTR->player.hoveredCommand[id] * 0xe);
+		SetPolyFT4(prim);
+		prim->tpage = 0x1f;
+		prim->clut = GetClut(0x11a, 0x1f1);
+		prim->r0 = 0x80;
+		prim->g0 = 0x80;
+		prim->b0 = 0x80;
+		setUVDataPolyFT4(prim, 0x3d, 0xe0, 0x16, 0x16);
+		if ((count % 2) == 0) {
+			if ((COMBAT_DATA_PTR->player.hoveredCommand[id] % 2) == 0) {
+				y = MAIN_D_8013517C[id];
+			} else {
+				y = MAIN_D_8013517C[id] + 0xa;
+			}
+			setPosDataPolyFT4(prim, x - 3, y, 0x16, 0x16);
+		} else {
+			if ((COMBAT_DATA_PTR->player.hoveredCommand[id] % 2) == 1) {
+				y = MAIN_D_8013517C[id];
+			} else {
+				y = MAIN_D_8013517C[id] + 0xa;
+			}
+			setPosDataPolyFT4(prim, x - 3, y, 0x16, 0x16);
+		}
+		AddPrim(ACTIVE_ORDERING_TABLE->org + 7, prim++);
+	}
+
+	for (i = 1, off = 0xe; i < COMBAT_DATA_PTR->player.numCommands[id]; i++, off += 0xe) {
+		SetPolyFT4(prim);
+		prim->tpage = 0x1f;
+		prim->clut = GetClut(0x110, 0x1f0);
+		prim->r0 = 0x80;
+		prim->g0 = 0x80;
+		prim->b0 = 0x80;
+		STD_setCommandIconUV((DigimonEntity *)ENTITY_TABLE[COMBAT_DATA_PTR->player.entityIds[id]], prim, COMBAT_DATA_PTR->player.availableCommands[id][i]);
+		x = base - off;
+		if ((count % 2) == 0) {
+			prim->x0 = x;
+			prim->y0 = ((i % 2) == 0) ? MAIN_D_8013517C[id] + 3 : MAIN_D_8013517C[id] + 0xd;
+			prim->x1 = x + 0x10;
+			prim->y1 = ((i % 2) == 0) ? MAIN_D_8013517C[id] + 3 : MAIN_D_8013517C[id] + 0xd;
+			prim->x2 = x;
+			prim->y2 = ((i % 2) == 0) ? MAIN_D_80135180[id] - 0xd : MAIN_D_80135180[id] - 3;
+			prim->x3 = x + 0x10;
+			prim->y3 = ((i % 2) == 0) ? MAIN_D_80135180[id] - 0xd : MAIN_D_80135180[id] - 3;
+		} else {
+			prim->x0 = x;
+			prim->y0 = ((i % 2) == 1) ? MAIN_D_8013517C[id] + 3 : MAIN_D_8013517C[id] + 0xd;
+			prim->x1 = x + 0x10;
+			prim->y1 = ((i % 2) == 1) ? MAIN_D_8013517C[id] + 3 : MAIN_D_8013517C[id] + 0xd;
+			prim->x2 = x;
+			prim->y2 = ((i % 2) == 1) ? MAIN_D_80135180[id] - 0xd : MAIN_D_80135180[id] - 3;
+			prim->x3 = x + 0x10;
+			prim->y3 = ((i % 2) == 1) ? MAIN_D_80135180[id] - 0xd : MAIN_D_80135180[id] - 3;
+		}
+		if ((i == COMBAT_DATA_PTR->player.hoveredCommand[id]) && (MAIN_D_80135184[id] == 1)) {
+			prim->u0 += 0x10;
+			prim->u1 += 0x10;
+			prim->u2 += 0x10;
+			prim->u3 += 0x10;
+		}
+		AddPrim(ACTIVE_ORDERING_TABLE->org + 7, prim++);
+	}
+
+	for (i = 0; i < COMBAT_DATA_PTR->player.numCommands[id]; i++) {
+		SetPolyFT4(prim);
+		prim->code |= 2;
+		prim->tpage = GetTPage(0, 0, 0x3c0, 0x100);
+		prim->clut = GetClut(0x110, 0x1f1);
+		prim->r0 = 0x80;
+		prim->g0 = 0x80;
+		prim->b0 = 0x80;
+		prim->u0 = MAIN_D_801348B0[STD_D_8007A6A8[MAIN_D_80135188[id]][i]];
+		prim->v0 = 0xe0;
+		prim->u1 = MAIN_D_801348B0[STD_D_8007A6A8[MAIN_D_80135188[id]][i]] + MAIN_D_801348B8[STD_D_8007A6A8[MAIN_D_80135188[id]][i]];
+		prim->v1 = 0xe0;
+		prim->u2 = MAIN_D_801348B0[STD_D_8007A6A8[MAIN_D_80135188[id]][i]];
+		prim->v2 = 0xff;
+		prim->u3 = MAIN_D_801348B0[STD_D_8007A6A8[MAIN_D_80135188[id]][i]] + MAIN_D_801348B8[STD_D_8007A6A8[MAIN_D_80135188[id]][i]];
+		prim->v3 = 0xff;
+		if (i > 0) {
+			rowY = ((i - 1) * 0xe) + 0xb;
+		} else {
+			rowY = 0;
+		}
+		if ((i == 0) || (i == (COMBAT_DATA_PTR->player.numCommands[id] - 1))) {
+			width = 0xb;
+		} else {
+			width = 0xe;
+		}
+		prim->x0 = (rowY - 0x8f) + id * 0xa6;
+		prim->y0 = MAIN_D_8013517C[id];
+		prim->x1 = ((rowY - 0x8f) + width) + id * 0xa6;
+		prim->y1 = MAIN_D_8013517C[id];
+		prim->x2 = (rowY - 0x8f) + id * 0xa6;
+		prim->y2 = MAIN_D_80135180[id];
+		prim->x3 = ((rowY - 0x8f) + width) + id * 0xa6;
+		prim->y3 = MAIN_D_80135180[id];
+		AddPrim(ACTIVE_ORDERING_TABLE->org + 7, prim++);
+	}
+
+	GsSetWorkBase((PACKET *)prim);
+}
+
 void STD_func_80058A60(int16_t x, int16_t y, int16_t size, uint8_t character)
 {
 	POLY_GT4 *prim;
@@ -834,7 +1149,77 @@ void STD_func_80058A60(int16_t x, int16_t y, int16_t size, uint8_t character)
 	GsSetWorkBase((PACKET *)prim);
 }
 
-INCLUDE_ASM("asm/std/nonmatchings/std_main", STD_func_80058E28);
+void STD_func_80058E28(int32_t which)
+{
+	int32_t dist;
+	int32_t id;
+	int16_t idn;
+	uint32_t pad;
+	uint32_t prev;
+
+	if (which == 1) {
+		dist = 0x514;
+	} else {
+		dist = 0x7d0;
+	}
+
+	((DigimonEntity *)MAIN_D_801350E8)->stats.current.vabId = 5;
+	MAIN_D_80135108 = readVBALLSection(5, MAIN_D_801350E8->type);
+	STD_func_80058494(which);
+	STD_func_80058504(which);
+	STD_func_8005858C();
+	STD_startCameraChase(ENTITY_TABLE[1], dist, 0);
+	idn = STD_func_80058634(ENTITY_TABLE[1]);
+	id = idn;
+	STD_func_80058684(ENTITY_TABLE[1], id);
+	stopBGM();
+	stopSound();
+	playMusic(MAIN_D_801350F8, 0);
+
+	prev = 0;
+	while ((ENTITY_TABLE[1]->anim.animFlag & 1) != 0) {
+		pad = PadRead(1);
+		STD_battleTickFrame();
+		if (((pad & ~prev) & 0x40) != 0) {
+			STD_func_800587F0(ENTITY_TABLE[1]);
+			prev = pad;
+			break;
+		}
+		prev = pad;
+	}
+
+	STD_func_80058898(id);
+	STD_func_800588A4(id);
+	removeObject(0x1aa, 0);
+	stopBGM();
+	stopSound();
+	isSoundLoaded(0, MAIN_D_80135108);
+	MAIN_D_80135108 = loadSB();
+
+	STD_startCameraChase(MAIN_D_801350E8, -dist, 1);
+	idn = STD_func_80058634(MAIN_D_801350E8);
+	id = idn;
+	STD_func_80058684(MAIN_D_801350E8, id);
+	playMusic(MAIN_D_801350F8, 1);
+
+	while ((MAIN_D_801350E8->anim.animFlag & 1) != 0) {
+		pad = PadRead(1);
+		STD_battleTickFrame();
+		if (((pad & ~prev) & 0x40) != 0) {
+			STD_func_800587F0(MAIN_D_801350E8);
+			prev = pad;
+			break;
+		}
+		prev = pad;
+	}
+
+	STD_func_80058898(id);
+	STD_func_800588A4(id);
+	removeObject(0x1aa, 0);
+	stopBGM();
+	stopSound();
+	isSoundLoaded(0, MAIN_D_80135108);
+}
 
 void STD_func_80059080(int32_t id)
 {
@@ -1048,9 +1433,76 @@ void STD_func_80059908(void)
 	GsSetView2((GsVIEW2 *)MAIN_D_801B1B98);
 }
 
-INCLUDE_ASM("asm/std/nonmatchings/std_main", STD_func_80059B70);
+void STD_func_80059B70(void)
+{
+	VECTOR *a;
+	VECTOR *b;
+	int32_t dx;
+	int32_t dz;
+	int32_t dist;
+	int32_t d;
+	int32_t ang;
+	MATRIX *m;
+	int32_t limA;
+	int32_t limB;
+	int32_t limC;
 
-INCLUDE_ASM("asm/std/nonmatchings/std_main", STD_func_80059DBC);
+	a = &MAIN_D_801350E8->posData->location;
+	b = &PARTNER_ENTITY.digimonEntity.entity.posData->location;
+	dx = a->vx - b->vx;
+	dz = a->vz - b->vz;
+	dist = SquareRoot0(dx * dx + dz * dz);
+	d = (dist * VIEWPORT_DISTANCE) / 200u;
+	limA = MAIN_D_8013511C;
+	limB = limB = limA;
+	limC = limC = limA;
+	if (d < limA) {
+		d = limB;
+	}
+	if (d < limC + 0x12c) {
+		MAIN_D_8013510C = 1;
+	} else {
+		MAIN_D_8013510C = 0;
+	}
+	if (d > 0x1068) {
+		d = 0x1068;
+	}
+	ang = 0x1000 - _atan(dx, dz);
+	MAIN_D_801B1C14[0] = b->vx + dx / 2 + (d * dz) / dist;
+	MAIN_D_801B1C18[0] = -0x3e8;
+	MAIN_D_801B1C1C[0] = b->vz + dz / 2 - (d * dx) / dist;
+	MAIN_D_801B1C0C[0] = _atan(d, -0x2bc) + 0x800;
+	MAIN_D_801B1C0E[0] = ang + 0x800;
+	MAIN_D_801B1C10[0] = 0;
+	*(MATRIX *)MAIN_D_801B1B98 = GsIDMATRIX;
+	MAIN_D_801B1BB8[0] = (int32_t)MAIN_D_801B1BBC;
+	RotMatrixYXZ((SVECTOR *)MAIN_D_801B1C0C, m = m = (MATRIX *)MAIN_D_801B1BC0);
+	TransMatrix(m, (VECTOR *)MAIN_D_801B1C14);
+	MAIN_D_801B1BBC[0] = 0;
+	GsSetView2((GsVIEW2 *)MAIN_D_801B1B98);
+}
+
+void STD_func_80059DBC(void)
+{
+	VECTOR *a;
+	VECTOR *b;
+	MATRIX *m;
+
+	a = &PARTNER_ENTITY.digimonEntity.entity.posData->location;
+	b = &MAIN_D_801350E8->posData->location;
+	*(MATRIX *)MAIN_D_801B1B98 = GsIDMATRIX;
+	MAIN_D_801B1BB8[0] = (int32_t)MAIN_D_801B1BBC;
+	MAIN_D_801B1C14[0] = a->vx + (b->vx - a->vx) / 2;
+	MAIN_D_801B1C1C[0] = a->vz + (b->vz - a->vz) / 2;
+	MAIN_D_801B1C18[0] = -0x1f40;
+	MAIN_D_801B1C10[0] = 0;
+	MAIN_D_801B1C0E[0] = 0;
+	MAIN_D_801B1C0C[0] = -0x400;
+	RotMatrixYXZ((SVECTOR *)MAIN_D_801B1C0C, m = m = (MATRIX *)MAIN_D_801B1BC0);
+	TransMatrix(m, (VECTOR *)MAIN_D_801B1C14);
+	MAIN_D_801B1BBC[0] = 0;
+	GsSetView2((GsVIEW2 *)MAIN_D_801B1B98);
+}
 
 void STD_setCameraToEntity(void)
 {
@@ -1124,7 +1576,40 @@ void STD_setViewpointRotationFromEntity(void)
 	GsSetRefView2(&GS_VIEWPOINT);
 }
 
-INCLUDE_ASM("asm/std/nonmatchings/std_main", STD_func_8005A054);
+void STD_func_8005A054(void)
+{
+	VECTOR v;
+	VECTOR out;
+	Entity *self;
+	Entity *other;
+	VECTOR *selfPos;
+	VECTOR *otherPos;
+	int32_t dx;
+	int32_t dz;
+
+	self = (Entity *)MAIN_D_80135128;
+	selfPos = &self->posData->location;
+	if (self == ENTITY_TABLE[1]) {
+		other = MAIN_D_801350E8;
+	} else {
+		other = ENTITY_TABLE[1];
+	}
+	otherPos = &other->posData->location;
+	dx = otherPos->vx - selfPos->vx;
+	do {
+	} while (0);
+	dz = otherPos->vz - selfPos->vz;
+	MAIN_D_801B1C0E[0] = (-_atan(dz, dx) + 0x800) & 0xfff;
+	RotMatrix((SVECTOR *)MAIN_D_801B1C0C, (MATRIX *)MAIN_D_801B1B98);
+	v = *(VECTOR *)MAIN_D_801B1C14;
+	ApplyMatrixLV((MATRIX *)MAIN_D_801B1B98,
+	              &((Entity *)MAIN_D_80135128)->posData->location, &out);
+	v.vx -= out.vx;
+	v.vy -= out.vy;
+	v.vz -= out.vz;
+	TransMatrix((MATRIX *)MAIN_D_801B1B98, &v);
+	GsSetView2((GsVIEW2 *)MAIN_D_801B1B98);
+}
 
 void STD_applyViewpoint(void)
 {
@@ -1174,6 +1659,7 @@ void STD_func_8005A1BC(void)
 	MAIN_D_801B1BBC[0] = 0;
 	GsSetView2((GsVIEW2 *)MAIN_D_801B1B98);
 }
+
 void STD_setCameraParams(int16_t a, int16_t b, int16_t c, int16_t d, int16_t e, int16_t f)
 {
 	MAIN_D_801B1C0C[0] = a;
@@ -1225,6 +1711,7 @@ void STD_func_8005A55C(DigimonEntity *entity, int32_t mode, int32_t sub)
 	MAIN_D_80135128 = (char **)ENTITY_TABLE[1];
 	STD_func_8005B688(ENTITY_TABLE[1], MAIN_D_801350E8);
 }
+
 void STD_setRandomViewpoint(Entity *entity, int32_t idx)
 {
 	VECTOR v;
@@ -1362,6 +1849,7 @@ int32_t STD_isPositionNearEntity(Entity *entity, VECTOR *pos)
 	if (entity->posData->location.vz > pos->vz + 50) {
 		goto no;
 	}
+
 	return 1;
 no:
 	return 0;
@@ -1385,9 +1873,103 @@ int32_t STD_func_8005ADFC(int32_t lo, int32_t hi, int32_t t, int32_t start, int3
 	return start + ((end - start) * (t - lo) / (hi - lo));
 }
 
-INCLUDE_ASM("asm/std/nonmatchings/std_main", STD_tickCameraChase);
+void STD_tickCameraChase(void)
+{
+	SVECTOR off;
+	SVECTOR rot;
+	CameraChase *cc;
+	int32_t dist;
+	int32_t d2;
+	int32_t slot;
+	int32_t i;
 
-INCLUDE_ASM("asm/std/nonmatchings/std_main", STD_startCameraChase);
+	cc = (CameraChase *)&MAIN_D_80135144;
+	if (MAIN_D_80135144 < 0x14) {
+		return;
+	}
+	if (cc->timer < 0x14) {
+		goto inc;
+	}
+	if (cc->timer == 0x14) {
+		startAnimation((Entity *)MAIN_D_80135128, 0x23);
+	}
+	if (cc->phase == 0) {
+		dist = STD_getFighterDistance((VECTOR *)STD_D_8007B704, &STD_D_8007B6F4, &((Entity *)MAIN_D_80135128)->posData->location);
+		if (dist >= 0x23) {
+			*(VECTOR *)STD_D_8007B704 = ((Entity *)MAIN_D_80135128)->posData->location;
+			cc->phase = 1;
+			MAIN_D_801350EC = 8;
+		} else {
+			off = MAIN_D_80134818;
+			rot = MAIN_D_80134820;
+			if (cc->side == 0) {
+				rot.vy = lerp(-0x638, -0x293, 0, 0x23, dist);
+			} else {
+				rot.vy = lerp(0x638, 0x293, 0, 0x23, dist);
+			}
+			rot.vy += ((Entity *)MAIN_D_80135128)->posData->rotation.vy;
+			off.vy = (-DIGIMON_DATA[((Entity *)MAIN_D_80135128)->type].height * 7) / 10;
+			d2 = (((DIGIMON_DATA[((Entity *)MAIN_D_80135128)->type].height + DIGIMON_DATA[((Entity *)MAIN_D_80135128)->type].radius) / 2) * 0x5aa) / 450;
+			STD_setViewpointFromBone((Entity *)MAIN_D_80135128, &off, &rot, d2);
+			GS_VIEWPOINT.vpy = (off.vy * 7) / 10;
+			if (GS_VIEWPOINT.vpy > -0xb4) {
+				GS_VIEWPOINT.vpy = -0xb4;
+			}
+			goto inc;
+		}
+	}
+	dist = STD_getFighterDistance((VECTOR *)STD_D_8007B704, &STD_D_8007B6F4, &((Entity *)MAIN_D_80135128)->posData->location);
+	STD_updateCameraLerp(dist, cc->side);
+	if (STD_isPositionNearEntity((Entity *)MAIN_D_80135128, &STD_D_8007B6F4) == 1) {
+		for (i = 0; i < 3; i++) {
+			if (((uint8_t *)MAIN_D_80135128 + i)[0x44] != 0xff) {
+				startAnimation((Entity *)MAIN_D_80135128, ((uint8_t *)MAIN_D_80135128 + i)[0x44]);
+				break;
+			}
+		}
+		((Entity *)MAIN_D_80135128)->anim.animFlag |= 2;
+		cc->timer = -1;
+		return;
+	}
+inc:
+	cc->timer++;
+}
+
+void STD_startCameraChase(Entity *entity, int32_t dx, int32_t side)
+{
+	SVECTOR off;
+	SVECTOR rot;
+	int32_t dist;
+
+	MAIN_D_80135128 = (char **)entity;
+	STD_D_8007B704[0] = entity->posData->location.vx;
+	STD_D_8007B708[0] = entity->posData->location.vy;
+	STD_D_8007B70C[0] = entity->posData->location.vz;
+	STD_D_8007B6F4.vx = STD_D_8007B704[0] - dx;
+	STD_D_8007B6F4.vy = STD_D_8007B708[0];
+	STD_D_8007B6F4.vz = STD_D_8007B70C[0];
+	startAnimation(entity, 0x21);
+	MAIN_D_801350EC = 9;
+	((CameraChase *)&MAIN_D_80135144)->timer = 0;
+	((CameraChase *)&MAIN_D_80135144)->phase = 0;
+	((CameraChase *)&MAIN_D_80135144)->side = side;
+	addObject(0x1aa, 0, (TickFunction)STD_tickCameraChase, NULL);
+	off = MAIN_D_80134828;
+	rot = MAIN_D_80134830;
+	if (MAIN_D_80135147 == 0) {
+		rot.vy = -0x638;
+	} else {
+		rot.vy = 0x638;
+	}
+	rot.vy += ((Entity *)MAIN_D_80135128)->posData->rotation.vy;
+	off.vy = (-DIGIMON_DATA[((Entity *)MAIN_D_80135128)->type].height * 2) / 3;
+	dist = (((DIGIMON_DATA[((Entity *)MAIN_D_80135128)->type].height + DIGIMON_DATA[((Entity *)MAIN_D_80135128)->type].radius) / 2) * 0x5aa) / 450;
+	STD_setViewpointFromBone((Entity *)MAIN_D_80135128, &off, &rot, dist);
+	GS_VIEWPOINT.vpy = (off.vy * 3) / 10;
+	if (GS_VIEWPOINT.vpy > -0xb4) {
+		GS_VIEWPOINT.vpy = -0xb4;
+	}
+}
 
 void STD_tickCameraIntro(void)
 {
@@ -1414,7 +1996,72 @@ void STD_tickCameraIntro(void)
 	p[0]++;
 }
 
-INCLUDE_ASM("asm/std/nonmatchings/std_main", STD_func_8005B688);
+void STD_func_8005B688(Entity *target, Entity *entity)
+{
+	SVECTOR off;
+	SVECTOR rot;
+	int16_t dx;
+	int16_t dz;
+	int32_t d;
+	int32_t i;
+
+	STD_D_8007B9C8[0] = 0;
+	STD_D_8007B9D8[0] = entity;
+	if (target == NULL) {
+		if ((Entity *)MAIN_D_80135128 == ENTITY_TABLE[1]) {
+			target = MAIN_D_801350E8;
+		} else {
+			target = ENTITY_TABLE[1];
+		}
+	}
+	STD_D_8007B9D4[0] = target;
+	MAIN_D_801350EC = 8;
+	addObject(0x1ad, 0, (TickFunction)STD_tickCameraIntro, NULL);
+
+	off = MAIN_D_80134848;
+	rot = MAIN_D_80134850;
+	dx = entity->posData->location.vx - target->posData->location.vx;
+	dz = entity->posData->location.vz - target->posData->location.vz;
+	STD_D_8007B9CA[0] = (-_atan(dz, dx) + 0x7de) & 0xfff;
+	rot.vy = STD_D_8007B9CA[0];
+	STD_D_8007B9CC[0] = getDistance(dx, 0, dz);
+	STD_D_8007B9CC[0] = STD_D_8007B9CC[0] + 0x2bc;
+	if (STD_D_8007B9CC[0] < 0x5dc) {
+		STD_D_8007B9CC[0] = 0x5dc;
+	}
+	STD_setViewpointFromBone(target, &off, &rot, STD_D_8007B9CC[0]);
+
+	STD_D_8007B9CE[0] = DIGIMON_DATA[target->type].radius * 3 * 2;
+	GS_VIEWPOINT.vry = (-DIGIMON_DATA[target->type].height * 2) / 3;
+	GS_VIEWPOINT.vpy = -DIGIMON_DATA[entity->type].height;
+	STD_D_8007B9D0[0] = GS_VIEWPOINT.vpy;
+	STD_D_8007B9D2[0] = GS_VIEWPOINT.vpy * 250 / 100;
+	((int32_t *)STD_D_8007BA9C)[0] = DIGIMON_DATA[entity->type].height;
+	STD_D_8007BAA0[0] = DIGIMON_DATA[entity->type].height;
+	STD_D_8007BAA4[0] = DIGIMON_DATA[entity->type].height * 200 / 100;
+	STD_D_8007BAA8[0] = DIGIMON_DATA[target->type].height * 380 / 100;
+	STD_D_8007BAAC[0] = DIGIMON_DATA[target->type].height * 250 / 100;
+	for (i = 5; i < 0x16; i++) {
+		((int32_t *)STD_D_8007BA9C)[i] =
+			customRandom(0x50, DIGIMON_DATA[target->type].height * 180 / 100);
+	}
+	MAIN_func_800DA60C(0x16, STD_D_8007A41C, STD_D_8007BA9C, STD_D_8007BA44);
+
+	d = getDistance(dx, 0, dz) + 0x2bc;
+	((int32_t *)STD_D_8007B9EC)[0] = d;
+	STD_D_8007B9F0[0] = d;
+	if (d < 0x5dc) {
+		d = 0x5dc;
+	}
+	STD_D_8007B9F4[0] = d * 120 / 100;
+	STD_D_8007B9F8[0] = d * 80 / 100;
+	STD_D_8007B9FC[0] = STD_D_8007B9CE[0];
+	for (i = 5; i < 0x16; i++) {
+		((int32_t *)STD_D_8007B9EC)[i] =
+			customRandom(STD_D_8007B9CE[0] * 45 * 2 / 100,
+		                     STD_D_8007B9CE[0] * 45 * 4 / 100);
+	}
+}
 
 void STD_removeCameraIntro(void)
 {
@@ -1527,18 +2174,490 @@ void STD_removeFighterCounter(void)
 	}
 }
 
-INCLUDE_ASM("asm/std/nonmatchings/std_main", STD_func_8005C1E4);
+void STD_func_8005C1E4(void)
+{
+	int32_t i;
+	StdUnkBAF4 *s;
+	int32_t match;
+	int32_t va;
+	int16_t ab[2];
+	int32_t v;
+	int32_t flag;
+	int16_t arg;
+	int32_t st;
+	int32_t st2;
+	int16_t b;
+	uint8_t u;
+	int32_t n7;
 
-INCLUDE_ASM("asm/std/nonmatchings/std_main", STD_func_8005CE9C);
+	if (MAIN_D_8013514C < 5) {
+		ab[0] = (MAIN_D_8013514C - 1) * 2;
+		v = (MAIN_D_8013514C - 1) * 2;
+		ab[1] = v + 1;
+	} else if (MAIN_D_8013514C < 7) {
+		ab[0] = MAIN_D_80135158[(MAIN_D_8013514C - 5) * 2];
+		ab[1] = MAIN_D_80135158[(MAIN_D_8013514C - 5) * 2 + 1];
+	} else {
+		ab[0] = MAIN_D_8013515C;
+		ab[1] = MAIN_D_8013515D;
+	}
+	if (ab[0] == MAIN_D_8013514D || ab[1] == MAIN_D_8013514D) {
+		match = 1;
+	} else {
+		match = 0;
+	}
+	va = ab[0];
+	b = ab[1];
 
-INCLUDE_ASM("asm/std/nonmatchings/std_main", STD_func_8005D398);
+	for (i = 0; i < 8; i++) {
+		s = &STD_D_8007BAF4[i];
+		if (i != ab[0] && i != ab[1]) {
+			continue;
+		}
+		n7 = s->unk7;
+		switch (n7) {
+		case 0:
+			s->unk8++;
+			s->unk9++;
+			if (s->unk8 % 10 == 0) {
+				s->unk5 = (s->unk5 + 1) & 1;
+			}
+			if (s->unk9 < 0x29) {
+				continue;
+			}
+			s->unk9 = 0;
+			s->unk7++;
+			continue;
+		case 1:
+			s->unk8++;
+			s->unk9++;
+			if (s->unk9 == 5) {
+				playSound(8, 5);
+			}
+			if (s->unk2 != STD_D_8007A48C[s->unk4]) {
+				s->unk2 -= 1;
+			}
+			if (s->unk8 % 10 == 0) {
+				STD_D_8007BAF4[i].unk5 = (s->unk5 + 1) & 1;
+			}
+			if (s->unk2 != STD_D_8007A48C[s->unk4]) {
+				continue;
+			}
+			if (s->unk0 != (&STD_D_8007A598[i].unk0)[s->unk4]) {
+				continue;
+			}
+			s->unkA[1] = 0;
+			s->unk9 = 0;
+			s->unk7++;
+			continue;
+		case 2:
+			s->unk8++;
+			s->unk9++;
+			if (s->unk8 % 10 == 0) {
+				s->unk5 = (s->unk5 + 1) & 1;
+			}
+			if (match == 0) {
+				if (s->unk9 < 0x29) {
+					continue;
+				}
+				s->unk5 = 2;
+				playSound(8, 1);
+				s->unk8 = 0;
+				s->unk9 = 0;
+				s->unkA[0] = 0;
+				flag = 0;
+				if (MAIN_D_8013514C < 5) {
+					if (i == MAIN_D_80135158[MAIN_D_8013514C - 1]) {
+						flag = 1;
+					}
+				}
+				if (!(MAIN_D_8013514C < 5) && MAIN_D_8013514C < 7) {
+					if (i == (&MAIN_D_8013515C)[MAIN_D_8013514C - 5]) {
+						flag = 1;
+					}
+				}
+				if (i == ab[0]) {
+					arg = ab[1];
+				} else {
+					arg = ab[0];
+				}
+				STD_func_8005D398((int16_t)i, arg, flag);
+				s->unk7++;
+				continue;
+			}
+			MAIN_D_80135164 += 3;
+			if (MAIN_D_80135164 < 0x81) {
+				continue;
+			}
+			MAIN_D_80135164 = 0x80;
+			continue;
+		case 3:
+			if (s->unk5 == 2) {
+				s->unk9++;
+			} else {
+				s->unk8++;
+				if (s->unk8 % 10 == 0) {
+					s->unk5 = (s->unk5 + 1) & 1;
+				}
+			}
+			if (s->unk9 >= 0x15) {
+				s->unk5 = 0;
+				s->unk8 = 0;
+				s->unk9 = 0;
+			}
+			if (s->unkA[0] != 1) {
+				continue;
+			}
+			s->unkA[1] = 3;
+			s->unk9 = 0;
+			s->unk8 = 0;
+			s->unk7++;
+			if (s->unkA[1] != 3) {
+				STD_func_8005D538((int16_t)i);
+				continue;
+			}
+			if (s->unkC == 1) {
+				STD_func_8005D538((int16_t)i);
+				continue;
+			}
+			s->unk6 = (s->unk6 + 1) & 1;
+			continue;
+		case 4:
+			s->unk8++;
+			if (s->unkA[1] != 3) {
+				s->unk5 = 3;
+				if (s->unk8 < 0x15) {
+					continue;
+				}
+				s->unk8 = 0;
+				s->unk7 = 2;
+				continue;
+			}
+			if (s->unkC == 1) {
+				s->unk5 = 3;
+				if (s->unk8 < 0x1f) {
+					continue;
+				}
+				s->unk8 = 0;
+				s->unk7++;
+				playSound(8, 3);
+				continue;
+			}
+			if (s->unk8 == 0x14) {
+				s->unk6 = (s->unk6 + 1) & 1;
+			}
+			if (s->unk8 < 0x1f) {
+				continue;
+			}
+			s->unk4++;
+			s->unk7 += 2;
+			if (s->unk5 != 2) {
+				continue;
+			}
+			s->unk5 = 0;
+			continue;
+		case 5:
+			if (s->unk8 < 0x18) {
+				v = STD_D_8007A48C[s->unk4];
+				u = s->unk8++;
+				s->unk2 = STD_D_8007A474[u] + v;
+				if (s->unk8 != 0x14) {
+					continue;
+				}
+				playSound(8, 4);
+				continue;
+			}
+			s->unk7 = (uint32_t)n7 + 1;
+			continue;
+		case 6:
+			if (match != 0) {
+				if (MAIN_D_801350E4 == 1) {
+					if (i == MAIN_D_8013514D) {
+						s->unk0 = (&STD_D_8007A598[i].unk0)[s->unk4 + 1];
+						s->unk5 = 0;
+						s->unk6 = (&STD_D_8007A598[i].unk10)[s->unk4 + 1];
+						s->unk4 += 2;
+						s->unk9 = 0;
+						s->unk8 = 0;
+						s->unk5 = 0;
+						s->unk7 = 0;
+						if (MAIN_D_8013514C < 5) {
+							MAIN_D_80135158[MAIN_D_8013514D / 2] = MAIN_D_8013514D;
+						}
+						if (MAIN_D_8013514C < 7) {
+							(&MAIN_D_8013515C)[MAIN_D_8013514D / 4] = MAIN_D_8013514D;
+						}
+						MAIN_D_8013514C++;
+						continue;
+					}
+					s->unk2 = STD_D_8007A48C[s->unk4 - 1];
+					s->unk5 = 3;
+					continue;
+				}
+				if (i == MAIN_D_8013514D) {
+					s->unk2 = STD_D_8007A48C[s->unk4 - 1];
+					s->unk5 = 3;
+					continue;
+				}
+				s->unk0 = (&STD_D_8007A598[i].unk0)[s->unk4 - 1];
+				s->unk5 = 0;
+				continue;
+			}
+			if (s->unkC != 0) {
+				continue;
+			}
+			s->unk8++;
+			if (s->unk8 % 10 == 0) {
+				s->unk5 = (s->unk5 + 1) & 1;
+			}
+			if (STD_D_8007BAF4[STD_D_8007BB64[i].owner].unk7 != 6) {
+				continue;
+			}
+			if (s->unk0 > (&STD_D_8007A598[i].unk0)[s->unk4]) {
+				s->unk0 -= 1;
+			}
+			if (s->unk0 < (&STD_D_8007A598[i].unk0)[s->unk4]) {
+				s->unk0 += 1;
+			}
+			if (s->unk2 != STD_D_8007A48C[s->unk4]) {
+				continue;
+			}
+			if (s->unk0 != (&STD_D_8007A598[i].unk0)[s->unk4]) {
+				continue;
+			}
+			s->unk6 = (&STD_D_8007A598[i].unk10)[s->unk4];
+			s->unk4++;
+			s->unk9 = 0;
+			s->unk8 = 0;
+			s->unk5 = 0;
+			s->unk7 = 0;
+			MAIN_D_8013514C++;
+			continue;
+		case 7:
+			s->unk8++;
+			if (i == MAIN_D_8013514D) {
+				s->unk0 = (&STD_D_8007A598[i].unk0)[7];
+				s->unk2 = STD_D_8007A48C[7];
+				s->unk5 = 0;
+				s->unk6 = (&STD_D_8007A598[i].unk10)[7];
+			} else {
+				s->unk0 = (&STD_D_8007A598[i].unk0)[4];
+				s->unk2 = STD_D_8007A48C[4];
+				s->unk6 = (&STD_D_8007A598[i].unk10)[4];
+				s->unk5 = 3;
+			}
+			if (s->unk8 < 0x3d) {
+				continue;
+			}
+			MAIN_D_80135160 = 1;
+			continue;
+		}
+	}
+
+	for (i = 0; i < 8; i++) {
+		STD_func_8005D550((int16_t)i);
+	}
+
+	if (match == 0) {
+		return;
+	}
+	if (MAIN_D_80135164 != 0x80) {
+		return;
+	}
+	if (STD_D_8007BAF4[MAIN_D_8013514D].unk7 != 2) {
+		return;
+	}
+	if (MAIN_D_8013514C != 7) {
+		st = 6;
+	} else {
+		st = 7;
+	}
+	STD_D_8007BAF4[MAIN_D_8013514D].unk7 = st;
+	if (MAIN_D_8013514C == 7) {
+		STD_D_8007BAF4[MAIN_D_8013514D].unk8 = 0;
+	}
+	if (MAIN_D_8013514D == va) {
+		if (MAIN_D_8013514C != 7) {
+			st2 = 6;
+		} else {
+			st2 = 7;
+		}
+		STD_D_8007BAF4[ab[1]].unk7 = st2;
+		if (MAIN_D_8013514C == 7) {
+			STD_D_8007BAF4[ab[1]].unk8 = 0;
+		}
+	} else {
+		if (MAIN_D_8013514C != 7) {
+			st2 = 6;
+		} else {
+			st2 = 7;
+		}
+		STD_D_8007BAF4[ab[0]].unk7 = st2;
+		if (MAIN_D_8013514C == 7) {
+			STD_D_8007BAF4[ab[0]].unk8 = 0;
+		}
+	}
+	MAIN_D_80135160 = 1;
+}
+
+void STD_func_8005CE9C(void)
+{
+	POLY_FT4 *prim;
+	GsBOXF box;
+	int32_t len;
+	int32_t i;
+	int32_t p;
+	int32_t c;
+	int32_t off;
+	int32_t x;
+	int32_t j;
+	int32_t small;
+	int16_t shift;
+	int32_t k;
+	int32_t v;
+
+	for (i = 0; i < 8; i++) {
+		len = strlen(DIGIMON_DATA[MAIN_D_80135150[i]].name) / 2;
+		if (MAIN_D_80135150[i] == 0x4e || MAIN_D_80135150[i] == 0x3c) {
+			len = 10;
+		}
+		p = 0;
+		shift = 0;
+		small = 0;
+		j = 0;
+		x = 0;
+		off = i;
+		for (; j < len; j++, x += 8) {
+			k = j - 1;
+			if (len < 8) {
+				c = STD_D_80079CBC[MAIN_D_80135150[i]][p++];
+				STD_func_8005D814((int16_t)(STD_D_8007A598[off].unk0 + 4),
+				                  (int16_t)(STD_D_8007A48C[0] + 0x12 + x), c, 5);
+				if (c == 0x1f || c == 0x25) {
+					c = STD_D_80079CBC[MAIN_D_80135150[i]][p++];
+					STD_func_8005D814((int16_t)(STD_D_8007A598[off].unk0 + 4),
+					                  (int16_t)(STD_D_8007A48C[0] + 0x12 + x), c, 5);
+				}
+			} else {
+				c = STD_D_80079CBC[MAIN_D_80135150[i]][p++];
+				if (c == 0x3d) {
+					c = STD_D_80079CBC[MAIN_D_80135150[i]][p++];
+					small = 1;
+					shift = -(k * 8);
+				}
+				if (small == 0) {
+					v = STD_D_8007A598[off].unk0 + 8;
+				} else {
+					v = STD_D_8007A598[off].unk0;
+				}
+				STD_func_8005D814((int16_t)v,
+				                  (int16_t)(shift + (STD_D_8007A48C[0] + 0x12 + x)), c, 5);
+				if (c == 0x1f || c == 0x25) {
+					c = STD_D_80079CBC[MAIN_D_80135150[i]][p++];
+					if (small == 0) {
+						v = STD_D_8007A598[off].unk0 + 8;
+					} else {
+						v = STD_D_8007A598[off].unk0;
+					}
+					STD_func_8005D814((int16_t)v,
+					                  (int16_t)(shift + (STD_D_8007A48C[0] + 0x12 + x)), c, 5);
+				}
+			}
+		}
+	}
+
+	prim = (POLY_FT4 *)GsGetWorkBase();
+	SetPolyFT4(prim);
+	if (MAIN_D_80135164 != 0) {
+		prim->code |= 2;
+	}
+	setRGB0(prim, 0x80 - MAIN_D_80135164, 0x80 - MAIN_D_80135164, 0x80 - MAIN_D_80135164);
+	setUVDataPolyFT4(prim, 0, 0x78, 0xff, 0x87);
+	setPosDataPolyFT4(prim, -0x80, -0x61, 0xff, 0x87);
+	prim->tpage = GetTPage(0, 1, 0x340, 0);
+	prim->clut = GetClut(0x20, 0x1e0);
+	AddPrim(ACTIVE_ORDERING_TABLE->org + 5, prim++);
+	GsSetWorkBase((PACKET *)prim);
+
+	box.attribute = 0x40000000;
+	box.x = -0xa0;
+	box.y = -0x78;
+	box.r = box.g = box.b = 0x20;
+	box.w = 0x140;
+	box.h = 0xf0;
+	GsSortBoxFill(&box, ACTIVE_ORDERING_TABLE, 5);
+}
+
+void STD_func_8005D398(int16_t i, int32_t owner, int32_t flag)
+{
+	if (STD_D_8007BAF4[i].unk6 == 1) {
+		STD_D_8007BB64[i].x = STD_D_8007BAF4[i].unk0 + 0x10;
+		STD_D_8007BB64[i].y = STD_D_8007BAF4[i].unk2;
+		if (flag == 1) {
+			STD_D_8007BAF4[owner].unkC = 1;
+		}
+	} else {
+		STD_D_8007BB64[i].x = STD_D_8007BAF4[i].unk0 - 8;
+		if (flag == 0) {
+			STD_D_8007BB64[i].y = STD_D_8007BAF4[i].unk2 + 8;
+		} else {
+			STD_D_8007BB64[i].y = STD_D_8007BAF4[i].unk2;
+			STD_D_8007BAF4[owner].unkC = 1;
+		}
+	}
+	STD_D_8007BB64[i].flag = flag;
+	STD_D_8007BB64[i].owner = owner;
+	addObject(0x1af, i, (TickFunction)STD_func_8005E124, NULL);
+}
 
 void STD_func_8005D538(int32_t i)
 {
 	addObject(0x1B0, i, STD_func_8005E004, 0);
 }
 
-INCLUDE_ASM("asm/std/nonmatchings/std_main", STD_func_8005D550);
+void STD_func_8005D550(int16_t id)
+{
+	POLY_FT4 *prim;
+	int32_t tile;
+	int32_t t;
+	uint8_t u;
+	uint8_t v;
+	int32_t w;
+	int32_t h;
+	int32_t w2;
+	int32_t h2;
+
+	tile = MAIN_D_80135150[id];
+	prim = (POLY_FT4 *)GsGetWorkBase();
+	SetPolyFT4(prim);
+	if (MAIN_D_80135164 != 0) {
+		prim->code |= 2;
+	}
+	t = t = tile;
+	prim->tpage = GetTPage(0, 1, (tile / 64) * 64 + 0x380, 0);
+	prim->clut = GetClut((tile / 64) * 16 + 0x120, STD_D_8007A49C[tile] + 0x1e0);
+	setRGB0(prim, 0x80 - MAIN_D_80135164, 0x80 - MAIN_D_80135164, 0x80 - MAIN_D_80135164);
+	u = ((t - 1) % 32) * 32 + (STD_D_8007BAF4[id].unk5 & 1) * 16;
+	v = ((t - 1) / 8) * 32 + (STD_D_8007BAF4[id].unk5 / 2) * 16;
+	h = 0x10;
+	w = h;
+	if (u == 0xf0) {
+		w = 0xf;
+	}
+	if (v == 0xf0) {
+		h = 0xf;
+	}
+	h2 = h2 = h;
+	setUVDataPolyFT4(prim, u, v, w2 = w2 = w, h);
+	setPosDataPolyFT4(prim, STD_D_8007BAF4[id].unk0, STD_D_8007BAF4[id].unk2, w2, h2);
+	if (STD_D_8007BAF4[id].unk6 == 1) {
+		swapShort(&prim->x0, &prim->x1);
+		swapShort(&prim->x2, &prim->x3);
+		STD_func_8005D7C0(prim, prim->u0, w, h);
+	}
+	AddPrim(ACTIVE_ORDERING_TABLE->org + 5, prim++);
+	GsSetWorkBase((PACKET *)prim);
+}
 
 void STD_func_8005D7A8(int32_t i)
 {
@@ -1550,9 +2669,49 @@ void STD_func_8005D7B4(int32_t i)
 	removeObject(0x1AF, i);
 }
 
-INCLUDE_ASM("asm/std/nonmatchings/std_main", STD_func_8005D7C0);
+// clang-format off
+void STD_func_8005D7C0(prim, a, b, h)
+	POLY_FT4 *prim;
+	int16_t a;
+	int16_t b;
+	int32_t h;
+// clang-format on
+{
+	int32_t x;
+	int32_t w;
 
-INCLUDE_ASM("asm/std/nonmatchings/std_main", STD_func_8005D814);
+	w = b;
+	x = a - 1;
+	a = x;
+	if ((int16_t)x < 0) {
+		a = 0;
+		w = (int16_t)(w - 1);
+	}
+	setUVDataPolyFT4(prim, a, prim->v0, w, h);
+}
+
+void STD_func_8005D814(int32_t x, int32_t y, int32_t n, int32_t size)
+{
+	POLY_FT4 *prim;
+	uint8_t u;
+	uint8_t v;
+	int32_t k;
+
+	prim = (POLY_FT4 *)GsGetWorkBase();
+	SetPolyFT4(prim);
+	prim->tpage = GetTPage(0, 1, 0x340, 0x100);
+	prim->clut = GetClut(0x30, 0x1e0);
+	if (MAIN_D_80135164 != 0) {
+		prim->code |= 2;
+	}
+	setRGB0(prim, 0x80 - MAIN_D_80135164, 0x80 - MAIN_D_80135164, 0x80 - MAIN_D_80135164);
+	k = k = n;
+	u = (n % 8) * 8;
+	v = (k / 8) * 8;
+	setUVDataPolyFT4(prim, u, v, (u != 0xf8) ? 8 : 7, (v != 0xf8) ? 8 : 7);
+	setPosDataPolyFT4(prim, x, y, 8, 8);
+	GsSetWorkBase((PACKET *)prim);
+}
 
 void STD_func_8005D964(void)
 {
@@ -1574,7 +2733,89 @@ void STD_func_8005D964(void)
 	}
 }
 
-INCLUDE_ASM("asm/std/nonmatchings/std_main", STD_func_8005D9F4);
+void STD_func_8005D9F4(uint8_t *out, uint8_t *list)
+{
+	int32_t i;
+	int32_t j;
+	uint8_t *p;
+	int32_t r;
+	int32_t k;
+
+	MAIN_D_8013514D = random(8);
+	MAIN_D_80135150[MAIN_D_8013514D] = ENTITY_TABLE[1]->type;
+
+	for (i = 1; i < 8; i++) {
+		swapByte(&list[i], &list[random(7) + 1]);
+	}
+
+	p = list + 1;
+	for (i = 0; i < 8; i++) {
+		if (i != MAIN_D_8013514D) {
+			MAIN_D_80135150[i] = *p++;
+		}
+	}
+
+	for (i = 0, j = 0; i < 4; i++, j += 2) {
+		r = random(100);
+		k = j;
+		if (r < STD_D_8007A58C[DIGIMON_DATA[MAIN_D_80135150[j]].level - 3][DIGIMON_DATA[MAIN_D_80135151[j]].level - 3]) {
+			MAIN_D_80135158[i] = k;
+		} else {
+			MAIN_D_80135158[i] = k + 1;
+		}
+	}
+
+	if (MAIN_D_8013514D < 4) {
+		if (MAIN_D_8013514D < 2) {
+			MAIN_D_8013515C = MAIN_D_80135159;
+		} else {
+			MAIN_D_8013515C = MAIN_D_80135158[0];
+		}
+		r = random(100);
+		if (r < STD_D_8007A58C[DIGIMON_DATA[MAIN_D_80135150[MAIN_D_8013515A]].level - 3][DIGIMON_DATA[MAIN_D_80135150[MAIN_D_8013515B]].level - 3]) {
+			MAIN_D_8013515D = MAIN_D_8013515A;
+		} else {
+			MAIN_D_8013515D = MAIN_D_8013515B;
+		}
+	} else {
+		r = random(100);
+		if (r < STD_D_8007A58C[DIGIMON_DATA[MAIN_D_80135150[MAIN_D_80135158[0]]].level - 3][DIGIMON_DATA[MAIN_D_80135150[MAIN_D_80135159]].level - 3]) {
+			MAIN_D_8013515C = MAIN_D_80135158[0];
+		} else {
+			MAIN_D_8013515C = MAIN_D_80135159;
+		}
+		if (MAIN_D_8013514D < 6) {
+			MAIN_D_8013515D = MAIN_D_8013515B;
+		} else {
+			MAIN_D_8013515D = MAIN_D_8013515A;
+		}
+	}
+
+	if (MAIN_D_8013514D % 2 == 0) {
+		out[0] = MAIN_D_80135150[MAIN_D_8013514D + 1];
+	} else {
+		out[0] = MAIN_D_80135150[MAIN_D_8013514D - 1];
+	}
+
+	switch (MAIN_D_8013514D / 2) {
+	case 0:
+		out[1] = MAIN_D_80135150[MAIN_D_80135159];
+		out[2] = MAIN_D_80135150[MAIN_D_8013515D];
+		break;
+	case 1:
+		out[1] = MAIN_D_80135150[MAIN_D_80135158[0]];
+		out[2] = MAIN_D_80135150[MAIN_D_8013515D];
+		break;
+	case 2:
+		out[1] = MAIN_D_80135150[MAIN_D_8013515B];
+		out[2] = MAIN_D_80135150[MAIN_D_8013515C];
+		break;
+	case 3:
+		out[1] = MAIN_D_80135150[MAIN_D_8013515A];
+		out[2] = MAIN_D_80135150[MAIN_D_8013515C];
+		break;
+	}
+}
 
 void STD_func_8005DEEC(int32_t track)
 {
@@ -1614,9 +2855,99 @@ int32_t STD_func_8005DFF8(void)
 	return MAIN_D_80135160;
 }
 
-INCLUDE_ASM("asm/std/nonmatchings/std_main", STD_func_8005E004);
+void STD_func_8005E004(int32_t idx)
+{
+	POLY_FT4 *prim;
 
-INCLUDE_ASM("asm/std/nonmatchings/std_main", STD_func_8005E124);
+	if (STD_D_8007BAF4[idx].unk8 >= 0x10) {
+		STD_func_8005D7A8(idx);
+	}
+	if ((STD_D_8007BAF4[idx].unk8 % 5) == 4) {
+		prim = (POLY_FT4 *)GsGetWorkBase();
+		SetPolyFT4(prim);
+		setRGB0(prim, 0x80, 0x80, 0x80);
+		prim->tpage = 0xf;
+		prim->clut = GetClut(0x130, 0x1e0);
+		setUVDataPolyFT4(prim, 0, 0xc8, 0x10, 0x10);
+		setPosDataPolyFT4(prim, STD_D_8007BAF4[idx].unk0, STD_D_8007BAF4[idx].unk2, 0x10, 0x10);
+		AddPrim(ACTIVE_ORDERING_TABLE->org + 3, prim++);
+		GsSetWorkBase((PACKET *)prim);
+	}
+}
+
+void STD_func_8005E124(int32_t id)
+{
+	int16_t d;
+	int32_t i;
+
+	if (MAIN_D_8013514C < 5) {
+		d = 1;
+	} else if (MAIN_D_8013514C < 7) {
+		d = 3;
+	}
+
+	i = i = id;
+	if (STD_D_8007BAF4[id].unk6 == 1) {
+		STD_D_8007BB64[i].x += d;
+	} else {
+		STD_D_8007BB64[i].x -= d;
+	}
+	STD_func_8005E1E4(id);
+}
+
+void STD_func_8005E1E4(int32_t id)
+{
+	POLY_FT4 *prim;
+	int32_t n;
+	int32_t o;
+
+	prim = (POLY_FT4 *)GsGetWorkBase();
+	SetPolyFT4(prim);
+	setRGB0(prim, 0x80, 0x80, 0x80);
+	prim->tpage = GetTPage(0, 2, 0x3c0, 0);
+	n = n = id;
+	prim->clut = GetClut(0x130,
+	                     STD_D_8007A57C[STD_D_8007A50C[MAIN_D_80135150[id]] - 1] + 0x1e0);
+	setUVDataPolyFT4(prim, STD_D_8007A50C[MAIN_D_80135150[n]] * 8 - 8, 0xc0, 8, 8);
+	setPosDataPolyFT4(prim, STD_D_8007BB64[n].x, STD_D_8007BB64[n].y, 8, 8);
+	if (STD_D_8007BAF4[n].unk6 == 1) {
+		swapShort(&prim->x0, &prim->x1);
+		swapShort(&prim->x2, &prim->x3);
+		STD_func_8005D7C0(prim, prim->u0, 8, 8);
+	}
+	AddPrim(ACTIVE_ORDERING_TABLE->org + 4, prim++);
+
+	if (STD_D_8007BB64[n].flag == 1) {
+		SetPolyFT4(prim);
+		setRGB0(prim, 0x80, 0x80, 0x80);
+		prim->tpage = GetTPage(0, 2, 0x3c0, 0);
+		prim->clut = GetClut(0x130,
+		                     STD_D_8007A57C[STD_D_8007A50C[MAIN_D_80135150[n]] - 1] + 0x1e0);
+		setUVDataPolyFT4(prim, STD_D_8007A50C[MAIN_D_80135150[n]] * 8 - 8, 0xc0, 8, 8);
+		setPosDataPolyFT4(prim, STD_D_8007BB64[n].x, STD_D_8007BB64[n].y + 8, 8, 8);
+		if (STD_D_8007BAF4[n].unk6 == 1) {
+			swapShort(&prim->x0, &prim->x1);
+			swapShort(&prim->x2, &prim->x3);
+			STD_func_8005D7C0(prim, prim->u0, 8, 8);
+		}
+		AddPrim(ACTIVE_ORDERING_TABLE->org + 4, prim++);
+	}
+	GsSetWorkBase((PACKET *)prim);
+
+	if (STD_D_8007BAF4[n].unk6 == 1) {
+		o = STD_D_8007BB64[n].owner;
+		if (STD_D_8007BAF4[o].unk0 - STD_D_8007BB64[n].x < 9) {
+			STD_D_8007BAF4[o].unkA[0] = 1;
+			STD_func_8005D7B4(id);
+		}
+	} else {
+		o = STD_D_8007BB64[n].owner;
+		if (STD_D_8007BB64[n].x - STD_D_8007BAF4[o].unk0 < 0x11) {
+			STD_D_8007BAF4[o].unkA[0] = 1;
+			STD_func_8005D7B4(id);
+		}
+	}
+}
 
 void STD_func_8005E5E0(void)
 {
@@ -1697,21 +3028,876 @@ void STD_func_8005E898(void)
 	removeObject(0x1A1, 0);
 }
 
-INCLUDE_ASM("asm/std/nonmatchings/std_main", STD_func_8005E8A4);
+void STD_func_8005F650(void)
+{
+	int16_t enemies[4];
+	int16_t moveFlags[4];
+	int16_t targetFlags[4];
+	int16_t count;
+	Entity *partner;
+	FighterData *fighter;
+	Stats *stats;
+	uint16_t *flagsPtr;
+	uint16_t flags;
+	int32_t chance;
+	int32_t index;
+	int32_t result;
+	int32_t i;
 
-INCLUDE_ASM("asm/std/nonmatchings/std_main", STD_func_8005EF84);
+	fighter = COMBAT_DATA_PTR->fighter;
+	partner = ENTITY_TABLE[1];
+	stats = &((DigimonEntity *)partner)->stats;
+	flagsPtr = &COMBAT_DATA_PTR->fighter[0].flags;
+	if (COMBAT_DATA_PTR->player.commandDelay[0] == 0) {
+		COMBAT_DATA_PTR->player.currentCommand[0] = COMBAT_DATA_PTR->player.bufferedCommand[0];
+	} else if (!(*flagsPtr & 0x800e) && (fighter->flatTimer == 0)) {
+		COMBAT_DATA_PTR->player.commandDelay[0]--;
+	}
 
-INCLUDE_ASM("asm/std/nonmatchings/std_main", STD_func_8005F354);
+	if (MAIN_D_80134D74 == 0) {
+		if (stats->current.currentHP > fighter->hpDamageBuffer) {
+			if (stats->base.brain < 0x12d) {
+				if ((MAIN_D_80134D66 % (((stats->base.brain / 2) + 1) * 20)) == 0) {
+					chance = 0x46 - PARTNER_PARA.discipline;
+					if (random(100) < chance) {
+						*flagsPtr |= 0x2000;
+						fighter->senileTimer = 100;
+					}
+				}
+			}
+		}
+		if (fighter->cooldown >= 2) {
+			fighter->cooldown--;
+		}
+		if (!(*flagsPtr & 0x2000)) {
+			STD_increaseSpeedBuffer(fighter, stats);
+		}
+	}
 
-INCLUDE_ASM("asm/std/nonmatchings/std_main", STD_func_8005F650);
+	if (*flagsPtr & 0x80b0) {
+		return;
+	}
 
-INCLUDE_ASM("asm/std/nonmatchings/std_main", STD_func_8005FDDC);
+	if (stats->current.currentHP == 0) {
+		STD_faintDigimon((DigimonEntity *)partner, fighter, 0);
+		if (STD_func_80060B98() == 0) {
+			STD_func_8005A55C((DigimonEntity *)partner, 5, 0);
+		}
+		MAIN_D_80135118 = 1;
+		return;
+	}
 
-INCLUDE_ASM("asm/std/nonmatchings/std_main", STD_func_800602A8);
+	STD_getRemainingEnemies(partner, enemies, &count);
+	if ((count == 0) || (((DigimonEntity *)partner)->stats.current.currentHP <= fighter->hpDamageBuffer)) {
+		handleBattleIdle((DigimonEntity *)partner, stats, *flagsPtr);
+		fighter->moveRange = -1;
+		STD_resetFlatten(0);
+		STD_removeStatusEffects((DigimonEntity *)partner, fighter);
+		*flagsPtr = 0;
+		*flagsPtr |= 0x40;
+		return;
+	}
 
-INCLUDE_ASM("asm/std/nonmatchings/std_main", STD_func_80060620);
+	if (MAIN_D_80134D74 != 0) {
+		return;
+	}
 
-INCLUDE_ASM("asm/std/nonmatchings/std_main", STD_func_80060998);
+	if (!(*flagsPtr & 0x800e) && (fighter->flatTimer == 0)) {
+		switch (COMBAT_DATA_PTR->player.currentCommand[0]) {
+		case 7:
+			if (fighter->targetId == 0xff) {
+				break;
+			}
+			if (COMBAT_DATA_PTR->player.changeTarget != 1) {
+				break;
+			}
+			switch (count) {
+			case 2:
+				if (fighter->targetId == enemies[0]) {
+					fighter->targetId = enemies[1];
+				} else {
+					fighter->targetId = enemies[0];
+				}
+				break;
+			case 3:
+				if ((COMBAT_DATA_PTR->player.unk5[0] == 0xff) && (COMBAT_DATA_PTR->player.unk5[1] == 0xff)) {
+					for (i = 1; i < 4; i++) {
+						targetFlags[i] = 1;
+					}
+					fighter->targetId = STD_getNearestEnemy(partner, targetFlags);
+					COMBAT_DATA_PTR->player.unk5[COMBAT_DATA_PTR->player.unk7] = fighter->targetId;
+					COMBAT_DATA_PTR->player.unk7 = (COMBAT_DATA_PTR->player.unk7 + 1) & 1;
+				} else {
+					for (i = 1; i < 4; i++) {
+						if ((fighter->targetId != i) && (COMBAT_DATA_PTR->player.unk5[(COMBAT_DATA_PTR->player.unk7 + 1) & 1] != i)) {
+							break;
+						}
+					}
+					COMBAT_DATA_PTR->player.unk5[COMBAT_DATA_PTR->player.unk7] = fighter->targetId;
+					COMBAT_DATA_PTR->player.unk7 = (COMBAT_DATA_PTR->player.unk7 + 1) & 1;
+					fighter->targetId = i;
+				}
+				break;
+			}
+			COMBAT_DATA_PTR->player.changeTarget = 0;
+			return;
+		case 8:
+		case 9:
+		case 10:
+			if (STD_isMoveUsable((DigimonEntity *)partner, fighter, COMBAT_DATA_PTR->player.currentCommand[0] - 8) == 0) {
+				break;
+			}
+			fighter->targetId = 1;
+			index = COMBAT_DATA_PTR->player.currentCommand[0] - 8;
+			if ((((DigimonEntity *)partner)->stats.base.moves[COMBAT_DATA_PTR->player.currentCommand[0] - 8] != fighter->queuedAnim) || (fighter->moveRange <= 0)) {
+				STD_setupQueuedMove((DigimonEntity *)partner, fighter, 0, (COMBAT_DATA_PTR->player.currentCommand[0] - 8) & 0xff);
+			}
+			STD_applyChargeRequirement((DigimonEntity *)partner, fighter, DIGIMON_DATA[partner->type].moves[fighter->queuedAnim - 0x2e]);
+			return;
+		case 11:
+			fighter->targetId = 1;
+			if ((((DigimonEntity *)partner)->stats.base.moves[3] != fighter->queuedAnim) || (fighter->moveRange <= 0)) {
+				STD_setupQueuedMove((DigimonEntity *)partner, fighter, 0, 3);
+			}
+			STD_applyChargeRequirement((DigimonEntity *)partner, fighter, DIGIMON_DATA[partner->type].moves[fighter->queuedAnim - 0x2e]);
+			return;
+		}
+		if ((COMBAT_DATA_PTR->player.currentCommand[0] != 2) && (COMBAT_DATA_PTR->player.currentCommand[0] != 4)) {
+			((DigimonEntity *)partner)->stats.current.chargeMode = MAIN_D_80135168;
+		}
+	}
+
+	if ((*flagsPtr & 8) && ((MAIN_D_80134D66 % 100) == 0)) {
+		fighter->targetId = enemies[random(count)];
+	}
+
+	flags = *flagsPtr;
+	if (flags & 0x40) {
+		return;
+	}
+
+	if (flags & 8) {
+		fighter->queuedAnim = 0;
+		fighter->targetId = 1;
+		fighter->moveRange = 2;
+		partner->flatSprite = 0;
+		fighter->flags |= 0x40;
+		return;
+	}
+
+	if (flags & 4) {
+		return;
+	}
+
+	if (flags & 2) {
+		STD_selectConfusedMove((DigimonEntity *)partner, fighter, 0);
+		return;
+	}
+
+	if (flags & 0x800) {
+		return;
+	}
+
+	if (flags & 0x1000) {
+		return;
+	}
+
+	if (flags & 0x2000) {
+		return;
+	}
+
+	fighter->targetId = 1;
+
+	result = -1;
+	switch (COMBAT_DATA_PTR->player.currentCommand[0]) {
+	case 2:
+		if (STD_func_80062BD8(moveFlags, 0) == 0) {
+			fighter->cooldown = 0x50;
+			fighter->flags |= 0x800;
+			return;
+		}
+		result = STD_func_800675E8(0, moveFlags);
+		((DigimonEntity *)partner)->stats.current.chargeMode = 0;
+		break;
+	case 4:
+		if (STD_func_80062BD8(moveFlags, 0) == 0) {
+			fighter->cooldown = 0x50;
+			fighter->flags |= 0x800;
+			return;
+		}
+		result = STD_func_80067660(0, moveFlags);
+		((DigimonEntity *)partner)->stats.current.chargeMode = 2;
+		break;
+	}
+
+	if (result == -1) {
+		STD_func_80067A30((DigimonEntity *)partner, fighter, 0);
+	} else {
+		STD_setupQueuedMove((DigimonEntity *)partner, fighter, 0, result & 0xff);
+	}
+}
+
+void STD_func_8005EF84(void)
+{
+	int16_t moves[18];
+	int16_t effectIds[18];
+	int8_t isBusy;
+	int32_t moveCount;
+	int32_t frames;
+	int32_t finished;
+	int32_t i;
+	int32_t j;
+	DigimonEntity *entity;
+	uint8_t move;
+
+	GAME_STATE = 5;
+	STD_startWalkingAnimation2(&PARTNER_ENTITY.digimonEntity.entity,
+	                           &PARTNER_ENTITY.digimonEntity.stats,
+	                           COMBAT_DATA_PTR->fighter[0].flags);
+	entityLookAtLocation(&PARTNER_ENTITY.digimonEntity.entity,
+	                     &ENTITY_TABLE[COMBAT_DATA_PTR->player.entityIds[1]]->posData->location);
+
+	for (i = 1; i <= ENEMY_COUNT; ++i) {
+		startAnimation(ENTITY_TABLE[COMBAT_DATA_PTR->player.entityIds[i]], 0x21);
+		entityLookAtLocation(ENTITY_TABLE[COMBAT_DATA_PTR->player.entityIds[i]],
+		                     &ENTITY_TABLE[1]->posData->location);
+	}
+
+	moveCount = 0;
+	STD_initializeEFEEngine((char *)GENERAL_BUFFER_PTR);
+
+	for (i = 0; i <= ENEMY_COUNT; ++i) {
+		entity = (DigimonEntity *)ENTITY_TABLE[COMBAT_DATA_PTR->player.entityIds[i]];
+		entity->stats.current.unk1 = -1;
+		entity->stats.current.efeSubEffect = -1;
+
+		for (j = 0; j < 4; ++j) {
+			if ((move = entity->stats.base.moves[j]) != 0xff) {
+				moves[moveCount++] =
+					DIGIMON_DATA[entity->entity.type].moves[move - 0x2e] + 0x100;
+			}
+		}
+	}
+
+	moves[moveCount] = -1;
+	STD_loadMoveEFE(moves, effectIds, &isBusy);
+
+	while (isBusy > 0) {
+		tickFileReadQueue(0);
+	}
+
+	MAIN_D_8013511C = 200;
+	STD_initializeBattleStartText();
+
+	frames = 0;
+	finished = 0;
+	playSound(0, 0x10);
+
+	while (frames < 60 || finished == 0) {
+		if (MAIN_D_8013511C < 4200) {
+			MAIN_D_8013511C += 400;
+		}
+
+		++frames;
+		finished = STD_func_8006A514();
+		STD_battleTickFrame();
+	}
+
+	STD_func_8006A044();
+	STD_initializeBattleStartTextBurst();
+	playSound(0, 0x11);
+
+	while (STD_func_8006A514() == 0) {
+		if (MAIN_D_8013511C > 1000) {
+			MAIN_D_8013511C -= 400;
+		}
+
+		STD_battleTickFrame();
+	}
+
+	STD_func_8006A508();
+
+	moveCount = 0;
+	for (i = 0; i <= ENEMY_COUNT; ++i) {
+		entity = (DigimonEntity *)ENTITY_TABLE[COMBAT_DATA_PTR->player.entityIds[i]];
+
+		for (j = 0; j < 4; ++j) {
+			move = entity->stats.base.moves[j];
+			if (move == 0xff) {
+				COMBAT_DATA_PTR->fighter[i].effectSlot[j] = -1;
+			} else {
+				COMBAT_DATA_PTR->fighter[i].effectSlot[j] = effectIds[moveCount++];
+			}
+		}
+	}
+
+	MAIN_D_8013511C = 1000;
+	MAIN_D_80135114 = 1;
+	MAIN_D_801350EC = 1;
+	GAME_STATE = 4;
+}
+
+int32_t STD_func_8005F354(void)
+{
+	Entity *other;
+	int32_t i;
+
+	if (COMBAT_DATA_PTR->fighter[0].hpDamageBuffer != 0) {
+		return 0;
+	}
+
+	if (COMBAT_DATA_PTR->fighter[1].hpDamageBuffer != 0) {
+		return 0;
+	}
+
+	if (ENTITY_TABLE[1]->anim.animId == 0x2b &&
+	    (ENTITY_TABLE[1]->anim.animFlag & 1) == 0) {
+		if (STD_func_80060B98() == 0) {
+			return -1;
+		}
+
+		for (i = 1; i <= ENEMY_COUNT; ++i) {
+			other = ENTITY_TABLE[COMBAT_DATA_PTR->player.entityIds[i]];
+			if (other->anim.animId != 0x2b ||
+			    (other->anim.animFlag & 1) != 0) {
+				return 0;
+			}
+		}
+
+		return 2;
+	}
+
+	for (i = 1; i <= ENEMY_COUNT; ++i) {
+		other = ENTITY_TABLE[COMBAT_DATA_PTR->player.entityIds[i]];
+		if (other->anim.animId != 0x2b ||
+		    (other->anim.animFlag & 1) != 0) {
+			break;
+		}
+	}
+
+	if (i == ENEMY_COUNT + 1) {
+		if ((PARTNER_ENTITY.digimonEntity.stats.current.currentHP - COMBAT_DATA_PTR->fighter[0].hpDamageBuffer) > 0) {
+			return 1;
+		}
+
+		if (ENTITY_TABLE[1]->anim.animId != 0x2b ||
+		    (ENTITY_TABLE[1]->anim.animFlag & 1) != 0) {
+			return 0;
+		}
+
+		return 2;
+	}
+
+	if (MAIN_D_80135110 == 0) {
+		FighterData *fighter = *(FighterData **)&COMBAT_DATA_PTR;
+
+		if ((PARTNER_ENTITY.digimonEntity.stats.current.currentHP - fighter->hpDamageBuffer) <= 0) {
+			return 0;
+		}
+
+		if (STD_func_80060B98() != 0) {
+			return 0;
+		}
+
+		MAIN_D_80135100 = MAIN_D_801350FC - ((DigimonEntity *)ENTITY_TABLE[COMBAT_DATA_PTR->player.entityIds[0]])->stats.current.currentHP;
+		MAIN_D_80135102 = MAIN_D_801350FE - ((DigimonEntity *)ENTITY_TABLE[COMBAT_DATA_PTR->player.entityIds[1]])->stats.current.currentHP;
+		COMBAT_DATA_PTR->fighter[0].hpDamageBuffer = 0;
+		COMBAT_DATA_PTR->fighter[1].hpDamageBuffer = 0;
+
+		if (MAIN_D_80135100 > MAIN_D_80135102) {
+			STD_func_80060C14(1, 0);
+			return -1;
+		}
+
+		if (MAIN_D_80135100 < MAIN_D_80135102) {
+			STD_func_80060C14(0, 1);
+			return 1;
+		}
+
+		if (MAIN_D_80135100 == MAIN_D_80135102) {
+			STD_func_80060C14(1, 1);
+			return 2;
+		}
+	}
+
+	return 0;
+}
+
+void STD_func_8005E8A4(Entity *entity, Entity *other)
+{
+	int32_t i;
+	int32_t j;
+	int16_t brains;
+	int16_t *dst;
+	FighterData *f;
+	Stats *stats;
+
+	((int16_t *)&MAIN_D_80135100)[0] = 0;
+	((int16_t *)&MAIN_D_80135100)[1] = 0;
+	MAIN_D_8013516C = 0;
+	STD_addFighterCounter(0x63);
+	MAIN_D_80135170 = 0;
+	if (entity->type == other->type) {
+		STD_func_80062D14();
+	}
+
+	resetFlattenGlobal();
+	MAIN_D_80135178 = -1;
+	COMBAT_DATA_PTR->player.remainingChargeupTime[0] = -1;
+	MAIN_D_80135168 = PARTNER_ENTITY.digimonEntity.stats.current.chargeMode;
+	MAIN_D_80134D7C[1] = 0;
+	MAIN_D_80134D60 = NULL;
+	MAIN_D_80135174 = 0;
+	MAIN_D_80134D84 = 0;
+	COMBAT_DATA_PTR->player.unk7 = 0;
+	COMBAT_DATA_PTR->player.changeTarget = 0;
+	MAIN_D_80134D7C[0] = 1;
+	MAIN_D_80134D66 = 1;
+	MAIN_D_80134D74 = 0;
+	MAIN_D_80134D64 = 0;
+	MAIN_D_80135114 = 0;
+	MAIN_D_80135118 = 0;
+	for (i = 0; i < 2; i++) {
+		COMBAT_DATA_PTR->player.unk5[i] = 0xff;
+	}
+
+	initializeAttackObjects();
+	ENEMY_COUNT = 1;
+	COMBAT_DATA_PTR->player.entityIds[0] = 1;
+	COMBAT_DATA_PTR->player.entityIds[1] = STD_func_80062D5C(other);
+	for (i = 0; i < 0xc; i++) {
+		COMBAT_DATA_PTR->player.usedMoves[i] = 0xff;
+	}
+
+	COMBAT_DATA_PTR->player.startingHP = PARTNER_ENTITY.digimonEntity.stats.current.currentHP;
+	MAIN_D_80135104 = 1;
+	f = COMBAT_DATA_PTR->fighter;
+	COMBAT_DATA_PTR->player.blockedCount = 0;
+	COMBAT_DATA_PTR->player.hitCount = 0;
+	COMBAT_DATA_PTR->player.unk2 = 0;
+	COMBAT_DATA_PTR->player.statusedCount = 0;
+
+	for (i = 0; ENEMY_COUNT >= i; i++) {
+		stats = &((DigimonEntity *)ENTITY_TABLE[COMBAT_DATA_PTR->player.entityIds[i]])->stats;
+		stats->current.isHit = 0;
+		f->targetId = 0xff;
+		f->hpDamageBuffer = 0;
+		f->mpDamageBuffer = 0;
+		f->flags = 0;
+		f->moveRange = 0;
+		COMBAT_DATA_PTR->player.unk1[i].unk25 = 0xff;
+		f->flatTimer = 0;
+		f->invulnerableTimer = 0;
+		f->cooldown = 0;
+		f->finisherProgress = 0;
+		f->statusFxId = -1;
+		f->unk11 = -1;
+		f->speedBuffer = 0x64;
+		f->unk15 = 0;
+		f->unk16 = 0;
+		if (stats->base.brain < 0x190) {
+			f->buffsRemaining = (stats->base.brain / 100) + 1;
+		} else if (stats->base.brain < 0x258) {
+			f->buffsRemaining = 4;
+		} else {
+			f->buffsRemaining = 5;
+		}
+		f->buffPrioTimer = (stats->base.brain / 10) + 5;
+		f->finisherGoal = 0xbb8 - stats->base.speed;
+		for (j = 0; j < 0x96; j++) {
+			f->table1[j] = -1;
+			f->table2[i] = -1;
+		}
+		f++;
+	}
+
+	brains = PARTNER_ENTITY.digimonEntity.stats.base.brain;
+	if (brains < 0x1f4) {
+		COMBAT_DATA_PTR->player.numCommands[0] = MAIN_D_80134880[brains / 100];
+	} else {
+		COMBAT_DATA_PTR->player.numCommands[0] = 7;
+	}
+
+	COMBAT_DATA_PTR->player.availableCommands[0][0] = 0xb;
+
+	switch (COMBAT_DATA_PTR->player.numCommands[0]) {
+	case 2:
+		COMBAT_DATA_PTR->player.availableCommands[0][1] = 3;
+		break;
+	case 3:
+		COMBAT_DATA_PTR->player.availableCommands[0][1] = 2;
+		COMBAT_DATA_PTR->player.availableCommands[0][2] = 3;
+		break;
+	case 4:
+		COMBAT_DATA_PTR->player.availableCommands[0][1] = 4;
+		COMBAT_DATA_PTR->player.availableCommands[0][2] = 2;
+		COMBAT_DATA_PTR->player.availableCommands[0][3] = 3;
+		break;
+	case 5:
+		COMBAT_DATA_PTR->player.availableCommands[0][1] = 5;
+		COMBAT_DATA_PTR->player.availableCommands[0][2] = 4;
+		COMBAT_DATA_PTR->player.availableCommands[0][3] = 2;
+		COMBAT_DATA_PTR->player.availableCommands[0][4] = 3;
+		break;
+	case 6:
+		COMBAT_DATA_PTR->player.availableCommands[0][1] = 6;
+		COMBAT_DATA_PTR->player.availableCommands[0][2] = 5;
+		COMBAT_DATA_PTR->player.availableCommands[0][3] = 4;
+		COMBAT_DATA_PTR->player.availableCommands[0][4] = 2;
+		COMBAT_DATA_PTR->player.availableCommands[0][5] = 3;
+		break;
+	case 7:
+		COMBAT_DATA_PTR->player.availableCommands[0][1] = 6;
+		COMBAT_DATA_PTR->player.availableCommands[0][2] = 5;
+		i = 3;
+		if (PARTNER_ENTITY.digimonEntity.stats.base.moves[2] != 0xff) {
+			COMBAT_DATA_PTR->player.availableCommands[0][i++] = 0xa;
+		}
+		if (PARTNER_ENTITY.digimonEntity.stats.base.moves[1] != 0xff) {
+			COMBAT_DATA_PTR->player.availableCommands[0][i++] = 9;
+		}
+		if (PARTNER_ENTITY.digimonEntity.stats.base.moves[0] != 0xff) {
+			COMBAT_DATA_PTR->player.availableCommands[0][i++] = 8;
+		}
+		COMBAT_DATA_PTR->player.availableCommands[0][i++] = 3;
+		COMBAT_DATA_PTR->player.numCommands[0] = i;
+		break;
+	}
+
+	COMBAT_DATA_PTR->player.hoveredCommand[0] = COMBAT_DATA_PTR->player.numCommands[0] - 1;
+	COMBAT_DATA_PTR->player.bufferedCommand[0] = 3;
+	COMBAT_DATA_PTR->player.currentCommand[0] = 3;
+
+	for (i = 0; ENEMY_COUNT >= i; i++) {
+		stats = &((DigimonEntity *)ENTITY_TABLE[COMBAT_DATA_PTR->player.entityIds[i]])->stats;
+		(&MAIN_D_801350FC)[i] = stats->current.currentHP;
+		dst = (int16_t *)&INITIAL_COMBAT_STATS[i];
+		*dst++ = stats->base.hp;
+		*dst++ = stats->base.mp;
+		*dst++ = stats->base.off;
+		*dst++ = stats->base.def;
+		*dst++ = stats->base.speed;
+		*dst++ = stats->base.brain;
+	}
+
+	if ((PARTNER_PARA.condition & 0x60) != 0) {
+		stats = &PARTNER_ENTITY.digimonEntity.stats;
+		stats->base.off = stats->base.off - (int16_t)(stats->base.off / 5);
+		stats->base.def = stats->base.def - (int16_t)(stats->base.def / 5);
+		stats->base.speed = stats->base.speed - (int16_t)(stats->base.speed / 5);
+		stats->base.brain = stats->base.brain - (int16_t)(stats->base.brain / 5);
+	}
+
+	STD_func_8006AD00(0);
+	STD_func_8006AD00(1);
+	STD_addCommandMenu(0);
+}
+
+void STD_func_8005FDDC(void)
+{
+	CombatData *combat;
+	Entity *partner;
+	Entity *entity;
+	FighterData *fighter;
+	uint16_t *flagsPtr;
+	Stats *stats;
+	uint16_t flags;
+	int32_t chance;
+	int16_t anim;
+	BaseStats *base;
+	int32_t i;
+
+	combat = COMBAT_DATA_PTR;
+	partner = ENTITY_TABLE[1];
+	if ((MAIN_D_80134D66 % 20) == 0) {
+		for (i = 0; ENEMY_COUNT >= i; i++) {
+			if (combat->fighter[i].buffPrioTimer != 0) {
+				combat->fighter[i].buffPrioTimer--;
+			}
+		}
+	}
+
+	for (i = 1, fighter = &combat->fighter[1]; ENEMY_COUNT >= i; i++, fighter = (FighterData *)((int32_t)fighter + 0x168)) {
+		entity = ENTITY_TABLE[COMBAT_DATA_PTR->player.entityIds[i]];
+		stats = &((DigimonEntity *)entity)->stats;
+		base = &stats->base;
+		stats->base.movesPrio[0] = 30;
+		stats->base.movesPrio[1] = 30;
+		stats->base.movesPrio[2] = 30;
+		stats->base.movesPrio[3] = 0;
+		flagsPtr = &fighter->flags;
+		if (MAIN_D_80134D74 == 0) {
+			if (stats->current.currentHP > fighter->hpDamageBuffer) {
+				if (stats->base.brain < 0x12d) {
+					if ((MAIN_D_80134D66 % (((stats->base.brain / 2) + 1) * 20)) == 0) {
+						chance = (0x12c - base->brain) / 4;
+						if (random(100) < chance) {
+							*flagsPtr |= 0x2000;
+							fighter->senileTimer = 100;
+						}
+					}
+				}
+			}
+			if (!(*flagsPtr & 0x2000)) {
+				STD_increaseSpeedBuffer(fighter, stats);
+			}
+			if (fighter->cooldown >= 2) {
+				fighter->cooldown--;
+			}
+		}
+		flags = *flagsPtr;
+		if (flags & 0x80b0) {
+			continue;
+		}
+		if (stats->current.currentHP == 0) {
+			STD_faintDigimon((DigimonEntity *)entity, fighter, i);
+			if (PARTNER_ENTITY.digimonEntity.stats.current.currentHP > COMBAT_DATA_PTR->fighter[0].hpDamageBuffer) {
+				STD_func_8005A55C((DigimonEntity *)entity, 5, 0);
+			}
+			MAIN_D_80135118 = 1;
+			continue;
+		}
+		if (fighter->hpDamageBuffer >= stats->current.currentHP) {
+			handleBattleIdle((DigimonEntity *)entity, stats, flags);
+			fighter->moveRange = -1;
+			STD_resetFlatten(i);
+			STD_removeStatusEffects((DigimonEntity *)entity, fighter);
+			fighter->flags &= 0xfff0;
+			continue;
+		}
+		if (((DigimonEntity *)partner)->stats.current.currentHP == 0) {
+			handleBattleIdle((DigimonEntity *)entity, stats, flags);
+			STD_resetFlatten(i);
+			*flagsPtr &= 0xff4f;
+			*flagsPtr |= 0x40;
+			fighter->moveRange = -1;
+			continue;
+		}
+		if (MAIN_D_80134D74 != 0) {
+			return;
+		}
+		if (flags & 0x40) {
+			continue;
+		}
+		if (flags & 8) {
+			fighter->queuedAnim = 0;
+			fighter->targetId = 0;
+			fighter->moveRange = 2;
+			startAnimation(entity, 0x23);
+			entity->flatSprite = 0;
+			fighter->flags |= 0x40;
+			continue;
+		}
+		if (flags & 4) {
+			continue;
+		}
+		if (flags & 2) {
+			STD_selectConfusedMove((DigimonEntity *)entity, fighter, i);
+			continue;
+		}
+		if (flags & 0x2000) {
+			continue;
+		}
+		if (flags & 0x800) {
+			continue;
+		}
+		if (flags & 0x1000) {
+			continue;
+		}
+		if (!(flags & 0x980e) && (fighter->flatTimer == 0)) {
+			anim = ((DigimonEntity *)entity)->stats.base.moves[3];
+			if (anim != 0xff) {
+				anim = entityGetTechFromAnim(entity, anim);
+				if ((anim >= 0x3a) && (anim < 0x71) && (fighter->finisherProgress == fighter->finisherGoal)) {
+					fighter->targetId = 0;
+					STD_setupQueuedMove((DigimonEntity *)entity, fighter, i, 3);
+					fighter->finisherProgress = 0;
+					continue;
+				}
+			}
+		}
+		if (!(*flagsPtr & 0x400)) {
+			fighter->targetId = 0;
+		}
+		if (random(10) == 0) {
+			stats->current.chargeMode = 2;
+		} else {
+			stats->current.chargeMode = random(2);
+		}
+		STD_func_80067744((DigimonEntity *)entity, fighter, i);
+	}
+}
+
+void STD_func_800602A8(void)
+{
+	DigimonEntity *entity;
+	DigimonEntity *target;
+	FighterData *fighter;
+	uint16_t *flags;
+	uint32_t combat;
+	int32_t id;
+	int32_t i;
+
+	if (MAIN_D_80134D7C[1] > 0) {
+		MAIN_D_80134D7C[1]--;
+	}
+
+	if (MAIN_D_80134D84 > 0) {
+		MAIN_D_80134D84--;
+	}
+
+	combat = (uint32_t)COMBAT_DATA_PTR;
+	for (i = 0, fighter = (FighterData *)combat; ENEMY_COUNT >= i; i++, fighter = (FighterData *)((int32_t)fighter + 0x168)) {
+		flags = &fighter->flags;
+		combat = (uint32_t)COMBAT_DATA_PTR;
+		entity = (DigimonEntity *)ENTITY_TABLE[((uint8_t *)((uint32_t)i + combat))[0x66c]];
+		STD_addFinisherProgress(fighter, 1);
+		id = fighter->targetId;
+
+		if (id != 0xff) {
+			combat = (uint32_t)COMBAT_DATA_PTR;
+			target = (DigimonEntity *)ENTITY_TABLE[((uint8_t *)((uint32_t)id + combat))[0x66c]];
+		} else {
+			target = NULL;
+		}
+		if (*flags & 0x20) {
+			STD_tickAttackState(&entity->entity, target, i);
+		} else if ((*flags & 0x10) || (*flags & 0x80)) {
+			STD_tickHitState(&entity->entity, fighter, i);
+		} else if (fighter->moveRange != -1) {
+			if (*flags & 8) {
+				STD_tickFlatState(entity, target, fighter, i);
+			} else if (*flags & 4) {
+				STD_tickStunState(&entity->entity);
+			} else if (*flags & 2) {
+				STD_tickConfusedState(entity, target, fighter, i);
+			} else if (*flags & 0x2000) {
+				STD_func_800615D8(entity, fighter);
+			} else if (*flags & 0x800) {
+				STD_tickChargeState(entity, target, fighter);
+			} else if (*flags & 0x1000) {
+				STD_tickCooldownState(entity, target, fighter);
+			} else {
+				STD_tickQueuedMove(entity, target, fighter, i);
+			}
+		}
+	}
+
+	STD_func_800647F8();
+	STD_applyMoveResult();
+	if (MAIN_D_801350EC != 7 && MAIN_D_801350EC != 8) {
+		if (MAIN_D_8013512C != 0) {
+			MAIN_D_8013512C--;
+			if (MAIN_D_8013512C == 0) {
+				MAIN_D_801350EC = 1;
+			}
+		}
+		if ((MAIN_D_80134D66 % 600) == 0 && random(2) == 1) {
+			MAIN_D_801350EC = 6;
+			STD_setRandomViewpoint(ENTITY_TABLE[1], 4);
+			MAIN_D_8013512C = random(0x29) + 0x3c;
+		}
+	}
+
+	for (i = 0; ENEMY_COUNT >= i; i++) {
+		if (COMBAT_DATA_PTR->fighter[i].flags & 0x20) {
+			break;
+		}
+		if (COMBAT_DATA_PTR->fighter[i].flags & 0x10) {
+			break;
+		}
+		if (MAIN_D_8013512C != 0) {
+			break;
+		}
+		if (MAIN_D_801350EC == 7) {
+			break;
+		}
+		if (MAIN_D_801350EC == 8) {
+			break;
+		}
+	}
+
+	if (i == ENEMY_COUNT + 1) {
+		MAIN_D_801350EC = 1;
+	}
+}
+
+int16_t STD_func_80060620(int32_t a, int32_t b)
+{
+	Stats *stats;
+	int32_t i;
+	int32_t j;
+	int32_t off;
+
+	PARTNER_ENTITY.digimonEntity.stats.current.chargeMode = MAIN_D_80135168;
+	GAME_STATE = 5;
+	STD_func_80060998();
+	for (i = 0, off = 0; ENEMY_COUNT >= i; i++, off += 0x168) {
+		removeEntityText(i);
+		STD_resetFlatten(i);
+		STD_removeStatusEffects((DigimonEntity *)ENTITY_TABLE[((uint8_t *)((uint32_t)COMBAT_DATA_PTR + (uint32_t)i))[0x66c]], (FighterData *)((uint32_t)COMBAT_DATA_PTR + off));
+		((FighterData *)((uint32_t)off + (uint32_t)COMBAT_DATA_PTR))->flags = 0;
+	}
+	if (a == b) {
+		if (MAIN_D_80135110 != 0 || MAIN_D_8013516C == 0) {
+			STD_func_8006B2BC();
+			STD_func_8006B468();
+			while (STD_isVersusModelSceneFinished() == 0) {
+				STD_battleTickFrame();
+			}
+			STD_func_8006B6E8();
+		}
+	} else {
+		if (a == 0) {
+			MAIN_D_80135170 = 0x64;
+		} else {
+			MAIN_D_80135170 = 0x78;
+		}
+	}
+	if (a != b) {
+		startAnimation(ENTITY_TABLE[((uint8_t *)((uint32_t)COMBAT_DATA_PTR + (uint32_t)a))[0x66c]], 0x2a);
+		i = 0;
+		stopBGM();
+		stopSound();
+		if (a == 0) {
+			playMusic(MAIN_D_801350F8, 3);
+		} else {
+			playMusic(MAIN_D_801350F8, 4);
+		}
+		j = j = a;
+		for (; i < MAIN_D_80135170; i++) {
+			STD_battleTickFrame();
+			if ((ENTITY_TABLE[COMBAT_DATA_PTR->player.entityIds[j]]->anim.animFlag & 1) == 0) {
+				startAnimation(ENTITY_TABLE[COMBAT_DATA_PTR->player.entityIds[j]], 0x2a);
+			}
+		}
+	}
+	MAIN_D_80135104 = 0;
+	for (i = 0; i < 0x14; i++) {
+		STD_battleTickFrame();
+	}
+	STD_func_8006B1E4(0);
+	STD_func_8006B1E4(1);
+	STD_removeCommandMenu(0);
+	STD_removeFighterCounter();
+	stopBGM();
+	stopSound();
+	stats = &((DigimonEntity *)ENTITY_TABLE[1])->stats;
+	stats->base.off = INITIAL_COMBAT_STATS[0][2];
+	stats->base.def = INITIAL_COMBAT_STATS[0][3];
+	stats->base.speed = INITIAL_COMBAT_STATS[0][4];
+	stats->base.brain = INITIAL_COMBAT_STATS[0][5];
+	stats->current.currentHP += (int16_t)(stats->base.hp / 5);
+	stats->current.currentMP += (int16_t)(stats->base.mp / 5);
+	if (stats->current.currentHP > stats->base.hp) {
+		stats->current.currentHP = stats->base.hp;
+	}
+	if (stats->current.currentMP > stats->base.mp) {
+		stats->current.currentMP = stats->base.mp;
+	}
+
+	return (a == 0) ? 1 : -1;
+}
 
 void STD_func_80060AA0(void)
 {
@@ -1809,6 +3995,7 @@ void STD_func_80060C14(uint8_t hasLostP1, uint8_t hasLostP2)
 	entityLookAtLocation(&e0->entity, &e1->entity.posData->location);
 	removeAnimatedUIBox(0, 0);
 }
+
 void STD_func_80060EBC(void)
 {
 	RECT finalPos;
@@ -1836,6 +4023,7 @@ void STD_func_80060EBC(void)
 
 	createAnimatedUIBox(0, 0, 2, &finalPos, &startPos, NULL, (RenderFunction)STD_func_80063300);
 }
+
 void STD_faintDigimon(DigimonEntity *digimon, FighterData *fighter, int16_t arg2)
 {
 	digimon->stats.current.isHit = 1;
@@ -1860,6 +4048,7 @@ int32_t STD_func_80061124(int32_t value)
 	if (value < 1000) {
 		return 3;
 	}
+
 	return 4;
 }
 
@@ -2698,7 +4887,7 @@ int16_t STD_func_8006314C(Entity *entity, int32_t arg)
 	COMBAT_AREA_CENTER_Y = 0;
 	stopBGM();
 	playMusic(MAIN_D_801350F8, 2);
-	STD_func_8005E8A4(entity, arg);
+	STD_func_8005E8A4(entity, (Entity *)arg);
 	STD_func_8005EF84();
 	while (1) {
 		result = STD_func_8005F354();
@@ -2834,7 +5023,156 @@ void STD_func_80063508(int32_t id)
 	GsSetWorkBase((PACKET *)prim);
 }
 
-INCLUDE_ASM("asm/std/nonmatchings/std_main", STD_func_800647F8);
+void STD_func_800647F8(void)
+{
+	SVECTOR *hitPos;
+	VECTOR loc;
+	AttackObject attack;
+	FighterData *fighter;
+	PlayerDataSub *sub;
+	Entity *attacker;
+	uint8_t *moves;
+	int32_t tech;
+	int32_t dmg;
+	int32_t handled;
+	int32_t id;
+	uint32_t moveIdx;
+	int32_t i;
+	int32_t j;
+	Entity *entity;
+	int32_t t;
+
+	fighter = COMBAT_DATA_PTR->fighter;
+	sub = &COMBAT_DATA_PTR->player.unk1[0];
+	i = 0;
+	hitPos = &attack.position;
+	for (; ENEMY_COUNT >= i; i++, fighter++, sub++) {
+		if (fighter->flags & 0x8000) {
+			continue;
+		}
+		if (popAttackObject(COMBAT_DATA_PTR->player.entityIds[i], &attack) == 0) {
+			continue;
+		}
+		entity = ENTITY_TABLE[((uint8_t *)((uint32_t)i + (uint32_t)COMBAT_DATA_PTR))[0x66c]];
+		tech = STD_getAttackTech(&attack);
+		moveIdx = entity->anim.animId - 0x2e;
+		if (DIGIMON_DATA[entity->type].moves[moveIdx] == 0x2d) {
+			if (COMBAT_DATA_PTR->player.entityIds[fighter->targetId] == attack.casterId) {
+				((DigimonEntity *)entity)->stats.current.isHit = 0;
+				continue;
+			}
+		}
+		if (STD_applyBuffMove((DigimonEntity *)entity, (int16_t)i, (int16_t)tech) != 0) {
+			((DigimonEntity *)entity)->stats.current.isHit = 0;
+			continue;
+		}
+		STD_removeMoveEffect((DigimonEntity *)entity, fighter);
+		fighter->flags &= 0xff8f;
+		attacker = ENTITY_TABLE[attack.casterId];
+		dmg = STD_applyPartnerStatsToFighter((DigimonEntity *)attacker, (DigimonEntity *)entity, fighter, tech);
+		if (entity == MAIN_D_80134D60) {
+			if (i == 0) {
+				STD_removeFinisherChargeup();
+			}
+			if ((*(int32_t *)&MAIN_D_80135178) != -1) {
+				STD_removeFinisherAura(MAIN_D_80135178);
+			}
+			MAIN_D_80134D74 = 0;
+			MAIN_D_80134D60 = NULL;
+		}
+		if (random(100) < dmg) {
+			if (MAIN_D_801350EC == 6 && MOVE_DATA[tech].range == 1 && MAIN_D_801350EC == 3) {
+				t = entityGetTechFromAnim((Entity *)MAIN_D_80135128, ((Entity *)MAIN_D_80135128)->anim.animId);
+				if (MOVE_DATA[t].range == 3) {
+					goto skipViewpoint;
+				}
+			}
+			STD_setRandomViewpoint(entity, random(4));
+skipViewpoint:
+			dmg = STD_calculateDamage((DigimonEntity *)attacker, (DigimonEntity *)entity, tech);
+			if (i == 0) {
+				if ((dmg * 100 / PARTNER_ENTITY.digimonEntity.stats.base.hp) >= 0x14) {
+					COMBAT_DATA_PTR->player.unk2++;
+				}
+			}
+			fighter->hpDamageBuffer += dmg;
+			if (fighter->hpDamageBuffer >= 0x2710) {
+				fighter->hpDamageBuffer = 0x270f;
+			}
+			fighter->flags |= 0x10;
+			STD_handleHitReaction(entity, fighter, &attack, i);
+			sub->unk25 = 0;
+			addEntityText((DigimonEntity *)entity, i, 0, dmg, 0);
+			fighter->invulnerableTimer = MOVE_DATA[tech].iframes;
+			entity->anim.animFlag &= 0xfe;
+			STD_applyMoveStatus((DigimonEntity *)entity, fighter, tech);
+			continue;
+		}
+		handled = 0;
+		if (!(fighter->flags & 0x80) && (MOVE_DATA[tech].range == 1) && (DIGIMON_DATA[entity->type].moves[(uint32_t)(entity->anim.animId - 0x2e)] != 0x2d)) {
+			moves = ((DigimonEntity *)entity)->stats.base.moves;
+			for (j = 0; j < 4; j++) {
+				if (((DigimonEntity *)entity)->stats.current.currentMP < 0xa5) {
+					break;
+				}
+				if ((moves[j] != 0xff) && (DIGIMON_DATA[entity->type].moves[moves[j] - 0x2e] == 0x2d)) {
+					if (random(100) < (((DigimonEntity *)entity)->stats.base.speed / DIGIMON_DATA[entity->type].level)) {
+						fighter->queuedAnim = moves[j];
+						fighter->targetId = STD_getFighterSlot(attack.casterId);
+						fighter->moveRange = 1;
+						STD_func_80065540((DigimonEntity *)entity, (DigimonEntity *)attacker, fighter);
+						attacker->anim.animFlag &= 0xfe;
+						handled = 1;
+						((DigimonEntity *)entity)->stats.current.isHit = 0;
+						break;
+					}
+				}
+			}
+		}
+		if (handled != 0) {
+			continue;
+		}
+		if (STD_addBlockedAttack(fighter, (FighterData *)&attack) != 0) {
+			createParticleFX(0, 2, hitPos, entity, 0x11);
+		}
+		if ((fighter->flags & 0x80) && (fighter->invulnerableTimer > 0)) {
+			goto blocked;
+		}
+		if (MOVE_DATA[tech].range == 1) {
+			dmg = STD_calculateDamage((DigimonEntity *)attacker, (DigimonEntity *)entity, tech);
+			dmg = dmg * (random(0x15) + 0xa) / 100;
+			if (dmg <= 0) {
+				dmg = 1;
+			}
+			fighter->hpDamageBuffer += dmg;
+			if (fighter->hpDamageBuffer >= 0x2710) {
+				fighter->hpDamageBuffer = 0x270f;
+			}
+			sub->unk25 = 0;
+			addEntityText((DigimonEntity *)entity, i, 0, dmg, 0);
+		}
+		STD_addFinisherProgress(fighter, fighter->finisherGoal * 3 / 50);
+		for (j = 0; ENEMY_COUNT >= j; j++) {
+			if (attacker == ENTITY_TABLE[COMBAT_DATA_PTR->player.entityIds[j]]) {
+				STD_addFinisherProgress(&COMBAT_DATA_PTR->fighter[j], COMBAT_DATA_PTR->fighter[j].finisherGoal * 4 / 50);
+				break;
+			}
+		}
+		if (i == 0) {
+			COMBAT_DATA_PTR->player.blockedCount++;
+		}
+		loc.vx = attack.position.vx;
+		loc.vy = 0;
+		loc.vz = attack.position.vz;
+		entityLookAtLocation(entity, &loc);
+		fighter->flags |= 0x80;
+		startAnimation(entity, 0x25);
+		entity->anim.animFlag &= 0xfe;
+blocked:
+		fighter->invulnerableTimer = 3;
+		((DigimonEntity *)entity)->stats.current.isHit = 0;
+	}
+}
 
 int16_t STD_getAttackTech(AttackObject *attack)
 {
@@ -2956,7 +5294,57 @@ int16_t STD_applyPartnerStatsToFighter(DigimonEntity *attacker, DigimonEntity *d
 
 INCLUDE_ASM("asm/std/nonmatchings/std_main", STD_calculateDamage);
 
-INCLUDE_ASM("asm/std/nonmatchings/std_main", STD_handleHitReaction);
+void STD_handleHitReaction(Entity *entity, FighterData *fighter, AttackObject *attack, int16_t index)
+{
+	VECTOR *loc;
+	int16_t *rotY;
+	int32_t ax;
+	int32_t az;
+	int32_t dx;
+	int32_t dz;
+	int32_t nx;
+	int16_t ang;
+
+	loc = &entity->posData->location;
+	rotY = &entity->posData->rotation.vy;
+	ax = ax = attack->position.vx;
+	az = az = attack->position.vz;
+	dx = loc->vx - ax;
+	dz = loc->vz - az;
+	nx = nx = -dx;
+	ang = _atan(-dz, nx);
+	if (fighter->flags & 8) {
+		*rotY = ang;
+		entity->flatSprite = 3;
+		startAnimation(entity, 0x28);
+		return;
+	}
+	if (*rotY >= 0x400 && *rotY < 0xc00) {
+		if (*rotY - 0x400 <= ang && *rotY + 0x400 >= ang) {
+			*rotY = ang;
+			STD_startHitAnimation(entity, attack, 0x28);
+		} else {
+			*rotY = _atan(dz, dx);
+			STD_startHitAnimation(entity, attack, 0x29);
+		}
+	} else if (!(0 > *rotY) && *rotY < 0x400) {
+		if ((!(0 > ang) && ang <= *rotY + 0x400) || (ang >= *rotY + 0xc00 && ang < 0x1000)) {
+			*rotY = ang;
+			STD_startHitAnimation(entity, attack, 0x28);
+		} else {
+			*rotY = _atan(dz, dx);
+			STD_startHitAnimation(entity, attack, 0x29);
+		}
+	} else {
+		if ((*rotY - 0x400 <= ang && ang < 0x1000) || (!(0 > ang) && *rotY - 0xc00 >= ang)) {
+			*rotY = ang;
+			STD_startHitAnimation(entity, attack, 0x28);
+		} else {
+			*rotY = _atan(dz, dx);
+			STD_startHitAnimation(entity, attack, 0x29);
+		}
+	}
+}
 
 void STD_applyMoveStatus(DigimonEntity *digimon, FighterData *fighter, int32_t move)
 {
@@ -3196,9 +5584,251 @@ void STD_selectConfusedMove(DigimonEntity *digimon, FighterData *fighter, int32_
 	}
 }
 
-INCLUDE_ASM("asm/std/nonmatchings/std_main", STD_func_80067744);
+int16_t STD_getNpcEntityIndex(Entity *entity)
+{
+	int32_t i;
 
-INCLUDE_ASM("asm/std/nonmatchings/std_main", STD_func_80067A30);
+	for (i = 2; i < 0xa; i++) {
+		if (entity == ENTITY_TABLE[i]) {
+			return i - 2;
+		}
+	}
+
+	return -1;
+}
+
+void STD_func_80067744(DigimonEntity *digimon, FighterData *fighter, int16_t index)
+{
+	int16_t flags[4];
+	int16_t weights[4];
+	int16_t tech;
+	int32_t total;
+	int32_t pick;
+	int32_t i;
+	int32_t j;
+
+	if (STD_func_80066A50(flags, index) == 0) {
+		STD_setFighterCooldown(digimon, fighter);
+		return;
+	}
+
+	for (i = 0; i < 4; i++) {
+		weights[i] = digimon->stats.base.movesPrio[i];
+	}
+
+	for (i = 0; i < 4; i++) {
+		if (digimon->stats.base.moves[i] == 0xff) {
+			continue;
+		}
+		if (flags[i] == 0) {
+			weights[i] = 0;
+			continue;
+		}
+		tech = entityGetTechFromAnim(&digimon->entity, digimon->stats.base.moves[i]);
+		for (j = 1; ENEMY_COUNT >= j; j++) {
+			if (j != index) {
+				if ((((DigimonEntity *)ENTITY_TABLE[COMBAT_DATA_PTR->player.entityIds[j]])->stats.current.currentHP - COMBAT_DATA_PTR->fighter[j].hpDamageBuffer) > 0) {
+					break;
+				}
+			}
+		}
+		if (j != (ENEMY_COUNT + 1)) {
+			if (NPC_ENTITIES[STD_getNpcEntityIndex(&digimon->entity)].unk1 == 0) {
+				if (MOVE_DATA[tech].range == 3) {
+					weights[i] += 0x14;
+				}
+			}
+		}
+		if (MOVE_DATA[tech].range == 4) {
+			weights[i] += fighter->buffPrioTimer;
+		}
+	}
+
+	total = 0;
+	for (i = 0; i < 4; i++) {
+		total += weights[i];
+	}
+
+	pick = random(total);
+	total = 0;
+	for (i = 0; i < 4; i++) {
+		if (weights[i] != 0) {
+			total += weights[i];
+			if (pick < total) {
+				break;
+			}
+		}
+	}
+
+	if (digimon->stats.base.moves[i] != 0xff) {
+		STD_setupQueuedMove(digimon, fighter, index, (uint8_t)i);
+	} else {
+		fighter->cooldown = 0x50;
+		fighter->flags |= 0x800;
+	}
+}
+
+void STD_func_80067A30(DigimonEntity *digimon, FighterData *fighter, int16_t index)
+{
+	Stats *stats;
+	int32_t values[3];
+	int32_t keys[3];
+	int32_t groups[3];
+	int16_t flags[4];
+	int16_t weights[4];
+	int16_t w;
+	int16_t tech;
+	int16_t bonus;
+	int32_t count;
+	int32_t total;
+	int32_t pick;
+	int32_t i;
+	int32_t j;
+
+	if (STD_func_80066A50(flags, index) == 0) {
+		STD_setFighterCooldown(digimon, fighter);
+		return;
+	}
+
+	for (i = 0; i < 3; i++) {
+		weights[i] = 0;
+		keys[i] = i;
+	}
+
+	stats = &digimon->stats;
+	switch (stats->current.chargeMode) {
+	case 0:
+		for (i = 0; i < 3; i++) {
+			if (flags[i] == 0) {
+				values[i] = -1;
+			} else {
+				tech = entityGetTechFromAnim(&digimon->entity, stats->base.moves[i]);
+				values[i] = MOVE_DATA[tech].power;
+			}
+		}
+		STD_sortScoresDescending(values, keys, groups, 3);
+		for (i = 0; i < 3; i++) {
+			if (stats->base.moves[keys[i]] == 0xff) {
+				weights[keys[i]] += 5;
+			} else if (flags[keys[i]] != 0) {
+				weights[keys[i]] = MAIN_D_80134888[groups[i]];
+			}
+		}
+		break;
+	case 1:
+		for (i = 0; i < 3; i++) {
+			if (stats->base.moves[i] == 0xff) {
+				weights[i] += 5;
+			}
+			if (flags[i] != 0) {
+				weights[i] += 0x14;
+			}
+		}
+		break;
+	case 2:
+		for (i = 0; i < 3; i++) {
+			if (flags[i] == 0) {
+				values[i] = 10000;
+			} else {
+				tech = entityGetTechFromAnim(&digimon->entity, stats->base.moves[i]);
+				values[i] = MOVE_DATA[tech].mpCost * 3;
+			}
+		}
+		STD_sortScoresAscending(values, keys, groups, 3);
+		for (i = 0; i < 3; i++) {
+			if (stats->base.moves[keys[i]] == 0xff) {
+				weights[keys[i]] += 5;
+			} else if (flags[keys[i]] != 0) {
+				weights[keys[keys[i]]] = MAIN_D_8013488C[groups[i]];
+			}
+		}
+		break;
+	}
+
+	for (i = 0; i < 3; i++) {
+		if (stats->base.moves[i] == 0xff) {
+			continue;
+		}
+		if (flags[i] == 0) {
+			weights[i] = 0;
+			continue;
+		}
+		tech = entityGetTechFromAnim(&digimon->entity, stats->base.moves[i]);
+		if (MOVE_DATA[tech].range == 4) {
+			bonus = fighter->buffPrioTimer + STD_calculateElementBonus(MOVE_DATA[tech].special, DIGIMON_DATA[digimon->entity.type].special[0]);
+			weights[i] += bonus;
+			continue;
+		}
+		weights[i] = weights[i] + STD_calculateElementBonus(MOVE_DATA[tech].special, DIGIMON_DATA[ENTITY_TABLE[COMBAT_DATA_PTR->player.entityIds[fighter->targetId]]->type].special[0]);
+		if (MOVE_DATA[tech].range != 3) {
+			continue;
+		}
+		count = STD_countLivingEnemies();
+		switch (digimon->stats.current.chargeMode) {
+		case 0:
+			if ((stats->base.brain >= 0xc8) && (count >= 2)) {
+				bonus = count * 10;
+				weights[i] += bonus;
+			}
+			break;
+		case 1:
+			if ((stats->base.brain >= 0xc8) && (count >= 2)) {
+				bonus = count * 15;
+				weights[i] += bonus;
+			}
+			break;
+		case 2:
+			if ((stats->base.brain >= 0xc8) && (count >= 2)) {
+				bonus = count * 15;
+				weights[i] += bonus;
+			} else if ((stats->current.currentHP * 100 / stats->base.hp) < 0x1f) {
+				for (j = 0; j < 3; j++) {
+					if (flags[i] == 0) {
+						values[i] = -1;
+					} else {
+						tech = entityGetTechFromAnim(&digimon->entity, stats->base.moves[i]);
+						values[i] = MOVE_DATA[tech].distance;
+					}
+				}
+				STD_sortScoresDescending(values, keys, groups, 3);
+				for (i = 0; i < 3; i++) {
+					if (stats->base.moves[i] == 0xff) {
+						continue;
+					}
+					if (flags[i] == 0) {
+						continue;
+					}
+					w = MAIN_D_80134890[groups[i]];
+					weights[keys[i]] = w;
+				}
+			}
+			break;
+		}
+	}
+
+	total = 0;
+	for (i = 0; i < 3; i++) {
+		total += weights[i];
+	}
+
+	pick = random(total);
+	total = 0;
+	for (i = 0; i < 3; i++) {
+		if (weights[i] != 0) {
+			total += weights[i];
+			if (pick < total) {
+				break;
+			}
+		}
+	}
+
+	if (digimon->stats.base.moves[i] != 0xff) {
+		STD_setupQueuedMove(digimon, fighter, index, (uint8_t)i);
+	} else {
+		fighter->cooldown = 0x50;
+		fighter->flags |= 0x800;
+	}
+}
 
 void STD_setupQueuedMove(DigimonEntity *digimon, FighterData *fighter, int16_t arg2, int32_t moveIndex)
 {
@@ -3297,6 +5927,7 @@ void STD_func_80065540(DigimonEntity *digimon, DigimonEntity *target, FighterDat
 	}
 	fighter->flatAttackTimer = 0x1e;
 }
+
 int32_t STD_selectMoveTarget(Entity *entity, FighterData *fighter)
 {
 	int32_t i;
@@ -3331,10 +5962,121 @@ int32_t STD_selectMoveTarget(Entity *entity, FighterData *fighter)
 			return 1;
 		}
 	}
+
 	return 0;
 }
 
-INCLUDE_ASM("asm/std/nonmatchings/std_main", STD_func_800658B4);
+void STD_func_800658B4(DigimonEntity *digimon, DigimonEntity *target, FighterData *fighter)
+{
+	int32_t tech;
+	int16_t cost;
+	int16_t brain;
+	int32_t i;
+	int32_t t;
+	int32_t n;
+
+	MAIN_D_80134EF8 = digimon;
+	tech = entityGetTechFromAnim(&digimon->entity, fighter->queuedAnim);
+	if (fighter->moveRange != 4) {
+		MAIN_D_80134EF4 = target;
+		if (target == NULL) {
+			if (MOVE_DATA[tech].unk3 & 1) {
+				if (digimon != (DigimonEntity *)ENTITY_TABLE[1]) {
+					MAIN_D_80134EF4 = (DigimonEntity *)ENTITY_TABLE[1];
+					fighter->targetId = 0;
+				} else {
+					MAIN_D_80134EF4 = (DigimonEntity *)ENTITY_TABLE[COMBAT_DATA_PTR->player.entityIds[1]];
+					fighter->targetId = 1;
+				}
+			}
+		}
+	} else {
+		MAIN_D_80134EF4 = digimon;
+	}
+
+	STD_removeMoveEffect(digimon, fighter);
+	if (digimon == (DigimonEntity *)ENTITY_TABLE[1]) {
+		if (!((tech >= 0x3a) && (tech < 0x71))) {
+			cost = MOVE_DATA[tech].mpCost * 3;
+			if (PARTNER_PARA.condition & 0x60) {
+				cost = cost + (int16_t)(cost / 2);
+			}
+			brain = digimon->stats.base.brain;
+			if (brain >= 0x2bc) {
+				if (brain == 0x3e7) {
+					cost = (int16_t)(cost * 4 / 5);
+				} else if ((brain >= 0x384) && (brain < 0x3e7)) {
+					cost = (int16_t)(cost * 17 / 20);
+				} else if ((brain >= 0x320) && (brain < 0x384)) {
+					cost = (int16_t)(cost * 9 / 10);
+				} else {
+					cost = (int16_t)(cost * 19 / 20);
+				}
+			}
+			fighter->mpDamageBuffer += cost;
+		}
+	} else {
+		if (!((tech >= 0x3a) && (tech < 0x71))) {
+			digimon->stats.current.currentMP -= (int16_t)(MOVE_DATA[tech].mpCost * 3);
+		}
+		if (tech < 0x3a) {
+			for (i = 0; i < 0xc; i++) {
+				if (COMBAT_DATA_PTR->player.usedMoves[i] == tech) {
+					break;
+				}
+				if (COMBAT_DATA_PTR->player.usedMoves[i] == 0xff) {
+					COMBAT_DATA_PTR->player.usedMoves[i] = tech;
+					break;
+				}
+			}
+		}
+	}
+
+	digimon->stats.current.unk1 = tech + 0x100;
+	for (i = 0; i < 3; i++) {
+		if (fighter->queuedAnim == digimon->stats.base.moves[i]) {
+			break;
+		}
+	}
+
+	if (i != 4) {
+		digimon->stats.current.efeSubEffect = STD_startEFE(fighter->effectSlot[i]);
+		fighter->unk11 = fighter->effectSlot[i];
+	}
+
+	if ((MOVE_DATA[tech].range == 4) && (fighter->buffsRemaining != 0)) {
+		fighter->buffsRemaining--;
+	}
+
+	fighter->speedBuffer -= MOVE_DATA[tech].power;
+	if (fighter->speedBuffer < -0x9b) {
+		fighter->speedBuffer = -0x9b;
+	}
+
+	if (MAIN_D_801350EC == 3) {
+		t = entityGetTechFromAnim((Entity *)MAIN_D_80135128, ((Entity *)MAIN_D_80135128)->anim.animId);
+		if (MOVE_DATA[t].range == 3) {
+			return;
+		}
+	}
+
+	if (MAIN_D_801350EC == 6) {
+		if (MAIN_D_801350EC != 3) {
+			return;
+		}
+		if (digimon != (DigimonEntity *)ENTITY_TABLE[1]) {
+			return;
+		}
+	}
+
+	if ((MOVE_DATA[tech].range == 1) || (MOVE_DATA[tech].range == 4)) {
+		n = 2;
+	} else {
+		n = 5;
+	}
+
+	STD_func_8005A55C((DigimonEntity *)digimon, random(n), MOVE_DATA[tech].range);
+}
 
 void STD_removeMoveEffect(DigimonEntity *digimon, FighterData *fighter)
 {
@@ -3745,7 +6487,33 @@ int16_t STD_getStrongestMove(int32_t index, int16_t *flags)
 	return rank.best;
 }
 
-INCLUDE_ASM("asm/std/nonmatchings/std_main", STD_getMostEffectiveMove);
+int16_t STD_getMostEffectiveMove(int32_t index, int16_t *flags)
+{
+	MoveRanking rank;
+	DigimonEntity *digimon;
+	Entity *target;
+	uint8_t *moves;
+	int16_t tech;
+	int32_t i;
+	int32_t idx;
+
+	idx = idx = index;
+	digimon = (DigimonEntity *)ENTITY_TABLE[((uint8_t *)((uint32_t)index + (uint32_t)COMBAT_DATA_PTR))[0x66c]];
+	moves = digimon->stats.base.moves;
+	target = ENTITY_TABLE[((uint8_t *)COMBAT_DATA_PTR + ((FighterData *)COMBAT_DATA_PTR)[idx].targetId)[0x66c]];
+	for (i = 0; i < 3; i++) {
+		if (flags[i] == 1) {
+			tech = entityGetTechFromAnim(&digimon->entity, moves[i]);
+			rank.score[i] = MAIN_D_80125F70[MOVE_DATA[tech].special][DIGIMON_DATA[target->type].special[0]];
+		} else {
+			rank.score[i] = -1;
+		}
+	}
+
+	STD_getHighestScoredMove(rank.score, flags, &rank.best, 3);
+
+	return rank.best;
+}
 
 int16_t STD_getCheapestMove(int32_t index, int16_t *flags)
 {
@@ -3827,19 +6595,6 @@ void STD_getLowestScoredMove(int16_t *values, int16_t *marks, int16_t *out, int1
 	if (hits >= 2) {
 		*out = -1;
 	}
-}
-
-int16_t STD_getNpcEntityIndex(Entity *entity)
-{
-	int32_t i;
-
-	for (i = 2; i < 0xa; i++) {
-		if (entity == ENTITY_TABLE[i]) {
-			return i - 2;
-		}
-	}
-
-	return -1;
 }
 
 void STD_sortScoresDescending(int32_t *values, int32_t *keys, int32_t *groups, int32_t count)
@@ -4032,7 +6787,7 @@ void STD_func_80068388(int32_t i)
 	renderString(0, (int32_t)(n * 160) - 0x8c, MAIN_D_8013517C[i] - 0xe, 0x90, len, 0, y2, 7, 1);
 }
 
-void STD_setCommandIconUV(DigimonEntity *digimon, POLY_FT4 *prim, int32_t index)
+void STD_setCommandIconUV(DigimonEntity *digimon, POLY_FT4 *prim, uint8_t index)
 {
 	int16_t c;
 	int16_t eff;
@@ -4060,7 +6815,43 @@ void STD_setCommandIconUV(DigimonEntity *digimon, POLY_FT4 *prim, int32_t index)
 	}
 }
 
-INCLUDE_ASM("asm/std/nonmatchings/std_main", STD_addCommandMenu);
+void STD_addCommandMenu(uint8_t index)
+{
+	MAIN_D_8013517C[index] = 0x44;
+	MAIN_D_80135180[index] = MAIN_D_8013517C[index] + 0x20;
+	MAIN_D_80135184[index] = 0;
+	MAIN_D_80135186[index] = 0;
+
+	switch (COMBAT_DATA_PTR->player.numCommands[index]) {
+	case 2:
+		MAIN_D_80135188[index] = 0;
+		break;
+	case 3:
+		MAIN_D_80135188[index] = 1;
+		break;
+	case 4:
+		MAIN_D_80135188[index] = 2;
+		break;
+	case 5:
+		MAIN_D_80135188[index] = 3;
+		break;
+	case 6:
+		MAIN_D_80135188[index] = 4;
+		break;
+	case 7:
+		MAIN_D_80135188[index] = 5;
+		break;
+	case 8:
+		MAIN_D_80135188[index] = 6;
+		break;
+	case 9:
+		MAIN_D_80135188[index] = 7;
+		break;
+	}
+
+	MAIN_D_8013518A[index] = 0;
+	addObject(0x198, index, (TickFunction)STD_tickCommandMenu, (RenderFunction)STD_renderCommandMenu);
+}
 
 void STD_tickCommandMenu(uint8_t i)
 {
@@ -4073,8 +6864,6 @@ void STD_tickCommandMenu(uint8_t i)
 		}
 	}
 }
-
-INCLUDE_ASM("asm/std/nonmatchings/std_main", STD_renderCommandMenu);
 
 void STD_removeCommandMenu(int32_t i)
 {

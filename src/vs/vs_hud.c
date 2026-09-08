@@ -1,6 +1,8 @@
 #include <libetc.h>
 #include <libgpu.h>
 #include <libgs.h>
+#include <libgte.h>
+#include <mwinline_n.h>
 
 #include <dw/anim.h>
 #include <dw/combat.h>
@@ -10,55 +12,23 @@
 
 #include "common.h"
 
-extern int8_t MAIN_D_801352C4;
-extern int16_t VS_D_800707F4[][2];
-extern int16_t VS_D_800707F6[][2];
-extern char VS_D_80071B38[];
-extern int8_t GAME_STATE;
-extern int16_t MAIN_D_801352E0;
-extern uint8_t MAIN_D_801352E2;
-extern int32_t MAIN_D_801352C8;
-extern int16_t MAIN_D_801352AC[2];
-extern int16_t MAIN_D_801352B0[2];
-extern uint8_t MAIN_D_801352B4[2];
-extern uint8_t MAIN_D_801352B6[2];
-extern int8_t MAIN_D_801352B8[2];
-extern int8_t MAIN_D_80134AC8[2];
-extern GsOT *ACTIVE_ORDERING_TABLE;
+typedef struct {
+	int16_t clut;
+	uint8_t u;
+	uint8_t v;
+	uint8_t w;
+	uint8_t h;
+	int16_t x;
+	int16_t y;
+} VsBarSprite;
 
+void VS_removeFinisherChargeup(void);
 void VS_tickCommandMenu(uint8_t i);
-extern uint8_t MAIN_D_801352CC[2];
-extern uint8_t MAIN_D_801352CE[2];
-extern uint8_t MAIN_D_801352D0[2];
-extern uint8_t MAIN_D_801352D2[2];
-extern uint8_t MAIN_D_801352D4[2];
-extern uint8_t MAIN_D_801352D6[2];
-extern uint8_t MAIN_D_801352D8[2];
-extern uint8_t MAIN_D_801352DA[2];
-extern int32_t VS_D_80070A60[];
-
-extern int32_t ACTIVE_FRAMEBUFFER;
-extern GsRVIEW2 GS_VIEWPOINT;
-extern int32_t VIEWPORT_DISTANCE;
-extern int32_t VS_D_80070ACC[];
-extern GsOT VS_D_80071764[];
-extern PositionData VS_D_80072754[4];
-
-extern int16_t MAIN_D_80134B14[4];
-
-extern uint8_t MAIN_D_80134AF8[8];
-extern uint8_t MAIN_D_80134B00[8];
-extern uint8_t MAIN_D_80134B08[8];
-
-extern char *MAIN_D_80134B10;
-extern uint8_t *MAIN_D_801352DC;
 int32_t readFile(char *path, uint8_t *buffer);
-
 void GsSortBoxFill(GsBOXF *bp, GsOT *ot, unsigned short pri);
-
-void VS_renderCommandMenu(void);
-void VS_renderTargetCursor(void);
-void VS_tickTargetCursor(void);
+void VS_renderCommandMenu(uint8_t id);
+void VS_renderTargetCursor(uint8_t id);
+void VS_tickTargetCursor(uint8_t id);
 void VS_removeTargetCursor(uint8_t index);
 void VS_shuffleBattleStartTextPieces(void);
 void VS_renderBattleStartText(void);
@@ -68,12 +38,12 @@ void VS_renderFighterHPBar(int32_t id);
 void VS_renderHPBarFill(int32_t id);
 void VS_renderHPBarDigits(int16_t i, int32_t id);
 void VS_tickFighterStatusBars(void);
-void VS_renderFighterStatusBars(void);
+void VS_renderFighterStatusBars(uint8_t id);
 void VS_tickVersusModelScene(void);
 void VS_renderVersusModelScene(void);
 void VS_loadStageModels(void);
-void VS_addResultModelScene(void);
-void VS_tickResultModelScene(void);
+void VS_addResultModelScene(Entity *entity);
+void VS_tickResultModelScene(int32_t won);
 void VS_renderResultModelScene(void);
 void VS_setVersusModelSceneTimer(int16_t value);
 void setEntityTextDigit(POLY_FT4 *poly, int32_t x, int32_t y);
@@ -83,6 +53,85 @@ void convertValueToDigits(int32_t n, int32_t value, int32_t *outCount, int32_t *
 void swapByte(char *a, char *b);
 void addObject(int32_t objectId, int32_t instanceId, void *tick, void *render);
 void removeObject(int32_t objectId, int32_t instanceId);
+int32_t VS_renderCommandMenu__garbage__(int32_t i);
+void VS_renderMoveName(int32_t i);
+void VS_setCommandIconUV(DigimonEntity *digimon, POLY_FT4 *prim, uint8_t index);
+void damageTick(FighterData *fighter, Stats *stats);
+int32_t VS_addResultModelScene__garbage__(int32_t i);
+
+extern MATRIX VS_D_800707D4;
+extern int16_t MAIN_D_80135090[2];
+extern uint8_t MAIN_D_801352C4;
+extern int16_t VS_D_800707F4[][2];
+extern int16_t VS_D_800707F6[][2];
+extern uint8_t VS_D_80071B38[];
+extern int8_t GAME_STATE;
+extern int16_t MAIN_D_801352E0;
+extern uint8_t MAIN_D_801352E2;
+extern int32_t MAIN_D_801352C8;
+extern int16_t MAIN_D_801352AC[2];
+extern int16_t MAIN_D_801352B0[2];
+extern uint8_t MAIN_D_801352B4[2];
+extern uint8_t MAIN_D_801352B6[2];
+extern uint8_t MAIN_D_801352B8[2];
+extern int8_t MAIN_D_80134AC8[2];
+extern GsOT *ACTIVE_ORDERING_TABLE;
+extern uint8_t MAIN_D_801352CC[2];
+extern uint8_t MAIN_D_801352CE[2];
+extern uint8_t MAIN_D_801352D0[2];
+extern uint8_t MAIN_D_801352D2[2];
+extern uint8_t MAIN_D_801352D4[2];
+extern uint8_t MAIN_D_801352D6[2];
+extern uint8_t MAIN_D_801352D8[2];
+extern uint8_t MAIN_D_801352DA[2];
+extern int32_t VS_D_80070A60[];
+extern int32_t ACTIVE_FRAMEBUFFER;
+extern GsRVIEW2 GS_VIEWPOINT;
+extern int32_t VIEWPORT_DISTANCE;
+extern int32_t VS_D_80070ACC[];
+extern GsOT VS_D_80071764[];
+extern PositionData VS_D_80072754[4];
+extern int16_t MAIN_D_80134B14[4];
+extern uint8_t MAIN_D_80134AF8[8];
+extern uint8_t MAIN_D_80134B00[8];
+extern uint8_t MAIN_D_80134B08[8];
+extern char *MAIN_D_80134B10;
+extern uint8_t *MAIN_D_801352DC;
+extern uint8_t MAIN_D_80134AE8[8];
+extern uint8_t MAIN_D_80134AF0[8];
+extern uint8_t VS_D_80070764[][10];
+extern int16_t MAIN_D_801352BC[2];
+extern int16_t MAIN_D_801352C0[2];
+extern uint32_t POLLED_INPUT;
+extern uint32_t POLLED_INPUT_PREVIOUS;
+extern VsBarSprite VS_D_80070A90[];
+extern int16_t VS_D_80072974[];
+extern int16_t VS_D_800729A0[];
+extern int16_t VS_D_800729CC[];
+extern int16_t VS_D_800729F8[];
+extern int16_t VS_D_80072A24[];
+extern PositionData VS_D_80072A50[7];
+extern int16_t VS_D_80070AEC[];
+extern int16_t VS_D_80070AA4[];
+extern char VS_D_80070B30[];
+extern char MAIN_D_801A8B98[];
+extern GsOT_TAG VS_D_8007178C[];
+extern GsOT_TAG VS_D_8007180C[];
+extern PositionData VS_D_80072A50[7];
+extern int16_t VS_D_80072E08[5];
+extern uint8_t VS_D_80070B10[2][5];
+extern int16_t MAIN_D_801352E0;
+extern uint8_t MAIN_D_801352E2;
+extern PositionData VS_D_80072A50[7];
+extern int16_t VS_D_80072E08[5];
+extern uint8_t VS_D_80070B10[2][5];
+extern int16_t VS_D_80072974[];
+extern int16_t VS_D_800729A0[];
+extern int16_t VS_D_800729CC[];
+extern int16_t VS_D_800729F8[];
+extern int16_t VS_D_80072A24[];
+extern int16_t MAIN_D_801352E0;
+extern uint8_t MAIN_D_801352E2;
 
 static void *vs_hud_functions[] = {
 	VS_setVersusModelSceneTimer,
@@ -173,7 +222,171 @@ void VS_tickCommandMenu(uint8_t i)
 	}
 }
 
-INCLUDE_ASM("asm/vs/nonmatchings/vs_hud", VS_renderCommandMenu);
+int32_t VS_renderCommandMenu__garbage__(int32_t i)
+{
+	int32_t v0;
+	int32_t v1;
+	int32_t v2;
+	int32_t v3;
+	int32_t v4;
+	int32_t v5;
+	int32_t v6;
+	int32_t v7;
+	int32_t v8;
+	int32_t v9;
+	int32_t v10;
+	int32_t v11;
+	int32_t v12;
+	int32_t v13;
+	int32_t v14;
+	int32_t v15;
+	int32_t v16;
+	int32_t v17;
+
+	v0 = i + 0;
+	v1 = i + 1;
+	v2 = i + 2;
+	v3 = i + 3;
+	v4 = i + 4;
+	v5 = i + 5;
+	v6 = i + 6;
+	v7 = i + 7;
+	v8 = i + 8;
+	v9 = i + 9;
+	v10 = i + 10;
+	v11 = i + 11;
+	v12 = i + 12;
+	v13 = i + 13;
+	v14 = i + 14;
+	v15 = i + 15;
+	v16 = i + 16;
+	v17 = i + 17;
+	return v0 + v1 + v2 + v3 + v4 + v5 + v6 + v7 + v8 + v9 + v10 + v11 + v12 + v13 + v14 + v15 + v16 + v17;
+}
+
+void VS_renderCommandMenu(uint8_t id)
+{
+	POLY_FT4 *prim;
+	int32_t i;
+	int32_t off;
+	int16_t base;
+	int16_t count;
+	int16_t x;
+	int32_t y;
+	int16_t rowY;
+	int16_t width;
+
+	base = (id * 0xa6) - 0x8c + ((COMBAT_DATA_PTR->player.numCommands[id] - 1) * 0xe);
+	if (GAME_STATE == 4) {
+		VS_renderMoveName(id);
+	}
+
+	prim = (POLY_FT4 *)GsGetWorkBase();
+	count = COMBAT_DATA_PTR->player.numCommands[id] - 1;
+
+	if (GAME_STATE == 4) {
+		x = base - (COMBAT_DATA_PTR->player.hoveredCommand[id] * 0xe);
+		SetPolyFT4(prim);
+		prim->tpage = 0x1f;
+		prim->clut = GetClut(0x11a, 0x1f1);
+		prim->r0 = 0x80;
+		prim->g0 = 0x80;
+		prim->b0 = 0x80;
+		setUVDataPolyFT4(prim, 0x3d, 0xe0, 0x16, 0x16);
+		if ((count % 2) == 0) {
+			if ((COMBAT_DATA_PTR->player.hoveredCommand[id] % 2) == 0) {
+				y = MAIN_D_801352AC[id];
+			} else {
+				y = MAIN_D_801352AC[id] + 0xa;
+			}
+			setPosDataPolyFT4(prim, x - 3, y, 0x16, 0x16);
+		} else {
+			if ((COMBAT_DATA_PTR->player.hoveredCommand[id] % 2) == 1) {
+				y = MAIN_D_801352AC[id];
+			} else {
+				y = MAIN_D_801352AC[id] + 0xa;
+			}
+			setPosDataPolyFT4(prim, x - 3, y, 0x16, 0x16);
+		}
+		AddPrim(ACTIVE_ORDERING_TABLE->org + 7, prim++);
+	}
+
+	for (i = 1, off = 0xe; i < COMBAT_DATA_PTR->player.numCommands[id]; i++, off += 0xe) {
+		SetPolyFT4(prim);
+		prim->tpage = 0x1f;
+		prim->clut = GetClut(0x110, 0x1f0);
+		prim->r0 = 0x80;
+		prim->g0 = 0x80;
+		prim->b0 = 0x80;
+		VS_setCommandIconUV((DigimonEntity *)ENTITY_TABLE[COMBAT_DATA_PTR->player.entityIds[id]], prim, COMBAT_DATA_PTR->player.availableCommands[id][i]);
+		x = base - off;
+		if ((count % 2) == 0) {
+			prim->x0 = x;
+			prim->y0 = ((i % 2) == 0) ? MAIN_D_801352AC[id] + 3 : MAIN_D_801352AC[id] + 0xd;
+			prim->x1 = x + 0x10;
+			prim->y1 = ((i % 2) == 0) ? MAIN_D_801352AC[id] + 3 : MAIN_D_801352AC[id] + 0xd;
+			prim->x2 = x;
+			prim->y2 = ((i % 2) == 0) ? MAIN_D_801352B0[id] - 0xd : MAIN_D_801352B0[id] - 3;
+			prim->x3 = x + 0x10;
+			prim->y3 = ((i % 2) == 0) ? MAIN_D_801352B0[id] - 0xd : MAIN_D_801352B0[id] - 3;
+		} else {
+			prim->x0 = x;
+			prim->y0 = ((i % 2) == 1) ? MAIN_D_801352AC[id] + 3 : MAIN_D_801352AC[id] + 0xd;
+			prim->x1 = x + 0x10;
+			prim->y1 = ((i % 2) == 1) ? MAIN_D_801352AC[id] + 3 : MAIN_D_801352AC[id] + 0xd;
+			prim->x2 = x;
+			prim->y2 = ((i % 2) == 1) ? MAIN_D_801352B0[id] - 0xd : MAIN_D_801352B0[id] - 3;
+			prim->x3 = x + 0x10;
+			prim->y3 = ((i % 2) == 1) ? MAIN_D_801352B0[id] - 0xd : MAIN_D_801352B0[id] - 3;
+		}
+		if ((i == COMBAT_DATA_PTR->player.hoveredCommand[id]) && (MAIN_D_801352B4[id] == 1)) {
+			prim->u0 += 0x10;
+			prim->u1 += 0x10;
+			prim->u2 += 0x10;
+			prim->u3 += 0x10;
+		}
+		AddPrim(ACTIVE_ORDERING_TABLE->org + 7, prim++);
+	}
+
+	for (i = 0; i < COMBAT_DATA_PTR->player.numCommands[id]; i++) {
+		SetPolyFT4(prim);
+		prim->code |= 2;
+		prim->tpage = GetTPage(0, 0, 0x3c0, 0x100);
+		prim->clut = GetClut(0x110, 0x1f1);
+		prim->r0 = 0x80;
+		prim->g0 = 0x80;
+		prim->b0 = 0x80;
+		prim->u0 = MAIN_D_80134AE8[VS_D_80070764[MAIN_D_801352B8[id]][i]];
+		prim->v0 = 0xe0;
+		prim->u1 = MAIN_D_80134AE8[VS_D_80070764[MAIN_D_801352B8[id]][i]] + MAIN_D_80134AF0[VS_D_80070764[MAIN_D_801352B8[id]][i]];
+		prim->v1 = 0xe0;
+		prim->u2 = MAIN_D_80134AE8[VS_D_80070764[MAIN_D_801352B8[id]][i]];
+		prim->v2 = 0xff;
+		prim->u3 = MAIN_D_80134AE8[VS_D_80070764[MAIN_D_801352B8[id]][i]] + MAIN_D_80134AF0[VS_D_80070764[MAIN_D_801352B8[id]][i]];
+		prim->v3 = 0xff;
+		if (i > 0) {
+			rowY = ((i - 1) * 0xe) + 0xb;
+		} else {
+			rowY = 0;
+		}
+		if ((i == 0) || (i == (COMBAT_DATA_PTR->player.numCommands[id] - 1))) {
+			width = 0xb;
+		} else {
+			width = 0xe;
+		}
+		prim->x0 = (rowY - 0x8f) + id * 0xa6;
+		prim->y0 = MAIN_D_801352AC[id];
+		prim->x1 = ((rowY - 0x8f) + width) + id * 0xa6;
+		prim->y1 = MAIN_D_801352AC[id];
+		prim->x2 = (rowY - 0x8f) + id * 0xa6;
+		prim->y2 = MAIN_D_801352B0[id];
+		prim->x3 = ((rowY - 0x8f) + width) + id * 0xa6;
+		prim->y3 = MAIN_D_801352B0[id];
+		AddPrim(ACTIVE_ORDERING_TABLE->org + 7, prim++);
+	}
+
+	GsSetWorkBase((PACKET *)prim);
+}
 
 void VS_removeCommandMenu(int32_t i)
 {
@@ -181,11 +394,109 @@ void VS_removeCommandMenu(int32_t i)
 	removeObject(0x198, i);
 }
 
-INCLUDE_ASM("asm/vs/nonmatchings/vs_hud", VS_addTargetCursor);
+void VS_addTargetCursor(int16_t id, int32_t tech)
+{
+	COMBAT_DATA_PTR->player.finisherChargeup[id] = 0;
+	COMBAT_DATA_PTR->player.remainingChargeupTime[id] = 0x50;
+	COMBAT_DATA_PTR->fighter[id].finisherProgress = 0;
+	if (COMBAT_DATA_PTR->player.hoveredCommand[id] == 0) {
+		COMBAT_DATA_PTR->player.hoveredCommand[id] = COMBAT_DATA_PTR->player.numCommands[id] - 1;
+	}
+	COMBAT_DATA_PTR->player.currentCommand[id] = 3;
+	COMBAT_DATA_PTR->player.bufferedCommand[id] = 3;
+	MAIN_D_801352BC[id] = id * 0xea - 0x8c;
+	MAIN_D_801352C0[id] = -0x4a;
+	addObject(0x19a, id, VS_tickTargetCursor, VS_renderTargetCursor);
+}
 
-INCLUDE_ASM("asm/vs/nonmatchings/vs_hud", VS_renderTargetCursor);
+void VS_renderTargetCursor(uint8_t id)
+{
+	POLY_FT4 prim;
+	int32_t i;
+	int32_t x;
+	int16_t bars;
+	uint32_t n;
+	int32_t px;
 
-INCLUDE_ASM("asm/vs/nonmatchings/vs_hud", VS_tickTargetCursor);
+	SetPolyFT4(&prim);
+	prim.tpage = 0x1f;
+	prim.clut = GetClut(0x110, 0x1f2);
+	prim.r0 = 0x80;
+	prim.g0 = 0x80;
+	prim.b0 = 0x80;
+	prim.u0 = 0x58;
+	prim.v0 = 0xe0;
+	prim.u1 = 0x86;
+	prim.v1 = 0xe0;
+	prim.u2 = 0x58;
+	prim.v2 = 0xec;
+	prim.u3 = 0x86;
+	prim.v3 = 0xec;
+	prim.x0 = MAIN_D_801352BC[id];
+	prim.y0 = MAIN_D_801352C0[id];
+	prim.x1 = MAIN_D_801352BC[id] + 0x2e;
+	prim.y1 = MAIN_D_801352C0[id];
+	prim.x2 = MAIN_D_801352BC[id];
+	prim.y2 = MAIN_D_801352C0[id] + 0xc;
+	prim.x3 = MAIN_D_801352BC[id] + 0x2e;
+	prim.y3 = MAIN_D_801352C0[id] + 0xc;
+	n = id;
+	GsSortPoly(&prim, ACTIVE_ORDERING_TABLE, 7);
+	bars = COMBAT_DATA_PTR->player.finisherChargeup[n] / 8;
+	prim.u0 = 0x88;
+	prim.v0 = 0xe0;
+	prim.u1 = 0x8c;
+	prim.v1 = 0xe0;
+	prim.u2 = 0x88;
+	prim.v2 = 0xe6;
+	prim.u3 = 0x8c;
+	prim.v3 = 0xe6;
+	for (i = 0, x = 0; i < bars; i++, x += 4) {
+		px = MAIN_D_801352BC[n] + 3;
+		prim.x0 = px + x;
+		prim.y0 = MAIN_D_801352C0[n] + 3;
+		prim.x1 = (int32_t)(px + x) + 4;
+		prim.y1 = MAIN_D_801352C0[n] + 3;
+		prim.x2 = px + x;
+		prim.y2 = MAIN_D_801352C0[n] + 9;
+		prim.x3 = (int32_t)(px + x) + 4;
+		prim.y3 = MAIN_D_801352C0[n] + 9;
+		GsSortPoly(&prim, ACTIVE_ORDERING_TABLE, 7);
+	}
+
+	if (COMBAT_DATA_PTR->player.remainingChargeupTime[n] == 0) {
+		VS_removeTargetCursor(id);
+	}
+}
+
+void VS_tickTargetCursor(uint8_t id)
+{
+	uint32_t input;
+	uint32_t prev;
+	int32_t up;
+	uint32_t charge;
+
+	input = POLLED_INPUT;
+	prev = POLLED_INPUT_PREVIOUS;
+	if (id == 1) {
+		POLLED_INPUT = (uint16_t)(POLLED_INPUT >> 16);
+		POLLED_INPUT_PREVIOUS = (uint16_t)(POLLED_INPUT_PREVIOUS >> 16);
+	}
+	COMBAT_DATA_PTR->player.remainingChargeupTime[id]--;
+	up = 0;
+	if (((POLLED_INPUT & ~POLLED_INPUT_PREVIOUS) & 4) != 0) {
+		up = 1;
+	}
+	if (((POLLED_INPUT & ~POLLED_INPUT_PREVIOUS) & 8) != 0) {
+		up = 1;
+	}
+	charge = COMBAT_DATA_PTR->player.finisherChargeup[id];
+	if ((charge < 0x50) && (up != 0)) {
+		COMBAT_DATA_PTR->player.finisherChargeup[id] = charge + 2;
+	}
+	POLLED_INPUT = input;
+	POLLED_INPUT_PREVIOUS = prev;
+}
 
 void VS_removeTargetCursor(uint8_t index)
 {
@@ -252,7 +563,179 @@ void VS_initializeBattleStartText(void)
 	addObject(0x1a6, 0, NULL, VS_renderBattleStartText);
 }
 
-INCLUDE_ASM("asm/vs/nonmatchings/vs_hud", VS_renderBattleStartText);
+void VS_renderBattleStartText(void)
+{
+	POLY_FT4 *ft;
+	POLY_F4 *shadow;
+	char (*p)[20];
+	POLY_FT4 *prim;
+	GsOT_TAG *ot;
+	int32_t i;
+	int32_t n;
+	int32_t y;
+	uint16_t clut;
+	int32_t otz;
+	SVECTOR p0;
+	SVECTOR p1;
+	SVECTOR p2;
+	SVECTOR p3;
+	SVECTOR q0;
+	SVECTOR q1;
+	SVECTOR q2;
+	SVECTOR q3;
+	MATRIX m;
+
+	m = GsWSMATRIX;
+	GsSetProjection(0x200);
+	GsSetLsMatrix(&VS_D_800707D4);
+
+	n = 0;
+	for (i = 0; i < 0x9b; i++) {
+		if ((VS_D_80071B38 + 0x12)[i * 20] != 0) {
+			break;
+		}
+		n++;
+	}
+
+	if (n == 0x9b) {
+		y = MAIN_D_801352C4++;
+		clut = GetClut(0x100, y % 6 / 2 + 0x1e8);
+		MAIN_D_801352C8 = 1;
+	} else {
+		clut = GetClut(0x100, 0x1e8);
+	}
+
+	p = (char (*)[20])VS_D_80071B38;
+	prim = (POLY_FT4 *)GsGetWorkBase();
+	ot = ACTIVE_ORDERING_TABLE->org;
+	for (i = 0; i < 0x9b; i++, p++) {
+		if (((int16_t *)*p)[4] != VS_D_800707F4[i][0]) {
+			((int16_t *)*p)[4] += ((int8_t *)*p)[0x10];
+			if (((int8_t *)*p)[0x10] > 0) {
+				if (((int16_t *)*p)[4] > VS_D_800707F4[i][0]) {
+					((int16_t *)*p)[4] = VS_D_800707F4[i][0];
+				}
+			} else {
+				if (((int16_t *)*p)[4] < VS_D_800707F4[i][0]) {
+					((int16_t *)*p)[4] = VS_D_800707F4[i][0];
+				}
+			}
+		} else {
+			if (((uint8_t *)*p)[0x12] != 0) {
+				((uint8_t *)*p)[0x12] -= 4;
+			}
+		}
+
+		p0.vx = ((int16_t *)*p)[4];
+		p0.vy = ((int16_t *)*p)[5];
+		p0.vz = 0;
+		p1.vx = p0.vx + 8;
+		p1.vy = p0.vy;
+		p1.vz = 0;
+		p2.vx = p0.vx;
+		p2.vy = p0.vy + 0xc;
+		p2.vz = 0;
+		p3.vx = p0.vx + 8;
+		p3.vy = p0.vy + 0xc;
+		p3.vz = 0;
+
+		ft = prim;
+		setEntityTextDigit(prim, 0x100, 0x1e8);
+		prim->r0 = 0x80;
+		prim->g0 = 0x80;
+		prim->b0 = 0x80;
+		prim->clut = clut;
+		gte_ldv3(&p0, &p1, &p2);
+		gte_rtpt();
+		gte_stsxy3(&prim->x0, &prim->x1, &prim->x2);
+		gte_stszotz(&otz);
+		gte_ldv0(&p3);
+		gte_rtps();
+		gte_stsxy(&prim->x3);
+		prim->u0 = ((uint8_t *)*p)[0x13] * 8 + 0x80;
+		prim->v0 = 0x80;
+		prim->u1 = ((uint8_t *)*p)[0x13] * 8 + 0x88;
+		prim->v1 = 0x80;
+		prim->u2 = ((uint8_t *)*p)[0x13] * 8 + 0x80;
+		prim->v2 = 0x88;
+		prim->u3 = ((uint8_t *)*p)[0x13] * 8 + 0x88;
+		prim->v3 = 0x88;
+		AddPrim(ot + 5, prim++);
+
+		if (n != 0x9b) {
+			SetPolyFT4(prim);
+			prim->r0 = 0x80;
+			prim->g0 = 0x80;
+			prim->b0 = 0x80;
+			prim->tpage = GetTPage(0, 0, 0x380, 0x180);
+			prim->clut = clut;
+			SetSemiTrans(prim, 1);
+			if (((int8_t *)*p)[0x10] > 0) {
+				q0.vx = p0.vx - ((uint8_t *)*p)[0x12];
+				q0.vy = p0.vy;
+				q0.vz = p0.vz;
+				q1 = p0;
+				q2.vx = p2.vx - ((uint8_t *)*p)[0x12];
+				q2.vy = p2.vy;
+				q2.vz = p2.vz;
+				q3 = p2;
+				prim->u0 = 0x9e;
+				prim->v0 = 0x80;
+				prim->u1 = 0x86;
+				prim->v1 = 0x80;
+				prim->u2 = 0x9e;
+				prim->v2 = 0x88;
+				prim->u3 = 0x86;
+				prim->v3 = 0x88;
+			} else {
+				q0 = p1;
+				q1.vx = p1.vx + ((uint8_t *)*p)[0x12];
+				q1.vy = p1.vy;
+				q1.vz = p1.vz;
+				q2 = p3;
+				q3.vx = p3.vx + ((uint8_t *)*p)[0x12];
+				q3.vy = p3.vy;
+				q3.vz = p3.vz;
+				prim->u0 = 0x86;
+				prim->v0 = 0x80;
+				prim->u1 = 0x9e;
+				prim->v1 = 0x80;
+				prim->u2 = 0x86;
+				prim->v2 = 0x88;
+				prim->u3 = 0x9e;
+				prim->v3 = 0x88;
+			}
+			gte_ldv3(&q0, &q1, &q2);
+			gte_rtpt();
+			gte_stsxy3(&prim->x0, &prim->x1, &prim->x2);
+			gte_stszotz(&otz);
+			gte_ldv0(&q3);
+			gte_rtps();
+			gte_stsxy(&prim->x3);
+			AddPrim(ot + 5, prim++);
+		}
+
+		shadow = (POLY_F4 *)prim;
+		SetPolyF4(shadow);
+		shadow->r0 = 0;
+		shadow->g0 = 0;
+		shadow->b0 = 0;
+		shadow->x0 = ft->x0 + 2;
+		shadow->y0 = ft->y0 + 2;
+		shadow->x1 = ft->x1 + 2;
+		shadow->y1 = ft->y1 + 2;
+		shadow->x2 = ft->x2 + 2;
+		shadow->y2 = ft->y2 + 2;
+		shadow->x3 = ft->x3 + 2;
+		shadow->y3 = ft->y3 + 2;
+		AddPrim(ot + 6, shadow++);
+		prim = (POLY_FT4 *)shadow;
+	}
+
+	GsSetWorkBase((PACKET *)prim);
+	GsSetProjection(VIEWPORT_DISTANCE);
+	GsWSMATRIX = m;
+}
 
 void VS_removeBattleStartText(void)
 {
@@ -265,7 +748,133 @@ void VS_initializeBattleStartTextBurst(void)
 	addObject(0x1a6, 0, NULL, VS_renderBattleStartTextBurst);
 }
 
-INCLUDE_ASM("asm/vs/nonmatchings/vs_hud", VS_renderBattleStartTextBurst);
+void VS_renderBattleStartTextBurst(void)
+{
+	POLY_FT4 *ft;
+	POLY_F4 *shadow;
+	char (*p)[20];
+	POLY_FT4 *prim;
+	GsOT_TAG *ot;
+	int32_t i;
+	int32_t dead;
+	int32_t j;
+	int16_t cx;
+	int16_t cy;
+	int32_t otz;
+	SVECTOR corner[4];
+	SVECTOR pts[4];
+	SVECTOR out;
+	MATRIX m;
+	MATRIX saved;
+
+	saved = GsWSMATRIX;
+	GsSetProjection(0x200);
+	GsSetLsMatrix(&VS_D_800707D4);
+
+	corner[0].vx = -4;
+	corner[0].vy = -6;
+	corner[0].vz = 0;
+	corner[1].vx = 4;
+	corner[1].vy = -6;
+	corner[1].vz = 0;
+	corner[2].vx = -4;
+	corner[2].vy = 6;
+	corner[2].vz = 0;
+	corner[3].vx = 4;
+	corner[3].vy = 6;
+	corner[3].vz = 0;
+
+	ot = ACTIVE_ORDERING_TABLE->org;
+	dead = 0;
+	p = (char (*)[20])VS_D_80071B38;
+	prim = (POLY_FT4 *)GsGetWorkBase();
+	for (i = 0; i < 0x9b; i++, p++) {
+		if ((((int16_t *)*p)[6] == 0) && (((int16_t *)*p)[7] == 0)) {
+			dead++;
+			continue;
+		}
+
+		PushMatrix();
+		RotMatrix((SVECTOR *)*p, &m);
+		for (j = 0; j < 4; j++) {
+			ApplyMatrixSV(&m, &corner[j], &out);
+			pts[j].vx = out.vx + ((int16_t *)*p)[4] - 4;
+			pts[j].vy = out.vy + ((int16_t *)*p)[5] - 6;
+			pts[j].vz = out.vz;
+		}
+
+		switch (((uint8_t *)*p)[0x13]) {
+		case 0:
+			((int16_t *)*p)[0] += 0x100;
+			((int16_t *)*p)[1] += 0x100;
+			break;
+		case 1:
+			((int16_t *)*p)[1] += 0x100;
+			((int16_t *)*p)[2] += 0x100;
+			break;
+		case 2:
+			((int16_t *)*p)[0] += 0x100;
+			((int16_t *)*p)[2] += 0x100;
+			break;
+		}
+
+		PopMatrix();
+
+		ft = prim;
+		setEntityTextDigit(prim, 0x100, 0x1e8);
+		prim->r0 = 0x80;
+		prim->g0 = 0x80;
+		prim->b0 = 0x80;
+		prim->clut = GetClut(0x100, 0x1e8);
+		gte_ldv3(&pts[0], &pts[1], &pts[2]);
+		gte_rtpt();
+		gte_stsxy3(&prim->x0, &prim->x1, &prim->x2);
+		gte_stszotz(&otz);
+		gte_ldv0(&pts[3]);
+		gte_rtps();
+		gte_stsxy(&prim->x3);
+		prim->u0 = ((uint8_t *)*p)[0x13] * 8 + 0x80;
+		prim->v0 = 0x80;
+		prim->u1 = ((uint8_t *)*p)[0x13] * 8 + 0x88;
+		prim->v1 = 0x80;
+		prim->u2 = ((uint8_t *)*p)[0x13] * 8 + 0x80;
+		prim->v2 = 0x88;
+		prim->u3 = ((uint8_t *)*p)[0x13] * 8 + 0x88;
+		prim->v3 = 0x88;
+		AddPrim(ot + 5, prim++);
+		shadow = (POLY_F4 *)prim;
+		SetPolyF4(shadow);
+		shadow->r0 = 0;
+		shadow->g0 = 0;
+		shadow->b0 = 0;
+		shadow->x0 = ft->x0 + 2;
+		shadow->y0 = ft->y0 + 2;
+		shadow->x1 = ft->x1 + 2;
+		shadow->y1 = ft->y1 + 2;
+		shadow->x2 = ft->x2 + 2;
+		shadow->y2 = ft->y2 + 2;
+		shadow->x3 = ft->x3 + 2;
+		shadow->y3 = ft->y3 + 2;
+		AddPrim(ot + 6, shadow++);
+		prim = (POLY_FT4 *)shadow;
+
+		cx = ft->x0;
+		cy = ft->y0;
+		if ((cx < -0xb4) || (cx >= 0xb5) || (cy < -0x8c) || (cy >= 0x8d)) {
+			((int16_t *)*p)[6] = 0;
+			((int16_t *)*p)[7] = 0;
+		}
+		((int16_t *)*p)[4] = ((int16_t *)*p)[4] + ((int16_t *)*p)[6];
+		((int16_t *)*p)[5] = ((int16_t *)*p)[5] + ((int16_t *)*p)[7];
+	}
+
+	GsSetWorkBase((PACKET *)prim);
+	if (dead == 0x9b) {
+		MAIN_D_801352C8 = 1;
+	}
+	GsSetProjection(VIEWPORT_DISTANCE);
+	GsWSMATRIX = saved;
+}
 
 void VS_removeBattleStartTextBurst(void)
 {
@@ -448,13 +1057,133 @@ void VS_renderHPBarDigits(int16_t i, int32_t id)
 	GsSetWorkBase((PACKET *)prim);
 }
 
-INCLUDE_ASM("asm/vs/nonmatchings/vs_hud", VS_addFighterStatusBars);
+// clang-format off
+void VS_addFighterStatusBars(id)
+	int16_t id;
+// clang-format on
+{
+	MAIN_D_801352CC[id] = 0;
+	MAIN_D_801352CE[id] = 0;
+	MAIN_D_801352D0[id] = 11;
+	MAIN_D_801352D2[id] = 0;
+	MAIN_D_801352D4[id] = 0;
+	MAIN_D_801352D6[id] = 0;
+	MAIN_D_801352DA[id] = MAIN_D_801352D8[id] = 0;
+	addObject(0x19c, id, VS_tickFighterStatusBars, VS_renderFighterStatusBars);
+}
 
 void VS_tickFighterStatusBars(void)
 {
 }
 
-INCLUDE_ASM("asm/vs/nonmatchings/vs_hud", VS_renderFighterStatusBars);
+void VS_renderFighterStatusBars(uint8_t id)
+{
+	POLY_FT4 *prim;
+	VsBarSprite *p;
+	FighterData *fighter;
+	DigimonEntity *e;
+	int16_t *hpPtr;
+	int16_t *mpPtr;
+	int32_t maxHp;
+	int32_t maxMp;
+	int32_t bar;
+	int32_t k;
+	int16_t x0;
+	int16_t y0;
+	int16_t fill;
+	int16_t cur;
+	int16_t nx;
+	int16_t ny;
+	int32_t w;
+	int32_t t;
+
+	p = (VsBarSprite *)COMBAT_DATA_PTR;
+	fighter = &COMBAT_DATA_PTR->fighter[id];
+	e = (DigimonEntity *)ENTITY_TABLE[((CombatData *)p)->player.entityIds[id]];
+	hpPtr = &e->stats.current.currentHP;
+	mpPtr = &((DigimonEntity *)ENTITY_TABLE[((CombatData *)p)->player.entityIds[id]])->stats.current.currentMP;
+	maxHp = ((DigimonEntity *)ENTITY_TABLE[((CombatData *)p)->player.entityIds[id]])->stats.base.hp;
+	maxMp = ((DigimonEntity *)ENTITY_TABLE[((CombatData *)p)->player.entityIds[id]])->stats.base.mp;
+
+	if (*hpPtr == 0) {
+		fighter->hpDamageBuffer = 0;
+	}
+	if (fighter->hpDamageBuffer != 0) {
+		damageTick(fighter,
+		           &((DigimonEntity *)ENTITY_TABLE[COMBAT_DATA_PTR->player.entityIds[id]])->stats);
+	}
+	*mpPtr = *mpPtr - fighter->mpDamageBuffer;
+	fighter->mpDamageBuffer = 0;
+	if (*mpPtr < 0) {
+		*mpPtr = 0;
+	}
+
+	for (bar = 0; bar < 2; bar++) {
+		p = &VS_D_80070A90[bar * 3 + 2];
+		if (bar == 0) {
+			if (id == 0) {
+				x0 = -0x8c;
+			} else {
+				x0 = 0x24;
+			}
+			y0 = -0x64;
+			cur = *hpPtr;
+			w = cur;
+			fill = w * 50 / maxHp;
+		} else {
+			if (id == 0) {
+				x0 = -0x8c;
+			} else {
+				x0 = 0x24;
+			}
+			y0 = -0x58;
+			cur = *mpPtr;
+			w = cur;
+			fill = w * 50 / maxMp;
+		}
+		nx = x0 + 0x49;
+		ny = y0 - 3;
+		VS_renderNumber(0, 4, nx, ny, cur, 8);
+		prim = (POLY_FT4 *)GsGetWorkBase();
+		for (k = 0; k < 3; k++, p--) {
+			SetPolyFT4(prim);
+			prim->clut = GetClut(0x100, p->clut);
+			prim->tpage = 0x1e;
+			setRGB0(prim, 0x80, 0x80, 0x80);
+			prim->u0 = p->u;
+			prim->v0 = p->v;
+			prim->u1 = p->u + p->w;
+			prim->v1 = p->v;
+			prim->u2 = p->u;
+			prim->v2 = p->v + p->h;
+			prim->u3 = p->u + p->w;
+			prim->v3 = p->v + p->h;
+			prim->x0 = x0 + p->x;
+			prim->y0 = y0 + p->y;
+			if (k == 0) {
+				w = fill;
+			} else {
+				w = p->w;
+			}
+			t = x0 + p->x;
+			prim->x1 = t + w;
+			prim->y1 = y0 + p->y;
+			prim->x2 = x0 + p->x;
+			prim->y2 = p->h + (y0 + p->y);
+			if (k == 0) {
+				w = fill;
+			} else {
+				w = p->w;
+			}
+			t = x0 + p->x;
+			prim->x3 = t + w;
+			prim->y3 = p->h + (y0 + p->y);
+			AddPrim(ACTIVE_ORDERING_TABLE->org + 8, prim++);
+		}
+		GsSetWorkBase((PACKET *)prim);
+	}
+	VS_renderFighterHPBar(id);
+}
 
 void VS_removeFighterStatusBars(int32_t i)
 {
@@ -551,13 +1280,198 @@ int32_t VS_isVersusModelSceneFinished(void)
 	}
 }
 
-INCLUDE_ASM("asm/vs/nonmatchings/vs_hud", VS_loadStageModels);
+void VS_loadStageModels(void)
+{
+	int32_t i;
+	int32_t v;
+	uint32_t buf;
 
-INCLUDE_ASM("asm/vs/nonmatchings/vs_hud", VS_addResultModelScene);
+	for (i = 0x14; i < 0x29; i++) {
+		(&VS_D_80072974[-0x14])[i] = ((i * 0x2000) / 40) & 0xfff;
+		(&VS_D_800729A0[-0x14])[i] = (((i * 0x800) / 40) + 0x800) & 0xfff;
+		if ((i >= 0x14) && (i < 0x25)) {
+			(&VS_D_800729CC[-0x14])[i] = VS_D_80070AEC[0x24 - i] - 0x134;
+			v = VS_D_80070AEC[0x24 - i];
+			(&VS_D_800729F8[-0x14])[i] = v - 0x140;
+			(&VS_D_80072A24[-0x14])[i] = 0x111 - v;
+		}
+		if ((i >= 0x25) && (i < 0x29)) {
+			(&VS_D_800729CC[-0x14])[i] = VS_D_80070AA4[i] - 0x134;
+			v = VS_D_80070AA4[i];
+			(&VS_D_800729F8[-0x14])[i] = v - 0x140;
+			(&VS_D_80072A24[-0x14])[i] = 0x111 - v;
+		}
+	}
 
-INCLUDE_ASM("asm/vs/nonmatchings/vs_hud", VS_tickResultModelScene);
+	VS_D_80071764[0].length = 5;
+	VS_D_80071764[0].org = VS_D_8007178C;
+	VS_D_80071764[1].length = 5;
+	VS_D_80071764[1].org = VS_D_8007180C;
+	buf = (uint32_t)MAIN_D_801A8B98;
+	readFile(VS_D_80070B30, (void *)buf);
+	GsMapModelingData((u_long *)(buf + 4));
+	for (i = 0; i < 7; i++) {
+		GsLinkObject4((u_long)(buf + 0xc), &VS_D_80072A50[i].obj, i);
+		GsInitCoordinate2(NULL, &VS_D_80072A50[i].posMatrix);
+		VS_D_80072A50[i].obj.attribute = 0;
+		VS_D_80072A50[i].obj.coord2 = &VS_D_80072A50[i].posMatrix;
+	}
+}
 
-INCLUDE_ASM("asm/vs/nonmatchings/vs_hud", VS_renderResultModelScene);
+int32_t VS_addResultModelScene__garbage__(int32_t i)
+{
+	int32_t v0;
+	int32_t v1;
+	int32_t v2;
+	int32_t v3;
+	int32_t v4;
+	int32_t v5;
+	int32_t v6;
+	int32_t v7;
+	int32_t v8;
+	int32_t v9;
+	int32_t v10;
+	int32_t v11;
+	int32_t v12;
+	int32_t v13;
+	int32_t v14;
+	int32_t v15;
+	int32_t v16;
+	int32_t v17;
+	int32_t v18;
+	int32_t v19;
+	int32_t v20;
+	int32_t v21;
+	int32_t v22;
+	int32_t v23;
+
+	v0 = i + 0;
+	v1 = i + 1;
+	v2 = i + 2;
+	v3 = i + 3;
+	v4 = i + 4;
+	v5 = i + 5;
+	v6 = i + 6;
+	v7 = i + 7;
+	v8 = i + 8;
+	v9 = i + 9;
+	v10 = i + 10;
+	v11 = i + 11;
+	v12 = i + 12;
+	v13 = i + 13;
+	v14 = i + 14;
+	v15 = i + 15;
+	v16 = i + 16;
+	v17 = i + 17;
+	v18 = i + 18;
+	v19 = i + 19;
+	v20 = i + 20;
+	v21 = i + 21;
+	v22 = i + 22;
+	v23 = i + 23;
+	return v0 + v1 + v2 + v3 + v4 + v5 + v6 + v7 + v8 + v9 + v10 + v11 + v12 + v13 + v14 + v15 + v16 + v17 + v18 + v19 + v20 + v21 + v22 + v23;
+}
+
+void VS_addResultModelScene(Entity *entity)
+{
+	int32_t i;
+	int32_t k;
+
+	MAIN_D_801352E0 = 0;
+	if (entity == ENTITY_TABLE[1]) {
+		MAIN_D_801352E2 = 0;
+	} else {
+		MAIN_D_801352E2 = 1;
+	}
+	VS_D_80072A50[MAIN_D_801352E2 * 2].location.vx = -0x148;
+	VS_D_80072A50[MAIN_D_801352E2 * 2].location.vy = 0;
+	VS_D_80072A50[MAIN_D_801352E2 * 2].location.vz = -0x4d0;
+	VS_D_80072A50[MAIN_D_801352E2 * 2 + 1].location.vx = -0x9b;
+	VS_D_80072A50[MAIN_D_801352E2 * 2 + 1].location.vy = 0;
+	VS_D_80072A50[MAIN_D_801352E2 * 2 + 1].location.vz = -0x4d0;
+	VS_D_80072A50[MAIN_D_801352E2 * 2].location.vx = -0x154;
+	VS_D_80072A50[MAIN_D_801352E2 * 2].location.vy = 0;
+	VS_D_80072A50[MAIN_D_801352E2 * 2].location.vz = -0x4d0;
+	VS_D_80072A50[MAIN_D_801352E2 * 2 + 1].location.vx = -0x9b;
+	VS_D_80072A50[MAIN_D_801352E2 * 2 + 1].location.vy = 0;
+	VS_D_80072A50[MAIN_D_801352E2 * 2 + 1].location.vz = -0x4d0;
+	VS_D_80072A50[4].location.vx = 0;
+	VS_D_80072A50[4].location.vy = 0;
+	VS_D_80072A50[4].location.vz = -0x4d0;
+	VS_D_80072A50[5].location.vx = 0x84;
+	VS_D_80072A50[5].location.vy = 0;
+	VS_D_80072A50[5].location.vz = -0x4d0;
+	VS_D_80072A50[6].location.vx = 0xfd;
+	VS_D_80072A50[6].location.vy = 0;
+	VS_D_80072A50[6].location.vz = -0x4d0;
+	for (i = 0; i < 5; i++) {
+		VS_D_80072E08[i] = 0;
+		k = VS_D_80070B10[MAIN_D_801352E2][i];
+		VS_D_80072A50[k].scale.vx = 0x1000;
+		VS_D_80072A50[k].scale.vy = 0x1000;
+		VS_D_80072A50[k].scale.vz = 0x1000;
+		VS_D_80072A50[k].rotation.vx = 0;
+		VS_D_80072A50[k].rotation.vy = 0;
+		VS_D_80072A50[k].rotation.vz = 0;
+		setupModelMatrix(&VS_D_80072A50[k]);
+	}
+	addObject(0x19d, MAIN_D_801352E2, VS_tickResultModelScene, VS_renderResultModelScene);
+}
+
+void VS_tickResultModelScene(int32_t won)
+{
+	int32_t i;
+	int32_t t;
+	int32_t k;
+
+	if (MAIN_D_801352E0 < 0xa0) {
+		MAIN_D_801352E0++;
+	}
+	for (i = 0, t = 0x3c; i < 5; i++, t += 6) {
+		if (t < MAIN_D_801352E0) {
+			k = VS_D_80070B10[MAIN_D_801352E2][i];
+			if (VS_D_80072A50[k].location.vz < 0xdc) {
+				VS_D_80072A50[k].location.vz += 0x42;
+			}
+			if (VS_D_80072E08[i] < 0x14) {
+				VS_D_80072E08[i]++;
+			}
+			VS_D_80072A50[k].rotation.vx = VS_D_80072974[VS_D_80072E08[i]];
+			VS_D_80072A50[k].rotation.vy = VS_D_800729A0[VS_D_80072E08[i]];
+			if (i == 0) {
+				if (won == 0) {
+					VS_D_80072A50[k].location.vx = VS_D_800729CC[VS_D_80072E08[i]];
+				} else {
+					VS_D_80072A50[k].location.vx = VS_D_800729F8[VS_D_80072E08[i]];
+				}
+			}
+			if (i == 4) {
+				VS_D_80072A50[k].location.vx = VS_D_80072A24[VS_D_80072E08[4]];
+			}
+		}
+		setupModelMatrix(&VS_D_80072A50[VS_D_80070B10[MAIN_D_801352E2][i]]);
+	}
+}
+
+void VS_renderResultModelScene(void)
+{
+	MATRIX lw;
+	MATRIX ls;
+	int32_t i;
+
+	GsSetProjection(0x15e);
+	GsWSMATRIX = *(MATRIX *)VS_D_80070ACC;
+	GsClearOt(0, 4, &VS_D_80071764[ACTIVE_FRAMEBUFFER]);
+	for (i = 4; i >= 0; i--) {
+		GsGetLws(VS_D_80072A50[VS_D_80070B10[MAIN_D_801352E2][i]].obj.coord2, &lw, &ls);
+		GsSetLightMatrix(&lw);
+		GsSetLsMatrix(&ls);
+		GsSortObject4(&VS_D_80072A50[VS_D_80070B10[MAIN_D_801352E2][i]].obj, &VS_D_80071764[ACTIVE_FRAMEBUFFER], 9, getScratchAddr(0));
+	}
+	GsSortOt(&VS_D_80071764[ACTIVE_FRAMEBUFFER], ACTIVE_ORDERING_TABLE);
+	GsSetProjection(VIEWPORT_DISTANCE);
+	GsSetRefView2(&GS_VIEWPOINT);
+}
 
 void VS_removeResultModelScene(void)
 {

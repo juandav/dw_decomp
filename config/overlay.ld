@@ -361,8 +361,6 @@ SECTIONS
 			. = ALIGN(., 4);
 			build/src/std/std_effect.c.o(.rodata.*);
 			. = ALIGN(., 4);
-			KEEP(build/asm/std/data/26E58.rodata.s.o(.rodata.*));
-			. = ALIGN(., 4);
 
 			build/src/std/std_setup.c.o(.data.*);
 			. = ALIGN(., 4);
