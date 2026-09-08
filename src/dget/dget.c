@@ -253,7 +253,88 @@ void buildScheduleEntries(void)
 
 extern void MAIN_func_80101EF8(int32_t, int32_t);
 
-INCLUDE_ASM("asm/dget/nonmatchings/dget", initTournamentInfo);
+static void initTournamentInfo__garbage__(void)
+{
+	int32_t v0;
+	int32_t v1;
+	int32_t v2;
+	int32_t v3;
+	int32_t v4;
+	int32_t v5;
+	int32_t v6;
+	int32_t v7;
+
+	v0 = TOURNAMENT_ARRAY[0] + 0;
+	v1 = TOURNAMENT_ARRAY[1] + 1;
+	v2 = TOURNAMENT_ARRAY[2] + 2;
+	v3 = TOURNAMENT_ARRAY[0] + 3;
+	v4 = TOURNAMENT_ARRAY[1] + 4;
+	v5 = TOURNAMENT_ARRAY[2] + 5;
+	v6 = TOURNAMENT_ARRAY[0] + 6;
+	v7 = TOURNAMENT_ARRAY[1] + 7;
+	TOURNAMENT_ARRAY[0] = (uint8_t)((v0 * v1) + v2);
+	TOURNAMENT_ARRAY[1] = (uint8_t)((v1 * v2) + v3);
+	TOURNAMENT_ARRAY[2] = (uint8_t)((v2 * v3) + v4);
+	TOURNAMENT_ARRAY[0] = (uint8_t)((v3 * v4) + v5);
+	TOURNAMENT_ARRAY[1] = (uint8_t)((v4 * v5) + v6);
+	TOURNAMENT_ARRAY[2] = (uint8_t)((v5 * v6) + v7);
+	TOURNAMENT_ARRAY[0] = (uint8_t)((v6 * v7) + v0);
+	TOURNAMENT_ARRAY[1] = (uint8_t)((v7 * v0) + v1);
+}
+void initTournamentInfo(int32_t arg)
+{
+	uint8_t *saved;
+	uint8_t *jumpTable;
+	uint8_t *entryPtr;
+	uint8_t entry;
+	int32_t boxId;
+	int32_t slot;
+	int32_t stat;
+	int16_t yOff;
+	int16_t x;
+	int16_t y;
+	RECT rect1;
+	RECT rect2;
+
+	MAIN_D_801353B0 = arg;
+	if (arg != 0) {
+		boxId = 0xe1;
+		stat = readPStat(PSTAT_254);
+		setupBoxOrigin(stat, &rect2);
+		yOff = -0x4f;
+		slot = 8;
+	} else {
+		x = UI_BOX_DATA[2].finalPos.x + 4;
+		y = UI_BOX_DATA[2].finalPos.y + 3;
+		x = x + TOURNAMENT_SELECTED_COLUMN * 51 + 3;
+		y = y + TOURNAMENT_SELECTED_ROW * 16 + 0x16;
+		rect2.x = x;
+		rect2.y = y;
+		rect2.w = 0x2a;
+		rect2.h = 0xd;
+		boxId = 0xc1;
+		yOff = -0x31;
+		slot = 0;
+
+	}
+	rect1.x = -0x7e;
+	rect1.y = yOff;
+	rect1.w = 0xfc;
+	rect1.h = 0x63;
+	createTextbox(3, boxId, &rect1, &rect2, tickTournamentInfo,
+		      renderTournamentInfo);
+	registerTextbox(3, slot, 7, 0, 0);
+
+	saved = MAIN_D_80134FDC;
+	entryPtr = TOURNAMENT_ARRAY + TOURNAMENT_SELECTED_COLUMN * 6;
+	entry = entryPtr[TOURNAMENT_SELECTED_ROW];
+	entry &= 0x3f;
+	jumpTable = getCupDataJumpTable(10, entry);
+	MAIN_D_80134FDC = getCupDataJumpTableEntry(jumpTable, 0) + 2;
+	MAIN_func_80101EF8(3, 0xff);
+	ACTIVE_INSTRUCTION = 0x64;
+	MAIN_D_80134FDC = saved;
+}
 
 int32_t tournamentCheckFair(uint8_t value)
 {
