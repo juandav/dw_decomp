@@ -121,6 +121,9 @@ void isSoundLoaded(int32_t isAsync, int32_t soundId);
 void setFishingEnabled();
 void setFishingDisabled();
 void handleEatingPoop();
+int16_t entityCheckCollision(Entity *source, Entity *entity, int32_t arg2,
+			     int32_t arg3);
+int32_t random(int32_t limit);
 void writePStat(int32_t id, int32_t value);
 int32_t readPStat(int32_t id);
 void addTamerLevel(int32_t chance, int32_t amount);
@@ -813,9 +816,167 @@ void tickPartnerDying2(void)
 	}
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/partner", tickPartnerWalking);
+void tickPartnerWalking(void)
+{
+	EntityAnim *anim;
+	int32_t isUnhappy;
+	int8_t closeness;
+	int8_t collision;
 
-INCLUDE_ASM("asm/main/nonmatchings/partner", getPartnerTamerCloseness);
+	anim = &PARTNER_ENTITY.digimonEntity.entity.anim;
+	closeness = getPartnerTamerCloseness();
+	isUnhappy = PARTNER_PARA.condition & 0x10;
+
+	if (closeness == 0) {
+		if (((anim->animId == 2) || (anim->animId == 3)) &&
+		    (isUnhappy == 0)) {
+			if (anim->loopCount == 0xff) {
+				anim->loopCount = 1;
+			}
+			if (anim->loopCount == 0) {
+				PARTNER_ANIMATION = 4;
+			}
+		}
+		else if ((anim->animId != 4) && (isUnhappy == 0)) {
+			PARTNER_ANIMATION = 4;
+		}
+		else {
+			if (isUnhappy == 0) {
+				PARTNER_ANIMATION = 4;
+			}
+			else {
+				PARTNER_ANIMATION = 2;
+			}
+			if (PARTNER_ANIMATION != anim->animId) {
+				startAnimation(&PARTNER_ENTITY.digimonEntity.entity,
+					       PARTNER_ANIMATION);
+			}
+		}
+		PARTNER_IS_STANDING_STILL = 1;
+	}
+	else if (closeness == 1) {
+		if (anim->animId == 4) {
+			setPartnerSlowWalking();
+		}
+		else if ((anim->animId != 2) && (anim->animId != 3)) {
+			if (anim->loopCount == 0xff) {
+				anim->loopCount = 1;
+			}
+			if (anim->animFrame >= anim->frameCount) {
+				setPartnerSlowWalking();
+			}
+		}
+		else if (anim->loopCount == 0) {
+			setPartnerSlowWalking();
+		}
+
+		EMOTION_ANIM_TIMEOUT = -1;
+		PARTNER_IS_STANDING_STILL = 1;
+	}
+	else if (closeness == 2) {
+		if ((anim->animId == 0) || (anim->animId == 1)) {
+			if (PARTNER_IS_STANDING_STILL != 2) {
+				updateConditionAnimation();
+			}
+		}
+
+		if ((anim->animId > 1) && (anim->animId < 5)) {
+			collision = entityCheckCollision(NULL,
+					 &PARTNER_ENTITY.digimonEntity.entity,
+					 0, 0);
+			if (anim->loopCount == 0xff) {
+				anim->loopCount = 1;
+			}
+			if ((anim->loopCount == 0) || (collision == 0)) {
+				EMOTION_ANIM_TIMEOUT = random(5) + 1;
+				setPartnerIdle();
+				STOP_DISTANCE_TIMER = 0;
+			}
+		}
+
+		if ((anim->animId == 0) || (anim->animId == 1)) {
+			if (STOP_DISTANCE_TIMER >
+			    anim->frameCount * EMOTION_ANIM_TIMEOUT) {
+				updateConditionAnimation();
+			}
+		}
+
+		if ((anim->animId >= 5) && (anim->animId < 8) &&
+		    ((anim->animFlag & 1) != 1)) {
+			EMOTION_ANIM_TIMEOUT = random(5) + 1;
+			setPartnerIdle();
+			STOP_DISTANCE_TIMER = 0;
+		}
+		else if ((anim->animId != 0) && (anim->animId != 1)) {
+			if ((anim->animFlag & 1) != 1) {
+				EMOTION_ANIM_TIMEOUT = random(5) + 1;
+				setPartnerIdle();
+				STOP_DISTANCE_TIMER = 0;
+			}
+		}
+
+		STOP_DISTANCE_TIMER++;
+		PARTNER_IS_STANDING_STILL = 2;
+	}
+
+	if (PARTNER_ANIMATION != anim->animId) {
+		startAnimation(&PARTNER_ENTITY.digimonEntity.entity,
+			       PARTNER_ANIMATION);
+		STOP_DISTANCE_TIMER = 0;
+	}
+
+	if ((TAMER_ENTITY.entity.anim.animId == 2) &&
+	    (getItemCount(0x25) != 0)) {
+		if (HEALTH_SHOE_FRAMES >= 20) {
+			PARTNER_ENTITY.digimonEntity.stats.current.currentHP += 5;
+			PARTNER_ENTITY.digimonEntity.stats.current.currentMP += 5;
+
+			if (PARTNER_ENTITY.digimonEntity.stats.current.currentHP >
+			    PARTNER_ENTITY.digimonEntity.stats.base.hp) {
+				PARTNER_ENTITY.digimonEntity.stats.current.currentHP =
+					PARTNER_ENTITY.digimonEntity.stats.base.hp;
+			}
+			if (PARTNER_ENTITY.digimonEntity.stats.current.currentMP >
+			    PARTNER_ENTITY.digimonEntity.stats.base.mp) {
+				PARTNER_ENTITY.digimonEntity.stats.current.currentMP =
+					PARTNER_ENTITY.digimonEntity.stats.base.mp;
+			}
+			HEALTH_SHOE_FRAMES = 0;
+		}
+		HEALTH_SHOE_FRAMES++;
+	}
+}
+
+int32_t getPartnerTamerCloseness(void)
+{
+	int32_t distanceZ;
+	VECTOR *tamerLocation;
+	VECTOR *partnerLocation;
+	int32_t distance;
+	int32_t distanceX;
+	int32_t sprintDistanceSquared;
+	int32_t walkDistance;
+	int32_t sprintDistance;
+
+	tamerLocation = &TAMER_ENTITY.entity.posData->location;
+	partnerLocation = &PARTNER_ENTITY.digimonEntity.entity.posData->location;
+	distanceZ = (tamerLocation->vz - partnerLocation->vz) * (tamerLocation->vz - partnerLocation->vz);
+	distanceX = (tamerLocation->vx - partnerLocation->vx) * (tamerLocation->vx - partnerLocation->vx);
+	distance = distanceX + distanceZ;
+
+	walkDistance = DIGIMON_DATA[PARTNER_ENTITY.digimonEntity.entity.type].radius;
+	sprintDistance = walkDistance;
+	walkDistance = (walkDistance * 5 / 2) * (walkDistance * 5 / 2);
+	sprintDistanceSquared = (sprintDistance * 7 / 2) * (sprintDistance * 7 / 2);
+
+	if (sprintDistanceSquared < distance) {
+		return 0;
+	}
+	if (distance >= walkDistance) {
+		return 1;
+	}
+	return 2;
+}
 
 void setPartnerSlowWalking(void)
 {
@@ -901,7 +1062,30 @@ void setPartnerState(int8_t state)
 	PARTNER_SUB_STATE = 0;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/partner", checkEatDistance);
+int32_t checkEatDistance(int32_t distance)
+{
+	int32_t tamerX;
+	int32_t tamerZ;
+	int32_t partnerX;
+	int32_t partnerZ;
+	int32_t targetDistance;
+	int32_t partnerDistance;
+
+	targetDistance = distance * 200 / 10 + 160;
+	tamerX = (int16_t)TAMER_ENTITY.entity.posData->location.vx;
+	tamerZ = (int16_t)TAMER_ENTITY.entity.posData->location.vz;
+	partnerX = (int16_t)PARTNER_ENTITY.digimonEntity.entity.posData->location.vx;
+	partnerZ = (int16_t)PARTNER_ENTITY.digimonEntity.entity.posData->location.vz;
+	partnerDistance = (tamerX - partnerX) * (tamerX - partnerX) + (tamerZ - partnerZ) * (tamerZ - partnerZ);
+	if (partnerDistance < 0) {
+		partnerDistance = -partnerDistance;
+	}
+	if (targetDistance * targetDistance >= partnerDistance) {
+		return 1;
+	} else {
+		return 0;
+	}
+}
 
 void MAIN_func_800DF5A0(void)
 {
