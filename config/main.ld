@@ -452,13 +452,15 @@ SECTIONS
         . = ALIGN(., 4);
         build/asm/main/data/map.data.s.o(.data.*)
         . = ALIGN(., 4);
+        build/src/main/inventory.c.o(.data.*)
+        . = ALIGN(., 4);
+        build/asm/main/data/clock.data.s.o(.data.*)
+        . = ALIGN(., 4);
         build/src/main/map_object.c.o(.data.*)
         . = ALIGN(., 4);
         build/asm/main/data/evolution.data.s.o(.data.*)
         . = ALIGN(., 4);
         build/asm/main/data/utils.data.s.o(.data.*)
-        . = ALIGN(., 4);
-        build/src/main/inventory.c.o(.data.*)
         . = ALIGN(., 4);
         build/src/main/clock.c.o(.data.*)
         . = ALIGN(., 4);
@@ -550,7 +552,7 @@ SECTIONS
         . = ALIGN(., 4);
         build/asm/main/data/map.sdata.s.o(.sdata.*)
         . = ALIGN(., 4);
-        build/asm/main/data/inventory.sdata.s.o(.sdata.*)
+        build/src/main/inventory.c.o(.sdata.*)
         . = ALIGN(., 4);
         build/src/main/clock.c.o(.sdata.*)
         . = ALIGN(., 4);
@@ -598,6 +600,10 @@ SECTIONS
         build/src/main/sound.c.o(.sbss.*)
         . = ALIGN(., 4);
         build/build/generated/unk_0x80134D9C.sbss.s.o(.sbss.*)
+        . = ALIGN(., 4);
+        build/src/main/inventory.c.o(.sbss.*)
+        . = ALIGN(., 4);
+        build/build/generated/unk_0x80134E1C.sbss.s.o(.sbss.*)
         . = ALIGN(., 4);
         KEEP(build/src/main/map_object.c.o(.sbss.*))
         . = ALIGN(., 4);
