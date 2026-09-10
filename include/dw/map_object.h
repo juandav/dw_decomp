@@ -7,7 +7,16 @@
 
 #include <dw/types.h>
 
+#define NUM_DOOR_MAPDATA	24
 #define NUM_CHESTS		8
+
+typedef struct {
+	uint8_t modelId[6];
+	int16_t posX[6];
+	int16_t posY[6];
+	int16_t posZ[6];
+	int16_t rotation[6];
+} DoorStruct;
 
 typedef struct {
 	VECTOR location;
@@ -22,6 +31,7 @@ typedef struct {
 	uint16_t padding;
 } Chest;
 
+extern DoorStruct DOOR_MAPDATA[NUM_DOOR_MAPDATA];
 extern Chest CHEST_ARRAY[NUM_CHESTS];
 extern GsDOBJ2 MEDAL_OBJECT;
 extern GsCOORDINATE2 MEDAL_COORDINATES;
