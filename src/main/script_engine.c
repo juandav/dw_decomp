@@ -4,21 +4,12 @@
 #include <dw/map_object.h>
 #include <dw/partner.h>
 #include <dw/script.h>
+#include <dw/tamer.h>
 
-int32_t tickLookAtEntity(uint32_t scriptId1, uint32_t scriptId2);
-int32_t tickEntitySetRotation(uint32_t scriptId, int16_t rotationY);
-int32_t tickEntityWalkTo(uint8_t scriptId1, uint8_t scriptId2,
-			 int32_t targetX, int32_t targetZ,
-			 int8_t withCamera);
 int32_t tickMoveCameraTo(int32_t x, int32_t y, uint8_t speed);
 int32_t tickMoveCameraToEntity(uint32_t scriptId, uint8_t speed);
-int32_t tickEntityMoveTo(uint32_t scriptId1, uint32_t scriptId2,
-			 int32_t targetX, int32_t targetZ, int32_t speed,
-			 int32_t withCamera);
 int32_t tickMoveObjectTo(uint32_t scriptId1, uint32_t scriptId2,
 			 int32_t angle, int32_t targetX, int32_t targetY);
-int32_t tickEntityMoveToAxis(uint32_t scriptId, int32_t target, int32_t axis,
-			     int32_t speed, int32_t withCamera);
 
 void initializeScripts(void);
 void initializeLoadedNPCModels(void);

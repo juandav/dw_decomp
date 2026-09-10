@@ -9,6 +9,7 @@
 #include <dw/params.h>
 #include <dw/script.h>
 #include <dw/sound.h>
+#include <dw/tamer.h>
 #include <dw/ui.h>
 #include <dw/utils.h>
 
@@ -42,7 +43,6 @@ typedef struct {
 	TextBoxData box[6];
 } TextBoxTable;
 
-void worldPosToScreenPos2(int16_t *a, int16_t *b, int16_t *c);
 void renderSelectionCursor(int32_t a0, int32_t a1, int32_t a2, int32_t a3,
 			   int32_t a4);
 int32_t MAIN_func_80106730(uint8_t op, uint32_t lhs, uint32_t rhs);

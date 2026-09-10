@@ -22,6 +22,7 @@
 #include <dw/partner.h>
 #include <dw/pstat.h>
 #include <dw/std.h>
+#include <dw/tamer.h>
 #include <dw/types.h>
 #include <dw/ui.h>
 #include <dw/utils.h>
@@ -143,7 +144,6 @@ void fadeToBlack(int32_t frames);
 void fadeFromBlack(int32_t frames);
 void changeMap(uint8_t mapId, uint8_t exitId);
 void addMapNameObject(uint8_t mapId);
-void checkMapInteraction(void);
 void renderString(int32_t, int32_t, int32_t, int32_t, int32_t, int32_t,
                   int32_t, int32_t, int32_t);
 void renderUIBox(int32_t id);
@@ -222,43 +222,22 @@ void tickMachinedramonSpawn(void);
 void tickBattleLostLife(void);
 void tickAwardSomething(void);
 
-void initializeTamer(int32_t id, int32_t x, int32_t y, int32_t z,
-                     int32_t rx, int32_t ry, int32_t rz);
 void tickTamer(int16_t instanceId);
 void renderItemPickupTextbox(int32_t instanceId);
 void renderAwardSomethingTextbox(int32_t instanceId);
 void setTamerDirection(int32_t direction);
 void setupTamerOnWarp(int32_t x, int32_t y, int32_t z, int32_t rotationY);
-int32_t tickEntitySetRotation(uint32_t scriptId, int16_t rotationY);
 int16_t getMapRotation(void);
-Entity *getEntityFromScriptId(uint8_t *scriptId);
-int32_t startBattle(int16_t instanceId);
 void advanceBattleTime(int32_t result);
 void addTamerLevel(int32_t chance, int32_t amount);
 void checkItemPickup(void);
 void checkMedalConditions(void);
 uint8_t checkChestCollision(void);
-void setTamerState(int8_t state);
-void setFullState(int8_t state, int8_t substate);
-int32_t getTamerState(void);
-void startAnimationTamer(int32_t animId);
 void checkPendingAwards(void);
-int32_t isTrainingComplete(void);
-int32_t tickEntityWalkTo(uint8_t scriptId1, uint8_t scriptId2,
-			 int32_t targetX, int32_t targetZ,
-			 int8_t withCamera);
-int32_t tickLookAtEntity(uint8_t scriptId1, uint8_t scriptId2);
-int32_t tickEntityMoveTo(uint8_t scriptId1, uint8_t scriptId2,
-			 int32_t targetX, int32_t targetZ, int8_t speed,
-			 int8_t withCamera);
-int32_t tickEntityMoveToAxis(uint8_t scriptId, int32_t target, int32_t axis,
-			     int32_t speed, int8_t withCamera);
-void loadMapEntities(uint8_t *data, int32_t mapId, int32_t warpIdx);
 void tickPickupItem(void);
 void tickTakeChest(void);
 void tickAwardSomething(void);
 void tickWalkingState(void);
-void worldPosToScreenPos2(int16_t *x, int16_t *y, int16_t *z);
 void tickChangeMap(void);
 void tickPraiseScold(int8_t state, int8_t unused);
 void tickOpening(void);
@@ -314,23 +293,23 @@ static void *tamer_functions[] = {
 	initializeTamer,
 };
 
-void initializeTamer(int32_t id, int32_t x, int32_t y, int32_t z,
-                     int32_t rx, int32_t ry, int32_t rz)
+void initializeTamer(int32_t type, int32_t posX, int32_t posY, int32_t posZ,
+		     int32_t rotX, int32_t rotY, int32_t rotZ)
 {
-	extern void setEntityPosition(int32_t entityId, int32_t x, int32_t y,
-	                              int32_t z);
+	extern void setEntityPosition(int32_t entityId, int32_t posX,
+				      int32_t posY, int32_t posZ);
 	int32_t i;
 
 	PLAYER_SHADOW_ENABLED = 1;
-	thunkLoadMMD(id, 2);
+	thunkLoadMMD(type, 2);
 	ENTITY_TABLE[0] = &TAMER_ENTITY.entity;
-	initializeDigimonObject(id, 0, (TickFunction)tickTamer);
-	setEntityPosition(0, x, y, z);
-	setEntityRotation(0, rx, ry, rz);
+	initializeDigimonObject(type, 0, (TickFunction)tickTamer);
+	setEntityPosition(0, posX, posY, posZ);
+	setEntityRotation(0, rotX, rotY, rotZ);
 	setupEntityMatrix(0);
-	STORED_TAMER_POS.vx = x;
-	STORED_TAMER_POS.vy = y;
-	STORED_TAMER_POS.vz = z;
+	STORED_TAMER_POS.vx = posX;
+	STORED_TAMER_POS.vy = posY;
+	STORED_TAMER_POS.vz = posZ;
 	startAnimation(ENTITY_TABLE[0], 0);
 	GAME_STATE = 0;
 	ENTITY_TABLE[0]->isOnMap = 1;
@@ -1044,9 +1023,14 @@ int32_t tickEntitySetRotation(uint32_t scriptId, int16_t rotationY)
 	return 1;
 }
 
-int32_t tickEntityMoveTo(uint8_t scriptId1, uint8_t scriptId2,
-			 int32_t targetX, int32_t targetZ, int8_t speed,
-			 int8_t withCamera)
+int32_t tickEntityMoveTo(scriptId1, scriptId2, targetX, targetZ, speed,
+			 withCamera)
+	uint8_t scriptId1;
+	uint8_t scriptId2;
+	int32_t targetX;
+	int32_t targetZ;
+	int8_t speed;
+	int8_t withCamera;
 {
 	extern void setEntityPosition(int32_t entityId, int32_t x, long y,
 	                              int32_t z);
@@ -1119,8 +1103,12 @@ int32_t tickEntityMoveTo(uint8_t scriptId1, uint8_t scriptId2,
 	return 0;
 }
 
-int32_t tickEntityMoveToAxis(uint8_t scriptId, int32_t target, int32_t axis,
-			     int32_t speed, int8_t withCamera)
+int32_t tickEntityMoveToAxis(scriptId, target, axis, speed, withCamera)
+	uint8_t scriptId;
+	int32_t target;
+	int32_t axis;
+	int32_t speed;
+	int8_t withCamera;
 {
 	extern void setEntityPosition(int32_t entityId, int32_t x, int32_t y,
 	                              int32_t z);

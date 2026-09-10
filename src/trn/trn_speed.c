@@ -5,6 +5,7 @@
 #include <dw/partner.h>
 #include <dw/script.h>
 #include <dw/sound.h>
+#include <dw/tamer.h>
 #include <dw/trn.h>
 #include <dw/types.h>
 #include <dw/ui.h>
@@ -18,7 +19,6 @@ extern int16_t MAIN_D_8013537A;
 extern int16_t MAIN_D_8013537C;
 
 void createCameraMovement(VECTOR *pos, int32_t speed);
-int32_t tickEntityWalkTo(uint8_t scriptId1, uint8_t scriptId2, int32_t targetX, int32_t targetZ, int8_t withCamera);
 void setCameraFollowPlayer(void);
 void unsetCameraFollowPlayer(void);
 void TRN_saveTrainingStartTime(void);

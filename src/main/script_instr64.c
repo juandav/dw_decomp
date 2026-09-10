@@ -9,6 +9,7 @@
 #include <dw/script.h>
 #include <dw/sound.h>
 #include <dw/sound_async.h>
+#include <dw/tamer.h>
 #include <dw/tournament.h>
 #include <dw/trn.h>
 #include <dw/trn2.h>
@@ -28,7 +29,6 @@ void spawnSpriteAtEntity(int32_t entId, int32_t sprite, int32_t param);
 void setRectImpassible(int16_t x, int16_t y, int8_t w, int8_t h);
 void addEntityText(int32_t a0, int32_t a1, int32_t a2, int32_t a3,
 		   int32_t a4);
-int32_t startBattle(int16_t instanceId);
 void setLoopCountToOne(int32_t a0);
 void MAIN_func_800D9360(int32_t a0);
 int32_t loadTextureFile(char *path, uint32_t *outTPage, uint32_t *outClut);

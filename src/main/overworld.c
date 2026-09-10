@@ -10,6 +10,7 @@
 #include <dw/move.h>
 #include <dw/std.h>
 #include <dw/sound.h>
+#include <dw/tamer.h>
 #include <dw/ui.h>
 
 typedef struct {
@@ -201,7 +202,6 @@ int32_t isTriggerSet(int32_t triggerId);
 void callScriptSection(uint16_t scriptId, uint32_t scriptSection,
 		       uint32_t param);
 void startNPCAnimation(uint8_t scriptId, int32_t animId);
-void setTamerState(int32_t state);
 void drawString(char *text, int32_t color, int32_t pos);
 void drawInventoryText(void);
 void closeTriangleMenu(void);
@@ -248,7 +248,6 @@ void buildMapOverlayPrim(POLY_FT4 *prim, LocalMapObjectInstance *inst,
 			 int8_t mode);
 void buildSnowflakePrim(POLY_FT4 *prim, LocalMapObjectInstance *inst,
 			LocalMapObject *obj);
-Entity *getEntityFromScriptId(uint8_t *scriptId);
 void tickNPCBattle(int32_t instanceId);
 void tickWaypointAI(MapDigimonEntity *mapDigimon, Entity *entity,
 		    int32_t instanceId);
@@ -279,7 +278,6 @@ void tickTrackingTamer2(MapDigimonEntity *mapDigimon, Entity *entity,
 void tickTrackingTamer4(MapDigimonEntity *mapDigimon, Entity *entity,
 			TamerEntity *tamer, int32_t instanceId);
 int32_t entityCheckCollision(Entity *a, Entity *entity, int32_t c, int32_t d);
-int32_t getTamerState(void);
 void removeTriangleMenu(void);
 void closeInventoryBoxes(void);
 void removeUIBox1(void);

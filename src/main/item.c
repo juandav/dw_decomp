@@ -14,6 +14,7 @@
 #include <dw/particle.h>
 #include <dw/partner.h>
 #include <dw/script.h>
+#include <dw/tamer.h>
 #include <dw/types.h>
 #include <dw/world_object.h>
 

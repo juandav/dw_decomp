@@ -121,7 +121,6 @@ void closeBox(int32_t boxId);
 void MAIN_func_801062F8(int32_t owner);
 void MAIN_func_800FCCFC(ItemMenuBox *box, int32_t startRow, int32_t style);
 void startAnimationTamer(int32_t animId);
-void setTamerState(int8_t state);
 void tickScriptDialogueBox(void);
 void renderScriptDialogueBox(void);
 void returnFromScriptFile(void);

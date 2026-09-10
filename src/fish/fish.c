@@ -16,6 +16,7 @@
 #include <dw/params.h>
 #include <dw/script.h>
 #include <dw/sound.h>
+#include <dw/tamer.h>
 #include <dw/ui.h>
 
 #include "common.h"

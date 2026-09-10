@@ -19,6 +19,7 @@
 #include <dw/params.h>
 #include <dw/partner.h>
 #include <dw/sound.h>
+#include <dw/tamer.h>
 #include <dw/world_object.h>
 
 #include "common.h"
@@ -229,7 +230,6 @@ extern int32_t BUTTERFLY_ID;
 extern int32_t IS_SCRIPT_PAUSED;
 extern Stats DEATH_STATS;
 
-int32_t getTamerState(void);
 void writePStat(int32_t id, uint8_t value);
 void callScriptSection(int32_t a, int32_t b, int32_t c);
 ModelComponent *thunkLoadMMD(int32_t digiType, int32_t modelType);
@@ -240,7 +240,6 @@ void getModelTile(VECTOR *pos, int16_t *outTileX, int16_t *outTileY);
 void setTrigger(uint16_t flag);
 void createCloudFX(int16_t *pos);
 void updateTimeOfDay(void);
-void setTamerState(int8_t state);
 void clearTextArea(void);
 void setTextColor(int32_t color);
 void drawString(char *str, int32_t x, int32_t y);

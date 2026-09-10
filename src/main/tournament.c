@@ -1,6 +1,7 @@
 #include <dw/clock.h>
 #include <dw/entity.h>
 #include <dw/pstat.h>
+#include <dw/tamer.h>
 #include <dw/tournament.h>
 #include <dw/trigger.h>
 #include <dw/types.h>
@@ -27,7 +28,6 @@ int32_t hasMedal(uint16_t medal);
 int32_t getCardAmount(uint8_t cardId);
 void unsetTrigger(uint16_t trigger);
 int32_t readPStat(int32_t id);
-int32_t getTamerState(void);
 int32_t getPartnerState(void);
 void callScriptSection(int32_t, int32_t, int32_t);
 void updateMapLightState(void);

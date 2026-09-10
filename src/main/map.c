@@ -1,21 +1,22 @@
 #include <string.h>
-#include <dw/item.h>
 
+#include <libetc.h>
 #include <libgpu.h>
 #include <libgs.h>
 #include <mwinline_n.h>
-#include <libetc.h>
 
 #include <dw/clock.h>
 #include <dw/entity.h>
 #include <dw/fade.h>
 #include <dw/file.h>
+#include <dw/item.h>
 #include <dw/map.h>
 #include <dw/math.h>
 #include <dw/model.h>
 #include <dw/params.h>
 #include <dw/partner.h>
 #include <dw/script.h>
+#include <dw/tamer.h>
 #include <dw/types.h>
 #include <dw/utils.h>
 #include <dw/world_object.h>
@@ -60,7 +61,6 @@ void checkCurlingMap(int32_t mapId);
 void checkFishingMap(int32_t mapId, int32_t arg1);
 int32_t checkMapCollisionX(Entity *entity, int32_t direction);
 int32_t checkMapCollisionY(Entity *entity, int32_t direction);
-void checkMapInteraction(void);
 void checkShopMap(uint8_t mapId);
 void clearMapDigimon(void);
 void clearMapObjects(uint8_t *instances);
@@ -68,13 +68,11 @@ void clearTextArea(void);
 void drawString(char *text, int32_t x, int32_t y);
 void entityLookAtTile(Entity *entity, int32_t tileX, int32_t tileY);
 void getModelTile(VECTOR *pos, int16_t *outTileX, int16_t *outTileY);
-int32_t getTamerState(void);
 void handleBattleIdle(DigimonEntity *entity, Stats *stats, int32_t flags);
 void initializeLoadedNPCModels(void);
 int32_t isInvisible(Entity *entity);
 void loadDoors(int32_t doorEntryId);
 void loadMapCollisionData(uint8_t *data);
-void loadMapEntities(uint8_t *data, int32_t mapId, uint8_t warpIdx);
 void loadMapImage1(uint8_t *tim);
 void loadMapImage2(uint8_t *tim, int8_t id);
 void loadMapObjects(uint8_t *mapObjects, uint8_t *data, int32_t mapId);

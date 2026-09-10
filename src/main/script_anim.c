@@ -1,6 +1,7 @@
 #include <dw/partner.h>
 #include <dw/params.h>
 #include <dw/script.h>
+#include <dw/tamer.h>
 
 #include "common.h"
 

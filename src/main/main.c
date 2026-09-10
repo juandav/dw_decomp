@@ -14,6 +14,7 @@
 #include <dw/item.h>
 #include <dw/main.h>
 #include <dw/model.h>
+#include <dw/tamer.h>
 #include <dw/types.h>
 #include <dw/world_object.h>
 
@@ -126,8 +127,6 @@ void MAIN_func_800EF38C(void);
 void recalculatePPandArena(void);
 void gameLoop(void);
 void cleanupGame(void);
-void initializeTamer(int32_t id, int32_t x, int32_t y, int32_t z,
-		     int32_t rx, int32_t ry, int32_t rz);
 void initializePartner(int32_t type, int32_t posX, int32_t posY,
 		       int32_t posZ, int32_t rotX, int32_t rotY,
 		       int32_t rotZ);
@@ -135,8 +134,6 @@ void setDigimonRaised(uint16_t type);
 void MAIN_func_800D56E0(void);
 void runMapHeadScript(int32_t scriptId);
 int32_t readPStat(int32_t id);
-int32_t getTamerState(void);
-void setTamerState(int32_t state);
 void stopGameTime(void);
 void fadeFromBlack(int32_t frames);
 void initializeUIBoxData(void);

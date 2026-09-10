@@ -3,6 +3,7 @@
 #include <dw/partner.h>
 #include <dw/script.h>
 #include <dw/sound.h>
+#include <dw/tamer.h>
 #include <dw/trn2.h>
 #include <dw/types.h>
 #include <dw/ui.h>
@@ -30,7 +31,6 @@ extern int16_t MAIN_D_801353CC;
 
 void createCameraMovement(VECTOR *pos, int32_t speed);
 void loadMapObjectPosition(int16_t *xData, int16_t *yData, int16_t startIndex, int16_t count);
-int32_t tickEntityWalkTo(uint8_t scriptId1, uint8_t scriptId2, int32_t targetX, int32_t targetZ, int8_t withCamera);
 void setMapObjectsFlag(int16_t start, int16_t count, int32_t flag);
 void setCameraFollowPlayer(void);
 void createParticleFX(uint8_t kind, int32_t count, void *arg2, Entity *entity, int32_t arg4);

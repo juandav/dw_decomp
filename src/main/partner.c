@@ -14,6 +14,7 @@
 #include <dw/partner.h>
 #include <dw/pstat.h>
 #include <dw/std.h>
+#include <dw/tamer.h>
 #include <dw/ui.h>
 #include <dw/utils.h>
 
@@ -83,7 +84,6 @@ int32_t entityIsOffScreen(Entity *entity, int32_t width, int32_t height);
 void tickConditionBoundaries();
 void stopGameTime();
 void unsetCameraFollowPlayer();
-void setTamerState(int32_t state);
 void tickPartnerWaypoints();
 void entityLookAtLocation(Entity *entity, VECTOR *pos);
 void playSound(int32_t vabId, uint32_t note);
@@ -100,14 +100,10 @@ void handleSpecialEvolutions(int32_t mode, Entity* partner);
 void startGameTime();
 void updateTimeOfDay();
 void handlePraiseScold();
-void startAnimationTamer(int32_t animId);
 int32_t partnerWillRefuseItem();
 void removeOneSelectedItem();
 void partnerHandleFoodFeed(int32_t type);
 void createCameraMovement(VECTOR* pos, int32_t instanceId);
-int32_t tickEntityWalkTo(uint8_t scriptId1, uint8_t scriptId2,
-			 int32_t targetX, int32_t targetZ,
-			 int8_t withCamera);
 void handleToilet();
 void getModelTile(VECTOR *pos, int16_t *outTileX, int16_t *outTileY);
 int32_t createPoopPile(int16_t tileX, int16_t tileY);

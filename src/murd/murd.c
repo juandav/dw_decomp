@@ -14,6 +14,7 @@
 #include <dw/partner.h>
 #include <dw/script.h>
 #include <dw/sound.h>
+#include <dw/tamer.h>
 #include <dw/types.h>
 #include <dw/ui.h>
 #include <dw/utils.h>
@@ -68,7 +69,6 @@ int32_t worldPosToScreenPos(SVECTOR *pos, DVECTOR *out);
 int32_t getDistance(int32_t x, int32_t y, int32_t z);
 void renderParticleFlash(int16_t *params);
 void renderDropShadow(Entity *entity);
-void setFullState(int32_t state, int32_t value);
 
 void MAIN_func_800D91EC(int32_t message, int32_t value);
 void MAIN_func_800D91FC(int32_t value);
