@@ -454,7 +454,9 @@ SECTIONS
         . = ALIGN(., 4);
         build/src/main/inventory.c.o(.data.*)
         . = ALIGN(., 4);
-        build/asm/main/data/clock.data.s.o(.data.*)
+        build/src/main/clock.c.o(.data.*)
+        . = ALIGN(., 4);
+        build/asm/main/data/entity_text.data.s.o(.data.*)
         . = ALIGN(., 4);
         build/src/main/map_object.c.o(.data.*)
         . = ALIGN(., 4);
@@ -462,11 +464,7 @@ SECTIONS
         . = ALIGN(., 4);
         build/asm/main/data/utils.data.s.o(.data.*)
         . = ALIGN(., 4);
-        build/src/main/clock.c.o(.data.*)
-        . = ALIGN(., 4);
         build/src/main/partner.c.o(.data.*)
-        . = ALIGN(., 4);
-        build/src/main/entity_text.c.o(.data.*)
         . = ALIGN(., 4);
         build/src/main/evolution.c.o(.data.*)
         . = ALIGN(., 4);

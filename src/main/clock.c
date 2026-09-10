@@ -1,29 +1,11 @@
 #include <libgs.h>
+#include <libgte.h>
+
 #include <dw/clock.h>
 #include <dw/params.h>
 #include <dw/pstat.h>
+#include <dw/script.h>
 #include <dw/world_object.h>
-
-#include "common.h"
-
-
-extern GsSPRITE CLOCK_SPRITE;
-
-extern int16_t LAST_HANDLED_FRAME;
-extern int8_t GAME_STATE;
-extern uint8_t MAP_LAYER_ENABLED;
-uint8_t CLOCK_TEXCOORD_U[2][4] = {
-	{0x80, 0xa0, 0x80, 0xa0},
-	{0xa0, 0x80, 0xa0, 0x80}
-};
-uint8_t CLOCK_TEXCOORD_V[2][4] = {
-	{0xc0, 0xc0, 0xd0, 0xc0},
-	{0xd0, 0xe0, 0xd0, 0xe0}
-};
-extern GsOT *ACTIVE_ORDERING_TABLE;
-
-extern uint8_t CLOCK_HOUR_X[24];
-extern uint8_t CLOCK_HOUR_Y[24];
 
 void renderRectPolyFT4(int32_t posX, int32_t posY,
 		       int32_t width, int32_t height,
@@ -31,15 +13,41 @@ void renderRectPolyFT4(int32_t posX, int32_t posY,
 		       int32_t texturePage, int32_t clut,
 		       int32_t zIndex, int32_t flag);
 
-void dailyPStatTrigger(void);
 void updateTimeOfDay();
 int32_t isFishing();
-int32_t readPStat(int32_t id);
-void writePStat(int32_t id, int32_t value);
 void addTamerLevel(int32_t chance, int32_t amount);
 void updateBGM();
 void renderStatusBars(int32_t isGameTimeRunning);
-void* clock_functions[] = {
+
+extern GsSPRITE CLOCK_SPRITE;
+extern int16_t LAST_HANDLED_FRAME;
+extern int8_t GAME_STATE;
+extern uint8_t MAP_LAYER_ENABLED;
+extern GsOT *ACTIVE_ORDERING_TABLE;
+
+uint8_t CLOCK_TEXCOORD_U[2][4] = {
+	{ 128, 160, 128, 160 },
+	{ 160, 128, 160, 128 }
+};
+
+uint8_t CLOCK_TEXCOORD_V[2][4] = {
+	{ 192, 192, 208, 192 },
+	{ 208, 224, 208, 224 }
+};
+
+uint8_t CLOCK_HOUR_X[24] = {
+	20, 23, 26, 31, 34, 36, 36, 36,
+	34, 31, 26, 23, 20, 17, 14,  9,
+	 6,  4,  4,  4,  6,  9, 14, 17,
+};
+
+uint8_t CLOCK_HOUR_Y[24] = {
+	 5,  6 , 6 , 8, 12, 15, 19, 23,
+	26, 30, 32, 32, 33, 32, 32, 30,
+	26, 23, 19, 15, 12,  8,  6,  6,
+};
+
+static void *clock_text_order[] = {
 	startGameTime,
 	stopGameTime,
 	updateMinuteHand,
@@ -49,6 +57,11 @@ void* clock_functions[] = {
 	tickGameClock,
 	addClock,
 	initializeClockData
+};
+
+static void *clock_data_order[] = {
+	CLOCK_HOUR_Y,
+	CLOCK_HOUR_X,
 };
 
 void addClock(void)
@@ -204,7 +217,7 @@ void advanceToTime(int32_t hour, int16_t minute)
     DAY += 1;
     PARTNER_PARA.age += 1;
     dailyPStatTrigger();
-    if (DAY >= 0x1E)
+    if (DAY >= 30)
     {
       DAY = 0;
       YEAR += 1;
@@ -212,8 +225,8 @@ void advanceToTime(int32_t hour, int16_t minute)
   }
   HOUR = hour % 24;
   MINUTE = minute;
-  frame = minute * 0x14;
-  new_var2 = HOUR * 0x4B0;
+  frame = minute * 20;
+  new_var2 = HOUR * 1200;
   CURRENT_FRAME = (new_var = frame) + new_var2;
   CLOCK_SPRITE.rotate = minute * 0x6000;
   updateTimeOfDay(frame, minute);
@@ -236,15 +249,15 @@ void initializeClockData(void)
 	CLOCK_SPRITE.y = -66;
 	CLOCK_SPRITE.w = 8;
 	CLOCK_SPRITE.h = 16;
-	CLOCK_SPRITE.tpage = GetTPage(0, 0, 0x380, 0x1c0);
-	CLOCK_SPRITE.cx = 0x100;
-	CLOCK_SPRITE.cy = 0x1f3;
-	CLOCK_SPRITE.u = 0x78;
-	CLOCK_SPRITE.v = 0xc0;
+	CLOCK_SPRITE.tpage = GetTPage(0, 0, 896, 448);
+	CLOCK_SPRITE.cx = 256;
+	CLOCK_SPRITE.cy = 499;
+	CLOCK_SPRITE.u = 120;
+	CLOCK_SPRITE.v = 192;
 	CLOCK_SPRITE.r = CLOCK_SPRITE.g = CLOCK_SPRITE.b = 0x80;
 	CLOCK_SPRITE.mx = 3;
 	CLOCK_SPRITE.my = 13;
-	CLOCK_SPRITE.scalex = CLOCK_SPRITE.scaley = 0x1000;
+	CLOCK_SPRITE.scalex = CLOCK_SPRITE.scaley = ONE;
 	CLOCK_SPRITE.rotate = MINUTE * 0x6000;
 	IS_GAMETIME_RUNNING = 1;
 }
@@ -260,6 +273,7 @@ void renderGameClock(int32_t instanceId)
 	} else {
 		isNight = 1;
 	}
+
 	frame = (CURRENT_FRAME % 16) / 4;
 
 	if (IS_GAMETIME_RUNNING == 0) {
@@ -267,28 +281,39 @@ void renderGameClock(int32_t instanceId)
 	} else {
 		CLOCK_OFFSET_X += 50;
 	}
+
 	if (CLOCK_OFFSET_X > -135) {
 		CLOCK_OFFSET_X = -135;
 	}
+
 	if (CLOCK_OFFSET_X < -220) {
 		CLOCK_OFFSET_X = -220;
 	}
 
-	renderRectPolyFT4(CLOCK_OFFSET_X - 2, -90, 16, 16, 0xc0, 0xe0,
-		GetTPage(0, 0, 0x380, 0x1c0), GetClut(0x100, 0x1f1), 9, 0);
-	renderRectPolyFT4(CLOCK_OFFSET_X + 34, -90, 16, 16, 0xc0, 0xf0,
-		GetTPage(0, 0, 0x380, 0x1c0), GetClut(0x100, 0x1f1), 9, 0);
+	renderRectPolyFT4(CLOCK_OFFSET_X - 2, -90, 16, 16, 192, 224,
+			  GetTPage(0, 0, 896, 448), GetClut(256, 497), 9, 0);
+
+	renderRectPolyFT4(CLOCK_OFFSET_X + 34, -90, 16, 16, 192, 240,
+			  GetTPage(0, 0, 896, 448), GetClut(256, 497), 9, 0);
+
 	renderRectPolyFT4(CLOCK_OFFSET_X + 8, -100, 32, 16,
-		CLOCK_TEXCOORD_U[isNight][frame], CLOCK_TEXCOORD_V[isNight][frame],
-		GetTPage(0, 0, 0x380, 0x1c0), GetClut(0x100, 0x1f2), 9, 0);
-	renderRectPolyFT4(CLOCK_OFFSET_X, -88, 48, 40, 0xd0, 0xd7,
-		GetTPage(0, 0, 0x380, 0x1c0), GetClut(0x100, 0x1f0), 10, 0);
+			  CLOCK_TEXCOORD_U[isNight][frame],
+			  CLOCK_TEXCOORD_V[isNight][frame],
+			  GetTPage(0, 0, 896, 448), GetClut(256, 498), 9, 0);
+
+	renderRectPolyFT4(CLOCK_OFFSET_X, -88, 48, 40, 208, 215,
+			  GetTPage(0, 0, 896, 448), GetClut(256, 496), 10, 0);
+
 	CLOCK_SPRITE.x = CLOCK_OFFSET_X + 23;
 	GsSortSprite(&CLOCK_SPRITE, ACTIVE_ORDERING_TABLE, 9);
+
 	hour = HOUR;
-	renderRectPolyFT4(CLOCK_OFFSET_X + CLOCK_HOUR_X[hour], CLOCK_HOUR_Y[hour] - 88,
-		6, 6, 0xcb, 0xd8,
-		GetTPage(0, 0, 0x380, 0x1c0), GetClut(0x100, 0x1f1), 9, 0);
+
+	renderRectPolyFT4(CLOCK_OFFSET_X + CLOCK_HOUR_X[hour],
+			  CLOCK_HOUR_Y[hour] - 88,
+			  6, 6, 203, 216,
+			  GetTPage(0, 0, 896, 448), GetClut(256, 497), 9, 0);
+
 	renderStatusBars(IS_GAMETIME_RUNNING);
 }
 
