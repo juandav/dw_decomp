@@ -5,6 +5,7 @@
 #include <libgs.h>
 #include <libgte.h>
 
+#include <dw/anim.h>
 #include <dw/entity.h>
 #include <dw/evl.h>
 #include <dw/file.h>
@@ -28,7 +29,6 @@ extern char *PTR_DIGIMON_FILE_NAMES[];
 extern GsOT *ACTIVE_ORDERING_TABLE;
 void renderDropShadow(Entity *entity);
 void setRotTransMatrix(MATRIX *m);
-void startAnimation(Entity *entity, int32_t animId);
 int32_t add3DSpritePrim(POLY_FT4 *poly, SVECTOR *v0, SVECTOR *v1, SVECTOR *v2, SVECTOR *v3);
 void updateTMDTextureData(char *tmd, int32_t clutX, int32_t x, int32_t y, int32_t tpage);
 extern PositionData TAMER_POSITION_DATA[];

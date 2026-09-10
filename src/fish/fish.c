@@ -6,6 +6,7 @@
 #include <libgte.h>
 #include <mwinline_n.h>
 
+#include <dw/anim.h>
 #include <dw/types.h>
 #include <dw/entity.h>
 #include <dw/file.h>
@@ -187,7 +188,6 @@ void renderLinePrimitive(uint32_t color, int32_t x0, int32_t y0, int32_t x1,
                          int32_t y1, int32_t layer, int32_t semiTrans);
 void setCameraFollowPlayer(void);
 void unsetCameraFollowPlayer(void);
-void startAnimation(Entity *entity, int32_t animId);
 void toEulerAngles(SVECTOR *out, int32_t x, int32_t y, int32_t z);
 void rotateVectorYXZ(SVECTOR *rotation, VECTOR *input, VECTOR *output);
 MATRIX *RotMatrixYXZ(SVECTOR *r, MATRIX *m);

@@ -1,3 +1,4 @@
+#include <dw/anim.h>
 #include <dw/entity.h>
 #include <dw/partner.h>
 #include <dw/script.h>
@@ -15,7 +16,6 @@ extern int16_t MAIN_D_801353C2;
 extern int16_t MAIN_D_801353C4;
 
 void createCameraMovement(VECTOR *pos, int32_t speed);
-void startAnimation(Entity *entity, int32_t animId);
 int32_t tickEntityWalkTo(uint8_t scriptId1, uint8_t scriptId2, int32_t targetX, int32_t targetZ, int8_t withCamera);
 void TRN_tickMpTraining(int32_t instanceId);
 void TRN2_tickMpTraining(int32_t instanceId);

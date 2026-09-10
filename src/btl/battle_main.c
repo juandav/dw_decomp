@@ -3,6 +3,7 @@
 #include <libgte.h>
 #include <mwinline_n.h>
 
+#include <dw/anim.h>
 #include <dw/attack_object.h>
 #include <dw/btl.h>
 #include <dw/combat.h>

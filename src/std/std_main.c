@@ -9,6 +9,7 @@
 #include <libgte.h>
 #include <mwinline_n.h>
 
+#include <dw/anim.h>
 #include <dw/aabb.h>
 #include <dw/attack_object.h>
 #include <dw/clock.h>
@@ -183,7 +184,6 @@ extern int16_t STD_D_8007BA9C[];
 extern char *MOVE_NAMES[];
 extern char *STD_D_8007A688[];
 
-void startAnimation(Entity *entity, int32_t animId);
 void entityLookAtLocation(Entity *entity, VECTOR *pos);
 int32_t entityCheckCollision(Entity *a, Entity *entity, int32_t c, int32_t d);
 void handleBattleIdle(DigimonEntity *entity, Stats *stats, int32_t flags);

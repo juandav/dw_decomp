@@ -1,12 +1,12 @@
 #include <libgs.h>
+
+#include <dw/anim.h>
 #include <dw/entity.h>
 #include <dw/params.h>
 #include <dw/types.h>
 #include <dw/ui.h>
 #include <dw/item.h>
 #include <dw/world_object.h>
-
-#include "common.h"
 
 char CONFIRM_PROMPT[16] = "Are you sure?";
 uint8_t MAIN_D_8012A9C4[3][6] = {
@@ -58,7 +58,6 @@ extern char *COMBAT_DATA_PTR;
 extern TamerEntity TAMER_ENTITY;
 void addGameMenu(void);
 void closeTriangleMenu(void);
-void startAnimation(Entity *e, int32_t anim);
 void startFeedingItem(uint8_t type);
 void startThrowingItem(void);
 void getEntityScreenPos(Entity *e, int32_t mode, int16_t *out);

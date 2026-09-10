@@ -1,4 +1,6 @@
 #include <libgte.h>
+
+#include <dw/anim.h>
 #include <dw/butterfly.h>
 #include <dw/entity.h>
 #include <dw/doo.h>
@@ -55,7 +57,6 @@ extern int8_t ITEM_TAKE_DISTANCE[68];
 void tickMainMenu(int32_t instanceId);
 void renderMainMenu(int32_t instanceId);
 void renderFeedingItem(int32_t instanceId);
-void startAnimation(Entity *entity, uint8_t animId);
 
 void tickPartnerOverworld(int32_t instanceId);
 void tickNormal(void);
@@ -77,7 +78,6 @@ void updateConditionAnimation(void);
 int32_t checkEatDistance(int32_t distance);
 void setPartnerState(int8_t state);
 void tickPartnerBattle(int32_t instanceId);
-void tickAnimation(Entity *entity);
 void handleConditionBubble();
 int32_t entityIsOffScreen(Entity *entity, int32_t width, int32_t height);
 void tickConditionBoundaries();
@@ -849,7 +849,7 @@ void tickPartnerWalking(void)
 			}
 			if (PARTNER_ANIMATION != anim->animId) {
 				startAnimation(&PARTNER_ENTITY.digimonEntity.entity,
-					       PARTNER_ANIMATION);
+					       (uint8_t)PARTNER_ANIMATION);
 			}
 		}
 		PARTNER_IS_STANDING_STILL = 1;
@@ -921,7 +921,7 @@ void tickPartnerWalking(void)
 
 	if (PARTNER_ANIMATION != anim->animId) {
 		startAnimation(&PARTNER_ENTITY.digimonEntity.entity,
-			       PARTNER_ANIMATION);
+			       (uint8_t)PARTNER_ANIMATION);
 		STOP_DISTANCE_TIMER = 0;
 	}
 
@@ -989,7 +989,7 @@ void setPartnerSlowWalking(void)
 		PARTNER_ANIMATION = 2;
 	}
 
-	startAnimation(ENTITY_TABLE[1], PARTNER_ANIMATION);
+	startAnimation(ENTITY_TABLE[1], (uint8_t)PARTNER_ANIMATION);
 }
 
 void updateConditionAnimation(void)
@@ -1052,7 +1052,7 @@ void setPartnerIdle(void)
 		}
 
 		startAnimation(&PARTNER_ENTITY.digimonEntity.entity,
-			       PARTNER_ANIMATION);
+			       (uint8_t)PARTNER_ANIMATION);
 	}
 }
 
@@ -1102,7 +1102,7 @@ int32_t getPartnerState(void)
 
 void startPartnerAnimation(int32_t animId)
 {
-	startAnimation(&PARTNER_ENTITY.digimonEntity.entity, animId);
+	startAnimation(&PARTNER_ENTITY.digimonEntity.entity, (uint8_t)animId);
 }
 
 void callDigimonRoutine(int32_t routine)

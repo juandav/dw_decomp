@@ -4,7 +4,6 @@
 #include <dw/entity.h>
 #include <dw/params.h>
 
-
 void unusedAABB(void)
 {
 }

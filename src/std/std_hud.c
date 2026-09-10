@@ -9,6 +9,7 @@
 #include <mwinline_n.h>
 
 #include <dw/aabb.h>
+#include <dw/anim.h>
 #include <dw/clock.h>
 #include <dw/combat.h>
 #include <dw/entity.h>
@@ -71,7 +72,6 @@ extern MATRIX STD_D_8007A718;
 
 void STD_func_8006B1F0(uint32_t *tmd, int32_t vofs, int32_t nofs, int32_t objIdx);
 void STD_func_8006B6F4(void);
-void startAnimation(Entity *entity, int32_t animId);
 void STD_func_8005A830(void);
 void STD_renderBattleStartText(void);
 void convertValueToDigits(int32_t n, int32_t value, int32_t *outCount, int32_t *buf);
@@ -97,10 +97,8 @@ void STD_func_80069468(void);
 void STD_func_8006AD68(void);
 void STD_func_8006BA18(void);
 void STD_func_8006B468(void);
-void tickAnimation(Entity *entity);
 void STD_func_8006AD00(int32_t i);
 void STD_func_80069134(int16_t tech);
-void setupModelMatrix(PositionData *posData);
 void GsSortBoxFill(GsBOXF *bp, GsOT *ot, unsigned short pri);
 void STD_func_8006A824(int32_t id);
 void STD_renderVersusModelScene(void);

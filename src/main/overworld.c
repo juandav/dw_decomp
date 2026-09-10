@@ -1,5 +1,6 @@
 #include <mwinline_n.h>
 
+#include <dw/anim.h>
 #include <dw/clock.h>
 #include <dw/evl.h>
 #include <dw/fish.h>
@@ -248,7 +249,6 @@ void buildMapOverlayPrim(POLY_FT4 *prim, LocalMapObjectInstance *inst,
 void buildSnowflakePrim(POLY_FT4 *prim, LocalMapObjectInstance *inst,
 			LocalMapObject *obj);
 Entity *getEntityFromScriptId(uint8_t *scriptId);
-void startAnimation(Entity *entity, int32_t animId);
 void tickNPCBattle(int32_t instanceId);
 void tickWaypointAI(MapDigimonEntity *mapDigimon, Entity *entity,
 		    int32_t instanceId);
@@ -285,7 +285,6 @@ void closeInventoryBoxes(void);
 void removeUIBox1(void);
 void collisionGrace(int32_t a, Entity *entity, int32_t c, int32_t d);
 uint8_t entityIsOffScreen(Entity *entity, int32_t w, int32_t h);
-void tickAnimation(Entity *entity);
 void tickNPC(int32_t instanceId);
 void tickNPCOverworld(int32_t instanceId, MapDigimonEntity *mapDigimon);
 void scriptUnloadEntity(uint8_t scriptId);

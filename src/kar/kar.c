@@ -5,6 +5,7 @@
 #include <libgte.h>
 #include <mwinline_n.h>
 
+#include <dw/anim.h>
 #include <dw/btl.h>
 #include <dw/entity.h>
 #include <dw/file.h>

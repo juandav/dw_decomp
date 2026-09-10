@@ -1,3 +1,4 @@
+#include <dw/anim.h>
 #include <dw/entity.h>
 #include <dw/partner.h>
 #include <dw/script.h>
@@ -28,7 +29,6 @@ extern int16_t TRN2_D_8008DC4C[];
 extern int16_t MAIN_D_801353CC;
 
 void createCameraMovement(VECTOR *pos, int32_t speed);
-void startAnimation(Entity *entity, int32_t animId);
 void loadMapObjectPosition(int16_t *xData, int16_t *yData, int16_t startIndex, int16_t count);
 int32_t tickEntityWalkTo(uint8_t scriptId1, uint8_t scriptId2, int32_t targetX, int32_t targetZ, int8_t withCamera);
 void setMapObjectsFlag(int16_t start, int16_t count, int32_t flag);

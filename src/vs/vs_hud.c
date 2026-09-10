@@ -2,6 +2,7 @@
 #include <libgpu.h>
 #include <libgs.h>
 
+#include <dw/anim.h>
 #include <dw/combat.h>
 #include <dw/math.h>
 #include <dw/types.h>
@@ -42,7 +43,6 @@ extern GsOT VS_D_80071764[];
 extern PositionData VS_D_80072754[4];
 
 extern int16_t MAIN_D_80134B14[4];
-void setupModelMatrix(PositionData *posData);
 
 extern uint8_t MAIN_D_80134AF8[8];
 extern uint8_t MAIN_D_80134B00[8];

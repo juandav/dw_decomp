@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <dw/anim.h>
 #include <dw/clock.h>
 #include <dw/entity.h>
 #include <dw/model.h>
@@ -20,9 +21,6 @@ void calculatePosMatrix(PositionData *posData, int32_t unused1,
 			int32_t unused2, int32_t translate);
 void resetMomentumData(MomentumData *momentum);
 void animateEntityTexture(Entity *entity, EntityAnim *anim);
-void setupModelMatrix(PositionData *posData);
-void startAnimation(Entity *entity, int32_t animId);
-void tickAnimation(Entity *entity);
 void tickMomentum(Entity *entity, MomentumData *momentumBase);
 void readMomentumInstructions(MomentumData *momentum, int16_t **instrPtr);
 void readMomentumInstruction(int16_t *delta, int16_t *reload1,
@@ -33,8 +31,7 @@ int32_t applyMomentum(int32_t base, int16_t reload, int16_t delta,
 		      int16_t *counter, int8_t step, int32_t offset);
 void applyRootMomentum(MomentumData *momentum, Entity *entity);
 
-
-void *anim_order_anchor[] = {
+static void *anim_text_order[] = {
 	applyRootMomentum,
 	applyMomentum,
 	readMomentumInstruction,
@@ -282,9 +279,9 @@ void tickMomentum(Entity *entity, MomentumData *momentumBase)
 	}
 }
 
-/* CodeWarrior retains scheduler state between functions. Keep tickMomentum
- * before these two functions to reproduce the retail instruction ordering. */
-void startAnimation(Entity *entity, int32_t animId)
+void startAnimation(entity, animId)
+	Entity *entity;
+	uint8_t animId;
 {
 	int16_t *animData;
 	int16_t *instrPtr;
@@ -296,12 +293,12 @@ void startAnimation(Entity *entity, int32_t animId)
 	int32_t hasScale;
 	int32_t boneCount;
 	int32_t entityType;
-	register int32_t i;
+	int32_t i;
 
 	{
 		int32_t loadedOffset;
 		int32_t *animTable;
-		register int32_t animOffset;
+		int32_t animOffset;
 
 		animTable = entity->animPtr;
 		loadedOffset = animTable[animId];
@@ -458,8 +455,6 @@ op_3000:
 		rect.y = anim->textureY + (*(*instrPtrPtr)++ & 0xff);
 		rect.w = (**instrPtrPtr & 0xff00) >> 8;
 		rect.h = *(*instrPtrPtr)++ & 0xff;
-		/* Separate function bodies sequence the cursor accesses. The pinned
-		 * compiler evaluates the high-byte peek before the advancing read. */
 		MoveImage(&rect,
 			  anim->textureX + peekAnimationTextureHighByte(instrPtrPtr),
 			  anim->textureY + readAnimationTextureLowByte(instrPtrPtr));
@@ -504,7 +499,7 @@ frame_update:
 void readMomentumInstructions(MomentumData *base, int16_t **instrPtr)
 {
 	MomentumData *momentum;
-	volatile int32_t instruction;
+	int32_t instruction;
 	int16_t divisor;
 	int16_t *reload1;
 	int16_t *subDelta;

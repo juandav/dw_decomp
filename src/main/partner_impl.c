@@ -1,6 +1,7 @@
 #include <libgs.h>
 #include <string.h>
 
+#include <dw/anim.h>
 #include <dw/model.h>
 #include <dw/types.h>
 #include <dw/clock.h>
@@ -231,7 +232,6 @@ extern Stats DEATH_STATS;
 int32_t getTamerState(void);
 void writePStat(int32_t id, uint8_t value);
 void callScriptSection(int32_t a, int32_t b, int32_t c);
-void startAnimation(Entity *entity, int32_t animId);
 ModelComponent *thunkLoadMMD(int32_t digiType, int32_t modelType);
 void learnMove(int32_t move);
 void addTamerLevel(int32_t chance, int32_t amount);

@@ -4,6 +4,7 @@
 #include <libgte.h>
 #include <mwinline_n.h>
 
+#include <dw/anim.h>
 #include <dw/eab.h>
 #include <dw/butterfly.h>
 #include <dw/endi.h>
@@ -134,9 +135,6 @@ typedef struct {
 
 extern MapWarps MAP_WARPS;
 
-
-void startAnimation(Entity *entity, int32_t animId);
-void tickAnimation(Entity *entity);
 void entityLookAtLocation(Entity *entity, VECTOR *pos);
 void setupEntityMatrix(int32_t entityId);
 void stopGameTime(void);

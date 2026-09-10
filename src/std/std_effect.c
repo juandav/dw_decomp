@@ -9,6 +9,7 @@
 #include <mwinline_n.h>
 
 #include <dw/aabb.h>
+#include <dw/anim.h>
 #include <dw/attack_object.h>
 #include <dw/clock.h>
 #include <dw/combat.h>
@@ -113,7 +114,6 @@ extern DigimonEntity *MAIN_D_80134EF4;
 extern DigimonEntity *MAIN_D_80134EF8;
 extern int16_t MAIN_D_80134CDC;
 
-void startAnimation(Entity *entity, int32_t animId);
 void entityLookAtLocation(Entity *entity, VECTOR *pos);
 void setMapLayerEnabled(int32_t enabled);
 void MAIN_func_80092B60(POLY_FT4 *prim);
@@ -343,7 +343,6 @@ char *STD_initializeAuraProjectiles(char *base);
 int32_t STD_addAuraProjectile(Entity *e);
 void STD_func_8006BFD4(void);
 void STD_func_8006C7D4(void);
-void setupModelMatrix(PositionData *posData);
 void STD_applyRadiusAttackHit(void);
 void STD_renderRingTube(void);
 void STD_renderRibbonStrip(void);

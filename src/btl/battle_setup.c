@@ -1,3 +1,4 @@
+#include <dw/anim.h>
 #include <dw/attack_object.h>
 #include <dw/btl.h>
 #include <dw/item.h>

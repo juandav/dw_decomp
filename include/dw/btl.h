@@ -43,7 +43,6 @@ void BTL_addEnemyHPBars(void);
 void BTL_initializePartnerStatusBars(void);
 void BTL_initializeCommandMenu(void);
 void BTL_addDeathCountdown(Entity *entity);
-void startAnimation(Entity *entity, int32_t animId);
 void entityLookAtLocation(Entity *entity, VECTOR *pos);
 int32_t entityCheckCollision(Entity *a, Entity *entity, int32_t c, int32_t d);
 int32_t entityIsOffScreen(Entity *entity, int32_t width, int32_t height);

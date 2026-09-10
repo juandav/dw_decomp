@@ -8,8 +8,7 @@
 
 #define ENTITY_MAX		10
 
-typedef struct
-{
+typedef struct {
 	GsDOBJ2 obj;
 	GsCOORDINATE2 posMatrix;
 	VECTOR scale;
@@ -17,14 +16,12 @@ typedef struct
 	VECTOR location;
 } PositionData;
 
-typedef struct
-{
+typedef struct {
 	int16_t scale1[9];
 	int16_t subDelta[9];
 	int16_t delta[9];
 	int16_t subScale[9];
 	char subValue[9];
-	uint8_t field5_0x51;
 } MomentumData;
 
 typedef struct {

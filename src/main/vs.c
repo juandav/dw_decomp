@@ -4,6 +4,7 @@
 #include <libgs.h>
 #include <mwinline_n.h>
 
+#include <dw/anim.h>
 #include <dw/attack_object.h>
 #include <dw/combat.h>
 #include <dw/entity.h>
@@ -28,7 +29,6 @@ typedef struct {
 	uint8_t y;
 } VsUISprite;
 
-void startAnimation(Entity *entity, uint8_t animId);
 void clearTextArea(void);
 void drawString(char *text, int32_t color, int32_t pos);
 uint32_t PadRead(int32_t id);
@@ -79,7 +79,6 @@ void VS_addAuraProjectile(Entity *entity);
 void VS_addFinisherProgress(FighterData *fighter, int16_t value);
 int32_t VS_isMoveUsable(Entity *entity, FighterData *fighter,
 			 int16_t moveId);
-void tickAnimation(Entity *entity);
 int32_t loadTIMFile(char *path, void *buffer);
 void fadeToBlack(int32_t frames);
 void removeStaticUIBox(int32_t id);
@@ -2522,7 +2521,7 @@ void VS__startWalkingAnimation(Entity *entity, Stats *stats, uint16_t flags)
 		animId = 0x24;
 	}
 
-	startAnimation(entity, animId);
+	startAnimation(entity, (uint8_t)animId);
 }
 
 void VS__initializePlayerMarker(void)

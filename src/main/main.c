@@ -7,6 +7,7 @@
 #include <libgpu.h>
 #include <libgs.h>
 
+#include <dw/anim.h>
 #include <dw/attack_object.h>
 #include <dw/combat.h>
 #include <dw/entity.h>
@@ -81,7 +82,6 @@ int32_t removeBuffModelObject(void);
 uint16_t convertAsciiToJis(uint8_t input);
 int32_t swapShortBytes(int32_t input);
 int32_t isAsciiEncoded(const char *value);
-void tickAnimation(Entity *entity);
 void tickPartnerBattle(int32_t instanceId);
 void tickNPCBattle(int32_t instanceId);
 void unloadNewGameScene(void);
@@ -96,8 +96,6 @@ extern TMDModel *BUFF_MODEL[];
 void resetInventoryFlags(void);
 void MAIN_func_800DF804(void);
 void initializeInventoryModules(void);
-
-void startAnimation(Entity *entity, uint8_t animId);
 
 void initializeEFE(void);
 void initializeParticleFX(void);

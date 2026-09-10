@@ -1,6 +1,7 @@
 #include <libgpu.h>
 #include <libgte.h>
 
+#include <dw/anim.h>
 #include <dw/attack_object.h>
 #include <dw/combat.h>
 #include <dw/entity.h>
@@ -24,7 +25,6 @@ extern uint8_t VS_D_800707C5[];
 extern int16_t ENEMY_COUNT;
 
 void createParticleFX();
-void startAnimation(Entity *e, int32_t anim);
 int16_t entityGetTechFromAnim(Entity *entity, int32_t anim);
 void swapInt(int32_t *a, int32_t *b);
 int16_t VS_getAttackTech(AttackObject *attack);

@@ -5,6 +5,7 @@
 #include <libgs.h>
 #include <libgte.h>
 
+#include <dw/anim.h>
 #include <dw/btl.h>
 #include <dw/doo.h>
 #include <dw/dooa.h>

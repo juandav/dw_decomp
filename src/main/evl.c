@@ -3,12 +3,12 @@
 #include <dw/utils.h>
 #include <dw/world_object.h>
 
-#include "common.h"
+#include "dw/anim.h"
 #include "dw/entity.h"
 
+#include "common.h"
 
 void stopBGM(void);
-void startAnimation(Entity* entity, int32_t animId);
 void addConditionBubble(int32_t bubbleType, Entity* entity);
 void stopSound(void);
 void loadMapSounds2();

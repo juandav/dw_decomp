@@ -1,3 +1,4 @@
+#include <dw/anim.h>
 #include <dw/entity.h>
 #include <dw/params.h>
 #include <dw/partner.h>
@@ -20,7 +21,6 @@ extern int16_t MAIN_D_8013537A;
 extern int16_t MAIN_D_8013537C;
 
 void createCameraMovement(VECTOR *pos, int32_t speed);
-void startAnimation(Entity *entity, int32_t animId);
 void removeAllCloudFX(void);
 void storeMapObjectPosition(int16_t *outX, int16_t *outY, int16_t a, int16_t count);
 void loadMapObjectPosition(int16_t *xData, int16_t *yData, int16_t startIndex, int16_t count);

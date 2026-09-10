@@ -4,6 +4,7 @@
 #include <libgs.h>
 #include <mwinline_n.h>
 
+#include <dw/anim.h>
 #include <dw/btl.h>
 #include <dw/combat.h>
 #include <dw/entity.h>
