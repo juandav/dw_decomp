@@ -1,5 +1,6 @@
 .venv/
 asm/
+assets/
 bin/
 build/
 disks/
