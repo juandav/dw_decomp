@@ -5,11 +5,11 @@
 #include <mwinline_n.h>
 
 #include <dw/anim.h>
-#include <dw/eab.h>
 #include <dw/butterfly.h>
+#include <dw/doo.h>
+#include <dw/eab.h>
 #include <dw/endi.h>
 #include <dw/entity.h>
-#include <dw/doo.h>
 #include <dw/fade.h>
 #include <dw/item.h>
 #include <dw/kar.h>
@@ -27,15 +27,13 @@
 #include <dw/ui.h>
 #include <dw/utils.h>
 
-#include "common.h"
-
-uint8_t MAIN_D_80122D68[24] = "I can't hold anymore.";
-uint8_t MAIN_D_80122D80[20] = "Hey! It's empty!";
-uint8_t MAIN_D_80122D94[24] = "Tamer level went up!!!";
-uint8_t MAIN_D_80122DAC[28] = "Tamer level went down!!!";
-uint8_t MAIN_D_80122DC8[20] = "Congratulations!";
-uint8_t MAIN_D_80122DDC[24] = "To recognize your great";
-uint8_t MAIN_D_80122DF4[28] = "recors, they sent a Medal!";
+char MAIN_D_80122D68[24] = "I can't hold anymore.";
+char MAIN_D_80122D80[20] = "Hey! It's empty!";
+char MAIN_D_80122D94[24] = "Tamer level went up!!!";
+char MAIN_D_80122DAC[28] = "Tamer level went down!!!";
+char MAIN_D_80122DC8[20] = "Congratulations!";
+char MAIN_D_80122DDC[24] = "To recognize your great";
+char MAIN_D_80122DF4[28] = "recors, they sent a Medal!";
 
 static void *tamer_data_order[] = {
 	MAIN_D_80122DF4,
@@ -48,10 +46,9 @@ static void *tamer_data_order[] = {
 };
 
 RECT MAIN_D_801341F4 = {0, 12, 256, 200};
-uint8_t MAIN_D_801341FC[8] = "Woah!";
+char MAIN_D_801341FC[8] = "Woah!";
 RECT MAIN_D_80134204 = {0, 12, 256, 200};
 RECT MAIN_D_8013420C = {0, 12, 256, 200};
-
 
 extern int8_t GAME_STATE;
 extern int8_t TAMER_STATE;
@@ -108,7 +105,6 @@ extern uint8_t YEAR;
 extern int32_t MONEY;
 extern int32_t NPC_IS_WALKING_TOWARDS[8];
 extern VECTOR MAIN_D_801386A0[8];
-
 
 typedef struct {
 	VECTOR location;
@@ -296,30 +292,36 @@ static void *tamer_functions[] = {
 void initializeTamer(int32_t type, int32_t posX, int32_t posY, int32_t posZ,
 		     int32_t rotX, int32_t rotY, int32_t rotZ)
 {
-	extern void setEntityPosition(int32_t entityId, int32_t posX,
-				      int32_t posY, int32_t posZ);
 	int32_t i;
 
 	PLAYER_SHADOW_ENABLED = 1;
 	thunkLoadMMD(type, 2);
+
 	ENTITY_TABLE[0] = &TAMER_ENTITY.entity;
+
 	initializeDigimonObject(type, 0, (TickFunction)tickTamer);
 	setEntityPosition(0, posX, posY, posZ);
 	setEntityRotation(0, rotX, rotY, rotZ);
 	setupEntityMatrix(0);
+
 	STORED_TAMER_POS.vx = posX;
 	STORED_TAMER_POS.vy = posY;
 	STORED_TAMER_POS.vz = posZ;
+
 	startAnimation(ENTITY_TABLE[0], 0);
+
 	GAME_STATE = 0;
 	ENTITY_TABLE[0]->isOnMap = 1;
 	ENTITY_TABLE[0]->isOnScreen = 1;
-	for (i = 0; i < 8; i = i + 1) {
+
+	for (i = 0; i < 8; ++i) {
 		HAS_ROTATION_DATA[i] = 0;
 	}
-	for (i = 0; i < 10; i = i + 1) {
+
+	for (i = 0; i < 10; ++i) {
 		UNKNOWN_TAMER_DATA[i] = 0;
 	}
+
 	PREVIOUS_CAMERA_POS_INITIALIZED = 0;
 	IS_STANDING_ON_DROP = 0;
 	STORED_TAMER_POS = TAMER_ENTITY.entity.posData->location;
@@ -378,9 +380,6 @@ void loadMapEntities(uint8_t *data, int32_t mapId, int32_t warpIdx)
 
 void setupTamerOnWarp(int32_t x, int32_t y, int32_t z, int32_t rotationY)
 {
-	extern void setEntityPosition(int32_t entityId, int32_t x, int32_t y,
-	                              int32_t z);
-
 	setEntityPosition(0, x, y, z);
 	setEntityRotation(0, TAMER_ENTITY.entity.posData->rotation.vx, rotationY,
 	                  TAMER_ENTITY.entity.posData->rotation.vz);
@@ -478,6 +477,7 @@ void tickWalkingState(void)
 	int32_t originalRotation;
 
 	tickTamerWaypoints();
+
 	if ((isKeyDown(0x10) != 0) &&
 	    (IS_SCRIPT_PAUSED == 1) &&
 	    (FADE_PROTECTION == 0) &&
@@ -487,10 +487,12 @@ void tickWalkingState(void)
 		setTamerState(1);
 		startAnimation(&TAMER_ENTITY.entity, 0);
 		unsetCameraFollowPlayer();
+
 		STORED_TAMER_POS.vx = TAMER_ENTITY.entity.posData->location.vx;
 		STORED_TAMER_POS.vy = TAMER_ENTITY.entity.posData->location.vy;
 		STORED_TAMER_POS.vz = TAMER_ENTITY.entity.posData->location.vz;
 		IS_IN_MENU = 1;
+
 		stopGameTime();
 		setPartnerIdling();
 		return;
@@ -548,6 +550,7 @@ void tickWalkingState(void)
 	checkMapInteraction();
 	checkMedalConditions();
 	checkPendingAwards();
+
 	STORED_TAMER_POS.vx = TAMER_ENTITY.entity.posData->location.vx;
 	STORED_TAMER_POS.vy = TAMER_ENTITY.entity.posData->location.vy;
 	STORED_TAMER_POS.vz = TAMER_ENTITY.entity.posData->location.vz;
@@ -583,35 +586,31 @@ void checkItemPickup(void)
 	PICKUP_ITEM_TYPE = 0xff;
 
 	item = DROPPED_ITEMS;
-	i = 0;
-	while (i < 11) {
-		if (item->worldItem.type != 0xff) {
-			goto populated;
+	for (i = 0; i < 11; ++i) {
+		if (item->worldItem.type == 0xff) {
+			++item;
+			continue;
 		}
-		item++;
-		goto increment;
 
-	populated:
 		if ((item->tileX < tileX - 1) ||
 		    (tileX + 1 < item->tileX)) {
 			goto next;
 		}
+
 		if ((item->tileY < tileY - 1) ||
 		    (tileY + 1 < item->tileY)) {
 			goto next;
 		}
 
 		PICKUP_ITEM_TYPE = i;
+
 		if (IS_STANDING_ON_DROP != 1) {
 			setTamerState(7);
 			IS_STANDING_ON_DROP = 1;
 		}
 		break;
-
-	next:
-		item++;
-	increment:
-		i++;
+next:
+		++item;
 	}
 
 	if (PICKUP_ITEM_TYPE == 0xff) {
@@ -658,6 +657,7 @@ void checkMapInteraction(void)
 		MAIN_D_80134DF9 = trigger - 110;
 		CURRENT_EXIT = MAP_WARPS.targetExit[trigger - 110];
 		PREVIOUS_EXIT = trigger - 110;
+
 		setTamerState(5);
 		unsetCameraFollowPlayer();
 		stopGameTime();
@@ -684,68 +684,67 @@ void checkMedalConditions(void)
 	int32_t i;
 
 	if (hasMedal(5) == 0) {
-		i = 0;
-		while (i < 0x39) {
+		for (i = 0; i < 0x39; ++i) {
 			if (hasMove(i) == 0) {
 				break;
 			}
-			i++;
 		}
+
 		if (i == 0x39) {
 			unlockMedal(5);
 			HAS_MEDAL_AWARD_PENDING = 1;
 		}
 	}
+
 	if (hasMedal(7) == 0) {
 		BaseStats *bs = &PARTNER_ENTITY.digimonEntity.stats.base;
-		if ((bs->hp == 0x270F) &&
-		    (bs->mp == 0x270F) &&
-		    (bs->off == 0x3E7) &&
-		    (bs->def == 0x3E7) &&
-		    (bs->brain == 0x3E7) &&
-		    (bs->speed == 0x3E7)) {
+		if ((bs->hp == 9999) && (bs->mp == 9999) &&
+		    (bs->off == 999) && (bs->def == 999) &&
+		    (bs->brain == 999) && (bs->speed == 999)) {
 			unlockMedal(7);
 			HAS_MEDAL_AWARD_PENDING = 1;
 		}
 	}
-	if ((hasMedal(0xD) == 0) && (MONEY == 0xF423F)) {
+
+	if ((hasMedal(0xD) == 0) && (MONEY == 999999)) {
 		unlockMedal(0xD);
 		HAS_MEDAL_AWARD_PENDING = 1;
 	}
-	if ((hasMedal(0xE) == 0) && (YEAR == 0xA)) {
+
+	if ((hasMedal(0xE) == 0) && (YEAR == 10)) {
 		unlockMedal(0xE);
 		HAS_MEDAL_AWARD_PENDING = 1;
 	}
+
 	if (hasMedal(6) == 0) {
-		i = 1;
-		while (i < 0x3E) {
+		for (i = 1; i < 62; ++i) {
 			if (hasDigimonRaised((uint16_t)i) == 0) {
 				break;
 			}
-			i++;
 		}
-		if (i == 0x3E) {
+
+		if (i == 62) {
 			unlockMedal(6);
 			HAS_MEDAL_AWARD_PENDING = 1;
-			TAMER_ENTITY.tamerLevel = TAMER_ENTITY.tamerLevel + 1;
-			if (TAMER_ENTITY.tamerLevel >= 0xB) {
-				TAMER_ENTITY.tamerLevel = 0xA;
+
+			++TAMER_ENTITY.tamerLevel;
+			if (TAMER_ENTITY.tamerLevel >= 11) {
+				TAMER_ENTITY.tamerLevel = 10;
 			}
 		}
 	}
-	if ((hasMedal(9) == 0) && (PARTNER_PARA.fishCaught >= 0x64)) {
+	if ((hasMedal(9) == 0) && (PARTNER_PARA.fishCaught >= 100)) {
 		unlockMedal(9);
 		HAS_MEDAL_AWARD_PENDING = 1;
 	}
 	if (hasMedal(0xC) == 0) {
-		i = 0;
-		while (i < 0x42) {
+		for (i = 0; i < 66; ++i) {
 			if (getCardAmount((uint8_t)i) == 0) {
 				break;
 			}
-			i++;
 		}
-		if (i == 0x42) {
+
+		if (i == 66) {
 			unlockMedal(0xC);
 			HAS_MEDAL_AWARD_PENDING = 1;
 		}
@@ -770,6 +769,7 @@ void renderItemPickupTextbox(int32_t instanceId)
 	} else {
 		renderString(0, 0xffffff83, 0x39, 0x90, 0xc, 0, 0x18, 5, 0);
 	}
+
 	renderUIBox(1);
 	++TEXTBOX_OPEN_TIMER;
 }
@@ -784,14 +784,18 @@ int32_t startBattle(int16_t instanceId)
 	STORED_TAMER_POS.vx = TAMER_ENTITY.entity.posData->location.vx;
 	STORED_TAMER_POS.vy = TAMER_ENTITY.entity.posData->location.vy;
 	STORED_TAMER_POS.vz = TAMER_ENTITY.entity.posData->location.vz;
+
 	unsetCameraFollowPlayer();
 	closeTriangleMenu();
 	stopGameTime();
+
 	battleData = handleBattleStart(instanceId);
 	loadBattleData(instanceId, battleData);
 	battleResult = BTL_battleMain();
 	result = battleResult;
+
 	GAME_STATE = 0;
+
 	if (result == -1) {
 		PARTNER_PARA.happiness = PARTNER_PARA.happiness - 0x1e;
 		PARTNER_PARA.discipline = PARTNER_PARA.discipline - 0x14;
@@ -811,13 +815,16 @@ int32_t startBattle(int16_t instanceId)
 		PARTNER_PARA.happiness = PARTNER_PARA.happiness + 2;
 		handlePostBattleTiredness();
 		SKIP_DAYTIME_TRANSITION = 0;
-		PARTNER_PARA.battles = PARTNER_PARA.battles + 1;
+		++PARTNER_PARA.battles;
 	}
+
 	tickConditionBoundaries();
+
 	ACTIVE_FRAMEBUFFER = GsGetActiveBuff();
 	GsSetWorkBase((PACKET *)GS_WORK_BASES[ACTIVE_FRAMEBUFFER]);
 	GsClearOt(0, 0, GS_ORDERING_TABLE + ACTIVE_FRAMEBUFFER);
 	ACTIVE_ORDERING_TABLE = GS_ORDERING_TABLE + ACTIVE_FRAMEBUFFER;
+
 	advanceBattleTime(result);
 
 	return result;
@@ -933,11 +940,14 @@ int32_t tickEntityWalkTo(uint8_t scriptId, uint8_t targetId, int32_t x, int32_t 
 
 	col = -1;
 	e = getEntityFromScriptId(&scriptId);
+
 	if (scriptId >= 2) {
 		NPC_IS_WALKING_TOWARDS[scriptId - 2] = 1;
 	}
+
 	pd = e->posData;
 	from = pd->location;
+
 	if (targetId == 0xFF) {
 		to.vx = x;
 		to.vy = e->posData->location.vy;
@@ -946,33 +956,42 @@ int32_t tickEntityWalkTo(uint8_t scriptId, uint8_t targetId, int32_t x, int32_t 
 		pd = getEntityFromScriptId(&targetId)->posData;
 		to = pd->location;
 	}
+
 	if ((PREVIOUS_CAMERA_POS_INITIALIZED == 0) && (useCamera == 1)) {
 		PREVIOUS_CAMERA_POS = from;
 		PREVIOUS_CAMERA_POS_INITIALIZED = 1;
 	}
+
 	getModelTile(&from, &fromTileX, &fromTileY);
 	getModelTile(&to, &toTileX, &toTileY);
 	entityLookAtLocation(e, &to);
+
 	if (useCamera == 1) {
 		moveCameraByDiff(&PREVIOUS_CAMERA_POS, &from);
 		PREVIOUS_CAMERA_POS = from;
 	}
+
 	if (targetId != 0xFF) {
 		col = entityCheckCollision(0, e, 0, 0);
 	}
+
 	if (((fromTileX == toTileX) && (fromTileY == toTileY)) || ((col != -1) && (col < 9))) {
 		PREVIOUS_CAMERA_POS_INITIALIZED = 0;
+
 		if (scriptId >= 2) {
 			NPC_IS_WALKING_TOWARDS[scriptId - 2] = 0;
 		}
+
 		return 1;
 	}
+
 	return 0;
 }
 
 int32_t tickLookAtEntity(uint8_t scriptId1, uint8_t scriptId2)
 {
-	Entity *value;
+	int32_t result;
+	Entity *entity;
 	int8_t entityId;
 	int32_t i;
 	int16_t rotX;
@@ -992,7 +1011,7 @@ int32_t tickLookAtEntity(uint8_t scriptId1, uint8_t scriptId2)
 		}
 	}
 
-	value = 0;
+	result = 0;
 	switch (HAS_ROTATION_DATA[entityId]) {
 	case 0:
 		MAIN_D_801386A0[entityId] =
@@ -1000,18 +1019,19 @@ int32_t tickLookAtEntity(uint8_t scriptId1, uint8_t scriptId2)
 		HAS_ROTATION_DATA[entityId] = 1;
 		break;
 	case 1:
-		value = getEntityFromScriptId(&scriptId1);
-		getRotationDifference(value->posData,
+		entity = getEntityFromScriptId(&scriptId1);
+		getRotationDifference(entity->posData,
 		                      &MAIN_D_801386A0[entityId],
 		                      &rotX, &rotY, &rotZ);
-		value = (Entity *)rotateEntity(&value->posData->rotation, &rotX,
-		                               &rotY, &rotZ, 0x200);
-		if ((int32_t)value == 1) {
+		result = rotateEntity(&entity->posData->rotation, &rotX,
+				      &rotY, &rotZ, 0x200);
+		if (result == 1) {
 			HAS_ROTATION_DATA[entityId] = 0;
 		}
 		break;
 	}
-	return (int32_t)value;
+
+	return result;
 }
 
 int32_t tickEntitySetRotation(uint32_t scriptId, int16_t rotationY)
@@ -1032,6 +1052,7 @@ int32_t tickEntityMoveTo(scriptId1, scriptId2, targetX, targetZ, speed,
 	int8_t speed;
 	int8_t withCamera;
 {
+	/* TODO: get rid of extra declaration */
 	extern void setEntityPosition(int32_t entityId, int32_t x, long y,
 	                              int32_t z);
 	Entity *entity;
@@ -1100,6 +1121,7 @@ int32_t tickEntityMoveTo(scriptId1, scriptId2, targetX, targetZ, speed,
 		                 &entity->posData->location);
 		PREVIOUS_CAMERA_POS = entity->posData->location;
 	}
+
 	return 0;
 }
 
@@ -1110,8 +1132,6 @@ int32_t tickEntityMoveToAxis(scriptId, target, axis, speed, withCamera)
 	int32_t speed;
 	int8_t withCamera;
 {
-	extern void setEntityPosition(int32_t entityId, int32_t x, int32_t y,
-	                              int32_t z);
 	Entity *entity;
 	long *axisValue;
 
@@ -1315,6 +1335,7 @@ void tickPickupItem(void)
 	int16_t screenPos[2];
 
 	textRect = MAIN_D_801341F4;
+
 	switch (TAMER_SUBSTATE) {
 	case 0:
 		startAnimation(ENTITY_TABLE[0], 0xc);
@@ -1323,7 +1344,7 @@ void tickPickupItem(void)
 		drawString(DIGIMON_DATA[0].name, 0, 0xc);
 		drawString(ITEM_PARA[DROPPED_ITEMS[PICKUP_ITEM_TYPE].worldItem.type].name,
 		           0, 0x18);
-		drawString((char *)MAIN_D_801341FC, 0, 0x24);
+		drawString(MAIN_D_801341FC, 0, 0x24);
 		INTERACTED_CHEST_STATE = 0;
 		TAKE_ITEM_FRAME_COUNT = 0;
 		TAMER_SUBSTATE = 1;
@@ -1331,15 +1352,12 @@ void tickPickupItem(void)
 	case 1:
 		available = isUIBoxAvailable(1);
 		if (available == 1) {
-			targetRect.x = -0x82;
-			targetRect.y = 0x2a;
-			targetRect.w = 0x106;
-			targetRect.h = 0x3b;
+			setRECT(&targetRect, -130, 42, 262, 59);
 			getEntityScreenPos(ENTITY_TABLE[0], 1, screenPos);
-			sourceRect.x = screenPos[0] - 5;
-			sourceRect.y = screenPos[1] - 5;
-			sourceRect.w = 10;
-			sourceRect.h = 10;
+			setRECT(&sourceRect,
+				screenPos[0] - 5,
+				screenPos[1] - 5,
+				10, 10);
 			RECEIVED_ITEM_TYPE =
 				DROPPED_ITEMS[PICKUP_ITEM_TYPE].worldItem.type;
 			createAnimatedUIBox(1, 0, 2, &targetRect, &sourceRect, 0,
@@ -1348,7 +1366,7 @@ void tickPickupItem(void)
 		}
 		break;
 	case 2:
-		TAKE_ITEM_FRAME_COUNT = TAKE_ITEM_FRAME_COUNT + 1;
+		++TAKE_ITEM_FRAME_COUNT;
 		available = isKeyDown(0x40);
 		if ((available != 0) && (4 < TAKE_ITEM_FRAME_COUNT)) {
 			if (TAKE_ITEM_FRAME_COUNT < 0x3c) {
@@ -1356,7 +1374,7 @@ void tickPickupItem(void)
 			}
 			available = giveItem(DROPPED_ITEMS[PICKUP_ITEM_TYPE].worldItem.type & 0xff, 0);
 			if (available == 0) {
-				drawString((char *)MAIN_D_80122D68, 0, 0x18);
+				drawString(MAIN_D_80122D68, 0, 0x18);
 				INTERACTED_CHEST_STATE = 1;
 				TAKE_ITEM_FRAME_COUNT = 0;
 				TAMER_SUBSTATE = 3;
@@ -1367,7 +1385,7 @@ void tickPickupItem(void)
 		}
 		break;
 	case 3:
-		TAKE_ITEM_FRAME_COUNT = TAKE_ITEM_FRAME_COUNT + 1;
+		++TAKE_ITEM_FRAME_COUNT;
 		available = isKeyDown(0x40);
 		if ((available != 0) && (4 < TAKE_ITEM_FRAME_COUNT)) {
 			if (TAKE_ITEM_FRAME_COUNT < 0x3c) {
@@ -1378,10 +1396,10 @@ void tickPickupItem(void)
 		break;
 	case 4:
 		getEntityScreenPos(ENTITY_TABLE[0], 1, screenPos);
-		textRect.x = screenPos[0] - 5;
-		textRect.y = screenPos[1] - 5;
-		textRect.w = 10;
-		textRect.h = 10;
+		setRECT(&textRect,
+			screenPos[0] - 5,
+			screenPos[1] - 5,
+			10, 10);
 		removeAnimatedUIBox(1, &textRect);
 		if (INTERACTED_CHEST_STATE == 0) {
 			pickupItem(PICKUP_ITEM_TYPE);
@@ -1391,6 +1409,7 @@ void tickPickupItem(void)
 	default:
 		break;
 	}
+
 	if (9 < TAKE_ITEM_FRAME_COUNT) {
 		TAKE_ITEM_FRAME_COUNT = 10;
 	}
@@ -1406,6 +1425,7 @@ void tickTakeChest(void)
 	int16_t screenPos[2];
 
 	textRect = MAIN_D_80134204;
+
 	switch (TAMER_SUBSTATE) {
 	case 0:
 		startAnimation(ENTITY_TABLE[0], 0);
@@ -1418,10 +1438,10 @@ void tickTakeChest(void)
 		if (CHEST_ARRAY[INTERACTED_CHEST].isTaken == DW_FALSE) {
 			drawString(ITEM_PARA[CHEST_ARRAY[INTERACTED_CHEST].item].name,
 			           0, 0x18);
-			drawString((char *)MAIN_D_801341FC, 0, 0x24);
+			drawString(MAIN_D_801341FC, 0, 0x24);
 			INTERACTED_CHEST_STATE = 0;
 		} else {
-			drawString((char *)MAIN_D_80122D80, 0, 0x18);
+			drawString(MAIN_D_80122D80, 0, 0x18);
 			INTERACTED_CHEST_STATE = 2;
 		}
 		TAMER_SUBSTATE = 1;
@@ -1431,16 +1451,13 @@ void tickTakeChest(void)
 		if (available == 1) {
 			trayResult = tickOpenChestTray(INTERACTED_CHEST);
 			if (trayResult == 1) {
-				targetRect.x = -0x82;
-				targetRect.y = 0x2a;
-				targetRect.w = 0x106;
-				targetRect.h = 0x3b;
+				setRECT(&targetRect, -130, 42, 262, 59);
 				getEntityScreenPos(ENTITY_TABLE[0], 1,
 						   screenPos);
-				sourceRect.x = screenPos[0] - 5;
-				sourceRect.y = screenPos[1] - 5;
-				sourceRect.w = 10;
-				sourceRect.h = 10;
+				setRECT(&sourceRect,
+					screenPos[0] - 5,
+					screenPos[1] - 5,
+					10, 10);
 				RECEIVED_ITEM_TYPE =
 					CHEST_ARRAY[INTERACTED_CHEST].item;
 				createAnimatedUIBox(1, 0, 2, &targetRect,
@@ -1456,13 +1473,13 @@ void tickTakeChest(void)
 		}
 		break;
 	case 2:
-		TAKE_ITEM_FRAME_COUNT = TAKE_ITEM_FRAME_COUNT + 1;
+		++TAKE_ITEM_FRAME_COUNT;
 		if (((POLLED_INPUT & PADRdown) != 0) &&
 		    (5 < TAKE_ITEM_FRAME_COUNT)) {
 			TAKE_ITEM_FRAME_COUNT = 0;
 			available = giveItem(RECEIVED_ITEM_TYPE, 0);
 			if (available == 0) {
-				drawString((char *)MAIN_D_80122D68, 0, 0x18);
+				drawString(MAIN_D_80122D68, 0, 0x18);
 				INTERACTED_CHEST_STATE = 1;
 				TAMER_SUBSTATE = 3;
 			} else {
@@ -1478,15 +1495,15 @@ void tickTakeChest(void)
 		}
 		break;
 	case 4:
-		TAKE_ITEM_FRAME_COUNT = TAKE_ITEM_FRAME_COUNT + 1;
+		++TAKE_ITEM_FRAME_COUNT;
 		if (((POLLED_INPUT & PADRdown) != 0) &&
 		    (5 < TAKE_ITEM_FRAME_COUNT)) {
 			getEntityScreenPos(&TAMER_ENTITY.entity, 1,
 					   screenPos);
-			textRect.x = screenPos[0] - 5;
-			textRect.y = screenPos[1] - 5;
-			textRect.w = 10;
-			textRect.h = 10;
+			setRECT(&textRect,
+				screenPos[0] - 5,
+				screenPos[1] - 5,
+				10, 10);
 			removeAnimatedUIBox(1, &textRect);
 			if (INTERACTED_CHEST_STATE == 0) {
 				giveItem(RECEIVED_ITEM_TYPE, 1);
@@ -1498,6 +1515,7 @@ void tickTakeChest(void)
 	default:
 		break;
 	}
+
 	if (9 < TAKE_ITEM_FRAME_COUNT) {
 		TAKE_ITEM_FRAME_COUNT = 10;
 	}
@@ -1605,8 +1623,6 @@ void tickEnding(void)
 
 void tickSicknessLostLife(void)
 {
-	int32_t value;
-
 	switch (TAMER_SUBSTATE) {
 	case 0:
 		loadDynamicLibrary(MURD_REL, 0, 0, 0, 0);
@@ -1614,11 +1630,9 @@ void tickSicknessLostLife(void)
 		TAMER_SUBSTATE = 1;
 		break;
 	case 1:
-		value = MURD_tick((PartnerEntity *)ENTITY_TABLE[1], 1);
-		if ((0 > value) &&
-		    (value = DOOA_tick((PartnerEntity *)ENTITY_TABLE[1],
-		                       GENERAL_BUFFER_PTR + 0x4b000, 1),
-		     0 > value)) {
+		if ((0 > MURD_tick((PartnerEntity *)ENTITY_TABLE[1], 1)) &&
+		    (0 > DOOA_tick((PartnerEntity *)ENTITY_TABLE[1],
+				   GENERAL_BUFFER_PTR + 0x4b000, 1))) {
 			SOME_SCRIPT_SYNC_BIT = 1;
 		}
 	default:
@@ -1628,16 +1642,13 @@ void tickSicknessLostLife(void)
 
 void tickMachinedramonSpawn(void)
 {
-	int32_t value;
-
 	switch (TAMER_SUBSTATE) {
 	case 0:
 		EAB_tick(ENTITY_TABLE[2], 0);
 		TAMER_SUBSTATE = 1;
 		break;
 	case 1:
-		value = EAB_tick(ENTITY_TABLE[2], 1);
-		if (0 > value) {
+		if (0 > EAB_tick(ENTITY_TABLE[2], 1)) {
 			SOME_SCRIPT_SYNC_BIT = 1;
 		}
 	default:
@@ -1647,8 +1658,6 @@ void tickMachinedramonSpawn(void)
 
 void tickBattleLostLife(void)
 {
-	int32_t value;
-
 	switch (TAMER_SUBSTATE) {
 	case 0:
 		loadDynamicLibrary(MURD_REL, 0, 0, 0, 0);
@@ -1656,8 +1665,7 @@ void tickBattleLostLife(void)
 		TAMER_SUBSTATE = 1;
 		break;
 	case 1:
-		value = MURD_tick((PartnerEntity *)ENTITY_TABLE[1], 1);
-		if (0 > value) {
+		if (0 > MURD_tick((PartnerEntity *)ENTITY_TABLE[1], 1)) {
 			SOME_SCRIPT_SYNC_BIT = 1;
 		}
 	default:
@@ -1674,6 +1682,7 @@ void tickAwardSomething(void)
 	int16_t screenPos[2];
 
 	textRect = MAIN_D_8013420C;
+
 	switch (TAMER_SUBSTATE) {
 	case 0:
 		stopGameTime();
@@ -1686,10 +1695,10 @@ void tickAwardSomething(void)
 			clearTextArea();
 			if (LEVELS_INCREASED == 1) {
 				setTextColor(7);
-				drawString((char *)MAIN_D_80122D94, 0, 0x78);
+				drawString(MAIN_D_80122D94, 0, 0x78);
 			} else {
 				setTextColor(3);
-				drawString((char *)MAIN_D_80122DAC, 0, 0x78);
+				drawString(MAIN_D_80122DAC, 0, 0x78);
 			}
 			setTextColor(1);
 			TAMER_SUBSTATE = 4;
@@ -1700,30 +1709,27 @@ void tickAwardSomething(void)
 	case 1:
 		clearTextArea();
 		setTextColor(7);
-		drawString((char *)MAIN_D_80122DC8, 0, 0x78);
+		drawString(MAIN_D_80122DC8, 0, 0x78);
 		TAMER_SUBSTATE = 2;
 		break;
 	case 2:
-		drawString((char *)MAIN_D_80122DDC, 0, 0x84);
+		drawString(MAIN_D_80122DDC, 0, 0x84);
 		TAMER_SUBSTATE = 3;
 		break;
 	case 3:
-		drawString((char *)MAIN_D_80122DF4, 0, 0x90);
+		drawString(MAIN_D_80122DF4, 0, 0x90);
 		setTextColor(1);
 		TAMER_SUBSTATE = 4;
 		break;
 	case 4:
 		available = isUIBoxAvailable(1);
 		if (available == 1) {
-			targetRect.x = -0x82;
-			targetRect.y = 0x2a;
-			targetRect.w = 0x106;
-			targetRect.h = 0x3b;
+			setRECT(&targetRect, -130, 42, 262, 59);
 			getEntityScreenPos(ENTITY_TABLE[0], 1, screenPos);
-			sourceRect.x = screenPos[0] - 5;
-			sourceRect.y = screenPos[1] - 5;
-			sourceRect.w = 10;
-			sourceRect.h = 10;
+			setRECT(&sourceRect,
+				screenPos[0] - 5,
+				screenPos[1] - 5,
+				10, 10);
 			RECEIVED_ITEM_TYPE =
 				CHEST_ARRAY[INTERACTED_CHEST].item;
 			createAnimatedUIBox(1, 0, 2, &targetRect, &sourceRect,
@@ -1737,10 +1743,10 @@ void tickAwardSomething(void)
 			TAKE_ITEM_FRAME_COUNT = 0;
 			getEntityScreenPos(&TAMER_ENTITY.entity, 1,
 					   screenPos);
-			textRect.x = screenPos[0] - 5;
-			textRect.y = screenPos[1] - 5;
-			textRect.w = 10;
-			textRect.h = 10;
+			setRECT(&textRect,
+				screenPos[0] - 5,
+				screenPos[1] - 5,
+				10, 10);
 			removeAnimatedUIBox(1, &textRect);
 			setTamerState(0);
 			setPartnerState(1);
