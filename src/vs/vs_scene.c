@@ -10,6 +10,8 @@
 #include <dw/types.h>
 #include <dw/vs.h>
 
+#include "common.h"
+
 extern uint8_t MAIN_D_80135258[2];
 extern uint8_t MAIN_D_8013525A[2];
 extern uint8_t MAIN_D_80135260;

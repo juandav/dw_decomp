@@ -50,6 +50,9 @@ void calculatePosMatrix(PositionData *posData, int32_t unused1,
 {
 	GsCOORDINATE2 *matrix;
 
+	(void)unused1;
+	(void)unused2;
+
 	matrix = &posData->posMatrix;
 	if (translate != 0) {
 		TransMatrix(&matrix->coord, &posData->location);

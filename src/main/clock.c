@@ -74,6 +74,8 @@ void tickGameClock(int32_t instanceId)
 {
 	uint8_t timeSpeed;
 
+	(void)instanceId;
+
 	LAST_HANDLED_FRAME = CURRENT_FRAME;
 
 	if ((GAME_STATE != 0) ||
@@ -189,6 +191,8 @@ out:
 
 void updatePlaytime(int32_t instanceId)
 {
+	(void)instanceId;
+
 	++PLAYTIME_FRAMES;
 	if ((PLAYTIME_FRAMES % 1200) == 0) {
 		++PLAYTIME_MINUTES;
@@ -268,6 +272,8 @@ void renderGameClock(int32_t instanceId)
 	uint8_t frame;
 	int32_t hour;
 
+	(void)instanceId;
+
 	if (HOUR >= 6 && HOUR < 17) {
 		isNight = 0;
 	} else {
@@ -319,6 +325,8 @@ void renderGameClock(int32_t instanceId)
 
 void updateMinuteHand(int32_t hour, int32_t minute)
 {
+	(void)hour;
+
 	CLOCK_SPRITE.rotate = minute * 0x6000;
 }
 

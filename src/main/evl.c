@@ -60,6 +60,7 @@ void tickEvoSequenceLoading(int32_t instanceId)
 
 void renderEvoSequenceLoading(int32_t instanceId)
 {
+	(void)instanceId;
 }
 
 /* CodeWarrior retains scheduler state between functions. This unused function
@@ -119,5 +120,7 @@ int32_t getEvoSequenceState(PartnerEntity *partner, void *buffer,
 
 int evoSequenceAlwaysTrue(int32_t unused)
 {
+	(void)unused;
+
 	return 1;
 }

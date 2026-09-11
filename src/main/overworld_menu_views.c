@@ -2,6 +2,8 @@
 #include <dw/move.h>
 #include <dw/ui.h>
 
+#include "common.h"
+
 typedef struct {
 	int16_t posX;
 	int16_t posY;

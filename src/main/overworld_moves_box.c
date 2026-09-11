@@ -2,6 +2,8 @@
 #include <dw/evl.h>
 #include <dw/move.h>
 
+#include "common.h"
+
 typedef struct {
 	int16_t orderValue;
 	int16_t x;

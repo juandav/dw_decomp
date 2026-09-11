@@ -1,15 +1,33 @@
-#include <libgs.h>
-
-#include <libmcrd.h>
 #include <stdio.h>
 #include <string.h>
 
+#include <libgs.h>
+#include <libmcrd.h>
+
 #include <dw/entity.h>
 #include <dw/params.h>
-
+#include <dw/sound.h>
 #include <dw/types.h>
 
 #include "common.h"
+
+typedef struct {
+	int8_t pos;
+	int8_t count;
+	int8_t unk2;
+	int8_t scroll;
+	int8_t max;
+} MenuCursor;
+
+typedef struct {
+	int8_t pos;
+	int8_t pad[5];
+	int16_t rowHeight;
+	int16_t x;
+	int16_t y;
+	int16_t w;
+	int16_t h;
+} MenuHighlight;
 
 extern int32_t TARGET_MENU;
 extern int32_t CURRENT_MENU;
@@ -26,104 +44,24 @@ extern int32_t MAIN_D_80135050;
 extern int32_t MAIN_D_80135060;
 extern uint8_t MAIN_D_80131B2C[];
 extern uint8_t MAIN_D_8013192C[];
-long MemCardExist();
-void clearTextSubArea(RECT *area);
-void drawString(char *text, int32_t color, int32_t pos);
 extern char MAIN_D_80131658[];
 extern char MAIN_D_801BF768[];
 extern int32_t CHANGED_INPUT;
-void playSound(int32_t vabId, uint32_t note);
-
-typedef struct {
-	int8_t pos;
-	int8_t count;
-	int8_t unk2;
-	int8_t scroll;
-	int8_t max;
-} MenuCursor;
-
-
-extern char MAIN_D_801346C0;
-extern struct DIRENTRY *volatile MAIN_D_801346D0;
-
-#include <dw/entity.h>
-#include <dw/params.h>
-
-int8_t getFileCityTopMap(void);
 extern GsOT *ACTIVE_ORDERING_TABLE;
 extern int32_t MAIN_D_80135034;
 extern int32_t MAIN_D_80135038;
 extern int8_t MAIN_D_8013172B[];
 extern char *MOVE_NAMES[];
-extern TamerEntity TAMER_ENTITY;
-extern int16_t HOUR;
-extern int16_t MINUTE;
-extern int16_t DAY;
-extern uint8_t YEAR;
-extern uint16_t CURRENT_FRAME;
-extern uint16_t LAST_HANDLED_FRAME;
-extern uint16_t PLAYTIME_FRAMES;
-extern uint16_t PLAYTIME_HOURS;
-extern uint16_t PLAYTIME_MINUTES;
-extern int32_t MONEY;
-extern uint8_t PREVIOUS_SCREEN;
-extern uint8_t CURRENT_EXIT;
-extern uint8_t PREVIOUS_EXIT;
-extern int16_t MERIT;
-extern int16_t MAIN_D_80134FC8;
-extern int16_t MAIN_D_80134FCA;
-extern int16_t MAIN_D_80134FCC;
-extern int16_t MAIN_D_80134FD0;
-extern int16_t TOURNAMENTS_LOST;
-extern void *MAIN_D_80134FB8;
-extern char WORLD_POOP;
-extern char TAMER_WAYPOINT_X;
-extern char TAMER_WAYPOINT_Y;
-extern int8_t TAMER_PREVIOUS_TILE_X;
-extern int8_t TAMER_PREVIOUS_TILE_Y;
-extern int8_t TAMER_WAYPOINT_CURRENT;
-extern int8_t TAMER_WAYPOINT_COUNT;
-extern int8_t TAMER_START_TILE_X;
-extern int8_t TAMER_START_TILE_Y;
-extern int8_t TAMER_WAYPOINT_ACTIVE;
-void recalculatePPandArena(void);
-extern int32_t SAVE_TAMER_POS[];
-extern int32_t MAIN_D_801555D4[];
-extern int32_t MAIN_D_801555D8[];
-extern int32_t MAIN_D_801555DC[];
-extern int32_t SAVE_PARTNER_POS[];
-extern int32_t MAIN_D_801555E4[];
-extern int32_t MAIN_D_801555E8[];
-extern int32_t MAIN_D_801555EC[];
-extern int32_t MAIN_D_80155670[];
-extern int32_t MAIN_D_80155674[];
-extern int16_t SAVE_STATS[];
-extern int32_t SAVE_PARTNER_PARA[];
-extern int8_t MAIN_D_8015571C[];
-extern uint8_t MAIN_D_8015571D[];
-extern uint8_t MAIN_D_80155725[];
-extern uint8_t SAVE_PREVIOUS_SCREEN[];
-extern uint8_t SAVE_CURRENT_EXIT[];
-extern uint8_t SAVE_PREVIOUS_EXIT[];
-extern char SAVE_TAMER_WAYPOINT_X[];
-extern char SAVE_TAMER_WAYPOINT_Y[];
-extern int8_t SAVE_TAMER_PREVIOUS_TILE_X[];
-extern int8_t SAVE_TAMER_PREVIOUS_TILE_Y[];
-extern int8_t SAVE_TAMER_WAYPOINT_CURRENT[];
-extern int8_t SAVE_TAMER_WAYPOINT_COUNT[];
-extern int8_t SAVE_TAMER_START_TILE_X[];
-extern int8_t SAVE_TAMER_START_TILE_Y[];
-extern int8_t SAVE_TAMER_WAYPOINT_ACTIVE[];
-int32_t readPStat(int32_t id);
-void writePStat(int32_t id, int32_t value);
-void setTextColor(int32_t color);
 extern uint8_t MAIN_D_80131638[];
-extern uint8_t MAIN_D_801315F8[];
-extern uint8_t MAIN_D_80131618[];
-extern char MAIN_D_801346C4;
 extern char MAIN_D_8013468C;
 extern uint8_t MAIN_D_80131639[];
 extern uint8_t MAIN_D_8013163A[];
+extern int8_t MAIN_D_80131818[];
+extern MenuHighlight MAIN_D_801316B8[];
+
+void clearTextSubArea(RECT *area);
+void drawString(char *text, int32_t color, int32_t pos);
+int8_t getFileCityTopMap(void);
 void renderUIBoxBorder(int16_t *rect, int32_t flag);
 void MAIN_func_80092B9C(POLY_G4 *prim);
 
@@ -160,7 +98,7 @@ void tickMainMenu();
 int32_t MAIN_func_8011239C(MenuCursor *cursor, int32_t which);
 int32_t MAIN_func_80112524(int32_t menu);
 void setMemoryCardReadError(int32_t id, int32_t slot);
-int32_t MAIN_func_801125A8(int32_t unused, int32_t mode);
+int32_t MAIN_func_801125A8(int32_t chan, int32_t mode);
 int32_t MAIN_func_80112628(int32_t channel, int32_t slot);
 void loadSaveSlotData();
 int32_t MAIN_func_8011296C(MenuCursor *cursor, int32_t which);
@@ -172,18 +110,7 @@ void writeSavegame(uint8_t *sv);
 int32_t MAIN_func_8011341C(uint8_t *p);
 void renderMainMenu();
 void registerBattleData();
-typedef struct {
-	int8_t pos;
-	int8_t pad[5];
-	int16_t rowHeight;
-	int16_t x;
-	int16_t y;
-	int16_t w;
-	int16_t h;
-} MenuHighlight;
 void MAIN_func_801136C8(MenuHighlight *b);
-extern int8_t MAIN_D_80131818[];
-extern MenuHighlight MAIN_D_801316B8[];
 int32_t createByteSum(uint8_t *data, int32_t len);
 void openSaveMachine(void);
 int32_t MAIN_func_801138B0(void);
@@ -243,8 +170,6 @@ void *main_menu_order_anchor[] = {
 	renderText,
 	MAIN_func_8010D034,
 };
-
-
 
 void renderText(POLY_FT4 *prim, int32_t x, int32_t y, uint8_t u, int32_t v,
 		int32_t w, int32_t h, int32_t textColor)
@@ -1207,7 +1132,7 @@ void setMemoryCardReadError(int32_t id, int32_t slot)
 	MAIN_D_8013506C = slot;
 }
 
-int32_t MAIN_func_801125A8(int32_t unused, int32_t mode)
+int32_t MAIN_func_801125A8(int32_t chan, int32_t mode)
 {
 	unsigned long cmd;
 	unsigned long result;
@@ -1216,7 +1141,7 @@ int32_t MAIN_func_801125A8(int32_t unused, int32_t mode)
 		return 0;
 	}
 
-	MemCardExist();
+	MemCardExist(chan);
 	MemCardSync(0, &cmd, &result);
 	if ((result == 0) && (mode == 4)) {
 		result = 4;
@@ -1463,8 +1388,6 @@ void MAIN_func_801136C8(MenuHighlight *b)
 	AddPrim(ACTIVE_ORDERING_TABLE->org, prim++);
 	GsSetWorkBase((PACKET *)prim);
 }
-
-
 
 void openSaveMachine(void)
 {

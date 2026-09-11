@@ -8,6 +8,8 @@
 #include <dw/types.h>
 #include <dw/vs.h>
 
+#include "common.h"
+
 extern int8_t MAIN_D_801352C4;
 extern int16_t VS_D_800707F4[][2];
 extern int16_t VS_D_800707F6[][2];
