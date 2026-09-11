@@ -1,3 +1,4 @@
+#include <dw/bubble.h>
 #include <dw/evl.h>
 #include <dw/main.h>
 #include <dw/utils.h>
@@ -9,7 +10,6 @@
 #include "common.h"
 
 void stopBGM(void);
-void addConditionBubble(int32_t bubbleType, Entity* entity);
 void stopSound(void);
 void loadMapSounds2();
 void isSoundLoaded();

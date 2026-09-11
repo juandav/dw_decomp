@@ -2,6 +2,7 @@
 
 #include <dw/anim.h>
 #include <dw/butterfly.h>
+#include <dw/clock.h>
 #include <dw/entity.h>
 #include <dw/doo.h>
 #include <dw/evl.h>
@@ -75,14 +76,11 @@ void tickPartnerWalking(void);
 void setPartnerSlowWalking(void);
 void setPartnerIdle(void);
 int32_t getPartnerTamerCloseness(void);
-void updateConditionAnimation(void);
 int32_t checkEatDistance(int32_t distance);
-void setPartnerState(int8_t state);
 void tickPartnerBattle(int32_t instanceId);
 void handleConditionBubble();
 int32_t entityIsOffScreen(Entity *entity, int32_t width, int32_t height);
 void tickConditionBoundaries();
-void stopGameTime();
 void unsetCameraFollowPlayer();
 void tickPartnerWaypoints();
 void entityLookAtLocation(Entity *entity, VECTOR *pos);
@@ -129,7 +127,7 @@ void checkShopMap(int32_t mapId);
 void checkArenaMap(int32_t mapId);
 void readMapTFS(int32_t mapId);
 
-void * partner_functions[] = {
+static void *partner_text_order[] = {
 	MAIN_func_800DF7F8,
 	callDigimonRoutine,
 	startPartnerAnimation,

@@ -8,6 +8,7 @@
 #include <dw/map.h>
 #include <dw/model.h>
 #include <dw/move.h>
+#include <dw/partner.h>
 #include <dw/std.h>
 #include <dw/sound.h>
 #include <dw/tamer.h>
@@ -323,7 +324,6 @@ int32_t scriptSetDigimon(uint8_t type, uint8_t slot, uint8_t autotalk);
 int32_t tickMoveObjectTo(uint8_t objectIndex, uint8_t moveIndex,
 			 int8_t steps, int16_t targetX, int16_t targetY);
 void setMovementEnabled(int32_t id, int32_t enabled);
-void setPartnerState(int32_t state);
 void addGameMenu(void);
 void renderDateDigits(void);
 void renderTriangleCursor(int32_t selection, int16_t yOffset);

@@ -9,6 +9,7 @@
 
 #include <dw/anim.h>
 #include <dw/attack_object.h>
+#include <dw/clock.h>
 #include <dw/combat.h>
 #include <dw/entity.h>
 #include <dw/item.h>
@@ -134,13 +135,10 @@ void setDigimonRaised(uint16_t type);
 void MAIN_func_800D56E0(void);
 void runMapHeadScript(int32_t scriptId);
 int32_t readPStat(int32_t id);
-void stopGameTime(void);
 void fadeFromBlack(int32_t frames);
 void initializeUIBoxData(void);
-void initializeClockData(void);
 void initializeMedalModel(void);
 void initializeChest(void);
-void addClock(void);
 void initializeFileReadQueue(void);
 void fillEFEXTable(void);
 void initializeFadeData(void);

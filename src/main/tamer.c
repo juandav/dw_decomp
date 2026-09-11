@@ -6,6 +6,7 @@
 
 #include <dw/anim.h>
 #include <dw/butterfly.h>
+#include <dw/clock.h>
 #include <dw/doo.h>
 #include <dw/eab.h>
 #include <dw/endi.h>
@@ -134,8 +135,6 @@ extern MapWarps MAP_WARPS;
 
 void entityLookAtLocation(Entity *entity, VECTOR *pos);
 void setupEntityMatrix(int32_t entityId);
-void stopGameTime(void);
-void startGameTime(void);
 void fadeToBlack(int32_t frames);
 void fadeFromBlack(int32_t frames);
 void changeMap(uint8_t mapId, uint8_t exitId);
@@ -186,7 +185,6 @@ int32_t getEntityScreenPos(Entity *entity, int32_t flag, int16_t *outPos);
 int32_t isUIBoxAvailable(int32_t id);
 void playBGM(int16_t bgmId);
 void readMapTFS(int32_t mapId);
-void updateMinuteHand(int32_t hour, int32_t minute);
 void initializeDaytimeTransition(int32_t mode);
 int32_t handleBattleStart(int32_t instanceId);
 void loadBattleData(int32_t a, int32_t b);
