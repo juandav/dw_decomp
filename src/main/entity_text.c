@@ -25,7 +25,29 @@ void *entity_text_order_anchor[] = {
 	MAIN_func_800DF804,
 };
 
-INCLUDE_ASM("asm/main/nonmatchings/entity_text", MAIN_func_800DF804);
+void MAIN_func_800DF804()
+{
+	int32_t id;
+	int32_t i;
+	int32_t ofs;
+	uint8_t *p;
+
+	id = 0;
+	p = &MAIN_D_80150CD0[id * 0x8C];
+	while (id < 4) {
+		i = 0;
+		ofs = 0;
+		while (i < 8) {
+			(&p[ofs])[0x10] = 0xFF;
+			(&p[i])[0x84] = 0xFF;
+			i += 1;
+			ofs += 0x10;
+		}
+		*(int32_t *)p = 0;
+		id += 1;
+		p += 0x8C;
+	}
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/entity_text", addEntityText);
 
