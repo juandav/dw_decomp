@@ -1,7 +1,6 @@
 #ifndef DW_SCRIPT_H
 #define DW_SCRIPT_H
 
-#define LANGUAGE_C
 #include <setjmp.h>
 
 #include <libgpu.h>

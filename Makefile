@@ -50,7 +50,7 @@ ARCHFLAGS := -march=r3000 -mtune=r3000 -mabi=32 -EL -mfp32 \
 	     -Xassembler -no-pad-sections
 ASFLAGS := -Wa,--sectname-subst
 CFLAGS := -g -Wall -Wextra -Werror -std=c99 -Os -G0 -mno-gpopt $(ARCHFLAGS)
-CPPFLAGS := $(INC)
+CPPFLAGS := -DLANGUAGE_C $(INC)
 DEPFLAGS = -MM -MF $(@:.o=.d) -MT $@
 LDFLAGS := -g $(addprefix -T ,$(CPPLDSCRIPT)) -static \
 	   -Wl,--no-check-sections -Wl,-Map=% -Wl,--build-id=none \
