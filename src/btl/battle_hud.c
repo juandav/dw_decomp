@@ -11,11 +11,12 @@
 
 #include <dw/aabb.h>
 #include <dw/btl.h>
-#include <dw/item.h>
 #include <dw/combat.h>
 #include <dw/graphics.h>
+#include <dw/item.h>
 #include <dw/model.h>
 #include <dw/params.h>
+#include <dw/sjis.h>
 #include <dw/sound.h>
 
 #include "common.h"
@@ -33,8 +34,6 @@ void convertValueToDigits(int32_t n, int32_t value, int32_t *outCount, int32_t *
 void setEntityTextDigit(POLY_FT4 *poly, int32_t x, int32_t y);
 void setUVDataPolyFT4(POLY_FT4 *prim, int32_t u, int32_t v, int32_t w, int32_t h);
 void setPosDataPolyFT4(POLY_FT4 *prim, int32_t x, int32_t y, int32_t w, int32_t h);
-int32_t convertAsciiToJis(uint8_t input);
-int32_t swapShortBytes(int32_t input);
 int32_t drawGlyph(uint16_t glyph, int32_t x, int32_t y);
 void BTL_drawBattleEndText(int32_t a);
 void swapByte(char *a, char *b);
@@ -620,7 +619,7 @@ void BTL_drawBattleEndText(int32_t flag)
 		if (c == '0') {
 			return;
 		}
-		w = drawGlyph((uint16_t)swapShortBytes((uint16_t)convertAsciiToJis(c)), MAIN_D_801350A8, MAIN_D_801350AA);
+		w = drawGlyph(swapShortBytes(convertAsciiToJis(c)), MAIN_D_801350A8, MAIN_D_801350AA);
 		MAIN_D_801350A8 += w;
 		MAIN_D_801350A4++;
 		return;

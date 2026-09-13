@@ -4,12 +4,9 @@
 #include <dw/params.h>
 #include <dw/pstat.h>
 #include <dw/script.h>
+#include <dw/sjis.h>
 #include <dw/trigger.h>
 #include <dw/ui.h>
-
-uint16_t convertAsciiToJis(int32_t input);
-int32_t swapShortBytes(int32_t input);
-int32_t isAsciiEncoded(const char *value);
 
 void initializeFontCLUT(void);
 void clearTextArea(void);
@@ -912,7 +909,7 @@ void drawString(char *str, uint16_t x, int32_t y)
 			hi = (uint8_t)hi;
 			lo = lo << 8;
 			str++;
-			glyph = swapShortBytes((uint16_t)(lo | hi));
+			glyph = swapShortBytes(lo | hi);
 		}
 
 		x += drawGlyph(glyph, x, y);

@@ -15,11 +15,10 @@
 #include <dw/item.h>
 #include <dw/main.h>
 #include <dw/model.h>
+#include <dw/params.h>
 #include <dw/tamer.h>
 #include <dw/types.h>
 #include <dw/world_object.h>
-
-#include <dw/params.h>
 
 #include "common.h"
 
@@ -27,11 +26,6 @@ int32_t isTriggerSet(uint16_t trigger);
 void unsetTrigger(uint16_t trigger);
 
 
-
-typedef struct {
-	uint16_t shiftJIS;
-	uint16_t ascii;
-} Ascii2ShiftJIS;
 
 extern GsRVIEW2 GS_VIEWPOINT;
 
@@ -54,8 +48,6 @@ extern DR_OFFSET DRAW_OFFSETS[];
 
 extern uint8_t MAP_LAYER_ENABLED;
 
-extern Ascii2ShiftJIS CHAR_MAPPING_NORMAL[];
-extern Ascii2ShiftJIS CHAR_MAPPING_SPECIAL[];
 
 void GsSetNearClip(long clip);
 
@@ -81,9 +73,6 @@ void renderThrownItem(int32_t instanceId);
 void handleBuffDisks(int32_t type);
 void MAIN_func_800F1794(void);
 int32_t removeBuffModelObject(void);
-uint16_t convertAsciiToJis(uint8_t input);
-int32_t swapShortBytes(int32_t input);
-int32_t isAsciiEncoded(const char *value);
 void tickPartnerBattle(int32_t instanceId);
 void tickNPCBattle(int32_t instanceId);
 void unloadNewGameScene(void);
@@ -166,15 +155,10 @@ void tickTamerBattle(int32_t instanceId);
 void MAIN_func_800F0B2C(void);
 void MAIN_func_800F1020(void);
 void MAIN_func_800F179C(void *model, int32_t compIdx, int32_t color);
-void asciiToShiftJIS(char *src, uint8_t *dst);
 
 /* Order anchor (reversed): pins symtab/section order to address order.
  * Unreferenced; discarded by --gc-sections. */
 void *main_order_anchor[] = {
-	swapShortBytes,
-	asciiToShiftJIS,
-	convertAsciiToJis,
-	isAsciiEncoded,
 	removeBuffModelObject,
 	initializeBuffModelObject,
 	initializeBuffModel,
@@ -875,61 +859,4 @@ int32_t initializeBuffModelObject(void)
 int32_t removeBuffModelObject(void)
 {
 	return removeObject(0x501, 0);
-}
-
-int32_t isAsciiEncoded(const char *value)
-{
-	if ((*value >> 7) == 0) {
-		return 1;
-	}
-	return 0;
-}
-
-uint16_t convertAsciiToJis(uint8_t input)
-{
-	uint8_t charType;
-	uint8_t specialOffset;
-	int32_t offset;
-
-	specialOffset = 0;
-
-	if ((input >= 0x20) && (input <= 0x2f)) {
-		specialOffset = 0x1;
-	}
-	else if ((input >= 0x30) && (input <= 0x39)) {
-		charType = 0x0;
-	}
-	else if ((input >= 0x3a) && (input <= 0x40)) {
-		specialOffset = 0xb;
-	}
-	else if ((input >= 0x41) && (input <= 0x5a)) {
-		charType = 0x1;
-	}
-	else if ((input >= 0x5b) && (input <= 0x60)) {
-		specialOffset = 0x25;
-	}
-	else if ((input >= 0x61) && (input <= 0x7a)) {
-		charType = 0x2;
-	}
-	else if ((input >= 0x7b) && (input <= 0x7e)) {
-		specialOffset = 0x3f;
-	} else {
-		return 0;
-	}
-
-	if (specialOffset != 0) {
-		offset = (input - 0x20) - (specialOffset - 1);
-		return CHAR_MAPPING_SPECIAL[offset].shiftJIS;
-	} else {
-		return (input +
-			CHAR_MAPPING_NORMAL[charType].shiftJIS -
-			CHAR_MAPPING_NORMAL[charType].ascii);
-	}
-}
-
-INCLUDE_ASM("asm/main/nonmatchings/main", asciiToShiftJIS);
-
-int32_t swapShortBytes(int32_t input)
-{
-	return ((input >> 8) | (input << 8)) & 0xFFFF;
 }

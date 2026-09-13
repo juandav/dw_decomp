@@ -108,6 +108,7 @@ MAIN_SRC := \
 	src/main/item.c \
 	src/main/kar.c \
 	src/main/main.c \
+	src/main/sjis.c \
 	src/main/main_menu.c \
 	src/main/inventory.c \
 	src/main/entity_text.c \

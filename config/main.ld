@@ -142,6 +142,8 @@ SECTIONS
         . = ALIGN(., 4);
         build/src/main/main.c.o(.text.*);
         . = ALIGN(., 4);
+        build/src/main/sjis.c.o(.text.*);
+        . = ALIGN(., 4);
         build/src/main/vs.c.o(.text.*);
         . = ALIGN(., 4);
         build/src/main/script_common.c.o(.text.*);
@@ -372,6 +374,8 @@ SECTIONS
         . = ALIGN(., 4);
         build/src/main/main.c.o(.rodata.*);
         . = ALIGN(., 4);
+        build/src/main/sjis.c.o(.rodata.*);
+        . = ALIGN(., 4);
         build/src/main/vs.c.o(.rodata.*);
         . = ALIGN(., 4);
         build/src/main/script_common.c.o(.rodata.*);
@@ -535,6 +539,14 @@ SECTIONS
         build/src/main/battle_ui.c.o(.data.*);
         . = ALIGN(., 4);
         KEEP(build/asm/main/data/main.data.s.o(.data.*));
+        . = ALIGN(., 4);
+        build/src/main/sjis.c.o(.data.*);
+        . = ALIGN(., 4);
+        KEEP(build/asm/main/data/vs.data.s.o(.data.*));
+        . = ALIGN(., 4);
+        KEEP(build/asm/main/data/script.data.s.o(.data.*));
+        . = ALIGN(., 4);
+        KEEP(build/asm/main/data/main_menu.data.s.o(.data.*));
         . = ALIGN(., 4);
         build/src/main/vs.c.o(.data.*);
         . = ALIGN(., 4);

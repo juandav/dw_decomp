@@ -8,6 +8,7 @@
 #include <dw/math.h>
 #include <dw/params.h>
 #include <dw/script.h>
+#include <dw/sjis.h>
 #include <dw/sound.h>
 #include <dw/tamer.h>
 #include <dw/ui.h>
@@ -54,9 +55,6 @@ void setUVDataPolyFT4(POLY_FT4 *prim, int32_t xPos, int32_t yPos,
 void renderString(int32_t a0, int32_t a1, int32_t a2, int32_t a3, int32_t a4,
 		  int32_t a5, int32_t a6, int32_t a7, int32_t a8);
 int32_t MAIN_func_80100E40(int32_t boxId);
-int32_t convertAsciiToJis(int32_t input);
-int32_t swapShortBytes(int32_t input);
-int32_t isAsciiEncoded(const char *value);
 int32_t drawGlyph(uint16_t glyph, int32_t col, int32_t a2);
 int32_t hasMove(int32_t moveId);
 void unlearnMove(int32_t moveId);
@@ -2770,7 +2768,7 @@ int32_t drawString2(uint8_t *str, int16_t x, int16_t y, int32_t flag)
 			return 0;
 		default:
 			if (isAsciiEncoded((char *)&ch) != 0) {
-				glyph = swapShortBytes((uint16_t)convertAsciiToJis(ch));
+				glyph = swapShortBytes(convertAsciiToJis(ch));
 			} else {
 				glyph = ch + (*str++ << 8);
 			}

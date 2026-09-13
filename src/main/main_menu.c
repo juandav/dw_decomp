@@ -10,6 +10,7 @@
 #include <dw/params.h>
 #include <dw/partner.h>
 #include <dw/script.h>
+#include <dw/sjis.h>
 #include <dw/sound.h>
 #include <dw/types.h>
 #include <dw/utils.h>
@@ -224,7 +225,6 @@ void MAIN_func_80092B9C(POLY_G4 *prim);
 void recalculatePPandArena(void);
 uint8_t readPStat(int32_t index);
 void writePStat(int32_t index, uint8_t value);
-void asciiToShiftJIS(char *src, uint8_t *dst);
 void VS__initializeVSMode(char *namesP1, char *namesP2);
 void renderMainMenuBackground(void);
 
@@ -1502,7 +1502,8 @@ void tickMainMenu(void)
 		memcpy(MAIN_D_80131A2C, MAIN_D_80133A10, 0x80);
 		memcpy(MAIN_D_80131AAC, MAIN_D_80133A90, 0x80);
 		initializeDefaultSavegame();
-		asciiToShiftJIS(MAIN_D_8013392C, MAIN_D_8013192C + 4);
+		asciiToShiftJIS((uint8_t *)MAIN_D_8013392C,
+				(uint16_t *)(MAIN_D_8013192C + 4));
 		_strncpy((char *)MAIN_D_8013192C + 0xC,
 			 MAIN_D_80131658 + (MEMORY_CARD_SLOT + 1) * 6, 4);
 		_strncpy((char *)MAIN_D_8013192C + 0x12,
@@ -1857,7 +1858,8 @@ void tickMainMenu(void)
 			memcpy(MAIN_D_80131A2C, MAIN_D_80133A10, 0x80);
 			memcpy(MAIN_D_80131AAC, MAIN_D_80133A90, 0x80);
 			writeSavegame(MAIN_D_80131B2C);
-			asciiToShiftJIS(MAIN_D_8013392C, MAIN_D_8013192C + 4);
+			asciiToShiftJIS((uint8_t *)MAIN_D_8013392C,
+				(uint16_t *)(MAIN_D_8013192C + 4));
 			_strncpy((char *)MAIN_D_8013192C + 0xC,
 				 MAIN_D_80131658 + (MEMORY_CARD_SLOT + 1) * 6, 4);
 			_strncpy((char *)MAIN_D_8013192C + 0x12,
@@ -2201,7 +2203,8 @@ void tickMainMenu(void)
 			memcpy(MAIN_D_80131A2C, MAIN_D_80133A10, 0x80);
 			memcpy(MAIN_D_80131AAC, MAIN_D_80133A90, 0x80);
 			writeSavegame(MAIN_D_80131B2C);
-			asciiToShiftJIS(MAIN_D_8013392C, MAIN_D_8013192C + 4);
+			asciiToShiftJIS((uint8_t *)MAIN_D_8013392C,
+				(uint16_t *)(MAIN_D_8013192C + 4));
 			_strncpy((char *)MAIN_D_8013192C + 0xC,
 				 MAIN_D_80131658 + (MEMORY_CARD_SLOT + 1) * 6, 4);
 			_strncpy((char *)MAIN_D_8013192C + 0x12,
