@@ -4,6 +4,22 @@
 #include <dw/sjis.h>
 #include <dw/types.h>
 
+#define NUM_GLYPHS		79
+#define GLYPH_WIDTH		12
+#define GLYPH_HEIGHT		11
+
+#define TEXT_VRAM_X		704
+#define TEXT_VRAM_Y		256
+#define TEXT_AREA_SIZE		256
+#define TEXT_DRAW_LIMIT		(TEXT_AREA_SIZE - GLYPH_WIDTH)
+
+#define NUM_RENDER_SLOTS	50
+#define RENDER_SLOT_SIZE	72
+
+#define NUM_FONT_CLUT_ENTRIES	16
+#define FONT_CLUT_VRAM_X	208
+#define FONT_CLUT_VRAM_Y	488
+
 typedef struct {
 	uint16_t pixelData[11];
 	uint16_t width;
@@ -25,7 +41,7 @@ uint16_t CHAR_TO_GLYPH_TABLE[80] = {
 // clang-format on
 
 // clang-format off
-GlyphData GLYPH_DATA[79] = {
+GlyphData GLYPH_DATA[NUM_GLYPHS] = {
 	{ { 0xf3ff, 0xedff, 0xddff, 0xdeff, 0xbeff, 0x80ff, 0x7f7f, 0x7f7f, 0x7f7f, 0x7f7f, 0xffff, }, 12 },
 	{ { 0x01ff, 0x7eff, 0x7eff, 0x01ff, 0x7eff, 0x7f7f, 0x7f7f, 0x7f7f, 0x7f7f, 0x00ff, 0xffff, }, 12 },
 	{ { 0xe0ff, 0x9f7f, 0x7f7f, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7f7f, 0x9f7f, 0xe0ff, 0xffff, }, 12 },
@@ -109,9 +125,9 @@ GlyphData GLYPH_DATA[79] = {
 // clang-format on
 
 // clang-format off
-u_long FONT_CLUT[8] = {
-	0x6b5a0000, 0x14dc7c00, 0x4b736a7f, 0x03ff7eb2,
-	0x42100400, 0x00002e3c, 0x00000000, 0x00000000,
+uint16_t FONT_CLUT[NUM_FONT_CLUT_ENTRIES] = {
+	0x0000, 0x6b5a, 0x7c00, 0x14dc, 0x6a7f, 0x4b73, 0x7eb2, 0x03ff,
+	0x0400, 0x4210, 0x2e3c, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
 };
 // clang-format on
 
@@ -119,7 +135,7 @@ uint8_t COLORCODE_LOWBITS = 0x01;
 uint8_t COLORCODE_HIGHBITS = 0x10;
 
 int32_t RENDER_AREA_POINTER;
-uint8_t RENDER_AREA[3600];
+uint8_t RENDER_AREA[NUM_RENDER_SLOTS * RENDER_SLOT_SIZE];
 
 void initializeFontCLUT(void)
 {
@@ -127,8 +143,8 @@ void initializeFontCLUT(void)
 
 	clearTextArea();
 
-	setRECT(&rect, 208, 488, 16, 1);
-	LoadImage(&rect, FONT_CLUT);
+	setRECT(&rect, FONT_CLUT_VRAM_X, FONT_CLUT_VRAM_Y, NUM_FONT_CLUT_ENTRIES, 1);
+	LoadImage(&rect, (u_long *)FONT_CLUT);
 
 	RENDER_AREA_POINTER = 0;
 }
@@ -137,14 +153,14 @@ void clearTextArea(void)
 {
 	RECT rect;
 
-	setRECT(&rect, 0, 0, 256, 256);
+	setRECT(&rect, 0, 0, TEXT_AREA_SIZE, TEXT_AREA_SIZE);
 	clearTextSubArea(&rect);
 }
 
 void clearTextSubArea(RECT *rect)
 {
-	rect->x = (rect->x / 4) + 704;
-	rect->y += 256;
+	rect->x = (rect->x / 4) + TEXT_VRAM_X;
+	rect->y += TEXT_VRAM_Y;
 	rect->w >>= 2;
 	ClearImage(rect, 0, 0, 0);
 }
@@ -158,23 +174,23 @@ void setTextColor(int32_t color)
 int32_t drawGlyph(uint16_t codepoint, int32_t x, int32_t y)
 {
 	RECT rect;
-	uint16_t *g;
-	uint8_t *out;
-	uint16_t bits;
-	uint8_t px;
+	uint16_t *p;
+	uint8_t *drawRow;
+	uint16_t rowData;
+	uint8_t tmp;
 	int32_t n;
 	int32_t i;
 
-	if ((uint32_t)x >= 0xf4) {
+	if ((uint32_t)x >= TEXT_DRAW_LIMIT) {
 		return 0;
 	}
 
-	if ((uint32_t)y >= 0xf4) {
+	if ((uint32_t)y >= TEXT_DRAW_LIMIT) {
 		return 0;
 	}
 
 	codepoint = ((codepoint & 0xff) << 8) + ((codepoint & 0xff00) >> 8);
-	CHAR_TO_GLYPH_TABLE[78] = codepoint;
+	CHAR_TO_GLYPH_TABLE[NUM_GLYPHS - 1] = codepoint;
 
 	for (n = 0;; ++n) {
 		if (codepoint == CHAR_TO_GLYPH_TABLE[n]) {
@@ -182,83 +198,84 @@ int32_t drawGlyph(uint16_t codepoint, int32_t x, int32_t y)
 		}
 	}
 
-	g = GLYPH_DATA[n].pixelData;
-	RENDER_AREA_POINTER = (RENDER_AREA_POINTER + 1) % 0x32;
-	out = RENDER_AREA + RENDER_AREA_POINTER * 72;
-	for (i = 0; i < 0xb; i++) {
-		bits = *g++;
+	p = GLYPH_DATA[n].pixelData;
+	RENDER_AREA_POINTER = (RENDER_AREA_POINTER + 1) % NUM_RENDER_SLOTS;
+	drawRow = RENDER_AREA + RENDER_AREA_POINTER * RENDER_SLOT_SIZE;
 
-		px = 0;
-		if ((bits & 0x8000) == 0) {
-			px |= COLORCODE_LOWBITS;
+	for (i = 0; i < GLYPH_HEIGHT; i++) {
+		rowData = *p++;
+
+		tmp = 0;
+		if ((rowData & 0x8000) == 0) {
+			tmp |= COLORCODE_LOWBITS;
 		}
 
-		if ((bits & 0x4000) == 0) {
-			px |= COLORCODE_HIGHBITS;
+		if ((rowData & 0x4000) == 0) {
+			tmp |= COLORCODE_HIGHBITS;
 		}
 
-		*out++ = px;
+		*drawRow++ = tmp;
 
-		px = 0;
-		if ((bits & 0x2000) == 0) {
-			px |= COLORCODE_LOWBITS;
+		tmp = 0;
+		if ((rowData & 0x2000) == 0) {
+			tmp |= COLORCODE_LOWBITS;
 		}
 
-		if ((bits & 0x1000) == 0) {
-			px |= COLORCODE_HIGHBITS;
+		if ((rowData & 0x1000) == 0) {
+			tmp |= COLORCODE_HIGHBITS;
 		}
 
-		*out++ = px;
+		*drawRow++ = tmp;
 
-		px = 0;
-		if ((bits & 0x800) == 0) {
-			px |= COLORCODE_LOWBITS;
+		tmp = 0;
+		if ((rowData & 0x800) == 0) {
+			tmp |= COLORCODE_LOWBITS;
 		}
 
-		if ((bits & 0x400) == 0) {
-			px |= COLORCODE_HIGHBITS;
+		if ((rowData & 0x400) == 0) {
+			tmp |= COLORCODE_HIGHBITS;
 		}
 
-		*out++ = px;
+		*drawRow++ = tmp;
 
-		px = 0;
-		if ((bits & 0x200) == 0) {
-			px |= COLORCODE_LOWBITS;
+		tmp = 0;
+		if ((rowData & 0x200) == 0) {
+			tmp |= COLORCODE_LOWBITS;
 		}
 
-		if ((bits & 0x100) == 0) {
-			px |= COLORCODE_HIGHBITS;
+		if ((rowData & 0x100) == 0) {
+			tmp |= COLORCODE_HIGHBITS;
 		}
 
-		*out++ = px;
+		*drawRow++ = tmp;
 
-		px = 0;
-		if ((bits & 0x80) == 0) {
-			px |= COLORCODE_LOWBITS;
+		tmp = 0;
+		if ((rowData & 0x80) == 0) {
+			tmp |= COLORCODE_LOWBITS;
 		}
 
-		if ((bits & 0x40) == 0) {
-			px |= COLORCODE_HIGHBITS;
+		if ((rowData & 0x40) == 0) {
+			tmp |= COLORCODE_HIGHBITS;
 		}
 
-		*out++ = px;
+		*drawRow++ = tmp;
 
-		px = 0;
-		if ((bits & 0x20) == 0) {
-			px |= COLORCODE_LOWBITS;
+		tmp = 0;
+		if ((rowData & 0x20) == 0) {
+			tmp |= COLORCODE_LOWBITS;
 		}
 
-		if ((bits & 0x10) == 0) {
-			px |= COLORCODE_HIGHBITS;
+		if ((rowData & 0x10) == 0) {
+			tmp |= COLORCODE_HIGHBITS;
 		}
 
-		*out++ = px;
+		*drawRow++ = tmp;
 	}
 
-	setRECT(&rect, (x / 4) + 704, y + 256, 3, 11);
-	LoadImage(&rect, (u_long *)(RENDER_AREA + RENDER_AREA_POINTER * 72));
+	setRECT(&rect, (x / 4) + TEXT_VRAM_X, y + TEXT_VRAM_Y, GLYPH_WIDTH / 4, GLYPH_HEIGHT);
+	LoadImage(&rect, (u_long *)(RENDER_AREA + RENDER_AREA_POINTER * RENDER_SLOT_SIZE));
 
-	return *g;
+	return *p;
 }
 
 // clang-format off
@@ -268,21 +285,21 @@ void drawString(str, x, y)
 	int32_t y;
 // clang-format on
 {
-	uint16_t glyph;
+	uint16_t codepoint;
 	uint16_t hi;
 	uint16_t lo;
 
-	while (*str != 0) {
+	while (*str != '\0') {
 		if (isAsciiEncoded(str) != 0) {
-			if (*str == 0x2e) {
-				glyph = 0x8142;
-			} else if (*str == 0x27) {
-				glyph = 0x8175;
+			if (*str == '.') {
+				codepoint = 0x8142;
+			} else if (*str == '\'') {
+				codepoint = 0x8175;
 			} else {
-				glyph = convertAsciiToJis(*str);
+				codepoint = convertAsciiToJis(*str);
 			}
 
-			glyph = swapShortBytes(glyph);
+			codepoint = swapShortBytes(codepoint);
 			str++;
 		} else {
 			lo = *str;
@@ -292,9 +309,9 @@ void drawString(str, x, y)
 			hi = (uint8_t)hi;
 			lo = lo << 8;
 			str++;
-			glyph = swapShortBytes(lo | hi);
+			codepoint = swapShortBytes(lo | hi);
 		}
 
-		x += drawGlyph(glyph, x, y);
+		x += drawGlyph(codepoint, x, y);
 	}
 }
