@@ -3,6 +3,7 @@
 #include <libgs.h>
 
 #include <dw/file_queue.h>
+#include <dw/font.h>
 #include <dw/item.h>
 #include <dw/map.h>
 #include <dw/math.h>
@@ -55,7 +56,6 @@ void setUVDataPolyFT4(POLY_FT4 *prim, int32_t xPos, int32_t yPos,
 void renderString(int32_t a0, int32_t a1, int32_t a2, int32_t a3, int32_t a4,
 		  int32_t a5, int32_t a6, int32_t a7, int32_t a8);
 int32_t MAIN_func_80100E40(int32_t boxId);
-int32_t drawGlyph(uint16_t glyph, int32_t col, int32_t a2);
 int32_t hasMove(int32_t moveId);
 void unlearnMove(int32_t moveId);
 void loadMap(uint16_t mapId);

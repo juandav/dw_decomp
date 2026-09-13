@@ -2,6 +2,7 @@
 #include <string.h>
 
 #include <dw/anim.h>
+#include <dw/font.h>
 #include <dw/model.h>
 #include <dw/types.h>
 #include <dw/clock.h>
@@ -240,9 +241,6 @@ void getModelTile(VECTOR *pos, int16_t *outTileX, int16_t *outTileY);
 void setTrigger(uint16_t flag);
 void createCloudFX(int16_t *pos);
 void updateTimeOfDay(void);
-void clearTextArea(void);
-void setTextColor(int32_t color);
-void drawString(char *str, int32_t x, int32_t y);
 int32_t isInDaytimeTransition(void);
 void renderRectPolyFT4(int32_t posX, int32_t posY, int32_t width,
 		       int32_t height, int32_t texX, int32_t texY,

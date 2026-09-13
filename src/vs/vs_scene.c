@@ -5,6 +5,7 @@
 #include <libgte.h>
 
 #include <dw/clock.h>
+#include <dw/font.h>
 #include <dw/main.h>
 #include <dw/math.h>
 #include <dw/model.h>
@@ -139,8 +140,6 @@ int32_t loadTIMFile(char *path, void *buffer);
 void renderNumber(int32_t a, int32_t x, int32_t y, int32_t digits, int32_t value, int32_t layer);
 void initStringFT4(POLY_FT4 *p);
 int32_t VS_initializeLighting__garbage__(int32_t i);
-void clearTextArea(void);
-void drawString(char *text, int32_t x, int32_t y);
 void fadeFromBlack(int32_t frames);
 void fadeToBlack(int32_t frames);
 void VS_setVersusModelSceneTimer(int16_t value);

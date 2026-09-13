@@ -1,14 +1,15 @@
 #include <string.h>
+
 #include <libetc.h>
 #include <libgpu.h>
+
 #include <dw/clock.h>
 #include <dw/entity.h>
+#include <dw/font.h>
 #include <dw/pstat.h>
 #include <dw/tournament.h>
 #include <dw/trigger.h>
 #include <dw/ui.h>
-
-#include "common.h"
 
 extern char *TEXT_BUFFERS_PTR;
 
@@ -50,7 +51,6 @@ void triggerBoxCloseFlag(int32_t);
 void playSound(int16_t, int16_t);
 void writePStat(int32_t id, uint8_t value);
 
-void drawString(char *str, uint32_t x, uint32_t y);
 void renderString(int32_t colorId,
 		  int32_t posX, int32_t posY,
 		  int16_t uvWidth, int16_t uvHeight,
@@ -473,7 +473,7 @@ void renderTournamentTextbox(void)
 	posX = UI_BOX_DATA[1].finalPos.x + 6;
 	posY = UI_BOX_DATA[1].finalPos.y + 3;
 
-	drawString("Tournament", 0, uvY);
+	drawString("Tournament", 0, (uint32_t)uvY);
 	renderString(0, posX, posY, 0x54, 0xc, 0, uvY, 5, 1);
 }
 

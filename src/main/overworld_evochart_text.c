@@ -1,3 +1,4 @@
+#include <dw/font.h>
 #include <dw/graphics.h>
 #include <dw/params.h>
 #include <dw/ui.h>
@@ -13,8 +14,6 @@ extern char *MAIN_D_8012481C[];
 extern char *MAIN_D_80124820[];
 extern char *MAIN_D_80124824[];
 
-void clearTextSubArea(RECT *area);
-void drawString(char *text, int32_t color, int32_t pos);
 int32_t drawEvoChartStrings(int32_t arg);
 
 int32_t drawEvoChartStrings(int32_t arg)

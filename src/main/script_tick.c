@@ -1,5 +1,6 @@
 #include <dw/clock.h>
 #include <dw/doo.h>
+#include <dw/font.h>
 #include <dw/map_object.h>
 #include <dw/partner.h>
 #define CURRENT_SCRIPT_PTR CURRENT_SCRIPT_PTR_shadow
@@ -11,7 +12,6 @@ extern uint8_t *CURRENT_SCRIPT_PTR;
 #include <dw/trigger.h>
 
 void unsetCameraFollowPlayer(void);
-void clearTextArea(void);
 extern int32_t MAIN_func_800D8E64(int32_t param_1, int32_t param_2,
 				  int32_t param_3);
 extern int32_t tickRemoveMist(void);

@@ -1,9 +1,10 @@
 #include <libgs.h>
-#include <dw/item.h>
 
 #include <dw/combat.h>
 #include <dw/entity.h>
+#include <dw/font.h>
 #include <dw/graphics.h>
+#include <dw/item.h>
 #include <dw/math.h>
 #include <dw/move.h>
 #include <dw/params.h>
@@ -28,8 +29,6 @@ void initStringFT4(POLY_FT4 *p);
 void setUVDataPolyFT4(POLY_FT4 *p, int32_t u, int32_t v, int32_t w, int32_t h);
 void setPosDataPolyFT4(POLY_FT4 *prim, int32_t x, int32_t y, int32_t w,
 		       int32_t h);
-void drawString(char *text, int32_t color, int32_t pos);
-void clearTextArea(void);
 int32_t hasMove(int32_t moveId);
 void learnMove(int32_t moveId);
 void BTL_battleTickFrame(void);

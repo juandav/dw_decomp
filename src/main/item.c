@@ -8,6 +8,7 @@
 #include <dw/btl.h>
 #include <dw/combat.h>
 #include <dw/entity.h>
+#include <dw/font.h>
 #include <dw/item.h>
 #include <dw/math.h>
 #include <dw/params.h>
@@ -45,7 +46,6 @@ void getModelTile(VECTOR *pos, int16_t *outTileX, int16_t *outTileY);
 void renderDroppedItem(int32_t instanceId);
 void renderDroppedItemShadow(WorldItem *item);
 void handlePoopWeightLoss(int32_t type);
-void clearTextArea(void);
 void closeInventoryBoxes(void);
 void BTL_healStatusEffect(int32_t arg);
 void addEntityText(Entity *entity, int32_t a, int32_t b, int16_t value,

@@ -1,4 +1,5 @@
 #include <dw/evl.h>
+#include <dw/font.h>
 
 extern int8_t MENU_SUB_STATE;
 extern char MAIN_D_80124C54[];
@@ -14,8 +15,6 @@ extern char *MAIN_D_801247D4[];
 extern char *MAIN_D_801247D8[];
 extern char *MOVE_NAMES[];
 
-void clearTextSubArea(RECT *area);
-void drawString(char *text, int32_t color, int32_t pos);
 int32_t entityGetTechFromAnim(Entity *entity, int32_t anim);
 int32_t drawDigimonMovesText(void);
 

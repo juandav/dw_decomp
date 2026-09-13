@@ -2,6 +2,7 @@
 #include <libgs.h>
 
 #include <dw/entity.h>
+#include <dw/font.h>
 #include <dw/script.h>
 #include <dw/sound.h>
 #include <dw/types.h>
@@ -40,8 +41,6 @@ void renderTrianglePrimitive(int32_t color, int32_t x0, int32_t y0, int32_t x1, 
 void setEntityTextDigit(POLY_FT4 *poly, int32_t x, int32_t y);
 void setPosDataPolyFT4(POLY_FT4 *prim, int32_t x, int32_t y, int32_t w, int32_t h);
 void setUVDataPolyFT4(POLY_FT4 *p, int32_t u, int32_t v, int32_t w, int32_t h);
-void clearTextArea(void);
-void drawString(char *text, int32_t color, int32_t pos);
 void worldPosToScreenPos(TrainingSpot *item, SVECTOR *out);
 void TRN_saveBaseStats(void);
 void TRN_applyBaseStats(void);

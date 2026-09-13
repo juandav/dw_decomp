@@ -9,6 +9,7 @@
 #include <dw/entity.h>
 #include <dw/fade.h>
 #include <dw/file.h>
+#include <dw/font.h>
 #include <dw/item.h>
 #include <dw/map.h>
 #include <dw/math.h>
@@ -64,8 +65,6 @@ int32_t checkMapCollisionY(Entity *entity, int32_t direction);
 void checkShopMap(uint8_t mapId);
 void clearMapDigimon(void);
 void clearMapObjects(uint8_t *instances);
-void clearTextArea(void);
-void drawString(char *text, int32_t x, int32_t y);
 void entityLookAtTile(Entity *entity, int32_t tileX, int32_t tileY);
 void getModelTile(VECTOR *pos, int16_t *outTileX, int16_t *outTileY);
 void handleBattleIdle(DigimonEntity *entity, Stats *stats, int32_t flags);

@@ -1,3 +1,4 @@
+#include <dw/font.h>
 #include <dw/graphics.h>
 #include <dw/ui.h>
 
@@ -10,8 +11,6 @@ extern char *MAIN_D_80124804[];
 extern char *MAIN_D_80124828[];
 extern char *MAIN_D_80124864[];
 
-void clearTextSubArea(RECT *area);
-void drawString(char *text, int32_t color, int32_t pos);
 int32_t drawMedalViewStrings(void);
 
 int32_t drawMedalViewStrings(void)

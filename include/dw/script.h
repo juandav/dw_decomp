@@ -6,6 +6,7 @@
 #include <libgpu.h>
 
 #include <dw/entity.h>
+#include <dw/font.h>
 #include <dw/types.h>
 
 typedef struct {
@@ -258,8 +259,6 @@ void MAIN_func_8010C28C(void);
 void MAIN_func_8010C4B0(void);
 void initializeNamingBuffer(uint8_t flags);
 int32_t newGameStateMachine(void);
-void clearTextSubArea(RECT *rect);
-void setTextColor(int32_t color);
 int16_t *getStatsPointer(int32_t stat);
 uint8_t *getScript(int32_t mapId);
 uint8_t *getScriptSection(uint8_t *script, int32_t section);

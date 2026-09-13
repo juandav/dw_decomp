@@ -10,6 +10,7 @@
 #include <dw/btl.h>
 #include <dw/entity.h>
 #include <dw/file.h>
+#include <dw/font.h>
 #include <dw/kar.h>
 #include <dw/script.h>
 #include <dw/sound.h>
@@ -128,7 +129,6 @@ typedef struct {
 } KarDigits;
 
 void renderSelectionCursor(int32_t a, int32_t b, int32_t c, int32_t d, int32_t e);
-void clearTextArea(void);
 void renderString(int32_t a, int32_t b, int32_t c, int32_t d, int32_t e, int32_t f, int32_t g, int32_t h, int32_t i);
 void renderUIBox(int32_t id);
 

@@ -6,6 +6,7 @@
 #include <libmcrd.h>
 
 #include <dw/entity.h>
+#include <dw/font.h>
 #include <dw/item.h>
 #include <dw/params.h>
 #include <dw/partner.h>
@@ -216,9 +217,6 @@ extern uint8_t MAIN_D_80133A90[];
 extern uint8_t MAIN_D_80133B10[];
 extern uint8_t *MAIN_D_801346D4;
 
-void clearTextSubArea(RECT *area);
-void drawString(char *text, int32_t color, int32_t pos);
-void setTextColor(int32_t color);
 int8_t getFileCityTopMap(void);
 void renderUIBoxBorder(int16_t *rect, int32_t flag);
 void MAIN_func_80092B9C(POLY_G4 *prim);
@@ -250,7 +248,6 @@ void MAIN_func_8010E73C();
 void MAIN_func_8010E8C0(void);
 void MAIN_func_8010E938(void);
 void MAIN_func_8010EA1C(void);
-void clearTextArea(void);
 void drawMainMenuStrings();
 void drawSaveSlotText(int32_t slot, int32_t row);
 char *MAIN_func_8010FB7C(int32_t value, char *buf, int32_t digits);

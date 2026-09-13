@@ -20,3 +20,5 @@ subsegments:
   - [0x80155560, bubble]
   - [0x801555A8, battle_ui]
   - [0x801555D0, unk_0x801555D0]
+  - [0x801BE958, font]
+  - [0x801BF768, unk_0x801BF768]

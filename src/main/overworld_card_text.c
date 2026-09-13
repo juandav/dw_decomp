@@ -1,5 +1,6 @@
 #include <libgpu.h>
 
+#include <dw/font.h>
 #include <dw/graphics.h>
 
 extern RECT MAIN_D_80134328;
@@ -8,8 +9,6 @@ extern char MAIN_D_80124C54[];
 extern int8_t MENU_SUB_STATE;
 extern int8_t SELECTED_CARD;
 
-void drawString(char *text, int32_t color, int32_t pos);
-void clearTextSubArea(RECT *area);
 int32_t drawCardViewStrings(void);
 
 int32_t drawCardViewStrings(void)

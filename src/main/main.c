@@ -12,6 +12,7 @@
 #include <dw/clock.h>
 #include <dw/combat.h>
 #include <dw/entity.h>
+#include <dw/font.h>
 #include <dw/item.h>
 #include <dw/main.h>
 #include <dw/model.h>
@@ -103,7 +104,6 @@ void PadInit(int32_t mode);
 long MemCardInit(long val);
 long MemCardStart(void);
 void initializeGsTMDMap(void);
-void initializeFontCLUT(void);
 void initializeScripts(void);
 void initializeStatusObjects(void);
 void initializeMusic(void);

@@ -1,6 +1,7 @@
 #include <stdio.h>
 
 #include <dw/clock.h>
+#include <dw/font.h>
 #include <dw/params.h>
 #include <dw/ui.h>
 
@@ -11,8 +12,6 @@ extern char MAIN_D_80134300[8];
 extern char *MAIN_D_80124800[];
 extern char *MAIN_D_80124918[];
 
-void clearTextSubArea(RECT *area);
-void drawString(char *text, int32_t color, int32_t pos);
 int32_t drawPlayerInfoStrings(void);
 
 int32_t drawPlayerInfoStrings(void)

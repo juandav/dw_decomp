@@ -4,13 +4,14 @@
 #include <dw/clock.h>
 #include <dw/evl.h>
 #include <dw/fish.h>
+#include <dw/font.h>
 #include <dw/item.h>
 #include <dw/map.h>
 #include <dw/model.h>
 #include <dw/move.h>
 #include <dw/partner.h>
-#include <dw/std.h>
 #include <dw/sound.h>
+#include <dw/std.h>
 #include <dw/tamer.h>
 #include <dw/ui.h>
 
@@ -198,12 +199,10 @@ extern int8_t MAIN_D_80134D46;
 extern int16_t MAIN_D_80134D48;
 extern char *MOVE_NAMES[];
 
-void clearTextSubArea(RECT *area);
 int32_t isTriggerSet(int32_t triggerId);
 void callScriptSection(uint16_t scriptId, uint32_t scriptSection,
 		       uint32_t param);
 void startNPCAnimation(uint8_t scriptId, int32_t animId);
-void drawString(char *text, int32_t color, int32_t pos);
 void drawInventoryText(void);
 void closeTriangleMenu(void);
 void closeInventoryBoxes2();
@@ -224,7 +223,6 @@ int32_t createMenuBox(int32_t id, int16_t x, int16_t y, int16_t width,
 void closeUIBoxIfOpen(int32_t arg);
 void getEntityScreenPos(Entity *entity, int32_t flag, int16_t *outPos);
 void initializeInventoryObject(void);
-void clearTextArea(void);
 void tickGameMenu(void);
 void renderGameMenu(void);
 void tickDigimonMenu(void);

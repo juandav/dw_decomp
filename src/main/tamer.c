@@ -12,6 +12,7 @@
 #include <dw/endi.h>
 #include <dw/entity.h>
 #include <dw/fade.h>
+#include <dw/font.h>
 #include <dw/item.h>
 #include <dw/kar.h>
 #include <dw/main.h>
@@ -144,10 +145,6 @@ void renderString(int32_t, int32_t, int32_t, int32_t, int32_t, int32_t,
 void renderUIBox(int32_t id);
 void setMapLayerEnabled(int32_t enabled);
 int32_t isSoundLoaded(int32_t isAsync, int32_t soundId);
-void drawString(char *text, int32_t color, int32_t pos);
-void clearTextArea(void);
-void clearTextSubArea(RECT *area);
-void setTextColor(int32_t color);
 void playSound(int32_t vabId, uint32_t note);
 void setCameraFollowPlayer(void);
 void unsetCameraFollowPlayer(void);

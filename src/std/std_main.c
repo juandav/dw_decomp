@@ -16,6 +16,7 @@
 #include <dw/combat.h>
 #include <dw/entity.h>
 #include <dw/evl.h>
+#include <dw/font.h>
 #include <dw/item.h>
 #include <dw/math.h>
 #include <dw/model.h>
@@ -261,8 +262,6 @@ void STD_func_8005E004(int32_t i);
 void convertValueToDigits(int32_t n, int32_t value, int32_t *outCount, int32_t *digits);
 int32_t getDistance(int32_t x, int32_t y, int32_t z);
 int32_t STD_getFighterDistance(VECTOR *self, VECTOR *other, VECTOR *target);
-void clearTextArea(void);
-void drawString(char *text, int32_t color, int32_t pos);
 int32_t STD_func_80060B98(void);
 void STD_tickFighterCounter(void);
 void STD_applyEntityViewpoint(void);
@@ -328,7 +327,6 @@ void STD_setCameraToEntity(void);
 void STD_func_8005A054(void);
 void swapShort(int16_t *a, int16_t *b);
 void STD_func_8005D550(int16_t i);
-void clearTextSubArea(RECT *rect);
 void STD_func_80068388(int32_t i);
 void STD_func_80059B70(void);
 void STD_removeAllStunEffects(void);

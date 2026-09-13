@@ -8,6 +8,7 @@
 #include <dw/attack_object.h>
 #include <dw/combat.h>
 #include <dw/entity.h>
+#include <dw/font.h>
 #include <dw/main.h>
 #include <dw/math.h>
 #include <dw/model.h>
@@ -29,8 +30,6 @@ typedef struct {
 	uint8_t y;
 } VsUISprite;
 
-void clearTextArea(void);
-void drawString(char *text, int32_t color, int32_t pos);
 uint32_t PadRead(int32_t id);
 void VS_startCameraChase(Entity *entity, int32_t offset, int32_t id);
 void VS_tickFrame(void);

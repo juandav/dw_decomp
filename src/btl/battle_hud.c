@@ -12,6 +12,7 @@
 #include <dw/aabb.h>
 #include <dw/btl.h>
 #include <dw/combat.h>
+#include <dw/font.h>
 #include <dw/graphics.h>
 #include <dw/item.h>
 #include <dw/model.h>
@@ -34,7 +35,6 @@ void convertValueToDigits(int32_t n, int32_t value, int32_t *outCount, int32_t *
 void setEntityTextDigit(POLY_FT4 *poly, int32_t x, int32_t y);
 void setUVDataPolyFT4(POLY_FT4 *prim, int32_t u, int32_t v, int32_t w, int32_t h);
 void setPosDataPolyFT4(POLY_FT4 *prim, int32_t x, int32_t y, int32_t w, int32_t h);
-int32_t drawGlyph(uint16_t glyph, int32_t x, int32_t y);
 void BTL_drawBattleEndText(int32_t a);
 void swapByte(char *a, char *b);
 void BTL_renderBattleStartTextBurst(void);

@@ -2,10 +2,11 @@
 
 #include <dw/anim.h>
 #include <dw/entity.h>
+#include <dw/font.h>
+#include <dw/item.h>
 #include <dw/params.h>
 #include <dw/types.h>
 #include <dw/ui.h>
-#include <dw/item.h>
 #include <dw/world_object.h>
 
 char CONFIRM_PROMPT[16] = "Are you sure?";
@@ -52,7 +53,6 @@ static void *inventory_sbss_order[] = {
 
 extern int32_t POLLED_INPUT;
 extern int32_t POLLED_INPUT_PREVIOUS;
-void clearTextArea(void);
 extern int8_t GAME_STATE;
 extern char *COMBAT_DATA_PTR;
 extern TamerEntity TAMER_ENTITY;
@@ -65,8 +65,6 @@ void renderString(int32_t a, int32_t b, int32_t c, int32_t d, int32_t e,
 		  int32_t f, int32_t g, int32_t h, int32_t i);
 void renderSelectionCursor(int32_t x, int32_t y, int16_t w, int16_t h, int32_t layer);
 extern char *ITEM_DESC_PTR[];
-void clearTextSubArea(RECT *area);
-void drawString(char *text, int32_t color, int32_t pos);
 void swapByte(uint8_t *a, uint8_t *b);
 void playSound(int32_t vabId, uint32_t note);
 void sortItems(int16_t mode);

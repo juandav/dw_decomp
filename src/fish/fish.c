@@ -7,16 +7,17 @@
 #include <mwinline_n.h>
 
 #include <dw/anim.h>
-#include <dw/types.h>
+#include <dw/clock.h>
 #include <dw/entity.h>
 #include <dw/file.h>
 #include <dw/fish.h>
+#include <dw/font.h>
 #include <dw/item.h>
-#include <dw/clock.h>
 #include <dw/params.h>
 #include <dw/script.h>
 #include <dw/sound.h>
 #include <dw/tamer.h>
+#include <dw/types.h>
 #include <dw/ui.h>
 
 #include "common.h"
@@ -196,9 +197,6 @@ VECTOR *ApplyMatrix(MATRIX *m, SVECTOR *v0, VECTOR *v1);
 void MAIN_func_800E4038(VECTOR *out, int32_t x, int32_t z, int32_t *f);
 void renderString(int32_t a, int32_t b, int32_t c, int32_t d, int32_t e, int32_t f, int32_t g, int32_t h, int32_t i);
 void renderUIBox(int32_t id);
-void drawString(char *text, int32_t color, int32_t pos);
-void clearTextSubArea(RECT *area);
-void clearTextArea(void);
 void renderItemSprite(int32_t itemId, int32_t x, int32_t y, int32_t depth);
 void calculatePosition(GsCOORDINATE2 *coord, MATRIX *matrix);
 void matrixToEuler2(MATRIX *m, SVECTOR *out);

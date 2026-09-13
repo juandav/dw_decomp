@@ -82,7 +82,8 @@ MAIN_BSS := \
 	$(BUILDDIR)/generated/libmrcd.bss.s \
 	$(BUILDDIR)/generated/bubble.bss.s \
 	$(BUILDDIR)/generated/battle_ui.bss.s \
-	$(BUILDDIR)/generated/unk_0x801555D0.bss.s
+	$(BUILDDIR)/generated/unk_0x801555D0.bss.s \
+	$(BUILDDIR)/generated/unk_0x801BF768.bss.s
 
 MAIN_SRC := \
 	$(MAIN_ASM_SRC) \
@@ -91,11 +92,15 @@ MAIN_SRC := \
 	src/main/_psstart.c \
 	src/main/aabb.c \
 	src/main/anim.c \
+	src/main/battle_ui.c \
+	src/main/btl.c \
 	src/main/bubble.c \
 	src/main/butterfly.c \
 	src/main/clock.c \
 	src/main/door_mapdata.c \
+	src/main/efe.c \
 	src/main/efe_table.c \
+	src/main/entity_text.c \
 	src/main/evl.c \
 	src/main/evolution.c \
 	src/main/fade.c \
@@ -103,47 +108,44 @@ MAIN_SRC := \
 	src/main/file_queue.c \
 	src/main/file_table.c \
 	src/main/fish.c \
+	src/main/font.c \
 	src/main/graphics.c \
 	src/main/graphics2.c \
+	src/main/inventory.c \
 	src/main/item.c \
 	src/main/kar.c \
 	src/main/main.c \
-	src/main/sjis.c \
 	src/main/main_menu.c \
-	src/main/inventory.c \
-	src/main/entity_text.c \
-	src/main/efe.c \
-	src/main/btl.c \
-	src/main/battle_ui.c \
 	src/main/map.c \
 	src/main/map_collision.c \
 	src/main/map_object.c \
-	src/main/overworld.c \
-	src/main/overworld_evochart_detail.c \
-	src/main/overworld_menu_views.c \
-	src/main/overworld_evochart_view.c \
-	src/main/overworld_status_boxes.c \
-	src/main/overworld_moves_text.c \
-	src/main/overworld_moves_box.c \
-	src/main/overworld_playerinfo_text.c \
-	src/main/overworld_evochart_text.c \
-	src/main/overworld_medal_text.c \
-	src/main/overworld_card_text.c \
 	src/main/math.c \
 	src/main/model.c \
+	src/main/overworld.c \
+	src/main/overworld_card_text.c \
+	src/main/overworld_evochart_detail.c \
+	src/main/overworld_evochart_text.c \
+	src/main/overworld_evochart_view.c \
+	src/main/overworld_medal_text.c \
+	src/main/overworld_menu_views.c \
+	src/main/overworld_moves_box.c \
+	src/main/overworld_moves_text.c \
+	src/main/overworld_playerinfo_text.c \
+	src/main/overworld_status_boxes.c \
 	src/main/particle.c \
 	src/main/partner.c \
 	src/main/partner_impl.c \
+	src/main/script_anim.c \
 	src/main/script_common.c \
+	src/main/script_draw.c \
+	src/main/script_engine.c \
 	src/main/script_instr10.c \
 	src/main/script_instr28.c \
 	src/main/script_instr64.c \
 	src/main/script_music.c \
-	src/main/script_anim.c \
-	src/main/script_engine.c \
-	src/main/script_tick.c \
 	src/main/script_ops.c \
-	src/main/script_draw.c \
+	src/main/script_tick.c \
+	src/main/sjis.c \
 	src/main/sound.c \
 	src/main/sound_async.c \
 	src/main/tamer.c \

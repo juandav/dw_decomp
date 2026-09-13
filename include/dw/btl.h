@@ -5,6 +5,7 @@
 #include <libgte.h>
 
 #include <dw/entity.h>
+#include <dw/font.h>
 #include <dw/math.h>
 #include <dw/script.h>
 #include <dw/types.h>
@@ -69,7 +70,6 @@ void BTL_removeAllItemParticles(void);
 void BTL_removeAllAuraProjectiles(void);
 void BTL_unloadAllEFESlots(void);
 void BTL_removeEFEEngine(void);
-void drawString(char *text, int32_t color, int32_t pos);
 void BTL_drawHoveredCommandName(void);
 
 #endif

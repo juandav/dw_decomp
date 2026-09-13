@@ -7,6 +7,7 @@
 #include <dw/attack_object.h>
 #include <dw/combat.h>
 #include <dw/entity.h>
+#include <dw/font.h>
 #include <dw/item.h>
 #include <dw/math.h>
 #include <dw/move.h>
@@ -24,8 +25,6 @@ typedef struct {
 
 void createParticleFX();
 int16_t entityGetTechFromAnim(Entity *entity, int32_t anim);
-void clearTextSubArea(RECT *rect);
-void drawString(char *text, int32_t color, int32_t pos);
 void renderObjects(void);
 void entityLookAtLocation(Entity *entity, VECTOR *pos);
 void swapInt(int32_t *a, int32_t *b);
