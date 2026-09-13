@@ -18,148 +18,156 @@ SECTIONS
     .main : AT(main_ROM_START)
     {
         main_TEXT_START = .;
-        KEEP(build/asm/main/psyq/libapi.s.o(.text.*))
+        KEEP(build/asm/main/psyq/libapi.s.o(.text.*));
         . = ALIGN(., 4);
-        KEEP(build/asm/main/psyq/libc.s.o(.text.*))
+        KEEP(build/asm/main/psyq/libc.s.o(.text.*));
         . = ALIGN(., 4);
-        KEEP(build/asm/main/psyq/libetc.s.o(.text.*))
+        KEEP(build/asm/main/psyq/libetc.s.o(.text.*));
         . = ALIGN(., 4);
-        KEEP(build/asm/main/psyq/libgpu.s.o(.text.*))
+        KEEP(build/asm/main/psyq/libgpu.s.o(.text.*));
         . = ALIGN(., 4);
-        KEEP(build/asm/main/psyq/libgs.s.o(.text.*))
+        KEEP(build/asm/main/psyq/libgs.s.o(.text.*));
         . = ALIGN(., 4);
-        KEEP(build/asm/main/psyq/libgte.s.o(.text.*))
+        KEEP(build/asm/main/psyq/libgte.s.o(.text.*));
         . = ALIGN(., 4);
-        build/src/main/model.c.o(.text.*)
+        build/src/main/model.c.o(.text.*);
         . = ALIGN(., 4);
-        build/src/main/world_object.c.o(.text.*)
+        build/src/main/world_object.c.o(.text.*);
         . = ALIGN(., 4);
-        build/src/main/file.c.o(.text.*)
+        build/src/main/file.c.o(.text.*);
         . = ALIGN(., 4);
-        build/src/main/math.c.o(.text.*)
+        build/src/main/math.c.o(.text.*);
         . = ALIGN(., 4);
-        build/src/main/graphics.c.o(.text.*)
+        build/src/main/graphics.c.o(.text.*);
         . = ALIGN(., 4);
-        build/src/main/_psstart.c.o(.text.*)
+        build/src/main/_psstart.c.o(.text.*);
         . = ALIGN(., 4);
-        build/src/main/partner_impl.c.o(.text.*)
+        build/src/main/partner_impl.c.o(.text.*);
         . = ALIGN(., 4);
-        build/src/main/tamer.c.o(.text.*)
+        build/src/main/tamer.c.o(.text.*);
         . = ALIGN(., 4);
-        build/src/main/fade.c.o(.text.*)
+        build/src/main/fade.c.o(.text.*);
         . = ALIGN(., 4);
-        build/src/main/aabb.c.o(.text.*)
+        build/src/main/aabb.c.o(.text.*);
         . = ALIGN(., 4);
-        build/src/main/efe.c.o(.text.*)
+        build/src/main/efe.c.o(.text.*);
         . = ALIGN(., 4);
-        KEEP(build/asm/main/psyq/libcd.s.o(.text.*))
+        KEEP(build/asm/main/psyq/libcd.s.o(.text.*));
         . = ALIGN(., 4);
-        build/src/main/overworld.c.o(.text.*)
-        build/src/main/overworld_evochart_detail.c.o(.text.*)
-        build/src/main/overworld_menu_views.c.o(.text.*)
-        build/src/main/overworld_evochart_view.c.o(.text.*)
-        build/src/main/overworld_status_boxes.c.o(.text.*)
-        build/src/main/overworld_moves_text.c.o(.text.*)
-        build/src/main/overworld_moves_box.c.o(.text.*)
-        build/src/main/overworld_playerinfo_text.c.o(.text.*)
-        build/src/main/overworld_evochart_text.c.o(.text.*)
-        build/src/main/overworld_medal_text.c.o(.text.*)
-        build/src/main/overworld_card_text.c.o(.text.*)
+        build/src/main/overworld.c.o(.text.*);
         . = ALIGN(., 4);
-        build/src/main/map_collision.c.o(.text.*)
+        build/src/main/overworld_evochart_detail.c.o(.text.*);
         . = ALIGN(., 4);
-        build/src/main/particle.c.o(.text.*)
+        build/src/main/overworld_menu_views.c.o(.text.*);
         . = ALIGN(., 4);
-        build/src/main/anim.c.o(.text.*)
+        build/src/main/overworld_evochart_view.c.o(.text.*);
         . = ALIGN(., 4);
-        build/src/main/ui.c.o(.text.*)
+        build/src/main/overworld_status_boxes.c.o(.text.*);
         . = ALIGN(., 4);
-        build/src/main/item.c.o(.text.*)
+        build/src/main/overworld_moves_text.c.o(.text.*);
         . = ALIGN(., 4);
-        build/src/main/sound.c.o(.text.*)
+        build/src/main/overworld_moves_box.c.o(.text.*);
         . = ALIGN(., 4);
-        KEEP(build/asm/main/psyq/libspu.s.o(.text.*))
+        build/src/main/overworld_playerinfo_text.c.o(.text.*);
         . = ALIGN(., 4);
-        KEEP(build/asm/main/psyq/libsnd.s.o(.text.*))
+        build/src/main/overworld_evochart_text.c.o(.text.*);
         . = ALIGN(., 4);
-        build/src/main/map.c.o(.text.*)
+        build/src/main/overworld_medal_text.c.o(.text.*);
         . = ALIGN(., 4);
-        build/src/main/inventory.c.o(.text.*)
+        build/src/main/overworld_card_text.c.o(.text.*);
         . = ALIGN(., 4);
-        build/src/main/clock.c.o(.text.*)
+        build/src/main/map_collision.c.o(.text.*);
         . = ALIGN(., 4);
-        build/src/main/partner.c.o(.text.*)
+        build/src/main/particle.c.o(.text.*);
         . = ALIGN(., 4);
-        build/src/main/entity_text.c.o(.text.*)
+        build/src/main/anim.c.o(.text.*);
         . = ALIGN(., 4);
-        build/src/main/map_object.c.o(.text.*)
+        build/src/main/ui.c.o(.text.*);
         . = ALIGN(., 4);
-        build/src/main/evolution.c.o(.text.*)
+        build/src/main/item.c.o(.text.*);
         . = ALIGN(., 4);
-        build/src/main/file_queue.c.o(.text.*)
+        build/src/main/sound.c.o(.text.*);
         . = ALIGN(., 4);
-        build/src/main/graphics2.c.o(.text.*)
+        KEEP(build/asm/main/psyq/libspu.s.o(.text.*));
         . = ALIGN(., 4);
-        build/src/main/fish.c.o(.text.*)
+        KEEP(build/asm/main/psyq/libsnd.s.o(.text.*));
         . = ALIGN(., 4);
-        build/src/main/utils.c.o(.text.*)
+        build/src/main/map.c.o(.text.*);
         . = ALIGN(., 4);
-        build/src/main/utils2.c.o(.text.*)
+        build/src/main/inventory.c.o(.text.*);
         . = ALIGN(., 4);
-        build/src/main/tournament.c.o(.text.*)
+        build/src/main/clock.c.o(.text.*);
         . = ALIGN(., 4);
-        build/src/main/evl.c.o(.text.*)
+        build/src/main/partner.c.o(.text.*);
         . = ALIGN(., 4);
-        build/src/main/btl.c.o(.text.*)
+        build/src/main/entity_text.c.o(.text.*);
         . = ALIGN(., 4);
-        build/src/main/kar.c.o(.text.*)
+        build/src/main/map_object.c.o(.text.*);
         . = ALIGN(., 4);
-        build/src/main/efe_table.c.o(.text.*)
+        build/src/main/evolution.c.o(.text.*);
         . = ALIGN(., 4);
-        build/src/main/sound_async.c.o(.text.*)
+        build/src/main/file_queue.c.o(.text.*);
         . = ALIGN(., 4);
-        KEEP(build/asm/main/psyq/libpress.s.o(.text.*))
+        build/src/main/graphics2.c.o(.text.*);
         . = ALIGN(., 4);
-        KEEP(build/asm/main/psyq/libds.s.o(.text.*))
+        build/src/main/fish.c.o(.text.*);
         . = ALIGN(., 4);
-        build/src/main/butterfly.c.o(.text.*)
+        build/src/main/utils.c.o(.text.*);
         . = ALIGN(., 4);
-        KEEP(build/asm/main/psyq/libmcrd.s.o(.text.*))
+        build/src/main/utils2.c.o(.text.*);
         . = ALIGN(., 4);
-        build/src/main/bubble.c.o(.text.*)
+        build/src/main/tournament.c.o(.text.*);
         . = ALIGN(., 4);
-        build/src/main/battle_ui.c.o(.text.*)
+        build/src/main/evl.c.o(.text.*);
         . = ALIGN(., 4);
-        build/src/main/main.c.o(.text.*)
+        build/src/main/btl.c.o(.text.*);
         . = ALIGN(., 4);
-        build/src/main/vs.c.o(.text.*)
+        build/src/main/kar.c.o(.text.*);
         . = ALIGN(., 4);
-        build/src/main/script_common.c.o(.text.*)
+        build/src/main/efe_table.c.o(.text.*);
         . = ALIGN(., 4);
-        build/src/main/script_instr10.c.o(.text.*)
+        build/src/main/sound_async.c.o(.text.*);
         . = ALIGN(., 4);
-        build/src/main/script_instr28.c.o(.text.*)
+        KEEP(build/asm/main/psyq/libpress.s.o(.text.*));
         . = ALIGN(., 4);
-        build/src/main/script_instr64.c.o(".text.scriptInstruction64to7E")
-        build/src/main/script_instr64.c.o(".text.setMapHeadActive")
-        build/src/main/script_tick.c.o(".text.returnFromScriptFile")
-        build/src/main/script_instr64.c.o(.text.*)
+        KEEP(build/asm/main/psyq/libds.s.o(.text.*));
         . = ALIGN(., 4);
-        build/src/main/script_anim.c.o(.text.*)
+        build/src/main/butterfly.c.o(.text.*);
         . = ALIGN(., 4);
-        build/src/main/script_music.c.o(.text.*)
+        KEEP(build/asm/main/psyq/libmcrd.s.o(.text.*));
         . = ALIGN(., 4);
-        build/src/main/script_engine.c.o(.text.*)
+        build/src/main/bubble.c.o(.text.*);
         . = ALIGN(., 4);
-        build/src/main/script_tick.c.o(.text.*)
+        build/src/main/battle_ui.c.o(.text.*);
         . = ALIGN(., 4);
-        build/src/main/script_ops.c.o(.text.*)
+        build/src/main/main.c.o(.text.*);
         . = ALIGN(., 4);
-        build/src/main/script_draw.c.o(.text.*)
+        build/src/main/vs.c.o(.text.*);
         . = ALIGN(., 4);
-        build/src/main/main_menu.c.o(".text.MAIN_func_8010D034")
+        build/src/main/script_common.c.o(.text.*);
         . = ALIGN(., 4);
-        build/src/main/main_menu.c.o(.text.*)
+        build/src/main/script_instr10.c.o(.text.*);
+        . = ALIGN(., 4);
+        build/src/main/script_instr28.c.o(.text.*);
+        . = ALIGN(., 4);
+        build/src/main/script_instr64.c.o(".text.scriptInstruction64to7E");
+        build/src/main/script_instr64.c.o(".text.setMapHeadActive");
+        build/src/main/script_tick.c.o(".text.returnFromScriptFile");
+        build/src/main/script_instr64.c.o(.text.*);
+        . = ALIGN(., 4);
+        build/src/main/script_anim.c.o(.text.*);
+        . = ALIGN(., 4);
+        build/src/main/script_music.c.o(.text.*);
+        . = ALIGN(., 4);
+        build/src/main/script_engine.c.o(.text.*);
+        . = ALIGN(., 4);
+        build/src/main/script_tick.c.o(.text.*);
+        . = ALIGN(., 4);
+        build/src/main/script_ops.c.o(.text.*);
+        . = ALIGN(., 4);
+        build/src/main/script_draw.c.o(.text.*);
+        . = ALIGN(., 4);
+        build/src/main/main_menu.c.o(.text.*);
         . = ALIGN(., 16);
         main_TEXT_END = .;
         main_TEXT_SIZE = ABSOLUTE(main_TEXT_END - main_TEXT_START);
@@ -240,337 +248,363 @@ SECTIONS
         LONG(eab_TEXT_START)
 
         . = ALIGN(., 4);
-        build/src/main/partner_impl.c.o(.rodata.*)
+        build/src/main/partner_impl.c.o(.rodata.*);
         . = ALIGN(., 4);
-        KEEP(build/asm/main/data/psyq/libc.rodata.s.o(.rodata.*))
+        KEEP(build/asm/main/data/psyq/libc.rodata.s.o(.rodata.*));
         . = ALIGN(., 4);
-        KEEP(build/asm/main/data/psyq/libetc.rodata.s.o(.rodata.*))
+        KEEP(build/asm/main/data/psyq/libetc.rodata.s.o(.rodata.*));
         . = ALIGN(., 4);
-        KEEP(build/asm/main/data/psyq/libgpu.rodata.s.o(.rodata.*))
+        KEEP(build/asm/main/data/psyq/libgpu.rodata.s.o(.rodata.*));
         . = ALIGN(., 4);
-        KEEP(build/asm/main/data/psyq/libgs.rodata.s.o(.rodata.*))
+        KEEP(build/asm/main/data/psyq/libgs.rodata.s.o(.rodata.*));
         . = ALIGN(., 4);
-        KEEP(build/asm/main/psyq/libgte.s.o(.rodata.*))
+        KEEP(build/asm/main/psyq/libgte.s.o(.rodata.*));
         . = ALIGN(., 4);
-        build/src/main/model.c.o(.rodata.*)
+        build/src/main/model.c.o(.rodata.*);
         . = ALIGN(., 4);
-        build/src/main/world_object.c.o(.rodata.*)
+        build/src/main/world_object.c.o(.rodata.*);
         . = ALIGN(., 4);
-        build/src/main/file.c.o(.rodata.*)
+        build/src/main/file.c.o(.rodata.*);
         . = ALIGN(., 4);
-        build/src/main/math.c.o(.rodata.*)
+        build/src/main/math.c.o(.rodata.*);
         . = ALIGN(., 4);
-        build/src/main/graphics.c.o(.rodata.*)
+        build/src/main/graphics.c.o(.rodata.*);
+        . = ALIGN(., 4);
+        build/src/main/_psstart.c.o(.rodata.*);
+        . = ALIGN(., 4);
+        build/src/main/partner_impl.c.o(.rodata.*);
         . = ALIGN(., 4);
         build/src/main/tamer.c.o(.rodata.*);
         . = ALIGN(., 4);
-        build/src/main/fade.c.o(.rodata.*)
+        build/src/main/fade.c.o(.rodata.*);
         . = ALIGN(., 4);
-        build/src/main/aabb.c.o(.rodata.*)
+        build/src/main/aabb.c.o(.rodata.*);
         . = ALIGN(., 4);
-        build/src/main/efe.c.o(.rodata.*)
+        build/src/main/efe.c.o(.rodata.*);
         . = ALIGN(., 4);
-        KEEP(build/asm/main/data/psyq/libcd.rodata.s.o(.rodata.*))
+        KEEP(build/asm/main/data/psyq/libcd.rodata.s.o(.rodata.*));
         . = ALIGN(., 4);
-        build/src/main/overworld.c.o(.rodata.*)
+        build/src/main/overworld.c.o(.rodata.*);
         . = ALIGN(., 4);
-        build/src/main/overworld_menu_views.c.o(.rodata.*)
+        build/src/main/overworld_menu_views.c.o(.rodata.*);
         . = ALIGN(., 4);
-        build/src/main/overworld_moves_box.c.o(.rodata.*)
+        build/src/main/overworld_moves_box.c.o(.rodata.*);
         . = ALIGN(., 4);
-        build/src/main/overworld_evochart_view.c.o(.rodata.*)
+        build/src/main/overworld_evochart_view.c.o(.rodata.*);
         . = ALIGN(., 4);
-        build/src/main/overworld_evochart_detail.c.o(.rodata.*)
+        build/src/main/overworld_status_boxes.c.o(.rodata.*);
         . = ALIGN(., 4);
-        build/src/main/overworld_moves_text.c.o(.rodata.*)
+        build/src/main/overworld_evochart_detail.c.o(.rodata.*);
         . = ALIGN(., 4);
-        build/src/main/overworld_playerinfo_text.c.o(.rodata.*)
+        build/src/main/overworld_moves_text.c.o(.rodata.*);
         . = ALIGN(., 4);
-        build/src/main/overworld_medal_text.c.o(.rodata.*)
+        build/src/main/overworld_playerinfo_text.c.o(.rodata.*);
         . = ALIGN(., 4);
-        build/src/main/map_collision.c.o(.rodata.*)
+        build/src/main/overworld_evochart_text.c.o(.rodata.*);
         . = ALIGN(., 4);
-        build/src/main/particle.c.o(.rodata.*)
+        build/src/main/overworld_medal_text.c.o(.rodata.*);
         . = ALIGN(., 4);
-        build/src/main/anim.c.o(.rodata.*)
+        build/src/main/overworld_card_text.c.o(.rodata.*);
         . = ALIGN(., 4);
-        build/src/main/ui.c.o(.rodata.*)
+        build/src/main/map_collision.c.o(.rodata.*);
         . = ALIGN(., 4);
-        /* TODO: figure out why jump table order is inverted */
-        build/src/main/item.c.o(SORT_BY_NAME(.rodata.*))
+        build/src/main/particle.c.o(.rodata.*);
         . = ALIGN(., 4);
-        build/asm/main/data/item.rodata.s.o(.rodata.*)
+        build/src/main/anim.c.o(.rodata.*);
         . = ALIGN(., 4);
-        build/src/main/sound.c.o(.rodata.*)
+        build/src/main/ui.c.o(.rodata.*);
         . = ALIGN(., 4);
-        KEEP(build/asm/main/data/psyq/libspu.rodata.s.o(.rodata.*))
+        build/src/main/item.c.o(.rodata.*);
         . = ALIGN(., 4);
-        KEEP(build/asm/main/data/psyq/libsnd.rodata.s.o(.rodata.*))
+        build/src/main/sound.c.o(.rodata.*);
         . = ALIGN(., 4);
-        build/asm/main/data/inventory.rodata.s.o(.rodata.*)
+        KEEP(build/asm/main/data/psyq/libspu.rodata.s.o(.rodata.*));
         . = ALIGN(., 4);
-        build/src/main/inventory.c.o(.rodata.*)
+        KEEP(build/asm/main/data/psyq/libsnd.rodata.s.o(.rodata.*));
         . = ALIGN(., 4);
-        build/src/main/clock.c.o(.rodata.*)
+        build/src/main/map.c.o(.rodata.*);
         . = ALIGN(., 4);
-        build/src/main/partner.c.o(.rodata.*)
+        build/src/main/inventory.c.o(.rodata.*);
         . = ALIGN(., 4);
-        build/src/main/entity_text.c.o(.rodata.*)
+        build/src/main/clock.c.o(.rodata.*);
         . = ALIGN(., 4);
-        build/src/main/map_object.c.o(.rodata.*)
+        build/src/main/partner.c.o(.rodata.*);
         . = ALIGN(., 4);
-        build/src/main/evolution.c.o(.rodata.*)
+        build/src/main/entity_text.c.o(.rodata.*);
         . = ALIGN(., 4);
-        build/src/main/file_queue.c.o(.rodata.*)
+        build/src/main/map_object.c.o(.rodata.*);
         . = ALIGN(., 4);
-        build/src/main/graphics2.c.o(.rodata.*)
+        build/src/main/evolution.c.o(.rodata.*);
         . = ALIGN(., 4);
-        build/src/main/fish.c.o(.rodata.*)
+        build/src/main/file_queue.c.o(.rodata.*);
         . = ALIGN(., 4);
-        build/src/main/utils.c.o(.rodata.*)
+        build/src/main/graphics2.c.o(.rodata.*);
         . = ALIGN(., 4);
-        build/src/main/tournament.c.o(.rodata.*)
+        build/src/main/fish.c.o(.rodata.*);
         . = ALIGN(., 4);
-        build/src/main/evl.c.o(.rodata.*)
+        build/src/main/utils.c.o(.rodata.*);
         . = ALIGN(., 4);
-        build/src/main/btl.c.o(.rodata.*)
+        build/src/main/utils2.c.o(.rodata.*);
         . = ALIGN(., 4);
-        build/src/main/kar.c.o(.rodata.*)
+        build/src/main/tournament.c.o(.rodata.*);
         . = ALIGN(., 4);
-        build/src/main/efe_table.c.o(.rodata.*)
+        build/src/main/evl.c.o(.rodata.*);
         . = ALIGN(., 4);
-        build/src/main/sound_async.c.o(.rodata.*)
+        build/src/main/btl.c.o(.rodata.*);
         . = ALIGN(., 4);
-        KEEP(build/asm/main/data/psyq/libpress.rodata.s.o(.rodata.*))
+        build/src/main/kar.c.o(.rodata.*);
         . = ALIGN(., 4);
-        KEEP(build/asm/main/psyq/libds.s.o(.rodata.*))
+        build/src/main/efe_table.c.o(.rodata.*);
         . = ALIGN(., 4);
-        build/src/main/butterfly.c.o(.rodata.*)
+        build/src/main/sound_async.c.o(.rodata.*);
         . = ALIGN(., 4);
-        KEEP(build/asm/main/data/psyq/libmcrd.rodata.s.o(.rodata.*))
+        KEEP(build/asm/main/data/psyq/libpress.rodata.s.o(.rodata.*));
         . = ALIGN(., 4);
-        build/src/main/bubble.c.o(.rodata.*)
+        KEEP(build/asm/main/psyq/libds.s.o(.rodata.*));
         . = ALIGN(., 4);
-        build/src/main/battle_ui.c.o(.rodata.*)
+        build/src/main/butterfly.c.o(.rodata.*);
         . = ALIGN(., 4);
-        build/src/main/main.c.o(.rodata.*)
+        KEEP(build/asm/main/data/psyq/libmcrd.rodata.s.o(.rodata.*));
         . = ALIGN(., 4);
-        build/src/main/vs.c.o(.rodata.*)
+        build/src/main/bubble.c.o(.rodata.*);
         . = ALIGN(., 4);
-        build/src/main/script_common.c.o(.rodata.*)
+        build/src/main/battle_ui.c.o(.rodata.*);
         . = ALIGN(., 4);
-        build/src/main/script_tick.c.o(.rodata.*)
+        build/src/main/main.c.o(.rodata.*);
         . = ALIGN(., 4);
-        build/src/main/script_instr10.c.o(.rodata.*)
+        build/src/main/vs.c.o(.rodata.*);
         . = ALIGN(., 4);
-        build/src/main/script_anim.c.o(.rodata.*)
+        build/src/main/script_common.c.o(.rodata.*);
         . = ALIGN(., 4);
-        build/src/main/script_ops.c.o(.rodata.*)
+        build/src/main/script_tick.c.o(.rodata.*);
         . = ALIGN(., 4);
-        build/src/main/script_instr28.c.o(.rodata.*)
+        build/src/main/script_instr10.c.o(.rodata.*);
         . = ALIGN(., 4);
-        build/src/main/script_music.c.o(.rodata.*)
+        build/src/main/script_anim.c.o(.rodata.*);
         . = ALIGN(., 4);
-        build/src/main/script_instr64.c.o(.rodata.*)
+        build/src/main/script_ops.c.o(.rodata.*);
         . = ALIGN(., 4);
-        build/src/main/script_engine.c.o(.rodata.*)
+        build/src/main/script_instr28.c.o(.rodata.*);
         . = ALIGN(., 4);
-        build/src/main/script_draw.c.o(.rodata.*)
+        build/src/main/script_music.c.o(.rodata.*);
         . = ALIGN(., 4);
-        build/src/main/main_menu.c.o(".rodata.@184")
+        build/src/main/script_instr64.c.o(.rodata.*);
         . = ALIGN(., 4);
-        build/asm/main/data/main_menu.rodata.s.o(.rodata.*)
+        build/src/main/script_engine.c.o(.rodata.*);
         . = ALIGN(., 4);
-        build/src/main/main_menu.c.o(.rodata.* .rodata)
+        build/src/main/script_draw.c.o(.rodata.*);
         . = ALIGN(., 4);
-        KEEP(build/asm/main/psyq/libapi.s.o(.rodata.*))
+        build/src/main/main_menu.c.o(.rodata.* .rodata);
+        . = ALIGN(., 4);
+        KEEP(build/asm/main/psyq/libapi.s.o(.rodata.*));
         . = ALIGN(., 4);
         main_RODATA_END = .;
         main_RODATA_SIZE = ABSOLUTE(main_RODATA_END - main_RODATA_START);
 
         main_DATA_START = .;
-        KEEP(build/asm/main/data/psyq/libapi.data.s.o(.data.*))
+        KEEP(build/asm/main/data/psyq/libapi.data.s.o(.data.*));
         . = ALIGN(., 4);
-        KEEP(build/asm/main/data/psyq/libc.data.s.o(.data.*))
+        KEEP(build/asm/main/data/psyq/libc.data.s.o(.data.*));
         . = ALIGN(., 4);
-        KEEP(build/asm/main/data/psyq/libetc.data.s.o(.data.*))
+        KEEP(build/asm/main/data/psyq/libetc.data.s.o(.data.*));
         . = ALIGN(., 4);
-        KEEP(build/asm/main/data/psyq/libgte.data.s.o(.data.*))
+        KEEP(build/asm/main/data/psyq/libgte.data.s.o(.data.*));
         . = ALIGN(., 4);
-        KEEP(build/asm/main/data/psyq/libetc2.data.s.o(.data.*))
+        KEEP(build/asm/main/data/psyq/libetc2.data.s.o(.data.*));
         . = ALIGN(., 4);
-        KEEP(build/asm/main/data/psyq/libgpu.data.s.o(.data.*))
+        KEEP(build/asm/main/data/psyq/libgpu.data.s.o(.data.*));
         . = ALIGN(., 4);
-        KEEP(build/asm/main/psyq/libgs.s.o(.data.*))
+        KEEP(build/asm/main/psyq/libgs.s.o(.data.*));
         . = ALIGN(., 4);
-        KEEP(build/asm/main/data/psyq/libgte2.data.s.o(.data.*))
+        KEEP(build/asm/main/data/psyq/libgte2.data.s.o(.data.*));
         . = ALIGN(., 4);
-        build/asm/main/data/model.data.s.o(.data.*)
+        build/asm/main/data/model.data.s.o(.data.*);
         . = ALIGN(., 4);
-        build/src/main/world_object.c.o(.data.*)
+        build/src/main/world_object.c.o(.data.*);
         . = ALIGN(., 4);
-        build/src/main/file.c.o(.data.*)
+        build/src/main/file.c.o(.data.*);
         . = ALIGN(., 4);
-        build/src/main/math.c.o(.data.*)
+        build/src/main/math.c.o(.data.*);
         . = ALIGN(., 4);
-        build/src/main/file_table.c.o(.data.*)
+        build/src/main/file_table.c.o(.data.*);
         . = ALIGN(., 4);
-        build/asm/main/data/graphics.data.s.o(.data.*)
+        build/asm/main/data/graphics.data.s.o(.data.*);
         . = ALIGN(., 4);
-        KEEP(build/src/main/_psstart.c.o(.data.*))
+        KEEP(build/src/main/_psstart.c.o(.data.*));
         . = ALIGN(., 4);
-        build/src/main/partner_impl.c.o(.data.*)
+        build/src/main/partner_impl.c.o(.data.*);
         . = ALIGN(., 4);
-        build/src/main/tamer.c.o(.data.*)
-        build/src/main/toilet_data.c.o(.data.*)
-        build/src/main/door_mapdata.c.o(.data.*)
-        build/src/main/efe.c.o(.data.*)
+        build/src/main/tamer.c.o(.data.*);
         . = ALIGN(., 4);
-        build/src/main/fade.c.o(.data.*)
+        build/src/main/fade.c.o(.data.*);
         . = ALIGN(., 4);
-        build/src/main/aabb.c.o(.data.*)
+        build/src/main/aabb.c.o(.data.*);
         . = ALIGN(., 4);
-        KEEP(build/asm/main/data/psyq/libcd.data.s.o(.data.*))
+        build/src/main/toilet_data.c.o(.data.*);
         . = ALIGN(., 4);
-        build/asm/main/data/overworld.data.s.o(.data.*)
+        build/src/main/door_mapdata.c.o(.data.*);
         . = ALIGN(., 4);
-        build/src/main/sound.c.o(.data.*)
+        build/src/main/efe.c.o(.data.*);
         . = ALIGN(., 4);
-        build/src/main/map_collision.c.o(.data.*)
+        KEEP(build/asm/main/data/psyq/libcd.data.s.o(.data.*));
         . = ALIGN(., 4);
-        build/src/main/particle.c.o(.data.*)
+        build/asm/main/data/overworld.data.s.o(.data.*);
         . = ALIGN(., 4);
-        build/src/main/anim.c.o(.data.*)
+        build/src/main/overworld_evochart_detail.c.o(.data.*);
         . = ALIGN(., 4);
-        build/src/main/ui.c.o(.data.*)
+        build/src/main/overworld_menu_views.c.o(.data.*);
         . = ALIGN(., 4);
-        build/src/main/item.c.o(.data.*)
+        build/src/main/overworld_evochart_view.c.o(.data.*);
         . = ALIGN(., 4);
-        KEEP(build/asm/main/data/psyq/libspu.data.s.o(.data.*))
+        build/src/main/overworld_status_boxes.c.o(.data.*);
         . = ALIGN(., 4);
-        KEEP(build/asm/main/data/psyq/libsnd.data.s.o(.data.*))
+        build/src/main/overworld_moves_text.c.o(.data.*);
         . = ALIGN(., 4);
-        build/asm/main/data/map.data.s.o(.data.*)
+        build/src/main/overworld_moves_box.c.o(.data.*);
         . = ALIGN(., 4);
-        build/src/main/inventory.c.o(.data.*)
+        build/src/main/overworld_playerinfo_text.c.o(.data.*);
         . = ALIGN(., 4);
-        build/src/main/clock.c.o(.data.*)
+        build/src/main/overworld_evochart_text.c.o(.data.*);
         . = ALIGN(., 4);
-        build/asm/main/data/entity_text.data.s.o(.data.*)
+        build/src/main/overworld_medal_text.c.o(.data.*);
         . = ALIGN(., 4);
-        build/src/main/map_object.c.o(.data.*)
+        build/src/main/overworld_card_text.c.o(.data.*);
         . = ALIGN(., 4);
-        build/asm/main/data/evolution.data.s.o(.data.*)
+        build/src/main/map_collision.c.o(.data.*);
         . = ALIGN(., 4);
-        build/asm/main/data/utils.data.s.o(.data.*)
+        build/src/main/particle.c.o(.data.*);
         . = ALIGN(., 4);
-        build/src/main/partner.c.o(.data.*)
+        build/src/main/anim.c.o(.data.*);
         . = ALIGN(., 4);
-        build/src/main/evolution.c.o(.data.*)
+        build/src/main/ui.c.o(.data.*);
         . = ALIGN(., 4);
-        build/src/main/file_queue.c.o(.data.*)
+        build/src/main/item.c.o(.data.*);
         . = ALIGN(., 4);
-        build/src/main/graphics2.c.o(.data.*)
+        build/src/main/sound.c.o(.data.*);
         . = ALIGN(., 4);
-        build/src/main/fish.c.o(.data.*)
+        KEEP(build/asm/main/data/psyq/libspu.data.s.o(.data.*));
         . = ALIGN(., 4);
-        build/src/main/utils.c.o(.data.*)
+        KEEP(build/asm/main/data/psyq/libsnd.data.s.o(.data.*));
         . = ALIGN(., 4);
-        build/src/main/tournament.c.o(.data.*)
+        build/asm/main/data/map.data.s.o(.data.*);
         . = ALIGN(., 4);
-        build/src/main/evl.c.o(.data.*)
+        build/src/main/inventory.c.o(.data.*);
         . = ALIGN(., 4);
-        build/src/main/btl.c.o(.data.*)
+        build/src/main/clock.c.o(.data.*);
         . = ALIGN(., 4);
-        build/src/main/kar.c.o(.data.*)
+        build/src/main/partner.c.o(.data.*);
         . = ALIGN(., 4);
-        build/src/main/efe_table.c.o(.data.*)
+        build/asm/main/data/entity_text.data.s.o(.data.*);
+        . = ALIGN(., 4);
+        build/src/main/map_object.c.o(.data.*);
+        . = ALIGN(., 4);
+        build/asm/main/data/evolution.data.s.o(.data.*);
+        . = ALIGN(., 4);
+        build/src/main/file_queue.c.o(.data.*);
+        . = ALIGN(., 4);
+        build/src/main/graphics2.c.o(.data.*);
+        . = ALIGN(., 4);
+        build/src/main/fish.c.o(.data.*);
+        . = ALIGN(., 4);
+        build/asm/main/data/utils.data.s.o(.data.*);
+        . = ALIGN(., 4);
+        build/src/main/utils2.c.o(.data.*);
+        . = ALIGN(., 4);
+        build/src/main/tournament.c.o(.data.*);
+        . = ALIGN(., 4);
+        build/src/main/evl.c.o(.data.*);
+        . = ALIGN(., 4);
+        build/src/main/btl.c.o(.data.*);
+        . = ALIGN(., 4);
+        build/src/main/kar.c.o(.data.*);
+        . = ALIGN(., 4);
+        build/src/main/efe_table.c.o(.data.*);
         . = ALIGN(., 4);
         build/src/main/sound_async.c.o(.data.*);
         . = ALIGN(., 4);
-        KEEP(build/asm/main/data/psyq/libpress.data.s.o(.data.*))
+        KEEP(build/asm/main/data/psyq/libpress.data.s.o(.data.*));
         . = ALIGN(., 4);
-        KEEP(build/asm/main/psyq/libds.s.o(.data.*))
+        KEEP(build/asm/main/psyq/libds.s.o(.data.*));
         . = ALIGN(., 4);
-        build/src/main/butterfly.c.o(.data.*)
+        build/src/main/butterfly.c.o(.data.*);
         . = ALIGN(., 4);
-        KEEP(build/asm/main/data/psyq/libmcrd.data.s.o(.data.*))
+        KEEP(build/asm/main/data/psyq/libmcrd.data.s.o(.data.*));
         . = ALIGN(., 4);
-        build/src/main/bubble.c.o(.data.*)
+        build/src/main/bubble.c.o(.data.*);
         . = ALIGN(., 4);
-        build/src/main/battle_ui.c.o(.data.*)
+        build/src/main/battle_ui.c.o(.data.*);
         . = ALIGN(., 4);
-        KEEP(build/asm/main/data/main.data.s.o(.data.*))
+        KEEP(build/asm/main/data/main.data.s.o(.data.*));
         . = ALIGN(., 4);
-        build/src/main/vs.c.o(.data.*)
+        build/src/main/vs.c.o(.data.*);
         . = ALIGN(., 4);
-        build/src/main/script_common.c.o(.data.*)
+        build/src/main/script_common.c.o(.data.*);
         . = ALIGN(., 4);
-        build/src/main/script_instr10.c.o(.data.*)
+        build/src/main/script_instr10.c.o(.data.*);
         . = ALIGN(., 4);
-        build/src/main/script_instr28.c.o(.data.*)
+        build/src/main/script_instr28.c.o(.data.*);
         . = ALIGN(., 4);
-        build/src/main/script_instr64.c.o(.data.*)
+        build/src/main/script_instr64.c.o(.data.*);
         . = ALIGN(., 4);
-        build/src/main/script_music.c.o(.data.*)
+        build/src/main/script_anim.c.o(.data.*);
         . = ALIGN(., 4);
-        build/src/main/script_anim.c.o(.data.*)
+        build/src/main/script_music.c.o(.data.*);
         . = ALIGN(., 4);
-        build/src/main/script_engine.c.o(.data.*)
+        build/src/main/script_engine.c.o(.data.*);
         . = ALIGN(., 4);
-        build/src/main/script_tick.c.o(.data.*)
+        build/src/main/script_tick.c.o(.data.*);
         . = ALIGN(., 4);
-        build/src/main/script_ops.c.o(.data.*)
+        build/src/main/script_ops.c.o(.data.*);
         . = ALIGN(., 4);
-        build/src/main/script_draw.c.o(.data.*)
+        build/src/main/script_draw.c.o(.data.*);
         . = ALIGN(., 4);
-        build/src/main/main_menu.c.o(.data.*)
+        build/src/main/main_menu.c.o(.data.*);
         . = ALIGN(., 4);
         main_DATA_END = .;
         main_DATA_SIZE = ABSOLUTE(main_DATA_END - main_DATA_START);
 
         main_SDATA_START = .;
-        build/asm/main/data/model.sdata.s.o(.sdata.*)
+        build/asm/main/data/model.sdata.s.o(.sdata.*);
         . = ALIGN(., 4);
-        build/src/main/file_table.c.o(.sdata.*)
+        build/src/main/file_table.c.o(.sdata.*);
         . = ALIGN(., 4);
-        build/src/main/partner_impl.c.o(.sdata.*)
+        build/src/main/partner_impl.c.o(.sdata.*);
         . = ALIGN(., 4);
-        build/src/main/tamer.c.o(.sdata.*)
+        build/src/main/tamer.c.o(.sdata.*);
         . = ALIGN(., 4);
-        build/asm/main/data/efe.sdata.s.o(.sdata.*)
+        build/asm/main/data/efe.sdata.s.o(.sdata.*);
         . = ALIGN(., 4);
-        build/asm/main/data/overworld.sdata.s.o(.sdata.*)
+        build/asm/main/data/overworld.sdata.s.o(.sdata.*);
         . = ALIGN(., 4);
-        build/asm/main/data/ui.sdata.s.o(.sdata.*)
+        build/asm/main/data/ui.sdata.s.o(.sdata.*);
         . = ALIGN(., 4);
-        build/src/main/item.c.o(.sdata.*)
+        build/src/main/item.c.o(.sdata.*);
         . = ALIGN(., 4);
-        build/src/main/sound.c.o(.sdata.*)
+        build/src/main/sound.c.o(.sdata.*);
         . = ALIGN(., 4);
-        build/asm/main/data/map.sdata.s.o(.sdata.*)
+        build/asm/main/data/map.sdata.s.o(.sdata.*);
         . = ALIGN(., 4);
-        build/src/main/inventory.c.o(.sdata.*)
+        build/src/main/inventory.c.o(.sdata.*);
         . = ALIGN(., 4);
-        build/src/main/clock.c.o(.sdata.*)
+        build/src/main/clock.c.o(.sdata.*);
         . = ALIGN(., 4);
-        build/asm/main/data/entity_text.sdata.s.o(.sdata.*)
+        build/asm/main/data/entity_text.sdata.s.o(.sdata.*);
         . = ALIGN(., 4);
-        build/src/main/map_object.c.o(.sdata.*)
+        build/src/main/map_object.c.o(.sdata.*);
         . = ALIGN(., 4);
-        build/src/main/file_queue.c.o(.sdata.*)
+        build/src/main/file_queue.c.o(.sdata.*);
         . = ALIGN(., 4);
-        build/asm/main/data/graphics2.sdata.s.o(.sdata.*)
+        build/asm/main/data/graphics2.sdata.s.o(.sdata.*);
         . = ALIGN(., 4);
-        build/asm/main/data/utils.sdata.s.o(.sdata.*)
+        build/asm/main/data/utils.sdata.s.o(.sdata.*);
         . = ALIGN(., 4);
         build/src/main/efe_table.c.o(.sdata.*);
         . = ALIGN(., 4);
-        build/src/main/sound_async.c.o(.sdata.*)
+        build/src/main/sound_async.c.o(.sdata.*);
         . = ALIGN(., 4);
-        build/src/main/bubble.c.o(.sdata.*)
+        build/src/main/bubble.c.o(.sdata.*);
         . = ALIGN(., 4);
-        build/src/main/battle_ui.c.o(.sdata.*)
+        build/src/main/battle_ui.c.o(.sdata.*);
         . = ALIGN(., 4);
         build/asm/main/data/main.sdata.s.o(.sdata.*);
         . = ALIGN(., 4);
@@ -589,35 +623,35 @@ SECTIONS
     sbss_ROM_START = __romPos;
     .sbss main_SBSS_START : AT(sbss_ROM_START)
     {
-        build/build/generated/unk_0x80134C4C.sbss.s.o(.sbss.*)
+        build/build/generated/unk_0x80134C4C.sbss.s.o(.sbss.*);
         . = ALIGN(., 4);
-        build/src/main/fade.c.o(.sbss.*)
+        build/src/main/fade.c.o(.sbss.*);
         . = ALIGN(., 4);
-        build/build/generated/unk_0x80134CC0.sbss.s.o(.sbss.*)
+        build/build/generated/unk_0x80134CC0.sbss.s.o(.sbss.*);
         . = ALIGN(., 4);
-        build/src/main/sound.c.o(.sbss.*)
+        build/src/main/sound.c.o(.sbss.*);
         . = ALIGN(., 4);
-        build/build/generated/unk_0x80134D9C.sbss.s.o(.sbss.*)
+        build/build/generated/unk_0x80134D9C.sbss.s.o(.sbss.*);
         . = ALIGN(., 4);
-        build/src/main/inventory.c.o(.sbss.*)
+        build/src/main/inventory.c.o(.sbss.*);
         . = ALIGN(., 4);
-        build/build/generated/unk_0x80134E1C.sbss.s.o(.sbss.*)
+        build/build/generated/unk_0x80134E1C.sbss.s.o(.sbss.*);
         . = ALIGN(., 4);
-        KEEP(build/src/main/map_object.c.o(.sbss.*))
+        KEEP(build/src/main/map_object.c.o(.sbss.*));
         . = ALIGN(., 4);
-        build/build/generated/unk_0x80134E50.sbss.s.o(.sbss.*)
+        build/build/generated/unk_0x80134E50.sbss.s.o(.sbss.*);
         . = ALIGN(., 4);
-        build/src/main/file_queue.c.o(.sbss.*)
+        build/src/main/file_queue.c.o(.sbss.*);
         . = ALIGN(., 4);
-        build/build/generated/unk_0x80134E68.sbss.s.o(.sbss.*)
+        build/build/generated/unk_0x80134E68.sbss.s.o(.sbss.*);
         . = ALIGN(., 4);
-        build/src/main/sound_async.c.o(.sbss.*)
+        build/src/main/sound_async.c.o(.sbss.*);
         . = ALIGN(., 4);
-        build/build/generated/unk_0x80134E90.sbss.s.o(.sbss.*)
+        build/build/generated/unk_0x80134E90.sbss.s.o(.sbss.*);
         . = ALIGN(., 4);
-        build/src/main/main_menu.c.o(.sbss.*)
+        build/src/main/main_menu.c.o(.sbss.*);
         . = ALIGN(., 4);
-        build/build/generated/unk_0x80135078.sbss.s.o(.sbss.*)
+        build/build/generated/unk_0x80135078.sbss.s.o(.sbss.*);
         . = ALIGN(., 4);
         main_SBSS_END = .;
         main_SBSS_SIZE = ABSOLUTE(main_SBSS_END - main_SBSS_START);
@@ -630,41 +664,41 @@ SECTIONS
     bss_ROM_START = __romPos;
     .bss main_BSS_START : AT(bss_ROM_START)
     {
-        build/build/generated/unk_0x801353F8.bss.s.o(.bss.*)
+        build/build/generated/unk_0x801353F8.bss.s.o(.bss.*);
         . = ALIGN(., 4);
-        build/build/generated/libgs.bss.s.o(.bss.*)
+        build/build/generated/libgs.bss.s.o(.bss.*);
         . = ALIGN(., 4);
-        build/build/generated/libgte.bss.s.o(.bss.*)
+        build/build/generated/libgte.bss.s.o(.bss.*);
         . = ALIGN(., 4);
-        build/build/generated/model.bss.s.o(.bss.*)
+        build/build/generated/model.bss.s.o(.bss.*);
         . = ALIGN(., 4);
-        build/src/main/world_object.c.o(.bss.*)
+        build/src/main/world_object.c.o(.bss.*);
         . = ALIGN(., 4);
-        KEEP(build/build/generated/unk_0x80137A24.bss.s.o(.bss.*))
+        KEEP(build/build/generated/unk_0x80137A24.bss.s.o(.bss.*));
         . = ALIGN(., 4);
-        KEEP(build/src/main/item.c.o(.bss.*))
+        KEEP(build/src/main/item.c.o(.bss.*));
         . = ALIGN(., 4);
-        KEEP(build/build/generated/unk_0x8013D590.bss.s.o(.bss.*))
+        KEEP(build/build/generated/unk_0x8013D590.bss.s.o(.bss.*));
         . = ALIGN(., 4);
-        build/src/main/sound.c.o(.bss.*)
+        build/src/main/sound.c.o(.bss.*);
         . = ALIGN(., 4);
-        KEEP(build/build/generated/unk_0x8014DBEC.bss.s.o(.bss.*))
+        KEEP(build/build/generated/unk_0x8014DBEC.bss.s.o(.bss.*));
         . = ALIGN(., 4);
-        build/src/main/map_object.c.o(.bss.*)
+        build/src/main/map_object.c.o(.bss.*);
         . = ALIGN(., 4);
-        build/src/main/file_queue.c.o(.bss.*)
+        build/src/main/file_queue.c.o(.bss.*);
         . = ALIGN(., 4);
-        build/build/generated/unk_0x80154F80.bss.s.o(.bss.*)
+        build/build/generated/unk_0x80154F80.bss.s.o(.bss.*);
         . = ALIGN(., 4);
-        build/src/main/butterfly.c.o(.bss.*)
+        build/src/main/butterfly.c.o(.bss.*);
         . = ALIGN(., 4);
-        build/build/generated/libmrcd.bss.s.o(.bss.*)
+        build/build/generated/libmrcd.bss.s.o(.bss.*);
         . = ALIGN(., 4);
-        build/build/generated/bubble.bss.s.o(.bss.*)
+        build/build/generated/bubble.bss.s.o(.bss.*);
         . = ALIGN(., 4);
-        build/build/generated/battle_ui.bss.s.o(.bss.*)
+        build/build/generated/battle_ui.bss.s.o(.bss.*);
         . = ALIGN(., 4);
-        build/build/generated/unk_0x801555D0.bss.s.o(.bss.*)
+        build/build/generated/unk_0x801555D0.bss.s.o(.bss.*);
         . = ALIGN(., 4);
         main_BSS_END = .;
         main_BSS_SIZE = ABSOLUTE(main_BSS_END - main_BSS_START);
