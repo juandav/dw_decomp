@@ -615,6 +615,10 @@ SECTIONS
         . = ALIGN(., 4);
         build/build/generated/unk_0x80134E90.sbss.s.o(.sbss.*)
         . = ALIGN(., 4);
+        build/src/main/main_menu.c.o(.sbss.*)
+        . = ALIGN(., 4);
+        build/build/generated/unk_0x80135078.sbss.s.o(.sbss.*)
+        . = ALIGN(., 4);
         main_SBSS_END = .;
         main_SBSS_SIZE = ABSOLUTE(main_SBSS_END - main_SBSS_START);
         main_BSS_START = .;

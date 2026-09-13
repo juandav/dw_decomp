@@ -166,7 +166,7 @@ void tickTamerBattle(int32_t instanceId);
 void MAIN_func_800F0B2C(void);
 void MAIN_func_800F1020(void);
 void MAIN_func_800F179C(void *model, int32_t compIdx, int32_t color);
-uint16_t asciiToShiftJIS(uint8_t input);
+void asciiToShiftJIS(char *src, uint8_t *dst);
 
 /* Order anchor (reversed): pins symtab/section order to address order.
  * Unreferenced; discarded by --gc-sections. */

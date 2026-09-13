@@ -15,3 +15,5 @@ subsegments:
   - [0x80134E68, unk_0x80134E68]
   - [0x80134E8C, sound_async]
   - [0x80134E90, unk_0x80134E90]
+  - [0x80135030, main_menu]
+  - [0x80135078, unk_0x80135078]
