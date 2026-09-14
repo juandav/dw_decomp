@@ -502,7 +502,7 @@ SECTIONS
         . = ALIGN(., 4);
         build/src/main/partner.c.o(.data.*);
         . = ALIGN(., 4);
-        build/asm/main/data/entity_text.data.s.o(.data.*);
+        build/src/main/entity_text.c.o(.data.*);
         . = ALIGN(., 4);
         build/src/main/map_object.c.o(.data.*);
         . = ALIGN(., 4);
@@ -618,7 +618,7 @@ SECTIONS
         . = ALIGN(., 4);
         build/src/main/clock.c.o(.sdata.*);
         . = ALIGN(., 4);
-        build/asm/main/data/entity_text.sdata.s.o(.sdata.*);
+        build/src/main/entity_text.c.o(.sdata.*);
         . = ALIGN(., 4);
         build/src/main/map_object.c.o(.sdata.*);
         . = ALIGN(., 4);
