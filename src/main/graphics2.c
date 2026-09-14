@@ -1,6 +1,7 @@
 #include <libgpu.h>
 #include <libgs.h>
 #include <libgte.h>
+#include <mwinline_n.h>
 
 #include <dw/types.h>
 
@@ -9,7 +10,11 @@
 #define CUSTOM_RNG_FACTOR	0x41c650ad
 #define CUSTOM_RNG_VALUE	0x3039
 
+#define ABS_VALUE(value)	((value) > 0 ? (value) : -(value))
+#define MAX_VALUE(a, b)	((a) > (b) ? (a) : (b))
+
 extern GsOT *ACTIVE_ORDERING_TABLE;
+extern int32_t VIEWPORT_DISTANCE;
 
 extern uint32_t CUSTOM_RNG_1;
 extern uint32_t CUSTOM_RNG_2;
@@ -57,7 +62,13 @@ void renderTrianglePrimitive(uint32_t color, int16_t x0, int16_t y0,
 			     int32_t order, uint32_t mode);
 void renderLinePrimitive(uint32_t color, int16_t x0, int16_t y0, int16_t x1,
 			 int32_t y1, int32_t order, uint32_t mode);
+void MAIN_func_800E4038(VECTOR *output, int32_t x, int32_t y,
+			int32_t *success);
 void rotateVectorYXZ(SVECTOR *rotation, VECTOR *input, VECTOR *output);
+void toEulerAngles(SVECTOR *output, int32_t deltaX, int32_t deltaY,
+		   int32_t deltaZ);
+int32_t getDistance(int32_t deltaX, int32_t deltaY, int32_t deltaZ);
+void MAIN_func_800E4470(MATRIX *matrix, SVECTOR *output);
 void matrixToEuler2(MATRIX *matrix, SVECTOR *output);
 void multiplyRotations(SVECTOR *rotation1, SVECTOR *rotation2);
 int32_t customRandom(int32_t min, int32_t max);
@@ -129,7 +140,52 @@ void MAIN_func_800E3FB8(int16_t *pos, VECTOR *out)
   ApplyMatrix(&m, &v, out);
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/graphics2", MAIN_func_800E4038);
+void MAIN_func_800E4038(VECTOR *output, int32_t x, int32_t y,
+			int32_t *success)
+{
+	SVECTOR positions[2];
+	VECTOR transformed[2];
+	int32_t i;
+
+	if (success != NULL) {
+		*success = 0;
+	}
+
+	positions[0].vx = 0;
+	positions[0].vy = 0;
+	positions[0].vz = 0;
+	positions[1].vx = x;
+	positions[1].vy = y;
+	positions[1].vz = VIEWPORT_DISTANCE;
+
+	for (i = 0; i < 2; i++) {
+		MAIN_func_800E3FB8((int16_t *)&positions[i], &transformed[i]);
+	}
+
+	transformed[1].vx -= transformed[0].vx;
+	transformed[1].vy -= transformed[0].vy;
+	transformed[1].vz -= transformed[0].vz;
+
+	if ((uint32_t)transformed[0].vy == 0 ||
+	    (uint32_t)transformed[1].vy == 0 ||
+	    (((transformed[0].vy > 0) ^ (transformed[1].vy > 0)) == 0)) {
+		goto done;
+	}
+
+	output->vx = transformed[1].vx * transformed[0].vy /
+			     -transformed[1].vy +
+		     transformed[0].vx;
+	output->vy = 0;
+	output->vz = transformed[1].vz * transformed[0].vy /
+			     -transformed[1].vy +
+		     transformed[0].vz;
+
+	if (success != NULL) {
+		*success = 1;
+	}
+done:
+	;
+}
 
 void rotateVectorYXZ(SVECTOR *rotation, VECTOR *input, VECTOR *output)
 {
@@ -138,13 +194,175 @@ void rotateVectorYXZ(SVECTOR *rotation, VECTOR *input, VECTOR *output)
 	ApplyMatrixLV(&matrix, input, output);
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/graphics2", toEulerAngles);
+void toEulerAngles(SVECTOR *output, int32_t deltaX, int32_t deltaY,
+		   int32_t deltaZ)
+{
+	int32_t adjustment;
 
-INCLUDE_ASM("asm/main/nonmatchings/graphics2", getDistance);
+	output->vy = ratan2(deltaX, deltaZ);
+	deltaZ = getDistance(deltaX, 0, deltaZ);
+	output->vx = -ratan2(deltaY, deltaZ);
+	output->vz = 0;
 
-INCLUDE_ASM("asm/main/nonmatchings/graphics2", MAIN_func_800E4470);
+	output->vx &= 0xfff;
+	adjustment = output->vx >= 0x800 ? 0x1000 : 0;
+	output->vx -= adjustment;
 
-INCLUDE_ASM("asm/main/nonmatchings/graphics2", matrixToEuler2);
+	output->vy &= 0xfff;
+	adjustment = output->vy >= 0x800 ? 0x1000 : 0;
+	output->vy -= adjustment;
+}
+
+int32_t getDistance(int32_t deltaX, int32_t deltaY, int32_t deltaZ)
+{
+	int32_t absX;
+	int32_t absZ;
+	int32_t sum;
+	int32_t leadingZeroes;
+	int32_t shift;
+	int32_t value;
+	int32_t estimate;
+
+	value = value = deltaX;
+	if (value > 0) {
+		absX = value;
+	} else {
+		absX = -value;
+	}
+	value = absX;
+	if (deltaY > 0) {
+		deltaX = deltaY;
+	} else {
+		deltaX = -deltaY;
+	}
+	deltaY = deltaX;
+	if (deltaZ > 0) {
+		absZ = deltaZ;
+	} else {
+		absZ = -deltaZ;
+	}
+	deltaZ = absZ;
+	sum = absX + deltaX + absZ;
+
+	gte_ldlzc(sum);
+	if (sum <= 0) {
+		return sum != 0 ? 0x80000000 : 0;
+	}
+
+	gte_stlzc(&leadingZeroes);
+	shift = 17 - leadingZeroes;
+	if (shift < 0) {
+		goto negative_shift;
+	}
+	value >>= shift;
+	goto shift_complete;
+negative_shift:
+	shift = (shift = 0);
+	value >>= shift;
+shift_complete:
+
+	deltaY >>= shift;
+	deltaZ >>= shift;
+	value = value * value + deltaY * deltaY + deltaZ * deltaZ;
+
+	gte_ldlzc(value);
+	estimate = MAIN_D_80114D68[value & 0xff];
+	if (value >= 0x100) {
+		gte_stlzc(&leadingZeroes);
+		deltaY = (leadingZeroes & 1) + 24 - leadingZeroes;
+		estimate = MAIN_D_80114D68[value >> deltaY] << (deltaY >> 1);
+
+		estimate += ((value / estimate) - estimate) >> 1;
+		estimate += ((value / estimate) - estimate) >> 1;
+	}
+
+	value = estimate << shift;
+	return value < 0 ? 0x80000000 : value;
+}
+
+void MAIN_func_800E4470(MATRIX *matrix, SVECTOR *output)
+{
+	int32_t sinX;
+	int32_t cosX;
+	int32_t sinZ;
+	int32_t cosZ;
+	int32_t maximum;
+	int32_t value;
+
+	value = value;
+
+	if (matrix->m[2][2] == 0 && matrix->m[0][0] == 0) {
+		output->vy = matrix->m[0][2] > 0 ? 0x400 : -0x400;
+		output->vx = ratan2(matrix->m[2][1], matrix->m[1][1]);
+		output->vz = 0;
+		return;
+	}
+
+	output->vx = ratan2(-matrix->m[1][2], matrix->m[2][2]);
+	output->vz = ratan2(-matrix->m[0][1], matrix->m[0][0]);
+
+	sinX = rsin(output->vx);
+	cosX = rcos(output->vx);
+	sinZ = rsin(output->vz);
+	cosZ = rcos(output->vz);
+
+	maximum = MAX_VALUE(MAX_VALUE(ABS_VALUE(sinX), ABS_VALUE(cosX)),
+			    MAX_VALUE(ABS_VALUE(sinZ), ABS_VALUE(cosZ)));
+
+	if (maximum == ABS_VALUE(sinX)) {
+		value = matrix->m[1][2] * -0x1000 / sinX;
+	} else if (maximum == ABS_VALUE(cosX)) {
+		value = (matrix->m[2][2] << 12) / cosX;
+	} else if (maximum == ABS_VALUE(sinZ)) {
+		value = matrix->m[0][1] * -0x1000 / sinZ;
+	} else if (maximum == ABS_VALUE(cosZ)) {
+		value = (matrix->m[0][0] << 12) / cosZ;
+	}
+
+	output->vy = ratan2(matrix->m[0][2], value);
+}
+
+void matrixToEuler2(MATRIX *matrix, SVECTOR *output)
+{
+	int32_t sinY;
+	int32_t cosY;
+	int32_t sinZ;
+	int32_t cosZ;
+	int32_t maximum;
+	int32_t value;
+
+	value = value;
+
+	if (matrix->m[2][2] == 0 && matrix->m[0][2] == 0) {
+		output->vx = matrix->m[1][2] > 0 ? -0x400 : 0x400;
+		output->vy = ratan2(-matrix->m[2][0], matrix->m[0][0]);
+		output->vz = 0;
+		return;
+	}
+
+	output->vy = ratan2(matrix->m[0][2], matrix->m[2][2]);
+	output->vz = ratan2(matrix->m[1][0], matrix->m[1][1]);
+
+	sinY = rsin(output->vy);
+	cosY = rcos(output->vy);
+	sinZ = rsin(output->vz);
+	cosZ = rcos(output->vz);
+
+	maximum = MAX_VALUE(MAX_VALUE(ABS_VALUE(sinY), ABS_VALUE(cosY)),
+			    MAX_VALUE(ABS_VALUE(sinZ), ABS_VALUE(cosZ)));
+
+	if (maximum == ABS_VALUE(sinY)) {
+		value = (matrix->m[0][2] << 12) / sinY;
+	} else if (maximum == ABS_VALUE(cosY)) {
+		value = (matrix->m[2][2] << 12) / cosY;
+	} else if (maximum == ABS_VALUE(sinZ)) {
+		value = (matrix->m[1][0] << 12) / sinZ;
+	} else if (maximum == ABS_VALUE(cosZ)) {
+		value = (matrix->m[1][1] << 12) / cosZ;
+	}
+
+	output->vx = ratan2(-matrix->m[1][2], value);
+}
 
 void calculatePosition(GsCOORDINATE2 *coord, MATRIX *matrix)
 {
