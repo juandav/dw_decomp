@@ -9,9 +9,9 @@
 
 typedef struct {
 	DVECTOR *path;
-	int32_t unk4;
+	int32_t pathLength;
 	int32_t unk8;
-} FishSeadra;
+} FishSeadramon;
 
 typedef struct {
 	uint8_t unk0;
@@ -19,8 +19,8 @@ typedef struct {
 	uint8_t unk2;
 	uint8_t unk3;
 	int32_t unk4;
-	DVECTOR *unk8;
-	uint8_t unkC;
+	DVECTOR *points;
+	uint8_t pointCount;
 	uint8_t unkD;
 	uint8_t unkE;
 	uint8_t unkF;
@@ -29,32 +29,32 @@ typedef struct {
 typedef struct {
 	int16_t mapId;
 	int16_t unk2;
-	int32_t unk4;
+	int32_t scale;
 	int32_t unk8;
-	int32_t unkC;
-	int32_t unk10;
+	int32_t fishScaleSmall;
+	int32_t fishScaleLarge;
 	int16_t seadramonTime1;
 	int16_t seadramonTime2;
 	FishingSpot *fishingSpots;
 	int32_t unk1C;
-	int32_t (*unk20)(int32_t x, int32_t y);
+	int32_t (*isWater)(int32_t x, int32_t y);
 	void *unk24;
-	int16_t unk28;
+	int16_t castRange;
 	int16_t unk2A;
 	char *spriteFilePath;
 	DVECTOR *seadramonWaypoints;
-	int32_t unk34;
+	int32_t seadramonWaypointCount;
 } FishingMapData;
 
 typedef struct {
 	int32_t objCount;
-	uint8_t *bufferEnd;
-	uint8_t *unk8;
+	GsDOBJ2 *objects;
+	GsDOBJ2 *objectsEnd;
 	uint8_t *targetBuffer;
 } TMDFileLoadingData;
 
 typedef struct {
-	uint8_t alive : 1;
+	uint8_t active : 1;
 	uint8_t kind : 4;
 	uint8_t unk5 : 3;
 	uint8_t unk1;
@@ -63,9 +63,9 @@ typedef struct {
 	uint16_t unk6;
 	VECTOR pos;
 	SVECTOR rotation;
-	int32_t unk20;
-	int32_t target;
-	int32_t unk28;
+	int32_t animPhase;
+	int32_t state;
+	int32_t framesOnState;
 	int32_t lifetime;
 	int32_t timeNextMove;
 	int32_t timeThisMove;
@@ -81,27 +81,27 @@ typedef struct {
 } FishPool;
 
 typedef struct {
-	VECTOR unk0;
-	int32_t unk10;
-	int32_t unk14;
-	int32_t unk18;
-	uint32_t unk1C;
-	int32_t unk20;
+	VECTOR pos;
+	int32_t kind;
+	int32_t frame;
+	int32_t sprite;
+	uint32_t active;
+	int32_t scale;
 } FishRipple;
 
 typedef struct {
-	int8_t unk0;
-	int8_t unk1;
-	int16_t unk2;
-	VECTOR unk4;
+	int8_t active;
+	int8_t lifetime;
+	int16_t sprite;
+	VECTOR pos;
 } FishMarker;
 
 typedef struct {
 	FishRipple items[16];
 	int32_t count;
-	uint32_t unk244;
+	FishRipple *attractor;
 	FishRipple *next;
-	int32_t unk24C;
+	int32_t attractRadius;
 } FishRipplePool;
 
 typedef struct {
@@ -119,7 +119,7 @@ typedef struct {
 	int32_t display;
 	uint32_t unk4[2];
 	int32_t level;
-	int32_t unk10;
+	int32_t framesAtLimit;
 	int32_t limit;
 	FishColor color;
 } FishingTension;
@@ -134,26 +134,26 @@ typedef struct {
 
 typedef struct {
 	int32_t shown;
-	int32_t unk4;
-	int32_t unk8;
-	int32_t unkC;
-	int32_t unk10;
-	int16_t unk14[30];
-	int32_t unk50;
-	int32_t unk54;
-	RECT unk58;
-	RECT unk60;
+	int32_t totalRows;
+	int32_t column;
+	int32_t cursorRow;
+	int32_t rowOffset;
+	int16_t items[30];
+	int32_t lastRow;
+	int32_t visibleRows;
+	RECT startPos;
+	RECT finalPos;
 	int16_t boxId;
 	int16_t unk6A;
-	int32_t unk6C;
+	int32_t selectedItem;
 } FishingBaitMenu;
 
 typedef struct {
 	FishingBox box;
-	uint32_t unk18[4];
+	char *lines[4];
 	VECTOR scrollTo;
 	int32_t isScrolling;
-	int32_t unk3C;
+	int32_t framesOpen;
 } FishingView;
 
 typedef struct {
@@ -169,7 +169,7 @@ typedef struct {
 	int32_t animMode;
 	int32_t powerLeft;
 	int32_t powerMax;
-	int32_t unk4C;
+	int32_t strikeTimer;
 	int32_t escaped;
 } HookedFish;
 
@@ -190,35 +190,41 @@ typedef struct {
 } FishingRod;
 
 typedef struct {
+	VECTOR pos;
+	int32_t state;
+	int32_t timer;
+	int32_t sprite;
+	int32_t mode;
+	VECTOR vel;
+	int32_t dist;
+	int32_t unk34;
+	int32_t unk38;
+	int32_t gravity;
+	int32_t unk40;
+} FishingSwimmer;
+
+typedef struct {
 	uint32_t header;
-	FishingBaitMenu msg;
-	FishPool pool;
+	FishingBaitMenu baitMenu;
+	FishPool fishPool;
 	FishingRod rod;
 	HookedFish hooked;
 	FishingView view;
 	FishingTension tension;
 	FishingItem item;
-	VECTOR swimmerLoc;
-	uint32_t unk8E4[3];
-	int32_t unk8F0;
-	VECTOR unk8F4;
-	int32_t unk904;
-	int32_t unk908;
-	int32_t unk90C;
-	int32_t unk910;
-	uint32_t unk914;
-	uint8_t messageBuffer[32];
+	FishingSwimmer swimmer;
+	char messageBuffer[32];
 	TMDFileLoadingData rodModel;
-	TMDFileLoadingData seadraModel;
-	int32_t fishingEnabled;
+	TMDFileLoadingData seadramonModel;
+	int32_t fishingDisabled;
 	uint32_t mapId;
-	FishingMapData *mapDataPtr;
-	FishRipplePool pool1;
-	FishMarkerPool pool2;
-	FishSeadra seadra;
+	FishingMapData *mapData;
+	FishRipplePool ripplePool;
+	FishMarkerPool markerPool;
+	FishSeadramon seadramon;
 	uint8_t rodModelBuffer[4096];
-	uint8_t seadraModelBuffer[4096];
-	int32_t unk2D08;
+	uint8_t seadramonModelBuffer[4096];
+	int32_t catchComplete;
 	uint32_t trailer;
 } FishingData;
 
@@ -226,21 +232,23 @@ extern FishingData *FISHING_DATA_PTR;
 extern FishingMapData FISHING_MAP_DATA[];
 extern FishingData FISHING_DATA;
 
-void MAIN_func_800FF900(VECTOR *v);
 int32_t getBestFishingRod(void);
 int32_t hasFoodItem(void);
 void setFishingDisabled(void);
 void setFishingEnabled(void);
-int32_t hasFishingRod(void);
+int32_t getFishingAvailability(void);
 void initializeFishing(void);
 void tickFishing(void);
 int32_t isFishing(void);
 void deinitializeFishing(void);
 void checkFishingMap(uint32_t mapId);
 
-void FISH_loadFishing(FishingRod *fishingRod);
+void FISH_loadFishing(FishingRod *rod);
 void FISH_init(void);
 void FISH_deinitialize(void);
 int32_t FISH_tamerTick(void);
+void FISH_loadTMDModel(TMDFileLoadingData *model, char *path, uint8_t *buf, uint32_t bufSize);
+GsDOBJ2 *FISH_getModelObject(TMDFileLoadingData *model, int32_t idx);
+int32_t FISH_remapClamped(int32_t x, int32_t x0, int32_t x1, int32_t y0, int32_t y1);
 
 #endif

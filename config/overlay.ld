@@ -234,19 +234,21 @@ SECTIONS
 			. = ALIGN(., 4);
 
 			build/src/fish/fish.c.o(.text.*);
+			build/src/fish/fish_model.c.o(.text.*);
 			. = ALIGN(., 4);
 
 			build/src/fish/fish.c.o(.rodata.*);
-			. = ALIGN(., 4);
-			KEEP(build/asm/fish/data/A1E0.rodata.s.o(.rodata.*));
+			build/src/fish/fish_model.c.o(.rodata.*);
 			. = ALIGN(., 4);
 
 			build/src/fish/fish.c.o(.data.*);
+			build/src/fish/fish_model.c.o(.data.*);
 			. = ALIGN(., 4);
 			KEEP(build/asm/fish/data/A1F4.data.s.o(.data.*));
 			. = ALIGN(., 4);
 
 			build/src/fish/fish.c.o(.bss.*);
+			build/src/fish/fish_model.c.o(.bss.*);
 			. = ALIGN(., 4);
 		}
 	}

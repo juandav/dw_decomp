@@ -10,6 +10,7 @@
 
 extern int32_t MAIN_D_801349E0;
 
+void MAIN_func_800FF900(VECTOR *v);
 int32_t isTriggerSet(uint16_t trigger);
 
 int32_t getBestFishingRod(void)
@@ -41,26 +42,24 @@ int32_t hasFoodItem(void)
 void setFishingDisabled(void)
 {
 	if (FISHING_DATA_PTR != NULL) {
-		FISHING_DATA_PTR->fishingEnabled = 1;
+		FISHING_DATA_PTR->fishingDisabled = 1;
 	}
 }
 
 void setFishingEnabled(void)
 {
 	if (FISHING_DATA_PTR != NULL) {
-		FISHING_DATA_PTR->fishingEnabled = 0;
+		FISHING_DATA_PTR->fishingDisabled = 0;
 	}
 }
 
-int32_t hasFishingRod(void)
+int32_t getFishingAvailability(void)
 {
-	int32_t bestRod;
-
 	if (FISHING_DATA_PTR == NULL) {
 		return 0;
 	}
 
-	if (FISHING_DATA_PTR->fishingEnabled != 0) {
+	if (FISHING_DATA_PTR->fishingDisabled != 0) {
 		return 0;
 	}
 
@@ -128,11 +127,11 @@ void checkFishingMap(uint32_t mapId)
 			FISHING_DATA_PTR->header = 0x55DDDD55;
 			FISHING_DATA_PTR->trailer = 0x55DDDD55;
 			FISHING_DATA_PTR->mapId = mapId;
-			FISHING_DATA_PTR->mapDataPtr = &FISHING_MAP_DATA[i];
+			FISHING_DATA_PTR->mapData = &FISHING_MAP_DATA[i];
 			FISH_init();
 		}
 
-		hasFishingRod();
+		getFishingAvailability();
 	}
 
 	startGameTime();

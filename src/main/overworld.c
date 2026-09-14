@@ -2037,7 +2037,7 @@ void addGameMenu(void)
 	MAIN_D_80123E8C[0] = 1;
 	MAIN_D_80134D28 = 7;
 	GAME_MENU_SPRITES[0x4e] = 0;
-	MAIN_D_80134D2C = hasFishingRod();
+	MAIN_D_80134D2C = getFishingAvailability();
 	if (MAIN_D_80134D2C != 0) {
 		MAIN_D_80134D28++;
 		if (MAIN_D_80134D2C == 1) {
