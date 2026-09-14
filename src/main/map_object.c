@@ -23,6 +23,11 @@ typedef struct {
 } Map3DObject;
 
 typedef struct {
+	int16_t big;
+	int16_t small;
+} ToyTownBoxLidProgress;
+
+typedef struct {
 	VECTOR pos1;
 	VECTOR pos2;
 	SVECTOR rotation1;
@@ -44,8 +49,8 @@ int8_t DOOR_MODEL_IDS[4];
 int8_t DOOR_ROTATION_TIMER;
 int8_t ACTIVE_DIRT_CART_MODEL;
 int16_t map_object_unused_e42;
-int16_t BIG_BOX_LID_PROGRESS;
-int16_t SMALL_BOX_LID_PROGRESS;
+/* One object keeps the lid stores dependent for retail MWCC scheduling. */
+ToyTownBoxLidProgress TOY_TOWN_BOX_LID_PROGRESS;
 int8_t TOY_TOWN_SELECTED_BOX;
 int16_t MAIN_D_80134E4A;
 int16_t ANGEMON_PEDESTAL_PROGRESS_X;
@@ -179,8 +184,7 @@ static void *map_object_sbss_order[] = {
 	&ANGEMON_PEDESTAL_PROGRESS_X,
 	&MAIN_D_80134E4A,
 	&TOY_TOWN_SELECTED_BOX,
-	&SMALL_BOX_LID_PROGRESS,
-	&BIG_BOX_LID_PROGRESS,
+	&TOY_TOWN_BOX_LID_PROGRESS,
 	&map_object_unused_e42,
 	&ACTIVE_DIRT_CART_MODEL,
 	&DOOR_ROTATION_TIMER,
@@ -601,7 +605,53 @@ void initializeMedalModel(void)
 		      &MEDAL_COORDINATES);
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/map_object", spawnToyTownBoxes);
+void spawnToyTownBoxes(void)
+{
+	VECTOR bigBoxLocation;
+	VECTOR smallBoxLocation;
+	unsigned long *bigMeshData;
+	unsigned long *smallMeshData;
+	int32_t i;
+
+	bigBoxLocation = BIG_BOX_LOCATION;
+	smallBoxLocation = SMALL_BOX_LOCATION;
+	readFile(BIG_BOX_TMD, GENERAL_MESH_BUFFER[0]);
+	readFile(SMALL_BOX_TMD,
+		 (char *)(smallMeshData =
+			    (unsigned long *)GENERAL_MESH_BUFFER[1]));
+	bigMeshData = (unsigned long *)GENERAL_MESH_BUFFER[0];
+
+	GsMapModelingData(bigMeshData + 1);
+	GsMapModelingData(smallMeshData + 1);
+
+	GsInitCoordinate2(NULL, &WARP_CRYSTAL_COORDS[0]);
+	GsInitCoordinate2(&WARP_CRYSTAL_COORDS[0], &WARP_CRYSTAL_COORDS[1]);
+	GsInitCoordinate2(NULL, &GENERAL_COORDS[0]);
+	GsInitCoordinate2(&GENERAL_COORDS[0], &GENERAL_COORDS[1]);
+
+	i = 0;
+	while (i < 2) {
+		GsLinkObject4((unsigned long)(bigMeshData + 3),
+			      &WARP_CRYSTAL_OBJECT[i], i);
+		WARP_CRYSTAL_OBJECT[i].attribute = 0;
+		WARP_CRYSTAL_OBJECT[i].coord2 = &WARP_CRYSTAL_COORDS[i];
+
+		GsLinkObject4((unsigned long)(smallMeshData + 3),
+			      &GENERAL_OBJECT[i], i);
+		GENERAL_OBJECT[i].attribute = 0;
+		GENERAL_OBJECT[i].coord2 = &GENERAL_COORDS[i];
+		i++;
+	}
+	TransMatrix(&WARP_CRYSTAL_COORDS[0].coord, &bigBoxLocation);
+	WARP_CRYSTAL_COORDS[0].flg = 0;
+	TransMatrix(&GENERAL_COORDS[0].coord, &smallBoxLocation);
+	GENERAL_COORDS[0].flg = 0;
+	TOY_TOWN_BOX_LID_PROGRESS.small = 0;
+	TOY_TOWN_BOX_LID_PROGRESS.big = 0;
+	TOY_TOWN_SELECTED_BOX = 0;
+
+	addObject(0xfbd, 0, NULL, renderToyTownBoxes);
+}
 
 void renderToyTownBoxes(int32_t instanceId)
 {
@@ -610,12 +660,12 @@ void renderToyTownBoxes(int32_t instanceId)
 
 	if (MAP_LAYER_ENABLED) {
 		if (TOY_TOWN_SELECTED_BOX == 1) {
-			BIG_BOX_LID_PROGRESS -= 100;
-			if (BIG_BOX_LID_PROGRESS < -0x400) {
-				BIG_BOX_LID_PROGRESS = -0x400;
+			TOY_TOWN_BOX_LID_PROGRESS.big -= 100;
+			if (TOY_TOWN_BOX_LID_PROGRESS.big < -0x400) {
+				TOY_TOWN_BOX_LID_PROGRESS.big = -0x400;
 			}
 
-			rot.vx = BIG_BOX_LID_PROGRESS;
+			rot.vx = TOY_TOWN_BOX_LID_PROGRESS.big;
 			rot.vy = 0;
 			rot.vz = 0;
 			RotMatrix(&rot, &WARP_CRYSTAL_COORDS[1].coord);
@@ -623,12 +673,12 @@ void renderToyTownBoxes(int32_t instanceId)
 		}
 
 		if (TOY_TOWN_SELECTED_BOX == 2) {
-			SMALL_BOX_LID_PROGRESS -= 100;
-			if (SMALL_BOX_LID_PROGRESS < -0x400) {
-				SMALL_BOX_LID_PROGRESS = -0x400;
+			TOY_TOWN_BOX_LID_PROGRESS.small -= 100;
+			if (TOY_TOWN_BOX_LID_PROGRESS.small < -0x400) {
+				TOY_TOWN_BOX_LID_PROGRESS.small = -0x400;
 			}
 
-			rot.vx = SMALL_BOX_LID_PROGRESS;
+			rot.vx = TOY_TOWN_BOX_LID_PROGRESS.small;
 			rot.vy = 0;
 			rot.vz = 0;
 			RotMatrix(&rot, &GENERAL_COORDS[1].coord);
