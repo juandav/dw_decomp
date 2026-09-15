@@ -8,7 +8,10 @@
 #include <dw/evl.h>
 #include <dw/graphics.h>
 #include <dw/model.h>
+#include <dw/move.h>
 #include <dw/params.h>
+#include <dw/partner.h>
+#include <dw/script.h>
 #include <dw/types.h>
 #include <dw/world_object.h>
 
@@ -54,6 +57,11 @@ void MAIN_func_80092B60(POLY_FT4 *prim);
 void addScreenPolyFT3(void *prim, SVECTOR *v0, SVECTOR *v1, SVECTOR *v2);
 int32_t add3DSpritePrim(POLY_FT4 *poly, SVECTOR *v0, SVECTOR *v1, SVECTOR *v2, SVECTOR *v3);
 void calculateBoneMatrix(Entity *entity, int32_t boneId, MATRIX *out);
+void addTamerLevel(int32_t chance, int32_t amount);
+void learnMove(int32_t moveId);
+void initializeEvolvedPartner(int32_t type, int32_t posX, int32_t posY, int32_t posZ,
+			      int32_t rotationX, int32_t rotationY, int32_t rotationZ);
+void setDigimonRaised(int32_t type);
 
 void EVL_setScratchTop(int32_t size);
 void EVL_resetParticles(void);
@@ -376,8 +384,6 @@ int32_t EVL_spawnParticle(VECTOR *position, RGB8 *color)
 	return i;
 }
 
-INCLUDE_ASM("asm/evl/nonmatchings/evl", EVL_brightenDigimonClut);
-
 INCLUDE_ASM("asm/evl/nonmatchings/evl", EVL_buildShardSet);
 
 int32_t EVL_spawnSpark(void *owner, int32_t timer, int32_t param)
@@ -522,6 +528,63 @@ void EVL_renderTriShard(EvlModelVertex *drift, int32_t unused1, int16_t speed, i
 	c.vz = v->vz + dz;
 	setSemiTrans(prim, 1);
 	addScreenPolyFT3(prim, &a, &b, &c);
+}
+
+void EVL_brightenDigimonClut(int16_t *clut, Entity *entity, int16_t *dst,
+			     int32_t start, int32_t end, int32_t t)
+{
+	ModelComponent *model;
+	RECT rect;
+	int16_t redFactor;
+	int16_t greenFactor;
+	int16_t blueFactor;
+	int16_t red;
+	int16_t green;
+	int16_t blue;
+	int16_t stp;
+	int32_t amount;
+	int32_t i;
+	int32_t color;
+	int32_t channels;
+
+	model = getEntityModelComponent(entity->type, getEntityType(entity));
+	if (end < t)
+		t = end;
+
+	redFactor = rand() % 100;
+	greenFactor = rand() % 100;
+	blueFactor = rand() % 100;
+	i = 0;
+
+	while (i < 0x180) {
+		red = *clut & 0x1f;
+		color = *clut;
+		channels = color;
+		green = (channels >> 5) & 0x1f;
+		blue = (channels >> 10) & 0x1f;
+		stp = (*clut++ >> 15) & 1;
+		if (red || green || blue) {
+			if (t != start)
+				stp = 1;
+
+			color = ((0x1f - red) * (t - start)) / (end - start);
+			red += (redFactor * color) / 100;
+			amount = ((0x1f - green) * (t - start)) / (end - start);
+			green += (greenFactor * amount) / 100;
+			amount = ((0x1f - blue) * (t - start)) / (end - start);
+			blue += (blueFactor * amount) / 100;
+		}
+
+		dst[i] = red;
+		dst[i] += green << 5;
+		dst[i] += blue << 10;
+		dst[i] += stp << 15;
+		i++;
+	}
+
+	setRECT(&rect, (model->clutPage & 0x3f) << 4,
+		model->clutPage >> 6, 0x10, 0x18);
+	LoadImage(&rect, (u_long *)dst);
 }
 
 void EVL_renderQuadShard(EvlModelVertex *drift, int32_t unused1, int16_t speed, int16_t timer, ModelComponent *model)
@@ -694,7 +757,171 @@ void EVL_initEvoSequence(void)
 	addObject(0x80a, 0, EVL_tickEvoSequence, (RenderFunction)EVL_renderEvoSequence);
 }
 
-INCLUDE_ASM("asm/evl/nonmatchings/evl", EVL_applyEvolution);
+void EVL_applyEvolution(entity, stats, para, digimonId)
+	Entity *entity;
+	Stats *stats;
+	PartnerPara *para;
+	int16_t digimonId;
+{
+	EvoStatsGains *gains;
+	int32_t newId;
+	int16_t targetLevel;
+	int32_t oldType;
+	long currentType;
+	int32_t moveBase;
+	uint8_t special;
+	uint8_t *moves;
+	uint8_t *movePtr;
+	uint8_t candidates[16];
+	uint8_t best;
+	int32_t move;
+	int32_t i;
+	int32_t count;
+	PositionData *position;
+	int16_t x, y, z;
+	int16_t rx, ry, rz;
+	int16_t oldLevel;
+
+	gains = &EVO_GAINS_DATA[digimonId];
+	currentType = PARTNER_ENTITY.digimonEntity.entity.type;
+	oldLevel = DIGIMON_DATA[currentType].level;
+	newId = gains->targetDigimon;
+	targetLevel = DIGIMON_DATA[digimonId].level;
+	if (digimonId == 0x0b || digimonId == 0x27 || digimonId == 0x35 || digimonId == 6 ||
+		currentType == 0x27 || targetLevel < 3) {
+		EVL_scaleBaseStats(stats, (int8_t)gains->brains, digimonId);
+		newId = gains->targetDigimon;
+	} else {
+		if (HAS_USED_EVOITEM == 0) {
+			if (stats->base.hp >= gains->hp) {
+				stats->base.hp += (int16_t)(gains->hp / 10);
+			} else {
+				stats->base.hp = (gains->hp + stats->base.hp) / 2;
+			}
+
+			if (stats->base.mp >= gains->mp) {
+				stats->base.mp += (int16_t)(gains->mp / 10);
+			} else {
+				stats->base.mp = (gains->mp + stats->base.mp) / 2;
+			}
+
+			if (stats->base.off >= gains->offense) {
+				stats->base.off += (int16_t)(gains->offense / 10);
+			} else {
+				stats->base.off = (gains->offense + stats->base.off) / 2;
+			}
+
+			if (stats->base.def >= gains->defense) {
+				stats->base.def += (int16_t)(gains->defense / 10);
+			} else {
+				stats->base.def = (gains->defense + stats->base.def) / 2;
+			}
+
+			if (stats->base.speed >= gains->speed) {
+				stats->base.speed += (int16_t)(gains->speed / 10);
+			} else {
+				stats->base.speed = (gains->speed + stats->base.speed) / 2;
+			}
+
+			if (stats->base.brain >= gains->brains) {
+				stats->base.brain += (int16_t)(gains->brains / 10);
+			} else {
+				stats->base.brain = (gains->brains + stats->base.brain) / 2;
+			}
+
+			EVL_clampBaseStats();
+			if (IS_SCRIPT_PAUSED == 1) {
+				if (DIGIMON_DATA[newId].level == 4) {
+					addTamerLevel(20, 1);
+				}
+				if (DIGIMON_DATA[newId].level == 5) {
+					addTamerLevel(100, 1);
+				}
+			}
+		}
+		newId = gains->targetDigimon;
+	}
+	para->weight = RAISE_DATA[newId].defaultWeight;
+	para->careMistakes = 0;
+	para->battles = 0;
+	if (DIGIMON_DATA[newId].level == 5 && HAS_USED_EVOITEM == 0) {
+		para->remainingLifetime += 96;
+	}
+	special = DIGIMON_DATA[newId].special[0];
+	if (special == 0) {
+		moveBase = 0;
+	} else if (special == 1) {
+		moveBase = 40;
+	} else if (special == 2) {
+		moveBase = 8;
+	} else if (special == 3) {
+		moveBase = 32;
+	} else if (special == 4) {
+		moveBase = 16;
+	} else if (special == 5) {
+		moveBase = 24;
+	} else if (special == 6) {
+		moveBase = 49;
+	}
+	movePtr = DIGIMON_DATA[newId].moves;
+	moves = movePtr;
+	count = 0;
+	for (i = 0; i < 16; movePtr++, i++) {
+		if ((uint32_t)*movePtr >= (uint32_t)moveBase && *movePtr <= moveBase + 8) {
+			candidates[count] = *movePtr;
+			count++;
+		}
+	}
+	candidates[count] = 0xff;
+	best = candidates[0];
+	for (count = 0; candidates[count] != 0xff; count++) {
+		move = candidates[count];
+		if (MOVE_DATA[best].power > MOVE_DATA[move].power && MOVE_DATA[move].power != 0) {
+			best = move;
+		}
+	}
+	learnMove(best);
+	for (movePtr = moves, i = 0; i < 16; i++) {
+		if (*movePtr++ == best) {
+			break;
+		}
+	}
+	PARTNER_ENTITY.digimonEntity.stats.base.moves[0] = i + 0x2e;
+	PARTNER_ENTITY.digimonEntity.stats.base.moves[1] = 0xff;
+	PARTNER_ENTITY.digimonEntity.stats.base.moves[2] = 0xff;
+	if (DIGIMON_DATA[newId].level < 3) {
+		PARTNER_ENTITY.digimonEntity.stats.base.moves[0] = 0x2e;
+	}
+	for (i = 15; i >= 0; i--) {
+		if (DIGIMON_DATA[newId].moves[i] == 0xff)
+			continue;
+		if (DIGIMON_DATA[newId].moves[i] < 0x3a)
+			continue;
+		if (DIGIMON_DATA[newId].moves[i] >= 0x71)
+			continue;
+		PARTNER_ENTITY.digimonEntity.stats.base.moves[3] = i + 0x2e;
+		break;
+	}
+	if (i < 0) {
+		PARTNER_ENTITY.digimonEntity.stats.base.moves[3] = 0xff;
+	}
+	position = entity->posData;
+	x = position->location.vx;
+	y = position->location.vy;
+	z = position->location.vz;
+	rx = position->rotation.vx;
+	ry = position->rotation.vy;
+	rz = position->rotation.vz;
+	oldType = PARTNER_ENTITY.digimonEntity.entity.type;
+	removeEntity(oldType, 1);
+	ENTITY_TABLE[1] = NULL;
+	thunkUnloadModel(oldType, 3);
+	initializeEvolvedPartner(newId, x, y, z, rx, ry, rz);
+	setDigimonRaised((uint16_t)newId);
+	if (oldLevel != DIGIMON_DATA[newId].level) {
+		para->evoTimer = 0;
+	}
+}
 
 void EVL_scaleBaseStats(Stats *stats, int16_t pct, int32_t unused)
 {
