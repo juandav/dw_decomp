@@ -1,5 +1,8 @@
+
 #include <dw/clock.h>
 #include <dw/evl.h>
+#include <dw/font.h>
+#include <dw/map_object.h>
 #include <dw/move.h>
 
 #include "common.h"
@@ -28,6 +31,19 @@ typedef struct {
 	int8_t transparency;
 } LocalMapObject;
 
+extern int32_t ACTIVE_FRAMEBUFFER;
+void clearTextSubArea(RECT *rect);
+extern char *MAIN_D_801247B8[];
+extern RECT MAIN_D_801342F0;
+extern int8_t MENU_SUB_STATE;
+extern GsOT *ACTIVE_ORDERING_TABLE;
+extern GsOT_TAG *FRAMEBUFFER0_ORIGIN;
+extern GsOT_TAG *FRAMEBUFFER1_ORIGIN;
+extern GsOT *FRAMEBUFFER_OT[2];
+extern GsRVIEW2 GS_VIEWPOINT;
+extern SVECTOR MAIN_D_80134238;
+extern GsRVIEW2 MAIN_D_80123880;
+extern int32_t VIEWPORT_DISTANCE;
 extern int16_t MAP_OBJECT_INSTANCE_COUNT;
 extern LocalMapObject LOCAL_MAP_OBJECTS[];
 extern int32_t MAP_OBJECT_MOVE_TO_DATA[];
@@ -249,9 +265,45 @@ void renderDigimonMoveBox(void)
 	}
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/overworld_moves_box", drawMoveViewHelpStrings);
+int32_t drawMoveViewHelpStrings(void)
+{
+	RECT rect;
 
-INCLUDE_ASM("asm/main/nonmatchings/overworld_moves_box", renderDigiviceMedals);
+	rect = MAIN_D_801342F0;
+	if (MENU_SUB_STATE == 0) {
+		clearTextSubArea(&rect);
+	}
+
+	drawString(MAIN_D_801247B8[MENU_SUB_STATE + 9], 0, MENU_SUB_STATE * 0xc + 0x18);
+	MENU_SUB_STATE = MENU_SUB_STATE + 1;
+
+	if (MENU_SUB_STATE == 8) {
+		return 1;
+	}
+
+	return 0;
+}
+
+void renderDigiviceMedals(void)
+{
+	FRAMEBUFFER_OT[0]->length = 9;
+	FRAMEBUFFER_OT[0]->org = FRAMEBUFFER0_ORIGIN;
+	FRAMEBUFFER_OT[1]->length = 9;
+	FRAMEBUFFER_OT[1]->org = FRAMEBUFFER1_ORIGIN;
+
+	GsSetProjection(0x400);
+	GsSetRefView2(&MAIN_D_80123880);
+	GsClearOt(0, 1, FRAMEBUFFER_OT[ACTIVE_FRAMEBUFFER]);
+
+	MAIN_D_80134238.vy += 0x64;
+	RotMatrix(&MAIN_D_80134238, &MEDAL_COORDINATES.coord);
+	MEDAL_COORDINATES.flg = 0;
+	drawObject(&MEDAL_OBJECT, FRAMEBUFFER_OT[ACTIVE_FRAMEBUFFER], 5);
+	GsSortOt(FRAMEBUFFER_OT[ACTIVE_FRAMEBUFFER], ACTIVE_ORDERING_TABLE);
+
+	GsSetProjection(VIEWPORT_DISTANCE);
+	GsSetRefView2(&GS_VIEWPOINT);
+}
 
 void sortArray(int16_t *arr, uint8_t count)
 {
