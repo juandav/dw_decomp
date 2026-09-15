@@ -135,6 +135,9 @@ void VS__func_800F34F0(void);
 int32_t VS__checkEndCondition(void);
 void VS__digimonAiTickVS(uint8_t fighterId);
 void VS__tickFighterStates(void);
+void VS_resolveAttack(void);
+void VS_applyMoveResult(void);
+void VS_setRandomViewpoint(Entity *entity, int32_t idx);
 void VS__handlePause(void);
 int32_t VS__deinitializeCombat(int16_t lostP1, int16_t lostP2);
 int32_t VS__isButtonsPressed(int32_t buttons);
@@ -147,7 +150,7 @@ void VS__func_800F4F9C(void);
 void VS__faintDigimon(DigimonEntity *entity, FighterData *fighter,
 		     uint8_t fighterId);
 int32_t VS__func_800F51B8(int32_t value);
-void VS__tickAttackState(Entity *entity, FighterData *fighter,
+void VS__tickAttackState(Entity *entity, DigimonEntity *target,
 			int32_t fighterId);
 void VS__tickHitState(Entity *entity, FighterData *fighter,
 			int32_t fighterId);
@@ -263,6 +266,7 @@ extern int16_t INITIAL_COMBAT_STATS[][6];
 extern int8_t GAME_STATE;
 extern int16_t MAIN_D_80135294;
 extern int32_t MAIN_D_80135268;
+extern uint8_t MAIN_D_8013529C;
 extern uint8_t *GENERAL_BUFFER_PTR;
 extern int16_t MAIN_D_8013527E;
 extern uint8_t MAIN_D_80135288;
@@ -563,7 +567,7 @@ void VS__renderIntroNameChar(int16_t x, int16_t y, int16_t size,
 
 	MAIN_func_80092BB0(prim);
 	prim->tpage = 12;
-	prim->clut = GetClut(0, 0x1e0);
+	setClut(prim, 0, 480);
 	prim->r0 = MAIN_D_8012F438[MAIN_D_80134F28 * 3];
 	prim->g0 = MAIN_D_8012F439[MAIN_D_80134F28 * 3];
 	prim->b0 = MAIN_D_8012F43A[MAIN_D_80134F28 * 3];
@@ -769,7 +773,7 @@ void VS__renderNumber2(int32_t x, int32_t y, int32_t digits, int32_t value,
 		prim->g0 = 0x80;
 		prim->b0 = 0x80;
 		prim->tpage = 13;
-		prim->clut = GetClut(16, 480);
+		setClut(prim, 16, 480);
 		setUVDataPolyFT4(prim, buf[i] * 12, 32, 12, 12);
 		setPosDataPolyFT4(prim,
 				  x + (((int32_t)width - 1) - i) * 12, y,
@@ -1383,7 +1387,96 @@ void VS__digimonAiTickVS(uint8_t fighterId)
 	}
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/vs", VS__tickFighterStates);
+void VS__tickFighterStates(void)
+{
+	DigimonEntity *entity;
+	DigimonEntity *target;
+	FighterData *fighter;
+	uint16_t *flags;
+	uint32_t combat;
+	int32_t id;
+	int32_t i;
+
+	if (MAIN_D_80134D7C[1] > 0) {
+		MAIN_D_80134D7C[1]--;
+	}
+
+	if (MAIN_D_80134D84 > 0) {
+		MAIN_D_80134D84--;
+	}
+
+	combat = (uint32_t)COMBAT_DATA_PTR;
+	for (i = 0, fighter = (FighterData *)combat; ENEMY_COUNT >= i; i++, fighter = (FighterData *)((int32_t)fighter + 0x168)) {
+		flags = &fighter->flags;
+		combat = (uint32_t)COMBAT_DATA_PTR;
+		entity = (DigimonEntity *)ENTITY_TABLE[((uint8_t *)((uint32_t)i + combat))[0x66c]];
+		VS_addFinisherProgress(fighter, 1);
+		id = fighter->targetId;
+
+		if (id != 0xff) {
+			combat = (uint32_t)COMBAT_DATA_PTR;
+			target = (DigimonEntity *)ENTITY_TABLE[((uint8_t *)((uint32_t)id + combat))[0x66c]];
+		} else {
+			target = NULL;
+		}
+		if (*flags & 0x20) {
+			VS__tickAttackState(&entity->entity, target, i);
+		} else if ((*flags & 0x10) || (*flags & 0x80)) {
+			VS__tickHitState(&entity->entity, fighter, i);
+		} else if (fighter->moveRange != -1) {
+			if (*flags & 8) {
+				VS__tickFlatState(entity, target, fighter, i);
+			} else if (*flags & 4) {
+				VS__tickStunState(&entity->entity);
+			} else if (*flags & 2) {
+				VS__tickConfusedState(entity, target, fighter, i);
+			} else if (*flags & 0x2000) {
+				VS__tickSenileState(entity, fighter);
+			} else if (*flags & 0x800) {
+				VS__tickChargeState(entity, target, fighter);
+			} else if (*flags & 0x1000) {
+				VS__tickCooldownState(entity, target, fighter);
+			} else {
+				VS__tickQueuedMove(entity, target, fighter, i);
+			}
+		}
+	}
+
+	VS_resolveAttack();
+	VS_applyMoveResult();
+	if (MAIN_D_80135268 != 7 && MAIN_D_80135268 != 8) {
+		if (MAIN_D_8013529C != 0) {
+			MAIN_D_8013529C--;
+			if (MAIN_D_8013529C == 0) {
+				MAIN_D_80135268 = 1;
+			}
+		}
+		if ((MAIN_D_80134D66 % 600) == 0 && random(2) == 1) {
+			MAIN_D_80135268 = 6;
+			VS_setRandomViewpoint(ENTITY_TABLE[1], 4);
+			MAIN_D_8013529C = random(0x29) + 0x3c;
+		}
+	}
+
+	for (i = 0; ENEMY_COUNT >= i; i++) {
+		if (COMBAT_DATA_PTR->fighter[i].flags & 0x20) {
+			break;
+		}
+		if (COMBAT_DATA_PTR->fighter[i].flags & 0x10) {
+			break;
+		}
+		if (MAIN_D_80135268 == 7) {
+			break;
+		}
+		if (MAIN_D_80135268 == 8) {
+			break;
+		}
+	}
+
+	if (i == ENEMY_COUNT + 1) {
+		MAIN_D_80135268 = 1;
+	}
+}
 
 void VS__handlePause(void)
 {
@@ -1719,7 +1812,7 @@ int32_t VS__func_800F51B8(int32_t value)
 	return 4;
 }
 
-void VS__tickAttackState(Entity *entity, FighterData *fighter,
+void VS__tickAttackState(Entity *entity, DigimonEntity *target,
 			int32_t fighterId)
 {
 	int32_t i;
@@ -2666,7 +2759,7 @@ void VS__func_800F7284(void)
 
 	SetPolyFT4(prim);
 	prim->tpage = 0xd;
-	prim->clut = GetClut(16, 480);
+	setClut(prim, 16, 480);
 	setRGB0(prim, 0x80, 0x80, 0x80);
 	setUVDataPolyFT4(prim, 0, 8, 144, 24);
 	setPosDataPolyFT4(prim, -72, -12, 144, 24);
@@ -2725,7 +2818,7 @@ void VS__renderPlayerMarker(int32_t id)
 	prim = (POLY_FT4 *)GsGetWorkBase();
 	SetPolyFT4(prim);
 	prim->tpage = 6;
-	prim->clut = GetClut(0, 0x1f2);
+	setClut(prim, 0, 498);
 	prim->r0 = 0x80;
 	prim->g0 = 0x80;
 	prim->b0 = 0x80;
@@ -3410,15 +3503,15 @@ void VS__func_800FA234(int32_t depth)
 		}
 
 		if (i == 4 && MAIN_D_80134F59 != 0) {
-			prim->clut = GetClut(48, 0x1f5);
+			setClut(prim, 48, 501);
 		}
 
 		if (i == 5 && MAIN_D_80134F59 != 1) {
-			prim->clut = GetClut(48, 0x1f5);
+			setClut(prim, 48, 501);
 		}
 
 		if (i == 6 && MAIN_D_80134F59 != 2) {
-			prim->clut = GetClut(48, 0x1f5);
+			setClut(prim, 48, 501);
 		}
 
 		prim->tpage = 7;
@@ -3429,7 +3522,7 @@ void VS__func_800FA234(int32_t depth)
 					 sprite->v, sprite->w, sprite->h);
 
 			if (i == 3 && MAIN_D_80134F5A == 1) {
-				prim->clut = GetClut(48, 0x1ef);
+				setClut(prim, 48, 495);
 			}
 		} else {
 			setUVDataPolyFT4(prim, sprite->u, sprite->v, sprite->w,
@@ -3518,23 +3611,23 @@ void VS__func_800FA5CC(int32_t id)
 		if (i == 1 && MAIN_D_80134F59 != 0) {
 			setUVDataPolyFT4(prim, sprite->u + 40, sprite->v,
 					 sprite->w, sprite->h);
-			prim->clut = GetClut(48, 0x1f3);
+			setClut(prim, 48, 499);
 		}
 
 		if (i == 2 && MAIN_D_80134F59 != 1) {
 			setUVDataPolyFT4(prim, sprite->u + 40, sprite->v,
 					 sprite->w, sprite->h);
-			prim->clut = GetClut(48, 0x1f3);
+			setClut(prim, 48, 499);
 		}
 
 		if (i == 3 && MAIN_D_80134F59 != 2) {
 			setUVDataPolyFT4(prim, sprite->u + 40, sprite->v,
 					 sprite->w, sprite->h);
-			prim->clut = GetClut(48, 0x1f3);
+			setClut(prim, 48, 499);
 		}
 
 		if (i >= 4 && i < 7 && MAIN_D_80134F59 != i - 4) {
-			prim->clut = GetClut(48, 0x1ec);
+			setClut(prim, 48, 492);
 		}
 
 		prim->tpage = 7;
