@@ -15,9 +15,11 @@
 #include <dw/font.h>
 #include <dw/item.h>
 #include <dw/main.h>
+#include <dw/fade.h>
 #include <dw/model.h>
 #include <dw/params.h>
 #include <dw/tamer.h>
+#include <dw/ui.h>
 #include <dw/types.h>
 #include <dw/world_object.h>
 
@@ -42,6 +44,50 @@ extern GsOT_TAG GS_ORDERING_TABLE_0[];
 extern GsOT_TAG GS_ORDERING_TABLE_1[];
 extern GsOT GS_ORDERING_TABLE[2];
 
+extern int32_t ACTIVE_FRAMEBUFFER;
+typedef void (*ItemFunction)(int16_t);
+
+extern int32_t MAIN_D_80134EAC;
+typedef struct {
+	int16_t spawnX[10];
+	int16_t spawnY[10];
+	int16_t spawnZ[10];
+	int16_t rotation[10];
+	int16_t targetMap[10];
+	int16_t targetExit[10];
+} MapWarps;
+
+extern MapWarps MAP_WARPS;
+extern uint8_t CURRENT_EXIT;
+extern int8_t TAMER_START_TILE_X;
+extern int8_t TAMER_START_TILE_Y;
+extern int8_t TAMER_WAYPOINT_COUNT;
+extern int8_t TAMER_WAYPOINT_X[];
+extern int8_t TAMER_WAYPOINT_Y[];
+extern int8_t GAME_STATE;
+extern Entity *MAIN_D_80134D60;
+extern uint8_t MAIN_D_80134D64;
+extern int32_t MAIN_D_80134D74;
+extern int32_t MAIN_D_80134D78;
+extern int16_t MAIN_D_80134D68;
+extern int32_t MAIN_D_80134D7C[2];
+void BTL_getRemainingEnemies(Entity *self, int16_t *out, int16_t *count);
+void BTL_drawCommandShout(uint8_t command);
+extern int32_t MAIN_D_80134F0C;
+extern int16_t FADE_IN_CURRENT;
+extern int32_t CHECKED_MEMORY_CARD;
+extern int32_t CURRENT_MENU;
+extern int32_t TARGET_MENU;
+extern char MAIN_D_8012CEA0[];
+extern int32_t IS_SCRIPT_PAUSED;
+extern GsRVIEW2 GS_VIEWPOINT_COPY;
+extern int32_t VIEWPORT_DISTANCE;
+extern int32_t VIEWPORT_DISTANCE_COPY;
+extern int32_t DRAWING_OFFSET_X_COPY;
+extern int32_t DRAWING_OFFSET_Y_COPY;
+extern GsOT *ACTIVE_ORDERING_TABLE;
+extern PACKET GS_WORK_BASES[];
+extern int16_t FADE_OUT_CURRENT;
 extern int32_t DRAWING_OFFSET_X;
 extern int32_t DRAWING_OFFSET_Y;
 
@@ -59,6 +105,22 @@ extern int16_t MAIN_D_80134F10;
 extern GsF_LIGHT LIGHT_DATA[3];
 
 void renderMainMenuBackground(void);
+void checkShopMap(int32_t mapId);
+void entityLookAtTile(Entity *entity, int32_t tileX, int32_t tileY);
+void getModelTile(VECTOR *pos, int16_t *outTileX, int16_t *outTileY);
+void entityLookAtLocation(Entity *entity, VECTOR *pos);
+void initializeInventoryObject(void);
+uint32_t playSound(int32_t vabId, int32_t val);
+void tickMainMenu(void);
+void renderMainMenu(void);
+void handlePause(void);
+int32_t tickScript(void);
+void updateTournamentRegistration(void);
+void initializeNamingBuffer(uint8_t flags);
+void MAIN_func_8010020C(void);
+void MAIN_func_80100258(int32_t flag);
+int32_t newGameStateMachine(void);
+void processInput(void);
 void loadNewgameScene(void);
 void tickNewGameJijimon(int32_t instanceId);
 void writePStat(int32_t stat, int32_t value);
@@ -251,7 +313,7 @@ int32_t main(void)
 			initializeMusic();
 			loadStackedTIMFile(MAIN_D_8012CE8C);
 			initializeTamer(0, 0, 0, 0, 0, 0, 0);
-			if (readPStat(0xFE) == 0) {
+			if (readPStat(0xfe) == 0) {
 				partnerId = 0x3;
 			} else {
 				partnerId = 0x11;
@@ -260,7 +322,7 @@ int32_t main(void)
 			setDigimonRaised(partnerId);
 			MAIN_func_800D56E0();
 			initializeChest();
-			runMapHeadScript(0xCC);
+			runMapHeadScript(0xcc);
 			addClock();
 			stopGameTime();
 			break;
@@ -357,11 +419,142 @@ void initializeFramebuffer(void)
 	SetDispMask(1);
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/main", runLandingScreen);
+void runLandingScreen(void)
+{
+	int32_t timer;
 
-INCLUDE_ASM("asm/main/nonmatchings/main", runMainMenu);
+	timer = 0x258;
+	addObject(0xfa3, 0, NULL, (RenderFunction)renderPressStartToContinue);
+	FADE_OUT_CURRENT = 0;
+	fadeFromBlack(0x28);
 
-INCLUDE_ASM("asm/main/nonmatchings/main", newGameScene);
+	while (--timer > 0) {
+		pollInputMenu();
+
+		if ((POLLED_INPUT & 0x800) != 0) {
+			if ((FADE_OUT_CURRENT == 0) && (FADE_IN_CURRENT == 0)) {
+				playSound(0, 3);
+				MAIN_D_80134EB0 = 1;
+				goto fade;
+			}
+		}
+
+		ACTIVE_FRAMEBUFFER = GsGetActiveBuff();
+		GsSetWorkBase(&GS_WORK_BASES[ACTIVE_FRAMEBUFFER * 0x14000]);
+		GsClearOt(0, 0, &GS_ORDERING_TABLE[ACTIVE_FRAMEBUFFER]);
+		ACTIVE_ORDERING_TABLE = &GS_ORDERING_TABLE[ACTIVE_FRAMEBUFFER];
+		tickObjects();
+		renderObjects();
+		applyHUDOffset(ACTIVE_FRAMEBUFFER);
+		DrawSync(0);
+		VSync(0);
+		ResetGraph(1);
+		GsSetOrign(DRAWING_OFFSET_X, DRAWING_OFFSET_Y);
+		GsSwapDispBuff();
+		GsDrawOt(&GS_ORDERING_TABLE[ACTIVE_FRAMEBUFFER]);
+	}
+
+fade:
+	fadeToBlack(0x28);
+
+	while (FADE_OUT_CURRENT < 0x28) {
+		ACTIVE_FRAMEBUFFER = GsGetActiveBuff();
+		GsSetWorkBase(&GS_WORK_BASES[ACTIVE_FRAMEBUFFER * 0x14000]);
+		GsClearOt(0, 0, &GS_ORDERING_TABLE[ACTIVE_FRAMEBUFFER]);
+		ACTIVE_ORDERING_TABLE = &GS_ORDERING_TABLE[ACTIVE_FRAMEBUFFER];
+		tickObjects();
+		renderObjects();
+		applyHUDOffset(ACTIVE_FRAMEBUFFER);
+		DrawSync(0);
+		VSync(0);
+		ResetGraph(1);
+		GsSetOrign(DRAWING_OFFSET_X, DRAWING_OFFSET_Y);
+		GsSwapDispBuff();
+		GsDrawOt(&GS_ORDERING_TABLE[ACTIVE_FRAMEBUFFER]);
+	}
+
+	removeObject(0xfa3, 0);
+}
+
+void runMainMenu(void)
+{
+	CHECKED_MEMORY_CARD = 0x10;
+	CURRENT_MENU = -1;
+	TARGET_MENU = 0;
+	loadTIMFile(MAIN_D_8012CEA0, GENERAL_BUFFER_PTR);
+	addObject(0x1388, 0, (TickFunction)tickMainMenu, (RenderFunction)renderMainMenu);
+	addObject(0xfa3, 0, NULL, (RenderFunction)renderMainMenuBackground);
+	fadeFromBlack(0x28);
+
+	do {
+		ACTIVE_FRAMEBUFFER = GsGetActiveBuff();
+		ACTIVE_ORDERING_TABLE = &GS_ORDERING_TABLE[ACTIVE_FRAMEBUFFER];
+		GsSetWorkBase(&GS_WORK_BASES[ACTIVE_FRAMEBUFFER * 0x14000]);
+		GsClearOt(0, 0, &GS_ORDERING_TABLE[ACTIVE_FRAMEBUFFER]);
+		AddPrim((char *)ACTIVE_ORDERING_TABLE->org + 0x80,
+			&DRAW_OFFSETS[ACTIVE_FRAMEBUFFER]);
+		pollInputMenu();
+		tickObjects();
+		renderObjects();
+		DrawSync(0);
+		VSync(0);
+		ResetGraph(1);
+		GsSwapDispBuff();
+		GsSortClear(0, 0, 0, &GS_ORDERING_TABLE[ACTIVE_FRAMEBUFFER]);
+		GsDrawOt(&GS_ORDERING_TABLE[ACTIVE_FRAMEBUFFER]);
+
+		if ((CURRENT_MENU == -1) && (FADE_OUT_CURRENT == 0)) {
+			fadeToBlack(0x28);
+			removeObject(0x1388, 0);
+		}
+	} while ((CURRENT_MENU != -1) && (FADE_OUT_CURRENT < 0x28));
+
+	removeObject(0xfa3, 0);
+}
+
+void newGameScene(void)
+{
+	int32_t done;
+
+	done = 0;
+	checkShopMap(0xda);
+	initializeNamingBuffer(0);
+	MAIN_func_8010020C();
+	fadeFromBlack(0x14);
+	writePStat(0xfe, 0);
+	writePStat(0xf3, 0xff);
+	loadNewgameScene();
+
+	do {
+		pollInputGame();
+		ACTIVE_FRAMEBUFFER = GsGetActiveBuff();
+		ACTIVE_ORDERING_TABLE = &GS_ORDERING_TABLE[ACTIVE_FRAMEBUFFER];
+		GsSetWorkBase(&GS_WORK_BASES[ACTIVE_FRAMEBUFFER * 0x14000]);
+		GsClearOt(0, 0, ACTIVE_ORDERING_TABLE);
+		processInput();
+		MAIN_func_80100258(1);
+
+		if (readPStat(0xf3) == 0) {
+			done = newGameStateMachine();
+		}
+
+		tickObjects();
+		renderObjects();
+		applyHUDOffset(ACTIVE_FRAMEBUFFER);
+		DrawSync(0);
+		VSync(3);
+		GsSetOrign(DRAWING_OFFSET_X, DRAWING_OFFSET_Y);
+		GsSwapDispBuff();
+		GsSortClear(0, 0, 0, &GS_ORDERING_TABLE[ACTIVE_FRAMEBUFFER]);
+		GsDrawOt(ACTIVE_ORDERING_TABLE);
+
+		if ((done == 1) && (FADE_OUT_CURRENT == 0)) {
+			fadeToBlack(0x28);
+		}
+	} while ((done == 0) || (FADE_OUT_CURRENT < 0x28));
+
+	unloadNewGameScene();
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/main", MAIN_func_800EF38C);
 
@@ -371,9 +564,9 @@ void recalculatePPandArena(void)
 	int32_t i;
 
 	pp = 0;
-	for (i = 3; i < 0x3B; i++) {
-		if ((DIGIMON_DATA[i].level >= 3) && (isTriggerSet((uint16_t)(0xC8 + i)) != 0)) {
-			if ((i == 0xB) || (i == 0x27) || (i == 0x35)) {
+	for (i = 3; i < 0x3b; i++) {
+		if ((DIGIMON_DATA[i].level >= 3) && (isTriggerSet((uint16_t)(0xc8 + i)) != 0)) {
+			if ((i == 0xb) || (i == 0x27) || (i == 0x35)) {
 				pp++;
 			} else {
 				pp += (uint8_t)(DIGIMON_DATA[i].level - 2);
@@ -395,7 +588,37 @@ void recalculatePPandArena(void)
 	}
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/main", gameLoop);
+void gameLoop(void)
+{
+	pollInputGame();
+	ACTIVE_FRAMEBUFFER = GsGetActiveBuff();
+	GsSetWorkBase(&GS_WORK_BASES[ACTIVE_FRAMEBUFFER * 0x14000]);
+	GsClearOt(0, 0, &GS_ORDERING_TABLE[ACTIVE_FRAMEBUFFER]);
+	ACTIVE_ORDERING_TABLE = &GS_ORDERING_TABLE[ACTIVE_FRAMEBUFFER];
+	processInput();
+	updateTournamentRegistration();
+
+	if (IS_SCRIPT_PAUSED == 0) {
+		tickScript();
+	}
+
+	GsSetOrign(DRAWING_OFFSET_X, DRAWING_OFFSET_Y);
+	GsSetRefView2(&GS_VIEWPOINT);
+	GsSetProjection(VIEWPORT_DISTANCE);
+	GS_VIEWPOINT_COPY = GS_VIEWPOINT;
+	VIEWPORT_DISTANCE_COPY = VIEWPORT_DISTANCE;
+	DRAWING_OFFSET_X_COPY = DRAWING_OFFSET_X;
+	DRAWING_OFFSET_Y_COPY = DRAWING_OFFSET_Y;
+	tickObjects();
+	renderObjects();
+	applyHUDOffset(ACTIVE_FRAMEBUFFER);
+	DrawSync(0);
+	VSync(3);
+	GsSwapDispBuff();
+	GsSortClear(0, 0, 0, &GS_ORDERING_TABLE[ACTIVE_FRAMEBUFFER]);
+	GsDrawOt(&GS_ORDERING_TABLE[ACTIVE_FRAMEBUFFER]);
+	handlePause();
+}
 
 void applyHUDOffset(int32_t offset)
 {
@@ -410,7 +633,7 @@ void pollInputGame(void)
 	POLLED_INPUT_PREVIOUS = POLLED_INPUT;
 	POLLED_INPUT = PadRead(0);
 	CHANGED_INPUT = POLLED_INPUT & ~POLLED_INPUT_PREVIOUS;
-	held = POLLED_INPUT & POLLED_INPUT_PREVIOUS & 0xF000F000;
+	held = POLLED_INPUT & POLLED_INPUT_PREVIOUS & 0xf000f000;
 	if (held != 0) {
 		int32_t count;
 
@@ -434,13 +657,13 @@ void pollInputMenu(void)
 	POLLED_INPUT_PREVIOUS = POLLED_INPUT;
 	POLLED_INPUT = PadRead(0);
 	CHANGED_INPUT = POLLED_INPUT & ~POLLED_INPUT_PREVIOUS;
-	held = POLLED_INPUT & POLLED_INPUT_PREVIOUS & 0xF000F000;
+	held = POLLED_INPUT & POLLED_INPUT_PREVIOUS & 0xf000f000;
 	if (held != 0) {
 		int32_t count;
 
 		count = MAIN_D_80134EA8 + 1;
 		MAIN_D_80134EA8 = count;
-		if (count >= 0xF) {
+		if (count >= 0xf) {
 			MAIN_D_80134EA8 -= 6;
 		} else {
 			held = 0;
@@ -451,7 +674,48 @@ void pollInputMenu(void)
 	CHANGED_INPUT |= held;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/main", renderPressStartToContinue);
+void renderPressStartToContinue(void)
+{
+	GsOT_TAG *ot;
+	POLY_FT4 *prim;
+
+	ot = ACTIVE_ORDERING_TABLE->org;
+	prim = (POLY_FT4 *)GsGetWorkBase();
+	MAIN_D_80134EAC = MAIN_D_80134EAC + 1;
+
+	if (MAIN_D_80134EB0 == 1) {
+		MAIN_D_80134EAC = MAIN_D_80134EAC + 0x1d;
+	}
+
+	MAIN_D_80134EAC = MAIN_D_80134EAC % 0x3c;
+
+	if (MAIN_D_80134EAC < 0x1e) {
+		SetPolyFT4(prim);
+		setXY4(prim, -0x36, 0x32, 0x43, 0x32, -0x36, 0x3c, 0x43, 0x3c);
+		setUV4(prim, 0, 0xf1, 0x79, 0xf1, 0, 0xfb, 0x79, 0xfb);
+		setRGB0(prim, 0, 0x80, 0);
+		setTPage(prim, 1, 0, 768, 0);
+		setClut(prim, 0, 480);
+		AddPrim(&ot[30], prim++);
+	}
+
+	SetPolyFT4(prim);
+	setXY4(prim, -0xa0, -0x78, 0x60, -0x78, -0xa0, 0x78, 0x60, 0x78);
+	setUV4(prim, 0, 0, 0xff, 0, 0, 0xf0, 0xff, 0xf0);
+	setRGB0(prim, 0x80, 0x80, 0x80);
+	setTPage(prim, 1, 0, 768, 0);
+	setClut(prim, 0, 480);
+	AddPrim(ot = (GsOT_TAG *)((uint32_t)ot + 0x78), prim++);
+
+	SetPolyFT4(prim);
+	setXY4(prim, 0x60, -0x78, 0xa0, -0x78, 0x60, 0x78, 0xa0, 0x78);
+	setUV4(prim, 0, 0, 0x40, 0, 0, 0xf0, 0x40, 0xf0);
+	setRGB0(prim, 0x80, 0x80, 0x80);
+	setTPage(prim, 1, 0, 896, 0);
+	setClut(prim, 0, 480);
+	AddPrim(ot, prim++);
+	GsSetWorkBase((PACKET *)prim);
+}
 
 void renderMainMenuBackground(void)
 {
@@ -462,47 +726,19 @@ void renderMainMenuBackground(void)
 	prim = (POLY_FT4 *)GsGetWorkBase();
 
 	SetPolyFT4(prim);
-	prim->x0 = -0xA0;
-	prim->y0 = -0x78;
-	prim->x1 = 0x60;
-	prim->y1 = -0x78;
-	prim->x2 = -0xA0;
-	prim->y2 = 0x78;
-	prim->x3 = 0x60;
-	prim->y3 = 0x78;
-	prim->u0 = 0;
-	prim->v0 = 0;
-	prim->u1 = 0xFF;
-	prim->v1 = 0;
-	prim->u2 = 0;
-	prim->v2 = 0xF0;
-	prim->u3 = 0xFF;
-	prim->v3 = 0xF0;
+	setXY4(prim, -0xa0, -0x78, 0x60, -0x78, -0xa0, 0x78, 0x60, 0x78);
+	setUV4(prim, 0, 0, 0xff, 0, 0, 0xf0, 0xff, 0xf0);
 	setRGB0(prim, 0x80, 0x80, 0x80);
-	prim->tpage = GetTPage(1, 0, 0x300, 0);
-	prim->clut = GetClut(0, 0x1E0);
+	setTPage(prim, 1, 0, 768, 0);
+	setClut(prim, 0, 480);
 	AddPrim(ot = (GsOT_TAG *)((uint32_t)ot + 0x78), prim++);
 
 	SetPolyFT4(prim);
-	prim->x0 = 0x60;
-	prim->y0 = -0x78;
-	prim->x1 = 0xA0;
-	prim->y1 = -0x78;
-	prim->x2 = 0x60;
-	prim->y2 = 0x78;
-	prim->x3 = 0xA0;
-	prim->y3 = 0x78;
-	prim->u0 = 0;
-	prim->v0 = 0;
-	prim->u1 = 0x40;
-	prim->v1 = 0;
-	prim->u2 = 0;
-	prim->v2 = 0xF0;
-	prim->u3 = 0x40;
-	prim->v3 = 0xF0;
+	setXY4(prim, 0x60, -0x78, 0xa0, -0x78, 0x60, 0x78, 0xa0, 0x78);
+	setUV4(prim, 0, 0, 0x40, 0, 0, 0xf0, 0x40, 0xf0);
 	setRGB0(prim, 0x80, 0x80, 0x80);
-	prim->tpage = GetTPage(1, 0, 0x380, 0);
-	prim->clut = GetClut(0, 0x1E0);
+	setTPage(prim, 1, 0, 896, 0);
+	setClut(prim, 0, 480);
 	AddPrim(ot, prim++);
 	GsSetWorkBase((PACKET *)prim);
 }
@@ -527,10 +763,10 @@ void view_init(void)
 {
 	GsSetProjection(0x400);
 	GS_VIEWPOINT.vpx = 0;
-	GS_VIEWPOINT.vpy = -0xB73;
-	GS_VIEWPOINT.vpz = -0xB73;
+	GS_VIEWPOINT.vpy = -0xb73;
+	GS_VIEWPOINT.vpz = -0xb73;
 	GS_VIEWPOINT.vpy = 0;
-	GS_VIEWPOINT.vpz = -0x7D0;
+	GS_VIEWPOINT.vpz = -0x7d0;
 	GS_VIEWPOINT.vrx = 0;
 	GS_VIEWPOINT.vry = 0;
 	GS_VIEWPOINT.vrz = 0;
@@ -563,7 +799,7 @@ void addThrownItem(int32_t type)
 {
 	MATRIX *workm;
 
-	if (TAMER_ITEM.worldItem.type == 0xFF) {
+	if (TAMER_ITEM.worldItem.type == 0xff) {
 		workm = &TAMER_ENTITY.entity.posData[9].posMatrix.workm;
 		TAMER_ITEM.worldItem.spriteLocation.vx = workm->t[0];
 		TAMER_ITEM.worldItem.spriteLocation.vy = workm->t[1];
@@ -688,11 +924,248 @@ void handleBuffDisks(int32_t type)
 	BTL_addBuffDiskEffect(ENTITY_TABLE[1]);
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/main", MAIN_func_800F0B2C);
+void MAIN_func_800F0B2C(void)
+{
+	SVECTOR rot;
+	VECTOR target;
+	VECTOR in;
+	VECTOR out;
+	MATRIX m;
+	int16_t enemies[4];
+	int16_t tileX;
+	int16_t tileY;
+	int16_t count;
+	int32_t cmd;
 
-INCLUDE_ASM("asm/main/nonmatchings/main", MAIN_func_800F1020);
+	if (MAIN_D_80134D78 == 1) {
+		return;
+	}
 
-INCLUDE_ASM("asm/main/nonmatchings/main", tickTamerBattle);
+	if (UI_BOX_DATA[0].state != 0) {
+		return;
+	}
+
+	if (COMBAT_DATA_PTR->player.currentCommand[0] == 1) {
+		if ((MAIN_D_80134D68 == 0x14) &&
+		    ((PARTNER_ENTITY.digimonEntity.stats.current.currentHP -
+		      COMBAT_DATA_PTR->fighter[0].hpDamageBuffer) > 0)) {
+			fadeToBlack(0x14);
+		}
+
+		MAIN_func_800F1020();
+		MAIN_D_80134D68 = MAIN_D_80134D68 + 1;
+
+		return;
+	}
+
+	if ((POLLED_INPUT & ~POLLED_INPUT_PREVIOUS) & 0x8000) {
+		playSound(0, 2);
+		COMBAT_DATA_PTR->player.hoveredCommand[0]++;
+
+		if ((MAIN_D_80134D7C[0] != 0) &&
+		    (COMBAT_DATA_PTR->player.hoveredCommand[0] == 1)) {
+			COMBAT_DATA_PTR->player.hoveredCommand[0]++;
+		}
+
+		if ((COMBAT_DATA_PTR->player.numCommands[0] - 1) <
+		    COMBAT_DATA_PTR->player.hoveredCommand[0]) {
+			if (MAIN_D_80134D7C[0] != 0) {
+				COMBAT_DATA_PTR->player.hoveredCommand[0] = 2;
+			} else {
+				COMBAT_DATA_PTR->player.hoveredCommand[0] = 1;
+			}
+		}
+	}
+
+	if ((POLLED_INPUT & ~POLLED_INPUT_PREVIOUS) & 0x2000) {
+		playSound(0, 2);
+		COMBAT_DATA_PTR->player.hoveredCommand[0]--;
+
+		if ((MAIN_D_80134D7C[0] != 0) &&
+		    (COMBAT_DATA_PTR->player.hoveredCommand[0] == 1)) {
+			COMBAT_DATA_PTR->player.hoveredCommand[0]--;
+		}
+
+		if (COMBAT_DATA_PTR->player.hoveredCommand[0] <= 0) {
+			COMBAT_DATA_PTR->player.hoveredCommand[0] =
+				COMBAT_DATA_PTR->player.numCommands[0] - 1;
+		}
+	}
+
+	if ((POLLED_INPUT & ~POLLED_INPUT_PREVIOUS) & 0x40) {
+		playSound(0, 3);
+		BTL_getRemainingEnemies(ENTITY_TABLE[1], enemies, &count);
+
+		if (count == 0) {
+			return;
+		}
+
+		if (ENTITY_TABLE[0]->anim.animId != 0xe) {
+			startAnimation(ENTITY_TABLE[0], 0xe);
+		}
+
+		COMBAT_DATA_PTR->player.bufferedCommand[0] =
+			COMBAT_DATA_PTR->player.availableCommands[0][COMBAT_DATA_PTR->player.hoveredCommand[0]];
+
+		if (PARTNER_PARA.discipline < 0x46) {
+			COMBAT_DATA_PTR->player.commandDelay[0] = 0xa0 - (PARTNER_PARA.discipline / 10);
+		} else {
+			COMBAT_DATA_PTR->player.commandDelay[0] = (0xa - (PARTNER_PARA.discipline / 10)) * 10;
+		}
+
+		COMBAT_DATA_PTR->player.commandDelay[0] = 0;
+		cmd = COMBAT_DATA_PTR->player.bufferedCommand[0];
+
+		if (cmd == 7) {
+			goto changeTarget;
+		}
+
+		if (cmd == 1) {
+			COMBAT_DATA_PTR->player.commandDelay[0] = 0;
+			COMBAT_DATA_PTR->player.currentCommand[0] = 1;
+			getModelTile(&ENTITY_TABLE[0]->posData->location, &tileX, &tileY);
+
+			if ((tileX == TAMER_START_TILE_X) && (tileY == TAMER_START_TILE_Y)) {
+				target.vx = MAP_WARPS.spawnX[CURRENT_EXIT];
+				target.vy = 0;
+				target.vz = MAP_WARPS.spawnZ[CURRENT_EXIT];
+				in.vx = 0;
+				in.vy = 0;
+				in.vz = -0xbb8;
+				rot.vx = 0;
+				rot.vy = (MAP_WARPS.rotation[CURRENT_EXIT] + 0x800) & 0xfff;
+				rot.vz = 0;
+				RotMatrix(&rot, &m);
+				ApplyMatrixLV(&m, &in, &out);
+				target.vx = target.vx + out.vx;
+				target.vz = target.vz + out.vz;
+				entityLookAtLocation(ENTITY_TABLE[0], &target);
+			}
+
+			startAnimation(ENTITY_TABLE[0], 3);
+		}
+
+		goto shout;
+
+	changeTarget:
+		COMBAT_DATA_PTR->player.changeTarget = 1;
+
+	shout:
+		BTL_drawCommandShout(COMBAT_DATA_PTR->player.bufferedCommand[0]);
+	}
+
+	if ((POLLED_INPUT & ~POLLED_INPUT_PREVIOUS) & 0x80) {
+		if (COMBAT_DATA_PTR->fighter[0].finisherProgress ==
+		    COMBAT_DATA_PTR->fighter[0].finisherGoal) {
+			COMBAT_DATA_PTR->player.bufferedCommand[0] = 0xb;
+			playSound(0, 3);
+			COMBAT_DATA_PTR->player.commandDelay[0] = 0;
+			COMBAT_DATA_PTR->player.currentCommand[0] = 0xb;
+			BTL_drawCommandShout(COMBAT_DATA_PTR->player.bufferedCommand[0]);
+		}
+	}
+}
+
+void MAIN_func_800F1020(void)
+{
+	SVECTOR rot;
+	MATRIX m;
+	VECTOR target;
+	VECTOR in;
+	VECTOR out;
+	int16_t tileX;
+	int16_t tileY;
+	int16_t i;
+
+	i = TAMER_WAYPOINT_COUNT - 1;
+	getModelTile(&ENTITY_TABLE[0]->posData->location, &tileX, &tileY);
+
+	if (i >= 0) {
+		entityLookAtTile(ENTITY_TABLE[0], TAMER_WAYPOINT_X[i], TAMER_WAYPOINT_Y[i]);
+
+		if ((tileX == TAMER_WAYPOINT_X[i]) && (tileY == TAMER_WAYPOINT_Y[i])) {
+			TAMER_WAYPOINT_COUNT = TAMER_WAYPOINT_COUNT - 1;
+		}
+
+		return;
+	}
+
+	entityLookAtTile(ENTITY_TABLE[0], TAMER_START_TILE_X, TAMER_START_TILE_Y);
+
+	if ((tileX == TAMER_START_TILE_X) && (tileY == TAMER_START_TILE_Y)) {
+		target.vx = MAP_WARPS.spawnX[CURRENT_EXIT];
+		target.vy = 0;
+		target.vz = MAP_WARPS.spawnZ[CURRENT_EXIT];
+		in.vx = 0;
+		in.vy = 0;
+		in.vz = -0xbb8;
+		rot.vx = 0;
+		rot.vy = (MAP_WARPS.rotation[CURRENT_EXIT] + 0x800) & 0xfff;
+		rot.vz = 0;
+		RotMatrix(&rot, &m);
+		ApplyMatrixLV(&m, &in, &out);
+		target.vx = target.vx + out.vx;
+		target.vz = target.vz + out.vz;
+		entityLookAtLocation(ENTITY_TABLE[0], &target);
+		ENTITY_TABLE[0]->anim.animFlag |= 2;
+	}
+}
+
+void tickTamerBattle(int32_t instanceId)
+{
+	Entity *tamer;
+	Entity *partner;
+	int32_t anim;
+
+	tamer = ENTITY_TABLE[instanceId];
+
+	if (GAME_STATE == 1) {
+		if (((uint8_t *)COMBAT_DATA_PTR)[0x64e] != 1) {
+			partner = ENTITY_TABLE[1];
+
+			if (MAIN_D_80134D78 == 0) {
+				if (((POLLED_INPUT & ~POLLED_INPUT_PREVIOUS) & 0x10) != 0) {
+					initializeInventoryObject();
+				}
+			}
+
+			entityLookAtLocation(tamer, &partner->posData->location);
+
+			if (UI_BOX_DATA[0].state == 0) {
+				if ((MAIN_D_80134D74 == 0) || (MAIN_D_80134D60 != ENTITY_TABLE[1])) {
+					if ((tamer->anim.animId == 6) || ((anim = tamer->anim.animId) == 0xe)) {
+						if ((tamer->anim.animFlag & 1) == 0) {
+							startAnimation(tamer, 1);
+						}
+					} else if (tamer->anim.animId != 1) {
+						startAnimation(tamer, 1);
+					}
+				} else if (tamer->anim.animId != 0xa) {
+					startAnimation(tamer, 0xa);
+				}
+			}
+		}
+
+		if (((POLLED_INPUT & ~POLLED_INPUT_PREVIOUS) & 0x100) != 0) {
+			MAIN_D_80134D64 = (MAIN_D_80134D64 + 1) & 1;
+		}
+
+		MAIN_func_800F0B2C();
+	}
+
+	if (ENTITY_TABLE[0]->anim.animId == 1) {
+		MAIN_D_80134F0C = MAIN_D_80134F0C + 1;
+	} else {
+		MAIN_D_80134F0C = 0;
+	}
+
+	if (MAIN_D_80134F0C >= 0xab) {
+		startAnimation(ENTITY_TABLE[0], 1);
+		MAIN_D_80134F0C = 0;
+	}
+
+	tickAnimation(tamer);
+}
 
 void tickPartnerBattle(int32_t instanceId)
 {
@@ -722,7 +1195,7 @@ void tickNewGameJijimon(int32_t instanceId)
 		setEntityRotation(2, 0, 0x71, 0);
 		setupEntityMatrix(2);
 		startAnimation(ENTITY_TABLE[2], 0);
-		writePStat(0xF3, 0);
+		writePStat(0xf3, 0);
 	}
 	tickAnimation(ENTITY_TABLE[2]);
 }
@@ -741,7 +1214,7 @@ void loadNewgameScene(void)
 	setEntityRotation(2, 0, 0x400, 0);
 	setupEntityMatrix(2);
 	startAnimation(ENTITY_TABLE[2], 2);
-	GsSetProjection(0x3E8);
+	GsSetProjection(0x3e8);
 	view.vpx = 0;
 	view.vpz = -0x1068;
 	view.vpy = 0;
@@ -751,16 +1224,16 @@ void loadNewgameScene(void)
 	view.rz = 0;
 	view.super = NULL;
 	GsSetRefView2(&view);
-	DRAWING_OFFSET_X = 0xA0;
-	DRAWING_OFFSET_Y = 0xB9;
-	LIGHT_DATA[0].vx = 0x1E;
+	DRAWING_OFFSET_X = 0xa0;
+	DRAWING_OFFSET_Y = 0xb9;
+	LIGHT_DATA[0].vx = 0x1e;
 	LIGHT_DATA[0].vy = 0x64;
-	LIGHT_DATA[0].vz = 0x1E;
+	LIGHT_DATA[0].vz = 0x1e;
 	LIGHT_DATA[0].r = 0x40;
 	LIGHT_DATA[0].g = 0x40;
 	LIGHT_DATA[0].b = 0x40;
 	GsSetFlatLight(0, &LIGHT_DATA[0]);
-	LIGHT_DATA[1].vx = -0x1E;
+	LIGHT_DATA[1].vx = -0x1e;
 	LIGHT_DATA[1].vy = 0x64;
 	LIGHT_DATA[1].vz = 0;
 	LIGHT_DATA[1].r = 0x28;
@@ -769,7 +1242,7 @@ void loadNewgameScene(void)
 	GsSetFlatLight(1, &LIGHT_DATA[1]);
 	LIGHT_DATA[2].vx = 0;
 	LIGHT_DATA[2].vy = 0x64;
-	LIGHT_DATA[2].vz = -0x1E;
+	LIGHT_DATA[2].vz = -0x1e;
 	LIGHT_DATA[2].r = 0x26;
 	LIGHT_DATA[2].g = 0x26;
 	LIGHT_DATA[2].b = 0x26;
@@ -803,17 +1276,17 @@ void MAIN_func_800F179C(void *model, int32_t compIdx, int32_t color)
   int32_t attr;
   int new_var3;
   comp = (char *) model;
-  comp = comp + 0xC;
-  comp = comp + (compIdx * 0x1C);
+  comp = comp + 0xc;
+  comp = comp + (compIdx * 0x1c);
   new_var = *((int32_t *) (comp + 0x14));
   new_var3 = 0x10;
   p = *((char **) (comp + new_var3));
   for (i = 0; i < new_var; i++)
   {
-    attr = ((*((int32_t *) p)) >> 0x18) & 0xFF;
+    attr = ((*((int32_t *) p)) >> 0x18) & 0xff;
     if (attr & 4)
     {
-      attr = ((*((int32_t *) p)) >> 0x18) & 0xFF;
+      attr = ((*((int32_t *) p)) >> 0x18) & 0xff;
       *((int16_t *) (p + 6)) = (int16_t) color;
       new_var2 = attr;
       if (new_var2 & 8)
@@ -824,13 +1297,13 @@ void MAIN_func_800F179C(void *model, int32_t compIdx, int32_t color)
         }
         else
         {
-          p += 0x2C;
+          p += 0x2c;
         }
       }
       else
         if (!(attr & new_var3))
       {
-        p += 0x1C;
+        p += 0x1c;
       }
       else
       {
@@ -845,8 +1318,8 @@ void initializeBuffModel(TMDModel *model)
 {
 	BUFF_MODEL[0] = model;
 	GsMapModelingData((unsigned long *)&BUFF_MODEL[0]->flags);
-	buffModelValue[0] = 0x7ACC;
-	buffModelValue[1] = 0x7B0C;
+	buffModelValue[0] = 0x7acc;
+	buffModelValue[1] = 0x7b0c;
 }
 
 int32_t initializeBuffModelObject(void)
