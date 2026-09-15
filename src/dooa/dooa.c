@@ -98,7 +98,7 @@ int32_t lerp(int32_t start, int32_t end, int32_t t0, int32_t t1, int32_t t);
 int32_t worldPosToScreenPos(SVECTOR *pos, DVECTOR *out);
 int32_t DOOA_hasIrisClosed(Entity *entity, int32_t startFrame, int32_t endFrame, int32_t frame);
 void DOOA_saveShardClut(u_long *pixels);
-void DOOA_setOtherEntitiesHidden(int32_t restore);
+void DOOA_setOtherEntitiesVisible(int32_t restore);
 void DOOA_hideAllButPartner(void);
 void DOOA_getOrbitPosition(VECTOR *outRef, VECTOR *outPos, VECTOR *position, SVECTOR *rotation, int32_t distance, int32_t height);
 void DOOA_updateCutsceneCamera(VECTOR *position, int32_t angle, int32_t startFrame, int32_t endFrame, int32_t frame);
@@ -148,7 +148,7 @@ void DOO2_fadeClut(int16_t *srcClut, void *unused, int16_t *dstClut, int32_t sta
 void renderParticleFlash(int16_t *params);
 
 extern int32_t VIEWPORT_DISTANCE;
-extern int8_t MAIN_D_80134BBC;
+extern int8_t DOOA_ENTITIES_VISIBLE;
 extern SVECTOR MAIN_D_80134BB4;
 extern int32_t MAIN_D_8013532C;
 extern int32_t MAIN_D_80135330;
@@ -232,7 +232,7 @@ static void *dooa_functions[] = {
 	DOOA_spawnShardWave,
 	DOOA_updateCutsceneCamera,
 	DOOA_hideAllButPartner,
-	DOOA_setOtherEntitiesHidden,
+	DOOA_setOtherEntitiesVisible,
 	DOOA_saveShardClut,
 	DOOA_saveModelClut,
 	DOOA_saveEntityClut,
@@ -359,7 +359,7 @@ void DOOA_tickDissolve(int32_t instanceId)
 			startAnimation((Entity *)&PARTNER_ENTITY, 0x2c);
 			ENTITY_TABLE[1]->anim.animFlag &= 0xfe;
 		}
-		DOOA_setOtherEntitiesHidden(0);
+		DOOA_setOtherEntitiesVisible(0);
 		seq->phase = 1;
 		setMapLayerEnabled(0);
 		DOOA_hideAllButPartner();
@@ -648,11 +648,11 @@ void DOOA_saveShardClut(u_long *pixels)
 	DrawSync(0);
 }
 
-void DOOA_setOtherEntitiesHidden(int32_t restore)
+void DOOA_setOtherEntitiesVisible(int32_t restore)
 {
 	int32_t i;
 
-	MAIN_D_80134BBC = restore;
+	DOOA_ENTITIES_VISIBLE = restore;
 
 	if (restore == 0) {
 		for (i = 0; i < ENTITY_MAX; i++) {
@@ -1041,7 +1041,7 @@ void DOOA_tickRebirth(int32_t instanceId)
 			entity = (Entity *)&PARTNER_ENTITY;
 			seq->entity = entity;
 			setEntityPosition(1, 0, 0, 0);
-			DOOA_setOtherEntitiesHidden(1);
+			DOOA_setOtherEntitiesVisible(1);
 			ENTITY_TABLE[2]->isOnMap = 1;
 			DOOA_showPlayerAndPartner();
 			ENTITY_TABLE[1]->isOnMap = 0;

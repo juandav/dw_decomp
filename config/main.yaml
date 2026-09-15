@@ -245,7 +245,7 @@ segments:
       - [0xA4BAC, sdata, dooa]
       - [0xA4BC0, sdata, trn]
       - [0xA4BE0, sdata, trn2]
-      - [0xA4C00, sdata, murd]
+      - [0xA4C00, .sdata, murd]
       - [0xA4C1C, sdata, endi]
       - [0xA4C28, sdata, eab]
 

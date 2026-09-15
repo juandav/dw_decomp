@@ -20,8 +20,6 @@
 #include <dw/ui.h>
 #include <dw/utils.h>
 
-#include "common.h"
-
 typedef struct {
 	int16_t timer;
 	int16_t phase;
@@ -30,38 +28,8 @@ typedef struct {
 	int16_t pad;
 } MurdScene;
 
-typedef struct {
-	int16_t frame;
-	int16_t state;
-	PartnerEntity *partner;
-} MurdLivesBox;
-
-extern VECTOR MURD_FLASH_RISE;
-extern VECTOR MURD_FLASH_HOLD_1;
-extern VECTOR MURD_FLASH_HOLD_2;
-extern VECTOR MURD_FLASH_HOLD_3;
-extern VECTOR MURD_FLASH_FADE;
-extern GsSPRITE MURD_LIVES_BACKDROP;
-extern GsSPRITE MURD_LIFE_FULL;
-extern GsSPRITE MURD_LIFE_EMPTY;
-extern MurdScene MURD_SCENE;
-extern uint16_t MURD_TEXTURE_BUFFER[];
-extern int16_t MURD_PALETTE_BACKUP[];
-extern GsOT MURD_ORDERING_TABLES[2];
-extern int8_t MURD_ENTITY_VISIBILITY[10];
-
-extern char MURD_LIFE_TIM_PATH[];
-
-extern int8_t MAIN_D_80134C00[2];
-extern RECT MAIN_D_80134C04;
-extern RECT MAIN_D_80134C0C;
-extern RECT MAIN_D_80134C14;
-extern MurdLivesBox MAIN_D_801353E8;
-
 extern GsF_LIGHT LIGHT_DATA[3];
 extern int32_t ACTIVE_FRAMEBUFFER;
-extern int32_t DRAWING_OFFSET_X;
-extern int32_t DRAWING_OFFSET_Y;
 extern int32_t VIEWPORT_DISTANCE;
 
 void setMapLayerEnabled(int32_t enabled);
@@ -109,6 +77,87 @@ static void *murd_functions[] = {
 	MURD_renderScene,
 	MURD_tickScene,
 };
+
+char MURD_LIFE_TIM_PATH[16] = "\\ETCHI\\LIFE.TIM";
+
+VECTOR MURD_FLASH_RISE = { 0x80, 0x80, 0x80, 0 };
+VECTOR MURD_FLASH_HOLD_1 = { 0xff, 0xff, 0xff, 0 };
+VECTOR MURD_FLASH_HOLD_2 = { 0xff, 0xff, 0xff, 0 };
+VECTOR MURD_FLASH_HOLD_3 = { 0xff, 0xff, 0xff, 0 };
+VECTOR MURD_FLASH_FADE = { 0x80, 0x80, 0x80, 0 };
+
+// clang-format off
+GsSPRITE MURD_LIVES_BACKDROP = {
+	0x50000000,			/* attribute */
+	-85,				/* x */
+	-40,				/* y */
+	64,				/* w */
+	24,				/* h */
+	getTPage(0, 1, 576, 256),	/* tpage */
+	48,				/* u */
+	0,				/* v */
+	128,				/* cx */
+	488,				/* cy */
+	0x80,				/* r */
+	0x80,				/* g */
+	0x80,				/* b */
+	0,				/* mx */
+	0,				/* my */
+	0x1000,				/* scalex */
+	0x1000,				/* scaley */
+	0,				/* rotate */
+};
+
+GsSPRITE MURD_LIFE_FULL = {
+	0x50000000,			/* attribute */
+	-11,				/* x */
+	-40,				/* y */
+	24,				/* w */
+	24,				/* h */
+	getTPage(0, 1, 576, 256),	/* tpage */
+	0,				/* u */
+	0,				/* v */
+	128,				/* cx */
+	488,				/* cy */
+	0x80,				/* r */
+	0x80,				/* g */
+	0x80,				/* b */
+	0,				/* mx */
+	0,				/* my */
+	0x1000,				/* scalex */
+	0x1000,				/* scaley */
+	0,				/* rotate */
+};
+
+GsSPRITE MURD_LIFE_EMPTY = {
+	0x50000000,			/* attribute */
+	-11,				/* x */
+	-40,				/* y */
+	24,				/* w */
+	24,				/* h */
+	getTPage(0, 1, 576, 256),	/* tpage */
+	24,				/* u */
+	0,				/* v */
+	128,				/* cx */
+	488,				/* cy */
+	0x80,				/* r */
+	0x80,				/* g */
+	0x80,				/* b */
+	0,				/* mx */
+	0,				/* my */
+	0x1000,				/* scalex */
+	0x1000,				/* scaley */
+	0,				/* rotate */
+};
+
+MurdScene MURD_SCENE = {
+	0,	/* timer */
+	0,	/* phase */
+	NULL,	/* entity */
+	0,	/* lives */
+	0,	/* pad */
+};
+// clang-format on
 
 static void murd__garbage__(void)
 {
@@ -251,7 +300,7 @@ void MURD_tickScene(int32_t instanceId)
 		break;
 	case 0x65:
 		if (scene->lives == 0) {
-			while (MAIN_D_80134C00[0] != 0) {
+			while (MURD_LOADING_COMPLETE != 0) {
 				tickFileReadQueue(0);
 			}
 		}
@@ -292,10 +341,7 @@ void MURD_storeDigimonTexture(uint16_t *buffer, Entity *entity)
 	RECT rect;
 
 	model = getEntityModelComponent(entity->type, getEntityType(entity));
-	rect.x = (model->clutPage & 0x3f) << 4;
-	rect.y = model->clutPage >> 6;
-	rect.w = 0x10;
-	rect.h = 0x18;
+	setRECT(&rect, (model->clutPage & 0x3f) << 4, model->clutPage >> 6, 0x10, 0x18);
 	StoreImage(&rect, (u_long *)buffer);
 
 	DrawSync(0);
@@ -331,7 +377,7 @@ void MURD_setOtherEntitiesVisible(int32_t restore)
 {
 	int32_t i;
 
-	MAIN_D_80134C00[1] = restore;
+	MURD_ENTITIES_VISIBLE = restore;
 	if (restore == 0) {
 		for (i = 0; i < ENTITY_MAX; i++) {
 			if ((ENTITY_TABLE[i] != (Entity *)&PARTNER_ENTITY) && (ENTITY_TABLE[i]->isOnMap != 0)) {
@@ -355,10 +401,10 @@ void MURD_createLivesBox(Entity *entity)
 	RECT start;
 	SVECTOR pos;
 
-	start = MAIN_D_80134C0C;
-	MAIN_D_801353E8.frame = 0;
-	MAIN_D_801353E8.state = 0;
-	MAIN_D_801353E8.partner = (PartnerEntity *)entity;
+	start = MURD_LIVES_BOX_START_POS;
+	MURD_LIVES_BOX.frame = 0;
+	MURD_LIVES_BOX.state = 0;
+	MURD_LIVES_BOX.partner = (PartnerEntity *)entity;
 
 	pos.vx = entity->posData->location.vx;
 	pos.vy = entity->posData->location.vy;
@@ -367,7 +413,7 @@ void MURD_createLivesBox(Entity *entity)
 
 	start.x = start.x - (int16_t)(0xa8 - DRAWING_OFFSET_X);
 	start.y = start.y - (int16_t)(0x7e - DRAWING_OFFSET_Y);
-	createAnimatedUIBox(3, 0, 2, &MAIN_D_80134C04, &start, (TickFunction)MURD_tickLivesBox, (RenderFunction)MURD_renderLivesBox);
+	createAnimatedUIBox(3, 0, 2, &MURD_LIVES_BOX_FINAL_POS, &start, (TickFunction)MURD_tickLivesBox, (RenderFunction)MURD_renderLivesBox);
 }
 
 void MURD_animateLivesBoxOut(void)
@@ -375,11 +421,11 @@ void MURD_animateLivesBoxOut(void)
 	RECT target;
 	SVECTOR pos;
 
-	target = MAIN_D_80134C14;
+	target = MURD_LIVES_BOX_TARGET_POS;
 
-	pos.vx = MAIN_D_801353E8.partner->digimonEntity.entity.posData->location.vx;
-	pos.vy = MAIN_D_801353E8.partner->digimonEntity.entity.posData->location.vy;
-	pos.vz = MAIN_D_801353E8.partner->digimonEntity.entity.posData->location.vz;
+	pos.vx = MURD_LIVES_BOX.partner->digimonEntity.entity.posData->location.vx;
+	pos.vy = MURD_LIVES_BOX.partner->digimonEntity.entity.posData->location.vy;
+	pos.vz = MURD_LIVES_BOX.partner->digimonEntity.entity.posData->location.vz;
 	worldPosToScreenPos(&pos, (DVECTOR *)&target);
 
 	target.x = target.x - (int16_t)(0xa8 - DRAWING_OFFSET_X);
@@ -396,27 +442,11 @@ void MURD_renderFullscreenFade(VECTOR *color)
 
 	SetPolyFT4(prim);
 	SetSemiTrans(prim, 1);
-	prim->tpage = 0xdd;
-	prim->clut = 0x79c0;
-	prim->x0 = -0xa0;
-	prim->y0 = -0x78;
-	prim->x1 = 0xa0;
-	prim->y1 = -0x78;
-	prim->x2 = -0xa0;
-	prim->y2 = 0x78;
-	prim->x3 = 0xa0;
-	prim->y3 = 0x78;
-	prim->u0 = 0;
-	prim->v0 = 0x80;
-	prim->u1 = 3;
-	prim->v1 = 0x80;
-	prim->u2 = 0;
-	prim->v2 = 0x83;
-	prim->u3 = 3;
-	prim->v3 = 0x83;
-	prim->r0 = color->vx;
-	prim->g0 = color->vy;
-	prim->b0 = color->vz;
+	prim->tpage = getTPage(1, 2, 832, 256);
+	prim->clut = getClut(0, 487);
+	setXY4(prim, -0xa0, -0x78, 0xa0, -0x78, -0xa0, 0x78, 0xa0, 0x78);
+	setUV4(prim, 0, 0x80, 3, 0x80, 0, 0x83, 3, 0x83);
+	setRGB0(prim, color->vx, color->vy, color->vz);
 	AddPrim(ACTIVE_ORDERING_TABLE->org + layer, prim);
 	prim++;
 
@@ -523,10 +553,10 @@ int32_t MURD_renderIris(Entity *entity, int32_t start, int32_t end, int32_t t)
 	flash[1] = screen.vy;
 	flash[7] = 0x40;
 	flash[6] = 0x40;
-	flash[8] = 0xdd;
+	flash[8] = getTPage(1, 2, 832, 256);
 	((uint8_t *)flash)[0x12] = 0;
 	((uint8_t *)flash)[0x13] = c;
-	flash[10] = 0x79c0;
+	flash[10] = getClut(0, 487);
 	((uint8_t *)flash)[0x16] = c;
 	((uint8_t *)flash)[0x17] = c;
 	((uint8_t *)flash)[0x18] = c;
@@ -556,24 +586,10 @@ int32_t MURD_renderIris(Entity *entity, int32_t start, int32_t end, int32_t t)
 		SetPolyFT4(prim);
 		SetSemiTrans(prim, 2);
 		prim->r0 = prim->g0 = prim->b0 = 0x80;
-		prim->tpage = 0xdd;
-		prim->clut = 0x79c0;
-		prim->u0 = 0;
-		prim->v0 = 0x80;
-		prim->u1 = 3;
-		prim->v1 = 0x80;
-		prim->u2 = 0;
-		prim->v2 = 0x83;
-		prim->u3 = 3;
-		prim->v3 = 0x83;
-		prim->x0 = lx;
-		prim->y0 = ly;
-		prim->x1 = lx + lw;
-		prim->y1 = ly;
-		prim->x2 = lx;
-		prim->y2 = ly + 0xf0;
-		prim->x3 = lx + lw;
-		prim->y3 = ly + 0xf0;
+		prim->tpage = getTPage(1, 2, 832, 256);
+		prim->clut = getClut(0, 487);
+		setUV4(prim, 0, 0x80, 3, 0x80, 0, 0x83, 3, 0x83);
+		setXY4(prim, lx, ly, lx + lw, ly, lx, ly + 0xf0, lx + lw, ly + 0xf0);
 		AddPrim(ACTIVE_ORDERING_TABLE->org + 0x22, prim++);
 	}
 
@@ -584,24 +600,10 @@ int32_t MURD_renderIris(Entity *entity, int32_t start, int32_t end, int32_t t)
 		SetPolyFT4(prim);
 		prim->r0 = prim->g0 = prim->b0 = 0x80;
 		SetSemiTrans(prim, 2);
-		prim->tpage = 0xdd;
-		prim->clut = 0x79c0;
-		prim->u0 = 0;
-		prim->v0 = 0x80;
-		prim->u1 = 3;
-		prim->v1 = 0x80;
-		prim->u2 = 0;
-		prim->v2 = 0x83;
-		prim->u3 = 3;
-		prim->v3 = 0x83;
-		prim->x0 = rx;
-		prim->y0 = ry;
-		prim->x1 = rx + rw;
-		prim->y1 = ry;
-		prim->x2 = rx;
-		prim->y2 = ry + 0xf0;
-		prim->x3 = rx + rw;
-		prim->y3 = ry + 0xf0;
+		prim->tpage = getTPage(1, 2, 832, 256);
+		prim->clut = getClut(0, 487);
+		setUV4(prim, 0, 0x80, 3, 0x80, 0, 0x83, 3, 0x83);
+		setXY4(prim, rx, ry, rx + rw, ry, rx, ry + 0xf0, rx + rw, ry + 0xf0);
 		AddPrim(ACTIVE_ORDERING_TABLE->org + 0x22, prim++);
 	}
 
@@ -613,24 +615,10 @@ int32_t MURD_renderIris(Entity *entity, int32_t start, int32_t end, int32_t t)
 			SetPolyFT4(prim);
 			prim->r0 = prim->g0 = prim->b0 = 0x80;
 			SetSemiTrans(prim, 2);
-			prim->tpage = 0xdd;
-			prim->clut = 0x79c0;
-			prim->u0 = 0;
-			prim->v0 = 0x80;
-			prim->u1 = 3;
-			prim->v1 = 0x80;
-			prim->u2 = 0;
-			prim->v2 = 0x83;
-			prim->u3 = 3;
-			prim->v3 = 0x83;
-			prim->x0 = left;
-			prim->y0 = ty;
-			prim->x1 = left + tw;
-			prim->y1 = ty;
-			prim->x2 = left;
-			prim->y2 = ty + th;
-			prim->x3 = left + tw;
-			prim->y3 = ty + th;
+			prim->tpage = getTPage(1, 2, 832, 256);
+			prim->clut = getClut(0, 487);
+			setUV4(prim, 0, 0x80, 3, 0x80, 0, 0x83, 3, 0x83);
+			setXY4(prim, left, ty, left + tw, ty, left, ty + th, left + tw, ty + th);
 			AddPrim(ACTIVE_ORDERING_TABLE->org + 0x22, prim++);
 		}
 	}
@@ -643,24 +631,10 @@ int32_t MURD_renderIris(Entity *entity, int32_t start, int32_t end, int32_t t)
 			SetPolyFT4(prim);
 			prim->r0 = prim->g0 = prim->b0 = 0x80;
 			SetSemiTrans(prim, 2);
-			prim->tpage = 0xdd;
-			prim->clut = 0x79c0;
-			prim->u0 = 0;
-			prim->v0 = 0x80;
-			prim->u1 = 3;
-			prim->v1 = 0x80;
-			prim->u2 = 0;
-			prim->v2 = 0x83;
-			prim->u3 = 3;
-			prim->v3 = 0x83;
-			prim->x0 = left;
-			prim->y0 = by;
-			prim->x1 = left + bw;
-			prim->y1 = by;
-			prim->x2 = left;
-			prim->y2 = by + bh;
-			prim->x3 = left + bw;
-			prim->y3 = by + bh;
+			prim->tpage = getTPage(1, 2, 832, 256);
+			prim->clut = getClut(0, 487);
+			setUV4(prim, 0, 0x80, 3, 0x80, 0, 0x83, 3, 0x83);
+			setXY4(prim, left, by, left + bw, by, left, by + bh, left + bw, by + bh);
 			AddPrim(ACTIVE_ORDERING_TABLE->org + 0x22, prim++);
 		}
 	}
@@ -672,7 +646,7 @@ int32_t MURD_renderIris(Entity *entity, int32_t start, int32_t end, int32_t t)
 
 void MURD_tickLivesBox(void)
 {
-	MurdLivesBox *box = &MAIN_D_801353E8;
+	MurdLivesBox *box = &MURD_LIVES_BOX;
 
 	box->frame++;
 
@@ -695,8 +669,8 @@ void MURD_tickLivesBox(void)
 void MURD_renderLivesBox(int32_t layer)
 {
 	int32_t depth = 6 - layer;
-	PartnerEntity *partner = MAIN_D_801353E8.partner;
-	MurdLivesBox *box = &MAIN_D_801353E8;
+	PartnerEntity *partner = MURD_LIVES_BOX.partner;
+	MurdLivesBox *box = &MURD_LIVES_BOX;
 	int32_t offset = 0;
 	int32_t i;
 	int32_t x;
@@ -760,7 +734,7 @@ int32_t MURD_tick(PartnerEntity *partner, int32_t isInitialized)
 		MAIN_func_800D91EC(message, 1);
 	} else {
 		loadDynamicLibrary(DOOA_REL, NULL, 0, NULL, NULL);
-		MAIN_D_80134C00[0] = 0;
+		MURD_LOADING_COMPLETE = 0;
 	}
 
 	MURD_initializeOrderingTables();

@@ -67,7 +67,8 @@ MAIN_SBSS := \
 	$(BUILDDIR)/generated/unk_0x80134E50.sbss.s \
 	$(BUILDDIR)/generated/unk_0x80134E68.sbss.s \
 	$(BUILDDIR)/generated/unk_0x80134E90.sbss.s \
-	$(BUILDDIR)/generated/unk_0x80135078.sbss.s
+	$(BUILDDIR)/generated/unk_0x80135078.sbss.s \
+	$(BUILDDIR)/generated/unk_0x801353F0.sbss.s
 
 MAIN_BSS := \
 	$(BUILDDIR)/generated/unk_0x801353F8.bss.s \
@@ -121,6 +122,7 @@ MAIN_SRC := \
 	src/main/map_object.c \
 	src/main/math.c \
 	src/main/model.c \
+	src/main/murd.c \
 	src/main/overworld.c \
 	src/main/overworld_card_text.c \
 	src/main/overworld_evochart_detail.c \
@@ -329,7 +331,8 @@ MURD_ASM_SRC := $(shell find $(ASM_DIR)/murd -path '*.s' \
 
 MURD_SRC := \
 	$(MURD_ASM_SRC) \
-	src/murd/murd.c
+	src/murd/murd.c \
+	src/murd/murd_bss.c
 
 MURD_OBJ := $(MURD_SRC:%=$(BUILDDIR)/%.o)
 MURD_DEP := $(MURD_OBJ:%.o=%.d)

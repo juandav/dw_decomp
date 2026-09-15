@@ -662,7 +662,7 @@ SECTIONS
         . = ALIGN(., 4);
         KEEP(build/asm/main/data/trn2.sdata.s.o(.sdata.*));
         . = ALIGN(., 4);
-        KEEP(build/asm/main/data/murd.sdata.s.o(.sdata.*));
+        KEEP(build/src/main/murd.c.o(.sdata.*));
         . = ALIGN(., 4);
         KEEP(build/asm/main/data/endi.sdata.s.o(.sdata.*));
         . = ALIGN(., 4);
@@ -714,6 +714,10 @@ SECTIONS
         build/src/main/main_menu.c.o(.sbss.*);
         . = ALIGN(., 4);
         build/build/generated/unk_0x80135078.sbss.s.o(.sbss.*);
+        . = ALIGN(., 4);
+        build/src/main/murd.c.o(.sbss.*);
+        . = ALIGN(., 4);
+        build/build/generated/unk_0x801353F0.sbss.s.o(.sbss.*);
         . = ALIGN(., 4);
         main_SBSS_END = .;
         main_SBSS_SIZE = ABSOLUTE(main_SBSS_END - main_SBSS_START);

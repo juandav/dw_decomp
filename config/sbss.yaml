@@ -18,3 +18,5 @@ subsegments:
   - [0x8013502C, font]
   - [0x80135030, main_menu]
   - [0x80135078, unk_0x80135078]
+  - [0x801353E8, murd]
+  - [0x801353F0, unk_0x801353F0]

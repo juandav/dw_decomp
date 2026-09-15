@@ -319,7 +319,7 @@ SECTIONS
 
 			build/src/murd/murd.c.o(.data.*);
 			. = ALIGN(., 4);
-			KEEP(build/asm/murd/data/1748.data.s.o(.data.*));
+			build/src/murd/murd_bss.c.o(.data.*);
 			. = ALIGN(., 4);
 
 			build/src/murd/murd.c.o(.bss.*);
