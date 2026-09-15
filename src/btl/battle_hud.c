@@ -89,7 +89,7 @@ extern char MAIN_D_80134758[8];
 extern char MAIN_D_8013475C[8];
 extern char MAIN_D_80134744[8];
 extern char BTL_D_80072F18[];
-extern char BTL_D_800742A0[];
+extern uint8_t BTL_D_800742A0[];
 extern MATRIX BTL_D_80072FF4;
 extern char BTL_D_80072FE4[];
 extern char MAIN_D_80134740[8];
@@ -736,7 +736,177 @@ void BTL_initializeBattleStartText(void)
 	addObject(0x1a6, 0, NULL, (RenderFunction)BTL_renderBattleStartText);
 }
 
-INCLUDE_ASM("asm/btl/nonmatchings/battle_hud", BTL_renderBattleStartText);
+void BTL_renderBattleStartText(void)
+{
+	POLY_FT4 *ft;
+	POLY_F4 *shadow;
+	char (*p)[20];
+	POLY_FT4 *prim;
+	GsOT_TAG *ot;
+	int32_t i;
+	int32_t n;
+	int32_t y;
+	uint16_t clut;
+	int32_t otz;
+	SVECTOR p0;
+	SVECTOR p1;
+	SVECTOR p2;
+	SVECTOR p3;
+	SVECTOR q0;
+	SVECTOR q1;
+	SVECTOR q2;
+	SVECTOR q3;
+
+	GsSetProjection(0x200);
+	GsSetLsMatrix(&BTL_D_80072FF4);
+
+	n = 0;
+	for (i = 0; i < 0x9b; i++) {
+		if ((BTL_D_800742A0 + 0x12)[i * 20] != 0) {
+			break;
+		}
+		n++;
+	}
+
+	if (n == 0x9b) {
+		y = MAIN_D_801350BC++;
+		clut = GetClut(0x100, y % 6 / 2 + 0x1e8);
+		MAIN_D_801350C0 = 1;
+	} else {
+		clut = GetClut(0x100, 0x1e8);
+	}
+
+	p = (char (*)[20])BTL_D_800742A0;
+	prim = (POLY_FT4 *)GsGetWorkBase();
+	ot = ACTIVE_ORDERING_TABLE->org;
+	for (i = 0; i < 0x9b; i++, p++) {
+		if (((int16_t *)*p)[4] != BTL_D_80073014[i][0]) {
+			((int16_t *)*p)[4] += ((int8_t *)*p)[0x10];
+			if (((int8_t *)*p)[0x10] > 0) {
+				if (((int16_t *)*p)[4] > BTL_D_80073014[i][0]) {
+					((int16_t *)*p)[4] = BTL_D_80073014[i][0];
+				}
+			} else {
+				if (((int16_t *)*p)[4] < BTL_D_80073014[i][0]) {
+					((int16_t *)*p)[4] = BTL_D_80073014[i][0];
+				}
+			}
+		} else {
+			if (((uint8_t *)*p)[0x12] != 0) {
+				((uint8_t *)*p)[0x12] -= 4;
+			}
+		}
+
+		p0.vx = ((int16_t *)*p)[4];
+		p0.vy = ((int16_t *)*p)[5];
+		p0.vz = 0;
+		p1.vx = p0.vx + 8;
+		p1.vy = p0.vy;
+		p1.vz = 0;
+		p2.vx = p0.vx;
+		p2.vy = p0.vy + 0xc;
+		p2.vz = 0;
+		p3.vx = p0.vx + 8;
+		p3.vy = p0.vy + 0xc;
+		p3.vz = 0;
+
+		ft = prim;
+		setEntityTextDigit(prim, 0x100, 0x1e8);
+		prim->r0 = 0x80;
+		prim->g0 = 0x80;
+		prim->b0 = 0x80;
+		prim->clut = clut;
+		gte_ldv3(&p0, &p1, &p2);
+		gte_rtpt();
+		gte_stsxy3(&prim->x0, &prim->x1, &prim->x2);
+		gte_stszotz(&otz);
+		gte_ldv0(&p3);
+		gte_rtps();
+		gte_stsxy(&prim->x3);
+		prim->u0 = ((uint8_t *)*p)[0x13] * 8 + 0x80;
+		prim->v0 = 0x80;
+		prim->u1 = ((uint8_t *)*p)[0x13] * 8 + 0x88;
+		prim->v1 = 0x80;
+		prim->u2 = ((uint8_t *)*p)[0x13] * 8 + 0x80;
+		prim->v2 = 0x88;
+		prim->u3 = ((uint8_t *)*p)[0x13] * 8 + 0x88;
+		prim->v3 = 0x88;
+		AddPrim(ot + 5, prim++);
+
+		if (n != 0x9b) {
+			SetPolyFT4(prim);
+			prim->r0 = 0x80;
+			prim->g0 = 0x80;
+			prim->b0 = 0x80;
+			prim->tpage = GetTPage(0, 0, 0x380, 0x180);
+			prim->clut = clut;
+			SetSemiTrans(prim, 1);
+			if (((int8_t *)*p)[0x10] > 0) {
+				q0.vx = p0.vx - ((uint8_t *)*p)[0x12];
+				q0.vy = p0.vy;
+				q0.vz = p0.vz;
+				q1 = p0;
+				q2.vx = p2.vx - ((uint8_t *)*p)[0x12];
+				q2.vy = p2.vy;
+				q2.vz = p2.vz;
+				q3 = p2;
+				prim->u0 = 0x9e;
+				prim->v0 = 0x80;
+				prim->u1 = 0x86;
+				prim->v1 = 0x80;
+				prim->u2 = 0x9e;
+				prim->v2 = 0x88;
+				prim->u3 = 0x86;
+				prim->v3 = 0x88;
+			} else {
+				q0 = p1;
+				q1.vx = p1.vx + ((uint8_t *)*p)[0x12];
+				q1.vy = p1.vy;
+				q1.vz = p1.vz;
+				q2 = p3;
+				q3.vx = p3.vx + ((uint8_t *)*p)[0x12];
+				q3.vy = p3.vy;
+				q3.vz = p3.vz;
+				prim->u0 = 0x86;
+				prim->v0 = 0x80;
+				prim->u1 = 0x9e;
+				prim->v1 = 0x80;
+				prim->u2 = 0x86;
+				prim->v2 = 0x88;
+				prim->u3 = 0x9e;
+				prim->v3 = 0x88;
+			}
+			gte_ldv3(&q0, &q1, &q2);
+			gte_rtpt();
+			gte_stsxy3(&prim->x0, &prim->x1, &prim->x2);
+			gte_stszotz(&otz);
+			gte_ldv0(&q3);
+			gte_rtps();
+			gte_stsxy(&prim->x3);
+			AddPrim(ot + 5, prim++);
+		}
+
+		shadow = (POLY_F4 *)prim;
+		SetPolyF4(shadow);
+		shadow->r0 = 0;
+		shadow->g0 = 0;
+		shadow->b0 = 0;
+		shadow->x0 = ft->x0 + 2;
+		shadow->y0 = ft->y0 + 2;
+		shadow->x1 = ft->x1 + 2;
+		shadow->y1 = ft->y1 + 2;
+		shadow->x2 = ft->x2 + 2;
+		shadow->y2 = ft->y2 + 2;
+		shadow->x3 = ft->x3 + 2;
+		shadow->y3 = ft->y3 + 2;
+		AddPrim(ot + 6, shadow++);
+		prim = (POLY_FT4 *)shadow;
+	}
+
+	GsSetWorkBase((PACKET *)prim);
+	GsSetProjection(VIEWPORT_DISTANCE);
+	GsSetRefView2(&GS_VIEWPOINT);
+}
 
 void BTL_removeBattleStartText(void)
 {
