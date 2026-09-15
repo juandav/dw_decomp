@@ -43,6 +43,16 @@ typedef struct {
 } EfeUvAnim;
 
 typedef struct {
+	uint8_t r;
+	uint8_t g;
+	uint8_t b;
+} EfeRGB;
+
+typedef struct {
+	int32_t w[13];
+} EfeFileHeader;
+
+typedef struct {
 	int32_t life;
 	SVECTOR p[4];
 } EfeTrail;
@@ -111,6 +121,7 @@ typedef struct {
 void setRotTransMatrix(MATRIX *m);
 void setMapLayerEnabled(int32_t enabled);
 void GsGetTimInfo(unsigned long *tim, GsIMAGE *img);
+void updateTMDTextureData(char *tmd, int32_t clutX, int32_t x, int32_t y, int32_t tpage);
 void MAIN_func_80092B60(POLY_FT4 *prim);
 void addScreenPolyFT3(void *prim, SVECTOR *v0, SVECTOR *v1, SVECTOR *v2);
 void renderLinePrimitive(uint32_t color, int32_t x0, int32_t y0, int32_t x1, int32_t y1, int32_t layer, int32_t flag);
@@ -372,6 +383,10 @@ int32_t BTL_addBuffRingsEffect(uint8_t idx, Entity *e);
 long RotTransPers4(SVECTOR *v0, SVECTOR *v1, SVECTOR *v2, SVECTOR *v3, long *sxy0, long *sxy1, long *sxy2, long *sxy3, long *p, long *flag);
 
 extern SVECTOR BTL_D_80075244[];
+extern int16_t MAIN_D_801347BC[4];
+extern SVECTOR MAIN_D_801347C4;
+extern EfeRGB MAIN_D_801347CC;
+extern VECTOR BTL_D_8007382C;
 extern uint8_t BTL_D_80073704[];
 extern int8_t MAIN_D_80134788[8];
 extern int8_t MAIN_D_80134790[8];
@@ -419,6 +434,9 @@ extern char MAIN_D_8013477C[8];
 extern int16_t BTL_D_80075040[];
 extern void (*BTL_jtbl_80073604[])(void);
 extern int32_t MAIN_D_801350CC;
+extern int32_t MAIN_D_801350D0;
+extern int32_t UNKNOWN_MODEL_TAKEN[16];
+extern int16_t EFE_LOAD_STATE[];
 extern int16_t BTL_D_80075DCC[];
 extern int16_t BTL_D_80075DDC[];
 extern int16_t BTL_D_80075DEC[];
@@ -927,7 +945,179 @@ int32_t BTL_getEFEFileId(int32_t *p)
 	return p[12];
 }
 
-INCLUDE_ASM("asm/btl/nonmatchings/battle_effect", BTL_setupLoadedEFEFile);
+int32_t BTL_setupLoadedEFEFile(EfeLoad *load)
+{
+	GsIMAGE im;
+	RECT rect;
+	GsIMAGE im2;
+	RECT rect2;
+	EfeFileHeader hdr;
+	EfeLoad *ld;
+	ModelComponent *m;
+	char *tim;
+	char *tmd;
+	char *data;
+	char *base;
+	int32_t i;
+	int32_t k;
+	int32_t s;
+	int32_t j;
+	int32_t n;
+	int32_t off;
+	int32_t off2;
+	int32_t *tmdp;
+	int32_t idx;
+	int32_t idx2;
+	int32_t ce;
+
+	ld = ld = load;
+	m = ld->model;
+	data = (char *)m->mmdPtr;
+	tim = BTL_getEFETextureSection(data);
+	m->modelPtr = (TMDModel *)(tmd = BTL_getEFEModelSection(data));
+	BTL_getEFEFileId((int32_t *)data);
+
+	switch (MAIN_D_801350CC) {
+	case 0:
+		if (tim != NULL) {
+			for (i = 0; UNKNOWN_MODEL_TAKEN[i] != 0 && i < 0x10; i++) {
+			}
+			if (i == 0x10) {
+				*ld->isLoaded = -2;
+				goto end;
+			}
+			UNKNOWN_MODEL_TAKEN[i] = 1;
+			m->pixelPage = i / 8 + 0x19;
+			m->clutPage = ((i % 4 * 6 + 0x1e8) << 6) | ((i / 4 * 16 + 0x80) >> 4 & 0x3f);
+			m->pixelOffsetX = 0;
+			m->pixelOffsetY = i % 8 << 5;
+			m->modelId = i;
+			GsGetTimInfo((unsigned long *)(tim + 4), &im);
+			im.px = (m->pixelPage % 16 << 6) + m->pixelOffsetX;
+			im.py = (m->pixelPage / 16 << 8) + m->pixelOffsetY;
+			rect.x = im.px;
+			rect.y = im.py;
+			rect.w = im.pw;
+			rect.h = im.ph;
+			LoadImage(&rect, im.pixel);
+		}
+		GsGetTimInfo((unsigned long *)(tim + 4), &im2);
+		im2.cx = (m->clutPage & 0x3f) << 4;
+		im2.cy = m->clutPage >> 6;
+		if ((im2.pmode >> 3 & 1) != 0) {
+			rect2.x = im2.cx;
+			rect2.y = im2.cy;
+			rect2.w = im2.cw;
+			rect2.h = im2.ch;
+			LoadImage(&rect2, im2.clut);
+		}
+		MAIN_D_801350CC = 1;
+	case 1:
+		if (tmd != NULL) {
+			GsMapModelingData((unsigned long *)((char *)m->modelPtr + 4));
+			updateTMDTextureData((char *)m->modelPtr, m->pixelPage, m->pixelOffsetX, m->pixelOffsetY,
+			                     m->clutPage - 0x7a08);
+		}
+		MAIN_D_801350CC = 2;
+	case 2:
+		if (((int32_t *)m->mmdPtr)[12] != ld->moves[-1]) {
+			*ld->isLoaded = -3;
+			goto end;
+		}
+		EFE_LOAD_STATE[0] = -1;
+		k = 0;
+		while (1) {
+			if (EFE_LOADED_MOVE_DATA[k] == -1) {
+				break;
+			}
+			k++;
+		}
+		if (k == 0x10) {
+			*ld->isLoaded = -1;
+			goto end;
+		}
+		MAIN_D_801350D0 = k;
+		if (EFE_LOADED_MOVE_DATA[k] == -1) {
+			MAIN_D_801350CC = 0x15;
+		} else {
+			MAIN_D_801350CC = 3;
+		}
+		return 1;
+	case 0x15:
+		*(char **)&MAIN_D_80134D0C = MAIN_D_80134D10 + MAIN_D_801350D0 * 40;
+		MAIN_D_80134D0C[6] = (int32_t)m;
+		hdr = *(EfeFileHeader *)m->mmdPtr;
+		base = (char *)m->mmdPtr;
+		MAIN_D_80134D14 += (uint32_t)hdr.w[6] + 0x34;
+		base = (char *)((uint32_t)base + 0x34);
+		MAIN_D_80134D0C[2] = (int32_t)base;
+		tmdp = (int32_t *)m->modelPtr;
+		if (hdr.w[6] - hdr.w[5] == 0) {
+			MAIN_D_80134D0C[7] = 0;
+		} else {
+			MAIN_D_80134D0C[7] = tmdp[2];
+		}
+		((int16_t *)MAIN_D_80134D0C)[10] = hdr.w[11];
+		MAIN_D_80134D0C[4] = (int32_t)(base + hdr.w[4]);
+		off = 0;
+		for (j = 0; j < hdr.w[11]; j++) {
+			*(int32_t *)((uint32_t)MAIN_D_80134D0C[4] + off) = 0;
+			off += 0x1c;
+		}
+		n = MAIN_D_80134D0C[7];
+		if (n != 0) {
+			MAIN_D_80134D0C[8] = (int32_t)(base + hdr.w[2]);
+			off2 = 0;
+			for (j = 0; j < n; j++) {
+				*(int16_t *)((uint32_t)MAIN_D_80134D0C[8] + off2) = 0;
+				((int16_t *)(off2 + (uint32_t)MAIN_D_80134D0C[8]))[6] = 0;
+				off2 += 0x20;
+			}
+		}
+		MAIN_D_80134D0C[0] = hdr.w[12];
+		MAIN_D_80134D0C[3] = (int32_t)base + hdr.w[0];
+		MAIN_D_80134D0C[1] = (int32_t)base + hdr.w[1];
+		MAIN_D_80134D0C[9] = (int32_t)base + hdr.w[3];
+		EFE_INSTANCE = NULL;
+		MAIN_D_80134D08 = MAIN_D_80134D0C[2];
+		MAIN_D_80134CE8 = (EfeSubEffect *)MAIN_D_80134D0C[4];
+		MAIN_D_80134CE4 = -1;
+		MAIN_D_80134D00 = (int16_t *)MAIN_D_80134D0C[1];
+		EFE_DATA_STACK = EFE_SCRIPT_MEM1_DATA;
+		MAIN_D_80134CFC = MAIN_D_80139B54;
+		*MAIN_D_80134CFC++ = 0;
+		MAIN_D_801350CC = 0x16;
+		return 1;
+	case 0x16:
+		*(char **)&MAIN_D_80134D0C = MAIN_D_80134D10 + MAIN_D_801350D0 * 40;
+		for (s = 0; s < 4; s++) {
+			MAIN_D_80134D04 = *MAIN_D_80134D00;
+			BTL_dispatchEFEOpcode(MAIN_D_80134D04 & 0xff);
+			if (MAIN_D_80134D00 == NULL) {
+				break;
+			}
+		}
+		if (s == 4) {
+			return 1;
+		}
+		if (*(int32_t *)MAIN_D_80134CE8->instance == -1) {
+			MAIN_D_80134CE8->inst = NULL;
+		}
+		ce = ce = MAIN_D_80134CE4;
+		k = MAIN_D_801350D0;
+		idx = k;
+		if (ce >= -1) {
+			EFE_LOADED_MOVE_DATA[k] = MAIN_D_80134D0C[0];
+		} else {
+			EFE_LOADED_MOVE_DATA[k] = ce;
+		}
+		*ld->effectIds++ = idx;
+		BTL_loadNextEFEFile((int16_t *)load);
+		MAIN_D_801350CC = 3;
+		return 0;
+	}
+end:;
+}
 
 void BTL_handleEFEFileLoaded(int32_t arg)
 {
@@ -1565,7 +1755,110 @@ void BTL_renderScreenOverlay(void)
 	GsSetWorkBase((PACKET *)(dr + 1));
 }
 
-INCLUDE_ASM("asm/btl/nonmatchings/battle_effect", BTL_renderRingTube);
+void BTL_renderRingTube(void)
+{
+	SVECTOR pos;
+	DVECTOR screen;
+	int32_t n;
+	int32_t *radius;
+	int32_t *heights;
+	int32_t *colors;
+	int32_t start;
+	int16_t *pts;
+	POLY_FT4 *p;
+	ModelComponent *m;
+	int16_t *q;
+	VECTOR *center;
+	int32_t i;
+	int32_t j;
+	int32_t r;
+	int32_t z;
+	int16_t count;
+
+	start = EFE_POP1(int32_t);
+	colors = EFE_POP1(int32_t *);
+	heights = EFE_POP1(int32_t *);
+	radius = EFE_POP1(int32_t *);
+	n = EFE_POP1(int32_t);
+	center = EFE_POP1(VECTOR *);
+
+	if (n < 2) {
+		return;
+	}
+
+	p = (POLY_FT4 *)GsGetWorkBase();
+	count = (n - 1) * 10;
+	q = pts = (int16_t *)&p[count];
+	m = (ModelComponent *)MAIN_D_80134D0C[6];
+	for (i = 0; i < n; i++) {
+		r = radius[i];
+		for (j = 0; j < 10; j++) {
+			pos.vx = center->vx + ((r * _cos(0x80 - j * 0x200 / 10)) >> 12);
+			pos.vy = (int32_t)center->vy + heights[i];
+			pos.vz = center->vz + ((r * _sin(0x80 - j * 0x200 / 10)) >> 12);
+			z = worldPosToScreenPos(&pos, &screen);
+			*q++ = screen.vx;
+			*q++ = screen.vy;
+			z >>= 4;
+			if (z >= 0x21 && z < 0x1000) {
+				*q++ = z;
+			} else {
+				*q++ = -1;
+			}
+		}
+	}
+
+	q = pts;
+	for (i = 0; i < n - 1; i++) {
+		for (j = 0; j < 10; q += 3, j++) {
+			SetPolyFT4(p);
+			p->code |= 2;
+			p->r0 = p->g0 = p->b0 = colors[i];
+			p->tpage = m->pixelPage | 0x20;
+			p->clut = GetClut((m->clutPage & 0x3f) << 4, m->clutPage >> 6);
+			p->u0 = m->pixelOffsetX + ((i + start) & 1) * 24;
+			p->v0 = m->pixelOffsetY;
+			p->u1 = m->pixelOffsetX + ((i + start) & 1) * 24 + 0x17;
+			p->v1 = m->pixelOffsetY;
+			p->u2 = m->pixelOffsetX + ((i + start) & 1) * 24;
+			p->v2 = m->pixelOffsetY + 0x1f;
+			p->u3 = m->pixelOffsetX + ((i + start) & 1) * 24 + 0x17;
+			p->v3 = m->pixelOffsetY + 0x1f;
+			if (j == 9) {
+				goto wrap;
+			}
+			if (q[2] < 0x21 || q[2] >= 0x1000 || q[5] < 0x21 || q[5] >= 0x1000
+			    || q[32] < 0x21 || q[32] >= 0x1000 || q[35] < 0x21
+			    || q[35] >= 0x1000) {
+				continue;
+			}
+			p->x0 = q[33];
+			p->y0 = q[34];
+			p->x1 = q[3];
+			p->y1 = q[4];
+emit:
+			p->x2 = q[30];
+			p->y2 = q[31];
+			p->x3 = q[0];
+			p->y3 = q[1];
+			AddPrim(&ACTIVE_ORDERING_TABLE->org[q[2]], p);
+			p++;
+			continue;
+wrap:
+			if (q[2] < 0x21 || q[2] >= 0x1000 || q[-25] < 0x21
+			    || q[-25] >= 0x1000 || q[32] < 0x21 || q[32] >= 0x1000
+			    || q[5] < 0x21 || q[5] >= 0x1000) {
+				continue;
+			}
+			p->x0 = q[3];
+			p->y0 = q[4];
+			p->x1 = q[-27];
+			p->y1 = q[-26];
+			goto emit;
+		}
+	}
+	GsSetWorkBase((PACKET *)p);
+}
 
 INCLUDE_ASM("asm/btl/nonmatchings/battle_effect", BTL_renderRibbonStrip);
 
@@ -3238,7 +3531,129 @@ void BTL_calculatePolarOffset(void)
 	out[0] = (r * _cos(0x80 - ang)) >> 12;
 }
 
-INCLUDE_ASM("asm/btl/nonmatchings/battle_effect", BTL_renderProjectedSprite);
+static int32_t BTL_renderProjectedSprite__garbage__(int32_t i)
+{
+	int16_t v0;
+	int16_t v1;
+	int16_t v2;
+	int16_t v3;
+	int16_t v4;
+	int16_t v5;
+	int16_t v6;
+	int16_t v7;
+	int16_t v8;
+	int16_t v9;
+	int16_t v10;
+	int16_t v11;
+	int16_t v12;
+	int16_t v13;
+	int16_t v14;
+	int16_t v15;
+	int16_t v16;
+	int16_t v17;
+	int16_t v18;
+	int16_t v19;
+	int16_t v20;
+	int16_t v21;
+	int16_t v22;
+	int16_t v23;
+	int16_t v24;
+	int16_t v25;
+	int16_t v26;
+	int16_t v27;
+	int16_t v28;
+	int16_t v29;
+	int16_t v30;
+	int16_t v31;
+	int16_t v32;
+	int16_t v33;
+	int16_t v34;
+
+	v0 = i + 0;
+	v1 = i + 1;
+	v2 = i + 2;
+	v3 = i + 3;
+	v4 = i + 4;
+	v5 = i + 5;
+	v6 = i + 6;
+	v7 = i + 7;
+	v8 = i + 8;
+	v9 = i + 9;
+	v10 = i + 10;
+	v11 = i + 11;
+	v12 = i + 12;
+	v13 = i + 13;
+	v14 = i + 14;
+	v15 = i + 15;
+	v16 = i + 16;
+	v17 = i + 17;
+	v18 = i + 18;
+	v19 = i + 19;
+	v20 = i + 20;
+	v21 = i + 21;
+	v22 = i + 22;
+	v23 = i + 23;
+	v24 = i + 24;
+	v25 = i + 25;
+	v26 = i + 26;
+	v27 = i + 27;
+	v28 = i + 28;
+	v29 = i + 29;
+	v30 = i + 30;
+	v31 = i + 31;
+	v32 = i + 32;
+	v33 = i + 33;
+	v34 = i + 34;
+	return v0 + v1 + v2 + v3 + v4 + v5 + v6 + v7 + v8 + v9 + v10 + v11 + v12 + v13 + v14 + v15 + v16 + v17 + v18 + v19 + v20 + v21 + v22 + v23 + v24 + v25 + v26 + v27 + v28 + v29 + v30 + v31 + v32 + v33 + v34;
+}
+
+void BTL_renderProjectedSprite(void)
+{
+	ModelComponent *m;
+	VECTOR *col;
+	int32_t zA;
+	int32_t zB;
+
+	m = (ModelComponent *)MAIN_D_80134D0C[6];
+	EFE_SPRITE_SCRATCH->sprite.tpage = m->pixelPage | 0x20;
+	EFE_SPRITE_SCRATCH->sprite.cx = (m->clutPage & 0x3f) << 4;
+	EFE_SPRITE_SCRATCH->sprite.cy = m->clutPage >> 6;
+	EFE_SPRITE_SCRATCH->sprite.u = m->pixelOffsetX;
+	EFE_SPRITE_SCRATCH->sprite.v = m->pixelOffsetY;
+	EFE_SPRITE_SCRATCH->sprite.cy += (int16_t)EFE_POP1(int32_t);
+	EFE_SPRITE_SCRATCH->sprite.attribute = EFE_POP1(int32_t) << 28;
+	EFE_SPRITE_SCRATCH->sprite.rotate = EFE_POP1(int32_t) << 12;
+	EFE_SPRITE_SCRATCH->sprite.my = EFE_POP1(int32_t);
+	EFE_SPRITE_SCRATCH->sprite.mx = EFE_POP1(int32_t);
+	EFE_SPRITE_SCRATCH->sprite.h = EFE_POP1(int32_t);
+	EFE_SPRITE_SCRATCH->sprite.w = EFE_POP1(int32_t);
+	EFE_SPRITE_SCRATCH->sprite.v += EFE_POP1(int32_t);
+	EFE_SPRITE_SCRATCH->sprite.u += EFE_POP1(int32_t);
+	EFE_SPRITE_SCRATCH->sprite.scaley = EFE_POP1(int32_t);
+	EFE_SPRITE_SCRATCH->sprite.scalex = EFE_POP1(int32_t);
+	col = EFE_POP1(VECTOR *);
+	EFE_SPRITE_SCRATCH->sprite.r = col->vx;
+	EFE_SPRITE_SCRATCH->sprite.g = col->vy;
+	EFE_SPRITE_SCRATCH->sprite.b = col->vz;
+	EFE_SPRITE_SCRATCH->position = EFE_POP1(VECTOR *);
+	SetRotMatrix(&GsWSMATRIX);
+	SetTransMatrix(&GsWSMATRIX);
+	EFE_SPRITE_SCRATCH->point.vx = EFE_SPRITE_SCRATCH->position->vx;
+	EFE_SPRITE_SCRATCH->point.vy = EFE_SPRITE_SCRATCH->position->vy;
+	EFE_SPRITE_SCRATCH->point.vz = EFE_SPRITE_SCRATCH->position->vz;
+	EFE_SPRITE_SCRATCH->otz = RotTransPers(&EFE_SPRITE_SCRATCH->point, &EFE_SPRITE_SCRATCH->sxy, &EFE_SPRITE_SCRATCH->p, &EFE_SPRITE_SCRATCH->flag);
+	if ((EFE_SPRITE_SCRATCH->flag & 0x80000000) == 0) {
+		*(int32_t *)&EFE_SPRITE_SCRATCH->sprite.x = EFE_SPRITE_SCRATCH->sxy;
+		EFE_SPRITE_SCRATCH->sprite.scalex = ((uint32_t)(EFE_SPRITE_SCRATCH->sprite.scalex * VIEWPORT_DISTANCE) << 5) / (uint32_t)EFE_SPRITE_SCRATCH->otz;
+		EFE_SPRITE_SCRATCH->sprite.scaley = ((uint32_t)(EFE_SPRITE_SCRATCH->sprite.scaley * VIEWPORT_DISTANCE) << 5) / (uint32_t)EFE_SPRITE_SCRATCH->otz;
+		EFE_SPRITE_SCRATCH->otz = (EFE_SPRITE_SCRATCH->otz - 0xa) >> 2;
+		zA = EFE_SPRITE_SCRATCH->otz;
+		zB = zB = zA;
+		if (zA >= 0x20 && zB < 0x1000) {
+			GsSortSprite(&EFE_SPRITE_SCRATCH->sprite, ACTIVE_ORDERING_TABLE, (uint16_t)zA);
+		}
+	}
+}
 
 void BTL_getTargetDigimonSize(void)
 {
@@ -4890,7 +5305,64 @@ void BTL_tickFinisherAura(int32_t i)
 	}
 }
 
-INCLUDE_ASM("asm/btl/nonmatchings/battle_effect", BTL_renderFinisherAura);
+void BTL_renderFinisherAura(int32_t id)
+{
+	GsCOORDINATE2 coord;
+	SVECTOR rot;
+	VECTOR trans;
+	VECTOR scale;
+	EfeRGB col;
+	int16_t *fa;
+	Entity *e;
+	int32_t sx;
+	int32_t sy;
+	int32_t t;
+	int32_t i;
+
+	fa = &BTL_D_80075234[id * 4];
+	e = (Entity *)*(int32_t *)&fa[2];
+
+	if (fa[0] < 10) {
+		sx = (0x1000 - _cos(lerp(0, 0x80, 0, 9, fa[0]))) * 0xb34 / 0x1000 + 0x4cc;
+	} else {
+		sx = 0x1000;
+	}
+	sx = sx * DIGIMON_DATA[e->type].radius / 150;
+
+	t = lerp(0, 0x200, 0, 0x10, fa[0]);
+	if (fa[0] < 5) {
+		sy = fa[0] * 0x1000 / 4;
+	} else {
+		sy = 0x1000;
+	}
+	sy = sy * DIGIMON_DATA[e->type].height / 350;
+	sy = sy * 85 / 100 + sy * 15 / 100 * _sin(t) / 0x1000;
+
+	rot = MAIN_D_801347C4;
+	scale = BTL_D_8007382C;
+	trans.vx = e->posData->location.vx;
+	trans.vy = e->posData->location.vy;
+	trans.vz = e->posData->location.vz;
+	scale.vx = scale.vz = sx;
+	scale.vy = sy;
+	renderTMDModel(*(uint8_t **)&MAIN_D_801350DC, MAIN_D_801347BC[fa[0] / 2 % 3], &coord, NULL, &trans, &rot, &scale);
+	renderTMDModel(*(uint8_t **)&MAIN_D_801350DC, 3, &coord, NULL, &trans, &rot, &scale);
+	rot.vy = rand();
+	scale.vx = scale.vz = sx * 140 / 100;
+	renderTMDModel(*(uint8_t **)&MAIN_D_801350DC, 4, &coord, NULL, &trans, &rot, &scale);
+
+	if (fa[0] < 7) {
+		col = MAIN_D_801347CC;
+		sx = fa[0] * 0x1000 / 7;
+		sx = sx * DIGIMON_DATA[e->type].radius / 150;
+		col.r = (uint32_t)col.r * (7 - fa[0]) / 7;
+		col.g = (uint32_t)col.g * (7 - fa[0]) / 7;
+		col.b = (uint32_t)col.b * (7 - fa[0]) / 7;
+		for (i = 0; i < 20; i += 2) {
+			BTL_renderFinisherAuraSpark((char *)&e->posData->location, sx, &BTL_D_80075244[i], (uint8_t *)&col);
+		}
+	}
+}
 
 void BTL_renderFinisherAuraSpark(char *pos, int32_t scale, SVECTOR *dir, uint8_t *col)
 {

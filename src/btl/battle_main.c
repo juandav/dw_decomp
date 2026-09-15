@@ -3047,7 +3047,33 @@ int16_t BTL_getStrongestMove(int32_t index, int16_t *flags)
 	return rank.best;
 }
 
-INCLUDE_ASM("asm/btl/nonmatchings/battle_main", BTL_getMostEffectiveMove);
+int16_t BTL_getMostEffectiveMove(int32_t index, int16_t *flags)
+{
+	MoveRanking rank;
+	DigimonEntity *digimon;
+	Entity *target;
+	uint8_t *moves;
+	int16_t tech;
+	int32_t i;
+	int32_t idx;
+
+	idx = idx = index;
+	digimon = (DigimonEntity *)ENTITY_TABLE[((uint8_t *)((uint32_t)index + (uint32_t)COMBAT_DATA_PTR))[0x66c]];
+	moves = digimon->stats.base.moves;
+	target = ENTITY_TABLE[((uint8_t *)COMBAT_DATA_PTR + ((FighterData *)COMBAT_DATA_PTR)[idx].targetId)[0x66c]];
+	for (i = 0; i < 3; i++) {
+		if (flags[i] == 1) {
+			tech = entityGetTechFromAnim(&digimon->entity, moves[i]);
+			rank.score[i] = MAIN_D_80125F70[MOVE_DATA[tech].special][DIGIMON_DATA[target->type].special[0]];
+		} else {
+			rank.score[i] = -1;
+		}
+	}
+
+	BTL_getHighestScoredMove(rank.score, flags, &rank.best, 3);
+
+	return rank.best;
+}
 
 void BTL_handleHitReaction(Entity *entity, FighterData *fighter, AttackObject *attack, int16_t index)
 {
