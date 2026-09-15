@@ -6599,6 +6599,3 @@ MAIN_D_801BE956 = 0x801BE956;
 RENDER_AREA = 0x801BE958;
 MAIN_D_801BF768 = 0x801BF768;
 HEAP = 0x801BFB64;
-
-// GENERAL_BUFFER (0x80010000) is a literal in C; keep splat from symbolizing interior words
-D_80010004 = 0x80010004; // ignore:true
