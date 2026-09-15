@@ -1,3 +1,6 @@
+#include <string.h>
+
+#include <dw/entity.h>
 #include <dw/graphics.h>
 #include <dw/move.h>
 #include <dw/ui.h>
@@ -22,6 +25,16 @@ typedef struct {
 } StringRect;
 
 extern int8_t MENU_STATE;
+extern int32_t MONEY;
+extern int16_t MAIN_D_80124424[];
+extern StringRect MAIN_D_801244EC[11];
+extern RECT MAIN_D_80124494[11];
+extern char *MAIN_D_80124918[];
+int32_t drawPlayerInfoStrings(void);
+int32_t isTriggerSet(uint16_t trigger);
+int32_t hasMedal(uint16_t medal);
+void renderInsetBox(int16_t a, int16_t b, int16_t c, int16_t d, int32_t otz);
+void renderDigiviceEntity(Entity *entity, int32_t entityId);
 extern int8_t SELECTED_CARD;
 extern uint8_t MAIN_D_80134234[4];
 extern int16_t MAIN_D_80134D38;
@@ -39,7 +52,7 @@ int32_t drawDigimonMovesText(void);
 u_short GetTPage(int32_t tp, int32_t abr, int32_t x, int32_t y);
 u_short GetClut(int32_t x, int32_t y);
 void renderRectPolyFT4(int16_t posX, int16_t posY, int32_t width,
-		       int32_t height, uint8_t texX, uint8_t texY,
+		       uint8_t height, uint8_t texX, uint8_t texY,
 		       int16_t texturePage, int16_t clut, int32_t zIndex,
 		       int8_t flag);
 void renderString();
@@ -61,7 +74,7 @@ int32_t loadCardImage(int32_t id);
 void renderCardImage(void);
 void renderCardCount(void);
 void renderDigimonStatsView(void);
-void renderMenuTab(void);
+void renderMenuTab(int16_t x, int32_t w, int8_t layer);
 void renderPlayerInfoView(void);
 
 static void *overworld_menu_views_functions[] = {
@@ -77,7 +90,7 @@ static void *overworld_menu_views_functions[] = {
 int32_t loadCardImage(int32_t id)
 {
 	return loadStackedTIMEntry(MAIN_D_80123E78, (uint8_t *)0x80088800,
-				    id * 0xE, 0xE);
+				    id * 0xe, 0xe);
 }
 
 void renderCardImage(void)
@@ -85,8 +98,8 @@ void renderCardImage(void)
 	int16_t tpage;
 	int16_t clut;
 
-	tpage = GetTPage(1, 0, 0x240, 0x100);
-	clut = GetClut(0x1c0, 0x1ff);
+	tpage = GetTPage(1, 0, 576, 256);
+	clut = GetClut(448, 511);
 	renderRectPolyFT4(-0x4b, -0x54, 0x96, 0xb4, 0, 0, tpage, clut, 4, 0);
 }
 
@@ -300,4 +313,83 @@ void renderDigimonMovesView(void)
 
 INCLUDE_ASM("asm/main/nonmatchings/overworld_menu_views", renderMenuTab);
 
-INCLUDE_ASM("asm/main/nonmatchings/overworld_menu_views", renderPlayerInfoView);
+void renderPlayerInfoView(void)
+{
+	int32_t i;
+	int32_t state;
+	StringRect *e;
+	RECT *r;
+	int32_t count;
+	int32_t j;
+	int32_t k;
+	int32_t n;
+	int32_t x;
+	int32_t trigger;
+	int32_t texX;
+
+	state = MENU_STATE;
+
+	if (state == 1) {
+		goto grid;
+	}
+
+	if (state != 0) {
+		return;
+	}
+
+	if (drawPlayerInfoStrings() == 1) {
+		MENU_STATE = 1;
+	}
+
+	return;
+
+grid:
+	renderSeperatorLines(MAIN_D_80124424, 0xb, 5);
+
+	for (i = 0; i < 0xb; i++) {
+		e = &MAIN_D_801244EC[i];
+		renderString(3 - ((i / 7) * 3), e->posX, e->posY + 1, e->uvWidth, 0xc, e->uvX,
+			     e->uvY, 5, 1);
+	}
+
+	renderString(0, -0x54, -0x50, 0x48, 0xc, 0, 0x30, 5, 1);
+	renderNumber(0, 0x35, -0x36, 2, TAMER_ENTITY.tamerLevel, 5);
+	renderString(0, 0x28, -0x24, 0x64, 0xc, 0, (TAMER_ENTITY.tamerLevel * 12) + 0x40, 5, 1);
+	n = strlen(MAIN_D_80124918[TAMER_ENTITY.tamerLevel]) / 2;
+	renderString(0, (n * 12) + 0x28, -0x25, 0x30, 0xc, 0xb4, 0x18, 5, 1);
+	renderNumber(0, 0x35, -0x11, 2, TAMER_ENTITY.raisedCount, 5);
+	renderNumber(0, 0x29, 2, 6, MONEY, 5);
+	renderString(0, 0x32, 0x16, 0x4c, 0xc, 0, 0xe4, 5, 1);
+
+	for (i = 0, trigger = 0x2d, texX = 0, x = 0x34; i < 2; i++, x += 0x15, texX += 0x10, trigger++) {
+		texX = texX;
+
+		if (isTriggerSet(trigger) == 1) {
+			renderRectPolyFT4(x, 0x37, 0x10, 0x10, texX + 0xb0, 0xa0, 5, 0x7bc6, 5, 0);
+		}
+	}
+
+	if (isTriggerSet(0x2f) == 1) {
+		renderRectPolyFT4(0x5e, 0x37, 0x10, 0x10, 0xe0, 0xa0, 5, 0x7bc6, 5, 0);
+	}
+
+	if (isTriggerSet(0x30) == 1) {
+		renderRectPolyFT4(0x73, 0x37, 0x10, 0x10, 0xd0, 0xa0, 5, 0x7bc6, 5, 0);
+	}
+
+	count = 0;
+
+	for (j = 0; j < 0x12; j++) {
+		if (hasMedal(j) != 0) {
+			count = (int8_t)(count + 1);
+		}
+	}
+
+	renderNumber(0, 0x35, 0x4d, 2, count, 5);
+	renderDigiviceEntity(ENTITY_TABLE[0], 0);
+
+	for (k = 0; k < 0xb; k++) {
+		r = &MAIN_D_80124494[k];
+		renderInsetBox(r->x, r->y, r->w, r->h, 5);
+	}
+}
