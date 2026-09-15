@@ -9,6 +9,32 @@
 
 #include "common.h"
 
+typedef struct {
+	uint8_t data[8];
+} SelectionBoxUVData;
+
+typedef struct {
+	int8_t data[8];
+} SelectionBoxOffsetData;
+
+extern GsOT *ACTIVE_ORDERING_TABLE;
+void setPosDataPolyFT4(POLY_FT4 *prim, int32_t x, int32_t y, int32_t w, int32_t h);
+extern SelectionBoxUVData MAIN_D_8013460C;
+extern SelectionBoxUVData MAIN_D_80134614;
+extern SelectionBoxUVData MAIN_D_8013461C;
+extern SelectionBoxUVData MAIN_D_80134624;
+extern SelectionBoxOffsetData MAIN_D_8013462C;
+extern SelectionBoxOffsetData MAIN_D_80134634;
+extern SelectionBoxOffsetData MAIN_D_8013463C;
+extern SelectionBoxOffsetData MAIN_D_80134644;
+extern SelectionBoxOffsetData MAIN_D_8013464C;
+extern SelectionBoxOffsetData MAIN_D_80134654;
+extern int16_t MAIN_D_8013078C[];
+extern int16_t MAIN_D_8013078E[];
+extern GsOT *ACTIVE_ORDERING_TABLE;
+int32_t random(int32_t limit);
+void *allocateArray(uint32_t size);
+void freeArray(uint32_t *array);
 uint8_t *padWithSpaces(uint8_t *str, int32_t width, int32_t used);
 void terminateString(uint8_t *str, int32_t flag);
 void drawString2(uint8_t *str, int16_t x, int16_t y, int32_t flag);
@@ -31,7 +57,7 @@ void MAIN_func_800FD534(ItemMenuBox *box, int32_t style);
 void unloadDigimonModel(int32_t digimonType);
 void loadNPCModel(int32_t modelId);
 
-void MAIN_func_80108EB4(ItemMenuBox *box, int32_t b);
+void MAIN_func_80108EB4(ItemMenuBox *box, int8_t flag);
 void MAIN_func_801097F4(void);
 void MAIN_func_801099E8(void);
 void MAIN_func_80107E6C(void);
@@ -73,6 +99,7 @@ extern uint8_t MAIN_D_80134F82;
 extern uint16_t MAIN_D_801307A0[10];
 extern char MAIN_D_801345F4[4];
 extern uint8_t MAIN_D_8012FFD9[];
+extern uint8_t MAIN_D_8012FFDA[];
 extern uint8_t CARD_DATA[];
 extern uint8_t MAIN_D_80130438[];
 extern uint8_t MAIN_D_80130444[];
@@ -82,6 +109,8 @@ extern uint8_t MAIN_D_80134F90;
 extern int32_t MAIN_D_8012FFC4[];
 extern uint16_t MAIN_D_80134608[2];
 extern uint8_t MAIN_D_80134F81;
+void terminateNamingBuffer(void);
+void namingDeleteLast(void);
 extern uint32_t POLLED_INPUT;
 extern int32_t MAIN_D_80130250[];
 extern RECT MAIN_D_801302BC[];
@@ -320,7 +349,7 @@ void scriptLearnMove(int32_t moveId)
 int32_t MAIN_func_80107000(void)
 {
 	uint8_t *buf;
-	int32_t any;
+	uint8_t any;
 	uint8_t i;
 	int32_t id;
 
@@ -382,7 +411,7 @@ void showCardTextbox(void)
 int32_t MAIN_func_80107200(void)
 {
 	uint8_t *buf;
-	int32_t any;
+	uint8_t any;
 	uint8_t id;
 	uint8_t amount;
 
@@ -621,7 +650,44 @@ int32_t MAIN_func_80106D28(void)
 	return 0;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/script_ops", rollCard);
+uint8_t rollCard(void)
+{
+	uint8_t *cards;
+	uint8_t *p;
+	uint8_t count;
+	uint8_t i;
+	uint32_t rarity;
+	int32_t off;
+
+	rarity = (uint8_t)random(100);
+	if (rarity == 0) {
+		rarity = 0;
+	} else if (rarity < 5) {
+		rarity = 1;
+	} else if (rarity < 0x14) {
+		rarity = 2;
+	} else if (rarity < 0x32) {
+		rarity = 3;
+	} else {
+		rarity = 4;
+	}
+
+	cards = (uint8_t *)allocateArray(0x42);
+	p = cards;
+	count = 0;
+	for (i = 0, off = 0; i < 0x42; i++, off += 4) {
+		if (rarity == MAIN_D_8012FFD9[off]) {
+			*p++ = i;
+			count++;
+		}
+	}
+
+	rarity = (uint8_t)random(count);
+	i = cards[rarity];
+	freeArray((uint32_t *)cards);
+
+	return i;
+}
 
 void MAIN_func_80107110(void)
 {
@@ -652,7 +718,62 @@ void MAIN_func_80107110(void)
 	MAIN_D_8013500C = 0;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/script_ops", MAIN_func_801072C4);
+int32_t MAIN_func_801072C4(void)
+{
+	uint8_t hasFreeSlot;
+	uint8_t *out;
+	uint8_t i;
+	uint8_t item;
+	uint8_t size;
+	int32_t any;
+
+	size = INVENTORY.size;
+	out = MAIN_D_80134F6C->buf;
+	any = 0;
+	hasFreeSlot = 0;
+	MAIN_D_80134F6C->itemCount = 0;
+
+	for (i = 0; i < size; i++) {
+		if (INVENTORY.types.array[i] == 0xff) {
+			hasFreeSlot = 1;
+			break;
+		}
+	}
+
+	for (item = 0; item < 0x80; item++) {
+		if (ITEM_PARA[item].meritValue == 0) {
+			continue;
+		}
+
+		MAIN_D_80134F6C->itemCount++;
+		*out++ = item;
+
+		if (ITEM_PARA[item].meritValue > MERIT) {
+			*out++ = 0;
+			continue;
+		}
+
+		if (hasFreeSlot != 0) {
+			*out++ = 1;
+			any = 1;
+			continue;
+		}
+
+		for (i = 0; i < size; i++) {
+			if ((INVENTORY.types.array[i] == item) &&
+			    (INVENTORY.amounts.array[i] != 0x63)) {
+				*out++ = 1;
+			any = 1;
+				goto next;
+			}
+		}
+
+		*out++ = 0;
+next:;
+	}
+
+	return any;
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/script_ops", MAIN_func_80107444);
 
@@ -728,7 +849,65 @@ void MAIN_func_80107784(void)
 	stopBGM();
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/script_ops", MAIN_func_801078F4);
+void MAIN_func_801078F4(void)
+{
+	RECT rect;
+	RECT origin;
+	int32_t i;
+	uint8_t item;
+	ItemMenuBox *menu;
+	int32_t off;
+	int32_t scroll;
+	ItemMenuBox *box;
+	int32_t count;
+	int32_t row;
+
+	setupBoxOrigin(readPStat(0xfe), &origin);
+	rect.x = -0x47;
+	rect.y = -0x62;
+	rect.w = 0xde;
+	rect.h = 0x81;
+	createTextbox(1, 0xf1, &rect, &origin, MAIN_func_801091DC, MAIN_func_801093E4);
+	registerTextbox(1, 9, 6, 1, 0);
+
+	if (MAIN_D_80134F68->isOpen == 0) {
+		MAIN_D_80134F68->isOpen = 1;
+		MAIN_D_80134F68->boxId = 1;
+
+		item = readPStat(0xf9);
+		box = MAIN_D_80134F68;
+		menu = box;
+		count = menu->itemCount;
+
+		for (i = 0, off = 0; i < count; i++, off += 2) {
+			if (item == box->buf[off]) {
+				goto found;
+			}
+		}
+
+		i = 0;
+
+	found:
+		scroll = i - menu->visibleRows;
+
+		if (scroll < 0) {
+			menu->topRow = 0;
+			MAIN_D_80134F68->cursor = i;
+		} else {
+			menu->topRow = scroll + 1;
+			MAIN_D_80134F68->cursor = MAIN_D_80134F68->visibleRows - 1;
+		}
+
+		MAIN_D_80134F68->prevTopRow = MAIN_D_80134F68->topRow;
+		MAIN_D_80134F68->prevCursor = MAIN_D_80134F68->cursor;
+
+		for (i = 0, row = 9; i < MAIN_D_80134F68->visibleRows; i++, row++) {
+			MAIN_D_80134F68->itemRow[i] = row;
+		}
+	}
+
+	MAIN_func_800FCCFC(MAIN_D_80134F68, 9, 2);
+}
 
 void MAIN_func_80107AB8(void)
 {
@@ -907,7 +1086,37 @@ void MAIN_func_80107E6C(void)
 
 INCLUDE_ASM("asm/main/nonmatchings/script_ops", MAIN_func_80108090);
 
-INCLUDE_ASM("asm/main/nonmatchings/script_ops", MAIN_func_80108230);
+int32_t MAIN_func_80108230(void)
+{
+	ItemMenuBox *box;
+	int32_t off;
+	int32_t idx;
+	uint8_t kind;
+
+	box = MAIN_func_800FCC40();
+	off = (box->topRow + box->cursor) * 2;
+	MAIN_D_80134F78 = box->buf[off];
+
+	if (MAIN_D_80134F78 != 0xff) {
+		kind = box->buf[off + 1];
+		if (kind != 0) {
+			idx = MAIN_D_80134F78 * 4;
+			MAIN_D_8013500C = *(int16_t *)&MAIN_D_8012FFDA[idx];
+			kind = MAIN_D_8012FFD9[MAIN_D_80134F78 * 4] + 7;
+			showMapHeadTextbox(kind, readPStat(0xfe), 0, 0x4d4);
+			SELECTION_MENU_STATE = 1;
+			SCRIPT_STATE_4 = 7;
+			SCRIPT_STATE_3 = 1;
+			playSound(0, 3);
+
+			return 1;
+		}
+	}
+
+	playSound(0, 0xb);
+
+	return 0;
+}
 
 void MAIN_func_80108334(void)
 {
@@ -1028,15 +1237,282 @@ void MAIN_func_801086D4(void)
 	MAIN_func_80108EB4(MAIN_D_80134F6C, 1);
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/script_ops", MAIN_func_801086E0);
+int32_t MAIN_func_801086E0(void)
+{
+	ItemMenuBox *box;
+	int32_t off;
+	uint8_t *buf;
+	uint8_t *b2;
+	int32_t item;
+	uint8_t *p;
 
-INCLUDE_ASM("asm/main/nonmatchings/script_ops", MAIN_func_80108890);
+	if (MAIN_D_80134F90 == 0) {
+		box = MAIN_D_80134F68;
+		off = (box->topRow + box->cursor) * 2;
+		buf = box->buf;
+		item = buf[off];
+		b2 = box->buf;
 
-INCLUDE_ASM("asm/main/nonmatchings/script_ops", MAIN_func_80108A98);
+		if (item == 0xff) {
+			return 0;
+		}
+
+		if ((b2[off + 1] & 0x80) == 0) {
+			return 0;
+		}
+
+		if ((uint32_t)getItemCount(item) >= 0x63) {
+			return 0;
+		}
+
+		p = (uint8_t *)((uint32_t)item + (uint32_t)SCRIPT_STATE_PTR);
+		p[0x54] -= 1;
+		giveItem(item, 1);
+		MAIN_func_80107444();
+		MAIN_func_80108C88(item);
+		MAIN_func_80108DC0(item);
+
+		return 1;
+	}
+
+	box = MAIN_D_80134F6C;
+	off = (box->topRow + box->cursor) * 2;
+	buf = box->buf;
+	item = buf[off];
+	b2 = box->buf;
+
+	if (item == 0xff) {
+		return 0;
+	}
+
+	if ((b2[off + 1] & 0x80) == 0) {
+		return 0;
+	}
+
+	if (getItemCount(item) == 0) {
+		return 0;
+	}
+
+	removeItem(item, 1);
+	p = (uint8_t *)((uint32_t)item + (uint32_t)SCRIPT_STATE_PTR);
+	p[0x54] += 1;
+	MAIN_func_80107444();
+	MAIN_func_80108DC0(item);
+	MAIN_func_80108C88(item);
+
+	return 1;
+}
+
+int32_t MAIN_func_80108890(void)
+{
+	ItemMenuBox *box;
+	uint8_t *buf;
+	uint8_t *b2;
+	int32_t off;
+	int32_t item;
+	int32_t item2;
+	uint8_t flags;
+	uint8_t *p;
+
+	if (MAIN_D_80134F90 == 0) {
+		box = MAIN_D_80134F68;
+		off = (box->topRow + box->cursor) * 2;
+		buf = box->buf;
+		item = buf[off];
+		b2 = box->buf;
+
+		if (item == 0xff) {
+			return 0;
+		}
+
+		flags = b2[off + 1];
+
+		if ((flags & 0x80) == 0) {
+			return 0;
+		}
+
+		flags &= 0x7f;
+
+		if (flags < 0xa) {
+			return 0;
+		}
+
+		if (((uint32_t)getItemCount(item) & 0xff) >= 0x5a) {
+			return 0;
+		}
+
+		p = (uint8_t *)((uint32_t)item + (uint32_t)SCRIPT_STATE_PTR);
+		p[0x54] -= 0xa;
+		giveItem(item, 0xa);
+		MAIN_func_80107444();
+		MAIN_func_80108C88(item);
+		MAIN_func_80108DC0(item);
+
+		return 1;
+	}
+
+	box = MAIN_D_80134F6C;
+	off = (box->topRow + box->cursor) * 2;
+	buf = box->buf;
+	item = buf[off];
+	b2 = box->buf;
+
+	if (item == 0xff) {
+		return 0;
+	}
+
+	flags = b2[off + 1];
+
+	if ((flags & 0x80) == 0) {
+		return 0;
+	}
+
+	flags &= 0x7f;
+
+	if (flags < 0xa) {
+		return 0;
+	}
+
+	if (((uint8_t *)((uint32_t)item + (uint32_t)SCRIPT_STATE_PTR))[0x54] >= 0x5a) {
+		return 0;
+	}
+
+	item2 = item;
+	item = item2;
+	removeItem(item, 0xa);
+	p = (uint8_t *)((uint32_t)item2 + (uint32_t)SCRIPT_STATE_PTR);
+	p[0x54] += 0xa;
+	MAIN_func_80107444();
+	MAIN_func_80108DC0(item);
+	MAIN_func_80108C88(item);
+
+	return 1;
+}
+
+int32_t MAIN_func_80108A98(void)
+{
+	ItemMenuBox *box;
+	uint8_t *p;
+	int32_t off;
+	uint8_t *buf;
+	uint8_t *b2;
+	int32_t item;
+	int32_t item2;
+	uint8_t amount;
+	uint8_t cap;
+
+	if (MAIN_D_80134F90 == 0) {
+		box = MAIN_D_80134F68;
+		off = (box->topRow + box->cursor) * 2;
+		buf = box->buf;
+		item = buf[off];
+		b2 = box->buf;
+
+		if (item == 0xff) {
+			return 0;
+		}
+
+		amount = b2[off + 1];
+
+		if ((amount & 0x80) == 0) {
+			return 0;
+		}
+
+		amount &= 0x7f;
+		cap = 0x63 - getItemCount(item);
+
+		if (cap < amount) {
+			amount = cap;
+		}
+
+		p = (uint8_t *)((uint32_t)item + (uint32_t)SCRIPT_STATE_PTR);
+		p[0x54] = (uint32_t)p[0x54] - amount;
+		giveItem(item, amount);
+		MAIN_func_80107444();
+		MAIN_func_80108C88(item);
+		MAIN_func_80108DC0(item);
+
+		return 1;
+	}
+
+	box = MAIN_D_80134F6C;
+	off = (box->topRow + box->cursor) * 2;
+	buf = box->buf;
+	item = buf[off];
+	b2 = box->buf;
+
+	if (item == 0xff) {
+		return 0;
+	}
+
+	amount = b2[off + 1];
+
+	if ((amount & 0x80) == 0) {
+		return 0;
+	}
+
+	amount &= 0x7f;
+	cap = 0x63 - ((uint8_t *)((uint32_t)item + (uint32_t)SCRIPT_STATE_PTR))[0x54];
+	item2 = item;
+	item = item2;
+
+	if (cap < amount) {
+		amount = cap;
+	}
+
+	removeItem(item, amount);
+	p = (uint8_t *)((uint32_t)item2 + (uint32_t)SCRIPT_STATE_PTR);
+	p[0x54] = (uint32_t)p[0x54] + amount;
+	MAIN_func_80107444();
+	MAIN_func_80108DC0(item);
+	MAIN_func_80108C88(item);
+
+	return 1;
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/script_ops", MAIN_func_80108C88);
 
-INCLUDE_ASM("asm/main/nonmatchings/script_ops", MAIN_func_80108DC0);
+void MAIN_func_80108DC0(int32_t item)
+{
+	int32_t i;
+	ItemMenuBox *box;
+	ItemMenuBox *menu;
+	int32_t limit;
+	int32_t top;
+	int32_t scroll;
+
+	MAIN_D_80134F6C->prevTopRow = MAIN_D_80134F6C->topRow;
+	MAIN_D_80134F6C->prevCursor = MAIN_D_80134F6C->cursor;
+
+	box = MAIN_D_80134F6C;
+	menu = box;
+	limit = menu->itemCount * 2;
+	for (i = 0; i < limit; i += 2) {
+		if (item == box->buf[i]) {
+			i = i >> 1;
+			if (i >= menu->topRow) {
+				top = menu->topRow;
+				if (i < (top + menu->visibleRows)) {
+					menu->cursor = i - top;
+					goto done;
+				}
+			}
+
+			scroll = i - menu->visibleRows;
+			if (scroll < 0) {
+				menu->topRow = 0;
+				MAIN_D_80134F6C->cursor = i;
+			} else {
+				menu->topRow = scroll + 1;
+				MAIN_D_80134F6C->cursor = MAIN_D_80134F6C->visibleRows - 1;
+			}
+			goto done;
+		}
+	}
+
+done:
+	MAIN_func_80108610(1);
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/script_ops", MAIN_func_80108EB4);
 
@@ -1541,7 +2017,90 @@ void namingSelectionDown(int16_t column, int16_t row)
 	playSound(0, 2);
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/script_ops", renderSelectionBox);
+void renderSelectionBox(void)
+{
+	SelectionBoxUVData u0;
+	SelectionBoxUVData u1;
+	SelectionBoxUVData v0;
+	SelectionBoxUVData v1;
+	SelectionBoxOffsetData xOffset;
+	SelectionBoxOffsetData yOffset;
+	SelectionBoxOffsetData width;
+	SelectionBoxOffsetData height;
+	SelectionBoxOffsetData altXOffset;
+	SelectionBoxOffsetData altWidth;
+	POLY_FT4 *prim;
+	GsOT_TAG *tag;
+	uint16_t tpage;
+	uint16_t clut;
+	int16_t baseX;
+	int16_t baseY;
+	int32_t idx;
+	int32_t sel;
+	int16_t bx;
+	int16_t by;
+	int32_t i;
+
+	tpage = GetTPage(0, 0, 896, 448);
+	clut = GetClut(256, 508);
+	u0 = MAIN_D_8013460C;
+	u1 = MAIN_D_80134614;
+	v0 = MAIN_D_8013461C;
+	v1 = MAIN_D_80134624;
+	xOffset = MAIN_D_8013462C;
+	yOffset = MAIN_D_80134634;
+	width = MAIN_D_8013463C;
+	height = MAIN_D_80134644;
+	altXOffset = MAIN_D_8013464C;
+	altWidth = MAIN_D_80134654;
+
+	bx = UI_BOX_DATA[1].finalPos.x;
+	by = UI_BOX_DATA[1].finalPos.y;
+
+	if ((MAIN_D_80134F8C & 0x8000) == 0) {
+		sel = MAIN_D_80134F8C;
+		baseY = sel / 5;
+		baseX = sel % 5;
+
+		if (baseY < 9) {
+			baseX = (bx + (baseX * 18)) + 0x4a;
+			baseY = (by + (baseY * 14)) + 2;
+		} else {
+			baseX = (bx + (baseX * 18)) + 0xba;
+			baseY = (by + ((baseY - 9) * 14)) + 2;
+		}
+	} else {
+		sel = MAIN_D_80134F8C;
+		idx = ((sel & 0x7fff) * 3) + 3;
+		baseX = (bx + MAIN_D_8013078C[idx]) - 4;
+		baseY = (by + MAIN_D_8013078E[idx]) - 4;
+	}
+
+	tag = &ACTIVE_ORDERING_TABLE->org[5];
+
+	for (i = 0; i < 8; i++) {
+		prim = (POLY_FT4 *)GsGetWorkBase();
+		SetPolyFT4(prim);
+		setUV4(prim, u0.data[i], v0.data[i], u1.data[i], v0.data[i], u0.data[i], v1.data[i], u1.data[i], v1.data[i]);
+
+		if ((MAIN_D_80134F8C & 0x8000) == 0) {
+			setPosDataPolyFT4(prim, baseX + xOffset.data[i],
+					  baseY + yOffset.data[i], width.data[i],
+					  height.data[i]);
+		} else {
+			setPosDataPolyFT4(prim, baseX + altXOffset.data[i],
+					  baseY + yOffset.data[i], altWidth.data[i],
+					  height.data[i]);
+		}
+
+		setRGB0(prim, 0x80, 0x80, 0x80);
+		prim->tpage = tpage;
+		prim->clut = clut;
+		AddPrim(tag, prim);
+		prim++;
+		GsSetWorkBase((PACKET *)prim);
+	}
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/script_ops", renderNameDisplayBox);
 
