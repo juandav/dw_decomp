@@ -128,6 +128,10 @@ typedef struct {
 	} glyph[11];
 } KarDigits;
 
+typedef struct {
+	int8_t value[4];
+} KarTallyValues;
+
 void renderSelectionCursor(int32_t a, int32_t b, int32_t c, int32_t d, int32_t e);
 void renderString(int32_t a, int32_t b, int32_t c, int32_t d, int32_t e, int32_t f, int32_t g, int32_t h, int32_t i);
 void renderUIBox(int32_t id);
@@ -239,6 +243,19 @@ extern int16_t MAIN_D_80135254;
 
 extern int32_t MAIN_D_8013524C;
 extern uint16_t MAIN_D_80135238;
+extern KarTallyValues MAIN_D_80134A44;
+extern int8_t MAIN_D_8013522D;
+extern int8_t MAIN_D_8013522E;
+extern int32_t MAIN_D_80135230;
+extern int32_t MAIN_D_80135234;
+extern int8_t MAP_TILE_X;
+extern int8_t MAP_TILE_Y;
+extern int8_t MAP_WIDTH[];
+extern int16_t CAMERA_Y[];
+extern uint8_t MAP_TILE_DATA[];
+
+int32_t tickMoveCameraTo(int16_t x, int16_t z, int32_t speed);
+void uploadMapTileImages();
 
 static void *kar_functions[] = {
 	KAR_renderSprite,
@@ -1643,7 +1660,154 @@ void KAR_classifyStoneRings(void)
 	KAR_registerThrownStone();
 }
 
-INCLUDE_ASM("asm/kar/nonmatchings/kar", KAR_tickScoreTally);
+int32_t KAR_tickScoreTally(void)
+{
+	KarTallyValues values;
+	int32_t i;
+	int32_t j;
+	int32_t done;
+	int8_t rawRing;
+	int8_t player;
+	int8_t ring;
+
+	values = MAIN_D_80134A44;
+	if ((POLLED_INPUT & 0x40) != 0 && (POLLED_INPUT_PREVIOUS & 0x40) == 0) {
+		MAIN_D_8013522D = 1;
+	}
+
+	if (MAIN_D_8013522D == 1 && (MAIN_D_8013522E == 2 || MAIN_D_8013522E == 1)) {
+		KarStone *stone;
+
+		MAIN_D_80135256 = KAR_D_8005B5A0[0].thrown + KAR_D_8005B5A0[1].thrown;
+		MAIN_D_80135256--;
+		KAR_D_8005B5A0[0].score = 0;
+		KAR_D_8005B5A0[1].score = 0;
+		while (MAIN_D_80135256 >= 0) {
+			stone = KAR_D_800639C0[MAIN_D_80135256];
+			rawRing = stone->ring;
+			player = (rawRing & 0x10) ? 1 : 0;
+			ring = rawRing & 0xF;
+			if (stone->state > 0 && ring != 0) {
+				KAR_D_8005B5A0[player].score += values.value[ring - 1];
+			}
+			MAIN_D_80135256--;
+		}
+
+		for (i = 0; i < 3; i++) {
+			KarStone *rowStone;
+
+			rowStone = KAR_D_8005B5A0[i].stones;
+			for (j = 0; j < 5; j++, rowStone++) {
+				if (rowStone->state >= 100) {
+					rowStone->state -= 100;
+				}
+			}
+		}
+		MAIN_D_80135230 = 0;
+		MAIN_D_80135234 = 0;
+		MAIN_D_8013522E = 0;
+		MAIN_D_8013522D = 0;
+		return 1;
+	}
+
+	if (MAIN_D_80134A4F[0] != MAIN_D_80135256) {
+		KarStone *stone;
+
+		while (MAIN_D_80135256 >= 0) {
+			stone = KAR_D_800639C0[MAIN_D_80135256];
+			if ((int8_t)(stone->ring & 0xF) != 0) {
+				MAIN_D_80134A4F[0] = MAIN_D_80135256;
+				MAIN_D_8013522E = 0;
+				break;
+			}
+			MAIN_D_80135256--;
+		}
+		if (MAIN_D_80135256 < 0) {
+			MAIN_D_8013522D = 0;
+			return 1;
+		}
+	}
+
+	if (MAIN_D_8013522E == 0) {
+		KarStone *stone;
+		KarStone **stones;
+		int32_t cameraZ;
+		int32_t changed;
+
+		stones = KAR_D_800639C0;
+		stone = stones[MAIN_D_80135256];
+		changed = stone->ring != stone->prevRing;
+		if (changed != 0) {
+			cameraZ = stone->pos.vz;
+			done = tickMoveCameraTo(stone->pos.vx, cameraZ, 5);
+			if ((CAMERA_Y[0] % 0x80) == 0 || (CAMERA_Y[0] % 0x80) >= 0x6A) {
+				i = MAP_WIDTH[0];
+				j = i;
+				i = MAP_TILE_Y;
+				uploadMapTileImages(MAP_TILE_DATA, MAP_TILE_X + i * j);
+			}
+			if (done == 1) {
+				MAIN_D_8013522E = 1;
+			} else {
+				return 0;
+			}
+		} else {
+			MAIN_D_8013522E = 1;
+		}
+	}
+
+	if (MAIN_D_8013522E == 1) {
+		KarStone *stone;
+		int8_t ringIndex;
+
+		stone = KAR_D_800639C0[MAIN_D_80135256];
+		rawRing = stone->ring;
+		player = (rawRing & 0x10) ? 1 : 0;
+		ring = rawRing & 0xF;
+		ringIndex = ring;
+		KAR_D_8005B5A0[player].score += values.value[ringIndex - 1];
+		MAIN_D_8013522E = 2;
+		if (stone->ring != stone->prevRing && (stone->ring & 0xF) != 0) {
+			if (ringIndex == 3) {
+				playSound2(8, 6);
+			} else {
+				playSound2(8, 5);
+			}
+		}
+	}
+
+	if (MAIN_D_8013522E == 2 && MAIN_D_80135256 >= 0) {
+		KarStone *stone;
+		int32_t changed;
+
+		stone = KAR_D_800639C0[MAIN_D_80135256];
+		changed = stone->ring != stone->prevRing;
+		if (changed != 0 && (stone->ring & 0xF) != 0) {
+			if (MAIN_D_80135234++ >= 0xB) {
+				if (stone->state < 100) {
+					stone->state += 100;
+				} else {
+					stone->state -= 100;
+				}
+				MAIN_D_80135234 -= 10;
+				if (MAIN_D_80135230++ >= 7) {
+					MAIN_D_8013522E = 4;
+					MAIN_D_80135230 = 0;
+					MAIN_D_80135256--;
+				}
+			}
+		} else {
+			MAIN_D_80135256--;
+		}
+
+		if (MAIN_D_80135256 < 0) {
+			return 1;
+		}
+		return 0;
+	}
+
+	return 0;
+}
 
 INCLUDE_ASM("asm/kar/nonmatchings/kar", KAR_chooseOpponentShot);
 
