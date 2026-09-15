@@ -3531,7 +3531,129 @@ void BTL_calculatePolarOffset(void)
 	out[0] = (r * _cos(0x80 - ang)) >> 12;
 }
 
-INCLUDE_ASM("asm/btl/nonmatchings/battle_effect", BTL_renderProjectedSprite);
+static int32_t BTL_renderProjectedSprite__garbage__(int32_t i)
+{
+	int16_t v0;
+	int16_t v1;
+	int16_t v2;
+	int16_t v3;
+	int16_t v4;
+	int16_t v5;
+	int16_t v6;
+	int16_t v7;
+	int16_t v8;
+	int16_t v9;
+	int16_t v10;
+	int16_t v11;
+	int16_t v12;
+	int16_t v13;
+	int16_t v14;
+	int16_t v15;
+	int16_t v16;
+	int16_t v17;
+	int16_t v18;
+	int16_t v19;
+	int16_t v20;
+	int16_t v21;
+	int16_t v22;
+	int16_t v23;
+	int16_t v24;
+	int16_t v25;
+	int16_t v26;
+	int16_t v27;
+	int16_t v28;
+	int16_t v29;
+	int16_t v30;
+	int16_t v31;
+	int16_t v32;
+	int16_t v33;
+	int16_t v34;
+
+	v0 = i + 0;
+	v1 = i + 1;
+	v2 = i + 2;
+	v3 = i + 3;
+	v4 = i + 4;
+	v5 = i + 5;
+	v6 = i + 6;
+	v7 = i + 7;
+	v8 = i + 8;
+	v9 = i + 9;
+	v10 = i + 10;
+	v11 = i + 11;
+	v12 = i + 12;
+	v13 = i + 13;
+	v14 = i + 14;
+	v15 = i + 15;
+	v16 = i + 16;
+	v17 = i + 17;
+	v18 = i + 18;
+	v19 = i + 19;
+	v20 = i + 20;
+	v21 = i + 21;
+	v22 = i + 22;
+	v23 = i + 23;
+	v24 = i + 24;
+	v25 = i + 25;
+	v26 = i + 26;
+	v27 = i + 27;
+	v28 = i + 28;
+	v29 = i + 29;
+	v30 = i + 30;
+	v31 = i + 31;
+	v32 = i + 32;
+	v33 = i + 33;
+	v34 = i + 34;
+	return v0 + v1 + v2 + v3 + v4 + v5 + v6 + v7 + v8 + v9 + v10 + v11 + v12 + v13 + v14 + v15 + v16 + v17 + v18 + v19 + v20 + v21 + v22 + v23 + v24 + v25 + v26 + v27 + v28 + v29 + v30 + v31 + v32 + v33 + v34;
+}
+
+void BTL_renderProjectedSprite(void)
+{
+	ModelComponent *m;
+	VECTOR *col;
+	int32_t zA;
+	int32_t zB;
+
+	m = (ModelComponent *)MAIN_D_80134D0C[6];
+	EFE_SPRITE_SCRATCH->sprite.tpage = m->pixelPage | 0x20;
+	EFE_SPRITE_SCRATCH->sprite.cx = (m->clutPage & 0x3f) << 4;
+	EFE_SPRITE_SCRATCH->sprite.cy = m->clutPage >> 6;
+	EFE_SPRITE_SCRATCH->sprite.u = m->pixelOffsetX;
+	EFE_SPRITE_SCRATCH->sprite.v = m->pixelOffsetY;
+	EFE_SPRITE_SCRATCH->sprite.cy += (int16_t)EFE_POP1(int32_t);
+	EFE_SPRITE_SCRATCH->sprite.attribute = EFE_POP1(int32_t) << 28;
+	EFE_SPRITE_SCRATCH->sprite.rotate = EFE_POP1(int32_t) << 12;
+	EFE_SPRITE_SCRATCH->sprite.my = EFE_POP1(int32_t);
+	EFE_SPRITE_SCRATCH->sprite.mx = EFE_POP1(int32_t);
+	EFE_SPRITE_SCRATCH->sprite.h = EFE_POP1(int32_t);
+	EFE_SPRITE_SCRATCH->sprite.w = EFE_POP1(int32_t);
+	EFE_SPRITE_SCRATCH->sprite.v += EFE_POP1(int32_t);
+	EFE_SPRITE_SCRATCH->sprite.u += EFE_POP1(int32_t);
+	EFE_SPRITE_SCRATCH->sprite.scaley = EFE_POP1(int32_t);
+	EFE_SPRITE_SCRATCH->sprite.scalex = EFE_POP1(int32_t);
+	col = EFE_POP1(VECTOR *);
+	EFE_SPRITE_SCRATCH->sprite.r = col->vx;
+	EFE_SPRITE_SCRATCH->sprite.g = col->vy;
+	EFE_SPRITE_SCRATCH->sprite.b = col->vz;
+	EFE_SPRITE_SCRATCH->position = EFE_POP1(VECTOR *);
+	SetRotMatrix(&GsWSMATRIX);
+	SetTransMatrix(&GsWSMATRIX);
+	EFE_SPRITE_SCRATCH->point.vx = EFE_SPRITE_SCRATCH->position->vx;
+	EFE_SPRITE_SCRATCH->point.vy = EFE_SPRITE_SCRATCH->position->vy;
+	EFE_SPRITE_SCRATCH->point.vz = EFE_SPRITE_SCRATCH->position->vz;
+	EFE_SPRITE_SCRATCH->otz = RotTransPers(&EFE_SPRITE_SCRATCH->point, &EFE_SPRITE_SCRATCH->sxy, &EFE_SPRITE_SCRATCH->p, &EFE_SPRITE_SCRATCH->flag);
+	if ((EFE_SPRITE_SCRATCH->flag & 0x80000000) == 0) {
+		*(int32_t *)&EFE_SPRITE_SCRATCH->sprite.x = EFE_SPRITE_SCRATCH->sxy;
+		EFE_SPRITE_SCRATCH->sprite.scalex = ((uint32_t)(EFE_SPRITE_SCRATCH->sprite.scalex * VIEWPORT_DISTANCE) << 5) / (uint32_t)EFE_SPRITE_SCRATCH->otz;
+		EFE_SPRITE_SCRATCH->sprite.scaley = ((uint32_t)(EFE_SPRITE_SCRATCH->sprite.scaley * VIEWPORT_DISTANCE) << 5) / (uint32_t)EFE_SPRITE_SCRATCH->otz;
+		EFE_SPRITE_SCRATCH->otz = (EFE_SPRITE_SCRATCH->otz - 0xa) >> 2;
+		zA = EFE_SPRITE_SCRATCH->otz;
+		zB = zB = zA;
+		if (zA >= 0x20 && zB < 0x1000) {
+			GsSortSprite(&EFE_SPRITE_SCRATCH->sprite, ACTIVE_ORDERING_TABLE, (uint16_t)zA);
+		}
+	}
+}
 
 void BTL_getTargetDigimonSize(void)
 {
