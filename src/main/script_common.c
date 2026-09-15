@@ -61,6 +61,8 @@ void unlearnMove(int32_t moveId);
 void loadMap(uint16_t mapId);
 
 void renderMonochromonMoodBubble(int32_t instanceId);
+void translateConditionFXToEntity(Entity *entity, SVECTOR *out);
+int32_t worldPosToScreenPos(SVECTOR *worldPos, DVECTOR *screenPos);
 void closeTextbox(int32_t boxId, RECT *target);
 void MAIN_func_800FF0FC(ItemMenuBox *box, int32_t style);
 void MAIN_func_800FBC58(void);
@@ -125,6 +127,9 @@ void MAIN_func_800FDC5C(ItemMenuBox *box, int16_t x1, int16_t y1, int16_t x2,
 			int16_t y2, int32_t flag);
 void MAIN_func_800FE150(int32_t boxId, int16_t x, int16_t y, int32_t w,
 			int16_t h);
+void renderTrianglePrimitive(int32_t color, int32_t x0, int32_t y0, int32_t x1,
+			     int32_t y1, int32_t x2, int32_t y2, int32_t otz,
+			     int32_t flag);
 void MAIN_func_800FE258(int32_t spriteId, int16_t x, int16_t y,
 			int32_t depth);
 void MAIN_func_800FE704(ItemMenuBox *box, uint8_t row, int32_t isLast);
@@ -139,15 +144,17 @@ int32_t MAIN_func_800FFC1C(void);
 int32_t MAIN_func_800FFF24(void);
 int32_t drawString2(uint8_t *str, int16_t x, int16_t y, int32_t flag);
 int32_t getSpeakerName(int32_t speakerId, uint8_t *buf);
-uint8_t *intToStringSJIS(uint8_t *buf, int32_t value, int32_t digits,
+uint8_t *intToStringSJIS(uint8_t *buf, int32_t value, uint8_t digits,
 			 int32_t flag);
 void renderHorizontalLine(int32_t boxId, int16_t x, int16_t y, int32_t w);
+void renderLinePrimitive(uint32_t color, int32_t x0, int32_t y0, int32_t x1,
+			 int32_t y1, int32_t order, uint32_t mode);
 void renderSellItemBox(void);
 void renderUIBox(int32_t boxId);
 void renderVerticalLine(int32_t boxId, int16_t x, int16_t y, int32_t h);
 void tickSellItemBox(void);
 int32_t getSpeakerName(int32_t speakerId, uint8_t *buf);
-uint8_t *intToStringSJIS(uint8_t *buf, int32_t value, int32_t digits,
+uint8_t *intToStringSJIS(uint8_t *buf, int32_t value, uint8_t digits,
 			 int32_t flag);
 
 extern ScriptCameraMovement MAIN_D_801BE6B4[];
@@ -157,6 +164,10 @@ extern uint32_t MAIN_D_8013501C;
 extern int32_t MAIN_D_80135028;
 extern uint32_t MAIN_D_80134F64;
 extern uint8_t *MAIN_D_801345B0;
+extern GsSPRITE MAIN_D_8012FDC0;
+extern int16_t MAIN_D_801345C0[1];
+extern uint8_t MAIN_D_801345C2[2];
+extern char *MAIN_D_8013035C[];
 extern int16_t MAIN_D_80134F60;
 extern uint8_t MAIN_D_8012FDCE[];
 extern int32_t MAIN_D_80135024;
@@ -344,7 +355,7 @@ int32_t shopFillBuyItemList() {
   MAIN_D_80134F68->itemCount = 0;
 
   for (slotId = 0; slotId < inventorySize; slotId++) {
-    if (INVENTORY.types.array[slotId] == 0xFF) {
+    if (INVENTORY.types.array[slotId] == 0xff) {
       hasSpace = 1;
       break;
     }
@@ -789,7 +800,37 @@ uint8_t *resolveMapHeadEntry(int32_t section, int32_t idx)
 	return script + *(uint16_t *)offsetPtr + 2;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/script_common", renderMonochromonMoodBubble);
+void renderMonochromonMoodBubble(int32_t instanceId)
+{
+	SVECTOR pos;
+	DVECTOR screen;
+	uint8_t entityId;
+	int32_t depth;
+	int16_t offset;
+	int16_t scale;
+
+	entityId = readPStat(0xf7);
+	readPStat(0xf8);
+	entityId = scriptIdToEntityId(entityId);
+	if (entityId == 0xff) {
+		return;
+	}
+
+	translateConditionFXToEntity(ENTITY_TABLE[entityId], &pos);
+	depth = worldPosToScreenPos(&pos, &screen);
+
+	offset = 0x10 - (MAIN_D_80134F60 >> 1);
+	scale = offset << 8;
+	MAIN_D_8012FDC0.x = screen.vx;
+	MAIN_D_8012FDC0.y = screen.vy - offset;
+	MAIN_D_8012FDC0.scalex = scale;
+	MAIN_D_8012FDC0.scaley = scale;
+	GsSortSprite(&MAIN_D_8012FDC0, ACTIVE_ORDERING_TABLE, depth >> 4);
+
+	if (MAIN_D_80134F60 != 0) {
+		MAIN_D_80134F60--;
+	}
+}
 
 void initialKeyInputs(void)
 {
@@ -1067,7 +1108,55 @@ void tickSellItemBox(void)
 	MAIN_func_800FB700();
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/script_common", MAIN_func_800FEEF0);
+void MAIN_func_800FEEF0(ItemMenuBox *box, uint8_t row, int32_t isLast)
+{
+	uint8_t *out;
+	int32_t idx;
+	int32_t row0;
+	int32_t item;
+	int32_t len;
+
+	out = MAIN_func_800FF444((uint8_t *)box, row);
+	*out++ = 1;
+	*out++ = 7;
+
+	row0 = row;
+	row0 = row0;
+	idx = MAIN_D_80135011 + ((MAIN_D_80134F68->topRow + 5) + row);
+
+	if (isTriggerSet(idx) != 0) {
+		*out++ = 0x81;
+		*out++ = 0x7c;
+	} else {
+		*out++ = 0x81;
+		*out++ = 0x40;
+	}
+
+	idx = (box->topRow + row0) * 2;
+	item = MAIN_D_80134F68->buf[idx];
+	*out++ = 1;
+
+	if ((item & 0x80) != 0) {
+		*out++ = 1;
+	} else {
+		*out++ = 3;
+	}
+
+	item = (uint8_t)(item & 0x7f);
+	strcpy((char *)out, ITEM_PARA[item].name);
+	len = strlen(ITEM_PARA[item].name);
+	out += len;
+	out = padWithSpaces(out, 8, len);
+	*out++ = 0xf;
+	*out++ = 0;
+	*out++ = 1;
+	*out++ = 1;
+
+	item = MAIN_D_80134F6C->buf[idx];
+	strcpy((char *)out, ITEM_PARA[item].name);
+	out += strlen(ITEM_PARA[item].name);
+	terminateString(out, isLast);
+}
 
 void MAIN_func_800FC508(void)
 {
@@ -1656,7 +1745,7 @@ void MAIN_func_800FD7D8(int32_t boxId, int32_t idx, int16_t x, int16_t y)
 	e = &uvs.v[idx * 4];
 	SetPolyFT4(&poly);
 	poly.tpage = 5;
-	poly.clut = GetClut(0x60, 0x1ec);
+	poly.clut = GetClut(96, 492);
 	poly.r0 = 0x80;
 	poly.g0 = 0x80;
 	poly.b0 = 0x80;
@@ -1678,11 +1767,81 @@ void MAIN_func_800FDF84(void)
 	MAIN_D_80135018 = (*(int32_t *)(box + 0x18) ^ 1) * *(int32_t *)(box + 0x24);
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/script_common", MAIN_func_800FDFB4);
+void MAIN_func_800FDFB4(void)
+{
+	uint16_t mapId;
+	int32_t i;
+
+	mapId = CURRENT_MAP_ID;
+
+	for (i = 0; i <= 0; i++) {
+		if (mapId == MAIN_D_801345C0[i]) {
+			i = i * 2;
+			playSound(MAIN_D_801345C2[i], MAIN_D_801345C2[i + 1]);
+
+			return;
+		}
+	}
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/script_common", renderHorizontalLine);
 
-INCLUDE_ASM("asm/main/nonmatchings/script_common", MAIN_func_800FE150);
+static int32_t MAIN_func_800FE150__garbage__(int32_t seed)
+{
+	int32_t t0 = 1;
+	int32_t t1 = 2;
+	int32_t t2 = 3;
+	int32_t t3 = 4;
+	int32_t t4 = 5;
+	int32_t t5 = 6;
+	int32_t t6 = 7;
+	int32_t t7 = 8;
+	int32_t t8 = 9;
+	int32_t t9 = 10;
+	int32_t t10 = 11;
+	int32_t t11 = 12;
+	int32_t t12 = 13;
+	int32_t t13 = 14;
+	int32_t t14 = 15;
+	int32_t t15 = 16;
+	int32_t t16 = 17;
+	int32_t t17 = 18;
+	int32_t t18 = 19;
+	int32_t t19 = 20;
+	int32_t t20 = 21;
+	int32_t t21 = 22;
+	int32_t t22 = 23;
+	int32_t t23 = 24;
+	int32_t t24 = 25;
+	int32_t t25 = 26;
+	int32_t t26 = 27;
+	int32_t t27 = 28;
+	int32_t t28 = 29;
+	int32_t t29 = 30;
+	int32_t t30 = 31;
+	int32_t t31 = 32;
+	int32_t t32 = 33;
+	int32_t t33 = 34;
+	int32_t t34 = 35;
+	int32_t t35 = 36;
+	int32_t t36 = 37;
+	int32_t t37 = 38;
+	int32_t t38 = 39;
+	int32_t t39 = 40;
+
+	return seed + t0 + t1 + t2 + t3 + t4 + t5 + t6 + t7 + t8 + t9 + t10 + t11 + t12 + t13 + t14 + t15 + t16 + t17 + t18 + t19 + t20 + t21 + t22 + t23 + t24 + t25 + t26 + t27 + t28 + t29 + t30 + t31 + t32 + t33 + t34 + t35 + t36 + t37 + t38 + t39;
+}
+
+void MAIN_func_800FE150(int32_t boxId, int16_t x, int16_t y, int32_t w, int16_t h)
+{
+	uint8_t order;
+
+	x = x + UI_BOX_DATA[boxId].finalPos.x;
+	y = y + UI_BOX_DATA[boxId].finalPos.y;
+	order = 6 - boxId;
+	renderTrianglePrimitive(0xa08769, x + 1, (y + h) - 1, (x + w) - 1, (y + h) - 1, (x + w) - 1, y, order, 0);
+	renderTrianglePrimitive(0x20202, (x + w) - 1, y, x, y, x, (y + h) - 1, order, 0);
+}
 
 void MAIN_func_800FE258(int32_t spriteId, int16_t x, int16_t y, int32_t depth)
 {
@@ -1691,12 +1850,12 @@ void MAIN_func_800FE258(int32_t spriteId, int16_t x, int16_t y, int32_t depth)
 	prim = (POLY_FT4 *)GsGetWorkBase();
 	SetPolyFT4(prim);
 	prim->tpage = 5;
-	prim->clut = GetClut(0x60, 0x1ED);
+	setClut(prim, 96, 493);
 	prim->r0 = 0x80;
 	prim->g0 = 0x80;
 	prim->b0 = 0x80;
-	setUVDataPolyFT4(prim, spriteId * 12 + 0x200, 0x1C0, 0xC, 0xC);
-	setPosDataPolyFT4(prim, x, y, 0xC, 0xC);
+	setUVDataPolyFT4(prim, spriteId * 12 + 0x200, 0x1c0, 0xc, 0xc);
+	setPosDataPolyFT4(prim, x, y, 0xc, 0xc);
 	AddPrim(ACTIVE_ORDERING_TABLE->org + depth, prim++);
 	GsSetWorkBase((PACKET *)prim);
 }
@@ -2145,7 +2304,22 @@ uint8_t *padWithSpaces(uint8_t *str, int32_t width, int32_t used)
 	return str;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/script_common", renderVerticalLine);
+void renderVerticalLine(int32_t boxId, int16_t x, int16_t y, int32_t h)
+{
+	int32_t xc;
+	uint8_t order;
+
+	x = x + UI_BOX_DATA[boxId].finalPos.x;
+	y = y + UI_BOX_DATA[boxId].finalPos.y;
+	order = 6 - boxId;
+	xc = x;
+
+	renderLinePrimitive(0x20202, xc, y, xc, (y + h) - 1, order, 0);
+	x++;
+	renderLinePrimitive(0xa08769, x, y, x, (y + h) - 1, order, 0);
+	x++;
+	renderLinePrimitive(0x20202, x, y, x, (y + h) - 1, order, 0);
+}
 
 void setDialogueOwner(int32_t owner)
 {
@@ -2497,7 +2671,26 @@ void MAIN_func_800FFFF0(void)
 	}
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/script_common", MAIN_func_801000E4);
+void MAIN_func_801000E4(void)
+{
+	TextBoxData *box;
+	int16_t rowPx;
+	int16_t pagePx;
+	int16_t x;
+	int16_t y;
+	int32_t i;
+
+	box = MAIN_D_801BE80C.box;
+	rowPx = box->vramRow * 12;
+	pagePx = box->vramRows * 12;
+	rowPx = rowPx + (int16_t)(box->backPage * pagePx);
+	x = UI_BOX_DATA[0].finalPos.x + 5;
+	y = UI_BOX_DATA[0].finalPos.y + 4;
+
+	for (i = 0; i < box->vramRows; i++, rowPx += 0xc, y += 0xd) {
+		renderString(0, x, y, 0xfc, 0xc, 0, rowPx, 6, 1);
+	}
+}
 
 void MAIN_func_8010020C(void)
 {
@@ -2995,8 +3188,8 @@ void renderUIBox(int32_t boxId)
 	u = TEXTBOX_OPEN_TIMER / 4 % 3 * 16 + 0x4c;
 	SetPolyFT4(&poly);
 	SetSemiTrans(&poly, 1);
-	poly.tpage = GetTPage(0, 1, 0x140, 0x80);
-	poly.clut = GetClut(0x60, 0x1f4);
+	poly.tpage = GetTPage(0, 1, 320, 128);
+	poly.clut = GetClut(96, 500);
 	poly.r0 = 0x80;
 	poly.g0 = 0x80;
 	poly.b0 = 0x80;
@@ -3313,7 +3506,39 @@ int32_t MAIN_func_80101EF8(int32_t boxId, int32_t speakerId)
 	return showTextbox(boxId, speakerId);
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/script_common", getSpeakerName);
+int32_t getSpeakerName(int32_t speakerId, uint8_t *buf)
+{
+	if (speakerId == 0xff) {
+		return 0;
+	}
+
+	if (speakerId == 0xfd) {
+		speakerId = 0;
+		goto digimon;
+	}
+
+	if (speakerId == 0xfc) {
+		strcpy((char *)buf, PARTNER_ENTITY.name);
+
+		return strlen(PARTNER_ENTITY.name);
+	}
+
+	if ((uint32_t)speakerId < 0xc8) {
+		speakerId = scriptIdToEntityId(speakerId) & 0xff;
+		speakerId = ENTITY_TABLE[speakerId]->type & 0xff;
+		goto digimon;
+	}
+
+	speakerId = (speakerId - 0xc8) & 0xff;
+	strcpy((char *)buf, MAIN_D_8013035C[speakerId]);
+
+	return strlen(MAIN_D_8013035C[speakerId]);
+
+digimon:
+	strcpy((char *)buf, DIGIMON_DATA[speakerId].name);
+
+	return strlen(DIGIMON_DATA[speakerId].name);
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/script_common", intToStringSJIS);
 
