@@ -2480,7 +2480,52 @@ void checkArenaMap(int32_t mapId)
 	}
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/script_common", MAIN_func_800FFA4C);
+int32_t MAIN_func_800FFA4C(int32_t boxId, int32_t flag)
+{
+	TextBoxData *box;
+	uint32_t x;
+	int32_t clut;
+	int16_t px;
+	int16_t row;
+	uint8_t *buf;
+	int32_t done;
+
+	box = &MAIN_D_801BE80C.box[boxId];
+	if (box->writeCount == box->renderCount) {
+		return 0;
+	}
+
+	getVRAMModeCoords(box->vramMode, (int32_t *)&x, &clut);
+	px = x;
+	row = box->vramRow + box->writeRow;
+	buf = TEXT_BUFFERS_PTR + (row << 6);
+	if (x != 0) {
+		buf += 0x20;
+	}
+	row = row * 12;
+	if (box->vramMode == 0) {
+		x = 1;
+	} else {
+		x = 2;
+	}
+
+	while (x != 0) {
+		done = drawString2(buf, px, row, flag);
+		box->writeRow++;
+		if (done != 0) {
+			box->writeCount = 1;
+			box->renderCount = 1;
+			box->flipCount = 0;
+			box->registered = 1;
+			break;
+		}
+		row += 12;
+		buf += 0x40;
+		x--;
+	}
+
+	return 1;
+}
 
 void MAIN_func_800FFBB8(int32_t boxId)
 {
