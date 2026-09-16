@@ -154,17 +154,12 @@ extern int16_t MAIN_D_8013525E;
 extern uint8_t MAIN_D_80135261;
 extern uint8_t MAIN_D_80135262;
 extern int32_t MAIN_D_80135268;
-extern int32_t MAIN_D_801B1B98[];
-extern int32_t MAIN_D_801B1BB8[];
+extern GsVIEW2 MAIN_D_801B1B98;
 extern int32_t MAIN_D_801B1BBC[];
 extern char **MAIN_D_80135298;
 extern int8_t MAIN_D_8013529C;
-extern int16_t MAIN_D_801B1C0C[];
-extern int16_t MAIN_D_801B1C0E[];
-extern int16_t MAIN_D_801B1C10[];
-extern int32_t MAIN_D_801B1C14[];
-extern int32_t MAIN_D_801B1C18[];
-extern int32_t MAIN_D_801B1C1C[];
+extern SVECTOR MAIN_D_801B1C0C[];
+extern VECTOR MAIN_D_801B1C14;
 extern GsRVIEW2 GS_VIEWPOINT;
 extern int16_t VS_D_80071A0C[];
 extern uint8_t MAIN_D_80135288;
@@ -179,8 +174,16 @@ extern int16_t VS_D_80071A10[];
 extern int16_t VS_D_80071A12[];
 extern Entity *VS_D_80071A18[];
 extern int16_t VS_D_80071A30[];
+extern int32_t VS_D_80071A34[];
+extern int32_t VS_D_80071A38[];
+extern int32_t VS_D_80071A3C[];
+extern int32_t VS_D_80071A40[];
 extern int16_t VS_D_80071A88[];
 extern int16_t VS_D_80071AE0[];
+extern int32_t VS_D_80071AE4[];
+extern int32_t VS_D_80071AE8[];
+extern int32_t VS_D_80071AEC[];
+extern int32_t VS_D_80071AF0[];
 extern int16_t MAIN_D_80134D66;
 extern int32_t MAIN_D_8013528C;
 extern SVECTOR MAIN_D_80134AA4;
@@ -237,34 +240,20 @@ extern void *MAIN_D_801352A0;
 extern int8_t MAP_COLLISION_DATA[];
 extern int16_t MAIN_D_80135294;
 extern int32_t MAIN_D_80135284;
-extern int32_t MAIN_D_801B1BC0[];
-extern int32_t MAIN_D_801B1BC0[];
-extern int32_t VS_D_80071754[];
-extern int32_t VS_D_80071758[];
-extern int32_t VS_D_8007175C[];
-extern int32_t VS_D_80071760[];
+extern MATRIX MAIN_D_801B1BC0;
+extern VECTOR VS_D_80071754;
 extern SVECTOR MAIN_D_80134A64;
 extern SVECTOR MAIN_D_80134A6C;
 extern int32_t MAIN_D_80135268;
 extern char **MAIN_D_80135298;
 extern int16_t MAIN_D_801352A4;
-extern int32_t VS_D_80071754[];
-extern int32_t VS_D_80071758[];
-extern int32_t VS_D_8007175C[];
+extern VECTOR VS_D_80071754;
 extern int8_t MAIN_D_801352A7;
 extern SVECTOR MAIN_D_80134A74;
 extern SVECTOR MAIN_D_80134A7C;
 extern int16_t VS_D_80071A14[];
 extern int16_t VS_D_80071A16[];
 extern Entity *VS_D_80071A1C[];
-extern int32_t VS_D_80071A34[];
-extern int32_t VS_D_80071A38[];
-extern int32_t VS_D_80071A3C[];
-extern int32_t VS_D_80071A40[];
-extern int32_t VS_D_80071AE4[];
-extern int32_t VS_D_80071AE8[];
-extern int32_t VS_D_80071AEC[];
-extern int32_t VS_D_80071AF0[];
 extern SVECTOR MAIN_D_80134A94;
 extern SVECTOR MAIN_D_80134A9C;
 
@@ -1152,11 +1141,11 @@ void VS_removeArenaRenderers(void)
 
 void VS_applyCamera(void)
 {
-	MAIN_D_801B1BB8[0] = 0;
-	RotMatrix((SVECTOR *)MAIN_D_801B1C0C, (MATRIX *)MAIN_D_801B1B98);
-	TransMatrix((MATRIX *)MAIN_D_801B1B98, (VECTOR *)MAIN_D_801B1C14);
+	MAIN_D_801B1B98.super = NULL;
+	RotMatrix(MAIN_D_801B1C0C, &MAIN_D_801B1B98.view);
+	TransMatrix(&MAIN_D_801B1B98.view, &MAIN_D_801B1C14);
 	MAIN_D_801B1BBC[0] = 0;
-	GsSetView2((GsVIEW2 *)MAIN_D_801B1B98);
+	GsSetView2(&MAIN_D_801B1B98);
 }
 
 void VS_setCameraOrbit(void)
@@ -1194,18 +1183,18 @@ void VS_setCameraOrbit(void)
 		d = 0x1068;
 	}
 	ang = 0x1000 - _atan(dx, dz);
-	MAIN_D_801B1C14[0] = b->vx + dx / 2 + (d * dz) / dist;
-	MAIN_D_801B1C18[0] = -0x3e8;
-	MAIN_D_801B1C1C[0] = b->vz + dz / 2 - (d * dx) / dist;
-	MAIN_D_801B1C0C[0] = _atan(d, -0x2bc) + 0x800;
-	MAIN_D_801B1C0E[0] = ang + 0x800;
-	MAIN_D_801B1C10[0] = 0;
-	*(MATRIX *)MAIN_D_801B1B98 = GsIDMATRIX;
-	MAIN_D_801B1BB8[0] = (int32_t)MAIN_D_801B1BBC;
-	RotMatrixYXZ((SVECTOR *)MAIN_D_801B1C0C, m = m = (MATRIX *)MAIN_D_801B1BC0);
-	TransMatrix(m, (VECTOR *)MAIN_D_801B1C14);
+	MAIN_D_801B1C14.vx = b->vx + dx / 2 + (d * dz) / dist;
+	MAIN_D_801B1C14.vy = -0x3e8;
+	MAIN_D_801B1C14.vz = b->vz + dz / 2 - (d * dx) / dist;
+	MAIN_D_801B1C0C[0].vx = _atan(d, -0x2bc) + 0x800;
+	MAIN_D_801B1C0C[0].vy = ang + 0x800;
+	MAIN_D_801B1C0C[0].vz = 0;
+	MAIN_D_801B1B98.view = GsIDMATRIX;
+	MAIN_D_801B1B98.super = (GsCOORDINATE2 *)MAIN_D_801B1BBC;
+	RotMatrixYXZ(MAIN_D_801B1C0C, m = m = &MAIN_D_801B1BC0);
+	TransMatrix(m, &MAIN_D_801B1C14);
 	MAIN_D_801B1BBC[0] = 0;
-	GsSetView2((GsVIEW2 *)MAIN_D_801B1B98);
+	GsSetView2(&MAIN_D_801B1B98);
 }
 
 void VS_setCameraYXZ(void)
@@ -1216,18 +1205,18 @@ void VS_setCameraYXZ(void)
 
 	a = &ENTITY_TABLE[1]->posData->location;
 	b = &ENTITY_TABLE[2]->posData->location;
-	*(MATRIX *)MAIN_D_801B1B98 = GsIDMATRIX;
-	MAIN_D_801B1BB8[0] = (int32_t)MAIN_D_801B1BBC;
-	MAIN_D_801B1C14[0] = a->vx + (b->vx - a->vx) / 2;
-	MAIN_D_801B1C1C[0] = a->vz + (b->vz - a->vz) / 2;
-	MAIN_D_801B1C18[0] = -0x1f40;
-	MAIN_D_801B1C10[0] = 0;
-	MAIN_D_801B1C0E[0] = 0;
-	MAIN_D_801B1C0C[0] = -0x400;
-	RotMatrixYXZ((SVECTOR *)MAIN_D_801B1C0C, m = m = (MATRIX *)MAIN_D_801B1BC0);
-	TransMatrix(m, (VECTOR *)MAIN_D_801B1C14);
+	MAIN_D_801B1B98.view = GsIDMATRIX;
+	MAIN_D_801B1B98.super = (GsCOORDINATE2 *)MAIN_D_801B1BBC;
+	MAIN_D_801B1C14.vx = a->vx + (b->vx - a->vx) / 2;
+	MAIN_D_801B1C14.vz = a->vz + (b->vz - a->vz) / 2;
+	MAIN_D_801B1C14.vy = -0x1f40;
+	MAIN_D_801B1C0C[0].vz = 0;
+	MAIN_D_801B1C0C[0].vy = 0;
+	MAIN_D_801B1C0C[0].vx = -0x400;
+	RotMatrixYXZ(MAIN_D_801B1C0C, m = m = &MAIN_D_801B1BC0);
+	TransMatrix(m, &MAIN_D_801B1C14);
 	MAIN_D_801B1BBC[0] = 0;
-	GsSetView2((GsVIEW2 *)MAIN_D_801B1B98);
+	GsSetView2(&MAIN_D_801B1B98);
 }
 
 void VS_setViewpointRotationFromEntity(void)
@@ -1264,16 +1253,16 @@ void VS_setCameraLookAtEntity(void)
 	do {
 	} while (0);
 	dz = otherPos->vz - selfPos->vz;
-	MAIN_D_801B1C0E[0] = (-_atan(dz, dx) + 0x800) & 0xfff;
-	RotMatrix((SVECTOR *)MAIN_D_801B1C0C, (MATRIX *)MAIN_D_801B1B98);
-	v = *(VECTOR *)MAIN_D_801B1C14;
-	ApplyMatrixLV((MATRIX *)MAIN_D_801B1B98,
+	MAIN_D_801B1C0C[0].vy = (-_atan(dz, dx) + 0x800) & 0xfff;
+	RotMatrix(MAIN_D_801B1C0C, &MAIN_D_801B1B98.view);
+	v = MAIN_D_801B1C14;
+	ApplyMatrixLV(&MAIN_D_801B1B98.view,
 	              &((Entity *)MAIN_D_80135298)->posData->location, &out);
 	v.vx -= out.vx;
 	v.vy -= out.vy;
 	v.vz -= out.vz;
-	TransMatrix((MATRIX *)MAIN_D_801B1B98, &v);
-	GsSetView2((GsVIEW2 *)MAIN_D_801B1B98);
+	TransMatrix(&MAIN_D_801B1B98.view, &v);
+	GsSetView2(&MAIN_D_801B1B98);
 }
 
 void VS_applyViewpoint(void)
@@ -1284,23 +1273,23 @@ void VS_applyViewpoint(void)
 
 void VS_setCameraSimple(void)
 {
-	MAIN_D_801B1C0E[0] += 2;
-	MAIN_D_801B1C0E[0] &= 0xFFF;
-	MAIN_D_801B1BB8[0] = 0;
-	RotMatrix((SVECTOR *)MAIN_D_801B1C0C, (MATRIX *)MAIN_D_801B1B98);
-	TransMatrix((MATRIX *)MAIN_D_801B1B98, (VECTOR *)MAIN_D_801B1C14);
+	MAIN_D_801B1C0C[0].vy += 2;
+	MAIN_D_801B1C0C[0].vy &= 0xFFF;
+	MAIN_D_801B1B98.super = NULL;
+	RotMatrix(MAIN_D_801B1C0C, &MAIN_D_801B1B98.view);
+	TransMatrix(&MAIN_D_801B1B98.view, &MAIN_D_801B1C14);
 	MAIN_D_801B1BBC[0] = 0;
-	GsSetView2((GsVIEW2 *)MAIN_D_801B1B98);
+	GsSetView2(&MAIN_D_801B1B98);
 }
 
 void VS_setCameraParams(int16_t a, int16_t b, int16_t c, int16_t d, int16_t e, int16_t f)
 {
-	MAIN_D_801B1C0C[0] = a;
-	MAIN_D_801B1C0E[0] = b;
-	MAIN_D_801B1C10[0] = c;
-	MAIN_D_801B1C14[0] = d;
-	MAIN_D_801B1C18[0] = e;
-	MAIN_D_801B1C1C[0] = f;
+	MAIN_D_801B1C0C[0].vx = a;
+	MAIN_D_801B1C0C[0].vy = b;
+	MAIN_D_801B1C0C[0].vz = c;
+	MAIN_D_801B1C14.vx = d;
+	MAIN_D_801B1C14.vy = e;
+	MAIN_D_801B1C14.vz = f;
 }
 
 void VS_setVSPhase(int32_t arg)
@@ -1399,7 +1388,7 @@ void VS_selectRandomCamera(DigimonEntity *entity, int32_t mode, int32_t sub)
 			return;
 		}
 	}
-	MAIN_D_801B1BB8[0] = 0;
+	MAIN_D_801B1B98.super = NULL;
 	MAIN_D_80135298 = (char **)entity;
 	if (sub != 3) {
 		p = &VS_D_8007063C[mode];
@@ -1458,17 +1447,17 @@ void VS_initializeCamera(void)
 {
 	VIEWPORT_DISTANCE = 500;
 	GsSetProjection(500);
-	MAIN_D_801B1C0C[0] = 100;
-	MAIN_D_801B1C0C[1] = 0;
-	MAIN_D_801B1C0C[2] = 0;
-	MAIN_D_801B1C14[0] = 0;
-	MAIN_D_801B1C14[1] = 500;
-	MAIN_D_801B1C14[2] = 3000;
-	MAIN_D_801B1BB8[0] = 0;
-	RotMatrix((SVECTOR *)MAIN_D_801B1C0C, (MATRIX *)MAIN_D_801B1B98);
-	TransMatrix((MATRIX *)MAIN_D_801B1B98, (VECTOR *)MAIN_D_801B1C14);
+	MAIN_D_801B1C0C[0].vx = 100;
+	MAIN_D_801B1C0C[0].vy = 0;
+	MAIN_D_801B1C0C[0].vz = 0;
+	MAIN_D_801B1C14.vx = 0;
+	MAIN_D_801B1C14.vy = 500;
+	MAIN_D_801B1C14.vz = 3000;
+	MAIN_D_801B1B98.super = NULL;
+	RotMatrix(MAIN_D_801B1C0C, &MAIN_D_801B1B98.view);
+	TransMatrix(&MAIN_D_801B1B98.view, &MAIN_D_801B1C14);
 	MAIN_D_801B1BBC[0] = 0;
-	GsSetView2((GsVIEW2 *)MAIN_D_801B1B98);
+	GsSetView2(&MAIN_D_801B1B98);
 }
 
 void VS_setViewpointFromBone(Entity *entity, SVECTOR *offset, SVECTOR *rot, int32_t dist)
@@ -1506,19 +1495,19 @@ void VS_setCameraToEntity(void)
 	VECTOR v;
 	VECTOR out;
 
-	rot = *(SVECTOR *)MAIN_D_801B1C0C;
+	rot = MAIN_D_801B1C0C[0];
 	rot.vy -= ((Entity *)MAIN_D_80135298)->posData->rotation.vy;
 	rot.vy &= 0xfff;
-	RotMatrix(&rot, (MATRIX *)MAIN_D_801B1B98);
-	v = *(VECTOR *)MAIN_D_801B1C14;
-	ApplyMatrixLV((MATRIX *)MAIN_D_801B1B98,
+	RotMatrix(&rot, &MAIN_D_801B1B98.view);
+	v = MAIN_D_801B1C14;
+	ApplyMatrixLV(&MAIN_D_801B1B98.view,
 	              &((Entity *)MAIN_D_80135298)->posData->location, &out);
 	v.vx -= out.vx;
 	v.vy -= out.vy;
 	v.vz -= out.vz;
-	TransMatrix((MATRIX *)MAIN_D_801B1B98, &v);
+	TransMatrix(&MAIN_D_801B1B98.view, &v);
 	MAIN_D_801B1BBC[0] = 0;
-	GsSetView2((GsVIEW2 *)MAIN_D_801B1B98);
+	GsSetView2(&MAIN_D_801B1B98);
 }
 
 int32_t VS_getFighterDistance(VECTOR *self, VECTOR *other, VECTOR *target)
@@ -1624,9 +1613,9 @@ void VS_tickCameraChase(void)
 		startAnimation((Entity *)MAIN_D_80135298, 0x23);
 	}
 	if (cc->phase == 0) {
-		dist = VS_getFighterDistance((VECTOR *)VS_D_80071754, &VS_D_80071744, &((Entity *)MAIN_D_80135298)->posData->location);
+		dist = VS_getFighterDistance(&VS_D_80071754, &VS_D_80071744, &((Entity *)MAIN_D_80135298)->posData->location);
 		if (dist >= 0x23) {
-			*(VECTOR *)VS_D_80071754 = ((Entity *)MAIN_D_80135298)->posData->location;
+			VS_D_80071754 = ((Entity *)MAIN_D_80135298)->posData->location;
 			cc->phase = 1;
 			MAIN_D_80135268 = 8;
 		} else {
@@ -1648,7 +1637,7 @@ void VS_tickCameraChase(void)
 			goto inc;
 		}
 	}
-	dist = VS_getFighterDistance((VECTOR *)VS_D_80071754, &VS_D_80071744, &((Entity *)MAIN_D_80135298)->posData->location);
+	dist = VS_getFighterDistance(&VS_D_80071754, &VS_D_80071744, &((Entity *)MAIN_D_80135298)->posData->location);
 	VS_updateCameraLerp(dist, cc->side);
 	if (VS_isPositionNearEntity((Entity *)MAIN_D_80135298, &VS_D_80071744) == 1) {
 		for (i = 0; i < 3; i++) {
@@ -1672,12 +1661,12 @@ void VS_startCameraChase(Entity *entity, int32_t dx, int32_t side)
 	int32_t dist;
 
 	MAIN_D_80135298 = (char **)entity;
-	VS_D_80071754[0] = entity->posData->location.vx;
-	VS_D_80071758[0] = entity->posData->location.vy;
-	VS_D_8007175C[0] = entity->posData->location.vz;
-	VS_D_80071744.vx = VS_D_80071754[0] - dx;
-	VS_D_80071744.vy = VS_D_80071758[0];
-	VS_D_80071744.vz = VS_D_8007175C[0];
+	VS_D_80071754.vx = entity->posData->location.vx;
+	VS_D_80071754.vy = entity->posData->location.vy;
+	VS_D_80071754.vz = entity->posData->location.vz;
+	VS_D_80071744.vx = VS_D_80071754.vx - dx;
+	VS_D_80071744.vy = VS_D_80071754.vy;
+	VS_D_80071744.vz = VS_D_80071754.vz;
 	startAnimation(entity, 0x21);
 	MAIN_D_80135268 = 9;
 	((CameraChase *)&MAIN_D_801352A4)->timer = 0;

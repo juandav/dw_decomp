@@ -81,7 +81,6 @@ extern int32_t FISH_D_8007A4F8[];
 extern int32_t FISH_D_8007A540[];
 extern int32_t FISH_D_8007A554[];
 extern SVECTOR MAIN_D_801349D0;
-extern int16_t MAIN_D_801349D4;
 extern char MAIN_D_801349D8[8];
 extern int16_t MAIN_D_80154F80[];
 extern int32_t FISH_REEL_TARGET_X[];
@@ -3600,7 +3599,7 @@ release:
 	FISHING_DATA_PTR->swimmer.dist = 0;
 	FISHING_DATA_PTR->swimmer.gravity = 3;
 	n = (rod->swimmerType == 1) ? 0xc8 : 0x190;
-	MAIN_D_801349D4 = FISH_remapClamped(rod->throwPower, 0, 0x14, 0x64, n);
+	MAIN_D_801349D0.vz = FISH_remapClamped(rod->throwPower, 0, 0x14, 0x64, n);
 	rot.vx = 0;
 	rot.vy = TAMER_ENTITY.entity.posData->rotation.vy + 0x800;
 	rot.vz = -0xc8;

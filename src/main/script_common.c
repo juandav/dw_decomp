@@ -169,7 +169,6 @@ extern int16_t MAIN_D_801345C0[1];
 extern uint8_t MAIN_D_801345C2[2];
 extern char *MAIN_D_8013035C[];
 extern int16_t MAIN_D_80134F60;
-extern uint8_t MAIN_D_8012FDCE[];
 extern int32_t MAIN_D_80135024;
 extern int32_t MAIN_D_80135020;
 extern uint16_t MAIN_D_80135016;
@@ -2439,7 +2438,7 @@ void createMonochromonMoodBubble(void)
 	if ((uint32_t)b < 5) {
 		if (scriptIdToEntityId(a) != 0xff) {
 			MAIN_D_80134F60 = 0x1e;
-			MAIN_D_8012FDCE[0] = b * 32;
+			MAIN_D_8012FDC0.u = b * 32;
 			addObject(0x1b1, 0, 0, renderMonochromonMoodBubble);
 		}
 	} else {
