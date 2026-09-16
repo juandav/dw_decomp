@@ -74,7 +74,7 @@ int32_t loadCardImage(int32_t id);
 void renderCardImage(void);
 void renderCardCount(void);
 void renderDigimonStatsView(void);
-void renderMenuTab(int16_t x, int32_t w, int8_t layer);
+void renderMenuTab(int16_t x, int16_t w, int8_t layer);
 void renderPlayerInfoView(void);
 
 static void *overworld_menu_views_functions[] = {
@@ -311,7 +311,21 @@ void renderDigimonMovesView(void)
 	}
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/overworld_menu_views", renderMenuTab);
+void renderMenuTab(int16_t x, int16_t w, int8_t layer)
+{
+	int32_t i;
+	int8_t h;
+
+	h = 0x10;
+	if (layer == 1) {
+		h--;
+	}
+	renderRectPolyFT4(x, -0x68, 7, h, 0xd4, 0x8c, 5, GetClut(0x60, 0x1ec), 5, layer);
+	for (i = 0; i < (w - 0xe) / 4; i++) {
+		renderRectPolyFT4(x + 7 + i * 4, -0x68, 4, h, 0xe2, 0x8c, 5, GetClut(0x60, 0x1ec), 5, layer);
+	}
+	renderRectPolyFT4(x + w - 9, -0x68, 7, h, 0xdb, 0x8c, 5, GetClut(0x60, 0x1ec), 5, layer);
+}
 
 void renderPlayerInfoView(void)
 {

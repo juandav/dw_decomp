@@ -404,7 +404,8 @@ extern SVECTOR MAIN_D_801347D0;
 extern SVECTOR MAIN_D_801347D8;
 extern SVECTOR MAIN_D_801347E0;
 extern SVECTOR MAIN_D_801347E8;
-extern uint8_t BTL_D_8007372C[][4];
+extern uint8_t BTL_D_8007372C[];
+extern uint8_t MAIN_D_801347A4[8];
 extern SVECTOR MAIN_D_801347B4;
 extern VECTOR BTL_D_800737FC;
 extern GsSPRITE BTL_POISON_BUBBLE_SPRITE;
@@ -1859,8 +1860,6 @@ wrap:
 	}
 	GsSetWorkBase((PACKET *)p);
 }
-
-INCLUDE_ASM("asm/btl/nonmatchings/battle_effect", BTL_renderRibbonStrip);
 
 void BTL_tickRibbonPoints(void)
 {
@@ -4759,6 +4758,110 @@ int32_t BTL_interpolateClamped(int32_t lo, int32_t hi, int32_t t, int32_t start,
 	}
 
 	return start + ((end - start) * (t - lo) / (hi - lo));
+}
+
+void BTL_renderRibbonStrip(void)
+{
+	POLY_GT4 *prim;
+	SVECTOR *pts;
+	int32_t i;
+	int32_t f;
+	int32_t g;
+	uint32_t nxt;
+
+	EFE_RIBBON_SCRATCH->width = EFE_POP1(int32_t);
+	EFE_SCRATCH->scale = EFE_POP1(VECTOR *);
+	pts = EFE_POP1(SVECTOR *);
+
+	for (i = 0; i < 8U; i += 2) {
+		MAIN_D_801347A4[i] += ((ModelComponent *)MAIN_D_80134D0C[6])->pixelOffsetX;
+		MAIN_D_801347A4[i + 1] += ((ModelComponent *)MAIN_D_80134D0C[6])->pixelOffsetY;
+	}
+
+	EFE_RIBBON_SCRATCH->tpage = ((ModelComponent *)MAIN_D_80134D0C[6])->pixelPage | 0x20;
+	EFE_RIBBON_SCRATCH->clut = ((ModelComponent *)MAIN_D_80134D0C[6])->clutPage + 0x80;
+	EFE_RIBBON_SCRATCH->frame = EFE_INSTANCE->frame;
+	g = f = i = EFE_RIBBON_SCRATCH->frame;
+	i = (int32_t)((uint32_t)(g / 10) % 3);
+	nxt = (uint32_t)(i + 1) % 3;
+	EFE_RIBBON_SCRATCH->color.r = BTL_interpolateClamped(0, 10, f % 10,
+	                                                    (BTL_D_8007372C + i * 4)[0], (BTL_D_8007372C + nxt * 4)[0]);
+	EFE_RIBBON_SCRATCH->color.g = BTL_interpolateClamped(0, 10, EFE_RIBBON_SCRATCH->frame % 10,
+	                                                    (BTL_D_8007372C + i * 4)[1], (BTL_D_8007372C + nxt * 4)[1]);
+	EFE_RIBBON_SCRATCH->color.b = BTL_interpolateClamped(0, 10, EFE_RIBBON_SCRATCH->frame % 10,
+	                                                    (BTL_D_8007372C + i * 4)[2], (BTL_D_8007372C + nxt * 4)[2]);
+	if (EFE_RIBBON_SCRATCH->frame < 0xf) {
+		i = BTL_interpolateClamped(1, 7, *(uint32_t *)&EFE_RIBBON_SCRATCH->frame, 0, 0x1000);
+	} else {
+		i = BTL_interpolateClamped(0x17, 0x1e, *(uint32_t *)&EFE_RIBBON_SCRATCH->frame, 0x1000, 0);
+	}
+	EFE_RIBBON_SCRATCH->color.r = EFE_RIBBON_SCRATCH->color.r * i >> 12;
+	EFE_RIBBON_SCRATCH->color.g = EFE_RIBBON_SCRATCH->color.g * i >> 12;
+	EFE_RIBBON_SCRATCH->color.b = EFE_RIBBON_SCRATCH->color.b * i >> 12;
+	EFE_RIBBON_SCRATCH->colorHalf.r = EFE_RIBBON_SCRATCH->color.r >> 1;
+	EFE_RIBBON_SCRATCH->colorHalf.g = EFE_RIBBON_SCRATCH->color.g >> 1;
+	EFE_RIBBON_SCRATCH->colorHalf.b = EFE_RIBBON_SCRATCH->color.b >> 1;
+
+	copyVector(&EFE_SCRATCH->rot, (VECTOR *)((int32_t)EFE_INSTANCE + 0x10));
+	RotMatrixYXZ(&EFE_SCRATCH->rot, &EFE_SCRATCH->m1);
+	ScaleMatrix(&EFE_SCRATCH->m1, EFE_SCRATCH->scale);
+	EFE_SCRATCH->m1.t[0] = ((EfeTransform *)((int32_t)EFE_INSTANCE + 4))->position.vx;
+	EFE_SCRATCH->m1.t[1] = ((EfeTransform *)((int32_t)EFE_INSTANCE + 4))->position.vy;
+	EFE_SCRATCH->m1.t[2] = ((EfeTransform *)((int32_t)EFE_INSTANCE + 4))->position.vz;
+	GsMulCoord0(&GsWSMATRIX, &EFE_SCRATCH->m1, &EFE_SCRATCH->m0);
+	GsSetLightMatrix(&EFE_SCRATCH->m1);
+	GsSetLsMatrix(&EFE_SCRATCH->m0);
+
+	for (i = 0; i < 10; i++) {
+		EFE_RIBBON_SCRATCH->edge[i][0].vx = pts[i].vx;
+		EFE_RIBBON_SCRATCH->edge[i][0].vy = pts[i].vy - 0x1f4;
+		EFE_RIBBON_SCRATCH->edge[i][0].vz = pts[i].vz;
+		EFE_RIBBON_SCRATCH->edge[i][1].vx = pts[i].vx;
+		EFE_RIBBON_SCRATCH->edge[i][1].vy = pts[i].vy + 0xc8;
+		EFE_RIBBON_SCRATCH->edge[i][1].vz = pts[i].vz;
+	}
+
+	for (i = 1; i < 10; i++) {
+		prim = (POLY_GT4 *)GsGetWorkBase();
+		EFE_RIBBON_SCRATCH->proj.otz = RotTransPers4(
+			&EFE_RIBBON_SCRATCH->edge[i - 1][0], &EFE_RIBBON_SCRATCH->edge[i][0],
+			&EFE_RIBBON_SCRATCH->edge[i - 1][1], &EFE_RIBBON_SCRATCH->edge[i][1],
+			(long *)&prim->x0, (long *)&prim->x1, (long *)&prim->x2,
+			(long *)&prim->x3, &EFE_RIBBON_SCRATCH->proj.p, &EFE_RIBBON_SCRATCH->proj.flag);
+		if ((EFE_RIBBON_SCRATCH->proj.flag & 0x80000000) == 0) {
+			prim->tpage = EFE_RIBBON_SCRATCH->tpage;
+			prim->clut = EFE_RIBBON_SCRATCH->clut;
+			if (i == 1) {
+				*(int32_t *)&prim->r0 = 0;
+				*(int32_t *)&prim->r2 = 0;
+			} else {
+				*(int32_t *)&prim->r0 = *(int32_t *)&EFE_RIBBON_SCRATCH->colorHalf;
+				*(int32_t *)&prim->r2 = *(int32_t *)&EFE_RIBBON_SCRATCH->color;
+			}
+			if (i == 9) {
+				*(int32_t *)&prim->r1 = 0;
+				*(int32_t *)&prim->r3 = 0;
+			} else {
+				*(int32_t *)&prim->r1 = *(int32_t *)&EFE_RIBBON_SCRATCH->colorHalf;
+				*(int32_t *)&prim->r3 = *(int32_t *)&EFE_RIBBON_SCRATCH->color;
+			}
+			*(int16_t *)&prim->u0 = *(int16_t *)MAIN_D_801347A4;
+			*(int16_t *)&prim->u1 = *(int16_t *)&MAIN_D_801347A4[2];
+			*(int16_t *)&prim->u2 = *(int16_t *)&MAIN_D_801347A4[4];
+			*(int16_t *)&prim->u3 = *(int16_t *)&MAIN_D_801347A4[6];
+			((uint8_t *)prim)[3] = 0xc;
+			prim->code = 0x3c;
+			setSemiTrans(prim, 1);
+			setShadeTex(prim, 0);
+			addPrim(ACTIVE_ORDERING_TABLE->org + (EFE_RIBBON_SCRATCH->proj.otz >> 2), prim);
+			GsSetWorkBase((PACKET *)((char *)prim + 0x34));
+		}
+	}
+
+	for (i = 0; i < 8U; i += 2) {
+		MAIN_D_801347A4[i] -= ((ModelComponent *)MAIN_D_80134D0C[6])->pixelOffsetX;
+		MAIN_D_801347A4[i + 1] -= ((ModelComponent *)MAIN_D_80134D0C[6])->pixelOffsetY;
+	}
 }
 
 void BTL_initializeEFESubOpcodeTable(void)

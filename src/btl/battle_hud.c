@@ -107,6 +107,19 @@ extern uint8_t MAIN_D_801350C6;
 extern uint8_t MAIN_D_801350C7;
 extern uint8_t MAIN_D_801350C8;
 extern uint8_t MAIN_D_801350C9;
+typedef struct {
+	int16_t clut;
+	uint8_t u;
+	uint8_t v;
+	uint8_t w;
+	uint8_t h;
+	int16_t x;
+	int16_t y;
+} BtlBarSprite;
+
+void damageTick(FighterData *fighter, Stats *stats);
+extern int16_t BTL_D_80073280[];
+extern BtlBarSprite BTL_D_800732C0[];
 extern uint8_t MAIN_D_801350CA;
 extern uint8_t MAIN_D_801350CB;
 extern int32_t BTL_D_80073290[12];
@@ -1272,7 +1285,100 @@ void BTL_tickPartnerStatusBars(void)
 	}
 }
 
-INCLUDE_ASM("asm/btl/nonmatchings/battle_hud", BTL_renderPartnerStatusBars);
+void BTL_renderPartnerStatusBars(int16_t idx)
+{
+	POLY_FT4 *prim;
+	BtlBarSprite *p;
+	FighterData *fighter;
+	int16_t *hpPtr;
+	int16_t *mpPtr;
+	int32_t maxHp;
+	int32_t maxMp;
+	int32_t bar;
+	int32_t k;
+	int16_t x0;
+	int16_t y0;
+	int16_t fill;
+	int16_t cur;
+	int16_t nx;
+	int16_t ny;
+	int32_t w;
+	int32_t t;
+
+	fighter = &COMBAT_DATA_PTR->fighter[idx];
+	hpPtr = &PARTNER_ENTITY.digimonEntity.stats.current.currentHP;
+	mpPtr = &PARTNER_ENTITY.digimonEntity.stats.current.currentMP;
+	maxHp = PARTNER_ENTITY.digimonEntity.stats.base.hp;
+	maxMp = PARTNER_ENTITY.digimonEntity.stats.base.mp;
+
+	if (*hpPtr == 0) {
+		fighter->hpDamageBuffer = 0;
+	}
+	if (fighter->hpDamageBuffer != 0) {
+		damageTick(fighter, &PARTNER_ENTITY.digimonEntity.stats);
+	}
+	*mpPtr = *mpPtr - fighter->mpDamageBuffer;
+	fighter->mpDamageBuffer = 0;
+	if (*mpPtr < 0) {
+		*mpPtr = 0;
+	}
+
+	for (bar = 0; bar < 2; bar++) {
+		p = &BTL_D_800732C0[bar * 3 + 2];
+		if (bar == 0) {
+			x0 = BTL_D_80073280[MAIN_D_801350CB];
+			y0 = -0x64;
+			cur = PARTNER_ENTITY.digimonEntity.stats.current.currentHP;
+			fill = *hpPtr * 50 / maxHp;
+		} else {
+			x0 = BTL_D_80073280[MAIN_D_801350CA];
+			y0 = -0x58;
+			cur = PARTNER_ENTITY.digimonEntity.stats.current.currentMP;
+			fill = *mpPtr * 50 / maxMp;
+		}
+		nx = x0 + 0x49;
+		ny = y0 - 3;
+		BTL_renderNumber(0, 4, nx, ny, cur, 0xa);
+		prim = (POLY_FT4 *)GsGetWorkBase();
+		for (k = 0; k < 3; k++, p--) {
+			SetPolyFT4(prim);
+			prim->clut = GetClut(0x100, p->clut);
+			prim->tpage = 0x1e;
+			setRGB0(prim, 0x80, 0x80, 0x80);
+			prim->u0 = p->u;
+			prim->v0 = p->v;
+			prim->u1 = p->u + p->w;
+			prim->v1 = p->v;
+			prim->u2 = p->u;
+			prim->v2 = p->v + p->h;
+			prim->u3 = p->u + p->w;
+			prim->v3 = p->v + p->h;
+			prim->x0 = x0 + p->x;
+			prim->y0 = y0 + p->y;
+			if (k == 0) {
+				w = fill;
+			} else {
+				w = p->w;
+			}
+			t = x0 + p->x;
+			prim->x1 = t + w;
+			prim->y1 = y0 + p->y;
+			prim->x2 = x0 + p->x;
+			prim->y2 = p->h + (y0 + p->y);
+			if (k == 0) {
+				w = fill;
+			} else {
+				w = p->w;
+			}
+			t = x0 + p->x;
+			prim->x3 = t + w;
+			prim->y3 = p->h + (y0 + p->y);
+			AddPrim(ACTIVE_ORDERING_TABLE->org + 10, prim++);
+		}
+		GsSetWorkBase((PACKET *)prim);
+	}
+	BTL_renderFinisherGauge(idx);
+}
 
 void BTL_removePartnerStatusBars(void)
 {

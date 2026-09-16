@@ -384,8 +384,6 @@ int32_t EVL_spawnParticle(VECTOR *position, RGB8 *color)
 	return i;
 }
 
-INCLUDE_ASM("asm/evl/nonmatchings/evl", EVL_buildShardSet);
-
 int32_t EVL_spawnSpark(void *owner, int32_t timer, int32_t param)
 {
 	int32_t i;
@@ -585,6 +583,118 @@ void EVL_brightenDigimonClut(int16_t *clut, Entity *entity, int16_t *dst,
 	setRECT(&rect, (model->clutPage & 0x3f) << 4,
 		model->clutPage >> 6, 0x10, 0x18);
 	LoadImage(&rect, (u_long *)dst);
+}
+
+int32_t EVL_buildShardSet(Entity *entity, int32_t objIndex, int32_t bone)
+{
+	SVECTOR tmp;
+	MATRIX m1;
+	MATRIX m2;
+	SVECTOR p0;
+	SVECTOR p1;
+	SVECTOR p2;
+	SVECTOR p3;
+	ModelComponent *model;
+	struct TMD_STRUCT *obj;
+	EvlShardSet *entry;
+	SVECTOR *va;
+	SVECTOR *vb;
+	SVECTOR *vc;
+	SVECTOR *vd;
+	int32_t out;
+	int32_t outStart;
+	SVECTOR *src;
+	int32_t prim;
+	int32_t slot;
+	int32_t i;
+	int32_t j;
+	int16_t cx;
+	int16_t cy;
+	int16_t cz;
+
+	out = MAIN_D_8013520C;
+	model = getEntityModelComponent(entity->type, 3);
+	obj = &((struct TMD_STRUCT *)((uint32_t)model->modelPtr + 12))[objIndex];
+
+	for (slot = 0; slot < 30; slot++) {
+		if (((EvlShardSet *)MAIN_D_80135208)[slot].timer < 0) {
+			break;
+		}
+	}
+	if (slot == 30) {
+		return -1;
+	}
+
+	calculateBoneMatrix(entity, bone, &m1);
+	src = (SVECTOR *)obj->vertop;
+	outStart = out;
+	calculateBoneMatrix(entity, bone, &m2);
+	for (i = 0; (uint32_t)i < obj->vern; i++) {
+		ApplyMatrixSV(&m2, src++, &tmp);
+		((EvlModelVertex *)out)->vx = tmp.vx + m2.t[0];
+		((EvlModelVertex *)out)->vy = tmp.vy + m2.t[1];
+		((EvlModelVertex *)out)->vz = tmp.vz + m2.t[2];
+		out += sizeof(EvlModelVertex);
+	}
+
+	entry = &((EvlShardSet *)MAIN_D_80135208)[slot];
+	entry->timer = 0;
+	entry->primCount = obj->primn;
+	entry->centers = out;
+	entry->model = (int32_t *)entity;
+	entry->bone = bone;
+	entry->vertices = outStart;
+	entry->primitives = (int32_t)obj->primtop;
+	entry->centerCount = obj->primn;
+	addObject(0x604, slot, EVL_tickShardSet, EVL_renderShardSet);
+
+	prim = (int32_t)obj->primtop;
+	for (j = 0; (uint32_t)j < obj->primn; j++) {
+		switch (((int8_t *)prim)[3]) {
+		case 0x34:
+		case 0x36:
+			va = &((SVECTOR *)obj->nortop)[((TMD_P_TG3 *)prim)->n0];
+			vb = &((SVECTOR *)obj->nortop)[((TMD_P_TG3 *)prim)->n1];
+			vc = &((SVECTOR *)obj->nortop)[((TMD_P_TG3 *)prim)->n2];
+			ApplyMatrixSV(&m1, va, &p0);
+			ApplyMatrixSV(&m1, vb, &p1);
+			ApplyMatrixSV(&m1, vc, &p2);
+			cx = (p0.vx + p1.vx + p2.vx) / 3;
+			cy = (p0.vy + p1.vy + p2.vy) / 3;
+			cz = (p0.vz + p1.vz + p2.vz) / 3;
+			((EvlModelVertex *)out)->vx = cx;
+			((EvlModelVertex *)out)->vy = cy;
+			((EvlModelVertex *)out)->vz = cz;
+			out += sizeof(EvlModelVertex);
+			prim += sizeof(TMD_P_TG3);
+			break;
+		case 0x3c:
+		case 0x3e:
+			va = &((SVECTOR *)obj->nortop)[((TMD_P_TG4 *)prim)->n0];
+			vb = &((SVECTOR *)obj->nortop)[((TMD_P_TG4 *)prim)->n1];
+			vc = &((SVECTOR *)obj->nortop)[((TMD_P_TG4 *)prim)->n2];
+			vd = &((SVECTOR *)obj->nortop)[((TMD_P_TG4 *)prim)->n3];
+			ApplyMatrixSV(&m1, va, &p0);
+			ApplyMatrixSV(&m1, vb, &p1);
+			ApplyMatrixSV(&m1, vc, &p2);
+			ApplyMatrixSV(&m1, vd, &p3);
+			cx = (p0.vx + p1.vx + p2.vx) / 3;
+			cy = (p0.vy + p1.vy + p2.vy) / 3;
+			cz = (p0.vz + p1.vz + p2.vz) / 3;
+			((EvlModelVertex *)out)->vx = cx;
+			((EvlModelVertex *)out)->vy = cy;
+			((EvlModelVertex *)out)->vz = cz;
+			out += sizeof(EvlModelVertex);
+			prim += sizeof(TMD_P_TG4);
+			break;
+		}
+	}
+	(void)cx;
+	(void)cy;
+	(void)cz;
+
+	MAIN_D_8013520C = out;
+	return slot;
 }
 
 void EVL_renderQuadShard(EvlModelVertex *drift, int32_t unused1, int16_t speed, int16_t timer, ModelComponent *model)
