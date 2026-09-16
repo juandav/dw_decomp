@@ -168,7 +168,7 @@ DEP += $(MAIN_DEP)
 OVERLAY :=
 
 BTL_ASM_SRC := $(shell find $(ASM_DIR)/btl -path '*.s' \
-		-not -path '$(ASM_DIR)/btl/*matchings*')
+		-not -path '$(ASM_DIR)/btl/*matchings*' 2> /dev/null)
 
 BTL_SRC := \
 	$(BTL_ASM_SRC) \
@@ -343,7 +343,7 @@ DEP += $(MURD_DEP)
 OVERLAY += MURD
 
 STD_ASM_SRC := $(shell find $(ASM_DIR)/std -path '*.s' \
-		-not -path '$(ASM_DIR)/std/*matchings*')
+		-not -path '$(ASM_DIR)/std/*matchings*' 2> /dev/null)
 
 STD_SRC := \
 	$(STD_ASM_SRC) \
@@ -361,7 +361,7 @@ DEP += $(STD_DEP)
 OVERLAY += STD
 
 TRN2_ASM_SRC := $(shell find $(ASM_DIR)/trn2 -path '*.s' \
-		-not -path '$(ASM_DIR)/trn2/*matchings*')
+		-not -path '$(ASM_DIR)/trn2/*matchings*' 2> /dev/null)
 
 TRN2_SRC := \
 	$(TRN2_ASM_SRC) \
@@ -384,7 +384,7 @@ DEP += $(TRN2_DEP)
 OVERLAY += TRN2
 
 TRN_ASM_SRC := $(shell find $(ASM_DIR)/trn -path '*.s' \
-		-not -path '$(ASM_DIR)/trn/*matchings*')
+		-not -path '$(ASM_DIR)/trn/*matchings*' 2> /dev/null)
 
 TRN_SRC := \
 	$(TRN_ASM_SRC) \
@@ -407,7 +407,7 @@ DEP += $(TRN_DEP)
 OVERLAY += TRN
 
 VS_ASM_SRC := $(shell find $(ASM_DIR)/vs -path '*.s' \
-		-not -path '$(ASM_DIR)/vs/*matchings*')
+		-not -path '$(ASM_DIR)/vs/*matchings*' 2> /dev/null)
 
 VS_SRC := \
 	$(VS_ASM_SRC) \
