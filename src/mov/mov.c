@@ -12,29 +12,6 @@ typedef struct {
 	int32_t frameCount;
 } MovieEntry;
 
-typedef struct {
-	u_long *runLevelBuffer[2];
-	int32_t runLevelIndex;
-	u_long *sliceBuffer[2];
-	int32_t sliceIndex;
-	RECT frame[2];
-	int32_t frameIndex;
-	RECT slice;
-	int32_t flipPending;
-} MovieEnv;
-
-extern MovieEntry MOV_MOVIES[];
-extern MovieEnv MOV_ENV;
-extern u_long MOV_RUN_LEVEL_BUFFER_0[];
-extern u_long MOV_RUN_LEVEL_BUFFER_1[];
-extern u_long MOV_SLICE_BUFFER_0[];
-extern u_long MOV_SLICE_BUFFER_1[];
-extern u_long MOV_RING_BUFFER[];
-extern u_short MOV_VLC_TABLE[];
-
-extern int32_t MOVIE_COMPLETED;
-extern int32_t MOVIE_WIDTH;
-extern int32_t MOVIE_HEIGHT;
 extern int32_t MAIN_D_80139BA0[];
 
 void MAIN_func_80092A44(DISPENV *disp, int32_t x, int32_t y, int32_t w, int32_t h);
@@ -56,6 +33,13 @@ static void *mov_functions[] = {
 	MOV_startStream,
 	MOV_onSliceDecoded,
 	MOV_initEnvironment,
+};
+
+MovieEntry MOV_MOVIES[4] = {
+	{ "\\MOVIE\\OP1.STR;1", 1, 3637 },
+	{ "\\MOVIE\\OP2.STR;1", 1, 3266 },
+	{ "\\MOVIE\\ED2.STR;1", 1, 2654 },
+	{ "\\MOVIE\\EDR.STR;1", 1, 3447 },
 };
 
 void MOV_initEnvironment(MovieEnv *env, int32_t x0, int32_t y0, int32_t x1, int32_t y1)
@@ -187,7 +171,7 @@ u_long *MOV_readFrame(MovieEnv *env, MovieEntry *movie)
 	}
 
 	if ((MOVIE_WIDTH != header->width) || (MOVIE_HEIGHT != header->height)) {
-		setRECT(&rect, 0, 0, 0x1E0, 0x1E0);
+		setRECT(&rect, 0, 0, 0x1e0, 0x1e0);
 		ClearImage(&rect, 0, 0, 0);
 		MOVIE_WIDTH = header->width;
 		MOVIE_HEIGHT = header->height;
@@ -224,7 +208,7 @@ int32_t MOV_playMovie(int32_t movieId)
 	}
 
 	MOVIE_COMPLETED = 0;
-	setRECT(&rect, 0, 0, 0x1E0, 0x1E0);
+	setRECT(&rect, 0, 0, 0x1e0, 0x1e0);
 	ClearImage(&rect, 0, 0, 0);
 	DrawSync(0);
 
@@ -242,7 +226,7 @@ int32_t MOV_playMovie(int32_t movieId)
 		}
 		MOV_waitForFlip(&MOV_ENV, 0);
 		VSync(0);
-		MAIN_func_80092A44(&disp, 0, ((MOV_ENV.frameIndex != 0) ? 0 : 1) * 240, 0x1E0, 0xF0);
+		MAIN_func_80092A44(&disp, 0, ((MOV_ENV.frameIndex != 0) ? 0 : 1) * 240, 0x1e0, 0xf0);
 		disp.isrgb24 = 1;
 		disp.disp.w = (disp.disp.w * 2) / 3;
 		PutDispEnv(&disp);

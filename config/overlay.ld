@@ -295,7 +295,8 @@ SECTIONS
 
 			build/src/mov/mov.c.o(.data.*);
 			. = ALIGN(., 4);
-			KEEP(build/asm/mov/data/94C.data.s.o(.data.*));
+
+			build/src/mov/mov_bss.c.o(.data.*);
 			. = ALIGN(., 4);
 
 			build/src/mov/mov.c.o(.bss.*);

@@ -68,6 +68,7 @@ MAIN_SBSS := \
 	$(BUILDDIR)/generated/unk_0x80134E68.sbss.s \
 	$(BUILDDIR)/generated/unk_0x80134E90.sbss.s \
 	$(BUILDDIR)/generated/unk_0x80135078.sbss.s \
+	$(BUILDDIR)/generated/unk_0x80135310.sbss.s \
 	$(BUILDDIR)/generated/unk_0x801353F0.sbss.s
 
 MAIN_BSS := \
@@ -126,6 +127,7 @@ MAIN_SRC := \
 	src/main/map_object.c \
 	src/main/math.c \
 	src/main/model.c \
+	src/main/mov.c \
 	src/main/murd.c \
 	src/main/overworld.c \
 	src/main/overworld_card_text.c \
@@ -323,7 +325,8 @@ MOV_ASM_SRC := $(shell find $(ASM_DIR)/mov -path '*.s' \
 
 MOV_SRC := \
 	$(MOV_ASM_SRC) \
-	src/mov/mov.c
+	src/mov/mov.c \
+	src/mov/mov_bss.c
 
 MOV_OBJ := $(MOV_SRC:%=$(BUILDDIR)/%.o)
 MOV_DEP := $(MOV_OBJ:%.o=%.d)
