@@ -261,17 +261,11 @@ void createBitBox(void)
 	RECT finalPos;
 	RECT startPos;
 
-	finalPos.x = -88;
-	finalPos.y = 18;
-	finalPos.w = 176;
-	finalPos.h = BTL_END_BOX_TEXTBUFFER[0] ? 66 : 31;
+	setRECT(&finalPos, -88, 18, 176, BTL_END_BOX_TEXTBUFFER[0] ? 66 : 31);
 
 	getEntityScreenPos(ENTITY_TABLE[0], 1, screenPos);
 
-	startPos.x = screenPos[0] - 5;
-	startPos.y = screenPos[1] - 5;
-	startPos.w = 10;
-	startPos.h = 10;
+	setRECT(&startPos, screenPos[0] - 5, screenPos[1] - 5, 10, 10);
 	createAnimatedUIBox(1, 0, 2, &finalPos, &startPos, tickBitBox, (RenderFunction)renderBitBox);
 
 	drawString(BITS_LABEL, 0, 72);
@@ -293,10 +287,7 @@ void handleBattleEndBox(void)
 	}
 
 	battleStatsGainsAndDrops(droppedItems);
-	boxPosition.x = -78;
-	boxPosition.y = 54;
-	boxPosition.w = 156;
-	boxPosition.h = 24;
+	setRECT(&boxPosition, -78, 54, 156, 24);
 	BTL_initializeBattleEndText(0x60, 2, &boxPosition);
 
 	for (i = 0; i < 3; i++) {
@@ -445,14 +436,7 @@ void renderBitBox(uint8_t layer)
 {
 	renderNumber(2, -18, 28, 5, MAIN_D_80134E90, 6 - layer);
 
-	BIT_BOX.x0 = 52;
-	BIT_BOX.y0 = 28;
-	BIT_BOX.x1 = 76;
-	BIT_BOX.y1 = 28;
-	BIT_BOX.x2 = 52;
-	BIT_BOX.y2 = 40;
-	BIT_BOX.x3 = 76;
-	BIT_BOX.y3 = 40;
+	setXYWH(&BIT_BOX, 52, 28, 24, 12);
 	GsSortPoly(&BIT_BOX, ACTIVE_ORDERING_TABLE, 6 - layer);
 
 	renderString(4, -78, 28, 48, 12, 0, 72, 6 - layer, 0);
@@ -471,14 +455,7 @@ void renderFinalBalance(int32_t layer)
 		     UI_BOX_DATA[2].finalPos.y + 10,
 		     6, MONEY, 6 - layer);
 
-	BIT_BOX.x0 = UI_BOX_DATA[2].finalPos.x + 140;
-	BIT_BOX.y0 = UI_BOX_DATA[2].finalPos.y + 10;
-	BIT_BOX.x1 = UI_BOX_DATA[2].finalPos.x + 164;
-	BIT_BOX.y1 = UI_BOX_DATA[2].finalPos.y + 10;
-	BIT_BOX.x2 = UI_BOX_DATA[2].finalPos.x + 140;
-	BIT_BOX.y2 = UI_BOX_DATA[2].finalPos.y + 22;
-	BIT_BOX.x3 = UI_BOX_DATA[2].finalPos.x + 164;
-	BIT_BOX.y3 = UI_BOX_DATA[2].finalPos.y + 22;
+	setXYWH(&BIT_BOX, UI_BOX_DATA[2].finalPos.x + 140, UI_BOX_DATA[2].finalPos.y + 10, 24, 12);
 	GsSortPoly(&BIT_BOX, ACTIVE_ORDERING_TABLE, 6 - layer);
 
 	renderString(0,
@@ -534,17 +511,11 @@ void createPostBattleStatsBox(void)
 
 	MAIN_D_80134EA0 = 100;
 
-	finalPos.x = -88;
-	finalPos.y = -78;
-	finalPos.w = 176;
-	finalPos.h = 96;
+	setRECT(&finalPos, -88, -78, 176, 96);
 
 	getEntityScreenPos(ENTITY_TABLE[1], 1, screenPos);
 
-	startPos.x = screenPos[0] - 5;
-	startPos.y = screenPos[1] - 5;
-	startPos.w = 10;
-	startPos.h = 10;
+	setRECT(&startPos, screenPos[0] - 5, screenPos[1] - 5, 10, 10);
 	createAnimatedUIBox(0, 0, 2, &finalPos, &startPos, MAIN_func_800EE088,
 			    (RenderFunction)MAIN_func_800EE1FC);
 }
@@ -637,9 +608,7 @@ void MAIN_func_800EE1FC(uint8_t depth)
 		if (STATS_GAINS[i] != 0) {
 			POLY_FT4 *prim = (POLY_FT4 *)GsGetWorkBase();
 			setEntityTextDigit(prim, 256, 491);
-			prim->r0 = 0x80;
-			prim->g0 = 0x80;
-			prim->b0 = 0x80;
+			setRGB0(prim, 0x80, 0x80, 0x80);
 			setUVDataPolyFT4(prim, 96, 180, 12, 12);
 			setPosDataPolyFT4(prim, box->x + 130,
 					  (box->y + 9) + (i * 13), 12, 12);
@@ -733,9 +702,7 @@ void initBitBox(void)
 {
 	initStringFT4(&BIT_BOX);
 
-	BIT_BOX.r0 = 0x80;
-	BIT_BOX.g0 = 0x80;
-	BIT_BOX.b0 = 0x80;
+	setRGB0(&BIT_BOX, 0x80, 0x80, 0x80);
 	setUVDataPolyFT4(&BIT_BOX, 156, 240, 24, 12);
 }
 
@@ -744,10 +711,7 @@ void createFinalBalanceBox(void)
 	RECT finalPos;
 	RECT startPos;
 
-	finalPos.x = -88;
-	finalPos.y = -13;
-	finalPos.w = 176;
-	finalPos.h = 31;
+	setRECT(&finalPos, -88, -13, 176, 31);
 	startPos = UI_BOX_DATA[1].startPos;
 	createAnimatedUIBox(2, 1, 0, &finalPos, &startPos, NULL,
 			    renderFinalBalance);

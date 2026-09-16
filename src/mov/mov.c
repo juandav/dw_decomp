@@ -187,17 +187,13 @@ u_long *MOV_readFrame(MovieEnv *env, MovieEntry *movie)
 	}
 
 	if ((MOVIE_WIDTH != header->width) || (MOVIE_HEIGHT != header->height)) {
-		rect.x = 0;
-		rect.y = 0;
-		rect.w = 0x1E0;
-		rect.h = 0x1E0;
+		setRECT(&rect, 0, 0, 0x1E0, 0x1E0);
 		ClearImage(&rect, 0, 0, 0);
 		MOVIE_WIDTH = header->width;
 		MOVIE_HEIGHT = header->height;
 	}
 
-	env->frame[0].w = env->frame[1].w = (MOVIE_WIDTH * 3) / 2;
-	env->frame[0].h = env->frame[1].h = MOVIE_HEIGHT;
+	setWH(&env->frame[0], env->frame[1].w = (MOVIE_WIDTH * 3) / 2, env->frame[1].h = MOVIE_HEIGHT);
 	env->slice.h = MOVIE_HEIGHT;
 
 	return addr;
@@ -228,10 +224,7 @@ int32_t MOV_playMovie(int32_t movieId)
 	}
 
 	MOVIE_COMPLETED = 0;
-	rect.x = 0;
-	rect.y = 0;
-	rect.w = 0x1E0;
-	rect.h = 0x1E0;
+	setRECT(&rect, 0, 0, 0x1E0, 0x1E0);
 	ClearImage(&rect, 0, 0, 0);
 	DrawSync(0);
 

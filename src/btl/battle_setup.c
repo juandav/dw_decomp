@@ -227,9 +227,7 @@ void BTL_handleBattleIntro(void)
 				startAnimation(&npc->digimonEntity.entity, 0x24);
 				npc->digimonEntity.entity.anim.animFlag |= 4;
 				flee = npc->flee;
-				pos.vx = flee.vx;
-				pos.vy = flee.vy;
-				pos.vz = flee.vz;
+				copyVector(&pos, &flee);
 				entityLookAtLocation(&npc->digimonEntity.entity, &pos);
 				found[count++] = i;
 			}

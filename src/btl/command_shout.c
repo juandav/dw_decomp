@@ -33,10 +33,7 @@ void BTL_drawCommandShout(uint32_t arg0)
 
 	BTL_D_80072DAC[0] = 0;
 	getEntityScreenPos(ENTITY_TABLE[0], 4, screenPos);
-	rect.x = 0;
-	rect.y = 0xcc;
-	rect.w = 0xa8;
-	rect.h = 0xc;
+	setRECT(&rect, 0, 0xcc, 0xa8, 0xc);
 	clearTextSubArea(&rect);
 
 	if ((arg0 >= 8) && (arg0 < 0xc)) {
@@ -84,12 +81,11 @@ void BTL_renderCommandShout(void)
 	int32_t y;
 
 	sprite.attribute = 0;
-	sprite.tpage = 0x1b;
+	sprite.tpage = getTPage(0, 0, 704, 256);
 	sprite.cx = 0xd0;
 	sprite.cy = 0x1e8;
 	sprite.r = sprite.g = sprite.b = 0x80;
-	sprite.w = BTL_D_80072DB4[0];
-	sprite.h = 0xc;
+	setWH(&sprite, BTL_D_80072DB4[0], 0xc);
 	sprite.mx = sprite.w / 2;
 	sprite.my = 6;
 	sprite.u = 0;

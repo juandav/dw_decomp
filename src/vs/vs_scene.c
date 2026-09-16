@@ -549,10 +549,8 @@ void VS_renderVersusFlash(void)
 
 	prim = (POLY_FT4 *)GsGetWorkBase();
 	SetPolyFT4(prim);
-	prim->r0 = 0x80;
-	prim->g0 = 0x80;
-	prim->b0 = 0x80;
-	prim->tpage = 5;
+	setRGB0(prim, 0x80, 0x80, 0x80);
+	prim->tpage = getTPage(0, 0, 320, 0);
 	prim->clut = GetClut(0x40, 0x1E9);
 	setUVDataPolyFT4(prim, 0x30, 0x10, 0x4E, 0x18);
 
@@ -615,7 +613,7 @@ void VS_renderFighterNamePlate(int16_t side)
 		}
 		SetPolyFT4(prim);
 		setRGB0(prim, 0x80, 0x80, 0x80);
-		prim->tpage = 0xe;
+		prim->tpage = getTPage(0, 0, 896, 0);
 		prim->clut = GetClut(0x120, VS_D_8006FA28[type] + 0x1e0);
 		if (type == 0x73) {
 			u = 0xe0;
@@ -649,7 +647,7 @@ void VS_renderFighterNamePlate(int16_t side)
 			gx = sx - 0x5f;
 			SetPolyFT4(prim);
 			setRGB0(prim, 0x80, 0x80, 0x80);
-			prim->tpage = 7;
+			prim->tpage = getTPage(0, 0, 448, 0);
 			prim->clut = GetClut(0x30, 0x1e8);
 			np = (uint16_t *)name;
 			c = *np++;
@@ -685,7 +683,7 @@ void VS_renderRoundPips(int32_t slot)
 	for (i = 0, y = -0x39; i < VS_D_800716B3[0]; i++, y += 0x14) {
 		if (i < MAIN_D_80135261) {
 			SetPolyFT4(prim);
-			prim->tpage = 5;
+			prim->tpage = getTPage(0, 0, 320, 0);
 			setRGB0(prim, 0x80, 0x80, 0x80);
 			prim->clut = GetClut(0x40, 0x1e9);
 			if (i < MAIN_D_80135261) {
@@ -733,7 +731,7 @@ void VS_renderVersusBanner(int32_t slot)
 	base += slot = k + x;
 	for (; i < VS_D_800716B3[0]; i++, y += 0x14) {
 		SetPolyFT4(prim);
-		prim->tpage = 6;
+		prim->tpage = getTPage(0, 0, 384, 0);
 		setRGB0(prim, 0x80, 0x80, 0x80);
 		prim->clut = GetClut(0, cluty);
 		if (i < MAIN_D_80135261) {
@@ -799,17 +797,8 @@ void VS_renderVersusText(void)
 	y2 = y2 = ya + 0x9a;
 	for (; i < 2; i++) {
 		SetPolyF4(prim2);
-		prim2->r0 = (i != 0) ? 0x80 : 0x5b;
-		prim2->g0 = (i != 0) ? 0x5b : 0x70;
-		prim2->b0 = (i != 0) ? 0x5b : 0x80;
-		prim2->x0 = (i == 0) ? x1 : x2;
-		prim2->y0 = y1;
-		prim2->x1 = ((i == 0) ? x1 : x2) + 0x94;
-		prim2->y1 = y1;
-		prim2->x2 = (i == 0) ? x1 : x2;
-		prim2->y2 = y2;
-		prim2->x3 = ((i == 0) ? x1 : x2) + 0x94;
-		prim2->y3 = y2;
+		setRGB0(prim2, (i != 0) ? 0x80 : 0x5b, (i != 0) ? 0x5b : 0x70, (i != 0) ? 0x5b : 0x80);
+		setXY4(prim2, (i == 0) ? x1 : x2, y1, ((i == 0) ? x1 : x2) + 0x94, y1, (i == 0) ? x1 : x2, y2, ((i == 0) ? x1 : x2) + 0x94, y2);
 		AddPrim(ACTIVE_ORDERING_TABLE->org + 0x1e, prim2++);
 	}
 	GsSetWorkBase((PACKET *)prim2);
@@ -1661,9 +1650,7 @@ void VS_startCameraChase(Entity *entity, int32_t dx, int32_t side)
 	int32_t dist;
 
 	MAIN_D_80135298 = (char **)entity;
-	VS_D_80071754.vx = entity->posData->location.vx;
-	VS_D_80071754.vy = entity->posData->location.vy;
-	VS_D_80071754.vz = entity->posData->location.vz;
+	copyVector(&VS_D_80071754, &entity->posData->location);
 	VS_D_80071744.vx = VS_D_80071754.vx - dx;
 	VS_D_80071744.vy = VS_D_80071754.vy;
 	VS_D_80071744.vz = VS_D_80071754.vz;
@@ -1811,19 +1798,15 @@ void VS_renderCounterDigits(int32_t x, int32_t y, int32_t digits, int32_t value,
 
 	prim = (POLY_FT4 *)GsGetWorkBase();
 	SetPolyFT4(prim);
-	prim->r0 = 0x80;
-	prim->g0 = 0x80;
-	prim->b0 = 0x80;
-	prim->tpage = 0xD;
+	setRGB0(prim, 0x80, 0x80, 0x80);
+	prim->tpage = getTPage(0, 0, 832, 0);
 	prim->clut = GetClut(0x10, 0x1E0);
 	setUVDataPolyFT4(prim, 0x78, 0x30, 8, 0x12);
 	setPosDataPolyFT4(prim, -0x1C, -0x63, 8, 0x12);
 	AddPrim(ACTIVE_ORDERING_TABLE->org + layer, prim++);
 	SetPolyFT4(prim);
-	prim->r0 = 0x80;
-	prim->g0 = 0x80;
-	prim->b0 = 0x80;
-	prim->tpage = 0xD;
+	setRGB0(prim, 0x80, 0x80, 0x80);
+	prim->tpage = getTPage(0, 0, 832, 0);
 	prim->clut = GetClut(0x10, 0x1E0);
 	setUVDataPolyFT4(prim, 0x80, 0x30, 8, 0x12);
 	setPosDataPolyFT4(prim, 0x14, -0x63, 8, 0x12);
@@ -1833,10 +1816,8 @@ void VS_renderCounterDigits(int32_t x, int32_t y, int32_t digits, int32_t value,
 
 	for (i = count - 1; i >= 0; i--) {
 		SetPolyFT4(prim);
-		prim->r0 = 0x80;
-		prim->g0 = 0x80;
-		prim->b0 = 0x80;
-		prim->tpage = 0xD;
+		setRGB0(prim, 0x80, 0x80, 0x80);
+		prim->tpage = getTPage(0, 0, 832, 0);
 		prim->clut = GetClut(0x10, 0x1E0);
 		setUVDataPolyFT4(prim, buf[i] * 12, 0x30, 0xC, 0xF);
 		setPosDataPolyFT4(prim, x + ((((int32_t)width - 1) - i) * 14), y, 0xC, 0xF);
@@ -1844,9 +1825,7 @@ void VS_renderCounterDigits(int32_t x, int32_t y, int32_t digits, int32_t value,
 	}
 
 	SetPolyFT4(prim);
-	prim->r0 = 0x80;
-	prim->g0 = 0x80;
-	prim->b0 = 0x80;
+	setRGB0(prim, 0x80, 0x80, 0x80);
 	prim->tpage = GetTPage(1, 0, 0x2C0, 0);
 	prim->clut = GetClut(0x200, 0xFF);
 	setUVDataPolyFT4(prim, 0, 0x78, 0x42, 0x1D);

@@ -469,10 +469,7 @@ void MAIN_func_800FAB30(void)
 
 	if (isKeyDown(0x40)) {
 		src = &MAIN_D_801302BC[MAIN_D_80135011];
-		rect.x = src->x;
-		rect.y = src->y;
-		rect.w = src->w;
-		rect.h = src->h;
+		setRECT(&rect, src->x, src->y, src->w, src->h);
 
 		switch (MAIN_D_80135011) {
 		default:
@@ -513,10 +510,7 @@ void MAIN_func_800FAB30(void)
 		}
 	} else if (isKeyDown(0x800)) {
 		src = &MAIN_D_801302BC[MAIN_D_80135011];
-		rect.x = src->x;
-		rect.y = src->y;
-		rect.w = src->w;
-		rect.h = src->h;
+		setRECT(&rect, src->x, src->y, src->w, src->h);
 		MAIN_func_800FD61C(box, &rect, 1);
 		playSound(0, 3);
 	}
@@ -1279,8 +1273,7 @@ void initializeItemMenuBox(ItemMenuBox **box, int32_t bufSize, int32_t rows,
 	(*box)->visibleRows = rows;
 	(*box)->rect.x = x;
 	(*box)->rect.y = y;
-	(*box)->rect.w = w;
-	(*box)->rect.h = h;
+	setWH(&(*box)->rect, w, h);
 }
 
 void showShopkeeperTextbox(int32_t idx, int32_t owner, int32_t boxId)
@@ -1307,10 +1300,7 @@ void MAIN_func_800FC968(int32_t showBits)
 	}
 
 	setupBoxOrigin(0xfd, &origin);
-	rect.x = -0x98;
-	rect.y = -0x62;
-	rect.w = 0x52;
-	rect.h = 0x21;
+	setRECT(&rect, -0x98, -0x62, 0x52, 0x21);
 	createTextbox(2, 0xe1, &rect, &origin, MAIN_func_800FBC00,
 		      MAIN_func_800FBC58);
 	registerTextbox(2, 8, 1, 0, 0);
@@ -1340,10 +1330,7 @@ void MAIN_func_800FCA3C(void)
 	setupBoxOrigin(boxId, &origin);
 	result = MAIN_func_800FCC40();
 	dims = (int16_t *)((uint8_t *)MAIN_D_8013027C + MAIN_D_80135011 * 8);
-	rect.x = dims[0];
-	rect.y = dims[1];
-	rect.w = dims[2];
-	rect.h = dims[3];
+	setRECT(&rect, dims[0], dims[1], dims[2], dims[3]);
 	createTextbox(1, 0xf1, &rect, &origin, MAIN_func_800FAB30,
 		      MAIN_func_800FADE0);
 	registerTextbox(1, 9, 6, 1, 0);
@@ -1562,10 +1549,7 @@ int32_t MAIN_func_800FCFB8(RECT *origin)
 	boxY = UI_BOX_DATA[1].finalPos.y;
 	origin->x += UI_BOX_DATA[1].finalPos.x;
 	origin->y += (boxY + box->cursor * 18);
-	rect.x = -0x41;
-	rect.y = -0x2a;
-	rect.w = 0x82;
-	rect.h = 0x53;
+	setRECT(&rect, -0x41, -0x2a, 0x82, 0x53);
 	createTextbox(3, 0xc1, &rect, origin, tickSellItemBox,
 		      renderSellItemBox);
 	registerTextbox(3, MAIN_D_80135018, 1, 0, 0);
@@ -1609,10 +1593,7 @@ int32_t MAIN_func_800FD244(RECT *origin)
 	boxY = UI_BOX_DATA[1].finalPos.y;
 	origin->x += UI_BOX_DATA[1].finalPos.x;
 	origin->y += (boxY + box->cursor * 18);
-	rect.x = -0x38;
-	rect.y = -0x15;
-	rect.w = 0x70;
-	rect.h = 0x2a;
+	setRECT(&rect, -0x38, -0x15, 0x70, 0x2a);
 	createTextbox(3, 0xc1, &rect, origin, MAIN_func_800FB8D4,
 		      MAIN_func_800FBAA0);
 	registerTextbox(3, MAIN_D_80135018, 2, 0, 0);
@@ -1716,10 +1697,7 @@ int32_t MAIN_func_800FD61C(ItemMenuBox *box, RECT *origin, int32_t uiBoxId)
 	boxY = UI_BOX_DATA[uiBoxId].finalPos.y;
 	origin->x += UI_BOX_DATA[uiBoxId].finalPos.x;
 	origin->y += (boxY + box->cursor * 18);
-	rect.x = -0x84;
-	rect.y = -0xb;
-	rect.w = 0x108;
-	rect.h = 0x16;
+	setRECT(&rect, -0x84, -0xb, 0x108, 0x16);
 	createTextbox(3, 0xc1, &rect, origin, MAIN_func_800FB070,
 		      MAIN_func_800FB0CC);
 	registerTextbox(3, MAIN_D_80135018, 1, 0, 0);
@@ -1743,11 +1721,9 @@ void MAIN_func_800FD7D8(int32_t boxId, int32_t idx, int16_t x, int16_t y)
 	uvs = MAIN_D_8012FE24;
 	e = &uvs.v[idx * 4];
 	SetPolyFT4(&poly);
-	poly.tpage = 5;
+	poly.tpage = getTPage(0, 0, 320, 0);
 	poly.clut = GetClut(96, 492);
-	poly.r0 = 0x80;
-	poly.g0 = 0x80;
-	poly.b0 = 0x80;
+	setRGB0(&poly, 0x80, 0x80, 0x80);
 	setUVDataPolyFT4(&poly, e[0], e[1], e[2], e[3]);
 	setPosDataPolyFT4(&poly, x, y, e[2], e[3]);
 
@@ -1848,11 +1824,9 @@ void MAIN_func_800FE258(int32_t spriteId, int16_t x, int16_t y, int32_t depth)
 
 	prim = (POLY_FT4 *)GsGetWorkBase();
 	SetPolyFT4(prim);
-	prim->tpage = 5;
+	prim->tpage = getTPage(0, 0, 320, 0);
 	setClut(prim, 96, 493);
-	prim->r0 = 0x80;
-	prim->g0 = 0x80;
-	prim->b0 = 0x80;
+	setRGB0(prim, 0x80, 0x80, 0x80);
 	setUVDataPolyFT4(prim, spriteId * 12 + 0x200, 0x1c0, 0xc, 0xc);
 	setPosDataPolyFT4(prim, x, y, 0xc, 0xc);
 	AddPrim(ACTIVE_ORDERING_TABLE->org + depth, prim++);
@@ -2822,10 +2796,7 @@ void registerTextbox(int32_t boxId, int32_t row, int32_t rows,
 	MAIN_D_801BE80C.usedRows += usedRows;
 	setTextColor(1);
 	getVRAMModeCoords(entry->vramMode, &vramX, &vramW);
-	rect.x = vramX;
-	rect.y = entry->vramRow * 12;
-	rect.w = vramW;
-	rect.h = usedRows * 12;
+	setRECT(&rect, vramX, entry->vramRow * 12, vramW, usedRows * 12);
 	clearTextSubArea(&rect);
 }
 
@@ -2862,74 +2833,50 @@ int32_t drawString2(uint8_t *str, int16_t x, int16_t y, int32_t flag)
 			save = pos;
 			if (rem != 0) {
 				rem = (8 - rem) * 12;
-				rect.x = x + save;
-				rect.y = y;
-				rect.w = rem;
-				rect.h = 0xc;
+				setRECT(&rect, x + save, y, rem, 0xc);
 				clearTextSubArea(&rect);
 				pos = save + rem;
 			}
 			break;
 		case 0x16:
 			str++;
-			rect.x = x + pos - 6;
-			rect.y = y;
-			rect.w = 0x69;
-			rect.h = 0xc;
+			setRECT(&rect, x + pos - 6, y, 0x69, 0xc);
 			clearTextSubArea(&rect);
 			pos = 0x69;
 			break;
 		case 0x17:
 			str++;
-			rect.x = x + pos;
-			rect.y = y;
-			rect.w = 0x69;
-			rect.h = 0xc;
+			setRECT(&rect, x + pos, y, 0x69, 0xc);
 			clearTextSubArea(&rect);
 			pos = 0x69;
 			break;
 		case 0x1b:
 			str++;
-			rect.x = x + pos;
-			rect.y = y;
-			rect.w = 0xa0;
-			rect.h = 0xc;
+			setRECT(&rect, x + pos, y, 0xa0, 0xc);
 			clearTextSubArea(&rect);
 			pos = 0xa0;
 			break;
 		case 0x1c:
 			str++;
-			rect.x = x + pos;
-			rect.y = y;
-			rect.w = 0x64;
-			rect.h = 0xc;
+			setRECT(&rect, x + pos, y, 0x64, 0xc);
 			clearTextSubArea(&rect);
 			pos = 0x64;
 			break;
 		case 0x18:
 			str++;
-			rect.x = x + pos;
-			rect.y = y;
-			rect.w = 0x60;
-			rect.h = 0xc;
+			setRECT(&rect, x + pos, y, 0x60, 0xc);
 			clearTextSubArea(&rect);
 			pos = 0x60;
 			break;
 		case 0x19:
 			str++;
-			rect.x = x + pos;
-			rect.y = y;
-			rect.w = 0x9c;
-			rect.h = 0xc;
+			setRECT(&rect, x + pos, y, 0x9c, 0xc);
 			clearTextSubArea(&rect);
 			pos = 0x9c;
 			break;
 		case 0x1a:
 			str++;
-			rect.x = x + pos;
-			rect.y = y;
-			rect.w = 0xb4;
-			rect.h = 0xc;
+			setRECT(&rect, x + pos, y, 0xb4, 0xc);
 			clearTextSubArea(&rect);
 			pos = 0xb4;
 			break;
@@ -2939,20 +2886,14 @@ int32_t drawString2(uint8_t *str, int16_t x, int16_t y, int32_t flag)
 			save = pos;
 			if (rem != 0) {
 				rem = (0xb - rem) * 12;
-				rect.x = x + save;
-				rect.y = y;
-				rect.w = rem;
-				rect.h = 0xc;
+				setRECT(&rect, x + save, y, rem, 0xc);
 				clearTextSubArea(&rect);
 				pos = save + rem;
 			}
 			break;
 		case 0xf:
 			str++;
-			rect.x = x + pos;
-			rect.y = y;
-			rect.w = 6;
-			rect.h = 0xc;
+			setRECT(&rect, x + pos, y, 6, 0xc);
 			clearTextSubArea(&rect);
 			pos += 6;
 			break;
@@ -2966,10 +2907,7 @@ int32_t drawString2(uint8_t *str, int16_t x, int16_t y, int32_t flag)
 			}
 
 			if (glyph == 0x4081) {
-				rect.x = x + pos;
-				rect.y = y;
-				rect.w = 0xc;
-				rect.h = 0xc;
+				setRECT(&rect, x + pos, y, 0xc, 0xc);
 				clearTextSubArea(&rect);
 			} else {
 				y2 = y;
@@ -3088,10 +3026,7 @@ void setupDialogueBox(uint8_t owner)
 		flags |= 0x80;
 	}
 
-	rect.x = -0x82;
-	rect.y = 0x2a;
-	rect.w = 0x106;
-	rect.h = 0x3b;
+	setRECT(&rect, -0x82, 0x2a, 0x106, 0x3b);
 	createTextbox(0, flags, &rect, &origin, tickScriptDialogueBox,
 		      renderScriptDialogueBox);
 	registerTextbox(0, 0, 4, 1, 0);
@@ -3120,10 +3055,7 @@ int32_t setupBoxOrigin(int32_t ownerId, RECT *origin)
 		getEntityScreenPos(ENTITY_TABLE[entityId], 1, pos);
 	}
 
-	origin->x = pos[0];
-	origin->y = pos[1];
-	origin->w = 0xa;
-	origin->h = 0xa;
+	setRECT(origin, pos[0], pos[1], 0xa, 0xa);
 
 	return 1;
 }
@@ -3189,9 +3121,7 @@ void renderUIBox(int32_t boxId)
 	SetSemiTrans(&poly, 1);
 	poly.tpage = GetTPage(0, 1, 320, 128);
 	poly.clut = GetClut(96, 500);
-	poly.r0 = 0x80;
-	poly.g0 = 0x80;
-	poly.b0 = 0x80;
+	setRGB0(&poly, 0x80, 0x80, 0x80);
 	setUVDataPolyFT4(&poly, u, 0xb7, 0x10, 0xc);
 	setPosDataPolyFT4(&poly, x, y, 0x10, 0xc);
 
@@ -3489,10 +3419,7 @@ void scriptSetTextboxSize(void)
 
 	width = cols * 12 + 10;
 	height = rows * 13 + 7;
-	rect1.x = (0x140 - width) / 2 - 0xa0;
-	rect1.y = (0xf0 - height) / 2 - 0x78;
-	rect1.w = width;
-	rect1.h = height;
+	setRECT(&rect1, (0x140 - width) / 2 - 0xa0, (0xf0 - height) / 2 - 0x78, width, height);
 	createTextbox(0, boxFlags, &rect1, &origin, MAIN_func_800FFFF0,
 		      MAIN_func_801000E4);
 	registerTextbox(0, 0, rows, 1, 0);

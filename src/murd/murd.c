@@ -406,9 +406,7 @@ void MURD_createLivesBox(Entity *entity)
 	MURD_LIVES_BOX.state = 0;
 	MURD_LIVES_BOX.partner = (PartnerEntity *)entity;
 
-	pos.vx = entity->posData->location.vx;
-	pos.vy = entity->posData->location.vy;
-	pos.vz = entity->posData->location.vz;
+	copyVector(&pos, &entity->posData->location);
 	worldPosToScreenPos(&pos, (DVECTOR *)&start);
 
 	start.x = start.x - (int16_t)(0xa8 - DRAWING_OFFSET_X);
@@ -423,9 +421,7 @@ void MURD_animateLivesBoxOut(void)
 
 	target = MURD_LIVES_BOX_TARGET_POS;
 
-	pos.vx = MURD_LIVES_BOX.partner->digimonEntity.entity.posData->location.vx;
-	pos.vy = MURD_LIVES_BOX.partner->digimonEntity.entity.posData->location.vy;
-	pos.vz = MURD_LIVES_BOX.partner->digimonEntity.entity.posData->location.vz;
+	copyVector(&pos, &MURD_LIVES_BOX.partner->digimonEntity.entity.posData->location);
 	worldPosToScreenPos(&pos, (DVECTOR *)&target);
 
 	target.x = target.x - (int16_t)(0xa8 - DRAWING_OFFSET_X);
@@ -444,8 +440,8 @@ void MURD_renderFullscreenFade(VECTOR *color)
 	SetSemiTrans(prim, 1);
 	prim->tpage = getTPage(1, 2, 832, 256);
 	prim->clut = getClut(0, 487);
-	setXY4(prim, -0xa0, -0x78, 0xa0, -0x78, -0xa0, 0x78, 0xa0, 0x78);
-	setUV4(prim, 0, 0x80, 3, 0x80, 0, 0x83, 3, 0x83);
+	setXYWH(prim, -0xa0, -0x78, 320, 240);
+	setUVWH(prim, 0, 0x80, 3, 3);
 	setRGB0(prim, color->vx, color->vy, color->vz);
 	AddPrim(ACTIVE_ORDERING_TABLE->org + layer, prim);
 	prim++;
@@ -588,8 +584,8 @@ int32_t MURD_renderIris(Entity *entity, int32_t start, int32_t end, int32_t t)
 		prim->r0 = prim->g0 = prim->b0 = 0x80;
 		prim->tpage = getTPage(1, 2, 832, 256);
 		prim->clut = getClut(0, 487);
-		setUV4(prim, 0, 0x80, 3, 0x80, 0, 0x83, 3, 0x83);
-		setXY4(prim, lx, ly, lx + lw, ly, lx, ly + 0xf0, lx + lw, ly + 0xf0);
+		setUVWH(prim, 0, 0x80, 3, 3);
+		setXYWH(prim, lx, ly, lw, 0xf0);
 		AddPrim(ACTIVE_ORDERING_TABLE->org + 0x22, prim++);
 	}
 
@@ -602,8 +598,8 @@ int32_t MURD_renderIris(Entity *entity, int32_t start, int32_t end, int32_t t)
 		SetSemiTrans(prim, 2);
 		prim->tpage = getTPage(1, 2, 832, 256);
 		prim->clut = getClut(0, 487);
-		setUV4(prim, 0, 0x80, 3, 0x80, 0, 0x83, 3, 0x83);
-		setXY4(prim, rx, ry, rx + rw, ry, rx, ry + 0xf0, rx + rw, ry + 0xf0);
+		setUVWH(prim, 0, 0x80, 3, 3);
+		setXYWH(prim, rx, ry, rw, 0xf0);
 		AddPrim(ACTIVE_ORDERING_TABLE->org + 0x22, prim++);
 	}
 
@@ -617,8 +613,8 @@ int32_t MURD_renderIris(Entity *entity, int32_t start, int32_t end, int32_t t)
 			SetSemiTrans(prim, 2);
 			prim->tpage = getTPage(1, 2, 832, 256);
 			prim->clut = getClut(0, 487);
-			setUV4(prim, 0, 0x80, 3, 0x80, 0, 0x83, 3, 0x83);
-			setXY4(prim, left, ty, left + tw, ty, left, ty + th, left + tw, ty + th);
+			setUVWH(prim, 0, 0x80, 3, 3);
+			setXYWH(prim, left, ty, tw, th);
 			AddPrim(ACTIVE_ORDERING_TABLE->org + 0x22, prim++);
 		}
 	}
@@ -633,8 +629,8 @@ int32_t MURD_renderIris(Entity *entity, int32_t start, int32_t end, int32_t t)
 			SetSemiTrans(prim, 2);
 			prim->tpage = getTPage(1, 2, 832, 256);
 			prim->clut = getClut(0, 487);
-			setUV4(prim, 0, 0x80, 3, 0x80, 0, 0x83, 3, 0x83);
-			setXY4(prim, left, by, left + bw, by, left, by + bh, left + bw, by + bh);
+			setUVWH(prim, 0, 0x80, 3, 3);
+			setXYWH(prim, left, by, bw, bh);
 			AddPrim(ACTIVE_ORDERING_TABLE->org + 0x22, prim++);
 		}
 	}

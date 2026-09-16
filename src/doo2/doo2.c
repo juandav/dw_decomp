@@ -197,17 +197,10 @@ void DOO2_renderTriShard(Doo2Shard *drift, int32_t unused1, int32_t speed, int32
 	prim = (POLY_FT4 *)GsGetWorkBase();
 	MAIN_func_80092B60(prim);
 	SetSemiTrans(prim, 1);
-	prim->r0 = MAIN_D_8013531C[0];
-	prim->g0 = MAIN_D_8013531C[1];
-	prim->b0 = MAIN_D_8013531C[2];
+	setRGB0(prim, MAIN_D_8013531C[0], MAIN_D_8013531C[1], MAIN_D_8013531C[2]);
 	prim->tpage = model->tpage;
 	prim->clut = tri->clut;
-	prim->u0 = tri->tu0;
-	prim->v0 = tri->tv0;
-	prim->u1 = tri->tu1;
-	prim->v1 = tri->tv1;
-	prim->u2 = tri->tu2;
-	prim->v2 = tri->tv2;
+	setUV3(prim, tri->tu0, tri->tv0, tri->tu1, tri->tv1, tri->tu2, tri->tv2);
 	va = &MAIN_D_80135318[tri->v0];
 	vb = &MAIN_D_80135318[tri->v1];
 	vc = &MAIN_D_80135318[tri->v2];
@@ -253,19 +246,10 @@ void DOO2_renderQuadShard(Doo2Shard *fragment, int32_t arg1, int32_t duration,
 	prim = (POLY_FT4 *)GsGetWorkBase();
 	SetPolyFT4(prim);
 	SetSemiTrans(prim, 1);
-	prim->r0 = MAIN_D_8013531C[0];
-	prim->g0 = MAIN_D_8013531C[1];
-	prim->b0 = MAIN_D_8013531C[2];
+	setRGB0(prim, MAIN_D_8013531C[0], MAIN_D_8013531C[1], MAIN_D_8013531C[2]);
 	prim->tpage = sheet->tpage;
 	prim->clut = quad->clut;
-	prim->u0 = quad->tu0;
-	prim->v0 = quad->tv0;
-	prim->u1 = quad->tu1;
-	prim->v1 = quad->tv1;
-	prim->u2 = quad->tu2;
-	prim->v2 = quad->tv2;
-	prim->u3 = quad->tu3;
-	prim->v3 = quad->tv3;
+	setUV4(prim, quad->tu0, quad->tv0, quad->tu1, quad->tv1, quad->tu2, quad->tv2, quad->tu3, quad->tv3);
 	pa = MAIN_D_80135318 + quad->v0;
 	pb = MAIN_D_80135318 + quad->v1;
 	pc = MAIN_D_80135318 + quad->v2;
@@ -293,7 +277,7 @@ void DOO2_renderQuadShard(Doo2Shard *fragment, int32_t arg1, int32_t duration,
 	d.vx = pd->vx + fragment->offsetX;
 	d.vy = pd->vy + fragment->offsetY;
 	d.vz = pd->vz + fragment->offsetZ;
-	prim->code |= 2;
+	setSemiTrans(prim, 1);
 	add3DSpritePrim(prim, &a, &b, &c, &d);
 }
 
@@ -375,10 +359,7 @@ void DOO2_fadeClut(int16_t *srcClut, void *entity, int16_t *dstClut, int32_t sta
 		*dst++ += (int16_t)(stp << 15);
 	}
 
-	rect.x = 32;
-	rect.y = 488;
-	rect.w = 16;
-	rect.h = 24;
+	setRECT(&rect, 32, 488, 16, 24);
 	LoadImage(&rect, (u_long *)dstClut);
 	DrawSync(0);
 }
@@ -443,12 +424,7 @@ void DOO2_renderWireframeModel(GsDOBJ2 *obj, int32_t wireThreshold)
 						                &normals[tri->n2], &lightColor,
 						                (CVECTOR *)&poly3->r0, (CVECTOR *)&poly3->r1,
 						                (CVECTOR *)&poly3->r2);
-						poly3->u0 = tri->tu0;
-						poly3->v0 = tri->tv0;
-						poly3->u1 = tri->tu1;
-						poly3->v1 = tri->tv1;
-						poly3->u2 = tri->tu2;
-						poly3->v2 = tri->tv2;
+						setUV3(poly3, tri->tu0, tri->tv0, tri->tu1, tri->tv1, tri->tu2, tri->tv2);
 						poly3->clut = tri->clut;
 						poly3->tpage = tri->tpage;
 						setPolyGT3(poly3);
@@ -486,14 +462,7 @@ void DOO2_renderWireframeModel(GsDOBJ2 *obj, int32_t wireThreshold)
 						                (CVECTOR *)&poly4->r2);
 						NormalColorCol(&normals[quad->n3], &lightColor,
 						               (CVECTOR *)&poly4->r3);
-						poly4->u0 = quad->tu0;
-						poly4->v0 = quad->tv0;
-						poly4->u1 = quad->tu1;
-						poly4->v1 = quad->tv1;
-						poly4->u2 = quad->tu2;
-						poly4->v2 = quad->tv2;
-						poly4->u3 = quad->tu3;
-						poly4->v3 = quad->tv3;
+						setUV4(poly4, quad->tu0, quad->tv0, quad->tu1, quad->tv1, quad->tu2, quad->tv2, quad->tu3, quad->tv3);
 						poly4->clut = quad->clut;
 						poly4->tpage = quad->tpage;
 						setPolyGT4(poly4);
@@ -513,10 +482,7 @@ void DOO2_renderWireframeModel(GsDOBJ2 *obj, int32_t wireThreshold)
 					close = (LINE_F2 *)(line + 1);
 					setLineF2(close);
 					close->r0 = close->g0 = close->b0 = color;
-					close->x0 = line->x3;
-					close->y0 = line->y3;
-					close->x1 = line->x0;
-					close->y1 = line->y0;
+					setXY2(close, line->x3, line->y3, line->x0, line->y0);
 					packet = (uint8_t *)++close;
 				}
 			}
@@ -554,17 +520,10 @@ void DOO2_renderSparkStreak(int32_t *pos, SVECTOR *rot)
 	prim = (POLY_FT3 *)GsGetWorkBase();
 	MAIN_func_80092B60((POLY_FT4 *)prim);
 	SetSemiTrans(prim, 1);
-	prim->tpage = 0x3c;
-	prim->clut = 0x7a4c;
-	prim->u0 = 0x5f;
-	prim->v0 = 0xa0;
-	prim->u1 = 0x5f;
-	prim->v1 = 0xa7;
-	prim->u2 = 0x30;
-	prim->v2 = 0xa0;
-	prim->r0 = (rand() % 128) + 10;
-	prim->g0 = prim->r0;
-	prim->b0 = prim->r0;
+	prim->tpage = getTPage(0, 1, 768, 256);
+	prim->clut = getClut(192, 489);
+	setUV3(prim, 0x5f, 0xa0, 0x5f, 0xa7, 0x30, 0xa0);
+	setRGB0(prim, (rand() % 128) + 10, prim->r0, prim->r0);
 	addScreenPolyFT3(prim, &b, &origin, &a);
 }
 

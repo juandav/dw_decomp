@@ -499,17 +499,11 @@ void DOOA_tickDissolve(int32_t instanceId)
 			}
 			readFile(DOOA_EGG_TIM_PATH, DOO2_D_80071EE4);
 			GsGetTimInfo(DOO2_D_80071EE8, &timInfo);
-			rect.x = timInfo.px;
-			rect.y = timInfo.py;
-			rect.w = timInfo.pw;
-			rect.h = timInfo.ph;
+			setRECT(&rect, timInfo.px, timInfo.py, timInfo.pw, timInfo.ph);
 			LoadImage(&rect, timInfo.pixel);
 			GetTPage(timInfo.pmode & 3, 0, timInfo.px, timInfo.py);
 			if ((timInfo.pmode >> 3) & 1) {
-				rect.x = timInfo.cx;
-				rect.y = timInfo.cy;
-				rect.w = timInfo.cw;
-				rect.h = timInfo.ch;
+				setRECT(&rect, timInfo.cx, timInfo.cy, timInfo.cw, timInfo.ch);
 				LoadImage(&rect, timInfo.clut);
 				MAIN_D_80135328 = GetClut(timInfo.cx, timInfo.cy);
 			}
@@ -622,10 +616,7 @@ void DOOA_saveEntityClut(u_long *pixels, Entity *entity)
 	RECT rect;
 
 	model = getEntityModelComponent(entity->type, getEntityType(entity));
-	rect.x = (model->clutPage & 0x3f) << 4;
-	rect.y = model->clutPage >> 6;
-	rect.w = 16;
-	rect.h = 24;
+	setRECT(&rect, (model->clutPage & 0x3f) << 4, model->clutPage >> 6, 16, 24);
 	StoreImage(&rect, pixels);
 	DrawSync(0);
 }
@@ -706,9 +697,7 @@ void DOOA_updateCutsceneCamera(VECTOR *position, int32_t angle, int32_t startFra
 		return;
 	}
 
-	worldPos.vx = position->vx;
-	worldPos.vy = position->vy;
-	worldPos.vz = position->vz;
+	copyVector(&worldPos, position);
 	worldPosToScreenPos(&worldPos, &screenPos);
 
 	rotation = MAIN_D_80134BB4;
@@ -1200,10 +1189,7 @@ void DOOA_fadeModelClut(int16_t *srcClut, void *unused, int16_t *dstClut, int32_
 		*dst++ += stp << 15;
 	}
 
-	rect.x = 0;
-	rect.y = 488;
-	rect.w = 16;
-	rect.h = 24;
+	setRECT(&rect, 0, 488, 16, 24);
 	LoadImage(&rect, (u_long *)dstClut);
 	DrawSync(0);
 }
@@ -1245,10 +1231,7 @@ void DOOA_fadeShardClut(int16_t *srcClut, void *unused, int16_t *dstClut, int32_
 		*dst++ += stp << 15;
 	}
 
-	rect.x = 48;
-	rect.y = 488;
-	rect.w = 32;
-	rect.h = 24;
+	setRECT(&rect, 48, 488, 32, 24);
 	LoadImage(&rect, (u_long *)dstClut);
 	DrawSync(0);
 }

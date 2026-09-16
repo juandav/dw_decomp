@@ -337,27 +337,11 @@ void renderText(POLY_FT4 *prim, int32_t x, int32_t y, uint8_t u, int32_t v,
 	x -= 0xA0;
 	y -= 0x78;
 	SetPolyFT4(prim);
-	prim->tpage = 0x1B;
+	prim->tpage = getTPage(0, 0, 704, 256);
 	prim->clut = GetClut(0xD0, 0x1E8);
-	prim->r0 = MAIN_D_80131638[textColor * 4];
-	prim->g0 = MAIN_D_80131639[textColor * 4];
-	prim->b0 = MAIN_D_8013163A[textColor * 4];
-	prim->x0 = x;
-	prim->y0 = y;
-	prim->x1 = x + w;
-	prim->y1 = y;
-	prim->x2 = x;
-	prim->y2 = y + h;
-	prim->x3 = x + w;
-	prim->y3 = y + h;
-	prim->u0 = u;
-	prim->v0 = v;
-	prim->u1 = u + w;
-	prim->v1 = v;
-	prim->u2 = u;
-	prim->v2 = v + h;
-	prim->u3 = u + w;
-	prim->v3 = v + h;
+	setRGB0(prim, MAIN_D_80131638[textColor * 4], MAIN_D_80131639[textColor * 4], MAIN_D_8013163A[textColor * 4]);
+	setXYWH(prim, x, y, w, h);
+	setUVWH(prim, u, v, w, h);
 	AddPrim(ACTIVE_ORDERING_TABLE->org, prim);
 }
 
@@ -374,26 +358,11 @@ void renderMenuBox(int32_t x, int32_t y, int16_t w, int16_t h)
 	renderUIBoxBorder(rect, 0);
 	prim = (POLY_G4 *)GsGetWorkBase();
 	MAIN_func_80092B9C(prim);
-	prim->r0 = 0;
-	prim->g0 = 0;
-	prim->b0 = 0x70;
-	prim->r1 = 0;
-	prim->g1 = 0;
-	prim->b1 = 0x50;
-	prim->r2 = 0;
-	prim->g2 = 0;
-	prim->b2 = 0x30;
-	prim->r3 = 0;
-	prim->g3 = 0;
-	prim->b3 = 0x10;
-	prim->x0 = x + 3;
-	prim->y0 = y + 3;
-	prim->x1 = (x + 3) + (w - 6);
-	prim->y1 = y + 3;
-	prim->x2 = x + 3;
-	prim->y2 = (y + 3) + (h - 6);
-	prim->x3 = (x + 3) + (w - 6);
-	prim->y3 = (y + 3) + (h - 6);
+	setRGB0(prim, 0, 0, 0x70);
+	setRGB1(prim, 0, 0, 0x50);
+	setRGB2(prim, 0, 0, 0x30);
+	setRGB3(prim, 0, 0, 0x10);
+	setXYWH(prim, x + 3, y + 3, (w - 6), (h - 6));
 	AddPrim(ACTIVE_ORDERING_TABLE->org, prim++);
 	GsSetWorkBase((PACKET *)prim);
 }
@@ -1128,10 +1097,7 @@ void drawSaveSlotText(int32_t slot, int32_t row)
 
 	if (slot >= 0 && slot < 0xF) {
 		row *= 0x18;
-		area.x = 0;
-		area.y = row + 0xC;
-		area.w = 0xE0;
-		area.h = 0x18;
+		setRECT(&area, 0, row + 0xC, 0xE0, 0x18);
 		clearTextSubArea(&area);
 		drawString(&MAIN_D_80131658[(slot + 1) * 6], 0, row + 0xC);
 		drawString(&MAIN_D_801BF768[slot * 0x44] + 4, 0x18, row + 0xC);
@@ -1169,10 +1135,7 @@ void drawRegisteredBattleSlots(int32_t slot)
 	int32_t y;
 	uint8_t type;
 
-	area.x = 0;
-	area.y = 0xC;
-	area.w = 0xCC;
-	area.h = 0x78;
+	setRECT(&area, 0, 0xC, 0xCC, 0x78);
 	clearTextSubArea(&area);
 	/* CodeWarrior emits the retail s2 = s0 transfer before clearing s3 only when
 	 * the loop-counter initialization remains in this signed expression. */
@@ -2879,26 +2842,12 @@ void MAIN_func_801136C8(MenuHighlight *b)
 	h = b->h + 2;
 	prim = (LINE_F3 *)GsGetWorkBase();
 	SetLineF3(prim);
-	prim->r0 = 0xA0;
-	prim->g0 = 0xA0;
-	prim->b0 = 0;
-	prim->x0 = x;
-	prim->y0 = y;
-	prim->x1 = x + w;
-	prim->y1 = y;
-	prim->x2 = x + w;
-	prim->y2 = y + h;
+	setRGB0(prim, 0xA0, 0xA0, 0);
+	setXY3(prim, x, y, x + w, y, x + w, y + h);
 	AddPrim(ACTIVE_ORDERING_TABLE->org, prim++);
 	SetLineF3(prim);
-	prim->r0 = 0xA0;
-	prim->g0 = 0xA0;
-	prim->b0 = 0;
-	prim->x0 = x + w;
-	prim->y0 = y + h;
-	prim->x1 = x;
-	prim->y1 = y + h;
-	prim->x2 = x;
-	prim->y2 = y;
+	setRGB0(prim, 0xA0, 0xA0, 0);
+	setXY3(prim, x + w, y + h, x, y + h, x, y);
 	AddPrim(ACTIVE_ORDERING_TABLE->org, prim++);
 	GsSetWorkBase((PACKET *)prim);
 }

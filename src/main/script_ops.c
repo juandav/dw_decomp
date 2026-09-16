@@ -706,10 +706,7 @@ void MAIN_func_80107110(void)
 	setupBoxOrigin(boxId, &origin);
 	result = MAIN_func_800FCC40();
 	src = &((RECT *)MAIN_D_8013027C)[MAIN_D_80135011];
-	rect.x = src->x;
-	rect.y = src->y;
-	rect.w = src->w;
-	rect.h = src->h;
+	setRECT(&rect, src->x, src->y, src->w, src->h);
 	createTextbox(1, 0xf1, &rect, &origin, MAIN_func_80107E6C,
 		      MAIN_func_80108090);
 	registerTextbox(1, 9, 6, 1, 0);
@@ -785,20 +782,14 @@ void MAIN_func_80107660(void)
 
 	boxId = readPStat(PSTAT_254);
 	setupBoxOrigin(boxId, &origin);
-	rect.x = -152;
-	rect.y = -98;
-	rect.w = 148;
-	rect.h = 127;
+	setRECT(&rect, -152, -98, 148, 127);
 	createTextbox(1, 0xe1, &rect, &origin, MAIN_func_80108334,
 		      MAIN_func_80108604);
 	registerTextbox(1, 9, 6, 1, 1);
 	MAIN_func_800FCC98(MAIN_D_80134F68, 1, 0xa);
 	MAIN_func_80108610(0);
 	setupBoxOrigin(0xfd, &origin);
-	rect.x = 0;
-	rect.y = -98;
-	rect.w = 148;
-	rect.h = 127;
+	setRECT(&rect, 0, -98, 148, 127);
 	createTextbox(2, 0xe1, &rect, &origin, 0, MAIN_func_801086D4);
 	registerTextbox(2, 9, 6, 1, 2);
 	MAIN_func_800FCC98(MAIN_D_80134F6C, 2, 0xa);
@@ -863,10 +854,7 @@ void MAIN_func_801078F4(void)
 	int32_t row;
 
 	setupBoxOrigin(readPStat(0xfe), &origin);
-	rect.x = -0x47;
-	rect.y = -0x62;
-	rect.w = 0xde;
-	rect.h = 0x81;
+	setRECT(&rect, -0x47, -0x62, 0xde, 0x81);
 	createTextbox(1, 0xf1, &rect, &origin, MAIN_func_801091DC, MAIN_func_801093E4);
 	registerTextbox(1, 9, 6, 1, 0);
 
@@ -938,10 +926,7 @@ void MAIN_func_80107B98(void)
 
 	boxId = readPStat(PSTAT_254);
 	setupBoxOrigin(boxId, &origin);
-	rect.x = -71;
-	rect.y = -100;
-	rect.w = 222;
-	rect.h = 129;
+	setRECT(&rect, -71, -100, 222, 129);
 	createTextbox(1, 0xf1, &rect, &origin, MAIN_func_801094F0,
 		      MAIN_func_801096E8);
 	registerTextbox(1, 9, 6, 1, 0);
@@ -991,10 +976,7 @@ void MAIN_func_80107D54(void)
 
 	boxId = readPStat(PSTAT_254);
 	setupBoxOrigin(boxId, &origin);
-	rect.x = -88;
-	rect.y = -80;
-	rect.w = 223;
-	rect.h = 83;
+	setRECT(&rect, -88, -80, 223, 83);
 	createTextbox(1, 0xe1, &rect, &origin, MAIN_func_801097F4,
 		      MAIN_func_801099E8);
 	registerTextbox(1, 9, 4, 1, 0);
@@ -1048,18 +1030,12 @@ void MAIN_func_80107E6C(void)
 	if (isKeyDown(0x40)) {
 		src = &MAIN_D_801302BC[MAIN_D_80135011];
 		if (MAIN_D_80135011 == 3) {
-			rect.x = src->x;
-			rect.y = src->y;
-			rect.w = src->w;
-			rect.h = src->h;
+			setRECT(&rect, src->x, src->y, src->w, src->h);
 			MAIN_func_800FD244(&rect);
 		} else if (MAIN_D_80135011 == 6) {
 			MAIN_func_80108230();
 		} else {
-			rect.x = src->x;
-			rect.y = src->y;
-			rect.w = src->w;
-			rect.h = src->h;
+			setRECT(&rect, src->x, src->y, src->w, src->h);
 			MAIN_func_800FCFB8(&rect);
 		}
 	} else if (isKeyDown(0x10)) {
@@ -1195,10 +1171,7 @@ void MAIN_func_80108334(void)
 				MAIN_func_800FD534(box, 0);
 			}
 		} else if (isKeyDown(0x800)) {
-			rect.x = 5;
-			rect.y = 0x20;
-			rect.w = 0x80;
-			rect.h = 0x12;
+			setRECT(&rect, 5, 0x20, 0x80, 0x12);
 			MAIN_func_800FD61C(box, &rect,
 					   (uint8_t)(MAIN_D_80134F90 + 1));
 			playSound(0, 3);
@@ -1717,14 +1690,8 @@ void setupNewGameDialogueBox(void)
 		}
 	}
 
-	rect1.x = screenPos[0];
-	rect1.y = screenPos[1];
-	rect1.w = 10;
-	rect1.h = 10;
-	rect2.x = -130;
-	rect2.y = -78;
-	rect2.w = 262;
-	rect2.h = 59;
+	setRECT(&rect1, screenPos[0], screenPos[1], 10, 10);
+	setRECT(&rect2, -130, -78, 262, 59);
 	createTextbox(0, 0x81, &rect2, &rect1, tickScriptDialogueBox,
 		      renderScriptDialogueBox);
 	registerTextbox(0, 0, 4, 1, 0);
@@ -1772,14 +1739,8 @@ void setupNameSelectorBox(void)
 		}
 	}
 
-	rect1.x = screenPos[0];
-	rect1.y = screenPos[1];
-	rect1.w = 10;
-	rect1.h = 10;
-	rect2.x = -145;
-	rect2.y = -91;
-	rect2.w = 290;
-	rect2.h = 138;
+	setRECT(&rect1, screenPos[0], screenPos[1], 10, 10);
+	setRECT(&rect2, -145, -91, 290, 138);
 	createTextbox(1, flags, &rect2, &rect1, tickNamingBox,
 		      renderNamingBox);
 	registerTextbox(1, 1, 7, 1, 0);
@@ -1810,14 +1771,8 @@ void setupNameDisplayBox(void)
 		}
 	}
 
-	rect1.x = screenPos[0];
-	rect1.y = screenPos[1];
-	rect1.w = 10;
-	rect1.h = 10;
-	rect2.x = -145;
-	rect2.y = 60;
-	rect2.w = 149;
-	rect2.h = 42;
+	setRECT(&rect1, screenPos[0], screenPos[1], 10, 10);
+	setRECT(&rect2, -145, 60, 149, 42);
 	createTextbox(2, flags, &rect2, &rect1, 0, renderNameDisplayBox);
 	registerTextbox(2, 0, 1, 0, 0);
 

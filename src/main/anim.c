@@ -129,10 +129,7 @@ tex_done:
 		frame = 0;
 	}
 
-	rect.x = anim->textureX;
-	rect.y = anim->textureY + 0x20 + frame * 0x20;
-	rect.w = texX;
-	rect.h = 0x20;
+	setRECT(&rect, anim->textureX, anim->textureY + 0x20 + frame * 0x20, texX, 0x20);
 	MoveImage(&rect, anim->textureX, anim->textureY);
 }
 
@@ -454,10 +451,7 @@ op_3000:
 		RECT rect;
 
 		*instrPtrPtr = instrPtr + 1;
-		rect.x = anim->textureX + ((**instrPtrPtr & 0xff00) >> 8);
-		rect.y = anim->textureY + (*(*instrPtrPtr)++ & 0xff);
-		rect.w = (**instrPtrPtr & 0xff00) >> 8;
-		rect.h = *(*instrPtrPtr)++ & 0xff;
+		setRECT(&rect, anim->textureX + ((**instrPtrPtr & 0xff00) >> 8), anim->textureY + (*(*instrPtrPtr)++ & 0xff), (**instrPtrPtr & 0xff00) >> 8, *(*instrPtrPtr)++ & 0xff);
 		MoveImage(&rect,
 			  anim->textureX + peekAnimationTextureHighByte(instrPtrPtr),
 			  anim->textureY + readAnimationTextureLowByte(instrPtrPtr));

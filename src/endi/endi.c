@@ -517,10 +517,7 @@ static void ENDI_setClutStp(u_long *clut)
 		*ptr++ += stp << 15;
 	}
 
-	rect.x = 0;
-	rect.y = 488;
-	rect.w = 16;
-	rect.h = 24;
+	setRECT(&rect, 0, 488, 16, 24);
 	LoadImage(&rect, clut);
 
 	DrawSync(0);
@@ -530,10 +527,7 @@ static void ENDI_downloadClut(u_long *clut)
 {
 	RECT rect;
 
-	rect.x = 0;
-	rect.y = 488;
-	rect.w = 16;
-	rect.h = 24;
+	setRECT(&rect, 0, 488, 16, 24);
 	StoreImage(&rect, clut);
 
 	DrawSync(0);
@@ -702,10 +696,7 @@ static void ENDI_fadeClut(u_long *srcClut, Entity *entity, u_long *dstClut,
 		*dst++ += stp << 15;
 	}
 
-	rect.x = 0;
-	rect.y = 488;
-	rect.w = 16;
-	rect.h = 24;
+	setRECT(&rect, 0, 488, 16, 24);
 	LoadImage(&rect, (u_long *)dstClut);
 
 	DrawSync(0);
@@ -773,16 +764,12 @@ static void ENDI_releaseParticles(int32_t index)
 
 static void ENDI_getParticleBase(int32_t arg0, SVECTOR *dst)
 {
-	dst->vx = ENDI_DATA.base.vx;
-	dst->vy = ENDI_DATA.base.vy;
-	dst->vz = ENDI_DATA.base.vz;
+	copyVector(dst, &ENDI_DATA.base);
 }
 
 static void ENDI_setParticleBase(int32_t arg0, SVECTOR *src)
 {
-	ENDI_DATA.base.vx = src->vx;
-	ENDI_DATA.base.vy = src->vy;
-	ENDI_DATA.base.vz = src->vz;
+	copyVector(&ENDI_DATA.base, src);
 }
 
 static void ENDI_stopParticles(void)
@@ -824,9 +811,7 @@ static void ENDI_renderParticles(int32_t objectId)
 				vec.vx += (int16_t)boneMatrix.t[0];
 				vec.vy += (int16_t)boneMatrix.t[1];
 				vec.vz += (int16_t)boneMatrix.t[2];
-				p->worldPos.vx = vec.vx;
-				p->worldPos.vy = vec.vy;
-				p->worldPos.vz = vec.vz;
+				copyVector(&p->worldPos, &vec);
 			} else {
 				p->worldPos.vx = p->pos.vx + ENDI_DATA.base.vx;
 				p->worldPos.vy = p->pos.vy + ENDI_DATA.base.vy;

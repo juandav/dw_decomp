@@ -229,10 +229,7 @@ void TRN_tickBrainsTraining(int32_t instanceId)
 			TRN_closeUIBox(1);
 			if (UI_BOX_DATA[2].state == 1) {
 				getEntityScreenPos(ENTITY_TABLE[0], 0, (int16_t *)&pos);
-				rect.x = pos.vx - 5;
-				rect.y = pos.vy - 5;
-				rect.w = 10;
-				rect.h = 10;
+				setRECT(&rect, pos.vx - 5, pos.vy - 5, 10, 10);
 				removeAnimatedUIBox(2, &rect);
 			}
 			setTamerState(0);

@@ -531,10 +531,7 @@ void loadMapImage2(u_long *tim, int32_t id)
 
 	caddr = image.caddr;
 	for (i = 0; i < image.crect->h; i++) {
-		rect.x = i * 16;
-		rect.y = 486;
-		rect.w = 16;
-		rect.h = 1;
+		setRECT(&rect, i * 16, 486, 16, 1);
 		LoadImage(&rect, caddr);
 		caddr += 8;
 	}
@@ -785,9 +782,7 @@ void renderMist(void)
 				setPosDataPolyFT4(prim, MIST_X_OFFSETS[i % 2],
 						   MIST_Y_OFFSETS[i / 2], 0x140,
 						   0xf0);
-				prim->r0 = 0x96;
-				prim->g0 = 0x96;
-				prim->b0 = 0x96;
+				setRGB0(prim, 0x96, 0x96, 0x96);
 			} else {
 				prim->tpage = GetTPage(0, 1, 0x2c0, 0);
 				if (CURRENT_SCREEN == 0xa3 || CURRENT_SCREEN == 0xdc) {
@@ -807,9 +802,7 @@ void renderMist(void)
 				prim->y1 = MIST_Y_OFFSETS[yIndex / 2];
 				prim->y2 = MIST_Y_OFFSETS[yIndex / 2] + 0xf0;
 				prim->y3 = MIST_Y_OFFSETS[yIndex / 2] + 0xf0;
-				prim->r0 = 0x50;
-				prim->g0 = 0x50;
-				prim->b0 = 0x50;
+				setRGB0(prim, 0x50, 0x50, 0x50);
 			}
 			setUVDataPolyFT4(prim, 0, 0, 0xff, 0xc8);
 			AddPrim(&ACTIVE_ORDERING_TABLE->org[20], prim);
@@ -863,9 +856,7 @@ void buildSnowflakePrim(POLY_FT4 *prim, LocalMapObjectInstance *inst,
 
 	setPosDataPolyFT4(prim, inst->x - 0xa0 + horizontalMovement,
 			   inst->y - 0x78, obj->width, obj->height);
-	prim->r0 = 0x80;
-	prim->g0 = 0x80;
-	prim->b0 = 0x80;
+	setRGB0(prim, 0x80, 0x80, 0x80);
 	setUVDataPolyFT4(prim, obj->texX % 256, obj->texY % 256,
 			 obj->width - 1, obj->height - 1);
 	prim->tpage = GetTPage(0, obj->transparency,
@@ -905,9 +896,7 @@ void buildMapOverlayPrim(POLY_FT4 *prim, LocalMapObjectInstance *inst,
 				  obj->height);
 	}
 
-	prim->r0 = 128;
-	prim->g0 = 128;
-	prim->b0 = 128;
+	setRGB0(prim, 128, 128, 128);
 
 	if (((obj->texX % 256) + obj->width) < 256) {
 		if (((obj->texY % 256) + obj->height) < 256) {
@@ -2285,20 +2274,11 @@ void renderTriangleCursor(int32_t selection, int16_t yOffset)
 	for (; i < 8; i++) {
 		prim = (POLY_FT4 *)GsGetWorkBase();
 		SetPolyFT4(prim);
-		prim->u0 = (uint8_t)u0.data[i];
-		prim->v0 = (uint8_t)v0.data[i];
-		prim->u1 = (uint8_t)u1.data[i];
-		prim->v1 = (uint8_t)v0.data[i];
-		prim->u2 = (uint8_t)u0.data[i];
-		prim->v2 = (uint8_t)v1.data[i];
-		prim->u3 = (uint8_t)u1.data[i];
-		prim->v3 = (uint8_t)v1.data[i];
+		setUV4(prim, (uint8_t)u0.data[i], (uint8_t)v0.data[i], (uint8_t)u1.data[i], (uint8_t)v0.data[i], (uint8_t)u0.data[i], (uint8_t)v1.data[i], (uint8_t)u1.data[i], (uint8_t)v1.data[i]);
 		setPosDataPolyFT4(prim, baseX + xOffset.data[i],
 				   baseY + yOffsetData.data[i] + menuYOffset,
 				   width.data[i], height.data[i]);
-		prim->r0 = 0x80;
-		prim->g0 = 0x80;
-		prim->b0 = 0x80;
+		setRGB0(prim, 0x80, 0x80, 0x80);
 		prim->tpage = GetTPage(0, 0, 0x380, 0x1c0);
 		prim->clut = GetClut(0x100, 0x1fc);
 		AddPrim(tag, prim);
@@ -2349,13 +2329,9 @@ void renderRectPolyFT4(int16_t posX, int16_t posY, int32_t width,
 		setPosDataPolyFT4(prim, posX, posY, drawWidth, drawHeight);
 	}
 	if (flag & 1) {
-		prim->r0 = 0x32;
-		prim->g0 = 0x32;
-		prim->b0 = 0x32;
+		setRGB0(prim, 0x32, 0x32, 0x32);
 	} else {
-		prim->r0 = 0x80;
-		prim->g0 = 0x80;
-		prim->b0 = 0x80;
+		setRGB0(prim, 0x80, 0x80, 0x80);
 	}
 	prim->tpage = texturePage;
 	prim->clut = clut;
@@ -2448,15 +2424,9 @@ int32_t createMenuBox(int32_t id, int16_t x, int16_t y, int16_t width,
 		return 1;
 	}
 	if (UI_BOX_DATA[id].frame == 0) {
-		finalPos.x = x;
-		finalPos.y = y;
-		finalPos.w = width;
-		finalPos.h = height;
+		setRECT(&finalPos, x, y, width, height);
 		getEntityScreenPos(ENTITY_TABLE[0], 1, entityPos);
-		startPos.x = entityPos[0] - 5;
-		startPos.y = entityPos[1] - 5;
-		startPos.w = 10;
-		startPos.h = 10;
+		setRECT(&startPos, entityPos[0] - 5, entityPos[1] - 5, 10, 10);
 		createAnimatedUIBox(id, 1, features, &finalPos, &startPos,
 				    (TickFunction)tick, (RenderFunction)render);
 	}
@@ -2765,15 +2735,11 @@ void tickPlayerMenu(void)
 								(MAIN_D_80134D42 - 7) * 0x18 + 0xf8;
 						}
 						if (isUIBoxAvailable(2) == 1) {
-							finalPos.x = -0x96;
-							finalPos.y = -0x59;
-							finalPos.w = 0x12c;
-							finalPos.h = 0xbe;
+							setRECT(&finalPos, -0x96, -0x59, 0x12c, 0xbe);
 							startPos.x = selectorX - 0x99;
 							startPos.y =
 								MAIN_D_80134D44 * 0x13 - 0x45;
-							startPos.w = 10;
-							startPos.h = 10;
+							setWH(&startPos, 10, 10);
 							MAIN_D_80134D46 = 0;
 							createAnimatedUIBox(
 								2, 1, 0, &finalPos, &startPos,
@@ -2798,10 +2764,7 @@ void tickPlayerMenu(void)
 						selectorX =
 							(MAIN_D_80134D42 - 7) * 0x18 + 0xf8;
 					}
-					finalPos.x = selectorX - 0x99;
-					finalPos.y = MAIN_D_80134D44 * 0x13 - 0x45;
-					finalPos.w = 10;
-					finalPos.h = 10;
+					setRECT(&finalPos, selectorX - 0x99, MAIN_D_80134D44 * 0x13 - 0x45, 10, 10);
 					removeAnimatedUIBox(2, &finalPos);
 					playSound(0, 3);
 					MENU_STATE = 2;
@@ -2845,18 +2808,9 @@ void tickPlayerMenu(void)
 					playSound(0, 3);
 					MENU_STATE = 3;
 					loadCardImage(SELECTED_CARD);
-					startPos.x = (SELECTED_CARD % 11) * 0x18 - 0x79;
-					startPos.y = (SELECTED_CARD / 11) * 0x18 - 0x36;
-					startPos.w = 1;
-					startPos.h = 1;
-					finalPos.x = -0x4b;
-					finalPos.y = -0x53;
-					finalPos.w = 0x96;
-					finalPos.h = 0xb4;
-					secondFinalPos.x = 0x4a;
-					secondFinalPos.y = 0x45;
-					secondFinalPos.w = 0x36;
-					secondFinalPos.h = 0x18;
+					setRECT(&startPos, (SELECTED_CARD % 11) * 0x18 - 0x79, (SELECTED_CARD / 11) * 0x18 - 0x36, 1, 1);
+					setRECT(&finalPos, -0x4b, -0x53, 0x96, 0xb4);
+					setRECT(&secondFinalPos, 0x4a, 0x45, 0x36, 0x18);
 					createAnimatedUIBox(
 						2, 1, 0, &finalPos, &startPos, NULL,
 						(RenderFunction)renderCardImage);
@@ -2889,10 +2843,7 @@ void tickPlayerMenu(void)
 			if ((isKeyDown(0x10) != 0) && (MENU_STATE == 3)) {
 				playSound(0, 4);
 				MENU_STATE = 2;
-				startPos.x = (SELECTED_CARD % 11) * 0x18 - 0x79;
-				startPos.y = (SELECTED_CARD / 11) * 0x18 - 0x36;
-				startPos.w = 1;
-				startPos.h = 1;
+				setRECT(&startPos, (SELECTED_CARD % 11) * 0x18 - 0x79, (SELECTED_CARD / 11) * 0x18 - 0x36, 1, 1);
 				removeAnimatedUIBox(2, &startPos);
 				removeAnimatedUIBox(3, &startPos);
 			}
@@ -3153,10 +3104,7 @@ void equipMove(void)
 	}
 	MAIN_D_80134234[slot] = moveId;
 	PARTNER_ENTITY.digimonEntity.stats.base.moves[slot] = animation + 0x2e;
-	textArea.x = 0;
-	textArea.y = textY = slot * 12 + 0x18;
-	textArea.w = 0x84;
-	textArea.h = 0xc;
+	setRECT(&textArea, 0, textY = slot * 12 + 0x18, 0x84, 0xc);
 	clearTextSubArea(&textArea);
 	drawString(MOVE_NAMES[(uint8_t)moveId], 0, textY);
 	playSound(0, 3);

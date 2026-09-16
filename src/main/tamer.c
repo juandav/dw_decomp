@@ -483,9 +483,7 @@ void tickWalkingState(void)
 		startAnimation(&TAMER_ENTITY.entity, 0);
 		unsetCameraFollowPlayer();
 
-		STORED_TAMER_POS.vx = TAMER_ENTITY.entity.posData->location.vx;
-		STORED_TAMER_POS.vy = TAMER_ENTITY.entity.posData->location.vy;
-		STORED_TAMER_POS.vz = TAMER_ENTITY.entity.posData->location.vz;
+		copyVector(&STORED_TAMER_POS, &TAMER_ENTITY.entity.posData->location);
 		IS_IN_MENU = 1;
 
 		stopGameTime();
@@ -546,9 +544,7 @@ void tickWalkingState(void)
 	checkMedalConditions();
 	checkPendingAwards();
 
-	STORED_TAMER_POS.vx = TAMER_ENTITY.entity.posData->location.vx;
-	STORED_TAMER_POS.vy = TAMER_ENTITY.entity.posData->location.vy;
-	STORED_TAMER_POS.vz = TAMER_ENTITY.entity.posData->location.vz;
+	copyVector(&STORED_TAMER_POS, &TAMER_ENTITY.entity.posData->location);
 }
 
 int16_t getMapRotation(void)
@@ -776,9 +772,7 @@ int32_t startBattle(int16_t instanceId)
 	int32_t battleData;
 
 	GAME_STATE = 1;
-	STORED_TAMER_POS.vx = TAMER_ENTITY.entity.posData->location.vx;
-	STORED_TAMER_POS.vy = TAMER_ENTITY.entity.posData->location.vy;
-	STORED_TAMER_POS.vz = TAMER_ENTITY.entity.posData->location.vz;
+	copyVector(&STORED_TAMER_POS, &TAMER_ENTITY.entity.posData->location);
 
 	unsetCameraFollowPlayer();
 	closeTriangleMenu();

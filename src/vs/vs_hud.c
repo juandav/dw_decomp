@@ -287,11 +287,9 @@ void VS_renderCommandMenu(uint8_t id)
 	if (GAME_STATE == 4) {
 		x = base - (COMBAT_DATA_PTR->player.hoveredCommand[id] * 0xe);
 		SetPolyFT4(prim);
-		prim->tpage = 0x1f;
+		prim->tpage = getTPage(0, 0, 960, 256);
 		prim->clut = GetClut(0x11a, 0x1f1);
-		prim->r0 = 0x80;
-		prim->g0 = 0x80;
-		prim->b0 = 0x80;
+		setRGB0(prim, 0x80, 0x80, 0x80);
 		setUVDataPolyFT4(prim, 0x3d, 0xe0, 0x16, 0x16);
 		if ((count % 2) == 0) {
 			if ((COMBAT_DATA_PTR->player.hoveredCommand[id] % 2) == 0) {
@@ -313,31 +311,15 @@ void VS_renderCommandMenu(uint8_t id)
 
 	for (i = 1, off = 0xe; i < COMBAT_DATA_PTR->player.numCommands[id]; i++, off += 0xe) {
 		SetPolyFT4(prim);
-		prim->tpage = 0x1f;
+		prim->tpage = getTPage(0, 0, 960, 256);
 		prim->clut = GetClut(0x110, 0x1f0);
-		prim->r0 = 0x80;
-		prim->g0 = 0x80;
-		prim->b0 = 0x80;
+		setRGB0(prim, 0x80, 0x80, 0x80);
 		VS_setCommandIconUV((DigimonEntity *)ENTITY_TABLE[COMBAT_DATA_PTR->player.entityIds[id]], prim, COMBAT_DATA_PTR->player.availableCommands[id][i]);
 		x = base - off;
 		if ((count % 2) == 0) {
-			prim->x0 = x;
-			prim->y0 = ((i % 2) == 0) ? MAIN_D_801352AC[id] + 3 : MAIN_D_801352AC[id] + 0xd;
-			prim->x1 = x + 0x10;
-			prim->y1 = ((i % 2) == 0) ? MAIN_D_801352AC[id] + 3 : MAIN_D_801352AC[id] + 0xd;
-			prim->x2 = x;
-			prim->y2 = ((i % 2) == 0) ? MAIN_D_801352B0[id] - 0xd : MAIN_D_801352B0[id] - 3;
-			prim->x3 = x + 0x10;
-			prim->y3 = ((i % 2) == 0) ? MAIN_D_801352B0[id] - 0xd : MAIN_D_801352B0[id] - 3;
+			setXY4(prim, x, ((i % 2) == 0) ? MAIN_D_801352AC[id] + 3 : MAIN_D_801352AC[id] + 0xd, x + 0x10, ((i % 2) == 0) ? MAIN_D_801352AC[id] + 3 : MAIN_D_801352AC[id] + 0xd, x, ((i % 2) == 0) ? MAIN_D_801352B0[id] - 0xd : MAIN_D_801352B0[id] - 3, x + 0x10, ((i % 2) == 0) ? MAIN_D_801352B0[id] - 0xd : MAIN_D_801352B0[id] - 3);
 		} else {
-			prim->x0 = x;
-			prim->y0 = ((i % 2) == 1) ? MAIN_D_801352AC[id] + 3 : MAIN_D_801352AC[id] + 0xd;
-			prim->x1 = x + 0x10;
-			prim->y1 = ((i % 2) == 1) ? MAIN_D_801352AC[id] + 3 : MAIN_D_801352AC[id] + 0xd;
-			prim->x2 = x;
-			prim->y2 = ((i % 2) == 1) ? MAIN_D_801352B0[id] - 0xd : MAIN_D_801352B0[id] - 3;
-			prim->x3 = x + 0x10;
-			prim->y3 = ((i % 2) == 1) ? MAIN_D_801352B0[id] - 0xd : MAIN_D_801352B0[id] - 3;
+			setXY4(prim, x, ((i % 2) == 1) ? MAIN_D_801352AC[id] + 3 : MAIN_D_801352AC[id] + 0xd, x + 0x10, ((i % 2) == 1) ? MAIN_D_801352AC[id] + 3 : MAIN_D_801352AC[id] + 0xd, x, ((i % 2) == 1) ? MAIN_D_801352B0[id] - 0xd : MAIN_D_801352B0[id] - 3, x + 0x10, ((i % 2) == 1) ? MAIN_D_801352B0[id] - 0xd : MAIN_D_801352B0[id] - 3);
 		}
 		if ((i == COMBAT_DATA_PTR->player.hoveredCommand[id]) && (MAIN_D_801352B4[id] == 1)) {
 			prim->u0 += 0x10;
@@ -350,20 +332,11 @@ void VS_renderCommandMenu(uint8_t id)
 
 	for (i = 0; i < COMBAT_DATA_PTR->player.numCommands[id]; i++) {
 		SetPolyFT4(prim);
-		prim->code |= 2;
+		setSemiTrans(prim, 1);
 		prim->tpage = GetTPage(0, 0, 0x3c0, 0x100);
 		prim->clut = GetClut(0x110, 0x1f1);
-		prim->r0 = 0x80;
-		prim->g0 = 0x80;
-		prim->b0 = 0x80;
-		prim->u0 = MAIN_D_80134AE8[VS_D_80070764[MAIN_D_801352B8[id]][i]];
-		prim->v0 = 0xe0;
-		prim->u1 = MAIN_D_80134AE8[VS_D_80070764[MAIN_D_801352B8[id]][i]] + MAIN_D_80134AF0[VS_D_80070764[MAIN_D_801352B8[id]][i]];
-		prim->v1 = 0xe0;
-		prim->u2 = MAIN_D_80134AE8[VS_D_80070764[MAIN_D_801352B8[id]][i]];
-		prim->v2 = 0xff;
-		prim->u3 = MAIN_D_80134AE8[VS_D_80070764[MAIN_D_801352B8[id]][i]] + MAIN_D_80134AF0[VS_D_80070764[MAIN_D_801352B8[id]][i]];
-		prim->v3 = 0xff;
+		setRGB0(prim, 0x80, 0x80, 0x80);
+		setUVWH(prim, MAIN_D_80134AE8[VS_D_80070764[MAIN_D_801352B8[id]][i]], 0xe0, MAIN_D_80134AF0[VS_D_80070764[MAIN_D_801352B8[id]][i]], 31);
 		if (i > 0) {
 			rowY = ((i - 1) * 0xe) + 0xb;
 		} else {
@@ -374,14 +347,7 @@ void VS_renderCommandMenu(uint8_t id)
 		} else {
 			width = 0xe;
 		}
-		prim->x0 = (rowY - 0x8f) + id * 0xa6;
-		prim->y0 = MAIN_D_801352AC[id];
-		prim->x1 = ((rowY - 0x8f) + width) + id * 0xa6;
-		prim->y1 = MAIN_D_801352AC[id];
-		prim->x2 = (rowY - 0x8f) + id * 0xa6;
-		prim->y2 = MAIN_D_801352B0[id];
-		prim->x3 = ((rowY - 0x8f) + width) + id * 0xa6;
-		prim->y3 = MAIN_D_801352B0[id];
+		setXY4(prim, (rowY - 0x8f) + id * 0xa6, MAIN_D_801352AC[id], ((rowY - 0x8f) + width) + id * 0xa6, MAIN_D_801352AC[id], (rowY - 0x8f) + id * 0xa6, MAIN_D_801352B0[id], ((rowY - 0x8f) + width) + id * 0xa6, MAIN_D_801352B0[id]);
 		AddPrim(ACTIVE_ORDERING_TABLE->org + 7, prim++);
 	}
 
@@ -419,48 +385,18 @@ void VS_renderTargetCursor(uint8_t id)
 	int32_t px;
 
 	SetPolyFT4(&prim);
-	prim.tpage = 0x1f;
+	prim.tpage = getTPage(0, 0, 960, 256);
 	prim.clut = GetClut(0x110, 0x1f2);
-	prim.r0 = 0x80;
-	prim.g0 = 0x80;
-	prim.b0 = 0x80;
-	prim.u0 = 0x58;
-	prim.v0 = 0xe0;
-	prim.u1 = 0x86;
-	prim.v1 = 0xe0;
-	prim.u2 = 0x58;
-	prim.v2 = 0xec;
-	prim.u3 = 0x86;
-	prim.v3 = 0xec;
-	prim.x0 = MAIN_D_801352BC[id];
-	prim.y0 = MAIN_D_801352C0[id];
-	prim.x1 = MAIN_D_801352BC[id] + 0x2e;
-	prim.y1 = MAIN_D_801352C0[id];
-	prim.x2 = MAIN_D_801352BC[id];
-	prim.y2 = MAIN_D_801352C0[id] + 0xc;
-	prim.x3 = MAIN_D_801352BC[id] + 0x2e;
-	prim.y3 = MAIN_D_801352C0[id] + 0xc;
+	setRGB0(&prim, 0x80, 0x80, 0x80);
+	setUVWH(&prim, 0x58, 0xe0, 46, 12);
+	setXYWH(&prim, MAIN_D_801352BC[id], MAIN_D_801352C0[id], 0x2e, 0xc);
 	n = id;
 	GsSortPoly(&prim, ACTIVE_ORDERING_TABLE, 7);
 	bars = COMBAT_DATA_PTR->player.finisherChargeup[n] / 8;
-	prim.u0 = 0x88;
-	prim.v0 = 0xe0;
-	prim.u1 = 0x8c;
-	prim.v1 = 0xe0;
-	prim.u2 = 0x88;
-	prim.v2 = 0xe6;
-	prim.u3 = 0x8c;
-	prim.v3 = 0xe6;
+	setUVWH(&prim, 0x88, 0xe0, 4, 6);
 	for (i = 0, x = 0; i < bars; i++, x += 4) {
 		px = MAIN_D_801352BC[n] + 3;
-		prim.x0 = px + x;
-		prim.y0 = MAIN_D_801352C0[n] + 3;
-		prim.x1 = (int32_t)(px + x) + 4;
-		prim.y1 = MAIN_D_801352C0[n] + 3;
-		prim.x2 = px + x;
-		prim.y2 = MAIN_D_801352C0[n] + 9;
-		prim.x3 = (int32_t)(px + x) + 4;
-		prim.y3 = MAIN_D_801352C0[n] + 9;
+		setXYWH(&prim, px + x, MAIN_D_801352C0[n] + 3, 4, 6);
 		GsSortPoly(&prim, ACTIVE_ORDERING_TABLE, 7);
 	}
 
@@ -641,9 +577,7 @@ void VS_renderBattleStartText(void)
 
 		ft = prim;
 		setEntityTextDigit(prim, 0x100, 0x1e8);
-		prim->r0 = 0x80;
-		prim->g0 = 0x80;
-		prim->b0 = 0x80;
+		setRGB0(prim, 0x80, 0x80, 0x80);
 		prim->clut = clut;
 		gte_ldv3(&p0, &p1, &p2);
 		gte_rtpt();
@@ -652,21 +586,12 @@ void VS_renderBattleStartText(void)
 		gte_ldv0(&p3);
 		gte_rtps();
 		gte_stsxy(&prim->x3);
-		prim->u0 = ((uint8_t *)*p)[0x13] * 8 + 0x80;
-		prim->v0 = 0x80;
-		prim->u1 = ((uint8_t *)*p)[0x13] * 8 + 0x88;
-		prim->v1 = 0x80;
-		prim->u2 = ((uint8_t *)*p)[0x13] * 8 + 0x80;
-		prim->v2 = 0x88;
-		prim->u3 = ((uint8_t *)*p)[0x13] * 8 + 0x88;
-		prim->v3 = 0x88;
+		setUVWH(prim, ((uint8_t *)*p)[0x13] * 8 + 0x80, 0x80, 8, 8);
 		AddPrim(ot + 5, prim++);
 
 		if (n != 0x9b) {
 			SetPolyFT4(prim);
-			prim->r0 = 0x80;
-			prim->g0 = 0x80;
-			prim->b0 = 0x80;
+			setRGB0(prim, 0x80, 0x80, 0x80);
 			prim->tpage = GetTPage(0, 0, 0x380, 0x180);
 			prim->clut = clut;
 			SetSemiTrans(prim, 1);
@@ -679,14 +604,7 @@ void VS_renderBattleStartText(void)
 				q2.vy = p2.vy;
 				q2.vz = p2.vz;
 				q3 = p2;
-				prim->u0 = 0x9e;
-				prim->v0 = 0x80;
-				prim->u1 = 0x86;
-				prim->v1 = 0x80;
-				prim->u2 = 0x9e;
-				prim->v2 = 0x88;
-				prim->u3 = 0x86;
-				prim->v3 = 0x88;
+				setUVWH(prim, 0x9e, 0x80, -24, 8);
 			} else {
 				q0 = p1;
 				q1.vx = p1.vx + ((uint8_t *)*p)[0x12];
@@ -696,14 +614,7 @@ void VS_renderBattleStartText(void)
 				q3.vx = p3.vx + ((uint8_t *)*p)[0x12];
 				q3.vy = p3.vy;
 				q3.vz = p3.vz;
-				prim->u0 = 0x86;
-				prim->v0 = 0x80;
-				prim->u1 = 0x9e;
-				prim->v1 = 0x80;
-				prim->u2 = 0x86;
-				prim->v2 = 0x88;
-				prim->u3 = 0x9e;
-				prim->v3 = 0x88;
+				setUVWH(prim, 0x86, 0x80, 24, 8);
 			}
 			gte_ldv3(&q0, &q1, &q2);
 			gte_rtpt();
@@ -717,17 +628,8 @@ void VS_renderBattleStartText(void)
 
 		shadow = (POLY_F4 *)prim;
 		SetPolyF4(shadow);
-		shadow->r0 = 0;
-		shadow->g0 = 0;
-		shadow->b0 = 0;
-		shadow->x0 = ft->x0 + 2;
-		shadow->y0 = ft->y0 + 2;
-		shadow->x1 = ft->x1 + 2;
-		shadow->y1 = ft->y1 + 2;
-		shadow->x2 = ft->x2 + 2;
-		shadow->y2 = ft->y2 + 2;
-		shadow->x3 = ft->x3 + 2;
-		shadow->y3 = ft->y3 + 2;
+		setRGB0(shadow, 0, 0, 0);
+		setXY4(shadow, ft->x0 + 2, ft->y0 + 2, ft->x1 + 2, ft->y1 + 2, ft->x2 + 2, ft->y2 + 2, ft->x3 + 2, ft->y3 + 2);
 		AddPrim(ot + 6, shadow++);
 		prim = (POLY_FT4 *)shadow;
 	}
@@ -822,9 +724,7 @@ void VS_renderBattleStartTextBurst(void)
 
 		ft = prim;
 		setEntityTextDigit(prim, 0x100, 0x1e8);
-		prim->r0 = 0x80;
-		prim->g0 = 0x80;
-		prim->b0 = 0x80;
+		setRGB0(prim, 0x80, 0x80, 0x80);
 		prim->clut = GetClut(0x100, 0x1e8);
 		gte_ldv3(&pts[0], &pts[1], &pts[2]);
 		gte_rtpt();
@@ -833,28 +733,12 @@ void VS_renderBattleStartTextBurst(void)
 		gte_ldv0(&pts[3]);
 		gte_rtps();
 		gte_stsxy(&prim->x3);
-		prim->u0 = ((uint8_t *)*p)[0x13] * 8 + 0x80;
-		prim->v0 = 0x80;
-		prim->u1 = ((uint8_t *)*p)[0x13] * 8 + 0x88;
-		prim->v1 = 0x80;
-		prim->u2 = ((uint8_t *)*p)[0x13] * 8 + 0x80;
-		prim->v2 = 0x88;
-		prim->u3 = ((uint8_t *)*p)[0x13] * 8 + 0x88;
-		prim->v3 = 0x88;
+		setUVWH(prim, ((uint8_t *)*p)[0x13] * 8 + 0x80, 0x80, 8, 8);
 		AddPrim(ot + 5, prim++);
 		shadow = (POLY_F4 *)prim;
 		SetPolyF4(shadow);
-		shadow->r0 = 0;
-		shadow->g0 = 0;
-		shadow->b0 = 0;
-		shadow->x0 = ft->x0 + 2;
-		shadow->y0 = ft->y0 + 2;
-		shadow->x1 = ft->x1 + 2;
-		shadow->y1 = ft->y1 + 2;
-		shadow->x2 = ft->x2 + 2;
-		shadow->y2 = ft->y2 + 2;
-		shadow->x3 = ft->x3 + 2;
-		shadow->y3 = ft->y3 + 2;
+		setRGB0(shadow, 0, 0, 0);
+		setXY4(shadow, ft->x0 + 2, ft->y0 + 2, ft->x1 + 2, ft->y1 + 2, ft->x2 + 2, ft->y2 + 2, ft->x3 + 2, ft->y3 + 2);
 		AddPrim(ot + 6, shadow++);
 		prim = (POLY_FT4 *)shadow;
 
@@ -901,9 +785,7 @@ void VS_renderNumber(int32_t a, int32_t digits, int32_t x, int32_t y, int16_t va
 
 	for (i = count - 1; i >= 0; i--) {
 		setEntityTextDigit(prim, 256, 492);
-		prim->r0 = 0x80;
-		prim->g0 = 0x80;
-		prim->b0 = 0x80;
+		setRGB0(prim, 0x80, 0x80, 0x80);
 		setUVDataPolyFT4(prim, buf[i] * 7, 172, 7, 11);
 		setPosDataPolyFT4(prim, x + ((((int32_t)width - 1) - i) * 7), y, 7, 11);
 		AddPrim(ACTIVE_ORDERING_TABLE->org + layer, prim++);
@@ -972,31 +854,13 @@ void VS_renderHPBarFill(int32_t id)
 	setEntityTextDigit(prim, 256, 0x1e2);
 	n = id;
 	if ((MAIN_D_801352D6[id] != 1) || (((uint8_t *)COMBAT_DATA_PTR + n)[0x64e] == 0xb)) {
-		prim->r0 = 0x80;
-		prim->g0 = 0x80;
-		prim->b0 = 0x80;
+		setRGB0(prim, 0x80, 0x80, 0x80);
 	} else {
-		prim->r0 = MAIN_D_801352D2[n];
-		prim->g0 = MAIN_D_801352D2[n];
-		prim->b0 = MAIN_D_801352D2[n];
+		setRGB0(prim, MAIN_D_801352D2[n], MAIN_D_801352D2[n], MAIN_D_801352D2[n]);
 	}
 
-	prim->u0 = 0x80;
-	prim->v0 = 0x88;
-	prim->u1 = 0xa5;
-	prim->v1 = 0x88;
-	prim->u2 = 0x80;
-	prim->v2 = 0x91;
-	prim->u3 = 0xa5;
-	prim->v3 = 0x91;
-	prim->x0 = (id == 0 ? -0x56 : 0x6e);
-	prim->y0 = -0x4b;
-	prim->x1 = (id == 0 ? -0x56 : 0x6e) + 0x25;
-	prim->y1 = -0x4b;
-	prim->x2 = (id == 0 ? -0x56 : 0x6e);
-	prim->y2 = -0x42;
-	prim->x3 = (id == 0 ? -0x56 : 0x6e) + 0x25;
-	prim->y3 = -0x42;
+	setUVWH(prim, 0x80, 0x88, 37, 9);
+	setXYWH(prim, (id == 0 ? -0x56 : 0x6e), -0x4b, 0x25, 9);
 	AddPrim(ACTIVE_ORDERING_TABLE->org + 8, prim++);
 	GsSetWorkBase((PACKET *)prim);
 
@@ -1007,8 +871,7 @@ void VS_renderHPBarFill(int32_t id)
 		box.r = box.g = box.b = MAIN_D_801352D2[n];
 	}
 
-	box.w = 0x29;
-	box.h = 0xb;
+	setWH(&box, 0x29, 0xb);
 	box.x = (id == 0 ? -0x58 : 0x6c);
 	box.y = -0x4c;
 	GsSortBoxFill(&box, ACTIVE_ORDERING_TABLE, 8);
@@ -1028,31 +891,13 @@ void VS_renderHPBarDigits(int16_t i, int32_t id)
 
 	if ((((n - 1) == i) || (MAIN_D_801352D6[k] == 1)) &&
 	    (((uint8_t *)COMBAT_DATA_PTR + k)[0x64e] != 0xb)) {
-		prim->r0 = MAIN_D_801352D2[k];
-		prim->g0 = MAIN_D_801352D2[k];
-		prim->b0 = MAIN_D_801352D2[k];
+		setRGB0(prim, MAIN_D_801352D2[k], MAIN_D_801352D2[k], MAIN_D_801352D2[k]);
 	} else {
-		prim->r0 = 0x80;
-		prim->g0 = 0x80;
-		prim->b0 = 0x80;
+		setRGB0(prim, 0x80, 0x80, 0x80);
 	}
 
-	prim->u0 = MAIN_D_80134AF8[i];
-	prim->v0 = 0x9d;
-	prim->u1 = MAIN_D_80134AF8[i] + MAIN_D_80134B00[i];
-	prim->v1 = 0x9d;
-	prim->u2 = MAIN_D_80134AF8[i];
-	prim->v2 = 0xac;
-	prim->u3 = MAIN_D_80134AF8[i] + MAIN_D_80134B00[i];
-	prim->v3 = 0xac;
-	prim->x0 = (id == 0 ? MAIN_D_80134B08[i] - 0x8d : MAIN_D_80134B08[i] + 0x37);
-	prim->y0 = -0x4f;
-	prim->x1 = MAIN_D_80134B00[i] + ((id == 0 ? MAIN_D_80134B08[i] - 0x8d : MAIN_D_80134B08[i] + 0x37));
-	prim->y1 = -0x4f;
-	prim->x2 = (id == 0 ? MAIN_D_80134B08[i] - 0x8d : MAIN_D_80134B08[i] + 0x37);
-	prim->y2 = -0x40;
-	prim->x3 = MAIN_D_80134B00[i] + ((id == 0 ? MAIN_D_80134B08[i] - 0x8d : MAIN_D_80134B08[i] + 0x37));
-	prim->y3 = -0x40;
+	setUVWH(prim, MAIN_D_80134AF8[i], 0x9d, MAIN_D_80134B00[i], 15);
+	setXYWH(prim, (id == 0 ? MAIN_D_80134B08[i] - 0x8d : MAIN_D_80134B08[i] + 0x37), -0x4f, MAIN_D_80134B00[i], 15);
 	AddPrim(ACTIVE_ORDERING_TABLE->org + 8, prim++);
 	GsSetWorkBase((PACKET *)prim);
 }
@@ -1148,18 +993,10 @@ void VS_renderFighterStatusBars(uint8_t id)
 		for (k = 0; k < 3; k++, p--) {
 			SetPolyFT4(prim);
 			prim->clut = GetClut(0x100, p->clut);
-			prim->tpage = 0x1e;
+			prim->tpage = getTPage(0, 0, 896, 256);
 			setRGB0(prim, 0x80, 0x80, 0x80);
-			prim->u0 = p->u;
-			prim->v0 = p->v;
-			prim->u1 = p->u + p->w;
-			prim->v1 = p->v;
-			prim->u2 = p->u;
-			prim->v2 = p->v + p->h;
-			prim->u3 = p->u + p->w;
-			prim->v3 = p->v + p->h;
-			prim->x0 = x0 + p->x;
-			prim->y0 = y0 + p->y;
+			setUVWH(prim, p->u, p->v, p->w, p->h);
+			setXY0(prim, x0 + p->x, y0 + p->y);
 			if (k == 0) {
 				w = fill;
 			} else {

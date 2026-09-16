@@ -819,17 +819,11 @@ void uploadModelTexture(void *textureData, ModelComponent *component)
 	img.cx = (component->clutPage & 0x3f) << 4;
 	img.cy = component->clutPage >> 6;
 
-	rect.x = img.px;
-	rect.y = img.py;
-	rect.w = img.pw;
-	rect.h = img.ph;
+	setRECT(&rect, img.px, img.py, img.pw, img.ph);
 	LoadImage(&rect, img.pixel);
 
 	if ((img.pmode >> 3) & 1) {
-		rect.x = img.cx;
-		rect.y = img.cy;
-		rect.w = img.cw;
-		rect.h = img.ch;
+		setRECT(&rect, img.cx, img.cy, img.cw, img.ch);
 		LoadImage(&rect, img.clut);
 	}
 
@@ -976,16 +970,10 @@ ModelComponent *applyMMD(int32_t digimonType, int32_t entityType,
 	img.py = applyTPageOffset((m->pixelPage / 16) * 256, m->pixelOffsetY);
 	img.cx = (m->clutPage & 0x3f) << 4;
 	img.cy = m->clutPage >> 6;
-	rect.x = img.px;
-	rect.y = img.py;
-	rect.w = img.pw;
-	rect.h = img.ph;
+	setRECT(&rect, img.px, img.py, img.pw, img.ph);
 	LoadImage(&rect, img.pixel);
 	if ((img.pmode >> 3) & 1) {
-		rect.x = img.cx;
-		rect.y = img.cy;
-		rect.w = img.cw;
-		rect.h = img.ch;
+		setRECT(&rect, img.cx, img.cy, img.cw, img.ch);
 		LoadImage(&rect, img.clut);
 	}
 	memcpy(m->mmdPtr, modelData->modelPtr, modelData->modelSize);

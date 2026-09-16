@@ -145,14 +145,14 @@ void getEntityScreenPos(Entity *e, int32_t boneId, int16_t *out)
 void setEntityTextDigit(POLY_FT4* poly, int32_t x, int32_t y)
 {
 	SetPolyFT4(poly);
-	poly->tpage = 0x1E;
+	poly->tpage = getTPage(0, 0, 896, 256);
 	setClut(poly, x, y);
 }
 
 void initStringFT4(POLY_FT4* poly)
 {
 	SetPolyFT4(poly);
-	poly->tpage = 0x1B;
+	poly->tpage = getTPage(0, 0, 704, 256);
 	setClut(poly, 0xD0, 0x1E8);
 }
 

@@ -570,8 +570,7 @@ void renderFleeBubble(int32_t instanceId)
 	}
 
 	sprite.attribute = 0;
-	sprite.w = (sc < 0x30) ? 0x18 : 0x17;
-	sprite.h = (sc < 0x30) ? 0x18 : 0x17;
+	setWH(&sprite, (sc < 0x30) ? 0x18 : 0x17, (sc < 0x30) ? 0x18 : 0x17);
 	scale = sc;
 	sprite.mx = 0xb;
 	sprite.my = 0xc;

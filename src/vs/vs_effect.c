@@ -876,20 +876,14 @@ int32_t VS_setupLoadedEFEFile(EfeLoad *load)
 			GsGetTimInfo((unsigned long *)(tim + 4), &im);
 			im.px = (m->pixelPage % 16 << 6) + m->pixelOffsetX;
 			im.py = (m->pixelPage / 16 << 8) + m->pixelOffsetY;
-			rect.x = im.px;
-			rect.y = im.py;
-			rect.w = im.pw;
-			rect.h = im.ph;
+			setRECT(&rect, im.px, im.py, im.pw, im.ph);
 			LoadImage(&rect, im.pixel);
 		}
 		GsGetTimInfo((unsigned long *)(tim + 4), &im2);
 		im2.cx = (m->clutPage & 0x3f) << 4;
 		im2.cy = m->clutPage >> 6;
 		if ((im2.pmode >> 3 & 1) != 0) {
-			rect2.x = im2.cx;
-			rect2.y = im2.cy;
-			rect2.w = im2.cw;
-			rect2.h = im2.ch;
+			setRECT(&rect2, im2.cx, im2.cy, im2.cw, im2.ch);
 			LoadImage(&rect2, im2.clut);
 		}
 		MAIN_D_801352E4 = 1;
@@ -1590,7 +1584,7 @@ void VS_renderScreenOverlay(void)
 	layer = EFE_POP1(int32_t);
 
 	p = (POLY_F4 *)GsGetWorkBase();
-	setXY4(p, -0xa0, -0x78, 0xa0, -0x78, -0xa0, 0x78, 0xa0, 0x78);
+	setXYWH(p, -0xa0, -0x78, 320, 240);
 	setRGB0(p, col[0], col[1], col[2]);
 	setPolyF4(p);
 	setSemiTrans(p, mode >> 2);
@@ -1661,28 +1655,18 @@ void VS_renderRingTube(void)
 	for (i = 0; i < n - 1; i++) {
 		for (j = 0; j < 10; q += 3, j++) {
 			SetPolyFT4(p);
-			p->code |= 2;
+			setSemiTrans(p, 1);
 			p->r0 = p->g0 = p->b0 = colors[i];
 			p->tpage = m->pixelPage | 0x20;
 			p->clut = GetClut((m->clutPage & 0x3f) << 4, m->clutPage >> 6);
-			p->u0 = m->pixelOffsetX + ((i + start) & 1) * 24;
-			p->v0 = m->pixelOffsetY;
-			p->u1 = m->pixelOffsetX + ((i + start) & 1) * 24 + 0x17;
-			p->v1 = m->pixelOffsetY;
-			p->u2 = m->pixelOffsetX + ((i + start) & 1) * 24;
-			p->v2 = m->pixelOffsetY + 0x1f;
-			p->u3 = m->pixelOffsetX + ((i + start) & 1) * 24 + 0x17;
-			p->v3 = m->pixelOffsetY + 0x1f;
+			setUVWH(p, m->pixelOffsetX + ((i + start) & 1) * 24, m->pixelOffsetY, 0x17, 0x1f);
 			if (j == 9) {
 				goto wrap;
 			}
 			if (q[2] < 0x21 || q[5] < 0x21 || q[32] < 0x21 || q[35] < 0x21) {
 				continue;
 			}
-			p->x0 = q[33];
-			p->y0 = q[34];
-			p->x1 = q[3];
-			p->y1 = q[4];
+			setXY2(p, q[33], q[34], q[3], q[4]);
 emit:
 			p->x2 = q[30];
 			p->y2 = q[31];
@@ -1695,10 +1679,7 @@ wrap:
 			if (q[2] < 0x21 || q[-25] < 0x21 || q[32] < 0x21 || q[5] < 0x21) {
 				continue;
 			}
-			p->x0 = q[3];
-			p->y0 = q[4];
-			p->x1 = q[-27];
-			p->y1 = q[-26];
+			setXY2(p, q[3], q[4], q[-27], q[-26]);
 			goto emit;
 		}
 	}
@@ -1844,8 +1825,8 @@ void VS_renderRadialWaves(void)
 					*(int16_t *)&prim->u3 = uv[3];
 					setlen(prim, 9);
 					prim->code = 0x2c;
-					prim->code |= 2;
-					prim->code = prim->code & 0xfffffffe;
+					setSemiTrans(prim, 1);
+					setShadeTex(prim, 0);
 					addPrim(ACTIVE_ORDERING_TABLE->org + (EFE_PROJ_SCRATCH->otz >> 2),
 					        prim);
 					GsSetWorkBase((PACKET *)(prim + 1));
@@ -1886,10 +1867,7 @@ void VS_addClutLoadPrim(void)
 	src += idx * 2;
 	prim = GsGetWorkBase();
 	GsSetWorkBase(prim + 0x44);
-	rect.x = (((uint16_t *)MAIN_D_80134D0C[6])[9] & 0x3f) << 4;
-	rect.y = ((((uint16_t *)MAIN_D_80134D0C[6])[9] >> 6) & 0x1ff) + y;
-	rect.w = 0x10;
-	rect.h = 1;
+	setRECT(&rect, (((uint16_t *)MAIN_D_80134D0C[6])[9] & 0x3f) << 4, ((((uint16_t *)MAIN_D_80134D0C[6])[9] >> 6) & 0x1ff) + y, 0x10, 1);
 	MAIN_func_80092C18(prim, &rect);
 	memcpy(prim + 0x10, src, 0x20);
 	AddPrim(ACTIVE_ORDERING_TABLE->org + (z >> 4), prim);
@@ -1941,10 +1919,7 @@ void VS_loadClutColors(void)
 			clut[i] += *src++ << 10;
 			clut[i] += *src++ << 15;
 		}
-		rect.x = ((m->clutPage & 0x3f) << 4) + x;
-		rect.y = (m->clutPage >> 6) + y;
-		rect.w = count;
-		rect.h = 1;
+		setRECT(&rect, ((m->clutPage & 0x3f) << 4) + x, (m->clutPage >> 6) + y, count, 1);
 		LoadImage(&rect, (u_long *)clut);
 		DrawSync(0);
 	}
@@ -2132,19 +2107,10 @@ void VS_render3DTexturedQuad(void)
 		setSemiTrans(prim, 1);
 	}
 
-	prim->r0 = col[0];
-	prim->g0 = col[1];
-	prim->b0 = col[2];
+	setRGB0(prim, col[0], col[1], col[2]);
 	prim->tpage = m->pixelPage | semi;
 	prim->clut = GetClut((m->clutPage & 0x3f) << 4, (m->clutPage >> 6) + clutY);
-	prim->u0 = m->pixelOffsetX + u0off;
-	prim->v0 = m->pixelOffsetY + v0off;
-	prim->u1 = du + (m->pixelOffsetX + u0off);
-	prim->v1 = m->pixelOffsetY + v0off;
-	prim->u2 = m->pixelOffsetX + u0off;
-	prim->v2 = dv + (m->pixelOffsetY + v0off);
-	prim->u3 = du + (m->pixelOffsetX + u0off);
-	prim->v3 = dv + (m->pixelOffsetY + v0off);
+	setUVWH(prim, m->pixelOffsetX + u0off, m->pixelOffsetY + v0off, du, dv);
 	add3DSpritePrim(prim, &a, &b, &c, &d);
 }
 
@@ -2247,17 +2213,8 @@ void VS_renderWireframeBox(void)
 	idx = VS_D_80070F4C;
 	for (k = 0; k < 4; k++) {
 		SetLineF4(prim);
-		prim->r0 = col[0];
-		prim->g0 = col[1];
-		prim->b0 = col[2];
-		prim->x0 = pts[*idx].vx;
-		prim->y0 = pts[*idx++].vy;
-		prim->x1 = pts[*idx].vx;
-		prim->y1 = pts[*idx++].vy;
-		prim->x2 = pts[*idx].vx;
-		prim->y2 = pts[*idx++].vy;
-		prim->x3 = pts[*idx].vx;
-		prim->y3 = pts[*idx++].vy;
+		setRGB0(prim, col[0], col[1], col[2]);
+		setXY4(prim, pts[*idx].vx, pts[*idx++].vy, pts[*idx].vx, pts[*idx++].vy, pts[*idx].vx, pts[*idx++].vy, pts[*idx].vx, pts[*idx++].vy);
 		AddPrim(ot + 0x22, prim);
 		prim++;
 	}
@@ -2375,40 +2332,17 @@ void VS_render2DTexturedQuad(void)
 		SetPolyFT4(prim);
 		if (semi < 0) {
 			semi = -semi & 0xffff;
-			prim->x0 = ((int32_t *)a)[0];
-			prim->y0 = ((int32_t *)a)[1];
-			prim->x1 = ((int32_t *)b)[0];
-			prim->y1 = ((int32_t *)b)[1];
-			prim->x2 = ((int32_t *)c)[0];
-			prim->y2 = ((int32_t *)c)[1];
-			prim->x3 = ((int32_t *)d)[0];
-			prim->y3 = ((int32_t *)d)[1];
+			setXY4(prim, ((int32_t *)a)[0], ((int32_t *)a)[1], ((int32_t *)b)[0], ((int32_t *)b)[1], ((int32_t *)c)[0], ((int32_t *)c)[1], ((int32_t *)d)[0], ((int32_t *)d)[1]);
 		} else {
-			prim->x0 = a;
-			prim->y0 = b;
-			prim->x1 = a + c;
-			prim->y1 = b;
-			prim->x2 = a;
-			prim->y2 = b + d;
-			prim->x3 = a + c;
-			prim->y3 = b + d;
+			setXYWH(prim, a, b, c, d);
 		}
 		if (semi != 0) {
 			setSemiTrans(prim, 1);
 		}
-		prim->r0 = col[0];
-		prim->g0 = col[1];
-		prim->b0 = col[2];
+		setRGB0(prim, col[0], col[1], col[2]);
 		prim->tpage = m->pixelPage | semi;
 		prim->clut = GetClut((m->clutPage & 0x3f) << 4, (m->clutPage >> 6) + clutY);
-		prim->u0 = m->pixelOffsetX + u0off;
-		prim->v0 = m->pixelOffsetY + v0off;
-		prim->u1 = du + (m->pixelOffsetX + u0off);
-		prim->v1 = m->pixelOffsetY + v0off;
-		prim->u2 = m->pixelOffsetX + u0off;
-		prim->v2 = dv + (m->pixelOffsetY + v0off);
-		prim->u3 = du + (m->pixelOffsetX + u0off);
-		prim->v3 = dv + (m->pixelOffsetY + v0off);
+		setUVWH(prim, m->pixelOffsetX + u0off, m->pixelOffsetY + v0off, du, dv);
 		AddPrim(ACTIVE_ORDERING_TABLE->org + depth, prim);
 		prim++;
 		GsSetWorkBase((PACKET *)prim);
@@ -3150,14 +3084,7 @@ void VS_renderParallaxSprites(void)
 		prim->r0 = prim->g0 = prim->b0 = 0x80;
 		prim->tpage = m->pixelPage | 0x20;
 		prim->clut = m->clutPage + 0x40;
-		prim->u0 = m->pixelOffsetX + p[4];
-		prim->v0 = m->pixelOffsetY;
-		prim->u1 = m->pixelOffsetX + p[4] + 0x1f;
-		prim->v1 = m->pixelOffsetY;
-		prim->u2 = m->pixelOffsetX + p[4];
-		prim->v2 = m->pixelOffsetY + 0x1f;
-		prim->u3 = m->pixelOffsetX + p[4] + 0x1f;
-		prim->v3 = m->pixelOffsetY + 0x1f;
+		setUVWH(prim, m->pixelOffsetX + p[4], m->pixelOffsetY, 0x1f, 0x1f);
 		x = (p[3] * (p[1] + ox)) >> 7;
 		y = (p[3] * (p[2] + oy)) >> 7;
 		x = x % 400;
@@ -3171,14 +3098,7 @@ void VS_renderParallaxSprites(void)
 		y = y - 0xa0;
 		x = x - 0xc8;
 		sz = (p[0] * p[3]) >> 8;
-		prim->x0 = x;
-		prim->y0 = y;
-		prim->x1 = x + sz;
-		prim->y1 = y;
-		prim->x2 = x;
-		prim->y2 = y + sz;
-		prim->x3 = x + sz;
-		prim->y3 = y + sz;
+		setXYWH(prim, x, y, sz, sz);
 		AddPrim(ACTIVE_ORDERING_TABLE->org + 0x1e, prim);
 		prim++;
 		p += 5;
@@ -3239,20 +3159,13 @@ void VS_renderScrollingBackground(void)
 			ux = (ux0 + col) % 11;
 			SetPolyFT4(prim);
 			SetSemiTrans(prim, 1);
-			prim->code |= 2;
+			setSemiTrans(prim, 1);
 			prim->b0 = color;
 			prim->g0 = color;
 			prim->r0 = color;
 			prim->tpage = model->pixelPage | 0x20;
 			prim->clut = model->clutPage;
-			prim->u0 = model->pixelOffsetX + pal[tiles[uy + ux]];
-			prim->v0 = model->pixelOffsetY;
-			prim->u1 = model->pixelOffsetX + pal[tiles[uy + ux]] + 0x1f;
-			prim->v1 = model->pixelOffsetY;
-			prim->u2 = model->pixelOffsetX + pal[tiles[uy + ux]];
-			prim->v2 = model->pixelOffsetY + 0x1f;
-			prim->u3 = model->pixelOffsetX + pal[tiles[uy + ux]] + 0x1f;
-			prim->v3 = model->pixelOffsetY + 0x1f;
+			setUVWH(prim, model->pixelOffsetX + pal[tiles[uy + ux]], model->pixelOffsetY, 0x1f, 0x1f);
 			setXYWH(prim, x0, y0, 0x20, 0x20);
 			AddPrim(ACTIVE_ORDERING_TABLE->org + 0x1e, prim);
 			prim++;
@@ -3478,9 +3391,7 @@ void VS_renderProjectedSprite(void)
 	EFE_SPRITE_SCRATCH->position = EFE_POP1(VECTOR *);
 	SetRotMatrix(&GsWSMATRIX);
 	SetTransMatrix(&GsWSMATRIX);
-	EFE_SPRITE_SCRATCH->point.vx = EFE_SPRITE_SCRATCH->position->vx;
-	EFE_SPRITE_SCRATCH->point.vy = EFE_SPRITE_SCRATCH->position->vy;
-	EFE_SPRITE_SCRATCH->point.vz = EFE_SPRITE_SCRATCH->position->vz;
+	copyVector(&EFE_SPRITE_SCRATCH->point, EFE_SPRITE_SCRATCH->position);
 	EFE_SPRITE_SCRATCH->otz = RotTransPers(&EFE_SPRITE_SCRATCH->point, &EFE_SPRITE_SCRATCH->sxy, &EFE_SPRITE_SCRATCH->p, &EFE_SPRITE_SCRATCH->flag);
 	if ((EFE_SPRITE_SCRATCH->flag & 0x80000000) == 0) {
 		*(int32_t *)&EFE_SPRITE_SCRATCH->sprite.x = EFE_SPRITE_SCRATCH->sxy;
@@ -4555,9 +4466,7 @@ void VS_renderParallelLines(SVECTOR *a, SVECTOR *b, int16_t n, SVECTOR *from, SV
 	dz = (to->vz - from->vz) / n;
 	for (i = 0; i <= n; i++) {
 		SetLineF2(prim);
-		prim->r0 = col[0];
-		prim->g0 = col[1];
-		prim->b0 = col[2];
+		setRGB0(prim, col[0], col[1], col[2]);
 		depth = worldPosToScreenPos(a, (DVECTOR *)&prim->x0);
 		if ((depth > 0x200) && (depth < 0x10000)) {
 			depth = worldPosToScreenPos(b, (DVECTOR *)&prim->x1);
@@ -5283,9 +5192,7 @@ void VS_renderFinisherAura(int32_t id)
 
 	rot = MAIN_D_80134B64;
 	scale = VS_D_80071074;
-	trans.vx = e->posData->location.vx;
-	trans.vy = e->posData->location.vy;
-	trans.vz = e->posData->location.vz;
+	copyVector(&trans, &e->posData->location);
 	scale.vx = scale.vz = sx;
 	scale.vy = sy;
 	renderTMDModel(*(uint8_t **)&MAIN_D_801352FC, MAIN_D_80134B5C[fa[0] / 2 % 3], &coord, NULL, &trans, &rot, &scale);
@@ -5317,17 +5224,10 @@ void VS_renderFinisherAuraSpark(char *pos, int32_t scale, SVECTOR *dir, uint8_t 
 	prim = (POLY_FT4 *)GsGetWorkBase();
 	MAIN_func_80092B60(prim);
 	SetSemiTrans(prim, 1);
-	prim->r0 = col[0];
-	prim->g0 = col[1];
-	prim->b0 = col[2];
-	prim->tpage = 0x3c;
-	prim->clut = 0x7a4c;
-	prim->u0 = 0x30;
-	prim->v0 = 0xa8;
-	prim->u1 = 0x37;
-	prim->v1 = 0xa8;
-	prim->u2 = 0x30;
-	prim->v2 = 0xaf;
+	setRGB0(prim, col[0], col[1], col[2]);
+	prim->tpage = getTPage(0, 1, 768, 256);
+	prim->clut = getClut(192, 489);
+	setUV3(prim, 0x30, 0xa8, 0x37, 0xa8, 0x30, 0xaf);
 	a.vx = dir[0].vx * scale / 4096;
 	a.vy = dir[0].vy * scale / 4096;
 	a.vz = dir[0].vz * scale / 4096;
@@ -5361,17 +5261,11 @@ void VS_initializeFinisherAuraModel(char *tim, char *base)
 	SVECTOR *p;
 
 	GsGetTimInfo((unsigned long *)tim + 1, &image);
-	rect.x = image.px;
-	rect.y = image.py;
-	rect.w = image.pw;
-	rect.h = image.ph;
+	setRECT(&rect, image.px, image.py, image.pw, image.ph);
 	LoadImage(&rect, image.pixel);
 	GetTPage(image.pmode & 3, 0, image.px, image.py);
 	if (((image.pmode >> 3) & 1) != 0) {
-		rect.x = image.cx;
-		rect.y = image.cy;
-		rect.w = image.cw;
-		rect.h = image.ch;
+		setRECT(&rect, image.cx, image.cy, image.cw, image.ch);
 		LoadImage(&rect, image.clut);
 		GetClut(image.cx, image.cy);
 	}
@@ -5461,9 +5355,7 @@ void VS_tickAuraProjectile(int32_t id)
 		removeObject(0x179, (int16_t)id);
 		return;
 	}
-	a->position.vx += a->velocity.vx;
-	a->position.vy += a->velocity.vy;
-	a->position.vz += a->velocity.vz;
+	addVector(&a->position, &a->velocity);
 	box.center = &a->position;
 	box.extent.vx = 0x2d;
 	box.extent.vy = 0xc8;
@@ -5521,16 +5413,9 @@ void VS_renderAuraProjectile(int32_t i)
 	SetPolyFT4(prim);
 	setSemiTrans(prim, 1);
 	prim->r0 = prim->g0 = prim->b0 = 0x80;
-	prim->tpage = 0x3c;
-	prim->clut = 0x7b0c;
-	prim->u0 = ((int16_t *)((char **)p)[7])[5] + 0x60;
-	prim->v0 = 0xa0;
-	prim->u1 = ((int16_t *)((char **)p)[7])[5] + 0x67;
-	prim->v1 = 0xa0;
-	prim->u2 = ((int16_t *)((char **)p)[7])[5] + 0x60;
-	prim->v2 = 0xa7;
-	prim->u3 = ((int16_t *)((char **)p)[7])[5] + 0x67;
-	prim->v3 = 0xa7;
+	prim->tpage = getTPage(0, 1, 768, 256);
+	prim->clut = getClut(192, 492);
+	setUVWH(prim, ((int16_t *)((char **)p)[7])[5] + 0x60, 0xa0, 7, 7);
 	add3DSpritePrim(prim, &a, &b, &c, &d);
 }
 

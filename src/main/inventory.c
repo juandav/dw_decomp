@@ -241,15 +241,11 @@ void openActionMenu(void)
 		} else {
 			y = UI_BOX_DATA[0].finalPos.y + 0x20 + (row - 6) * 0x12;
 		}
-		finalPos.x = x;
-		finalPos.y = y;
-		finalPos.w = 0x3a;
-		finalPos.h = 0x54;
+		setRECT(&finalPos, x, y, 0x3a, 0x54);
 		startPos.x = x - 3;
 		startPos.y = UI_BOX_DATA[0].finalPos.y + 7 +
 			     (INVENTORY_POINTER / 2 - INVENTORY_SCROLL_ROW) * 0x12;
-		startPos.w = 0x8a;
-		startPos.h = 0x12;
+		setWH(&startPos, 0x8a, 0x12);
 		createAnimatedUIBox(2, 1, 0, &finalPos, &startPos,
 				    (TickFunction)tickActionMenu,
 				    (RenderFunction)renderActionMenu);
@@ -527,15 +523,9 @@ int32_t createInventoryUI(void)
 			features |= 4;
 			box->totalRows = INVENTORY.size == 20 ? 10 : 15;
 		}
-		finalPos.x = -0x98;
-		finalPos.y = -0x68;
-		finalPos.w = 0x130;
-		finalPos.h = INVENTORY.size == 10 ? 0x6E : 0xB6;
+		setRECT(&finalPos, -0x98, -0x68, 0x130, INVENTORY.size == 10 ? 0x6E : 0xB6);
 		getEntityScreenPos(ENTITY_TABLE[0], 1, xy);
-		startPos.x = xy[0] - 5;
-		startPos.y = xy[1] - 5;
-		startPos.w = 10;
-		startPos.h = 10;
+		setRECT(&startPos, xy[0] - 5, xy[1] - 5, 10, 10);
 		createAnimatedUIBox(0, 0, features, &finalPos, &startPos,
 				    (TickFunction)tickInventoryTop, (RenderFunction)renderInventoryTop);
 	}
@@ -549,10 +539,7 @@ int32_t createInventoryUI(void)
 		finalPos.w = 0x130;
 		UI_BOX_DATA[1].features = 2;
 		finalPos.h = 0x1C;
-		startPos.x = box->finalPos.x + 8;
-		startPos.y = box->finalPos.y + 0xE;
-		startPos.w = 0x10;
-		startPos.h = 0x10;
+		setRECT(&startPos, box->finalPos.x + 8, box->finalPos.y + 0xE, 0x10, 0x10);
 		createAnimatedUIBox(1, 0, 2, &finalPos, &startPos,
 				    NULL, renderInventoryBottom);
 	}
@@ -688,16 +675,12 @@ void closeInventoryBoxes2(void)
 		r.x = x;
 		r.y = UI_BOX_DATA[0].finalPos.y + 8 +
 		      ((int16_t)((INVENTORY_POINTER / 2) - INVENTORY_SCROLL_ROW) * 0x12);
-		r.w = 0x10;
-		r.h = 0x10;
+		setWH(&r, 0x10, 0x10);
 		removeAnimatedUIBox(1, &r);
 	}
 	if ((UI_BOX_DATA[1].frame <= 0) && (UI_BOX_DATA[0].state == 1)) {
 		getEntityScreenPos(ENTITY_TABLE[0], 1, xy);
-		r.x = xy[0] - 5;
-		r.y = xy[1] - 5;
-		r.w = 0xA;
-		r.h = 0xA;
+		setRECT(&r, xy[0] - 5, xy[1] - 5, 0xA, 0xA);
 		removeAnimatedUIBox(0, &r);
 	}
 }
@@ -733,14 +716,8 @@ void openSortTypeMenu(void)
 		drawString(SORT_LABEL_RAISE, 0xC0, 0x3C);
 		drawString(SORT_LABEL_BASIC, 0xC0, 0x48);
 		SORT_TYPE_CURSOR = 0;
-		r1.x = UI_BOX_DATA[2].finalPos.x + UI_BOX_DATA[2].finalPos.w;
-		r1.y = UI_BOX_DATA[2].finalPos.y;
-		r1.w = 0x48;
-		r1.h = 0x42;
-		r2.x = UI_BOX_DATA[2].finalPos.x + 9;
-		r2.y = UI_BOX_DATA[2].finalPos.y + 6 + (ACTION_CURSOR * 0x12);
-		r2.w = 0x28;
-		r2.h = 0x10;
+		setRECT(&r1, UI_BOX_DATA[2].finalPos.x + UI_BOX_DATA[2].finalPos.w, UI_BOX_DATA[2].finalPos.y, 0x48, 0x42);
+		setRECT(&r2, UI_BOX_DATA[2].finalPos.x + 9, UI_BOX_DATA[2].finalPos.y + 6 + (ACTION_CURSOR * 0x12), 0x28, 0x10);
 		createAnimatedUIBox(3, 1, 0, &r1, &r2,
 				    (TickFunction)tickSortTypeMenu,
 				    (RenderFunction)renderSortTypeMenu);
@@ -806,15 +783,11 @@ void openDropConfirm(void)
 		drawString(CONFIRM_LABEL_YES, 0xC5, 0x54);
 		drawString(CONFIRM_LABEL_NO, 0xC0, 0x60);
 		drawString(CONFIRM_PROMPT, 0, 0xC0);
-		r1.x = -0x40;
-		r1.y = -0x26;
-		r1.w = 0x80;
-		r1.h = 0x35;
+		setRECT(&r1, -0x40, -0x26, 0x80, 0x35);
 		r2.x = UI_BOX_DATA[2].finalPos.x + 9;
 		CONFIRM_CURSOR = 1;
 		r2.y = UI_BOX_DATA[2].finalPos.y + 6 + (ACTION_CURSOR * 0x12);
-		r2.w = 0x28;
-		r2.h = 0x10;
+		setWH(&r2, 0x28, 0x10);
 		createAnimatedUIBox(3, 1, 0, &r1, &r2,
 				    (TickFunction)tickDropConfirm,
 				    (RenderFunction)renderDropConfirm);
@@ -865,10 +838,7 @@ void updateItemNames(void)
 {
 	RECT area;
 
-	area.x = 0;
-	area.y = 0xB4;
-	area.w = 0xFC;
-	area.h = 0xC;
+	setRECT(&area, 0, 0xB4, 0xFC, 0xC);
 	clearTextSubArea(&area);
 	drawString(ITEM_DESC_PTR[INVENTORY.types.array[INVENTORY_POINTER]], 0, 0xB4);
 	DrawSync(0);

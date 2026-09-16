@@ -371,9 +371,7 @@ int32_t EVL_spawnParticle(VECTOR *position, RGB8 *color)
 	}
 
 	e->timer = 0;
-	e->pos.vx = position->vx;
-	e->pos.vy = position->vy;
-	e->pos.vz = position->vz;
+	copyVector(&e->pos, position);
 	e->r = color->r;
 	e->g = color->g;
 	e->b = color->b;
@@ -825,9 +823,7 @@ void EVL_initEvoSequence(void)
 	EVO_SEQUENCE_DATA.timer = 0;
 	EVO_SEQUENCE_DATA.unk_0x8 = 0;
 	EVO_SEQUENCE_DATA.state = 0;
-	EVL_D_80064D40.vx = partner->digimonEntity.entity.posData->location.vx;
-	EVL_D_80064D40.vy = partner->digimonEntity.entity.posData->location.vy;
-	EVL_D_80064D40.vz = partner->digimonEntity.entity.posData->location.vz;
+	copyVector(&EVL_D_80064D40, &partner->digimonEntity.entity.posData->location);
 	MAIN_func_800D9B60(EVL_D_80063F3C);
 	MAIN_func_800D9E68(EVL_D_80064D50);
 	EVL_storeDigimonClut(EVL_D_80065094, (Entity *)partner);

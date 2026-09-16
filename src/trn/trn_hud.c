@@ -123,17 +123,11 @@ void TRN_createPostTrainingStatsBox(void)
 
 	MAIN_D_8013539E = 100;
 
-	finalPos.x = -94;
-	finalPos.y = -78;
-	finalPos.w = 188;
-	finalPos.h = 96;
+	setRECT(&finalPos, -94, -78, 188, 96);
 
 	getEntityScreenPos(ENTITY_TABLE[1], 1, screenPos);
 
-	startPos.x = screenPos[0] - 5;
-	startPos.y = screenPos[1] - 5;
-	startPos.w = 10;
-	startPos.h = 10;
+	setRECT(&startPos, screenPos[0] - 5, screenPos[1] - 5, 10, 10);
 	createAnimatedUIBox(1, 0, 2, &finalPos, &startPos, TRN_tickPostTrainingStatsBox, (RenderFunction)TRN_renderPostTrainingStatsBox);
 }
 
@@ -218,9 +212,7 @@ void TRN_renderPostTrainingStatsBox(uint8_t depth)
 		if (STATS_GAINS[i] != 0) {
 			POLY_FT4 *prim = (POLY_FT4 *)GsGetWorkBase();
 			setEntityTextDigit(prim, 256, 491);
-			prim->r0 = 0x80;
-			prim->g0 = 0x80;
-			prim->b0 = 0x80;
+			setRGB0(prim, 0x80, 0x80, 0x80);
 			setUVDataPolyFT4(prim, 96, 180, 12, 12);
 			setPosDataPolyFT4(prim, box->x + 130, (box->y + 9) + (i * 13), 12, 12);
 			AddPrim((ACTIVE_ORDERING_TABLE->org + 6) - depth, prim++);

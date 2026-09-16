@@ -174,7 +174,7 @@ void renderItemSprite(uint8_t type, int16_t x, int16_t y, int32_t layer)
 
 	prim = (POLY_FT4 *)GsGetWorkBase();
 	SetPolyFT4(prim);
-	prim->tpage = 5;
+	prim->tpage = getTPage(0, 0, 320, 0);
 	setItemTexture(prim, type);
 
 	width = prim->u1 - prim->u0;

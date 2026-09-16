@@ -236,46 +236,16 @@ void STD_renderFinisherChargeup(void)
 	int16_t bars;
 
 	SetPolyFT4(&prim);
-	prim.tpage = 0x1f;
+	prim.tpage = getTPage(0, 0, 960, 256);
 	prim.clut = GetClut(0x110, 0x1f2);
-	prim.r0 = 0x80;
-	prim.g0 = 0x80;
-	prim.b0 = 0x80;
-	prim.u0 = 0x58;
-	prim.v0 = 0xe0;
-	prim.u1 = 0x86;
-	prim.v1 = 0xe0;
-	prim.u2 = 0x58;
-	prim.v2 = 0xec;
-	prim.u3 = 0x86;
-	prim.v3 = 0xec;
-	prim.x0 = MAIN_D_8013518C[0];
-	prim.y0 = MAIN_D_8013518C[1];
-	prim.x1 = MAIN_D_8013518C[0] + 0x2e;
-	prim.y1 = MAIN_D_8013518C[1];
-	prim.x2 = MAIN_D_8013518C[0];
-	prim.y2 = MAIN_D_8013518C[1] + 0xc;
-	prim.x3 = MAIN_D_8013518C[0] + 0x2e;
-	prim.y3 = MAIN_D_8013518C[1] + 0xc;
+	setRGB0(&prim, 0x80, 0x80, 0x80);
+	setUVWH(&prim, 0x58, 0xe0, 46, 12);
+	setXYWH(&prim, MAIN_D_8013518C[0], MAIN_D_8013518C[1], 0x2e, 0xc);
 	GsSortPoly(&prim, ACTIVE_ORDERING_TABLE, 7);
 	bars = COMBAT_DATA_PTR->player.finisherChargeup[0] / 8;
-	prim.u0 = 0x88;
-	prim.v0 = 0xe0;
-	prim.u1 = 0x8c;
-	prim.v1 = 0xe0;
-	prim.u2 = 0x88;
-	prim.v2 = 0xe6;
-	prim.u3 = 0x8c;
-	prim.v3 = 0xe6;
+	setUVWH(&prim, 0x88, 0xe0, 4, 6);
 	for (i = 0, x = 0; i < bars; i++, x += 4) {
-		prim.x0 = MAIN_D_8013518C[0] + 3 + x;
-		prim.y0 = MAIN_D_8013518C[1] + 3;
-		prim.x1 = (int32_t)(MAIN_D_8013518C[0] + 3 + x) + 4;
-		prim.y1 = MAIN_D_8013518C[1] + 3;
-		prim.x2 = MAIN_D_8013518C[0] + 3 + x;
-		prim.y2 = MAIN_D_8013518C[1] + 9;
-		prim.x3 = (int32_t)(MAIN_D_8013518C[0] + 3 + x) + 4;
-		prim.y3 = MAIN_D_8013518C[1] + 9;
+		setXYWH(&prim, (int32_t)(MAIN_D_8013518C[0] + 3 + x), MAIN_D_8013518C[1] + 3, 4, 6);
 		GsSortPoly(&prim, ACTIVE_ORDERING_TABLE, 7);
 	}
 
@@ -483,9 +453,7 @@ void STD_renderBattleStartText(void)
 
 		ft = prim;
 		setEntityTextDigit(prim, 0x100, 0x1e8);
-		prim->r0 = 0x80;
-		prim->g0 = 0x80;
-		prim->b0 = 0x80;
+		setRGB0(prim, 0x80, 0x80, 0x80);
 		prim->clut = clut;
 		gte_ldv3(&p0, &p1, &p2);
 		gte_rtpt();
@@ -494,21 +462,12 @@ void STD_renderBattleStartText(void)
 		gte_ldv0(&p3);
 		gte_rtps();
 		gte_stsxy(&prim->x3);
-		prim->u0 = ((uint8_t *)*p)[0x13] * 8 + 0x80;
-		prim->v0 = 0x80;
-		prim->u1 = ((uint8_t *)*p)[0x13] * 8 + 0x88;
-		prim->v1 = 0x80;
-		prim->u2 = ((uint8_t *)*p)[0x13] * 8 + 0x80;
-		prim->v2 = 0x88;
-		prim->u3 = ((uint8_t *)*p)[0x13] * 8 + 0x88;
-		prim->v3 = 0x88;
+		setUVWH(prim, ((uint8_t *)*p)[0x13] * 8 + 0x80, 0x80, 8, 8);
 		AddPrim(ot + 5, prim++);
 
 		if (n != 0x9b) {
 			SetPolyFT4(prim);
-			prim->r0 = 0x80;
-			prim->g0 = 0x80;
-			prim->b0 = 0x80;
+			setRGB0(prim, 0x80, 0x80, 0x80);
 			prim->tpage = GetTPage(0, 0, 0x380, 0x180);
 			prim->clut = clut;
 			SetSemiTrans(prim, 1);
@@ -521,14 +480,7 @@ void STD_renderBattleStartText(void)
 				q2.vy = p2.vy;
 				q2.vz = p2.vz;
 				q3 = p2;
-				prim->u0 = 0x9e;
-				prim->v0 = 0x80;
-				prim->u1 = 0x86;
-				prim->v1 = 0x80;
-				prim->u2 = 0x9e;
-				prim->v2 = 0x88;
-				prim->u3 = 0x86;
-				prim->v3 = 0x88;
+				setUVWH(prim, 0x9e, 0x80, -24, 8);
 			} else {
 				q0 = p1;
 				q1.vx = p1.vx + ((uint8_t *)*p)[0x12];
@@ -538,14 +490,7 @@ void STD_renderBattleStartText(void)
 				q3.vx = p3.vx + ((uint8_t *)*p)[0x12];
 				q3.vy = p3.vy;
 				q3.vz = p3.vz;
-				prim->u0 = 0x86;
-				prim->v0 = 0x80;
-				prim->u1 = 0x9e;
-				prim->v1 = 0x80;
-				prim->u2 = 0x86;
-				prim->v2 = 0x88;
-				prim->u3 = 0x9e;
-				prim->v3 = 0x88;
+				setUVWH(prim, 0x86, 0x80, 24, 8);
 			}
 			gte_ldv3(&q0, &q1, &q2);
 			gte_rtpt();
@@ -559,17 +504,8 @@ void STD_renderBattleStartText(void)
 
 		shadow = (POLY_F4 *)prim;
 		SetPolyF4(shadow);
-		shadow->r0 = 0;
-		shadow->g0 = 0;
-		shadow->b0 = 0;
-		shadow->x0 = ft->x0 + 2;
-		shadow->y0 = ft->y0 + 2;
-		shadow->x1 = ft->x1 + 2;
-		shadow->y1 = ft->y1 + 2;
-		shadow->x2 = ft->x2 + 2;
-		shadow->y2 = ft->y2 + 2;
-		shadow->x3 = ft->x3 + 2;
-		shadow->y3 = ft->y3 + 2;
+		setRGB0(shadow, 0, 0, 0);
+		setXY4(shadow, ft->x0 + 2, ft->y0 + 2, ft->x1 + 2, ft->y1 + 2, ft->x2 + 2, ft->y2 + 2, ft->x3 + 2, ft->y3 + 2);
 		AddPrim(ot + 6, shadow++);
 		prim = (POLY_FT4 *)shadow;
 	}
@@ -662,9 +598,7 @@ void STD_renderBattleStartTextBurst(void)
 
 		ft = prim;
 		setEntityTextDigit(prim, 0x100, 0x1e8);
-		prim->r0 = 0x80;
-		prim->g0 = 0x80;
-		prim->b0 = 0x80;
+		setRGB0(prim, 0x80, 0x80, 0x80);
 		prim->clut = GetClut(0x100, 0x1e8);
 		gte_ldv3(&pts[0], &pts[1], &pts[2]);
 		gte_rtpt();
@@ -673,28 +607,12 @@ void STD_renderBattleStartTextBurst(void)
 		gte_ldv0(&pts[3]);
 		gte_rtps();
 		gte_stsxy(&prim->x3);
-		prim->u0 = ((uint8_t *)*p)[0x13] * 8 + 0x80;
-		prim->v0 = 0x80;
-		prim->u1 = ((uint8_t *)*p)[0x13] * 8 + 0x88;
-		prim->v1 = 0x80;
-		prim->u2 = ((uint8_t *)*p)[0x13] * 8 + 0x80;
-		prim->v2 = 0x88;
-		prim->u3 = ((uint8_t *)*p)[0x13] * 8 + 0x88;
-		prim->v3 = 0x88;
+		setUVWH(prim, ((uint8_t *)*p)[0x13] * 8 + 0x80, 0x80, 8, 8);
 		AddPrim(ot + 5, prim++);
 		shadow = (POLY_F4 *)prim;
 		SetPolyF4(shadow);
-		shadow->r0 = 0;
-		shadow->g0 = 0;
-		shadow->b0 = 0;
-		shadow->x0 = ft->x0 + 2;
-		shadow->y0 = ft->y0 + 2;
-		shadow->x1 = ft->x1 + 2;
-		shadow->y1 = ft->y1 + 2;
-		shadow->x2 = ft->x2 + 2;
-		shadow->y2 = ft->y2 + 2;
-		shadow->x3 = ft->x3 + 2;
-		shadow->y3 = ft->y3 + 2;
+		setRGB0(shadow, 0, 0, 0);
+		setXY4(shadow, ft->x0 + 2, ft->y0 + 2, ft->x1 + 2, ft->y1 + 2, ft->x2 + 2, ft->y2 + 2, ft->x3 + 2, ft->y3 + 2);
 		AddPrim(ot + 6, shadow++);
 		prim = (POLY_FT4 *)shadow;
 
@@ -741,9 +659,7 @@ void STD_renderNumber(int32_t a, int32_t digits, int32_t x, int32_t y, int16_t v
 
 	for (i = count - 1; i >= 0; i--) {
 		setEntityTextDigit(prim, 256, 492);
-		prim->r0 = 0x80;
-		prim->g0 = 0x80;
-		prim->b0 = 0x80;
+		setRGB0(prim, 0x80, 0x80, 0x80);
 		setUVDataPolyFT4(prim, buf[i] * 7, 172, 7, 11);
 		setPosDataPolyFT4(prim, x + ((((int32_t)width - 1) - i) * 7), y, 7, 11);
 		AddPrim(ACTIVE_ORDERING_TABLE->org + layer, prim++);
@@ -811,31 +727,13 @@ void STD_func_8006A824(int32_t id)
 	setEntityTextDigit(prim, 256, 0x1e2);
 	n = id;
 	if ((MAIN_D_801351A2[id] != 1) || (((uint8_t *)COMBAT_DATA_PTR + n)[0x64e] == 0xb)) {
-		prim->r0 = 0x80;
-		prim->g0 = 0x80;
-		prim->b0 = 0x80;
+		setRGB0(prim, 0x80, 0x80, 0x80);
 	} else {
-		prim->r0 = MAIN_D_8013519E[n];
-		prim->g0 = MAIN_D_8013519E[n];
-		prim->b0 = MAIN_D_8013519E[n];
+		setRGB0(prim, MAIN_D_8013519E[n], MAIN_D_8013519E[n], MAIN_D_8013519E[n]);
 	}
 
-	prim->u0 = 0x80;
-	prim->v0 = 0x88;
-	prim->u1 = 0xa5;
-	prim->v1 = 0x88;
-	prim->u2 = 0x80;
-	prim->v2 = 0x91;
-	prim->u3 = 0xa5;
-	prim->v3 = 0x91;
-	prim->x0 = (id == 0 ? -0x56 : 0x6e);
-	prim->y0 = -0x4b;
-	prim->x1 = (id == 0 ? -0x56 : 0x6e) + 0x25;
-	prim->y1 = -0x4b;
-	prim->x2 = (id == 0 ? -0x56 : 0x6e);
-	prim->y2 = -0x42;
-	prim->x3 = (id == 0 ? -0x56 : 0x6e) + 0x25;
-	prim->y3 = -0x42;
+	setUVWH(prim, 0x80, 0x88, 37, 9);
+	setXYWH(prim, (id == 0 ? -0x56 : 0x6e), -0x4b, 0x25, 9);
 	AddPrim(ACTIVE_ORDERING_TABLE->org + 8, prim++);
 	GsSetWorkBase((PACKET *)prim);
 
@@ -846,8 +744,7 @@ void STD_func_8006A824(int32_t id)
 		box.r = box.g = box.b = MAIN_D_8013519E[n];
 	}
 
-	box.w = 0x29;
-	box.h = 0xb;
+	setWH(&box, 0x29, 0xb);
 	box.x = -0x58;
 	box.y = -0x4c;
 	GsSortBoxFill(&box, ACTIVE_ORDERING_TABLE, 8);
@@ -865,31 +762,13 @@ void STD_renderHPBarDigits(int16_t i, int32_t id)
 	setEntityTextDigit(prim, 0x100, 0x1ec);
 
 	if ((((n - 1) == i) || (MAIN_D_801351A2[k] == 1)) && (((uint8_t *)COMBAT_DATA_PTR + k)[0x64e] != 0xb)) {
-		prim->r0 = MAIN_D_8013519E[k];
-		prim->g0 = MAIN_D_8013519E[k];
-		prim->b0 = MAIN_D_8013519E[k];
+		setRGB0(prim, MAIN_D_8013519E[k], MAIN_D_8013519E[k], MAIN_D_8013519E[k]);
 	} else {
-		prim->r0 = 0x80;
-		prim->g0 = 0x80;
-		prim->b0 = 0x80;
+		setRGB0(prim, 0x80, 0x80, 0x80);
 	}
 
-	prim->u0 = MAIN_D_801348C0[i];
-	prim->v0 = 0x9d;
-	prim->u1 = MAIN_D_801348C0[i] + MAIN_D_801348C8[i];
-	prim->v1 = 0x9d;
-	prim->u2 = MAIN_D_801348C0[i];
-	prim->v2 = 0xac;
-	prim->u3 = MAIN_D_801348C0[i] + MAIN_D_801348C8[i];
-	prim->v3 = 0xac;
-	prim->x0 = (id == 0 ? MAIN_D_801348D0[i] - 0x8d : MAIN_D_801348D0[i] + 0x37);
-	prim->y0 = -0x4f;
-	prim->x1 = MAIN_D_801348C8[i] + ((id == 0 ? MAIN_D_801348D0[i] - 0x8d : MAIN_D_801348D0[i] + 0x37));
-	prim->y1 = -0x4f;
-	prim->x2 = (id == 0 ? MAIN_D_801348D0[i] - 0x8d : MAIN_D_801348D0[i] + 0x37);
-	prim->y2 = -0x40;
-	prim->x3 = MAIN_D_801348C8[i] + ((id == 0 ? MAIN_D_801348D0[i] - 0x8d : MAIN_D_801348D0[i] + 0x37));
-	prim->y3 = -0x40;
+	setUVWH(prim, MAIN_D_801348C0[i], 0x9d, MAIN_D_801348C8[i], 15);
+	setXYWH(prim, (id == 0 ? MAIN_D_801348D0[i] - 0x8d : MAIN_D_801348D0[i] + 0x37), -0x4f, MAIN_D_801348C8[i], 15);
 	AddPrim(ACTIVE_ORDERING_TABLE->org + 8, prim++);
 	GsSetWorkBase((PACKET *)prim);
 }
@@ -980,18 +859,10 @@ void STD_func_8006AD68(uint8_t id)
 		for (k = 0; k < 3; k++, p--) {
 			SetPolyFT4(prim);
 			prim->clut = GetClut(0x100, p->clut);
-			prim->tpage = 0x1e;
+			prim->tpage = getTPage(0, 0, 896, 256);
 			setRGB0(prim, 0x80, 0x80, 0x80);
-			prim->u0 = p->u;
-			prim->v0 = p->v;
-			prim->u1 = p->u + p->w;
-			prim->v1 = p->v;
-			prim->u2 = p->u;
-			prim->v2 = p->v + p->h;
-			prim->u3 = p->u + p->w;
-			prim->v3 = p->v + p->h;
-			prim->x0 = x0 + p->x;
-			prim->y0 = y0 + p->y;
+			setUVWH(prim, p->u, p->v, p->w, p->h);
+			setXY0(prim, x0 + p->x, y0 + p->y);
 			if (k == 0) {
 				w = fill;
 			} else {

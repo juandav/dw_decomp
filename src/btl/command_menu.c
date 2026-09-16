@@ -114,11 +114,9 @@ void BTL_renderCommandMenu(int32_t arg0)
 	if (GAME_STATE == 1) {
 		x = base - (COMBAT_DATA_PTR->player.hoveredCommand[0] * 0xe);
 		SetPolyFT4(prim);
-		prim->tpage = 0x1f;
+		prim->tpage = getTPage(0, 0, 960, 256);
 		prim->clut = GetClut(0x11a, 0x1f1);
-		prim->r0 = 0x80;
-		prim->g0 = 0x80;
-		prim->b0 = 0x80;
+		setRGB0(prim, 0x80, 0x80, 0x80);
 		setUVDataPolyFT4(prim, 0x3d, 0xe0, 0x16, 0x16);
 		if ((count % 2) == 0) {
 			if ((COMBAT_DATA_PTR->player.hoveredCommand[0] % 2) == 0) {
@@ -140,31 +138,15 @@ void BTL_renderCommandMenu(int32_t arg0)
 
 	for (i = 1, off = 0xe; i < COMBAT_DATA_PTR->player.numCommands[0]; i++, off += 0xe) {
 		SetPolyFT4(prim);
-		prim->tpage = 0x1f;
+		prim->tpage = getTPage(0, 0, 960, 256);
 		prim->clut = GetClut(0x110, 0x1f0);
-		prim->r0 = 0x80;
-		prim->g0 = 0x80;
-		prim->b0 = 0x80;
+		setRGB0(prim, 0x80, 0x80, 0x80);
 		BTL_setCommandIconUV(ENTITY_TABLE[COMBAT_DATA_PTR->player.entityIds[arg0]], prim, COMBAT_DATA_PTR->player.availableCommands[0][i]);
 		x = base - off;
 		if ((count % 2) == 0) {
-			prim->x0 = x;
-			prim->y0 = ((i % 2) == 0) ? MAIN_D_80135084 + 3 : MAIN_D_80135084 + 0xd;
-			prim->x1 = x + 0x10;
-			prim->y1 = ((i % 2) == 0) ? MAIN_D_80135084 + 3 : MAIN_D_80135084 + 0xd;
-			prim->x2 = x;
-			prim->y2 = ((i % 2) == 0) ? MAIN_D_80135086 - 0xd : MAIN_D_80135086 - 3;
-			prim->x3 = x + 0x10;
-			prim->y3 = ((i % 2) == 0) ? MAIN_D_80135086 - 0xd : MAIN_D_80135086 - 3;
+			setXY4(prim, x, ((i % 2) == 0) ? MAIN_D_80135084 + 3 : MAIN_D_80135084 + 0xd, x + 0x10, ((i % 2) == 0) ? MAIN_D_80135084 + 3 : MAIN_D_80135084 + 0xd, x, ((i % 2) == 0) ? MAIN_D_80135086 - 0xd : MAIN_D_80135086 - 3, x + 0x10, ((i % 2) == 0) ? MAIN_D_80135086 - 0xd : MAIN_D_80135086 - 3);
 		} else {
-			prim->x0 = x;
-			prim->y0 = ((i % 2) == 1) ? MAIN_D_80135084 + 3 : MAIN_D_80135084 + 0xd;
-			prim->x1 = x + 0x10;
-			prim->y1 = ((i % 2) == 1) ? MAIN_D_80135084 + 3 : MAIN_D_80135084 + 0xd;
-			prim->x2 = x;
-			prim->y2 = ((i % 2) == 1) ? MAIN_D_80135086 - 0xd : MAIN_D_80135086 - 3;
-			prim->x3 = x + 0x10;
-			prim->y3 = ((i % 2) == 1) ? MAIN_D_80135086 - 0xd : MAIN_D_80135086 - 3;
+			setXY4(prim, x, ((i % 2) == 1) ? MAIN_D_80135084 + 3 : MAIN_D_80135084 + 0xd, x + 0x10, ((i % 2) == 1) ? MAIN_D_80135084 + 3 : MAIN_D_80135084 + 0xd, x, ((i % 2) == 1) ? MAIN_D_80135086 - 0xd : MAIN_D_80135086 - 3, x + 0x10, ((i % 2) == 1) ? MAIN_D_80135086 - 0xd : MAIN_D_80135086 - 3);
 		}
 		if ((i == COMBAT_DATA_PTR->player.hoveredCommand[0]) && (MAIN_D_80135088 == 1)) {
 			prim->u0 += 0x10;
@@ -177,20 +159,11 @@ void BTL_renderCommandMenu(int32_t arg0)
 
 	for (i = 0; i < COMBAT_DATA_PTR->player.numCommands[0]; i++) {
 		SetPolyFT4(prim);
-		prim->code |= 2;
+		setSemiTrans(prim, 1);
 		prim->tpage = GetTPage(0, 0, 0x3c0, 0x100);
 		prim->clut = GetClut(0x110, 0x1f1);
-		prim->r0 = 0x80;
-		prim->g0 = 0x80;
-		prim->b0 = 0x80;
-		prim->u0 = MAIN_D_80134728[BTL_D_80072E7C[MAIN_D_8013508C][i]];
-		prim->v0 = 0xe0;
-		prim->u1 = MAIN_D_80134728[BTL_D_80072E7C[MAIN_D_8013508C][i]] + MAIN_D_80134730[BTL_D_80072E7C[MAIN_D_8013508C][i]];
-		prim->v1 = 0xe0;
-		prim->u2 = MAIN_D_80134728[BTL_D_80072E7C[MAIN_D_8013508C][i]];
-		prim->v2 = 0xff;
-		prim->u3 = MAIN_D_80134728[BTL_D_80072E7C[MAIN_D_8013508C][i]] + MAIN_D_80134730[BTL_D_80072E7C[MAIN_D_8013508C][i]];
-		prim->v3 = 0xff;
+		setRGB0(prim, 0x80, 0x80, 0x80);
+		setUVWH(prim, MAIN_D_80134728[BTL_D_80072E7C[MAIN_D_8013508C][i]], 0xe0, MAIN_D_80134730[BTL_D_80072E7C[MAIN_D_8013508C][i]], 31);
 		if (i > 0) {
 			rowY = ((i - 1) * 0xe) + 0xb;
 		} else {
@@ -201,14 +174,7 @@ void BTL_renderCommandMenu(int32_t arg0)
 		} else {
 			width = 0xe;
 		}
-		prim->x0 = rowY - 0x8f;
-		prim->y0 = MAIN_D_80135084;
-		prim->x1 = (rowY - 0x8f) + width;
-		prim->y1 = MAIN_D_80135084;
-		prim->x2 = rowY - 0x8f;
-		prim->y2 = MAIN_D_80135086;
-		prim->x3 = (rowY - 0x8f) + width;
-		prim->y3 = MAIN_D_80135086;
+		setXY4(prim, rowY - 0x8f, MAIN_D_80135084, (rowY - 0x8f) + width, MAIN_D_80135084, rowY - 0x8f, MAIN_D_80135086, (rowY - 0x8f) + width, MAIN_D_80135086);
 		AddPrim(ACTIVE_ORDERING_TABLE->org + 7, prim++);
 	}
 

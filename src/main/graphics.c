@@ -252,7 +252,7 @@ void renderDropShadow(Entity *entity)
 	SetSemiTrans(prim, 1);
 	prim->tpage = getTPage(1, 2, 832, 256);
 	setClut(prim, 0, 0x1E7);
-	setUV4(prim, 0x40, 0x80, 0x7F, 0x80, 0x40, 0xBF, 0x7F, 0xBF);
+	setUVWH(prim, 0x40, 0x80, 63, 63);
 	setRotTransMatrix(&GsWSMATRIX);
 	RotTransPers4(&p0, &p1, &p2, &p3, (long *)&prim->x0, (long *)&prim->x1, (long *)&prim->x2,
 		      (long *)&prim->x3, &depth, &flag);

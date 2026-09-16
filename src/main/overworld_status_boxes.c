@@ -305,8 +305,7 @@ void renderBoxBar(int16_t x, int16_t y, int16_t w, int16_t h, uint8_t r,
 
 	box.x = x;
 	box.y = y;
-	box.w = w;
-	box.h = h;
+	setWH(&box, w, h);
 	box.r = r;
 	box.g = g;
 	box.b = b;

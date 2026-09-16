@@ -395,10 +395,7 @@ void initializeFramebuffer(void)
 	GsInitGraph(320, 240, 4, 0, 0);
 	GsDefDispBuff(0, 0, 0, 240);
 
-	rect.x = 0;
-	rect.y = 0;
-	rect.w = 320;
-	rect.h = 480;
+	setRECT(&rect, 0, 0, 320, 480);
 	ClearImage(&rect, 0, 0, 0);
 
 	GS_ORDERING_TABLE[0].length = 12;
@@ -691,8 +688,8 @@ void renderPressStartToContinue(void)
 
 	if (MAIN_D_80134EAC < 0x1e) {
 		SetPolyFT4(prim);
-		setXY4(prim, -0x36, 0x32, 0x43, 0x32, -0x36, 0x3c, 0x43, 0x3c);
-		setUV4(prim, 0, 0xf1, 0x79, 0xf1, 0, 0xfb, 0x79, 0xfb);
+		setXYWH(prim, -0x36, 0x32, 121, 10);
+		setUVWH(prim, 0, 0xf1, 121, 10);
 		setRGB0(prim, 0, 0x80, 0);
 		setTPage(prim, 1, 0, 768, 0);
 		setClut(prim, 0, 480);
@@ -700,16 +697,16 @@ void renderPressStartToContinue(void)
 	}
 
 	SetPolyFT4(prim);
-	setXY4(prim, -0xa0, -0x78, 0x60, -0x78, -0xa0, 0x78, 0x60, 0x78);
-	setUV4(prim, 0, 0, 0xff, 0, 0, 0xf0, 0xff, 0xf0);
+	setXYWH(prim, -0xa0, -0x78, 256, 240);
+	setUVWH(prim, 0, 0, 255, 240);
 	setRGB0(prim, 0x80, 0x80, 0x80);
 	setTPage(prim, 1, 0, 768, 0);
 	setClut(prim, 0, 480);
 	AddPrim(ot = (GsOT_TAG *)((uint32_t)ot + 0x78), prim++);
 
 	SetPolyFT4(prim);
-	setXY4(prim, 0x60, -0x78, 0xa0, -0x78, 0x60, 0x78, 0xa0, 0x78);
-	setUV4(prim, 0, 0, 0x40, 0, 0, 0xf0, 0x40, 0xf0);
+	setXYWH(prim, 0x60, -0x78, 64, 240);
+	setUVWH(prim, 0, 0, 64, 240);
 	setRGB0(prim, 0x80, 0x80, 0x80);
 	setTPage(prim, 1, 0, 896, 0);
 	setClut(prim, 0, 480);
@@ -726,16 +723,16 @@ void renderMainMenuBackground(void)
 	prim = (POLY_FT4 *)GsGetWorkBase();
 
 	SetPolyFT4(prim);
-	setXY4(prim, -0xa0, -0x78, 0x60, -0x78, -0xa0, 0x78, 0x60, 0x78);
-	setUV4(prim, 0, 0, 0xff, 0, 0, 0xf0, 0xff, 0xf0);
+	setXYWH(prim, -0xa0, -0x78, 256, 240);
+	setUVWH(prim, 0, 0, 255, 240);
 	setRGB0(prim, 0x80, 0x80, 0x80);
 	setTPage(prim, 1, 0, 768, 0);
 	setClut(prim, 0, 480);
 	AddPrim(ot = (GsOT_TAG *)((uint32_t)ot + 0x78), prim++);
 
 	SetPolyFT4(prim);
-	setXY4(prim, 0x60, -0x78, 0xa0, -0x78, 0x60, 0x78, 0xa0, 0x78);
-	setUV4(prim, 0, 0, 0x40, 0, 0, 0xf0, 0x40, 0xf0);
+	setXYWH(prim, 0x60, -0x78, 64, 240);
+	setUVWH(prim, 0, 0, 64, 240);
 	setRGB0(prim, 0x80, 0x80, 0x80);
 	setTPage(prim, 1, 0, 896, 0);
 	setClut(prim, 0, 480);

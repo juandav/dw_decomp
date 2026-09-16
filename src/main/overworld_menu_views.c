@@ -286,9 +286,9 @@ void renderDigimonMovesView(void)
 			icon = &MAIN_D_80124294[i];
 			if (i != 2) {
 				if (i == 5) {
-					clut = 0x7a46;
+					clut = getClut(96, 489);
 				} else {
-					clut = 0x7a06;
+					clut = getClut(96, 488);
 				}
 				renderRectPolyFT4((int16_t)icon->posX,
 						  (int16_t)icon->posY,

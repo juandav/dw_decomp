@@ -1800,8 +1800,7 @@ void VS_renderMoveName(int32_t i)
 	rect.x = 0;
 	y2 = y;
 	rect.y = y;
-	rect.w = 0x90;
-	rect.h = 0xc;
+	setWH(&rect, 0x90, 0xc);
 	clearTextSubArea(&rect);
 	cmd = COMBAT_DATA_PTR->player.availableCommands[i][COMBAT_DATA_PTR->player.hoveredCommand[i]];
 
@@ -1826,22 +1825,8 @@ void VS_setCommandIconUV(DigimonEntity *digimon, POLY_FT4 *prim, int32_t index)
 
 	if ((index >= 8U) && (index < 0xcU)) {
 		eff = MOVE_DATA[entityGetTechFromAnim(&digimon->entity, digimon->stats.base.moves[index - 8])].special;
-		prim->u0 = VS_D_800707C4[eff * 2];
-		prim->v0 = VS_D_800707C5[eff * 2];
-		prim->u1 = VS_D_800707C4[eff * 2] + 0x10;
-		prim->v1 = VS_D_800707C5[eff * 2];
-		prim->u2 = VS_D_800707C4[eff * 2];
-		prim->v2 = VS_D_800707C5[eff * 2] + 0xf;
-		prim->u3 = VS_D_800707C4[eff * 2] + 0x10;
-		prim->v3 = VS_D_800707C5[eff * 2] + 0xf;
+		setUVWH(prim, VS_D_800707C4[eff * 2], VS_D_800707C5[eff * 2], 0x10, 0xf);
 	} else {
-		prim->u0 = VS_D_800707B4[(index - 1) * 2];
-		prim->v0 = VS_D_800707B5[(index - 1) * 2];
-		prim->u1 = VS_D_800707B4[(index - 1) * 2] + 0x10;
-		prim->v1 = VS_D_800707B5[(index - 1) * 2];
-		prim->u2 = VS_D_800707B4[(index - 1) * 2];
-		prim->v2 = VS_D_800707B5[(index - 1) * 2] + 0xf;
-		prim->u3 = VS_D_800707B4[(index - 1) * 2] + 0x10;
-		prim->v3 = VS_D_800707B5[(index - 1) * 2] + 0xf;
+		setUVWH(prim, VS_D_800707B4[(index - 1) * 2], VS_D_800707B5[(index - 1) * 2], 0x10, 0xf);
 	}
 }

@@ -1256,10 +1256,7 @@ int32_t entityCheckEntityCollision(Entity *entity, Entity *other,
 	myRadius = DIGIMON_DATA[entity->type].radius;
 	loc = &other->posData->location;
 	radius = DIGIMON_DATA[other->type].radius;
-	rect.x = loc->vx - radius;
-	rect.y = loc->vz + radius;
-	rect.w = radius * 2;
-	rect.h = radius * 2;
+	setRECT(&rect, loc->vx - radius, loc->vz + radius, radius * 2, radius * 2);
 	left = myLoc->vx - myRadius;
 	right = myLoc->vx + myRadius;
 	bottom = myLoc->vz + myRadius;
@@ -1497,13 +1494,9 @@ void renderMap(int32_t arg0)
 			SetPolyFT4(prim);
 
 			if (MAP_TILES[startTile + (stride * row) + col] == -1) {
-				prim->r0 = 0;
-				prim->g0 = 0;
-				prim->b0 = 0;
+				setRGB0(prim, 0, 0, 0);
 			} else {
-				prim->r0 = 0x80;
-				prim->g0 = 0x80;
-				prim->b0 = 0x80;
+				setRGB0(prim, 0x80, 0x80, 0x80);
 			}
 
 			if ((MAP_TILE_DATA[startTile + (stride * row) + col].texV % 256) != 0) {
@@ -1872,9 +1865,7 @@ void MAIN_func_800D6A4C(MapTileData *tiles)
 	gte_ldv0(&viewRef);
 	gte_rtps();
 	gte_stsxy(&viewScreen);
-	tamerPos.vx = TAMER_ENTITY.entity.posData->location.vx;
-	tamerPos.vy = TAMER_ENTITY.entity.posData->location.vy;
-	tamerPos.vz = TAMER_ENTITY.entity.posData->location.vz;
+	copyVector(&tamerPos, &TAMER_ENTITY.entity.posData->location);
 	gte_ldv0(&tamerPos);
 	gte_rtps();
 	gte_stsxy(&tamerScreen);
@@ -1915,10 +1906,7 @@ void uploadMapTileImages(MapTileData *tiles, int16_t index)
 	}
 
 	for (i = 0; i < count; i++) {
-		rect.x = tiles[index + i].texU;
-		rect.y = tiles[index + i].texV;
-		rect.w = 64;
-		rect.h = 128;
+		setRECT(&rect, tiles[index + i].texU, tiles[index + i].texV, 64, 128);
 
 		if (tiles[index + i].tileId == -1) {
 			ClearImage(&rect, 0, 0, 0);
@@ -1928,10 +1916,7 @@ void uploadMapTileImages(MapTileData *tiles, int16_t index)
 
 		DrawSync(0);
 
-		rect.x = tiles[index + stride + i].texU;
-		rect.y = tiles[index + stride + i].texV;
-		rect.w = 64;
-		rect.h = 128;
+		setRECT(&rect, tiles[index + stride + i].texU, tiles[index + stride + i].texV, 64, 128);
 
 		if (tiles[index + stride + i].tileId == -1) {
 			ClearImage(&rect, 0, 0, 0);
@@ -1942,10 +1927,7 @@ void uploadMapTileImages(MapTileData *tiles, int16_t index)
 		DrawSync(0);
 
 		if (MAP_HEIGHT[0] > 2) {
-			rect.x = tiles[index + (stride * 2) + i].texU;
-			rect.y = tiles[index + (stride * 2) + i].texV;
-			rect.w = 64;
-			rect.h = 128;
+			setRECT(&rect, tiles[index + (stride * 2) + i].texU, tiles[index + (stride * 2) + i].texV, 64, 128);
 
 			if (tiles[index + (stride * 2) + i].tileId == -1) {
 				ClearImage(&rect, 0, 0, 0);
@@ -1997,16 +1979,12 @@ void tickCameraFollowPlayer(void)
 	     ((POLLED_INPUT & 0x2000) != 0))) {
 		SetRotMatrix(&GsWSMATRIX);
 		SetTransMatrix(&GsWSMATRIX);
-		worldPos.vx = STORED_TAMER_POS.vx;
-		worldPos.vy = STORED_TAMER_POS.vy;
-		worldPos.vz = STORED_TAMER_POS.vz;
+		copyVector(&worldPos, &STORED_TAMER_POS);
 		gte_ldv0(&worldPos);
 		gte_rtps();
 		gte_stsxy(&screenStart);
 		posData = TAMER_ENTITY.entity.posData;
-		worldPos.vx = posData->location.vx;
-		worldPos.vy = posData->location.vy;
-		worldPos.vz = posData->location.vz;
+		copyVector(&worldPos, &posData->location);
 		gte_ldv0(&worldPos);
 		gte_rtps();
 		gte_stsxy(&screenEnd);
@@ -2392,9 +2370,7 @@ void tickCameraMovement(int16_t instanceId)
 	if (CAMERA_HAS_TARGET == 0) {
 		SetRotMatrix(&GsWSMATRIX);
 		SetTransMatrix(&GsWSMATRIX);
-		target.vx = CAMERA_TARGET.vx;
-		target.vy = CAMERA_TARGET.vy;
-		target.vz = CAMERA_TARGET.vz;
+		copyVector(&target, &CAMERA_TARGET);
 		view.vx = GS_VIEWPOINT.vrx;
 		view.vy = GS_VIEWPOINT.vry;
 		view.vz = GS_VIEWPOINT.vrz;
@@ -2638,12 +2614,8 @@ void moveCameraByDiff(VECTOR *from, VECTOR *to)
 	SetRotMatrix(&GsWSMATRIX);
 	SetTransMatrix(&GsWSMATRIX);
 
-	fromPos.vx = from->vx;
-	fromPos.vy = from->vy;
-	fromPos.vz = from->vz;
-	toPos.vx = to->vx;
-	toPos.vy = to->vy;
-	toPos.vz = to->vz;
+	copyVector(&fromPos, from);
+	copyVector(&toPos, to);
 	gte_ldv0(&fromPos);
 	gte_rtps();
 	gte_stsxy(&fromScreen);
@@ -2719,10 +2691,7 @@ void updateTileRow(int32_t bottom)
 		start = base + start;
 
 		for (i = 0; i < count; i++) {
-			rect.x = MAP_TILE_DATA[i + start].texU;
-			rect.y = MAP_TILE_DATA[i + start].texV;
-			rect.w = 64;
-			rect.h = 128;
+			setRECT(&rect, MAP_TILE_DATA[i + start].texU, MAP_TILE_DATA[i + start].texV, 64, 128);
 
 			if (MAP_TILE_DATA[base + i].tileId == -1) {
 				ClearImage(&rect, 0, 0, 0);
@@ -2769,10 +2738,7 @@ void updateTileColumn(int32_t arg0)
 			}
 
 			idx = colOffset + (tileIndex + rowOffset);
-			rect.x = MAP_TILE_DATA[idx].texU;
-			rect.y = MAP_TILE_DATA[idx].texV;
-			rect.w = 64;
-			rect.h = 128;
+			setRECT(&rect, MAP_TILE_DATA[idx].texU, MAP_TILE_DATA[idx].texV, 64, 128);
 
 			if (MAP_TILE_DATA[idx].tileId == -1) {
 				ClearImage(&rect, 0, 0, 0);
@@ -3017,14 +2983,12 @@ void tickMeramonShake(int32_t arg0)
 
 	SetPolyFT4(prim);
 	SetSemiTrans(prim, 1);
-	prim->tpage = 0xdd;
+	prim->tpage = getTPage(1, 2, 832, 256);
 	prim->clut = GetClut(0, 0x1e7);
 	setUVDataPolyFT4(prim, 64, 128, 63, 63);
 	setPosDataPolyFT4(prim, MERAMON_SHAKE_POS_X, MERAMON_SHAKE_POS_Y,
 			  MERAMON_SHAKE_WIDTH, MERAMON_SHAKE_HEIGHT);
-	prim->r0 = MERAMON_SHAKE_COLOR_R;
-	prim->g0 = MERAMON_SHAKE_COLOR_G;
-	prim->b0 = MERAMON_SHAKE_COLOR_B;
+	setRGB0(prim, MERAMON_SHAKE_COLOR_R, MERAMON_SHAKE_COLOR_G, MERAMON_SHAKE_COLOR_B);
 	AddPrim(&ACTIVE_ORDERING_TABLE->org[9], prim);
 	prim++;
 
@@ -3214,10 +3178,7 @@ void MAIN_func_800D9B60(uint32_t *buffer)
 {
 	RECT rect;
 
-	rect.x = 0;
-	rect.y = 480;
-	rect.w = 256;
-	rect.h = 7;
+	setRECT(&rect, 0, 480, 256, 7);
 	StoreImage(&rect, (u_long *)buffer);
 	DrawSync(0);
 }
@@ -3258,10 +3219,7 @@ void MAIN_func_800D9BA8(int32_t level, int16_t *src)
 		*dst++ += (int16_t)(mask << 15);
 	}
 
-	rect.x = 0;
-	rect.y = 480;
-	rect.w = 256;
-	rect.h = 7;
+	setRECT(&rect, 0, 480, 256, 7);
 	LoadImage(&rect, (u_long *)buffer);
 	DrawSync(0);
 }
@@ -3270,20 +3228,11 @@ void MAIN_func_800D9E68(u_long *buffer)
 {
 	RECT rect;
 
-	rect.x = 272;
-	rect.y = 480;
-	rect.w = 16;
-	rect.h = 1;
+	setRECT(&rect, 272, 480, 16, 1);
 	StoreImage(&rect, buffer);
-	rect.x = 96;
-	rect.y = 501;
-	rect.w = 16;
-	rect.h = 1;
+	setRECT(&rect, 96, 501, 16, 1);
 	StoreImage(&rect, buffer + 8);
-	rect.x = 224;
-	rect.y = 488;
-	rect.w = 16;
-	rect.h = 24;
+	setRECT(&rect, 224, 488, 16, 24);
 	StoreImage(&rect, buffer + 16);
 	DrawSync(0);
 }
@@ -3311,22 +3260,13 @@ void MAIN_func_800D9F14(int32_t fade, int16_t *src)
 		*dst++ += (int16_t)(mask << 15);
 	}
 
-	rect.x = 272;
-	rect.y = 480;
-	rect.w = 16;
-	rect.h = 1;
+	setRECT(&rect, 272, 480, 16, 1);
 	LoadImage(&rect, (u_long *)&pixels[0]);
 
-	rect.x = 96;
-	rect.y = 501;
-	rect.w = 16;
-	rect.h = 1;
+	setRECT(&rect, 96, 501, 16, 1);
 	LoadImage(&rect, (u_long *)&pixels[16]);
 
-	rect.x = 224;
-	rect.y = 488;
-	rect.w = 16;
-	rect.h = 24;
+	setRECT(&rect, 224, 488, 16, 24);
 	LoadImage(&rect, (u_long *)&pixels[32]);
 	DrawSync(0);
 }
@@ -3627,19 +3567,10 @@ void renderFXParticle(SVECTOR *pos, int32_t size, uint8_t *color)
 	depth = worldPosToScreenPos(pos, &screenPos);
 	SetPolyFT4(prim);
 	SetSemiTrans(prim, 1);
-	prim->code |= 2;
-	prim->r0 = color[0];
-	prim->g0 = color[1];
-	prim->b0 = color[2];
-	prim->tpage = 60;
-	prim->clut = 0x7a4c;
-	prim->u0 = 0;
-	prim->v0 = 160;
-	prim->u1 = 15;
-	prim->v1 = 160;
-	prim->u2 = 0;
-	prim->v2 = 175;
-	prim->u3 = 15;
-	prim->v3 = 175;
+	setSemiTrans(prim, 1);
+	setRGB0(prim, color[0], color[1], color[2]);
+	prim->tpage = getTPage(0, 1, 768, 256);
+	prim->clut = getClut(192, 489);
+	setUVWH(prim, 0, 160, 15, 15);
 	addFXPrim(prim, screenPos.vx, screenPos.vy, size, size, depth);
 }

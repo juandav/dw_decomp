@@ -976,9 +976,7 @@ void BTL_handleVictorySequence(void)
 				startAnimation(entity, 0x24);
 				entity->anim.animFlag |= 4;
 				tmp = ((NPCEntity *)entity)->flee;
-				loc.vx = tmp.vx;
-				loc.vy = tmp.vy;
-				loc.vz = tmp.vz;
+				copyVector(&loc, &tmp);
 				entityLookAtLocation(entity, &loc);
 			}
 			if (entityIsOffScreen(entity, 0x140, 0xf0) != 0) {
@@ -3869,22 +3867,8 @@ void BTL_setCommandIconUV(DigimonEntity *digimon, POLY_FT4 *prim, int32_t index)
 
 	if ((index >= 8U) && (index < 0xcU)) {
 		eff = MOVE_DATA[entityGetTechFromAnim(&digimon->entity, digimon->stats.base.moves[index - 8])].special;
-		prim->u0 = BTL_D_80072EE8[eff * 2];
-		prim->v0 = BTL_D_80072EE9[eff * 2];
-		prim->u1 = BTL_D_80072EE8[eff * 2] + 0x10;
-		prim->v1 = BTL_D_80072EE9[eff * 2];
-		prim->u2 = BTL_D_80072EE8[eff * 2];
-		prim->v2 = BTL_D_80072EE9[eff * 2] + 0xf;
-		prim->u3 = BTL_D_80072EE8[eff * 2] + 0x10;
-		prim->v3 = BTL_D_80072EE9[eff * 2] + 0xf;
+		setUVWH(prim, BTL_D_80072EE8[eff * 2], BTL_D_80072EE9[eff * 2], 0x10, 0xf);
 	} else {
-		prim->u0 = BTL_D_80072ED8[(index - 1) * 2];
-		prim->v0 = BTL_D_80072ED9[(index - 1) * 2];
-		prim->u1 = BTL_D_80072ED8[(index - 1) * 2] + 0x10;
-		prim->v1 = BTL_D_80072ED9[(index - 1) * 2];
-		prim->u2 = BTL_D_80072ED8[(index - 1) * 2];
-		prim->v2 = BTL_D_80072ED9[(index - 1) * 2] + 0xf;
-		prim->u3 = BTL_D_80072ED8[(index - 1) * 2] + 0x10;
-		prim->v3 = BTL_D_80072ED9[(index - 1) * 2] + 0xf;
+		setUVWH(prim, BTL_D_80072ED8[(index - 1) * 2], BTL_D_80072ED9[(index - 1) * 2], 0x10, 0xf);
 	}
 }

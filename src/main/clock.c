@@ -251,8 +251,7 @@ void initializeClockData(void)
 	CLOCK_SPRITE.attribute = 0;
 	CLOCK_SPRITE.x = -112;
 	CLOCK_SPRITE.y = -66;
-	CLOCK_SPRITE.w = 8;
-	CLOCK_SPRITE.h = 16;
+	setWH(&CLOCK_SPRITE, 8, 16);
 	CLOCK_SPRITE.tpage = GetTPage(0, 0, 896, 448);
 	CLOCK_SPRITE.cx = 256;
 	CLOCK_SPRITE.cy = 499;

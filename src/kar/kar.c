@@ -719,7 +719,7 @@ void KAR_renderAimArrow(void)
 		gte_stsxy(&sxy);
 		gte_stszotz(&otz);
 		if (i < 0xE) {
-			setUV4(prim, 0x18, 0x38, 0x28, 0x38, 0x18, 0x28, 0x28, 0x28);
+			setUVWH(prim, 0x18, 0x38, 16, -16);
 			setXY4(prim, sxy.vx - 8, sxy.vy + 8, sxy.vx + 8, sxy.vy + 8, sxy.vx - 8,
 			       sxy.vy - 8, sxy.vx + 8, sxy.vy - 8);
 		} else {
@@ -747,9 +747,9 @@ void KAR_renderAimArrow(void)
 				pts[k].vz += sxy.vy;
 			}
 			if (rot == 0x800) {
-				setUV4(prim, 0x28, 0x28, 0x38, 0x28, 0x28, 0x38, 0x38, 0x38);
+				setUVWH(prim, 0x28, 0x28, 16, 16);
 			} else {
-				setUV4(prim, 0x28, 0x28, 0x37, 0x28, 0x28, 0x37, 0x37, 0x37);
+				setUVWH(prim, 0x28, 0x28, 15, 15);
 			}
 			setXY4(prim, pts[0].vx, pts[0].vz, pts[1].vx, pts[1].vz, pts[2].vx,
 			       pts[2].vz, pts[3].vx, pts[3].vz);

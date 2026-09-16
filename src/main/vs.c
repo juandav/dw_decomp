@@ -566,52 +566,23 @@ void VS__renderIntroNameChar(int16_t x, int16_t y, int16_t size,
 	prim = (POLY_GT4 *)GsGetWorkBase();
 
 	MAIN_func_80092BB0(prim);
-	prim->tpage = 12;
+	prim->tpage = getTPage(0, 0, 768, 0);
 	setClut(prim, 0, 480);
-	prim->r0 = MAIN_D_8012F438[MAIN_D_80134F28 * 3];
-	prim->g0 = MAIN_D_8012F439[MAIN_D_80134F28 * 3];
-	prim->b0 = MAIN_D_8012F43A[MAIN_D_80134F28 * 3];
-	prim->r1 = MAIN_D_8012F438[MAIN_D_80134F28 * 3];
-	prim->g1 = MAIN_D_8012F439[MAIN_D_80134F28 * 3];
-	prim->b1 = MAIN_D_8012F43A[MAIN_D_80134F28 * 3];
-	prim->r2 = MAIN_D_8012F438[MAIN_D_80134F28 * 3] / 10;
-	prim->g2 = MAIN_D_8012F439[MAIN_D_80134F28 * 3] / 10;
-	prim->b2 = MAIN_D_8012F43A[MAIN_D_80134F28 * 3] / 10;
-	prim->r3 = MAIN_D_8012F438[MAIN_D_80134F28 * 3] / 10;
-	prim->g3 = MAIN_D_8012F439[MAIN_D_80134F28 * 3] / 10;
-	prim->b3 = MAIN_D_8012F43A[MAIN_D_80134F28 * 3] / 10;
+	setRGB0(prim, MAIN_D_8012F438[MAIN_D_80134F28 * 3], MAIN_D_8012F439[MAIN_D_80134F28 * 3], MAIN_D_8012F43A[MAIN_D_80134F28 * 3]);
+	setRGB1(prim, MAIN_D_8012F438[MAIN_D_80134F28 * 3], MAIN_D_8012F439[MAIN_D_80134F28 * 3], MAIN_D_8012F43A[MAIN_D_80134F28 * 3]);
+	setRGB2(prim, MAIN_D_8012F438[MAIN_D_80134F28 * 3] / 10, MAIN_D_8012F439[MAIN_D_80134F28 * 3] / 10, MAIN_D_8012F43A[MAIN_D_80134F28 * 3] / 10);
+	setRGB3(prim, MAIN_D_8012F438[MAIN_D_80134F28 * 3] / 10, MAIN_D_8012F439[MAIN_D_80134F28 * 3] / 10, MAIN_D_8012F43A[MAIN_D_80134F28 * 3] / 10);
 
 	u = (character % 32) * 32;
 	v = (character / 8) * 32;
 
 	if (size < 64) {
-		prim->u0 = u;
-		prim->v0 = v;
-		prim->u1 = u + (u != 0xe0 ? 32 : 31);
-		prim->v1 = v;
-		prim->u2 = u;
-		prim->v2 = v + (v != 0xe0 ? 32 : 31);
-		prim->u3 = u + (u != 0xe0 ? 32 : 31);
-		prim->v3 = v + (v != 0xe0 ? 32 : 31);
+		setUVWH(prim, u, v, (u != 0xe0 ? 32 : 31), (v != 0xe0 ? 32 : 31));
 	} else {
-		prim->u0 = u;
-		prim->v0 = v;
-		prim->u1 = u + 31;
-		prim->v1 = v;
-		prim->u2 = u;
-		prim->v2 = v + 31;
-		prim->u3 = u + 31;
-		prim->v3 = v + 31;
+		setUVWH(prim, u, v, 31, 31);
 	}
 
-	prim->x0 = x;
-	prim->y0 = y;
-	prim->x1 = x + size;
-	prim->y1 = y;
-	prim->x2 = x;
-	prim->y2 = y + size;
-	prim->x3 = x + size;
-	prim->y3 = y + size;
+	setXYWH(prim, x, y, size, size);
 
 	GsSetWorkBase((PACKET *)prim);
 }
@@ -769,10 +740,8 @@ void VS__renderNumber2(int32_t x, int32_t y, int32_t digits, int32_t value,
 
 	for (i = count - 1; i >= 0; i--) {
 		SetPolyFT4(prim);
-		prim->r0 = 0x80;
-		prim->g0 = 0x80;
-		prim->b0 = 0x80;
-		prim->tpage = 13;
+		setRGB0(prim, 0x80, 0x80, 0x80);
+		prim->tpage = getTPage(0, 0, 832, 0);
 		setClut(prim, 16, 480);
 		setUVDataPolyFT4(prim, buf[i] * 12, 32, 12, 12);
 		setPosDataPolyFT4(prim,
@@ -1761,15 +1730,9 @@ void VS__func_800F4F9C(void)
 	DrawSync(0);
 	removeObject(0x1a2, 0);
 
-	startPos.x = -10;
-	startPos.y = -10;
-	startPos.w = 20;
-	startPos.h = 20;
+	setRECT(&startPos, -10, -10, 20, 20);
 
-	finalPos.x = -132;
-	finalPos.y = -27;
-	finalPos.w = 264;
-	finalPos.h = 54;
+	setRECT(&finalPos, -132, -27, 264, 54);
 
 	createAnimatedUIBox(0, 0, 2, &finalPos, &startPos, NULL,
 			    VS__func_800F7338);
@@ -2758,7 +2721,7 @@ void VS__func_800F7284(void)
 	POLY_FT4 *prim = (POLY_FT4 *)GsGetWorkBase();
 
 	SetPolyFT4(prim);
-	prim->tpage = 0xd;
+	prim->tpage = getTPage(0, 0, 832, 0);
 	setClut(prim, 16, 480);
 	setRGB0(prim, 0x80, 0x80, 0x80);
 	setUVDataPolyFT4(prim, 0, 8, 144, 24);
@@ -2817,27 +2780,11 @@ void VS__renderPlayerMarker(int32_t id)
 
 	prim = (POLY_FT4 *)GsGetWorkBase();
 	SetPolyFT4(prim);
-	prim->tpage = 6;
+	prim->tpage = getTPage(0, 0, 384, 0);
 	setClut(prim, 0, 498);
-	prim->r0 = 0x80;
-	prim->g0 = 0x80;
-	prim->b0 = 0x80;
-	prim->u0 = id * 48 + 0x88;
-	prim->v0 = 0xd8;
-	prim->u1 = id * 48 + 0xb8;
-	prim->v1 = 0xd8;
-	prim->u2 = id * 48 + 0x88;
-	prim->v2 = 0xf8;
-	prim->u3 = id * 48 + 0xb8;
-	prim->v3 = 0xf8;
-	prim->x0 = sxy[0];
-	prim->y0 = sxy[1] - 32;
-	prim->x1 = sxy[0] + 48;
-	prim->y1 = sxy[1] - 32;
-	prim->x2 = sxy[0];
-	prim->y2 = sxy[1] + yOffset;
-	prim->x3 = sxy[0] + 48;
-	prim->y3 = sxy[1] + yOffset;
+	setRGB0(prim, 0x80, 0x80, 0x80);
+	setUVWH(prim, id * 48 + 0x88, 0xd8, 48, 32);
+	setXY4(prim, sxy[0], sxy[1] - 32, sxy[0] + 48, sxy[1] - 32, sxy[0], sxy[1] + yOffset, sxy[0] + 48, sxy[1] + yOffset);
 	AddPrim(ACTIVE_ORDERING_TABLE->org + otz, prim++);
 
 	GsSetWorkBase((PACKET *)prim);
@@ -3093,10 +3040,7 @@ void VS__func_800F7F0C(uint8_t id)
 		drawString(MAIN_D_8012F510, 0, 0);
 		drawString(MAIN_D_8012F51C, 0, 12);
 
-		rect.x = (id == 0) ? -132 : 22;
-		rect.y = 32;
-		rect.w = 108;
-		rect.h = 36;
+		setRECT(&rect, (id == 0) ? -132 : 22, 32, 108, 36);
 		createStaticUIBox(id, 0, 2, &rect, 0, VS__func_800F9DC8);
 
 		MAIN_D_80134F52[id] = 1;
@@ -3385,10 +3329,7 @@ int32_t VS__func_800F9EBC(void)
 		MAIN_D_80134F58 = 0;
 	}
 
-	rect.x = -90;
-	rect.y = -70;
-	rect.w = 180;
-	rect.h = 128;
+	setRECT(&rect, -90, -70, 180, 128);
 	MAIN_D_80134F59 = 0;
 	MAIN_D_80134F5A = 0;
 	MAIN_D_80134F5B = 0;
@@ -3491,15 +3432,11 @@ void VS__func_800FA234(int32_t depth)
 
 	for (i = 0, j = -1; i < 8; ++sprite, ++i, ++j) {
 		SetPolyFT4(prim);
-		prim->r0 = 0x80;
-		prim->g0 = 0x80;
-		prim->b0 = 0x80;
+		setRGB0(prim, 0x80, 0x80, 0x80);
 		prim->clut = GetClut(48, sprite->clut);
 
 		if (i > 0 && i < 4 && MAIN_D_80134F59 != j) {
-			prim->r0 = 0x40;
-			prim->g0 = 0x40;
-			prim->b0 = 0x40;
+			setRGB0(prim, 0x40, 0x40, 0x40);
 		}
 
 		if (i == 4 && MAIN_D_80134F59 != 0) {
@@ -3514,7 +3451,7 @@ void VS__func_800FA234(int32_t depth)
 			setClut(prim, 48, 501);
 		}
 
-		prim->tpage = 7;
+		prim->tpage = getTPage(0, 0, 448, 0);
 
 		if (i == MAIN_D_80134F59 + 1 && i > 0 && i < 4) {
 			setUVDataPolyFT4(prim,
@@ -3549,10 +3486,7 @@ int32_t VS__func_800FA4B8(void)
 	RECT rect;
 	int32_t i;
 
-	rect.x = -90;
-	rect.y = -70;
-	rect.w = 180;
-	rect.h = 128;
+	setRECT(&rect, -90, -70, 180, 128);
 	MAIN_D_80134F59 = 0;
 	MAIN_D_80134F5A = 0;
 	MAIN_D_80134F5B = 0;
@@ -3630,7 +3564,7 @@ void VS__func_800FA5CC(int32_t id)
 			setClut(prim, 48, 492);
 		}
 
-		prim->tpage = 7;
+		prim->tpage = getTPage(0, 0, 448, 0);
 		if (i != 7) {
 			posX = sprite->x - 90;
 		} else {

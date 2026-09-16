@@ -147,10 +147,7 @@ void buildScheduleLabels(void)
 	stat = readPStat(PSTAT_254);
 	setupBoxOrigin(stat, &rect2);
 
-	rect1.x = -54;
-	rect1.y = -98;
-	rect1.w = 108;
-	rect1.h = 20;
+	setRECT(&rect1, -54, -98, 108, 20);
 	createTextbox(1, 0xe1, &rect1, &rect2, 0, renderTournamentTextbox);
 	registerTextbox(1, 8, 2, 0, 0);
 	showMapHeadTextbox(1, 0xff, 1, 0x4d8);
@@ -194,10 +191,7 @@ void buildScheduleEntries(void)
 	stat = readPStat(PSTAT_254);
 	setupBoxOrigin(stat, &rect2);
 
-	rect1.x = -0x82;
-	rect1.y = -0x3e;
-	rect1.w = 0x104;
-	rect1.h = 0x7c;
+	setRECT(&rect1, -0x82, -0x3e, 0x104, 0x7c);
 
 	createTextbox(2, 0xe1, &rect1, &rect2, tickTournamentSchedule,
 		      renderTournamentSchedule);
@@ -308,19 +302,13 @@ void initTournamentInfo(int32_t arg)
 		y = UI_BOX_DATA[2].finalPos.y + 3;
 		x = x + TOURNAMENT_SELECTED_COLUMN * 51 + 3;
 		y = y + TOURNAMENT_SELECTED_ROW * 16 + 0x16;
-		rect2.x = x;
-		rect2.y = y;
-		rect2.w = 0x2a;
-		rect2.h = 0xd;
+		setRECT(&rect2, x, y, 0x2a, 0xd);
 		boxId = 0xc1;
 		yOff = -0x31;
 		slot = 0;
 
 	}
-	rect1.x = -0x7e;
-	rect1.y = yOff;
-	rect1.w = 0xfc;
-	rect1.h = 0x63;
+	setRECT(&rect1, -0x7e, yOff, 0xfc, 0x63);
 	createTextbox(3, boxId, &rect1, &rect2, tickTournamentInfo,
 		      renderTournamentInfo);
 	registerTextbox(3, slot, 7, 0, 0);

@@ -757,7 +757,7 @@ void FISH_renderBaitMenu(int32_t boxId)
 			prim->tpage = getTPage(0, 0, 896, 256);
 			setClut(prim, 256, 484);
 			*(int32_t *)&prim->r0 = 0x808080;
-			setUV4(prim, 0x80, 0x9c, 0x88, 0x9c, 0x80, 0xa4, 0x88, 0xa4);
+			setUVWH(prim, 0x80, 0x9c, 8, 8);
 			setXY4(prim, x + ((col != 0) ? 0x10d : 0x7d), y + 0x14 + (row * 0x12), x + ((col != 0) ? 0x10d : 0x7d) + 8, y + 0x14 + (row * 0x12), x + ((col != 0) ? 0x10d : 0x7d), y + 0x1c + (row * 0x12), x + ((col != 0) ? 0x10d : 0x7d) + 8, y + 0x1c + (row * 0x12));
 			setPolyFT4(prim);
 			addPrim(ACTIVE_ORDERING_TABLE->org + layer, prim);
@@ -1773,9 +1773,7 @@ void FISH_drawBaitSprite(void)
 		return;
 	}
 
-	((VECTOR *)m1.t)->vx = item->pos.vx;
-	((VECTOR *)m1.t)->vy = item->pos.vy;
-	((VECTOR *)m1.t)->vz = item->pos.vz;
+	copyVector(((VECTOR *)m1.t), &item->pos);
 	GsMulCoord0(&GsWSMATRIX, &m1, &m2);
 
 	if (m2.t[2] <= 0) {
@@ -1794,11 +1792,10 @@ void FISH_drawBaitSprite(void)
 	*(int32_t *)&prim->r0 = 0x808080;
 	prim->tpage = getTPage(0, 0, 320, 0);
 	setClut(prim, 224, MAIN_D_80127BDC[item->sprite] + 488);
-	prim->u0 = prim->u2 = (item->sprite % 16) * 16;
-	prim->v0 = prim->v1 = (item->sprite / 16) * 16;
+	setUV0(prim, prim->u2 = (item->sprite % 16) * 16, prim->v1 = (item->sprite / 16) * 16);
 	prim->u1 = prim->u3 = prim->u0 + 0xf;
 	prim->v2 = prim->v3 = prim->v0 + 0xf;
-	setXY4(prim, m2.t[0] - r, m2.t[1] - r, (m2.t[0] - r) + (r * 2), m2.t[1] - r, m2.t[0] - r, (m2.t[1] - r) + (r * 2), (m2.t[0] - r) + (r * 2), (m2.t[1] - r) + (r * 2));
+	setXYWH(prim, m2.t[0] - r, m2.t[1] - r, (r * 2), (r * 2));
 	setPolyFT4(prim);
 	addPrim(ACTIVE_ORDERING_TABLE->org + (m2.t[2] >> 4), prim);
 	GsSetWorkBase((PACKET *)(prim + 1));
@@ -3224,9 +3221,7 @@ void FISH_updateRodPose(FishingRod *rod)
 		MulMatrix(&FISH_SCRATCH->m[2], &FISH_SCRATCH->m[3]);
 		FISH_ROD_SEGMENT_POS[ang] = FISH_SCRATCH->v0;
 		FISH_ROD_SEGMENT_MATRIX[ang] = FISH_SCRATCH->m[2];
-		((VECTOR *)FISH_ROD_SEGMENT_MATRIX[ang].t)->vx = FISH_SCRATCH->v0.vx;
-		((VECTOR *)FISH_ROD_SEGMENT_MATRIX[ang].t)->vy = FISH_SCRATCH->v0.vy;
-		((VECTOR *)FISH_ROD_SEGMENT_MATRIX[ang].t)->vz = FISH_SCRATCH->v0.vz;
+		copyVector(((VECTOR *)FISH_ROD_SEGMENT_MATRIX[ang].t), &FISH_SCRATCH->v0);
 		ApplyMatrix(&FISH_SCRATCH->m[2], &FISH_D_8007A594[ang], &FISH_SCRATCH->v1);
 		addVector(&FISH_SCRATCH->v0, &FISH_SCRATCH->v1);
 	}

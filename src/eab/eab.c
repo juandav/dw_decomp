@@ -250,9 +250,7 @@ void EAB_renderBuildupRing(int32_t id)
 	scale = EAB_D_800616EC;
 	scale.vx = scale.vz = lerp(0x10b8, 0x614, 1, 0x12, p[0]);
 	scale.vy = ((_sin(lerp(0, 0x80, 1, 0x12, p[0])) * 0xc3c) / 4096) + 0x15c;
-	trans.vx = entity->posData->location.vx;
-	trans.vy = entity->posData->location.vy;
-	trans.vz = entity->posData->location.vz;
+	copyVector(&trans, &entity->posData->location);
 	renderTMDModel((uint8_t *)MAIN_D_80134C28, 0, &coord, NULL, &trans, &rot, &scale);
 }
 
@@ -305,9 +303,7 @@ void EAB_renderSpawnRing(int32_t id)
 	scale = EAB_D_800616FC;
 	scale.vx = scale.vz = lerp(0x16cc, 0x10b8, 1, 0x12, p[0]);
 	scale.vy = ((_sin(lerp(0, 0x80, 1, 0x12, p[0])) * 0x2b8) / 4096) + 0xae;
-	trans.vx = entity->posData->location.vx;
-	trans.vy = entity->posData->location.vy;
-	trans.vz = entity->posData->location.vz;
+	copyVector(&trans, &entity->posData->location);
 	renderTMDModel((uint8_t *)MAIN_D_80134C28, 0, &coord, NULL, &trans, &rot, &scale);
 }
 
@@ -452,27 +448,11 @@ void EAB_renderFlash(VECTOR *color)
 	prim = (POLY_FT4 *)GsGetWorkBase();
 	SetPolyFT4(prim);
 	SetSemiTrans(prim, 1);
-	prim->tpage = 0xdd;
-	prim->clut = 0x79c0;
-	prim->x0 = -0xa0;
-	prim->y0 = -0x78;
-	prim->x1 = 0xa0;
-	prim->y1 = -0x78;
-	prim->x2 = -0xa0;
-	prim->y2 = 0x78;
-	prim->x3 = 0xa0;
-	prim->y3 = 0x78;
-	prim->u0 = 0;
-	prim->v0 = 0x80;
-	prim->u1 = 3;
-	prim->v1 = 0x80;
-	prim->u2 = 0;
-	prim->v2 = 0x83;
-	prim->u3 = 3;
-	prim->v3 = 0x83;
-	prim->r0 = color->vx;
-	prim->g0 = color->vy;
-	prim->b0 = color->vz;
+	prim->tpage = getTPage(1, 2, 832, 256);
+	prim->clut = getClut(0, 487);
+	setXYWH(prim, -0xa0, -0x78, 320, 240);
+	setUVWH(prim, 0, 0x80, 3, 3);
+	setRGB0(prim, color->vx, color->vy, color->vz);
 	AddPrim(ACTIVE_ORDERING_TABLE->org + 0xa, prim);
 	prim++;
 	GsSetWorkBase((PACKET *)prim);
@@ -519,9 +499,7 @@ int32_t EAB_addParticle(VECTOR *position, RGB8 *color)
 	}
 
 	e->timer = 0;
-	e->pos.vx = position->vx;
-	e->pos.vy = position->vy;
-	e->pos.vz = position->vz;
+	copyVector(&e->pos, position);
 	e->r = color->r;
 	e->g = color->g;
 	e->b = color->b;
@@ -537,27 +515,11 @@ void EAB_renderBackdrop(VECTOR *color)
 	prim = (POLY_FT4 *)GsGetWorkBase();
 	SetPolyFT4(prim);
 	SetSemiTrans(prim, 1);
-	prim->tpage = 0xdd;
-	prim->clut = 0x79c0;
-	prim->x0 = -DRAWING_OFFSET_X;
-	prim->y0 = -DRAWING_OFFSET_Y;
-	prim->x1 = 0x140 - DRAWING_OFFSET_X;
-	prim->y1 = -DRAWING_OFFSET_Y;
-	prim->x2 = -DRAWING_OFFSET_X;
-	prim->y2 = 0xf0 - DRAWING_OFFSET_Y;
-	prim->x3 = 0x140 - DRAWING_OFFSET_X;
-	prim->y3 = 0xf0 - DRAWING_OFFSET_Y;
-	prim->u0 = 0;
-	prim->v0 = 0x80;
-	prim->u1 = 3;
-	prim->v1 = 0x80;
-	prim->u2 = 0;
-	prim->v2 = 0x83;
-	prim->u3 = 3;
-	prim->v3 = 0x83;
-	prim->r0 = color->vx;
-	prim->g0 = color->vy;
-	prim->b0 = color->vz;
+	prim->tpage = getTPage(1, 2, 832, 256);
+	prim->clut = getClut(0, 487);
+	setXY4(prim, -DRAWING_OFFSET_X, -DRAWING_OFFSET_Y, 0x140 - DRAWING_OFFSET_X, -DRAWING_OFFSET_Y, -DRAWING_OFFSET_X, 0xf0 - DRAWING_OFFSET_Y, 0x140 - DRAWING_OFFSET_X, 0xf0 - DRAWING_OFFSET_Y);
+	setUVWH(prim, 0, 0x80, 3, 3);
+	setRGB0(prim, color->vx, color->vy, color->vz);
 	AddPrim(ACTIVE_ORDERING_TABLE->org + 0xfa0, prim);
 	prim++;
 	GsSetWorkBase((PACKET *)prim);
@@ -649,13 +611,8 @@ void EAB_renderParticle(int32_t id)
 			d = depth[j];
 			if ((d > 0x20) && (d < 0x1000)) {
 				SetLineF2(prim);
-				prim->r0 = lerp(e->r, 0, 0, 0x56, e->timer);
-				prim->g0 = lerp(e->g, 0, 0, 0x56, e->timer);
-				prim->b0 = lerp(e->b, 0, 0, 0x56, e->timer);
-				prim->x0 = screen[i].vx;
-				prim->y0 = screen[i].vy;
-				prim->x1 = screen[j].vx;
-				prim->y1 = screen[j].vy;
+				setRGB0(prim, lerp(e->r, 0, 0, 0x56, e->timer), lerp(e->g, 0, 0, 0x56, e->timer), lerp(e->b, 0, 0, 0x56, e->timer));
+				setXY2(prim, screen[i].vx, screen[i].vy, screen[j].vx, screen[j].vy);
 				AddPrim(ACTIVE_ORDERING_TABLE->org + 0xf9f, prim++);
 			}
 		}

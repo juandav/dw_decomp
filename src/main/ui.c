@@ -125,8 +125,7 @@ void renderUIBoxStatic(int32_t instanceId)
 	box.b = UI_BOX_COLORS[data->color].b;
 	box.x = rect->x + 4;
 	box.y = rect->y + 3;
-	box.w = rect->w - 8;
-	box.h = rect->h - 3;
+	setWH(&box, rect->w - 8, rect->h - 3);
 	GsSortBoxFill(&box, ACTIVE_ORDERING_TABLE, (uint16_t)layer);
 }
 

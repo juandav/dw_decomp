@@ -65,20 +65,14 @@ int32_t loadTextureFile(char *path, uint32_t *outTPage, uint32_t *outClut)
 
 	GsGetTimInfo(&((u_long *)TEXTURE_BUFFER)[1], &image);
 
-	rect.x = image.px;
-	rect.y = image.py;
-	rect.w = image.pw;
-	rect.h = image.ph;
+	setRECT(&rect, image.px, image.py, image.pw, image.ph);
 	result = LoadImage(&rect, image.pixel);
 
 	result = tpage = GetTPage(image.pmode & 3, 0, image.px, image.py);
 	*outTPage = tpage;
 
 	if (((image.pmode >> 3) & 1) != 0) {
-		rect.x = image.cx;
-		rect.y = image.cy;
-		rect.w = image.cw;
-		rect.h = image.ch;
+		setRECT(&rect, image.cx, image.cy, image.cw, image.ch);
 		result = LoadImage(&rect,image.clut);
 
 		result = clut = GetClut(image.cx, image.cy);
@@ -123,17 +117,11 @@ int32_t loadTIMFile(char *path, void *buffer)
 
 	GsGetTimInfo(&((u_long *)buffer)[1], &image);
 
-	rect.x = image.px;
-	rect.y = image.py;
-	rect.w = image.pw;
-	rect.h = image.ph;
+	setRECT(&rect, image.px, image.py, image.pw, image.ph);
 	result = LoadImage(&rect, image.pixel);
 
 	if (((image.pmode >> 3) & 1) != 0) {
-		rect.x = image.cx;
-		rect.y = image.cy;
-		rect.w = image.cw;
-		rect.h = image.ch;
+		setRECT(&rect, image.cx, image.cy, image.cw, image.ch);
 		result = LoadImage(&rect,image.clut);
 	}
 
@@ -150,17 +138,11 @@ int32_t loadStackedTIMEntry(char *path, void *buffer, int32_t offset,
 	result = readFileSectors(path, buffer, offset, sectors);
 	GsGetTimInfo(&((u_long *)buffer)[1], &image);
 
-	rect.x = image.px;
-	rect.y = image.py;
-	rect.w = image.pw;
-	rect.h = image.ph;
+	setRECT(&rect, image.px, image.py, image.pw, image.ph);
 	result = LoadImage(&rect,image.pixel);
 
 	if (((image.pmode >> 3) & 1) != 0) {
-		rect.x = image.cx;
-		rect.y = image.cy;
-		rect.w = image.cw;
-		rect.h = image.ch;
+		setRECT(&rect, image.cx, image.cy, image.cw, image.ch);
 		result = LoadImage(&rect,image.clut);
 	}
 
