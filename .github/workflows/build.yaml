@@ -16,22 +16,20 @@ jobs:
         - dw_venv:/dw/.venv
     runs-on: ubuntu-latest
     steps:
-    - if: github.event_name != 'pull_request_target'
-      uses: actions/checkout@v5
+    - uses: actions/checkout@v5
       with:
-        ref: ${{ github.ref }}
+        ref: ${{ github.event.pull_request.head.sha || github.ref }}
         submodules: recursive
-    - if: github.event_name == 'pull_request_target'
-      uses: actions/checkout@v5
-      with:
-        ref: ${{ github.event.pull_request.head.sha }}
-        submodules: recursive
+        persist-credentials: false
+        allow-unsafe-pr-checkout: true
+
     - uses: actions/checkout@v5
       with:
         repository: jype0/dw_decomp_dependencies
         token: ${{ secrets.DW_DECOMP_DEPENDENCIES_TOKEN }}
         path: tmp
-    - run: tools/dl_deps.sh
+        persist-credentials: false
+
     - run: |
         mkdir -p disks
         cat tmp/dw* > tmp/dw.tar.gz
@@ -39,6 +37,8 @@ jobs:
         mkdir -p bin/cc_mips
         cat tmp/cc_mips* > tmp/cc_mips.tar.gz
         tar -xf tmp/cc_mips.tar.gz -C bin/cc_mips/
+        rm -rf tmp
+    - run: tools/dl_deps.sh
     - run: |
         make -j$(nproc) generate
         make -j$(nproc)
@@ -46,7 +46,7 @@ jobs:
     - if: github.ref == 'refs/heads/main' && github.event_name == 'push'
       run: make report
     - if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: SLUS_010.32_report
         path: build/report.json
