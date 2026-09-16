@@ -16,11 +16,13 @@
 #include <dw/combat.h>
 #include <dw/efe.h>
 #include <dw/entity.h>
+#include <dw/graphics.h>
 #include <dw/math.h>
 #include <dw/model.h>
 #include <dw/move.h>
 #include <dw/params.h>
 #include <dw/sound.h>
+#include <dw/std.h>
 #include <dw/types.h>
 
 #include "common.h"
@@ -49,14 +51,78 @@ typedef struct {
 } EfeUvAnim;
 
 typedef struct {
-	uint8_t r;
-	uint8_t g;
-	uint8_t b;
-} EfeRGB;
-
-typedef struct {
 	int32_t w[13];
 } EfeFileHeader;
+
+extern int32_t DRAWING_OFFSET_X;
+extern int32_t DRAWING_OFFSET_Y;
+extern GsOT *ACTIVE_ORDERING_TABLE;
+extern SVECTOR STD_D_8007FE24[];
+extern VECTOR STD_D_8007B048;
+extern int32_t MAIN_D_801351D0;
+extern VECTOR STD_D_8007B028;
+extern VECTOR STD_D_8007B038;
+extern int16_t STD_D_8007B058[];
+extern VECTOR STD_D_8007B018;
+extern GsSPRITE STD_POISON_BUBBLE_SPRITE;
+extern VECTOR STD_D_8007AF78;
+extern int32_t (*STD_D_8007AF08[])(int32_t);
+extern void (*STD_D_8007AE68[][8])(int32_t *);
+extern int32_t MAIN_D_801351C8;
+extern char *MAIN_D_801351D4;
+extern int32_t STD_D_8007AB18[];
+extern void *STD_D_8007AB1C[];
+extern int16_t STD_D_8007FD10[][6];
+extern int16_t STD_D_8007FE14[];
+extern char *MAIN_D_801351CC;
+extern int16_t STD_D_8007FCB0[][4];
+extern int16_t STD_D_8007FCD0[][8];
+extern int16_t STD_D_8007FD4C[][4];
+extern int32_t MAIN_D_80139AD0[][2];
+extern void (*STD_jtbl_8007FA7C[])(void);
+extern int16_t STD_D_8007FC20[];
+extern void (*STD_jtbl_8007AE20[])(void);
+extern int32_t MAIN_D_801351B8;
+extern int32_t STD_D_8007FC00[];
+extern int32_t MAIN_D_801351C0;
+extern int32_t MAIN_D_801351C4;
+extern int8_t *MAIN_D_80139B24[];
+extern int32_t VIEWPORT_DISTANCE;
+extern int32_t MAIN_D_801350F4;
+extern PositionData STD_D_8007F528[];
+extern PositionData STD_D_8007C7B0[4];
+extern int16_t STD_D_8007FA1C[];
+extern char STD_D_8007FA5C[];
+extern int16_t STD_D_8007AA70[];
+extern int16_t STD_D_8007AA40[];
+extern int16_t STD_D_8007FA08[];
+extern int16_t MAIN_D_801351A4;
+extern uint8_t MAIN_D_801351B4;
+extern int16_t STD_D_8007F968[];
+extern int16_t STD_D_8007AA30[];
+extern GsOT STD_D_8007B714[];
+extern int32_t STD_D_8007AA10[];
+extern GsRVIEW2 GS_VIEWPOINT;
+extern int32_t ACTIVE_FRAMEBUFFER;
+extern int16_t STD_D_8007CC78[];
+extern int16_t STD_D_8007CCA4[];
+extern int16_t STD_D_8007CCD0[];
+extern int16_t STD_D_8007CCFC[];
+extern GsSPRITE STD_D_8007AFD0;
+extern GsSPRITE STD_D_8007AFF4;
+extern GsSPRITE STD_D_8007AF88;
+extern GsSPRITE STD_D_8007AFAC;
+extern DigimonEntity *MAIN_D_80134EF4;
+extern DigimonEntity *MAIN_D_80134EF8;
+extern int16_t MAIN_D_80134CDC;
+extern int32_t UNKNOWN_MODEL_TAKEN[16];
+extern int16_t EFE_LOAD_STATE[];
+extern int32_t MAIN_D_801351BC;
+extern uint8_t STD_D_8007AF30[];
+extern int16_t STD_D_8007AF38[];
+extern int16_t STD_D_8007AF40[];
+extern uint8_t STD_D_8007AF20[];
+extern uint8_t STD_D_8007AF48[];
 
 void entityLookAtLocation(Entity *entity, VECTOR *pos);
 void setMapLayerEnabled(int32_t enabled);
@@ -324,93 +390,6 @@ void setRotTransMatrix(MATRIX *m);
 int32_t STD_renderProjectedSprite__garbage__(int32_t i);
 long RotTransPers(SVECTOR *v0, long *sxy, long *p, long *flag);
 int32_t STD_func_800770C0(int32_t lo, int32_t hi, int32_t t, int32_t a, int32_t b);
-
-extern int32_t DRAWING_OFFSET_X;
-extern int32_t DRAWING_OFFSET_Y;
-extern GsOT *ACTIVE_ORDERING_TABLE;
-extern SVECTOR STD_D_8007FE24[];
-extern int16_t MAIN_D_80134924[4];
-extern SVECTOR MAIN_D_8013492C;
-extern EfeRGB MAIN_D_80134934;
-extern VECTOR STD_D_8007B048;
-extern int32_t MAIN_D_801351D0;
-extern VECTOR STD_D_8007B028;
-extern VECTOR STD_D_8007B038;
-extern int8_t MAIN_D_801348E8[4];
-extern int8_t MAIN_D_801348EC[4];
-extern int16_t STD_D_8007B058[];
-extern SVECTOR MAIN_D_80134938;
-extern SVECTOR MAIN_D_80134940;
-extern SVECTOR MAIN_D_80134948;
-extern SVECTOR MAIN_D_80134950;
-extern SVECTOR MAIN_D_8013491C;
-extern VECTOR STD_D_8007B018;
-extern GsSPRITE STD_POISON_BUBBLE_SPRITE;
-extern int8_t MAIN_D_80134914[6];
-extern VECTOR STD_D_8007AF78;
-extern int32_t (*STD_D_8007AF08[])(int32_t);
-extern void (*STD_D_8007AE68[][8])(int32_t *);
-extern int32_t MAIN_D_801351C8;
-extern char *MAIN_D_801351D4;
-extern int32_t STD_D_8007AB18[];
-extern void *STD_D_8007AB1C[];
-extern int16_t STD_D_8007FD10[][6];
-extern int16_t STD_D_8007FE14[];
-extern char *MAIN_D_801351CC;
-extern int16_t STD_D_8007FCB0[][4];
-extern int16_t STD_D_8007FCD0[][8];
-extern int16_t STD_D_8007FD4C[][4];
-extern int32_t MAIN_D_80139AD0[][2];
-extern void (*STD_jtbl_8007FA7C[])(void);
-extern char MAIN_D_801348E4[8];
-extern int16_t STD_D_8007FC20[];
-extern void (*STD_jtbl_8007AE20[])(void);
-extern int32_t MAIN_D_801351B8;
-extern int32_t STD_D_8007FC00[];
-extern int32_t MAIN_D_801351C0;
-extern int32_t MAIN_D_801351C4;
-extern int8_t *MAIN_D_80139B24[];
-extern int32_t VIEWPORT_DISTANCE;
-extern int32_t MAIN_D_801350F4;
-extern PositionData STD_D_8007F528[];
-extern PositionData STD_D_8007C7B0[4];
-extern int16_t STD_D_8007FA1C[];
-extern char STD_D_8007FA5C[];
-extern int16_t STD_D_8007AA70[];
-extern int16_t STD_D_8007AA40[];
-extern int16_t STD_D_8007FA08[];
-extern int16_t MAIN_D_801351A4;
-extern uint8_t MAIN_D_801351B4;
-extern int16_t STD_D_8007F968[];
-extern int16_t STD_D_8007AA30[];
-extern GsOT STD_D_8007B714[];
-extern int32_t STD_D_8007AA10[];
-extern GsRVIEW2 GS_VIEWPOINT;
-extern int32_t ACTIVE_FRAMEBUFFER;
-extern int16_t STD_D_8007CC78[];
-extern int16_t STD_D_8007CCA4[];
-extern int16_t STD_D_8007CCD0[];
-extern int16_t STD_D_8007CCFC[];
-extern GsSPRITE STD_D_8007AFD0;
-extern GsSPRITE STD_D_8007AFF4;
-extern GsSPRITE STD_D_8007AF88;
-extern GsSPRITE STD_D_8007AFAC;
-extern DigimonEntity *MAIN_D_80134EF4;
-extern DigimonEntity *MAIN_D_80134EF8;
-extern int16_t MAIN_D_80134CDC;
-extern int32_t UNKNOWN_MODEL_TAKEN[16];
-extern int16_t EFE_LOAD_STATE[];
-extern int32_t MAIN_D_801351BC;
-extern uint8_t STD_D_8007AF30[];
-extern int16_t STD_D_8007AF38[];
-extern int16_t STD_D_8007AF40[];
-extern int32_t MAIN_D_80134908;
-extern int8_t MAIN_D_801348F0[8];
-extern int8_t MAIN_D_801348F8[8];
-extern int8_t MAIN_D_80134900[8];
-extern uint8_t STD_D_8007AF20[];
-extern uint8_t MAIN_D_8013490C[8];
-extern uint8_t STD_D_8007AF48[];
 
 static void *std_effect_functions[] = {
 	STD_func_80079874,
@@ -5631,7 +5610,7 @@ void STD_renderFinisherAura(int32_t id)
 	SVECTOR rot;
 	VECTOR trans;
 	VECTOR scale;
-	EfeRGB col;
+	RGB8 col;
 	int16_t *fa;
 	Entity *e;
 	int32_t sx;

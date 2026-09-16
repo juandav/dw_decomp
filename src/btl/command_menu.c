@@ -13,8 +13,6 @@ extern uint8_t MAIN_D_8013508C;
 extern int16_t BTL_D_80072EB8[];
 extern int16_t BTL_D_80072EC8[];
 extern uint8_t BTL_D_80072E7C[][10];
-extern uint8_t MAIN_D_80134728[8];
-extern int8_t MAIN_D_801346F8;
 extern int8_t MAIN_D_80135094;
 extern uint8_t MAIN_D_8013508A;
 extern uint8_t MAIN_D_8013508B;

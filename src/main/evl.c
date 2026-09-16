@@ -1,13 +1,16 @@
+#include <dw/anim.h>
 #include <dw/bubble.h>
+#include <dw/entity.h>
 #include <dw/evl.h>
+#include <dw/graphics.h>
 #include <dw/main.h>
 #include <dw/utils.h>
 #include <dw/world_object.h>
 
-#include "dw/anim.h"
-#include "dw/entity.h"
-
 #include "common.h"
+
+extern uint8_t MAIN_D_80020000[];
+extern int8_t EVL_LOADING_COMPLETE;
 
 void stopBGM(void);
 void stopSound(void);
@@ -15,7 +18,12 @@ void loadMapSounds2();
 void isSoundLoaded();
 void loadVLALL();
 
-extern int8_t EVL_LOADING_COMPLETE;
+uint8_t *MAIN_D_801349E4 = MAIN_D_80020000;
+RGB8 MAIN_D_801349E8 = { 0x0a, 0xff, 0x0a };
+SVECTOR MAIN_D_801349EC = { 0 };
+int8_t MAIN_D_801349F4 = 1;
+SVECTOR MAIN_D_801349F8 = { 0 };
+SVECTOR MAIN_D_80134A00 = { 0 };
 
 void* evl_functions[] = {
 	evoSequenceAlwaysTrue,

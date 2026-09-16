@@ -5,6 +5,7 @@
 
 #include <dw/script.h>
 #include <dw/sound.h>
+#include <dw/trn.h>
 #include <dw/types.h>
 #include <dw/ui.h>
 
@@ -31,8 +32,6 @@ extern SlotMachine TRN_SLOT_MACHINE;
 extern int16_t MAIN_D_801353A0[4];
 extern GsOT *ACTIVE_ORDERING_TABLE;
 extern int8_t TRN_D_8008F2CC[];
-extern RECT MAIN_D_80134BC8;
-extern RECT MAIN_D_80134BD0;
 extern uint8_t CURRENT_SCREEN;
 extern int32_t DRAWING_OFFSET_X;
 extern int32_t DRAWING_OFFSET_Y;
@@ -40,7 +39,6 @@ extern int8_t TRN_D_8008F1AC[3][13];
 extern int16_t TRN_D_8008F368[];
 extern GsSPRITE TRN_SLOT_SPRITE1;
 extern GsSPRITE TRN_SLOT_SPRITE2;
-extern RECT MAIN_D_80134BD8;
 
 void TRN_tickSlotSession(void);
 void TRN_renderSlotSession(void);

@@ -1,7 +1,8 @@
+#include <stdlib.h>
+
 #include <libgpu.h>
 #include <libgs.h>
 #include <libgte.h>
-#include <stdlib.h>
 
 #include <dw/btl.h>
 #include <dw/doo.h>
@@ -48,10 +49,6 @@ typedef struct {
 } Doo2ShardParams;
 
 typedef struct {
-	int8_t icon[4];
-} Doo2EggIcons;
-
-typedef struct {
 	SVECTOR *sourceVertices;
 	uint32_t vertexCount;
 	SVECTOR *worldVertices;
@@ -67,12 +64,8 @@ extern uint8_t *MAIN_D_80135314;
 extern Doo2ModelVertex *MAIN_D_80135318;
 extern int16_t MAIN_D_8013531C[3];
 extern Doo2ShardParams DOO2_SHARD_PARAMS;
-extern Doo2EggIcons EGG_ICONS;
 extern GsSPRITE DOO2_EGG_ICON_SPRITE;
 extern GsSPRITE DOO2_EGG_CURSOR_SPRITE;
-extern RECT MAIN_D_80134B90;
-extern RECT MAIN_D_80134B98;
-extern RECT MAIN_D_80134BA4;
 
 int32_t removeObject();
 void MAIN_func_80092B60(POLY_FT4 *prim);

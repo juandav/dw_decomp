@@ -56,12 +56,6 @@ extern GsRVIEW2 EAB_D_800619E4;
 extern int8_t EAB_D_80061A04[10];
 extern int32_t EAB_D_80061A10[100][4];
 
-extern char *MAIN_D_80134C28;
-extern SVECTOR MAIN_D_80134C2C;
-extern SVECTOR MAIN_D_80134C34;
-extern RGB8 MAIN_D_80134C3C;
-extern SVECTOR MAIN_D_80134C40;
-extern uint8_t MAIN_D_80134C48;
 extern EabHudState MAIN_D_801353F0;
 extern GsRVIEW2 GS_VIEWPOINT;
 extern int32_t *EFE_DATA_STACK;

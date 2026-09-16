@@ -1,5 +1,4 @@
 #include <libetc.h>
-#include <dw/item.h>
 #include <libgs.h>
 #include <mwinline_n.h>
 
@@ -7,6 +6,8 @@
 #include <dw/btl.h>
 #include <dw/combat.h>
 #include <dw/entity.h>
+#include <dw/graphics.h>
+#include <dw/item.h>
 #include <dw/main.h>
 #include <dw/math.h>
 #include <dw/params.h>
@@ -30,6 +31,20 @@ typedef struct {
 	int16_t type;
 	uint8_t unused[8];
 } FleeBubbleState;
+
+extern uint8_t CURRENT_SCREEN;
+extern int32_t VIEWPORT_DISTANCE;
+extern int32_t ACTIVE_FRAMEBUFFER;
+extern GsOT GS_ORDERING_TABLE[];
+extern PACKET GS_WORK_BASES[];
+extern char DRAW_OFFSETS[];
+extern uint8_t FLEE_BUBBLE_SCALE[];
+extern uint8_t BATTLE_MUSIC[];
+extern uint8_t FLEE_CHANCE_TABLE[];
+extern uint8_t CONCAVE_SCREENS[NUM_CONCAVE_SCREENS];
+extern uint8_t IS_PREDEFINED_BATTLE;
+extern int8_t LOAD_EFE_STATE;
+extern FleeBubbleState FLEE_BUBBLE_DATA[];
 
 int32_t isInvisible(Entity *entity);
 void getEntityTileFromModel(Entity *entity, int8_t *outTileX, int8_t *outTileY);
@@ -58,20 +73,6 @@ void renderFleeBubble(int32_t instanceId);
 void removeFleeBubble(int32_t id);
 int32_t handleBattleStart(int32_t id);
 
-extern uint8_t CURRENT_SCREEN;
-extern int32_t VIEWPORT_DISTANCE;
-extern int32_t ACTIVE_FRAMEBUFFER;
-extern GsOT GS_ORDERING_TABLE[];
-extern PACKET GS_WORK_BASES[];
-extern char DRAW_OFFSETS[];
-extern uint8_t FLEE_BUBBLE_SCALE[];
-extern uint8_t BATTLE_MUSIC[];
-extern uint8_t FLEE_CHANCE_TABLE[];
-extern uint8_t CONCAVE_SCREENS[NUM_CONCAVE_SCREENS];
-extern uint8_t IS_PREDEFINED_BATTLE;
-extern int8_t LOAD_EFE_STATE;
-extern FleeBubbleState FLEE_BUBBLE_DATA[];
-
 static void *btl_functions[] = {
 	startBattleIdleAnimation,
 	handleBattleStart,
@@ -83,6 +84,53 @@ static void *btl_functions[] = {
 	loadBattleData,
 	isScreenConcave,
 };
+
+int16_t MAIN_D_801346D8[4] = { 0, 1024, 2048, 3072 };
+uint8_t MAIN_D_801346E0[5] = { 3, 4, 5, 7, 8 };
+uint8_t MAIN_D_801346E8[4] = { 70, 40, 30, 0 };
+uint8_t MAIN_D_801346EC[4] = { 50, 20, 5, 0 };
+uint8_t MAIN_D_801346F0[4] = { 50, 20, 10, 0 };
+uint8_t MAIN_D_801346F4[4] = { 10, 5, 0, 0 };
+int8_t MAIN_D_801346F8 = -1;
+char MAIN_D_801346FC[] = "Run!";
+char MAIN_D_80134704[] = "Attack!";
+char MAIN_D_8013470C[] = "Change!";
+char MAIN_D_80134714[] = "Run";
+char MAIN_D_80134718[] = "Attack";
+char MAIN_D_80134720[] = "Change";
+uint8_t MAIN_D_80134728[5] = { 0, 11, 25, 39, 50 };
+uint8_t MAIN_D_80134730[8] = { 11, 14, 14, 11, 11, 0, 0, 0 };
+uint8_t MAIN_D_80134738[8] = { 0x50, 0x68, 0x58, 0x68, 0xa8, 0x90, 0x90, 0x80 };
+char MAIN_D_80134740[] = "#C7";
+char MAIN_D_80134744[] = "#C1#W";
+char MAIN_D_8013474C[] = "20";
+char MAIN_D_80134750[] = "15";
+char MAIN_D_80134754[] = "10";
+char MAIN_D_80134758[] = "5";
+char MAIN_D_8013475C[] = "%!#W";
+uint8_t MAIN_D_80134764[8] = { 0, 6, 10, 18, 22, 30, 38, 43 };
+uint8_t MAIN_D_8013476C[8] = { 6, 4, 8, 4, 8, 8, 5, 5 };
+uint8_t MAIN_D_80134774[8] = { 0, 6, 10, 18, 22, 30, 38, 43 };
+char MAIN_D_8013477C[] = "%d\n";
+int8_t MAIN_D_80134780[4] = { 1, 0, -1, 0 };
+int8_t MAIN_D_80134784[4] = { 0, 1, 0, -1 };
+int8_t MAIN_D_80134788[8] = { -1, 1, 1, -1, -1, 1, 1, -1 };
+int8_t MAIN_D_80134790[8] = { -1, -1, 1, 1, -1, -1, 1, 1 };
+int8_t MAIN_D_80134798[8] = { -1, -1, -1, -1, 1, 1, 1, 1 };
+int32_t MAIN_D_801347A0 = 0x808080;
+uint8_t MAIN_D_801347A4[8] = { 104, 0, 135, 0, 104, 31, 135, 31 };
+int8_t MAIN_D_801347AC[6] = { 0, 16, 32, 48, 64, 80 };
+SVECTOR MAIN_D_801347B4 = { 0 };
+int16_t MAIN_D_801347BC[4] = { 0, 1, 2, 0 };
+SVECTOR MAIN_D_801347C4 = { 0 };
+RGB8 MAIN_D_801347CC = { 0xcc, 0xa8, 0x28 };
+SVECTOR MAIN_D_801347D0 = { 0, -50, -50, 0 };
+SVECTOR MAIN_D_801347D8 = { 0, -50, 50, 0 };
+SVECTOR MAIN_D_801347E0 = { 0, 50, -50, 0 };
+SVECTOR MAIN_D_801347E8 = { 0, 50, 50, 0 };
+uint8_t MAIN_D_801347F0[4] = { 180, 100, 235, 180 };
+uint8_t MAIN_D_801347F4[4] = { 20, 20, 150, 180 };
+uint8_t MAIN_D_801347F8[4] = { 255, 255, 220, 180 };
 
 int32_t isScreenConcave(void)
 {

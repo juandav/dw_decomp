@@ -68,6 +68,8 @@ extern EvoStatsGains EVO_GAINS_DATA[];
 extern EvolutionPath EVO_PATHS_DATA[62];
 extern EvoRequirements EVO_REQ_DATA[63];
 
+extern int8_t MAIN_D_801349F4;
+
 void tickEvoSequenceLoading(int32_t instanceId);
 void renderEvoSequenceLoading(int32_t instanceId);
 int32_t getEvoSequenceState(PartnerEntity *partner, void *buffer,

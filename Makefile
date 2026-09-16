@@ -98,9 +98,13 @@ MAIN_SRC := \
 	src/main/bubble.c \
 	src/main/butterfly.c \
 	src/main/clock.c \
+	src/main/doo2.c \
+	src/main/dooa.c \
 	src/main/door_mapdata.c \
+	src/main/eab.c \
 	src/main/efe.c \
 	src/main/efe_table.c \
+	src/main/endi.c \
 	src/main/entity_text.c \
 	src/main/evl.c \
 	src/main/evolution.c \
@@ -150,9 +154,12 @@ MAIN_SRC := \
 	src/main/sjis.c \
 	src/main/sound.c \
 	src/main/sound_async.c \
+	src/main/std.c \
 	src/main/tamer.c \
 	src/main/toilet_data.c \
 	src/main/tournament.c \
+	src/main/trn.c \
+	src/main/trn2.c \
 	src/main/ui.c \
 	src/main/utils.c \
 	src/main/utils2.c \

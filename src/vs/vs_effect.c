@@ -13,6 +13,7 @@
 #include <dw/attack_object.h>
 #include <dw/efe.h>
 #include <dw/entity.h>
+#include <dw/graphics.h>
 #include <dw/math.h>
 #include <dw/model.h>
 #include <dw/params.h>
@@ -46,14 +47,58 @@ typedef struct {
 } EfeUvAnim;
 
 typedef struct {
-	uint8_t r;
-	uint8_t g;
-	uint8_t b;
-} EfeRGB;
-
-typedef struct {
 	int32_t w[13];
 } EfeFileHeader;
+
+extern int32_t DRAWING_OFFSET_X;
+extern int32_t DRAWING_OFFSET_Y;
+extern int32_t MAIN_D_801352F4;
+extern char *MAIN_D_801352F8;
+extern int32_t MAIN_D_801352FC;
+extern char *MAIN_D_80135300;
+extern int32_t VS_D_80070B44[];
+extern void *VS_D_80070B48[];
+extern void (*VS_D_80070E94[][8])(int32_t *);
+extern int32_t (*VS_D_80070F34[])(int32_t);
+extern VECTOR VS_D_80070FA4;
+extern VECTOR VS_D_80071044;
+extern VECTOR VS_D_80071064;
+extern int16_t VS_D_80071084[];
+extern SVECTOR VS_D_800731C4[];
+extern VECTOR VS_D_80071074;
+extern GsSPRITE VS_POISON_BUBBLE_SPRITE;
+extern void (*VS_jtbl_80070E4C[])(void);
+extern VECTOR VS_D_80071054;
+extern int16_t VS_D_80072FC0[];
+extern int16_t VS_D_80073070[][8];
+extern int16_t VS_D_800730B0[][6];
+extern int16_t VS_D_800730EC[][4];
+extern int16_t VS_D_800731B4[];
+extern int32_t VS_D_80072FA0[];
+extern int32_t MAIN_D_801352EC;
+extern int32_t MAIN_D_801352F0;
+extern int8_t *MAIN_D_80139B24[];
+extern int32_t MAIN_D_801352E4;
+extern int32_t MAIN_D_80139AD0[][2];
+extern void (*VS_jtbl_80072E1C[])(void);
+extern int16_t VS_D_80073050[][4];
+extern GsOT *ACTIVE_ORDERING_TABLE;
+extern int32_t VIEWPORT_DISTANCE;
+extern GsSPRITE VS_D_80070FFC;
+extern GsSPRITE VS_D_80071020;
+extern GsSPRITE VS_D_80070FB4;
+extern GsSPRITE VS_D_80070FD8;
+extern DigimonEntity *MAIN_D_80134EF4;
+extern DigimonEntity *MAIN_D_80134EF8;
+extern int16_t MAIN_D_80134CDC;
+extern int32_t UNKNOWN_MODEL_TAKEN[16];
+extern int16_t EFE_LOAD_STATE[];
+extern int32_t MAIN_D_801352E8;
+extern uint8_t VS_D_80070F5C[];
+extern int16_t VS_D_80070F64[];
+extern int16_t VS_D_80070F6C[];
+extern uint8_t VS_D_80070F4C[];
+extern uint8_t VS_D_80070F74[];
 
 void MAIN_func_80092B60(POLY_FT4 *prim);
 void MAIN_func_80092C18(PACKET *prim, RECT *rect);
@@ -295,73 +340,6 @@ void setRotTransMatrix(MATRIX *m);
 int32_t VS_renderProjectedSprite__garbage__(int32_t i);
 long RotTransPers(SVECTOR *v0, long *sxy, long *p, long *flag);
 int32_t VS_interpolateClamped(int32_t lo, int32_t hi, int32_t t, int32_t a, int32_t b);
-
-extern int32_t DRAWING_OFFSET_X;
-extern int32_t DRAWING_OFFSET_Y;
-extern int8_t MAIN_D_80134B20[4];
-extern int8_t MAIN_D_80134B24[4];
-extern int8_t MAIN_D_80134B4C[6];
-extern SVECTOR MAIN_D_80134B54;
-extern SVECTOR MAIN_D_80134B70;
-extern SVECTOR MAIN_D_80134B78;
-extern SVECTOR MAIN_D_80134B80;
-extern SVECTOR MAIN_D_80134B88;
-extern int32_t MAIN_D_801352F4;
-extern char *MAIN_D_801352F8;
-extern int32_t MAIN_D_801352FC;
-extern char *MAIN_D_80135300;
-extern int32_t VS_D_80070B44[];
-extern void *VS_D_80070B48[];
-extern void (*VS_D_80070E94[][8])(int32_t *);
-extern int32_t (*VS_D_80070F34[])(int32_t);
-extern VECTOR VS_D_80070FA4;
-extern VECTOR VS_D_80071044;
-extern VECTOR VS_D_80071064;
-extern int16_t VS_D_80071084[];
-extern SVECTOR VS_D_800731C4[];
-extern int16_t MAIN_D_80134B5C[4];
-extern SVECTOR MAIN_D_80134B64;
-extern EfeRGB MAIN_D_80134B6C;
-extern VECTOR VS_D_80071074;
-extern GsSPRITE VS_POISON_BUBBLE_SPRITE;
-extern void (*VS_jtbl_80070E4C[])(void);
-extern VECTOR VS_D_80071054;
-extern char MAIN_D_80134B1C[8];
-extern int16_t VS_D_80072FC0[];
-extern int16_t VS_D_80073070[][8];
-extern int16_t VS_D_800730B0[][6];
-extern int16_t VS_D_800730EC[][4];
-extern int16_t VS_D_800731B4[];
-extern int32_t VS_D_80072FA0[];
-extern int32_t MAIN_D_801352EC;
-extern int32_t MAIN_D_801352F0;
-extern int8_t *MAIN_D_80139B24[];
-extern int32_t MAIN_D_801352E4;
-extern int32_t MAIN_D_80139AD0[][2];
-extern void (*VS_jtbl_80072E1C[])(void);
-extern int16_t VS_D_80073050[][4];
-extern GsOT *ACTIVE_ORDERING_TABLE;
-extern int32_t VIEWPORT_DISTANCE;
-extern GsSPRITE VS_D_80070FFC;
-extern GsSPRITE VS_D_80071020;
-extern GsSPRITE VS_D_80070FB4;
-extern GsSPRITE VS_D_80070FD8;
-extern DigimonEntity *MAIN_D_80134EF4;
-extern DigimonEntity *MAIN_D_80134EF8;
-extern int16_t MAIN_D_80134CDC;
-extern int32_t UNKNOWN_MODEL_TAKEN[16];
-extern int16_t EFE_LOAD_STATE[];
-extern int32_t MAIN_D_801352E8;
-extern uint8_t VS_D_80070F5C[];
-extern int16_t VS_D_80070F64[];
-extern int16_t VS_D_80070F6C[];
-extern int32_t MAIN_D_80134B40;
-extern int8_t MAIN_D_80134B28[8];
-extern int8_t MAIN_D_80134B30[8];
-extern int8_t MAIN_D_80134B38[8];
-extern uint8_t VS_D_80070F4C[];
-extern uint8_t MAIN_D_80134B44[8];
-extern uint8_t VS_D_80070F74[];
 
 static void *vs_effect_functions[] = {
 	VS_removeAllAuraProjectiles,
@@ -5163,7 +5141,7 @@ void VS_renderFinisherAura(int32_t id)
 	SVECTOR rot;
 	VECTOR trans;
 	VECTOR scale;
-	EfeRGB col;
+	RGB8 col;
 	int16_t *fa;
 	Entity *e;
 	int32_t sx;

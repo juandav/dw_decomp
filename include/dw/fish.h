@@ -232,6 +232,25 @@ extern FishingData *FISHING_DATA_PTR;
 extern FishingMapData FISHING_MAP_DATA[];
 extern FishingData FISHING_DATA;
 
+extern int8_t MAIN_D_80134958[6];
+extern int8_t MAIN_D_80134960[7];
+extern int8_t MAIN_D_80134968[3];
+extern int8_t MAIN_D_8013496C[5];
+extern int16_t MAIN_D_80134974[4];
+extern SVECTOR MAIN_D_8013497C;
+extern SVECTOR MAIN_D_80134984;
+extern SVECTOR MAIN_D_8013498C;
+extern SVECTOR MAIN_D_80134994;
+extern int8_t MAIN_D_8013499C[8];
+extern uint8_t MAIN_D_801349A4[8];
+extern uint8_t MAIN_D_801349AC[4];
+extern uint8_t MAIN_D_801349B0[6];
+extern uint8_t MAIN_D_801349B8[6];
+extern SVECTOR MAIN_D_801349C0;
+extern SVECTOR MAIN_D_801349C8;
+extern SVECTOR MAIN_D_801349D0;
+extern char MAIN_D_801349D8[8];
+
 int32_t getBestFishingRod(void);
 int32_t hasFoodItem(void);
 void setFishingDisabled(void);

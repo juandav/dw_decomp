@@ -22,6 +22,63 @@
 
 #include "common.h"
 
+typedef struct {
+	int16_t clut;
+	uint8_t u;
+	uint8_t v;
+	uint8_t w;
+	uint8_t h;
+	int16_t x;
+	int16_t y;
+} BtlBarSprite;
+
+extern GsSPRITE BTL_D_80073E54;
+extern GsSPRITE BTL_D_80073E78;
+extern char BTL_END_BOX_TEXTBUFFER[];
+extern int16_t MAIN_D_8013509C;
+extern uint8_t *MAIN_D_801350A4;
+extern uint16_t MAIN_D_801350A8;
+extern uint16_t MAIN_D_801350AA;
+extern uint16_t MAIN_D_801350AC;
+extern int16_t BTL_D_80073E9C[];
+extern char *BTL_D_80072E34[];
+extern int16_t MAIN_D_80135090[2];
+extern int32_t MAIN_D_801350C0;
+extern GsRVIEW2 GS_VIEWPOINT;
+extern int32_t VIEWPORT_DISTANCE;
+extern int16_t BTL_D_80073014[][2];
+extern int16_t BTL_D_80073016[][2];
+extern uint8_t MAIN_D_801350BC;
+extern StatsGains STATS_GAINS;
+extern char BTL_D_80072EF8[];
+extern char BTL_D_80072F44[];
+extern char BTL_D_80072F58[];
+extern char BTL_D_80072F70[];
+extern char BTL_D_80072F90[];
+extern char BTL_D_80072FA4[];
+extern char BTL_D_80072FBC[];
+extern char BTL_D_80072FD8[];
+extern char BTL_D_80072F18[];
+extern uint8_t BTL_D_800742A0[];
+extern MATRIX BTL_D_80072FF4;
+extern char BTL_D_80072FE4[];
+extern char BTL_D_80072F2C[];
+extern int16_t MAIN_D_8013509E;
+extern int16_t MAIN_D_801350A0;
+extern int16_t MAIN_D_801350A2;
+extern int8_t MAIN_D_80135094;
+extern uint8_t MAIN_D_801350C4;
+extern uint8_t MAIN_D_801350C5;
+extern uint8_t MAIN_D_801350C6;
+extern uint8_t MAIN_D_801350C7;
+extern uint8_t MAIN_D_801350C8;
+extern uint8_t MAIN_D_801350C9;
+extern int16_t BTL_D_80073280[];
+extern BtlBarSprite BTL_D_800732C0[];
+extern uint8_t MAIN_D_801350CA;
+extern uint8_t MAIN_D_801350CB;
+extern int32_t BTL_D_80073290[12];
+
 void renderString(int32_t a, int32_t b, int32_t c, int32_t d, int32_t e, int32_t f, int32_t g, int32_t h, int32_t i);
 int16_t entityGetTechFromAnim(Entity *entity, int32_t anim);
 void BTL_tickDeathCountdown(void);
@@ -55,74 +112,7 @@ void BTL_renderPartnerStatusBars(int16_t idx);
 void BTL_tickPartnerStatusBars(void);
 void BTL_renderFinisherGauge(int32_t idx);
 void BTL_renderFinisherGaugeSegment(int16_t i, int32_t idx);
-
-extern GsSPRITE BTL_D_80073E54;
-extern GsSPRITE BTL_D_80073E78;
-extern char BTL_END_BOX_TEXTBUFFER[];
-extern int16_t MAIN_D_8013509C;
-extern uint8_t *MAIN_D_801350A4;
-extern uint16_t MAIN_D_801350A8;
-extern uint16_t MAIN_D_801350AA;
-extern uint16_t MAIN_D_801350AC;
-extern int16_t BTL_D_80073E9C[];
-extern char *BTL_D_80072E34[];
-extern int16_t MAIN_D_80135090[2];
-extern int32_t MAIN_D_801350C0;
-extern GsRVIEW2 GS_VIEWPOINT;
-extern int32_t VIEWPORT_DISTANCE;
-extern int16_t BTL_D_80073014[][2];
-extern int16_t BTL_D_80073016[][2];
-extern uint8_t MAIN_D_801350BC;
-extern StatsGains STATS_GAINS;
-extern char BTL_D_80072EF8[];
-extern char BTL_D_80072F44[];
-extern char BTL_D_80072F58[];
-extern char BTL_D_80072F70[];
-extern char BTL_D_80072F90[];
-extern char BTL_D_80072FA4[];
-extern char BTL_D_80072FBC[];
-extern char BTL_D_80072FD8[];
-extern char MAIN_D_8013474C[8];
-extern char MAIN_D_80134750[8];
-extern char MAIN_D_80134754[8];
-extern char MAIN_D_80134758[8];
-extern char MAIN_D_8013475C[8];
-extern char MAIN_D_80134744[8];
-extern char BTL_D_80072F18[];
-extern uint8_t BTL_D_800742A0[];
-extern MATRIX BTL_D_80072FF4;
-extern char BTL_D_80072FE4[];
-extern char MAIN_D_80134740[8];
-extern char BTL_D_80072F2C[];
-extern int16_t MAIN_D_8013509E;
-extern int16_t MAIN_D_801350A0;
-extern int16_t MAIN_D_801350A2;
-extern uint8_t MAIN_D_80134764[8];
-extern uint8_t MAIN_D_8013476C[8];
-extern uint8_t MAIN_D_80134774[8];
-extern int8_t MAIN_D_80135094;
-extern uint8_t MAIN_D_801350C4;
-extern uint8_t MAIN_D_801350C5;
-extern uint8_t MAIN_D_801350C6;
-extern uint8_t MAIN_D_801350C7;
-extern uint8_t MAIN_D_801350C8;
-extern uint8_t MAIN_D_801350C9;
-typedef struct {
-	int16_t clut;
-	uint8_t u;
-	uint8_t v;
-	uint8_t w;
-	uint8_t h;
-	int16_t x;
-	int16_t y;
-} BtlBarSprite;
-
 void damageTick(FighterData *fighter, Stats *stats);
-extern int16_t BTL_D_80073280[];
-extern BtlBarSprite BTL_D_800732C0[];
-extern uint8_t MAIN_D_801350CA;
-extern uint8_t MAIN_D_801350CB;
-extern int32_t BTL_D_80073290[12];
 
 static void *battle_hud_functions[] = {
 	BTL_removePartnerStatusBars,

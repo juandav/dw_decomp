@@ -60,10 +60,6 @@ typedef struct {
 } KarZones;
 
 typedef struct {
-	char *text[2];
-} KarStrPair;
-
-typedef struct {
 	char *text[61];
 } KarStrTbl;
 
@@ -72,16 +68,8 @@ typedef struct {
 } KarOffTbl;
 
 typedef struct {
-	int16_t weight[4];
-} KarWeightTbl;
-
-typedef struct {
 	int32_t id[3];
 } KarModelIds;
-
-typedef struct {
-	int8_t id[3];
-} KarPeggedModelIds;
 
 typedef struct {
 	int32_t x[3];
@@ -128,9 +116,59 @@ typedef struct {
 	} glyph[11];
 } KarDigits;
 
-typedef struct {
-	int8_t value[4];
-} KarTallyValues;
+extern GsOT_TAG KAR_D_800637CC[];
+extern GsOT_TAG KAR_D_8006384C[];
+extern GsOT KAR_D_800638CC[];
+extern KarStoneRow KAR_D_8005B5A0[];
+extern KarZones KAR_D_8005B438;
+extern int32_t ACTIVE_FRAMEBUFFER;
+extern int32_t VIEWPORT_DISTANCE;
+extern GsOT GS_ORDERING_TABLE[];
+extern GsRVIEW2 GS_VIEWPOINT;
+extern GsRVIEW2 KAR_D_8005B580;
+extern uint16_t MAIN_D_80135252;
+extern KarModelIds KAR_D_8005AB80;
+extern KarOffTbl KAR_D_8005AB8C;
+extern KarSpawnX KAR_D_8005AB98;
+extern int32_t KAR_D_80063914[];
+extern uint8_t MAIN_D_8013522C;
+extern KarStrTbl KAR_D_8005AF58;
+extern KarOffTbl KAR_D_8005B04C;
+extern KarStrTbl KAR_D_8005B318;
+extern KarOffTbl KAR_D_8005B40C;
+extern KarShotPlan KAR_D_8005B418;
+extern KarSprite KAR_D_8005B48C;
+extern KarDigits KAR_D_8005B4A0;
+extern KarSpritePair KAR_D_8005B4CC;
+extern int16_t MAIN_D_8013523E;
+extern KarSpriteSet KAR_D_8005B4F4;
+extern KarSprite KAR_D_8005B558;
+extern KarSprite KAR_D_8005B478;
+extern KarSprite KAR_D_8005B56C;
+extern uint8_t MAIN_D_80135220;
+extern char KAR_D_8005ABA4[];
+extern u_long KAR_D_8005BFCC[];
+extern u_long *MAIN_D_80135240;
+extern int32_t MAIN_D_80135244;
+extern uint8_t MAIN_D_80135248;
+extern KarStone *KAR_D_800639C0[];
+extern int16_t MAIN_D_8013523A;
+extern int8_t MAIN_D_80135256;
+extern int8_t MAIN_D_80135250;
+extern int8_t MAIN_D_8013523C;
+extern int16_t MAIN_D_80135254;
+
+extern int32_t MAIN_D_8013524C;
+extern uint16_t MAIN_D_80135238;
+extern int8_t MAIN_D_8013522D;
+extern int8_t MAIN_D_8013522E;
+extern int32_t MAIN_D_80135230;
+extern int32_t MAIN_D_80135234;
+extern int8_t MAP_TILE_X;
+extern int8_t MAP_TILE_Y;
+extern int8_t MAP_WIDTH[];
+extern int16_t CAMERA_Y[];
+extern uint8_t MAP_TILE_DATA[];
 
 void renderSelectionCursor(int32_t a, int32_t b, int32_t c, int32_t d, int32_t e);
 void renderString(int32_t a, int32_t b, int32_t c, int32_t d, int32_t e, int32_t f, int32_t g, int32_t h, int32_t i);
@@ -190,69 +228,6 @@ int32_t KAR_findClearShotAngle(int32_t x, int32_t z);
 int32_t KAR_aimAtStoneInRing(int32_t player, int32_t key, int16_t *outX, int16_t *outZ);
 void KAR_renderNamePlates(void);
 void KAR_beginThrow(void);
-
-extern GsOT_TAG KAR_D_800637CC[];
-extern GsOT_TAG KAR_D_8006384C[];
-extern GsOT KAR_D_800638CC[];
-extern KarStoneRow KAR_D_8005B5A0[];
-extern KarZones KAR_D_8005B438;
-extern int32_t ACTIVE_FRAMEBUFFER;
-extern int32_t VIEWPORT_DISTANCE;
-extern GsOT GS_ORDERING_TABLE[];
-extern GsRVIEW2 GS_VIEWPOINT;
-extern GsRVIEW2 KAR_D_8005B580;
-extern uint16_t MAIN_D_80135252;
-extern KarModelIds KAR_D_8005AB80;
-extern KarOffTbl KAR_D_8005AB8C;
-extern KarSpawnX KAR_D_8005AB98;
-extern KarWeightTbl MAIN_D_80134A08;
-extern int32_t KAR_D_80063914[];
-extern RECT MAIN_D_80134A10;
-extern RECT MAIN_D_80134A18;
-extern KarStrPair MAIN_D_80134A20;
-extern RECT MAIN_D_80134A28;
-extern RECT MAIN_D_80134A30;
-extern uint8_t MAIN_D_8013522C;
-extern KarStrTbl KAR_D_8005AF58;
-extern KarOffTbl KAR_D_8005B04C;
-extern KarStrTbl KAR_D_8005B318;
-extern KarOffTbl KAR_D_8005B40C;
-extern KarShotPlan KAR_D_8005B418;
-extern KarSprite KAR_D_8005B48C;
-extern KarDigits KAR_D_8005B4A0;
-extern KarSpritePair KAR_D_8005B4CC;
-extern int16_t MAIN_D_8013523E;
-extern KarSpriteSet KAR_D_8005B4F4;
-extern KarSprite KAR_D_8005B558;
-extern KarSprite KAR_D_8005B478;
-extern KarSprite KAR_D_8005B56C;
-extern uint8_t MAIN_D_80135220;
-extern char KAR_D_8005ABA4[];
-extern u_long KAR_D_8005BFCC[];
-extern u_long *MAIN_D_80135240;
-extern int32_t MAIN_D_80135244;
-extern uint8_t MAIN_D_80135248;
-extern KarStone *KAR_D_800639C0[];
-extern int16_t MAIN_D_8013523A;
-extern int8_t MAIN_D_80135256;
-extern KarPeggedModelIds MAIN_D_80134A4C;
-extern int8_t MAIN_D_80134A4F[1];
-extern int8_t MAIN_D_80135250;
-extern int8_t MAIN_D_8013523C;
-extern int16_t MAIN_D_80135254;
-
-extern int32_t MAIN_D_8013524C;
-extern uint16_t MAIN_D_80135238;
-extern KarTallyValues MAIN_D_80134A44;
-extern int8_t MAIN_D_8013522D;
-extern int8_t MAIN_D_8013522E;
-extern int32_t MAIN_D_80135230;
-extern int32_t MAIN_D_80135234;
-extern int8_t MAP_TILE_X;
-extern int8_t MAP_TILE_Y;
-extern int8_t MAP_WIDTH[];
-extern int16_t CAMERA_Y[];
-extern uint8_t MAP_TILE_DATA[];
 
 int32_t tickMoveCameraTo(int16_t x, int16_t z, int32_t speed);
 void uploadMapTileImages();
@@ -1710,13 +1685,13 @@ int32_t KAR_tickScoreTally(void)
 		return 1;
 	}
 
-	if (MAIN_D_80134A4F[0] != MAIN_D_80135256) {
+	if (MAIN_D_80134A4F != MAIN_D_80135256) {
 		KarStone *stone;
 
 		while (MAIN_D_80135256 >= 0) {
 			stone = KAR_D_800639C0[MAIN_D_80135256];
 			if ((int8_t)(stone->ring & 0xF) != 0) {
-				MAIN_D_80134A4F[0] = MAIN_D_80135256;
+				MAIN_D_80134A4F = MAIN_D_80135256;
 				MAIN_D_8013522E = 0;
 				break;
 			}
@@ -2032,7 +2007,7 @@ void KAR_registerThrownStone(void)
 	MAIN_D_80135256 = KAR_D_8005B5A0[0].thrown + KAR_D_8005B5A0[1].thrown;
 	KAR_D_800639C0[MAIN_D_80135256] =
 		&KAR_D_8005B5A0[MAIN_D_8013523C].stones[MAIN_D_8013523A];
-	MAIN_D_80134A4F[0] = -1;
+	MAIN_D_80134A4F = -1;
 }
 
 void KAR_rotatePoint(SVECTOR *p, int32_t ang)

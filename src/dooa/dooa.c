@@ -90,6 +90,33 @@ typedef struct {
 	int16_t v[32];
 } DissolveScaleCurve;
 
+extern int32_t VIEWPORT_DISTANCE;
+extern int32_t MAIN_D_8013532C;
+extern int32_t MAIN_D_80135330;
+extern int32_t MAIN_D_80135334;
+extern GsRVIEW2 GS_VIEWPOINT;
+extern uint32_t DOO2_D_80071EF0[];
+extern int8_t MAIN_D_80135364[8];
+extern int16_t MAIN_D_80135324;
+extern int32_t ACTIVE_FRAMEBUFFER;
+extern void *DOO2_D_80071EE4[];
+extern SVECTOR MAIN_D_80135338;
+extern int32_t MAIN_D_80135340;
+extern u_long DOO2_D_80071B5C[];
+extern u_long DOO2_D_80071BE0[];
+extern u_long DOO2_D_80071EE8[];
+extern VECTOR CAMERA_TARGET;
+extern int8_t CAMERA_REACHED_TARGET;
+extern int32_t FLASH_INSTANCE;
+extern int8_t DOO2_LOADING_COMPLETE;
+extern int32_t MAIN_D_80135328;
+extern int32_t MAIN_D_80135348;
+extern int32_t MAIN_D_8013534C;
+extern int32_t MAIN_D_80135350;
+extern int32_t MAIN_D_80135354;
+extern int32_t MAIN_D_80135358;
+extern SVECTOR MAIN_D_8013535C;
+
 void DOOA_renderDigimonModel(Entity *entity, uint32_t otPoint);
 int32_t DOOA_renderIrisWindow(Entity *entity, int32_t startFrame, int32_t endFrame, int32_t frame);
 void DOOA_renderDissolve(int32_t instanceId);
@@ -146,36 +173,6 @@ void DOO2_saveModelClut(u_long *pixels);
 void DOO2_saveClutTile(u_long *pixels, int32_t tile);
 void DOO2_fadeClut(int16_t *srcClut, void *unused, int16_t *dstClut, int32_t startFrame, int32_t endFrame, int32_t frame);
 void renderParticleFlash(int16_t *params);
-
-extern int32_t VIEWPORT_DISTANCE;
-extern int8_t DOOA_ENTITIES_VISIBLE;
-extern SVECTOR MAIN_D_80134BB4;
-extern int32_t MAIN_D_8013532C;
-extern int32_t MAIN_D_80135330;
-extern int32_t MAIN_D_80135334;
-extern GsRVIEW2 GS_VIEWPOINT;
-extern uint32_t DOO2_D_80071EF0[];
-extern int8_t MAIN_D_80135364[8];
-extern int16_t MAIN_D_80135324;
-extern int32_t ACTIVE_FRAMEBUFFER;
-extern void *DOO2_D_80071EE4[];
-extern int16_t EGG_DIGIMON_TYPES[4];
-extern SVECTOR MAIN_D_80135338;
-extern int32_t MAIN_D_80135340;
-extern u_long DOO2_D_80071B5C[];
-extern u_long DOO2_D_80071BE0[];
-extern u_long DOO2_D_80071EE8[];
-extern VECTOR CAMERA_TARGET;
-extern int8_t CAMERA_REACHED_TARGET;
-extern int32_t FLASH_INSTANCE;
-extern int8_t DOO2_LOADING_COMPLETE;
-extern int32_t MAIN_D_80135328;
-extern int32_t MAIN_D_80135348;
-extern int32_t MAIN_D_8013534C;
-extern int32_t MAIN_D_80135350;
-extern int32_t MAIN_D_80135354;
-extern int32_t MAIN_D_80135358;
-extern SVECTOR MAIN_D_8013535C;
 
 ShardWaveSchedule DOOA_SHARD_WAVE_SCHEDULE = {
 	{

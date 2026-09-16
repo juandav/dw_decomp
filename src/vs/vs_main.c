@@ -23,6 +23,38 @@ typedef struct {
 	int16_t best;
 } MoveRanking;
 
+extern uint8_t MAIN_D_80125F70[][7];
+extern uint8_t VS_D_800707B4[];
+extern uint8_t VS_D_800707B5[];
+extern uint8_t VS_D_800707C4[];
+extern uint8_t VS_D_800707C5[];
+extern int16_t ENEMY_COUNT;
+extern int32_t MAIN_D_80134D74;
+extern int32_t MAIN_D_80135290;
+extern int32_t MAIN_D_80134D7C[2];
+extern int32_t MAIN_D_80134D84;
+extern Entity *MAIN_D_80134D60;
+extern int32_t MAIN_D_80134F48;
+extern int32_t MAIN_D_80134F4C;
+extern uint32_t POLLED_INPUT;
+extern uint32_t POLLED_INPUT_PREVIOUS;
+extern int32_t DRAWING_OFFSET_Y;
+extern int32_t ACTIVE_FRAMEBUFFER;
+extern GsOT GS_ORDERING_TABLE[];
+extern PACKET GS_WORK_BASES[];
+extern char DRAW_OFFSETS[];
+extern GsOT *ACTIVE_ORDERING_TABLE;
+extern int32_t DRAWING_OFFSET_X;
+extern int16_t MAIN_D_801352AC[2];
+extern char *VS_D_80070744[];
+extern char *MOVE_NAMES[];
+extern int32_t MAIN_D_80135268;
+extern int32_t MAIN_D_80135268;
+extern char **MAIN_D_80135298;
+extern DigimonEntity *MAIN_D_80134EF4;
+extern DigimonEntity *MAIN_D_80134EF8;
+void renderString(int32_t a, int32_t b, int32_t c, int32_t d, int32_t e,
+                  int32_t f, int32_t g, int32_t h, int32_t i);
 void createParticleFX();
 int16_t entityGetTechFromAnim(Entity *entity, int32_t anim);
 void renderObjects(void);
@@ -30,8 +62,7 @@ void entityLookAtLocation(Entity *entity, VECTOR *pos);
 void swapInt(int32_t *a, int32_t *b);
 int16_t VS_getAttackTech(AttackObject *attack);
 int32_t VS_applyBuffMove(DigimonEntity *digimon, int32_t slot, int32_t anim);
-void renderString(int32_t a, int32_t b, int32_t c, int32_t d, int32_t e,
-                  int32_t f, int32_t g, int32_t h, int32_t i);
+
 int16_t VS_applyPartnerStatsToFighter(DigimonEntity *attacker, DigimonEntity *defender, FighterData *fighter, int16_t move);
 int32_t VS_rollAttackOutcome(DigimonEntity *attacker, DigimonEntity *defender, int16_t move);
 void VS_handleHitReaction(Entity *entity, FighterData *fighter, AttackObject *attack, int16_t index);
@@ -77,40 +108,6 @@ void VS_removeStunEffect(int32_t i, DigimonEntity *digimon);
 void VS_removeTargetCursor(int16_t index);
 void VS_removeFinisherAura(int32_t i);
 int32_t VS_startEFE(int32_t script);
-
-extern uint8_t MAIN_D_80125F70[][7];
-extern uint8_t VS_D_800707B4[];
-extern uint8_t VS_D_800707B5[];
-extern uint8_t VS_D_800707C4[];
-extern uint8_t VS_D_800707C5[];
-extern int16_t ENEMY_COUNT;
-extern int32_t MAIN_D_80134D74;
-extern int32_t MAIN_D_80135290;
-extern int32_t MAIN_D_80134D7C[2];
-extern int32_t MAIN_D_80134D84;
-extern uint8_t MAIN_D_80134ABC[4];
-extern uint8_t MAIN_D_80134AC0[4];
-extern uint8_t MAIN_D_80134AC4[4];
-extern Entity *MAIN_D_80134D60;
-extern int32_t MAIN_D_80134F48;
-extern int32_t MAIN_D_80134F4C;
-extern uint32_t POLLED_INPUT;
-extern uint32_t POLLED_INPUT_PREVIOUS;
-extern int32_t DRAWING_OFFSET_Y;
-extern int32_t ACTIVE_FRAMEBUFFER;
-extern GsOT GS_ORDERING_TABLE[];
-extern PACKET GS_WORK_BASES[];
-extern char DRAW_OFFSETS[];
-extern GsOT *ACTIVE_ORDERING_TABLE;
-extern int32_t DRAWING_OFFSET_X;
-extern int16_t MAIN_D_801352AC[2];
-extern char *VS_D_80070744[];
-extern char *MOVE_NAMES[];
-extern int32_t MAIN_D_80135268;
-extern int32_t MAIN_D_80135268;
-extern char **MAIN_D_80135298;
-extern DigimonEntity *MAIN_D_80134EF4;
-extern DigimonEntity *MAIN_D_80134EF8;
 
 static void *vs_main_functions[] = {
 	VS_setCommandIconUV,
@@ -719,7 +716,13 @@ int32_t VS_getDistanceSquared(Entity *a, Entity *b)
 	return (dx * dx) + (dz * dz);
 }
 
-void VS_setupQueuedMove(DigimonEntity *digimon, FighterData *fighter, int16_t arg2, int32_t moveIndex)
+// clang-format off
+void VS_setupQueuedMove(digimon, fighter, arg2, moveIndex)
+	DigimonEntity *digimon;
+	FighterData *fighter;
+	int16_t arg2;
+	int32_t moveIndex;
+// clang-format on
 {
 	int16_t tech;
 
@@ -774,7 +777,7 @@ void VS_startFighterMove(DigimonEntity *digimon, DigimonEntity *target, FighterD
 		}
 		if (MAIN_D_80134D74 != 0) {
 			MAIN_D_80134D60 = &digimon->entity;
-			VS_addTargetCursor((&digimon->entity == ENTITY_TABLE[1]) ? 0 : 1, tech);
+			VS_addTargetCursor((int16_t)((&digimon->entity == ENTITY_TABLE[1]) ? 0 : 1), tech);
 			entityLookAtLocation(&digimon->entity, &target->entity.posData->location);
 			startAnimation(&digimon->entity, fighter->queuedAnim);
 			digimon->entity.anim.animFlag &= 0xfe;
@@ -1658,7 +1661,7 @@ void VS_selectPartnerMove(DigimonEntity *digimon, FighterData *fighter, int16_t 
 	}
 
 	if (digimon->stats.base.moves[i] != 0xff) {
-		VS_setupQueuedMove(digimon, fighter, index, (uint8_t)i);
+		VS_setupQueuedMove(digimon, fighter, (int16_t)index, (int32_t)(uint8_t)i);
 	} else {
 		fighter->cooldown = 0x50;
 		fighter->flags |= 0x800;
@@ -1738,11 +1741,15 @@ void VS_queueRandomMove(DigimonEntity *digimon, FighterData *fighter, int32_t te
 	if (VS_hasAffordableMoves(flags, tech) == 0) {
 		VS_setFighterCooldown(digimon, fighter);
 	} else {
-		VS_setupQueuedMove(digimon, fighter, tech, VS_getRandomUsableMove(flags) & 0xff);
+		VS_setupQueuedMove(digimon, fighter, (int16_t)tech, (int32_t)(VS_getRandomUsableMove(flags) & 0xff));
 	}
 }
 
-int32_t VS_selectMoveByPower(int32_t arg0, int16_t *flags)
+// clang-format off
+int32_t VS_selectMoveByPower(arg0, flags)
+	int32_t arg0;
+	int16_t *flags;
+// clang-format on
 {
 	int16_t result;
 
@@ -1759,7 +1766,11 @@ int32_t VS_selectMoveByPower(int32_t arg0, int16_t *flags)
 	return VS_getRandomUsableMove(flags);
 }
 
-int32_t VS_selectMoveByMpCost(int32_t arg0, int16_t *flags)
+// clang-format off
+int32_t VS_selectMoveByMpCost(arg0, flags)
+	int32_t arg0;
+	int16_t *flags;
+// clang-format on
 {
 	int16_t result;
 

@@ -5,6 +5,7 @@
 
 #include <dw/script.h>
 #include <dw/sound.h>
+#include <dw/trn2.h>
 #include <dw/types.h>
 #include <dw/ui.h>
 
@@ -31,13 +32,10 @@ extern int16_t MAIN_D_801353E0[4];
 extern int8_t TRN2_D_8008DAA8[3][13];
 extern uint32_t POLLED_INPUT;
 extern uint32_t POLLED_INPUT_PREVIOUS;
-extern RECT MAIN_D_80134BF8;
 extern GsOT *ACTIVE_ORDERING_TABLE;
 extern GsSPRITE TRN2_SLOT_SPRITE1;
 extern GsSPRITE TRN2_SLOT_SPRITE2;
 extern int8_t TRN2_D_8008DBC8[];
-extern RECT MAIN_D_80134BE8;
-extern RECT MAIN_D_80134BF0;
 extern uint8_t CURRENT_SCREEN;
 extern int32_t DRAWING_OFFSET_X;
 extern int32_t DRAWING_OFFSET_Y;

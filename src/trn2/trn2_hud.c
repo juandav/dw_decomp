@@ -9,6 +9,7 @@
 #include <dw/partner.h>
 #include <dw/script.h>
 #include <dw/sound.h>
+#include <dw/trn2.h>
 #include <dw/types.h>
 #include <dw/ui.h>
 
@@ -35,7 +36,6 @@ extern uint32_t POLLED_INPUT_PREVIOUS;
 extern int32_t MAIN_D_801353D4;
 extern int16_t MAIN_D_801353DE;
 extern int8_t MAIN_D_801353D8[6];
-extern char MAIN_D_80134BE0[8];
 extern char MAIN_D_80124C0C[];
 extern char MAIN_D_80124C54[];
 extern GsOT *ACTIVE_ORDERING_TABLE;

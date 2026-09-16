@@ -24,6 +24,43 @@
 
 #include "common.h"
 
+extern int32_t MAIN_D_801350EC;
+extern void *MAIN_D_80135130;
+extern int8_t GAME_STATE;
+extern int32_t VIEWPORT_DISTANCE;
+extern SVECTOR MAIN_D_801B1C0C[];
+extern VECTOR MAIN_D_801B1C14;
+extern GsVIEW2 MAIN_D_801B1B98;
+extern int32_t MAIN_D_801B1BBC[];
+extern GsF_LIGHT LIGHT_DATA[];
+extern GsOT *ACTIVE_ORDERING_TABLE;
+extern int32_t ACTIVE_FRAMEBUFFER;
+extern GsDOBJ2 STD_D_8007B97C[];
+extern GsOT STD_D_8007B684[];
+extern GsOT STD_D_8007B6AC[];
+extern GsCOORDINATE2 STD_D_8007B83C[];
+extern GsOT_TAG STD_D_8007B664[];
+extern GsOT_TAG STD_D_8007B674[];
+extern GsOT_TAG STD_D_8007B6D4[];
+extern GsOT_TAG STD_D_8007B6E4[];
+extern char *STD_D_80079C24[];
+extern char STD_D_80079C80[];
+extern char STD_D_80079C94[];
+extern uint8_t MAIN_D_801350F8;
+extern int32_t DRAWING_OFFSET_X;
+extern int32_t DRAWING_OFFSET_Y;
+extern char STD_D_80079CA8[];
+extern int16_t STD_D_800799B4[];
+extern int16_t MAIN_D_801350E4;
+extern int32_t MAIN_D_801350F0;
+extern uint8_t CURRENT_SCREEN;
+extern Entity *MAIN_D_801350E8;
+extern int32_t MAIN_D_801350F4;
+extern char *STD_D_8007A338[];
+extern char *STD_D_8007A304[];
+extern char *STD_D_8007A358[];
+extern int8_t MAP_COLLISION_DATA[];
+
 void STD_func_80058488(void);
 void STD_func_80056E2C(int32_t type, int16_t slot, int32_t tier);
 void initializeDigimonObject(int32_t type, int32_t instanceId, void (*tick)(int32_t));
@@ -79,45 +116,6 @@ void STD_setVSPhase(int32_t arg);
 void fadeFromBlack(int32_t frames);
 int32_t loadMapSounds(int32_t mapSoundId);
 uint32_t lookupFileSize(char *path);
-
-extern int32_t MAIN_D_801350EC;
-extern void *MAIN_D_80135130;
-extern int8_t GAME_STATE;
-extern int32_t VIEWPORT_DISTANCE;
-extern SVECTOR MAIN_D_801B1C0C[];
-extern VECTOR MAIN_D_801B1C14;
-extern GsVIEW2 MAIN_D_801B1B98;
-extern int32_t MAIN_D_801B1BBC[];
-extern GsF_LIGHT LIGHT_DATA[];
-extern GsOT *ACTIVE_ORDERING_TABLE;
-extern int32_t ACTIVE_FRAMEBUFFER;
-extern GsDOBJ2 STD_D_8007B97C[];
-extern GsOT STD_D_8007B684[];
-extern GsOT STD_D_8007B6AC[];
-extern GsCOORDINATE2 STD_D_8007B83C[];
-extern GsOT_TAG STD_D_8007B664[];
-extern GsOT_TAG STD_D_8007B674[];
-extern GsOT_TAG STD_D_8007B6D4[];
-extern GsOT_TAG STD_D_8007B6E4[];
-extern char *STD_D_80079C24[];
-extern char STD_D_80079C80[];
-extern char STD_D_80079C94[];
-extern uint8_t MAIN_D_801350F8;
-extern int32_t DRAWING_OFFSET_X;
-extern int32_t DRAWING_OFFSET_Y;
-extern char STD_D_80079CA8[];
-extern int16_t STD_D_800799B4[];
-extern int16_t MAIN_D_801350E4;
-extern int32_t MAIN_D_801350F0;
-extern uint8_t CURRENT_SCREEN;
-extern Entity *MAIN_D_801350E8;
-extern int32_t MAIN_D_801350F4;
-extern char *STD_D_8007A338[];
-extern char *STD_D_8007A304[];
-extern char *STD_D_8007A358[];
-extern uint8_t MAIN_D_801347FE[2];
-extern uint8_t MAIN_D_801347FC[2];
-extern int8_t MAP_COLLISION_DATA[];
 
 static void *std_setup_functions[] = {
 	STD_func_80058488,
@@ -527,12 +525,13 @@ void STD_func_80057E5C(id)
 // clang-format on
 {
 	int32_t i;
+	uint8_t *tims = MAIN_D_801347FC.timCount;
 
-	STD_loadArenaTIMToVRAM(STD_D_8007A338[id], MAIN_D_801347FE[id]);
+	STD_loadArenaTIMToVRAM(STD_D_8007A338[id], tims[id]);
 	MAIN_D_80135130 = malloc3(((int32_t)lookupFileSize(STD_D_8007A304[id]) + 0x7ff) & ~0x7ff);
 	readFile(STD_D_8007A304[id], MAIN_D_80135130);
 	GsMapModelingData((u_long *)MAIN_D_80135130 + 1);
-	for (i = 0; i < MAIN_D_801347FC[id]; i++) {
+	for (i = 0; i < MAIN_D_801347FC.modelCount[id]; i++) {
 		GsLinkObject4((u_long)((char *)MAIN_D_80135130 + 0xc), &STD_D_8007B97C[i], i);
 		GsInitCoordinate2(NULL, &STD_D_8007B83C[i]);
 		STD_D_8007B97C[i].attribute = 0;

@@ -49,6 +49,28 @@ typedef struct {
 	Entity *entity;
 } EvlSpark;
 
+extern int32_t MAIN_D_8013520C;
+extern uint8_t *MAIN_D_80135210;
+extern EvlModelVertex *MAIN_D_80135214;
+extern int16_t MAIN_D_80135218[3];
+extern int8_t HAS_USED_EVOITEM;
+extern char *MAIN_D_80135208;
+extern int8_t EVL_D_80068938[];
+extern EvlParticle EVL_D_80068944[100];
+extern int16_t EVL_D_80068F84[][4];
+extern int16_t EVL_D_80063F3C[];
+extern VECTOR EVL_D_80064D40;
+extern char EVL_D_80064D50[];
+extern uint16_t EVL_D_80065094[];
+extern u_long EVL_D_80065398[];
+extern u_long EVL_D_8006569C[];
+extern char EVL_D_80065FA0[];
+extern char EVL_D_80066274[];
+extern char EVL_D_800677B0[];
+extern int16_t EVL_D_80067992[];
+extern int16_t EVL_D_80067994[];
+void initializeEvolvedPartner(int32_t type, int32_t posX, int32_t posY, int32_t posZ,
+			      int32_t rotationX, int32_t rotationY, int32_t rotationZ);
 void MAIN_func_800D9B60(int16_t *clut);
 void MAIN_func_800D9E68(char *base);
 char *initializeFlashData(char *base);
@@ -59,8 +81,8 @@ int32_t add3DSpritePrim(POLY_FT4 *poly, SVECTOR *v0, SVECTOR *v1, SVECTOR *v2, S
 void calculateBoneMatrix(Entity *entity, int32_t boneId, MATRIX *out);
 void addTamerLevel(int32_t chance, int32_t amount);
 void learnMove(int32_t moveId);
-void initializeEvolvedPartner(int32_t type, int32_t posX, int32_t posY, int32_t posZ,
-			      int32_t rotationX, int32_t rotationY, int32_t rotationZ);
+void EVL_brightenDigimonClut(int16_t *clut, Entity *entity, int16_t *dst, int32_t start,
+			     int32_t end, int32_t t);
 void setDigimonRaised(int32_t type);
 
 void EVL_setScratchTop(int32_t size);
@@ -80,8 +102,7 @@ void EVL_tickEvoSequence(int32_t instanceId);
 void EVL_fadeClutBank0(int16_t *srcClut, void *entity, int16_t *dstClut, int32_t startFrame, int32_t endFrame, int32_t frame);
 void EVL_fadeClutBank1(int16_t *srcClut, void *entity, int16_t *dstClut, int32_t startFrame, int32_t endFrame, int32_t frame);
 void EVL_updateEvoCamera(Entity *entity, int32_t unused, int32_t frame);
-void EVL_brightenDigimonClut(int16_t *clut, Entity *entity, int16_t *dst, int32_t start,
-			     int32_t end, int32_t t);
+
 int32_t EVL_buildShardSet(Entity *entity, int32_t objIndex, int32_t bone);
 int32_t EVL_spawnSpark(void *owner, int32_t timer, int32_t param);
 void EVL_calculateCameraVectors(VECTOR *viewRef, VECTOR *viewPos, Entity *entity, SVECTOR *rotation, int32_t distance, int32_t height);
@@ -95,28 +116,6 @@ void EVL_applyEvolution(Entity *entity, Stats *stats, PartnerPara *para, int32_t
 void EVL_scaleBaseStats(Stats *stats, int16_t pct, int32_t unused);
 void EVL_clampBaseStats(void);
 void EVL_renderEvoSequence(void);
-
-extern int32_t MAIN_D_8013520C;
-extern uint8_t *MAIN_D_80135210;
-extern EvlModelVertex *MAIN_D_80135214;
-extern int16_t MAIN_D_80135218[3];
-extern int8_t MAIN_D_801349F4;
-extern int8_t HAS_USED_EVOITEM;
-extern char *MAIN_D_80135208;
-extern int8_t EVL_D_80068938[];
-extern EvlParticle EVL_D_80068944[100];
-extern int16_t EVL_D_80068F84[][4];
-extern int16_t EVL_D_80063F3C[];
-extern VECTOR EVL_D_80064D40;
-extern char EVL_D_80064D50[];
-extern uint16_t EVL_D_80065094[];
-extern u_long EVL_D_80065398[];
-extern u_long EVL_D_8006569C[];
-extern char EVL_D_80065FA0[];
-extern char EVL_D_80066274[];
-extern char EVL_D_800677B0[];
-extern int16_t EVL_D_80067992[];
-extern int16_t EVL_D_80067994[];
 
 static void *evl_functions[] = {
 	EVL_clampBaseStats,

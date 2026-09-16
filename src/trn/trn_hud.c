@@ -5,6 +5,7 @@
 #include <dw/font.h>
 #include <dw/script.h>
 #include <dw/sound.h>
+#include <dw/trn.h>
 #include <dw/types.h>
 #include <dw/ui.h>
 
@@ -26,7 +27,6 @@ extern int16_t MAIN_D_8013539E;
 extern uint32_t POLLED_INPUT;
 extern uint32_t POLLED_INPUT_PREVIOUS;
 extern int16_t STATS_GAINS[6];
-extern char MAIN_D_80134BC0[8];
 extern int16_t MAIN_D_801353A0[4];
 extern GsOT *ACTIVE_ORDERING_TABLE;
 extern int8_t MAIN_D_80135398[6];

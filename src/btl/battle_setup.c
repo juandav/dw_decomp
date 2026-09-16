@@ -1,15 +1,14 @@
 #include <dw/anim.h>
 #include <dw/attack_object.h>
 #include <dw/btl.h>
-#include <dw/item.h>
 #include <dw/combat.h>
+#include <dw/item.h>
 #include <dw/model.h>
 #include <dw/params.h>
 
 extern int8_t MAIN_D_80134D64;
 extern int16_t MAIN_D_80134D6A;
 extern int32_t MAIN_D_80134D78;
-extern uint8_t MAIN_D_801346E0[5];
 extern int8_t TAMER_START_TILE_X;
 extern int8_t TAMER_START_TILE_Y;
 extern int8_t TAMER_WAYPOINT_ACTIVE;

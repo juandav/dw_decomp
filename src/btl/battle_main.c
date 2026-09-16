@@ -35,6 +35,29 @@ typedef struct {
 	int16_t count;
 } TargetSearch;
 
+extern int8_t PARTNER_PREVIOUS_TILE_X;
+extern int8_t PARTNER_PREVIOUS_TILE_Y;
+extern uint8_t MAIN_D_80125F70[][7];
+extern int32_t COMBAT_AREA_CENTER_X;
+extern int32_t COMBAT_AREA_CENTER_Y;
+extern int32_t ACTIVE_FRAMEBUFFER;
+extern GsOT GS_ORDERING_TABLE[];
+extern PACKET GS_WORK_BASES[];
+extern char DRAW_OFFSETS[];
+extern DigimonEntity *MAIN_D_80134EF4;
+extern DigimonEntity *MAIN_D_80134EF8;
+extern uint8_t CURRENT_SCREEN;
+extern uint8_t MAIN_D_80134D64;
+extern uint8_t MAIN_D_80135094;
+extern int8_t PARTNER_WAYPOINT_COUNT;
+extern int8_t PARTNER_WAYPOINT_CURRENT;
+extern int8_t PARTNER_WAYPOINT_X[];
+extern int8_t PARTNER_WAYPOINT_Y[];
+extern uint8_t BTL_D_80072ED8[];
+extern uint8_t BTL_D_80072ED9[];
+extern uint8_t BTL_D_80072EE8[];
+extern uint8_t BTL_D_80072EE9[];
+
 void removeObject(int32_t objectId, int32_t instanceId);
 void addObject(int32_t objectId, int32_t instanceId, void *tick, void *render);
 void getEntityTileFromModel(Entity *entity, int8_t *outTileX, int8_t *outTileY);
@@ -176,34 +199,6 @@ void removeBuffModelObject(void);
 void BTL_getHighestScoredMove(int16_t *values, int16_t *marks, int16_t *out, int16_t count);
 void BTL_getLowestScoredMove(int16_t *values, int16_t *marks, int16_t *out, int16_t count);
 void BTL_selectConfusedMove(DigimonEntity *digimon, FighterData *fighter, int32_t tech);
-
-extern int8_t PARTNER_PREVIOUS_TILE_X;
-extern int8_t PARTNER_PREVIOUS_TILE_Y;
-extern uint8_t MAIN_D_80125F70[][7];
-extern int32_t COMBAT_AREA_CENTER_X;
-extern int32_t COMBAT_AREA_CENTER_Y;
-extern int32_t ACTIVE_FRAMEBUFFER;
-extern GsOT GS_ORDERING_TABLE[];
-extern PACKET GS_WORK_BASES[];
-extern char DRAW_OFFSETS[];
-extern DigimonEntity *MAIN_D_80134EF4;
-extern DigimonEntity *MAIN_D_80134EF8;
-extern uint8_t CURRENT_SCREEN;
-extern uint8_t MAIN_D_80134D64;
-extern int16_t MAIN_D_801346D8[4];
-extern uint8_t MAIN_D_80135094;
-extern int8_t PARTNER_WAYPOINT_COUNT;
-extern int8_t PARTNER_WAYPOINT_CURRENT;
-extern int8_t PARTNER_WAYPOINT_X[];
-extern int8_t PARTNER_WAYPOINT_Y[];
-extern uint8_t BTL_D_80072ED8[];
-extern uint8_t BTL_D_80072ED9[];
-extern uint8_t BTL_D_80072EE8[];
-extern uint8_t BTL_D_80072EE9[];
-extern uint8_t MAIN_D_801346E8[5];
-extern uint8_t MAIN_D_801346EC[4];
-extern uint8_t MAIN_D_801346F0[4];
-extern uint8_t MAIN_D_801346F4[4];
 
 static void *battle_main_functions[] = {
 	BTL_setCommandIconUV,

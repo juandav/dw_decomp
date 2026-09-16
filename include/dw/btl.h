@@ -6,6 +6,7 @@
 
 #include <dw/entity.h>
 #include <dw/font.h>
+#include <dw/graphics.h>
 #include <dw/math.h>
 #include <dw/script.h>
 #include <dw/types.h>
@@ -36,6 +37,45 @@ extern int16_t MAIN_D_801350B2;
 extern int16_t MAIN_D_801350B4;
 extern int16_t MAIN_D_801350B6;
 extern int16_t MAIN_D_801350B8;
+
+extern int16_t MAIN_D_801346D8[4];
+extern uint8_t MAIN_D_801346E0[5];
+extern uint8_t MAIN_D_801346E8[4];
+extern uint8_t MAIN_D_801346EC[4];
+extern uint8_t MAIN_D_801346F0[4];
+extern uint8_t MAIN_D_801346F4[4];
+extern int8_t MAIN_D_801346F8;
+extern uint8_t MAIN_D_80134728[5];
+extern char MAIN_D_80134740[4];
+extern char MAIN_D_80134744[6];
+extern char MAIN_D_8013474C[3];
+extern char MAIN_D_80134750[3];
+extern char MAIN_D_80134754[3];
+extern char MAIN_D_80134758[2];
+extern char MAIN_D_8013475C[5];
+extern uint8_t MAIN_D_80134764[8];
+extern uint8_t MAIN_D_8013476C[8];
+extern uint8_t MAIN_D_80134774[8];
+extern char MAIN_D_8013477C[4];
+extern int8_t MAIN_D_80134780[4];
+extern int8_t MAIN_D_80134784[4];
+extern int8_t MAIN_D_80134788[8];
+extern int8_t MAIN_D_80134790[8];
+extern int8_t MAIN_D_80134798[8];
+extern int32_t MAIN_D_801347A0;
+extern uint8_t MAIN_D_801347A4[8];
+extern int8_t MAIN_D_801347AC[6];
+extern SVECTOR MAIN_D_801347B4;
+extern int16_t MAIN_D_801347BC[4];
+extern SVECTOR MAIN_D_801347C4;
+extern RGB8 MAIN_D_801347CC;
+extern SVECTOR MAIN_D_801347D0;
+extern SVECTOR MAIN_D_801347D8;
+extern SVECTOR MAIN_D_801347E0;
+extern SVECTOR MAIN_D_801347E8;
+extern uint8_t MAIN_D_801347F0[4];
+extern uint8_t MAIN_D_801347F4[4];
+extern uint8_t MAIN_D_801347F8[4];
 
 void BTL_initializeDeathCountdown(void);
 void BTL_initializePartnerTile(void);
