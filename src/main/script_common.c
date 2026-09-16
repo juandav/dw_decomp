@@ -137,8 +137,7 @@ void MAIN_func_800FE9F0(ItemMenuBox *box, uint8_t row, int32_t isLast);
 void MAIN_func_800FEC30(ItemMenuBox *box, uint8_t row, int32_t isLast);
 void MAIN_func_800FED64(ItemMenuBox *box, uint8_t row, int32_t isLast);
 void MAIN_func_800FEEF0(ItemMenuBox *box, uint8_t row, int32_t isLast);
-void MAIN_func_800FF338(int32_t boxId, int16_t x, int16_t y, int32_t w,
-			int16_t h);
+void MAIN_func_800FF338(uint8_t boxId, int16_t x, int16_t y, int32_t w, int16_t h);
 int32_t MAIN_func_800FFA4C(int32_t boxId, int32_t flag);
 int32_t MAIN_func_800FFC1C(void);
 int32_t MAIN_func_800FFF24(void);
@@ -146,7 +145,7 @@ int32_t drawString2(uint8_t *str, int16_t x, int16_t y, int32_t flag);
 int32_t getSpeakerName(int32_t speakerId, uint8_t *buf);
 uint8_t *intToStringSJIS(uint8_t *buf, int32_t value, uint8_t digits,
 			 int32_t flag);
-void renderHorizontalLine(int32_t boxId, int16_t x, int16_t y, int32_t w);
+void renderHorizontalLine(uint8_t boxId, int16_t x, int16_t y, int32_t w);
 void renderLinePrimitive(uint32_t color, int32_t x0, int32_t y0, int32_t x1,
 			 int32_t y1, int32_t order, uint32_t mode);
 void renderSellItemBox(void);
@@ -1759,7 +1758,21 @@ void MAIN_func_800FDFB4(void)
 	}
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/script_common", renderHorizontalLine);
+void renderHorizontalLine(uint8_t boxId, int16_t x, int16_t y, int32_t w)
+{
+	int32_t yc;
+
+	x = x + UI_BOX_DATA[boxId].finalPos.x;
+	y = y + UI_BOX_DATA[boxId].finalPos.y;
+	boxId = 6 - boxId;
+	yc = y;
+
+	renderLinePrimitive(0x20202, x, yc, (x + w) - 1, yc, boxId, 0);
+	y++;
+	renderLinePrimitive(0xa08769, x, y, (x + w) - 1, y, boxId, 0);
+	y++;
+	renderLinePrimitive(0x20202, x, y, (x + w) - 1, y, boxId, 0);
+}
 
 static int32_t MAIN_func_800FE150__garbage__(int32_t seed)
 {
@@ -2200,7 +2213,14 @@ void MAIN_func_800FF0FC(ItemMenuBox *box, int32_t style)
 	drawString2(p, outX, row * 12, 1);
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/script_common", MAIN_func_800FF338);
+void MAIN_func_800FF338(uint8_t boxId, int16_t x, int16_t y, int32_t w, int16_t h)
+{
+	x = x + UI_BOX_DATA[boxId].finalPos.x;
+	y = y + UI_BOX_DATA[boxId].finalPos.y;
+	boxId = 6 - boxId;
+	renderTrianglePrimitive(0xa08769, (x + w) - 1, y, x, y, x, (y + h) - 1, boxId, 0);
+	renderTrianglePrimitive(0x20202, x, (y + h) - 1, (x + w) - 1, (y + h) - 1, (x + w) - 1, y, boxId, 0);
+}
 
 void MAIN_func_800FF2A8(ItemMenuBox *data)
 {
