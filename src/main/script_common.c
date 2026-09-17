@@ -167,6 +167,10 @@ extern GsSPRITE MAIN_D_8012FDC0;
 extern int16_t MAIN_D_801345C0[1];
 extern uint8_t MAIN_D_801345C2[2];
 extern char *MAIN_D_8013035C[];
+typedef struct {
+	int32_t v[6];
+} Pow10Table;
+extern Pow10Table MAIN_D_80130344;
 extern int16_t MAIN_D_80134F60;
 extern int32_t MAIN_D_80135024;
 extern int32_t MAIN_D_80135020;
@@ -3569,7 +3573,44 @@ digimon:
 	return strlen(DIGIMON_DATA[speakerId].name);
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/script_common", intToStringSJIS);
+uint8_t *intToStringSJIS(uint8_t *buf, int32_t value, uint8_t digits, int32_t flag)
+{
+	Pow10Table divs;
+	uint16_t base;
+	int32_t started;
+	uint16_t c;
+	int32_t hi;
+	int32_t lo;
+
+	divs = MAIN_D_80130344;
+	base = 0x824f;
+	started = 0;
+	while (digits != 0) {
+		c = value / divs.v[digits - 1];
+		c = base + c;
+		value = value % divs.v[digits - 1];
+		if (digits != 1) {
+			if (c == 0x824f) {
+				if (started == 0) {
+					if (flag != 0) {
+						goto skip;
+					}
+					c = 0x8140;
+				}
+			} else {
+				started = 1;
+			}
+		}
+		hi = c >> 8;
+		lo = c;
+		*buf++ = hi;
+		*buf++ = lo;
+skip:
+		digits--;
+	}
+
+	return buf;
+}
 
 int32_t scriptIdToEntityId(int32_t scriptId)
 {
