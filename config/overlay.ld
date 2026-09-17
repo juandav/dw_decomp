@@ -170,7 +170,11 @@ SECTIONS
 
 			build/src/eab/eab.c.o(.data.*);
 			. = ALIGN(., 4);
-			KEEP(build/asm/eab/data/16DC.data.s.o(.data.*));
+			build/src/eab/eab_bss.c.o(.data.*);
+			. = ALIGN(., 4);
+
+			/* Trailer */
+			LONG(0);
 			. = ALIGN(., 4);
 
 			build/src/eab/eab.c.o(.bss.*);

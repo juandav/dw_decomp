@@ -249,7 +249,8 @@ EAB_ASM_SRC := $(shell find $(ASM_DIR)/eab -path '*.s' \
 
 EAB_SRC := \
 	$(EAB_ASM_SRC) \
-	src/eab/eab.c
+	src/eab/eab.c \
+	src/eab/eab_bss.c
 
 EAB_OBJ := $(EAB_SRC:%=$(BUILDDIR)/%.o)
 EAB_DEP := $(EAB_OBJ:%.o=%.d)

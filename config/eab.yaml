@@ -57,6 +57,7 @@ segments:
     subalign: 4
     subsegments:
       - [0x40, c, eab]
-      - [0x16DC, data]
+      - [0x16DC, .data, eab]
+      - [0x17D0, .data, eab_bss]
 
   - [0x2054]

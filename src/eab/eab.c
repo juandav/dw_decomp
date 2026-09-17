@@ -35,27 +35,6 @@ typedef struct {
 	uint8_t pad;
 } EabParticle;
 
-typedef struct {
-	int16_t frame;
-	int16_t phase;
-	Entity *entity;
-	VECTOR location;
-} EabState;
-
-extern VECTOR EAB_D_800616DC;
-extern VECTOR EAB_D_800616EC;
-extern VECTOR EAB_D_800616FC;
-extern int32_t EAB_D_8006170C[9][4];
-extern int8_t EAB_D_8006179C[18];
-extern VECTOR EAB_D_800617B0;
-extern VECTOR EAB_D_800617C0;
-extern int16_t EAB_D_800617D0[18][4];
-extern EabState EAB_D_800617E8;
-extern char EAB_D_80061800[];
-extern GsRVIEW2 EAB_D_800619E4;
-extern int8_t EAB_D_80061A04[10];
-extern int32_t EAB_D_80061A10[100][4];
-
 extern EabHudState MAIN_D_801353F0;
 extern GsRVIEW2 GS_VIEWPOINT;
 extern int32_t *EFE_DATA_STACK;
@@ -118,6 +97,36 @@ static void *eab_functions[] = {
 	EAB_tickBuildup,
 	EAB_setModelColor,
 };
+
+// clang-format off
+VECTOR EAB_D_800616DC = { 0x0000003c, 0x0000003c, 0x0000003c, 0x00000000 };
+
+VECTOR EAB_D_800616EC = { 0x00001000, 0x00001000, 0x00001000, 0x00000000 };
+
+VECTOR EAB_D_800616FC = { 0x00001000, 0x00001000, 0x00001000, 0x00000000 };
+
+int32_t EAB_D_8006170C[9][4] = {
+	{ 0x00000000, 0xfffffed4, 0xfffffc7c, 0x00001400 },
+	{ 0x000001f4, 0xfffffed4, 0xfffff7cc, 0x00001400 },
+	{ 0x000003e8, 0xfffffed4, 0xfffffa24, 0x00001400 },
+	{ 0x00000258, 0xfffffed4, 0xfffffd44, 0x00001400 },
+	{ 0xfffffce0, 0xfffffed4, 0x000001f4, 0x00001400 },
+	{ 0x00000384, 0xfffffed4, 0xffffff9c, 0x00001400 },
+	{ 0xffffff38, 0xfffffed4, 0xfffff510, 0x00001400 },
+	{ 0xfffffb50, 0xfffffed4, 0x00000064, 0x00001400 },
+	{ 0xfffffb50, 0xfffffed4, 0xfffff63c, 0x00001400 },
+};
+
+int8_t EAB_D_8006179C[18] = {
+	0x01, 0x02, 0x03, 0x04, 0x05, 0x04, 0x03, 0x02,
+	0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00,
+};
+
+VECTOR EAB_D_800617B0 = { 0x000000ff, 0x000000ff, 0x000000ff, 0x00000000 };
+
+VECTOR EAB_D_800617C0 = { 0x000000ff, 0x000000ff, 0x000000ff, 0x00000000 };
+// clang-format on
 
 void EAB_setModelColor(int32_t *color)
 {
