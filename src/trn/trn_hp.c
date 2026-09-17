@@ -7,36 +7,18 @@
 #include <dw/tamer.h>
 #include <dw/trn.h>
 #include <dw/types.h>
-#include <dw/ui.h>
+#include <dw/world_object.h>
 
 extern uint32_t POLLED_INPUT;
-extern int8_t MAIN_D_80135370;
-extern int8_t MAIN_D_80135371;
-extern int32_t TRN_D_8008F320[];
-extern int16_t MAIN_D_8013536C;
-extern int16_t MAIN_D_8013536E;
 extern int32_t TRAINING_COMPLETE;
-extern int16_t TRN_D_8008F368[];
-extern int16_t TRN_D_8008F388[];
-extern int16_t MAIN_D_8013537A;
-extern int16_t MAIN_D_8013537C;
 
 void createCameraMovement(VECTOR *pos, int32_t speed);
 void removeAllCloudFX(void);
 void storeMapObjectPosition(int16_t *outX, int16_t *outY, int16_t a, int16_t count);
 void loadMapObjectPosition(int16_t *xData, int16_t *yData, int16_t startIndex, int16_t count);
 int32_t moveMapObjectsWithLimit(int16_t startIndex, int16_t count, int16_t dx, int16_t dy, int16_t limitX, int16_t limitY);
-void TRN_saveTrainingStartTime(void);
-void TRN_startSlotSessionIfEnabled(int16_t arg);
 void TRN_func_800888A0(int8_t arg);
-void TRN_createCloudFXLine(int16_t a, int16_t b, int16_t x, int16_t z, int16_t dx, int16_t dz, int8_t n);
-void TRN_awardHpTrainingGains(int32_t a, int16_t b, int32_t c);
-int32_t TRN_statGainsAreZero(void);
 void TRN_tickHpTraining(int32_t instanceId);
-void TRN_applyBaseStats(void);
-void TRN_closeUIBox(int32_t id);
-int16_t TRN_getSlotSessionResult(void);
-void TRN_startSlotSpin(void);
 
 static void *trn_hp_functions[] = {
 	TRN_tickHpTraining,
@@ -111,9 +93,9 @@ static void trn_hp__garbage__(void)
 void TRN_setupHpTraining(int32_t arg)
 {
 	if (arg == 0x70) {
-		TRN_D_8008F320[0] = 0x58c;
-		TRN_D_8008F320[1] = 0;
-		TRN_D_8008F320[2] = -0x6d0;
+		TRN_D_8008F320.vx = 0x58c;
+		TRN_D_8008F320.vy = 0;
+		TRN_D_8008F320.vz = -0x6d0;
 		MAIN_D_8013536C = 0x53;
 		MAIN_D_8013536E = 0x10;
 		addObject(0xfab, 0, (TickFunction)TRN_tickHpTraining, NULL);
@@ -138,7 +120,7 @@ void TRN_tickHpTraining(int32_t instanceId)
 		setTamerState(8);
 		setPartnerState(10);
 		startAnimation(&PARTNER_ENTITY.digimonEntity.entity, 4);
-		createCameraMovement((VECTOR *)TRN_D_8008F320, 10);
+		createCameraMovement(&TRN_D_8008F320, 10);
 		playSound(8, 9);
 		MAIN_D_8013537A = 0;
 		MAIN_D_80135371 = 1;
@@ -146,7 +128,7 @@ void TRN_tickHpTraining(int32_t instanceId)
 		break;
 	case 1:
 		TRN_func_800888A0(4);
-		if (tickEntityWalkTo(0xfc, 0xff, TRN_D_8008F320[0], TRN_D_8008F320[2], 0) == 1) {
+		if (tickEntityWalkTo(0xfc, 0xff, TRN_D_8008F320.vx, TRN_D_8008F320.vz, 0) == 1) {
 			startAnimation(ENTITY_TABLE[1], 0x1b);
 			PARTNER_ENTITY.digimonEntity.entity.posData->rotation.vy = 0xa00;
 			if (MAIN_D_80135370 == 1) {

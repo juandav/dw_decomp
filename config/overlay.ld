@@ -452,9 +452,6 @@ SECTIONS
 			. = ALIGN(., 4);
 			build/src/trn2/trn2_slots.c.o(.data.*);
 			. = ALIGN(., 4);
-			KEEP(build/asm/trn2/data/5220.data.s.o(.data.*));
-			. = ALIGN(., 4);
-
 			build/src/trn2/trn2_hp_map99.c.o(.bss.*);
 			. = ALIGN(., 4);
 			build/src/trn2/trn2_def_map99.c.o(.bss.*);
@@ -540,9 +537,6 @@ SECTIONS
 			. = ALIGN(., 4);
 			build/src/trn/trn_slots.c.o(.data.*);
 			. = ALIGN(., 4);
-			KEEP(build/asm/trn/data/6850.data.s.o(.data.*));
-			. = ALIGN(., 4);
-
 			build/src/trn/trn_reward.c.o(.bss.*);
 			. = ALIGN(., 4);
 			build/src/trn/trn_hp.c.o(.bss.*);

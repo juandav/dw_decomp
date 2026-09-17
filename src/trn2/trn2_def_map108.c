@@ -6,28 +6,10 @@
 #include <dw/tamer.h>
 #include <dw/trn2.h>
 #include <dw/types.h>
-#include <dw/ui.h>
+#include <dw/world_object.h>
 
-extern int16_t TRN2_D_8008DC54[];
-extern int8_t MAIN_D_801353BC;
-extern int8_t MAIN_D_801353BD;
-extern int32_t TRN2_D_8008DC1C[];
-extern int32_t TRN2_D_8008DC2C[];
 extern int32_t TRAINING_COMPLETE;
 extern uint32_t POLLED_INPUT;
-extern int16_t MAIN_D_801353B4;
-extern int16_t MAIN_D_801353B6;
-extern int16_t MAIN_D_801353C2;
-extern int16_t MAIN_D_801353C4;
-extern int16_t TRN2_D_8008DC74[];
-extern int16_t MAIN_D_801353B8;
-extern int16_t MAIN_D_801353BA;
-extern int16_t MAIN_D_801353BE;
-extern int16_t MAIN_D_801353C0;
-extern int16_t TRN2_D_8008DC3C[];
-extern int16_t TRN2_D_8008DC44[];
-extern int16_t TRN2_D_8008DC4C[];
-extern int16_t MAIN_D_801353CC;
 
 void createCameraMovement(VECTOR *pos, int32_t speed);
 void loadMapObjectPosition(int16_t *xData, int16_t *yData, int16_t startIndex, int16_t count);
@@ -36,16 +18,6 @@ void setCameraFollowPlayer(void);
 void createParticleFX(uint8_t kind, int32_t count, void *arg2, Entity *entity, int32_t arg4);
 void resetMapObjectAnimation(int16_t startIndex, int16_t count);
 void entityLookAtLocation(Entity *entity, VECTOR *pos);
-void TRN2_awardDefenseTrainingGains(int32_t a, int32_t b, int32_t c);
-void TRN2_saveTrainingStartTime(void);
-void TRN2_tickDefenseTrainingMap108(int32_t instanceId);
-void TRN2_tickSpeedTraining(int32_t instanceId);
-void TRN2_startSlotSessionIfEnabled(int16_t arg);
-int32_t TRN2_statGainsAreZero(void);
-void TRN2_applyBaseStats(void);
-void TRN2_closeUIBox(int32_t id);
-int16_t TRN2_getSlotSessionResult(void);
-void TRN2_startSlotSpin(void);
 
 static void *trn2_def_map108_functions[] = {
 	TRN2_setupSpeedTraining,
@@ -61,13 +33,13 @@ void TRN2_tickDefenseTrainingMap108(int32_t instanceId)
 		setTamerState(8);
 		setPartnerState(10);
 		startAnimation(&PARTNER_ENTITY.digimonEntity.entity, 4);
-		createCameraMovement((VECTOR *)TRN2_D_8008DC1C, 10);
+		createCameraMovement(&TRN2_D_8008DC1C, 10);
 		MAIN_D_801353C2 = 0;
 		MAIN_D_801353BD = 1;
 		TRN2_startSlotSessionIfEnabled(3);
 		break;
 	case 1:
-		if (tickEntityWalkTo(0xfc, 0xff, TRN2_D_8008DC1C[0], TRN2_D_8008DC1C[2], 0) == 1) {
+		if (tickEntityWalkTo(0xfc, 0xff, TRN2_D_8008DC1C.vx, TRN2_D_8008DC1C.vz, 0) == 1) {
 			PARTNER_ENTITY.digimonEntity.entity.posData->rotation.vy = 0x800;
 			setMapObjectsFlag(MAIN_D_801353B8, MAIN_D_801353BA, 1);
 			setMapObjectsFlag(MAIN_D_801353BE, MAIN_D_801353C0, 0);
@@ -84,9 +56,9 @@ void TRN2_tickDefenseTrainingMap108(int32_t instanceId)
 		MAIN_D_801353CC++;
 		if (MAIN_D_801353CC == 4) {
 			startAnimation(ENTITY_TABLE[1], 0x25);
-			createParticleFX(0, 0, TRN2_D_8008DC3C, NULL, 0);
-			createParticleFX(0, 0, TRN2_D_8008DC44, NULL, 0);
-			createParticleFX(0, 0, TRN2_D_8008DC4C, NULL, 0);
+			createParticleFX(0, 0, &TRN2_D_8008DC3C[0], NULL, 0);
+			createParticleFX(0, 0, &TRN2_D_8008DC3C[1], NULL, 0);
+			createParticleFX(0, 0, &TRN2_D_8008DC3C[2], NULL, 0);
 			playSound(8, 4);
 			MAIN_D_801353CC = 0;
 			MAIN_D_801353BD = 3;
@@ -216,12 +188,12 @@ static void trn2_def_map108__garbage__(void)
 void TRN2_setupSpeedTraining(int32_t arg)
 {
 	if (arg == 0x6c) {
-		TRN2_D_8008DC2C[0] = 0xf7;
-		TRN2_D_8008DC2C[1] = 0;
-		TRN2_D_8008DC2C[2] = 0x226;
-		TRN2_D_8008DC1C[0] = 0x372;
-		TRN2_D_8008DC1C[1] = 0;
-		TRN2_D_8008DC1C[2] = 0x3c5;
+		TRN2_D_8008DC2C.vx = 0xf7;
+		TRN2_D_8008DC2C.vy = 0;
+		TRN2_D_8008DC2C.vz = 0x226;
+		TRN2_D_8008DC1C.vx = 0x372;
+		TRN2_D_8008DC1C.vy = 0;
+		TRN2_D_8008DC1C.vz = 0x3c5;
 		MAIN_D_801353B8 = 0x38;
 		MAIN_D_801353BA = 3;
 		addObject(0xfad, 1, (TickFunction)TRN2_tickSpeedTraining, NULL);

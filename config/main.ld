@@ -721,6 +721,12 @@ SECTIONS
         . = ALIGN(., 4);
         build/build/generated/unk_0x80135324.sbss.s.o(.sbss.*);
         . = ALIGN(., 4);
+        build/src/main/trn.c.o(.sbss.*);
+        . = ALIGN(., 4);
+        build/build/generated/unk_0x801353A8.sbss.s.o(.sbss.*);
+        . = ALIGN(., 4);
+        build/src/main/trn2.c.o(.sbss.*);
+        . = ALIGN(., 4);
         build/src/main/murd.c.o(.sbss.*);
         . = ALIGN(., 4);
         build/build/generated/unk_0x801353F0.sbss.s.o(.sbss.*);

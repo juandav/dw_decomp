@@ -7,25 +7,10 @@
 #include <dw/tamer.h>
 #include <dw/trn.h>
 #include <dw/types.h>
-#include <dw/ui.h>
+#include <dw/world_object.h>
 
 extern uint32_t POLLED_INPUT;
-extern int8_t MAIN_D_80135370;
-extern int8_t MAIN_D_80135371;
-extern int32_t TRN_D_8008F320[];
-extern int16_t MAIN_D_8013536C;
-extern int16_t MAIN_D_8013536E;
 extern int32_t TRAINING_COMPLETE;
-extern int32_t TRN_D_8008F330[];
-extern int16_t TRN_D_8008F340[];
-extern int16_t TRN_D_8008F348[];
-extern int16_t TRN_D_8008F350[];
-extern int16_t TRN_D_8008F368[];
-extern int16_t TRN_D_8008F388[];
-extern int16_t MAIN_D_8013537A;
-extern int16_t MAIN_D_8013537C;
-extern uint32_t MAIN_D_80135384;
-extern int16_t MAIN_D_80135380;
 
 void createCameraMovement(VECTOR *pos, int32_t speed);
 void createCloudFX(int16_t *pos);
@@ -35,15 +20,7 @@ int32_t moveMapObjectsWithLimit(int16_t startIndex, int16_t count, int16_t dx, i
 void setCameraFollowPlayer(void);
 void unsetCameraFollowPlayer(void);
 void createParticleFX(uint8_t kind, int32_t count, void *arg2, Entity *entity, int32_t arg4);
-void TRN_saveTrainingStartTime(void);
-void TRN_startSlotSessionIfEnabled(int16_t arg);
-int32_t TRN_statGainsAreZero(void);
-void TRN_awardDefenseTrainingGains(int32_t a, int16_t b, int32_t c);
 void TRN_tickDefenseTraining(int32_t instanceId);
-void TRN_applyBaseStats(void);
-void TRN_closeUIBox(int32_t id);
-int16_t TRN_getSlotSessionResult(void);
-void TRN_startSlotSpin(void);
 
 static void *trn_def_functions[] = {
 	TRN_tickDefenseTraining,
@@ -118,21 +95,21 @@ static void trn_def__garbage__(void)
 void TRN_setupDefenseTraining(int32_t arg)
 {
 	if (arg == 0x70) {
-		TRN_D_8008F330[0] = -0x26b;
-		TRN_D_8008F330[1] = 0;
-		TRN_D_8008F330[2] = -0x602;
-		TRN_D_8008F320[0] = -0x33b;
-		TRN_D_8008F320[1] = 0;
-		TRN_D_8008F320[2] = -0x662;
-		TRN_D_8008F340[0] = -0x384;
-		TRN_D_8008F340[1] = -0x1f4;
-		TRN_D_8008F340[2] = -0x7d0;
-		TRN_D_8008F348[0] = -0x3b6;
-		TRN_D_8008F348[1] = -0x1f4;
-		TRN_D_8008F348[2] = -0x76c;
-		TRN_D_8008F350[0] = -0x3b6;
-		TRN_D_8008F350[1] = -0x1f4;
-		TRN_D_8008F350[2] = -0x834;
+		TRN_D_8008F330.vx = -0x26b;
+		TRN_D_8008F330.vy = 0;
+		TRN_D_8008F330.vz = -0x602;
+		TRN_D_8008F320.vx = -0x33b;
+		TRN_D_8008F320.vy = 0;
+		TRN_D_8008F320.vz = -0x662;
+		TRN_D_8008F340[0].vx = -0x384;
+		TRN_D_8008F340[0].vy = -0x1f4;
+		TRN_D_8008F340[0].vz = -0x7d0;
+		TRN_D_8008F340[1].vx = -0x3b6;
+		TRN_D_8008F340[1].vy = -0x1f4;
+		TRN_D_8008F340[1].vz = -0x76c;
+		TRN_D_8008F340[2].vx = -0x3b6;
+		TRN_D_8008F340[2].vy = -0x1f4;
+		TRN_D_8008F340[2].vz = -0x834;
 		MAIN_D_8013536C = 0x47;
 		MAIN_D_8013536E = 0xd;
 		addObject(0xfae, 0, (TickFunction)TRN_tickDefenseTraining, NULL);
@@ -161,14 +138,14 @@ void TRN_tickDefenseTraining(int32_t instanceId)
 		unsetCameraFollowPlayer();
 		setPartnerState(10);
 		startAnimation(&PARTNER_ENTITY.digimonEntity.entity, 4);
-		createCameraMovement((VECTOR *)TRN_D_8008F320, 10);
+		createCameraMovement(&TRN_D_8008F320, 10);
 		playSound(8, 9);
 		MAIN_D_8013537A = 0;
 		MAIN_D_80135371 = 1;
 		TRN_startSlotSessionIfEnabled(3);
 		break;
 	case 1:
-		if (tickEntityWalkTo(0xfc, 0xff, TRN_D_8008F320[0], TRN_D_8008F320[2], 0) == 1) {
+		if (tickEntityWalkTo(0xfc, 0xff, TRN_D_8008F320.vx, TRN_D_8008F320.vz, 0) == 1) {
 			PARTNER_ENTITY.digimonEntity.entity.posData->rotation.vy = 0x400;
 			startAnimation(&PARTNER_ENTITY.digimonEntity.entity, 0x25);
 			MAIN_D_80135371 = 2;
@@ -184,9 +161,9 @@ void TRN_tickDefenseTraining(int32_t instanceId)
 			MAIN_D_8013537A = 0x4b0;
 		}
 		if (moveMapObjectsWithLimit(MAIN_D_8013536C, MAIN_D_8013536E, 0x32, 0, TRN_D_8008F368[0] + 0x64, 0) == 1) {
-			createParticleFX(0, 0, TRN_D_8008F340, NULL, 0);
-			createParticleFX(0, 0, TRN_D_8008F348, NULL, 0);
-			createParticleFX(0, 0, TRN_D_8008F350, NULL, 0);
+			createParticleFX(0, 0, &TRN_D_8008F340[0], NULL, 0);
+			createParticleFX(0, 0, &TRN_D_8008F340[1], NULL, 0);
+			createParticleFX(0, 0, &TRN_D_8008F340[2], NULL, 0);
 			MAIN_D_80135384 = playSound2(8, 4);
 			MAIN_D_80135371 = 3;
 		}
@@ -274,7 +251,7 @@ void TRN_tickDefenseTraining(int32_t instanceId)
 		if (POLLED_INPUT & 0x10) {
 			MAIN_D_8013537A = 0x4b0;
 		}
-		if (tickEntityWalkTo(0xfc, 0xff, TRN_D_8008F320[0], TRN_D_8008F320[2], 0) == 1) {
+		if (tickEntityWalkTo(0xfc, 0xff, TRN_D_8008F320.vx, TRN_D_8008F320.vz, 0) == 1) {
 			r = 10;
 			if (MAIN_D_80135370 == 1) {
 				r = TRN_getSlotSessionResult();

@@ -5,27 +5,13 @@
 #include <dw/script.h>
 #include <dw/sound.h>
 #include <dw/tamer.h>
+#include <dw/training.h>
 #include <dw/trn.h>
 #include <dw/types.h>
-#include <dw/ui.h>
+#include <dw/world_object.h>
 
 extern uint32_t POLLED_INPUT;
-extern int8_t MAIN_D_80135370;
-extern int8_t MAIN_D_80135371;
-extern int32_t TRN_D_8008F320[];
-extern int16_t MAIN_D_8013536C;
-extern int16_t MAIN_D_8013536E;
 extern int32_t TRAINING_COMPLETE;
-extern int32_t TRN_D_8008F330[];
-extern int16_t MAIN_D_80135372;
-extern int16_t MAIN_D_80135374;
-extern int16_t MAIN_D_80135376;
-extern int16_t MAIN_D_80135378;
-extern int16_t TRN_D_8008F368[];
-extern int16_t TRN_D_8008F388[];
-extern int16_t MAIN_D_8013537A;
-extern int16_t MAIN_D_8013537C;
-extern uint32_t MAIN_D_80135384;
 
 void createCameraMovement(VECTOR *pos, int32_t speed);
 void storeMapObjectPosition(int16_t *outX, int16_t *outY, int16_t a, int16_t count);
@@ -33,15 +19,6 @@ void loadMapObjectPosition(int16_t *xData, int16_t *yData, int16_t startIndex, i
 void setMapObjectsFlag(int16_t start, int16_t count, int32_t flag);
 void moveMapObjects(int32_t startIndex, int32_t count, int32_t dx, int32_t dy);
 void getDrawPosition(SVECTOR *worldPos, int16_t *outX, int16_t *outY);
-void TRN_saveTrainingStartTime(void);
-void TRN_startSlotSessionIfEnabled(int16_t arg);
-int32_t TRN_statGainsAreZero(void);
-void TRN_awardMpTrainingGains(int32_t a, int16_t b, int32_t c);
-void TRN_tickMpTraining(int32_t instanceId);
-void TRN_applyBaseStats(void);
-void TRN_closeUIBox(int32_t id);
-int16_t TRN_getSlotSessionResult(void);
-void TRN_startSlotSpin(void);
 
 static void *trn_mp_functions[] = {
 	TRN_tickMpTraining,
@@ -60,19 +37,19 @@ void TRN_tickMpTraining(int32_t instanceId)
 		setTamerState(8);
 		setPartnerState(10);
 		startAnimation(&PARTNER_ENTITY.digimonEntity.entity, 4);
-		createCameraMovement((VECTOR *)TRN_D_8008F320, 10);
+		createCameraMovement(&TRN_D_8008F320, 10);
 		playSound(8, 9);
 		MAIN_D_8013537A = 0;
 		MAIN_D_80135371 = 1;
 		TRN_startSlotSessionIfEnabled(1);
 		break;
 	case 1:
-		if (tickEntityWalkTo(0xfc, 0xff, TRN_D_8008F330[0], TRN_D_8008F330[2], 0) == 1) {
+		if (tickEntityWalkTo(0xfc, 0xff, TRN_D_8008F330.vx, TRN_D_8008F330.vz, 0) == 1) {
 			MAIN_D_80135371 = 2;
 		}
 		break;
 	case 2:
-		if (tickEntityWalkTo(0xfc, 0xff, TRN_D_8008F320[0], TRN_D_8008F320[2], 0) == 1) {
+		if (tickEntityWalkTo(0xfc, 0xff, TRN_D_8008F320.vx, TRN_D_8008F320.vz, 0) == 1) {
 			setMapObjectsFlag(MAIN_D_80135372, MAIN_D_80135374, 1);
 			setMapObjectsFlag(MAIN_D_80135376, MAIN_D_80135378, 0);
 			svec.vx = PARTNER_ENTITY.digimonEntity.entity.posData->location.vx;
@@ -108,7 +85,7 @@ void TRN_tickMpTraining(int32_t instanceId)
 		}
 		break;
 	case 4:
-		if (tickEntityWalkTo(0xfc, 0xff, TRN_D_8008F330[0], TRN_D_8008F330[2], 0) == 1) {
+		if (tickEntityWalkTo(0xfc, 0xff, TRN_D_8008F330.vx, TRN_D_8008F330.vz, 0) == 1) {
 			startAnimation(&PARTNER_ENTITY.digimonEntity.entity, 0x12);
 			MAIN_D_80135371 = 5;
 		}
@@ -203,12 +180,12 @@ static void trn_mp__garbage__(void)
 void TRN_setupMpTraining(int32_t arg)
 {
 	if (arg == 0x70) {
-		TRN_D_8008F330[0] = 0x290;
-		TRN_D_8008F330[1] = 0;
-		TRN_D_8008F330[2] = 0x2ee;
-		TRN_D_8008F320[0] = 0x2ac;
-		TRN_D_8008F320[1] = 0;
-		TRN_D_8008F320[2] = 0x868;
+		TRN_D_8008F330.vx = 0x290;
+		TRN_D_8008F330.vy = 0;
+		TRN_D_8008F330.vz = 0x2ee;
+		TRN_D_8008F320.vx = 0x2ac;
+		TRN_D_8008F320.vy = 0;
+		TRN_D_8008F320.vz = 0x868;
 		MAIN_D_8013536C = 0xa4;
 		MAIN_D_8013536E = 8;
 		MAIN_D_80135372 = 0x93;

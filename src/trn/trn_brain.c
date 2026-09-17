@@ -12,26 +12,12 @@
 #include <dw/ui.h>
 
 extern uint32_t POLLED_INPUT;
-extern int8_t MAIN_D_80135370;
-extern int8_t MAIN_D_80135371;
-extern int32_t TRN_D_8008F320[];
 extern int32_t TRAINING_COMPLETE;
-extern int32_t TRN_D_8008F358[];
-extern int16_t TRN_D_8008F368[];
-extern int16_t MAIN_D_8013537A;
-extern int16_t MAIN_D_8013537C;
+extern VECTOR TRN_D_8008F358;
 
 void createCameraMovement(VECTOR *pos, int32_t speed);
 void entityLookAtLocation(Entity *entity, VECTOR *pos);
-void TRN_saveTrainingStartTime(void);
-void TRN_startSlotSessionIfEnabled(int16_t arg);
-int32_t TRN_statGainsAreZero(void);
-void TRN_awardBrainsTrainingGains(int32_t a, int32_t b, int32_t c);
 void TRN_tickBrainsTraining(int32_t instanceId);
-void TRN_applyBaseStats(void);
-void TRN_closeUIBox(int32_t id);
-int16_t TRN_getSlotSessionResult(void);
-void TRN_startSlotSpin(void);
 
 static void *trn_brain_functions[] = {
 	TRN_tickBrainsTraining,
@@ -107,12 +93,12 @@ void TRN_setupBrainsTraining(int32_t arg)
 {
 	switch (arg) {
 	case 0x70:
-		TRN_D_8008F358[0] = -0x5ac;
-		TRN_D_8008F358[1] = 0;
-		TRN_D_8008F358[2] = 0x61b;
-		TRN_D_8008F320[0] = -0x4e1;
-		TRN_D_8008F320[1] = 0;
-		TRN_D_8008F320[2] = 0x3f3;
+		TRN_D_8008F358.vx = -0x5ac;
+		TRN_D_8008F358.vy = 0;
+		TRN_D_8008F358.vz = 0x61b;
+		TRN_D_8008F320.vx = -0x4e1;
+		TRN_D_8008F320.vy = 0;
+		TRN_D_8008F320.vz = 0x3f3;
 		addObject(0xfb0, 0, (TickFunction)TRN_tickBrainsTraining, NULL);
 		if (DIGIMON_DATA[PARTNER_ENTITY.digimonEntity.entity.type].level < 3) {
 			PARTNER_PARA.upgradeBrainCounter++;
@@ -120,12 +106,12 @@ void TRN_setupBrainsTraining(int32_t arg)
 		TRAINING_COMPLETE = 0;
 		break;
 	case 0x77:
-		TRN_D_8008F358[0] = -0x564;
-		TRN_D_8008F358[1] = 0;
-		TRN_D_8008F358[2] = 0x3c4;
-		TRN_D_8008F320[0] = -0x5e3;
-		TRN_D_8008F320[1] = 0;
-		TRN_D_8008F320[2] = 0x2ce;
+		TRN_D_8008F358.vx = -0x564;
+		TRN_D_8008F358.vy = 0;
+		TRN_D_8008F358.vz = 0x3c4;
+		TRN_D_8008F320.vx = -0x5e3;
+		TRN_D_8008F320.vy = 0;
+		TRN_D_8008F320.vz = 0x2ce;
 		addObject(0xfb0, 9, (TickFunction)TRN_tickBrainsTraining, NULL);
 		TRAINING_COMPLETE = 0;
 		break;
@@ -149,13 +135,13 @@ void TRN_tickBrainsTraining(int32_t instanceId)
 		setPartnerState(10);
 		startAnimation(&PARTNER_ENTITY.digimonEntity.entity, 0);
 		playSound(8, 9);
-		createCameraMovement((VECTOR *)TRN_D_8008F358, 10);
+		createCameraMovement(&TRN_D_8008F358, 10);
 		MAIN_D_8013537A = 0;
 		MAIN_D_80135371 = 1;
 		TRN_startSlotSessionIfEnabled(5);
 		break;
 	case 1:
-		if (tickEntityWalkTo(0xfd, 0xff, TRN_D_8008F358[0], TRN_D_8008F358[2], 0) == 1) {
+		if (tickEntityWalkTo(0xfd, 0xff, TRN_D_8008F358.vx, TRN_D_8008F358.vz, 0) == 1) {
 			startAnimation(ENTITY_TABLE[0], 0);
 			entityLookAtLocation(&TAMER_ENTITY.entity, &PARTNER_ENTITY.digimonEntity.entity.posData->location);
 			startAnimation(ENTITY_TABLE[1], 2);
@@ -163,7 +149,7 @@ void TRN_tickBrainsTraining(int32_t instanceId)
 		}
 		break;
 	case 2:
-		if (tickEntityWalkTo(0xfc, 0xff, TRN_D_8008F320[0], TRN_D_8008F320[2], 0) == 1) {
+		if (tickEntityWalkTo(0xfc, 0xff, TRN_D_8008F320.vx, TRN_D_8008F320.vz, 0) == 1) {
 			if (instanceId == 0) {
 				entityLookAtLocation(&TAMER_ENTITY.entity, &PARTNER_ENTITY.digimonEntity.entity.posData->location);
 				entityLookAtLocation(&PARTNER_ENTITY.digimonEntity.entity, &TAMER_ENTITY.entity.posData->location);

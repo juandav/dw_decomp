@@ -1,31 +1,17 @@
 #include <dw/anim.h>
 #include <dw/entity.h>
 #include <dw/partner.h>
-#include <dw/script.h>
 #include <dw/sound.h>
 #include <dw/tamer.h>
+#include <dw/training.h>
+#include <dw/trn2.h>
 #include <dw/types.h>
-#include <dw/ui.h>
+#include <dw/world_object.h>
 
-extern int8_t MAIN_D_801353BC;
-extern int8_t MAIN_D_801353BD;
-extern int32_t TRN2_D_8008DC1C[];
-extern int32_t TRN2_D_8008DC2C[];
 extern int32_t TRAINING_COMPLETE;
 extern uint32_t POLLED_INPUT;
-extern int16_t MAIN_D_801353C2;
-extern int16_t MAIN_D_801353C4;
 
 void createCameraMovement(VECTOR *pos, int32_t speed);
-void TRN_tickMpTraining(int32_t instanceId);
-void TRN2_tickMpTraining(int32_t instanceId);
-void TRN2_startSlotSessionIfEnabled(int16_t arg);
-int32_t TRN2_statGainsAreZero(void);
-void TRN2_awardMpTrainingGains(int32_t a, int16_t b, int32_t c);
-void TRN2_applyBaseStats(void);
-void TRN2_closeUIBox(int32_t id);
-int16_t TRN2_getSlotSessionResult(void);
-void TRN2_startSlotSpin(void);
 
 static void *trn2_mp_functions[] = {
 	TRN2_tickMpTraining,
@@ -40,19 +26,19 @@ void TRN2_tickMpTraining(int32_t instanceId)
 		setTamerState(8);
 		setPartnerState(10);
 		startAnimation(&PARTNER_ENTITY.digimonEntity.entity, 2);
-		createCameraMovement((VECTOR *)TRN2_D_8008DC1C, 10);
+		createCameraMovement(&TRN2_D_8008DC1C, 10);
 		playSound(8, 9);
 		MAIN_D_801353C2 = 0;
 		MAIN_D_801353BD = 1;
 		TRN2_startSlotSessionIfEnabled(1);
 		break;
 	case 1:
-		if (tickEntityWalkTo(0xfc, 0xff, TRN2_D_8008DC2C[0], TRN2_D_8008DC2C[2], 0) == 1) {
+		if (tickEntityWalkTo(0xfc, 0xff, TRN2_D_8008DC2C.vx, TRN2_D_8008DC2C.vz, 0) == 1) {
 			MAIN_D_801353BD = 2;
 		}
 		break;
 	case 2:
-		if (tickEntityWalkTo(0xfc, 0xff, TRN2_D_8008DC1C[0], TRN2_D_8008DC1C[2], 0) == 1) {
+		if (tickEntityWalkTo(0xfc, 0xff, TRN2_D_8008DC1C.vx, TRN2_D_8008DC1C.vz, 0) == 1) {
 			PARTNER_ENTITY.digimonEntity.entity.posData->rotation.vy = 0x400;
 			startAnimation(&PARTNER_ENTITY.digimonEntity.entity, 0xc);
 			MAIN_D_801353BD = 3;
@@ -80,7 +66,7 @@ void TRN2_tickMpTraining(int32_t instanceId)
 		}
 		break;
 	case 4:
-		if (tickEntityWalkTo(0xfc, 0xff, TRN2_D_8008DC2C[0], TRN2_D_8008DC2C[2], 0) == 1) {
+		if (tickEntityWalkTo(0xfc, 0xff, TRN2_D_8008DC2C.vx, TRN2_D_8008DC2C.vz, 0) == 1) {
 			startAnimation(&PARTNER_ENTITY.digimonEntity.entity, 0x12);
 			MAIN_D_801353BD = 5;
 		}

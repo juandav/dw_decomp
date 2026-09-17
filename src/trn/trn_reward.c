@@ -9,26 +9,10 @@
 #include <dw/params.h>
 #include <dw/partner.h>
 #include <dw/script.h>
+#include <dw/trn.h>
 #include <dw/types.h>
 
 extern int16_t STATS_GAINS[6];
-extern uint16_t MAIN_D_8013538C;
-extern int16_t MAIN_D_8013538E;
-extern int16_t MAIN_D_80135390;
-extern int8_t MAIN_D_80135370;
-extern int8_t MAIN_D_80135371;
-extern uint8_t MAIN_D_80135392;
-extern uint8_t TRN_D_8008F14C[56];
-extern int8_t TRN_D_8008F184[8][3];
-extern char TRN_D_8008F19C[];
-extern int32_t MAIN_D_80135388;
-extern char TRN_D_8008F0D8[];
-extern char TRN_D_8008F0F0[];
-extern char TRN_D_8008F100[];
-extern char TRN_D_8008F10C[];
-extern char TRN_D_8008F11C[];
-extern char TRN_D_8008F12C[];
-extern char TRN_D_8008F140[];
 extern char *MOVE_NAMES[];
 
 void renderString(int32_t a, int32_t b, int32_t c, int32_t d, int32_t e, int32_t f, int32_t g, int32_t h, int32_t i);
@@ -39,26 +23,12 @@ void createCloudFX(int16_t *pos);
 int32_t hasMove(int32_t moveId);
 void learnMove(int32_t moveId);
 void createMenuBox(int32_t a, int32_t b, int32_t c, int32_t d, int32_t e, int32_t f, void (*tick)(void), void (*render)(void));
-void TRN_saveTrainingStartTime(void);
-void TRN_startSlotSessionIfEnabled(int16_t arg);
 void TRN_func_800888A0(int8_t arg);
-void TRN_createCloudFXLine(int16_t a, int16_t b, int16_t x, int16_t z, int16_t dx, int16_t dz, int8_t n);
-void TRN_awardHpTrainingGains(int32_t a, int16_t b, int32_t c);
-int32_t TRN_statGainsAreZero(void);
-void TRN_awardOffenseTrainingGains(int32_t a, int32_t b, int32_t c);
-void TRN_awardSpeedTrainingGains(int32_t a, int32_t b, int32_t c);
-void TRN_awardDefenseTrainingGains(int32_t a, int16_t b, int32_t c);
-void TRN_awardMpTrainingGains(int32_t a, int16_t b, int32_t c);
-void TRN_awardBrainsTrainingGains(int32_t a, int32_t b, int32_t c);
 int16_t TRN_calculateTrainingMultiplier(int32_t type, int32_t mode, int32_t flag);
 void TRN_advanceTrainingTime(int16_t tiredGain, int16_t energyLoss, int16_t happyLoss);
 void TRN_renderNewOrdersBox(void);
 int32_t TRN_tryLearnMove(int32_t type);
 void TRN_renderMoveLearnedBox(void);
-void TRN_saveBaseStats(void);
-void TRN_createPostTrainingStatsBox(void);
-int32_t TRN_startSlotSession(int32_t arg);
-int16_t TRN_getSlotSessionResult(void);
 
 static void *trn_reward_functions[] = {
 	TRN_renderMoveLearnedBox,
@@ -78,6 +48,65 @@ static void *trn_reward_functions[] = {
 	TRN_startSlotSessionIfEnabled,
 	TRN_saveTrainingStartTime,
 };
+
+// clang-format off
+int8_t TRAINING_ANIM_IDS[68][2] = {
+	{ 0x0, 0x0 }, { 0x2e, 0xa }, { 0x2e, 0xa }, { 0x33, 0xc },
+	{ 0x2e, 0x14 }, { 0x35, 0x14 }, { 0x2e, 0xa }, { 0x2e, 0xa },
+	{ 0x2e, 0xa }, { 0x35, 0xd }, { 0x2e, 0xa }, { 0x2e, 0x14 },
+	{ 0x31, 0xa }, { 0x2e, 0x8 }, { 0x2e, 0xa }, { 0x2e, 0xa },
+	{ 0x2e, 0xa }, { 0x2e, 0x14 }, { 0x2e, 0xa }, { 0x2e, 0xa },
+	{ 0x2e, 0xe }, { 0x2e, 0xf }, { 0x2e, 0xa }, { 0x2e, 0xa },
+	{ 0x2e, 0xa }, { 0x2e, 0xa }, { 0x2e, 0xa }, { 0x2e, 0x8 },
+	{ 0x33, 0xa }, { 0x2e, 0x14 }, { 0x2e, 0x14 }, { 0x2e, 0xa },
+	{ 0x2e, 0xe }, { 0x2e, 0x14 }, { 0x31, 0xa }, { 0x2e, 0xa },
+	{ 0x35, 0x14 }, { 0x2e, 0x14 }, { 0x2e, 0xa }, { 0x2e, 0x14 },
+	{ 0x2e, 0xd }, { 0x2f, 0x1e }, { 0x2e, 0xf }, { 0x2e, 0xf },
+	{ 0x2e, 0xa }, { 0x35, 0x17 }, { 0x2e, 0xa }, { 0x33, 0xa },
+	{ 0x2e, 0xa }, { 0x2e, 0xa }, { 0x34, 0xa }, { 0x2e, 0xa },
+	{ 0x2e, 0xa }, { 0x2e, 0xa }, { 0x2e, 0xa }, { 0x2e, 0xa },
+	{ 0x30, 0x1e }, { 0x2e, 0xa }, { 0x2e, 0xa }, { 0x2e, 0x19 },
+	{ 0x30, 0xa }, { 0x2e, 0xa }, { 0x2e, 0xa }, { 0x2e, 0xa },
+	{ 0x2e, 0xa }, { 0x2e, 0xa }, { 0x2e, 0xa }, { 0x0, 0x0 },
+};
+
+char TRN_D_8008F0D8[24] = "Give it all you got!";
+
+char TRN_D_8008F0F0[16] = "Take it easy!";
+
+char TRN_D_8008F100[12] = "Get back!";
+
+char TRN_D_8008F10C[16] = "Change target!";
+
+char TRN_D_8008F11C[16] = "Hang in there!";
+
+char TRN_D_8008F12C[20] = "Technique mastered.";
+
+char TRN_D_8008F140[12] = "New orders!";
+
+uint8_t TRN_D_8008F14C[56] = {
+	0x2, 0x5, 0x0, 0x4, 0x3, 0x1, 0x6, 0x7,
+	0x2b, 0x2c, 0x2a, 0x2e, 0x2d, 0x29, 0x28, 0x2f,
+	0xc, 0xa, 0xd, 0x9, 0xb, 0xe, 0x8, 0xf,
+	0x25, 0x26, 0x20, 0x23, 0x22, 0x24, 0x27, 0x21,
+	0x17, 0x13, 0x14, 0x15, 0x12, 0x10, 0x11, 0x16,
+	0x18, 0x1a, 0x1f, 0x1b, 0x1e, 0x1c, 0x19, 0x1d,
+	0x37, 0x31, 0x32, 0x35, 0x36, 0x33, 0x34, 0x38,
+};
+
+int8_t TRN_D_8008F184[8][3] = {
+	{ 0x0, 0xf, 0xa },
+	{ 0x19, 0xd, 0x8 },
+	{ 0x16, 0xb, 0x7 },
+	{ 0x14, 0x9, 0x5 },
+	{ 0x12, 0x8, 0x2 },
+	{ 0xf, 0x7, 0x0 },
+	{ 0xc, 0x6, 0x0 },
+	{ 0xa, 0x5, 0x0 },
+};
+
+char TRN_D_8008F19C[16] = "was mastered!";
+// clang-format on
 
 void TRN_saveTrainingStartTime(void)
 {

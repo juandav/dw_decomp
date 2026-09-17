@@ -5,34 +5,18 @@
 #include <dw/font.h>
 #include <dw/script.h>
 #include <dw/sound.h>
+#include <dw/training.h>
 #include <dw/trn.h>
 #include <dw/types.h>
 #include <dw/ui.h>
 
-typedef struct {
-	int16_t x;
-	int16_t y;
-	int16_t z;
-	int16_t stat;
-} TrainingSpot;
-
-typedef struct {
-	int32_t mapId;
-	TrainingSpot *spots;
-} MapTrainingSpots;
-
 extern int16_t INITIAL_COMBAT_STATS[][6];
-extern int32_t MAIN_D_80135394;
-extern int16_t MAIN_D_8013539E;
 extern uint32_t POLLED_INPUT;
 extern uint32_t POLLED_INPUT_PREVIOUS;
 extern int16_t STATS_GAINS[6];
-extern int16_t MAIN_D_801353A0[4];
 extern GsOT *ACTIVE_ORDERING_TABLE;
-extern int8_t MAIN_D_80135398[6];
 extern char MAIN_D_80124C0C[];
 extern char MAIN_D_80124C54[];
-extern MapTrainingSpots TRN_TRAINING_SPOTS[];
 
 void renderString(int32_t a, int32_t b, int32_t c, int32_t d, int32_t e, int32_t f, int32_t g, int32_t h, int32_t i);
 void renderLinePrimitive(uint32_t color, int32_t x0, int32_t y0, int32_t x1, int32_t y1, int32_t order, uint32_t mode);
@@ -42,17 +26,9 @@ void setEntityTextDigit(POLY_FT4 *poly, int32_t x, int32_t y);
 void setPosDataPolyFT4(POLY_FT4 *prim, int32_t x, int32_t y, int32_t w, int32_t h);
 void setUVDataPolyFT4(POLY_FT4 *p, int32_t u, int32_t v, int32_t w, int32_t h);
 void worldPosToScreenPos(TrainingSpot *item, SVECTOR *out);
-void TRN_saveBaseStats(void);
-void TRN_applyBaseStats(void);
-void TRN_createPostTrainingStatsBox(void);
 void TRN_tickPostTrainingStatsBox();
 void TRN_renderPostTrainingStatsBox(uint8_t depth);
-void TRN_closeUIBox(int32_t id);
-void TRN_tickSlotSession(void);
-void TRN_renderSlotSession(void);
 int32_t TRN_getTrainingSpotScreenPos(int32_t key, int16_t sub, SVECTOR *out);
-void TRN_createSlotMachineBox(int16_t arg);
-int16_t TRN_getSlotMachineResult(void);
 
 static void *trn_hud_functions[] = {
 	TRN_getTrainingSpotScreenPos,
@@ -65,6 +41,69 @@ static void *trn_hud_functions[] = {
 	TRN_applyBaseStats,
 	TRN_saveBaseStats,
 };
+
+// clang-format off
+int8_t TRN_D_8008F1AC[3][13] = {
+	{ 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x1, 0x3, 0x5, 0x2, 0x4, 0x6 },
+	{ 0x6, 0x4, 0x2, 0x5, 0x3, 0x1, 0x2, 0x5, 0x3, 0x6, 0x1, 0x4, 0x7 },
+	{ 0x7, 0x6, 0x5, 0x4, 0x6, 0x5, 0x4, 0x3, 0x2, 0x1, 0x3, 0x2, 0x1 },
+};
+
+TrainingSpot TRN_D_8008F1D4[7] = {
+	{ 0x3f2, 0x0, -0x3cf, 0x0 },
+	{ -0x1fa, 0x0, -0x791, 0x2 },
+	{ -0x315, 0x0, -0x36b, 0x3 },
+	{ 0x598, 0x0, 0x4fc, 0x1 },
+	{ 0xc, 0x0, 0x1bd, 0x4 },
+	{ -0x6f3, 0x0, 0x824, 0x5 },
+	{ 0x0, 0x0, 0x0, -0x1 },
+};
+
+TrainingSpot TRN_D_8008F20C[3] = {
+	{ -0x33d, 0x0, 0x1003, 0x2 },
+	{ 0x2fe, 0x0, 0x6a, 0x4 },
+	{ 0x0, 0x0, 0x0, -0x1 },
+};
+
+TrainingSpot TRN_D_8008F224[2] = {
+	{ 0x59a, 0x0, -0x11b, 0x1 },
+	{ 0x0, 0x0, 0x0, -0x1 },
+};
+
+TrainingSpot TRN_D_8008F234[3] = {
+	{ -0x52b, 0x0, 0x540, 0x2 },
+	{ -0x228, 0x0, 0x6be, 0x0 },
+	{ 0x0, 0x0, 0x0, -0x1 },
+};
+
+TrainingSpot TRN_D_8008F24C[3] = {
+	{ 0x2ee, 0x0, 0x7f8, 0x4 },
+	{ -0xcc, 0x0, 0x962, 0x3 },
+	{ 0x0, 0x0, 0x0, -0x1 },
+};
+
+TrainingSpot TRN_D_8008F264[3] = {
+	{ 0x5e9, 0x0, 0x5b, 0x2 },
+	{ 0x0, 0x0, 0x3e8, 0x0 },
+	{ 0x0, 0x0, 0x0, -0x1 },
+};
+
+TrainingSpot TRN_D_8008F27C[2] = {
+	{ -0x7e1, 0x0, 0x562, 0x5 },
+	{ 0x0, 0x0, 0x0, -0x1 },
+};
+
+MapTrainingSpots TRN_TRAINING_SPOTS[8] = {
+	{ 0x70, TRN_D_8008F1D4 },
+	{ 0x4e, TRN_D_8008F20C },
+	{ 0xa5, TRN_D_8008F224 },
+	{ 0x6b, TRN_D_8008F234 },
+	{ 0x6c, TRN_D_8008F24C },
+	{ 0x63, TRN_D_8008F264 },
+	{ 0x77, TRN_D_8008F27C },
+	{ -0x1, NULL },
+};
+// clang-format on
 
 void TRN_saveBaseStats(void)
 {

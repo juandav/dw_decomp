@@ -5,52 +5,23 @@
 
 #include <dw/script.h>
 #include <dw/sound.h>
+#include <dw/training.h>
 #include <dw/trn2.h>
 #include <dw/types.h>
 #include <dw/ui.h>
 
-typedef struct {
-	int16_t result;
-	int16_t payout;
-	int16_t resultTimer;
-	int16_t state;
-	int8_t reelPos[3];
-	int8_t targetSymbol[3];
-	int8_t stopSteps[3];
-	int8_t pad11;
-	int16_t scrollY[3];
-	int16_t spinSpeed[3];
-	int16_t stat;
-	int16_t autoStart;
-	int8_t assist;
-	int8_t settling[3];
-} SlotMachine;
-
-extern int16_t TRN2_D_8008DC54[];
-extern SlotMachine TRN2_SLOT_MACHINE;
-extern int16_t MAIN_D_801353E0[4];
 extern int8_t TRN2_D_8008DAA8[3][13];
 extern uint32_t POLLED_INPUT;
 extern uint32_t POLLED_INPUT_PREVIOUS;
 extern GsOT *ACTIVE_ORDERING_TABLE;
-extern GsSPRITE TRN2_SLOT_SPRITE1;
-extern GsSPRITE TRN2_SLOT_SPRITE2;
-extern int8_t TRN2_D_8008DBC8[];
 extern uint8_t CURRENT_SCREEN;
 extern int32_t DRAWING_OFFSET_X;
 extern int32_t DRAWING_OFFSET_Y;
 
-void TRN2_tickSlotSession(void);
-void TRN2_renderSlotSession(void);
 int32_t TRN2_getTrainingSpotScreenPos(int32_t key, int16_t sub, SVECTOR *out);
 void TRN2_tickSlotMachine(int32_t arg);
 void TRN2_renderSlotMachine(int32_t arg);
 void TRN2_chooseReelStop(int16_t i, SlotMachine *p);
-int32_t TRN2_startSlotSession(int32_t arg);
-int16_t TRN2_getSlotSessionResult(void);
-void TRN2_createSlotMachineBox(int16_t arg);
-int16_t TRN2_getSlotMachineResult(void);
-void TRN2_startSlotSpin(void);
 
 static void *trn2_slots_functions[] = {
 	TRN2_startSlotSpin,
@@ -62,6 +33,66 @@ static void *trn2_slots_functions[] = {
 	TRN2_renderSlotMachine,
 	TRN2_tickSlotMachine,
 };
+
+// clang-format off
+int8_t TRN2_D_8008DBC8[12] = {
+	0x0, 0x0, 0x0, 0x0, 0x0, 0x1, 0x1, 0x1, 0x1, 0x2, 0x0, 0x0,
+};
+
+GsSPRITE TRN2_SLOT_SPRITE1 = {
+	0x50000000,	/* attribute */
+	0x0,		/* x */
+	0x0,		/* y */
+	0x20,		/* w */
+	0x20,		/* h */
+	0x2b,		/* tpage */
+	0x0,		/* u */
+	0xd8,		/* v */
+	0x30,		/* cx */
+	0x1e6,		/* cy */
+	0x80,		/* r */
+	0x80,		/* g */
+	0x80,		/* b */
+	0x10,		/* mx */
+	0x0,		/* my */
+	0x1000,		/* scalex */
+	0x1000,		/* scaley */
+	0x0,		/* rotate */
+};
+
+GsSPRITE TRN2_SLOT_SPRITE2 = {
+	0x60000000,	/* attribute */
+	0x0,		/* x */
+	-0x4a,		/* y */
+	0x8,		/* w */
+	0x20,		/* h */
+	0x4b,		/* tpage */
+	0xe0,		/* u */
+	0xd8,		/* v */
+	0x40,		/* cx */
+	0x1e6,		/* cy */
+	0x40,		/* r */
+	0x40,		/* g */
+	0x40,		/* b */
+	0x4,		/* mx */
+	0x0,		/* my */
+	0x4000,		/* scalex */
+	0x2000,		/* scaley */
+	0x0,		/* rotate */
+};
+
+VECTOR TRN2_D_8008DC1C = { 0 };
+
+VECTOR TRN2_D_8008DC2C = { 0 };
+
+SVECTOR TRN2_D_8008DC3C[3] = { 0 };
+
+int16_t TRN2_D_8008DC54[16] = { 0 };
+
+int16_t TRN2_D_8008DC74[16] = { 0 };
+
+SlotMachine TRN2_SLOT_MACHINE = { 0 };
+// clang-format on
 
 static void trn2_slots__garbage__(void)
 {

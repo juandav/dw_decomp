@@ -65,6 +65,8 @@ segments:
       - [0x4690, c, trn_brain]
       - [0x4CCC, c, trn_hud]
       - [0x5848, c, trn_slots]
-      - [0x6850, data]
+      - [0x6850, .data, trn_reward]
+      - [0x69AC, .data, trn_hud]
+      - [0x6ACC, .data, trn_slots]
 
   - [0x6BD4]

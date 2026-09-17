@@ -8,29 +8,15 @@
 #include <dw/tamer.h>
 #include <dw/trn.h>
 #include <dw/types.h>
-#include <dw/ui.h>
 
 extern uint32_t POLLED_INPUT;
-extern int8_t MAIN_D_80135370;
-extern int8_t MAIN_D_80135371;
-extern int32_t TRN_D_8008F320[];
 extern int32_t TRAINING_COMPLETE;
-extern int16_t MAIN_D_8013537A;
-extern int16_t MAIN_D_8013537C;
 
 void createCameraMovement(VECTOR *pos, int32_t speed);
 void setCameraFollowPlayer(void);
 void unsetCameraFollowPlayer(void);
-void TRN_saveTrainingStartTime(void);
-void TRN_startSlotSessionIfEnabled(int16_t arg);
 void TRN_func_800888A0(int8_t arg);
-int32_t TRN_statGainsAreZero(void);
-void TRN_awardSpeedTrainingGains(int32_t a, int32_t b, int32_t c);
 void TRN_tickSpeedTraining(int32_t instanceId);
-void TRN_applyBaseStats(void);
-void TRN_closeUIBox(int32_t id);
-int16_t TRN_getSlotSessionResult(void);
-void TRN_startSlotSpin(void);
 
 static void *trn_speed_functions[] = {
 	TRN_tickSpeedTraining,
@@ -41,18 +27,18 @@ void TRN_setupSpeedTraining(int32_t arg)
 {
 	switch (arg) {
 	case 0x70:
-		TRN_D_8008F320[0] = 0x2d;
-		TRN_D_8008F320[1] = 0;
-		TRN_D_8008F320[2] = -0x184;
+		TRN_D_8008F320.vx = 0x2d;
+		TRN_D_8008F320.vy = 0;
+		TRN_D_8008F320.vz = -0x184;
 		if (DIGIMON_DATA[PARTNER_ENTITY.digimonEntity.entity.type].level < 3) {
 			PARTNER_PARA.upgradeSpeedCounter++;
 		}
 		addObject(0xfad, 0, (TickFunction)TRN_tickSpeedTraining, NULL);
 		break;
 	case 0x4e:
-		TRN_D_8008F320[0] = 0x32;
-		TRN_D_8008F320[1] = 0;
-		TRN_D_8008F320[2] = -0x11f;
+		TRN_D_8008F320.vx = 0x32;
+		TRN_D_8008F320.vy = 0;
+		TRN_D_8008F320.vz = -0x11f;
 		addObject(0xfad, 6, (TickFunction)TRN_tickSpeedTraining, NULL);
 		break;
 	}
@@ -73,7 +59,7 @@ void TRN_tickSpeedTraining(int32_t instanceId)
 		unsetCameraFollowPlayer();
 		setPartnerState(10);
 		startAnimation(&PARTNER_ENTITY.digimonEntity.entity, 4);
-		createCameraMovement((VECTOR *)TRN_D_8008F320, 10);
+		createCameraMovement(&TRN_D_8008F320, 10);
 		playSound(8, 9);
 		MAIN_D_8013537A = 0;
 		MAIN_D_80135371 = 1;
@@ -81,7 +67,7 @@ void TRN_tickSpeedTraining(int32_t instanceId)
 		break;
 	case 1:
 		TRN_func_800888A0(4);
-		if (tickEntityWalkTo(0xfc, 0xff, TRN_D_8008F320[0], TRN_D_8008F320[2], 0) == 1) {
+		if (tickEntityWalkTo(0xfc, 0xff, TRN_D_8008F320.vx, TRN_D_8008F320.vz, 0) == 1) {
 			if (instanceId == 0) {
 				PARTNER_ENTITY.digimonEntity.entity.posData->rotation.vy = 0xc00;
 			} else if (instanceId == 6) {

@@ -9,33 +9,15 @@
 #include <dw/partner.h>
 #include <dw/script.h>
 #include <dw/sound.h>
+#include <dw/training.h>
 #include <dw/trn2.h>
 #include <dw/types.h>
 #include <dw/ui.h>
 
-typedef struct {
-	int16_t x;
-	int16_t y;
-	int16_t z;
-	int16_t stat;
-} TrainingSpot;
-
-typedef struct {
-	int32_t mapId;
-	TrainingSpot *spots;
-} MapTrainingSpots;
-
-extern uint16_t MAIN_D_801353CE;
-extern int16_t MAIN_D_801353D0;
-extern int16_t MAIN_D_801353E0[4];
-extern MapTrainingSpots TRN2_TRAINING_SPOTS[];
 extern int16_t STATS_GAINS[6];
 extern int16_t INITIAL_COMBAT_STATS[][6];
 extern uint32_t POLLED_INPUT;
 extern uint32_t POLLED_INPUT_PREVIOUS;
-extern int32_t MAIN_D_801353D4;
-extern int16_t MAIN_D_801353DE;
-extern int8_t MAIN_D_801353D8[6];
 extern char MAIN_D_80124C0C[];
 extern char MAIN_D_80124C54[];
 extern GsOT *ACTIVE_ORDERING_TABLE;
@@ -50,18 +32,8 @@ void TRN2_tickPostTrainingStatsBox();
 void setEntityTextDigit(POLY_FT4 *poly, int32_t x, int32_t y);
 void setUVDataPolyFT4(POLY_FT4 *p, int32_t u, int32_t v, int32_t w, int32_t h);
 void tickConditionBoundaries(void);
-int16_t TRN2_calculateTrainingMultiplier(int32_t type, int32_t mode);
-void TRN2_advanceTrainingTime(int16_t tiredGain, int16_t energyLoss, int16_t happyLoss);
-void TRN2_saveBaseStats(void);
-void TRN2_applyBaseStats(void);
-void TRN2_createPostTrainingStatsBox(void);
 void TRN2_renderPostTrainingStatsBox(uint8_t depth);
-void TRN2_closeUIBox(int32_t id);
-void TRN2_tickSlotSession(void);
-void TRN2_renderSlotSession(void);
 int32_t TRN2_getTrainingSpotScreenPos(int32_t key, int16_t sub, SVECTOR *out);
-void TRN2_createSlotMachineBox(int16_t arg);
-int16_t TRN2_getSlotMachineResult(void);
 
 static void *trn2_hud_functions[] = {
 	TRN2_getTrainingSpotScreenPos,
@@ -76,6 +48,69 @@ static void *trn2_hud_functions[] = {
 	TRN2_advanceTrainingTime,
 	TRN2_calculateTrainingMultiplier,
 };
+
+// clang-format off
+int8_t TRN2_D_8008DAA8[3][13] = {
+	{ 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x1, 0x3, 0x5, 0x2, 0x4, 0x6 },
+	{ 0x6, 0x4, 0x2, 0x5, 0x3, 0x1, 0x2, 0x5, 0x3, 0x6, 0x1, 0x4, 0x7 },
+	{ 0x7, 0x6, 0x5, 0x4, 0x6, 0x5, 0x4, 0x3, 0x2, 0x1, 0x3, 0x2, 0x1 },
+};
+
+TrainingSpot TRN2_D_8008DAD0[7] = {
+	{ 0x3f2, 0x0, -0x3cf, 0x0 },
+	{ -0x1fa, 0x0, -0x791, 0x2 },
+	{ -0x315, 0x0, -0x36b, 0x3 },
+	{ 0x598, 0x0, 0x4fc, 0x1 },
+	{ 0xc, 0x0, 0x1bd, 0x4 },
+	{ -0x6f3, 0x0, 0x824, 0x5 },
+	{ 0x0, 0x0, 0x0, -0x1 },
+};
+
+TrainingSpot TRN2_D_8008DB08[3] = {
+	{ -0x33d, 0x0, 0x1003, 0x2 },
+	{ 0x2fe, 0x0, 0x6a, 0x4 },
+	{ 0x0, 0x0, 0x0, -0x1 },
+};
+
+TrainingSpot TRN2_D_8008DB20[2] = {
+	{ 0x59a, 0x0, -0x11b, 0x1 },
+	{ 0x0, 0x0, 0x0, -0x1 },
+};
+
+TrainingSpot TRN2_D_8008DB30[3] = {
+	{ -0x52b, 0x0, 0x540, 0x2 },
+	{ -0x228, 0x0, 0x6be, 0x0 },
+	{ 0x0, 0x0, 0x0, -0x1 },
+};
+
+TrainingSpot TRN2_D_8008DB48[3] = {
+	{ 0x2ee, 0x0, 0x7f8, 0x4 },
+	{ -0xcc, 0x0, 0x962, 0x3 },
+	{ 0x0, 0x0, 0x0, -0x1 },
+};
+
+TrainingSpot TRN2_D_8008DB60[3] = {
+	{ 0x5e9, 0x0, 0x5b, 0x2 },
+	{ 0x0, 0x0, 0x3e8, 0x0 },
+	{ 0x0, 0x0, 0x0, -0x1 },
+};
+
+TrainingSpot TRN2_D_8008DB78[2] = {
+	{ -0x7e1, 0x0, 0x562, 0x5 },
+	{ 0x0, 0x0, 0x0, -0x1 },
+};
+
+MapTrainingSpots TRN2_TRAINING_SPOTS[8] = {
+	{ 0x70, TRN2_D_8008DAD0 },
+	{ 0x4e, TRN2_D_8008DB08 },
+	{ 0xa5, TRN2_D_8008DB20 },
+	{ 0x6b, TRN2_D_8008DB30 },
+	{ 0x6c, TRN2_D_8008DB48 },
+	{ 0x63, TRN2_D_8008DB60 },
+	{ 0x77, TRN2_D_8008DB78 },
+	{ -0x1, NULL },
+};
+// clang-format on
 
 int16_t TRN2_calculateTrainingMultiplier(int32_t type, int32_t mode)
 {

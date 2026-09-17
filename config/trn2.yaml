@@ -65,6 +65,8 @@ segments:
       - [0x1EF8, c, trn2_reward]
       - [0x2F6C, c, trn2_hud]
       - [0x4220, c, trn2_slots]
-      - [0x5220, data]
+      - [0x5220, .data, trn2_off]
+      - [0x52A8, .data, trn2_hud]
+      - [0x53C8, .data, trn2_slots]
 
   - [0x54C0]
