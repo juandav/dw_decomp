@@ -777,7 +777,77 @@ next:;
 	return any;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/script_ops", MAIN_func_80107444);
+void MAIN_func_80107444(void)
+{
+	uint8_t hasFreeSlot;
+	uint8_t *counts;
+	uint8_t *out;
+	uint8_t item;
+	uint8_t c;
+	uint8_t type;
+	uint8_t i;
+	uint8_t size;
+	uint8_t *p;
+
+	counts = &SCRIPT_STATE_PTR->smth[0x54];
+	out = MAIN_D_80134F68->buf;
+	hasFreeSlot = 0;
+	MAIN_D_80134F68->itemCount = 0;
+	size = INVENTORY.size;
+
+	for (i = 0; i < size; i++) {
+		if (INVENTORY.types.array[i] == 0xff) {
+			hasFreeSlot = 1;
+			break;
+		}
+	}
+
+	for (item = 0; item < 0x80; item++) {
+		c = *counts++;
+		if (c == 0) {
+			continue;
+		}
+
+		MAIN_D_80134F68->itemCount++;
+		*out++ = item;
+
+		if (hasFreeSlot != 0) {
+			*out++ = c | 0x80;
+			continue;
+		}
+
+		for (i = 0; i < size; i++) {
+			if ((INVENTORY.types.array[i] == item) &&
+			    (INVENTORY.amounts.array[i] != 0x63)) {
+				*out++ = c | 0x80;
+				goto next;
+			}
+		}
+
+		*out++ = c;
+next:;
+	}
+
+	out = MAIN_D_80134F6C->buf;
+	MAIN_D_80134F6C->itemCount = 0;
+
+	for (item = 0; item < size; item++) {
+		MAIN_D_80134F6C->itemCount++;
+		if ((type = INVENTORY.types.array[item]) != 0xff) {
+			c = INVENTORY.amounts.array[item];
+			*out++ = type;
+			p = (uint8_t *)((uint32_t)type + (uint32_t)SCRIPT_STATE_PTR);
+			if (p[0x54] != 0x63) {
+				*out++ = c | 0x80;
+			} else {
+				*out++ = c;
+			}
+		} else {
+			*out++ = 0xff;
+			*out++ = 0;
+		}
+	}
+}
 
 void MAIN_func_80107660(void)
 {
