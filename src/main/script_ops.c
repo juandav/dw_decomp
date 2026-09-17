@@ -2253,6 +2253,31 @@ void renderSelectionBox(void)
 	}
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/script_ops", renderNameDisplayBox);
+
+void renderNameDisplayBox(void)
+{
+	int16_t x;
+	int16_t y;
+	int16_t sx;
+	int16_t y6;
+	int16_t v;
+	int16_t i;
+	x = UI_BOX_DATA[2].finalPos.x;
+	y = UI_BOX_DATA[2].finalPos.y;
+	sx = x + 7;
+	y6 = y + 6;
+	if ((MAIN_D_80134F8E & 1) == 0) {
+		v = 0x48;
+	} else {
+		v = 0x54;
+	}
+	renderString(0, sx, y6, v, 0xc, 0, 0, 4, 1);
+	sx = x + 0x3a;
+	y6 = y + 0x14;
+	for (i = 0; i < 6; i++, sx += 0xe, v += 0xc) {
+		renderString(0, sx, y6, 0xc, 0xc, v, 0, 4, 1);
+	}
+	renderNamingUnderscore(2, MAIN_D_80134F82 * 0xc + 4, 0x10, 0xc);
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/script_ops", renderNamingUnderscore);
