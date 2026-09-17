@@ -7,7 +7,7 @@
 
 #include <dw/anim.h>
 #include <dw/btl.h>
-#include <dw/doo.h>
+#include <dw/doo2.h>
 #include <dw/dooa.h>
 #include <dw/efe.h>
 #include <dw/entity.h>
@@ -95,16 +95,11 @@ extern int32_t MAIN_D_8013532C;
 extern int32_t MAIN_D_80135330;
 extern int32_t MAIN_D_80135334;
 extern GsRVIEW2 GS_VIEWPOINT;
-extern uint32_t DOO2_D_80071EF0[];
 extern int8_t MAIN_D_80135364[8];
 extern int16_t MAIN_D_80135324;
 extern int32_t ACTIVE_FRAMEBUFFER;
-extern void *DOO2_D_80071EE4[];
 extern SVECTOR MAIN_D_80135338;
 extern int32_t MAIN_D_80135340;
-extern u_long DOO2_D_80071B5C[];
-extern u_long DOO2_D_80071BE0[];
-extern u_long DOO2_D_80071EE8[];
 extern VECTOR CAMERA_TARGET;
 extern int8_t CAMERA_REACHED_TARGET;
 extern int32_t FLASH_INSTANCE;
@@ -130,8 +125,6 @@ void DOOA_hideAllButPartner(void);
 void DOOA_getOrbitPosition(VECTOR *outRef, VECTOR *outPos, VECTOR *position, SVECTOR *rotation, int32_t distance, int32_t height);
 void DOOA_updateCutsceneCamera(VECTOR *position, int32_t angle, int32_t startFrame, int32_t endFrame, int32_t frame);
 void DOOA_toggleShardFlicker(void);
-void DOO2_renderWireframeModel(GsDOBJ2 *obj, int32_t wireThreshold);
-void DOO2_renderSparkStreak(int32_t *outPos, SVECTOR *rot);
 int32_t customRandom(int32_t low, int32_t high);
 void DOOA_renderRebirth(int32_t instanceId);
 void DOOA_setShardState(int16_t state);
@@ -148,9 +141,6 @@ void DOOA_saveModelClut(u_long *pixels);
 void renderDropShadow(Entity *entity);
 void createFlash(void);
 void setMapLayerEnabled(int32_t enabled);
-int32_t DOO2_buildShardSet(VECTOR *outRef, void *modelList, int32_t modelIndex);
-void DOO2_resetShardSets(int32_t size);
-void DOO2_releaseAllShardSets(void);
 void DOOA_tickRebirth(int32_t instanceId);
 void calculateBoneMatrix(Entity *entity, int32_t boneId, MATRIX *out);
 void DOOA_spawnBoneShards(DooaShardEffect *effect, int32_t boneIndex, int32_t wireIndex);
@@ -169,45 +159,7 @@ void MAIN_func_800D9248(void);
 void MAIN_func_800D9B60(int16_t *clut);
 void MAIN_func_800D9BA8(int32_t alpha, int16_t *clut, int32_t mode);
 void MAIN_func_800DA9C8(void);
-void DOO2_saveModelClut(u_long *pixels);
-void DOO2_saveClutTile(u_long *pixels, int32_t tile);
-void DOO2_fadeClut(int16_t *srcClut, void *unused, int16_t *dstClut, int32_t startFrame, int32_t endFrame, int32_t frame);
 void renderParticleFlash(int16_t *params);
-
-ShardWaveSchedule DOOA_SHARD_WAVE_SCHEDULE = {
-	{
-		15, 15, 15, 15, 15, 14, 14, 14,
-		14, 13, 13, 13, 12, 12, 12, 11,
-		11, 11, 10, 10, 10,  9,  9,  8,
-		 8,  7,  7,  6,  6,  5,  5,  4,
-		 3,  2,  1,  0,
-	}
-};
-
-DissolveScaleCurve DOOA_DISSOLVE_SCALE_CURVE = {
-	{
-		100,  94,  89,  85,  82,  80,  79,  79,
-		100, 120, 139, 157, 174, 190, 205, 219,
-		232, 244, 255, 265, 274, 282, 289, 295,
-		300, 350, 395, 435, 470, 500, 525, 545,
-	}
-};
-
-VECTOR DOOA_CAMERA_TARGET_RESET = { 0, 0, 0, 0 };
-
-char DOOA_EGG_TIM_PATH[20] = "\\ETCDAT\\TAMA.TIM";
-char DOOA_EGG_TMD_PATH[20] = "\\ETCDAT\\TAMA.TMD";
-
-VECTOR DOOA_FLASH_POSITION = { 0, -100, 0, 0 };
-
-int8_t DOOA_SPARKLE_BONE_IDS[48] = {
-	-1, -1, -1, -1,  0, -1, -1, -1, -1, -1, -1, -1,
-	-1, -1,  1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-	 2, -1, -1, -1, -1, -1, -1, -1, -1, -1,  3, -1,
-	-1, -1, -1, -1, -1, -1, -1, -1,  4,  5, -1,  0,
-};
-
-VECTOR DOOA_SPARKLE_OFFSET = { 0, 0, 0, 0 };
 
 static void *dooa_functions[] = {
 	DOOA_getSequenceState,
@@ -239,6 +191,45 @@ static void *dooa_functions[] = {
 	DOOA_renderDissolve,
 	DOOA_tickDissolve,
 };
+
+// clang-format off
+ShardWaveSchedule DOOA_SHARD_WAVE_SCHEDULE = {
+	{
+		15, 15, 15, 15, 15, 14, 14, 14,
+		14, 13, 13, 13, 12, 12, 12, 11,
+		11, 11, 10, 10, 10,  9,  9,  8,
+		 8,  7,  7,  6,  6,  5,  5,  4,
+		 3,  2,  1,  0,
+	}
+};
+
+DissolveScaleCurve DOOA_DISSOLVE_SCALE_CURVE = {
+	{
+		100,  94,  89,  85,  82,  80,  79,  79,
+		100, 120, 139, 157, 174, 190, 205, 219,
+		232, 244, 255, 265, 274, 282, 289, 295,
+		300, 350, 395, 435, 470, 500, 525, 545,
+	}
+};
+// clang-format on
+
+VECTOR DOOA_CAMERA_TARGET_RESET = { 0, 0, 0, 0 };
+
+char DOOA_EGG_TIM_PATH[20] = "\\ETCDAT\\TAMA.TIM";
+char DOOA_EGG_TMD_PATH[20] = "\\ETCDAT\\TAMA.TMD";
+
+VECTOR DOOA_FLASH_POSITION = { 0, -100, 0, 0 };
+
+// clang-format off
+int8_t DOOA_SPARKLE_BONE_IDS[48] = {
+	-1, -1, -1, -1,  0, -1, -1, -1, -1, -1, -1, -1,
+	-1, -1,  1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+	 2, -1, -1, -1, -1, -1, -1, -1, -1, -1,  3, -1,
+	-1, -1, -1, -1, -1, -1, -1, -1,  4,  5, -1,  0,
+};
+// clang-format on
+
+VECTOR DOOA_SPARKLE_OFFSET = { 0, 0, 0, 0 };
 
 static int32_t dooa__garbage__(int32_t seed)
 {
@@ -279,10 +270,10 @@ void DOOA_tickDissolve(int32_t instanceId)
 	int32_t work;
 	int32_t flashOffset;
 	int32_t wireCount;
-	DooFlash *flash;
-	DooFlash *target;
+	DooaFlash *flash;
+	DooaFlash *target;
 	Entity *entity;
-	DooSequence *seq;
+	DooaSequence *seq;
 
 	seq = &DOOA_REINCARNATION_SEQ;
 	entity = seq->entity;
@@ -495,7 +486,7 @@ void DOOA_tickDissolve(int32_t instanceId)
 				tickFileReadQueue(0);
 			}
 			readFile(DOOA_EGG_TIM_PATH, DOO2_D_80071EE4);
-			GsGetTimInfo(DOO2_D_80071EE8, &timInfo);
+			GsGetTimInfo(&DOO2_D_80071EE4[1], &timInfo);
 			setRECT(&rect, timInfo.px, timInfo.py, timInfo.pw, timInfo.ph);
 			LoadImage(&rect, timInfo.pixel);
 			GetTPage(timInfo.pmode & 3, 0, timInfo.px, timInfo.py);
@@ -506,7 +497,7 @@ void DOOA_tickDissolve(int32_t instanceId)
 			}
 			DOO2_saveClutTile(DOO2_D_80071B5C, MAIN_D_80135328);
 			readFile(DOOA_EGG_TMD_PATH, DOO2_D_80071EE4);
-			GsMapModelingData(DOO2_D_80071EE8);
+			GsMapModelingData((unsigned long *)DOO2_D_80071EE4 + 1);
 			DOO2_saveModelClut(DOO2_D_80071BE0);
 		}
 		work = 0x2c4;
@@ -537,7 +528,7 @@ void DOOA_tickDissolve(int32_t instanceId)
 
 void DOOA_renderDissolve(int32_t instanceId)
 {
-	DooSequence *seq = &DOOA_REINCARNATION_SEQ;
+	DooaSequence *seq = &DOOA_REINCARNATION_SEQ;
 
 	if (seq->frame < 36) {
 		if (ENTITY_TABLE[1]->isOnMap == 0) {
@@ -943,7 +934,7 @@ void DOOA_tickRebirth(int32_t instanceId)
 	VECTOR colorStart;
 	VECTOR colorEnd;
 	DooaSparkle sparkle;
-	DooSequence *seq;
+	DooaSequence *seq;
 	Entity *entity;
 	int32_t level;
 	int32_t frame;
@@ -993,7 +984,7 @@ void DOOA_tickRebirth(int32_t instanceId)
 		DOOA_removeShardEffect();
 		loadVLALL(EGG_DIGIMON_TYPES[seq->eggSlot], GENERAL_BUFFER_PTR);
 		loadMMDAsync(EGG_DIGIMON_TYPES[seq->eggSlot], 3, DOOA_MMD_BUFFER, (EvoModelData *)seq->modelData,
-			     (uint8_t *)&seq->isModelLoading);
+		             (uint8_t *)&seq->isModelLoading);
 		DOO2_resetShardSets(DOOA_SHARD_BUFFER);
 		playSound(8, 6);
 		break;
@@ -1097,12 +1088,12 @@ void DOOA_renderRebirth(int32_t instanceId)
 	VECTOR pos;
 	SVECTOR rot;
 	int32_t i;
-	DooSequence *panel;
+	DooaSequence *panel;
 	u_long tmd;
 
 	panel = &DOOA_REINCARNATION_SEQ;
 	i = 0;
-	tmd = (u_long)DOO2_D_80071EF0;
+	tmd = (u_long)&DOO2_D_80071EE4[3];
 
 	for (; i < 6; i++) {
 		if (MAIN_D_80135364[i] == 0) {
@@ -1528,7 +1519,7 @@ void DOOA_spawnBoneShards(DooaShardEffect *effect, int32_t boneIndex, int32_t wi
 
 	entity = effect->entity;
 	frags = (intptr_t)effect->shardWrite;
-	objs = ((TMDModel *)getEntityModelComponent(entity->type, 3)->modelPtr)->obj;
+	objs = getEntityModelComponent(entity->type, 3)->modelPtr->obj;
 	objIndex = DIGIMON_SKELETONS[entity->type][boneIndex].objIndex;
 	if (objIndex == -1) {
 		return;
@@ -1639,7 +1630,7 @@ void DOOA_spawnBoneShards(DooaShardEffect *effect, int32_t boneIndex, int32_t wi
 
 int32_t DOOA_tick(PartnerEntity *partner, void *buffer, int32_t isInitialized)
 {
-	DooSequence *panel;
+	DooaSequence *panel;
 	Entity *player;
 	int32_t messageId;
 
@@ -1681,7 +1672,7 @@ int32_t DOOA_tick(PartnerEntity *partner, void *buffer, int32_t isInitialized)
 int32_t DOOA_getSequenceState(int32_t unused, int32_t isInitialized)
 {
 	PartnerEntity *partner;
-	DooSequence *sequence;
+	DooaSequence *sequence;
 	int32_t i;
 
 	partner = (PartnerEntity *)DOOA_REINCARNATION_SEQ.entity;

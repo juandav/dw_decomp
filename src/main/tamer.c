@@ -7,7 +7,7 @@
 #include <dw/anim.h>
 #include <dw/butterfly.h>
 #include <dw/clock.h>
-#include <dw/doo.h>
+#include <dw/dooa.h>
 #include <dw/eab.h>
 #include <dw/endi.h>
 #include <dw/entity.h>

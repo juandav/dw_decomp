@@ -717,7 +717,9 @@ SECTIONS
         . = ALIGN(., 4);
         build/src/main/mov.c.o(.sbss.*);
         . = ALIGN(., 4);
-        build/build/generated/unk_0x80135310.sbss.s.o(.sbss.*);
+        build/src/main/doo2.c.o(.sbss.*);
+        . = ALIGN(., 4);
+        build/build/generated/unk_0x80135324.sbss.s.o(.sbss.*);
         . = ALIGN(., 4);
         build/src/main/murd.c.o(.sbss.*);
         . = ALIGN(., 4);

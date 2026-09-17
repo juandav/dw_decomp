@@ -1,10 +1,10 @@
 #include <libgs.h>
 #include <libgte.h>
 
-#include <dw/doo.h>
 #include <dw/dooa.h>
 #include <dw/types.h>
 
+// clang-format off
 char DOOA_FLASH_DATA[484] = {
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -886,7 +886,7 @@ DooaShardEffect DOOA_SHARD_EFFECT = {
 	0x00, 0x00, 0x07, 0x8f,
 };
 
-DooSequence DOOA_REINCARNATION_SEQ = {
+DooaSequence DOOA_REINCARNATION_SEQ = {
 	0x0f840000,
 	(Entity *)0x8f070000,
 	0x0000, 0x0fb4, 0x0000, 0x8004,
@@ -900,3 +900,4 @@ DooSequence DOOA_REINCARNATION_SEQ = {
 	},
 	0x0000, 0x04, 0x7f,
 };
+// clang-format on

@@ -115,7 +115,8 @@ SECTIONS
 
 			build/src/doo2/doo2.c.o(.data.*);
 			. = ALIGN(., 4);
-			KEEP(build/asm/doo2/data/1A80.data.s.o(.data.*));
+
+			build/src/doo2/doo2_bss.c.o(.data.*);
 			. = ALIGN(., 4);
 
 			build/src/doo2/doo2.c.o(.bss.*);

@@ -1,6 +1,6 @@
-#include <dw/eab.h>
 #include <dw/clock.h>
-#include <dw/doo.h>
+#include <dw/doo2.h>
+#include <dw/eab.h>
 #include <dw/fade.h>
 #include <dw/file_queue.h>
 #include <dw/item.h>
@@ -15,8 +15,6 @@
 #include <dw/trn2.h>
 #include <dw/ui.h>
 #include <dw/utils.h>
-
-#include "common.h"
 
 void resetMapObjectAnimation(int32_t a0, int32_t a1);
 void createMeramonShake(void);

@@ -1,18 +1,17 @@
-#include <libgs.h>
 #include <string.h>
 
+#include <libgs.h>
+
 #include <dw/anim.h>
-#include <dw/font.h>
-#include <dw/model.h>
-#include <dw/types.h>
-#include <dw/clock.h>
 #include <dw/bubble.h>
 #include <dw/butterfly.h>
-#include <dw/doo.h>
+#include <dw/clock.h>
+#include <dw/dooa.h>
 #include <dw/entity.h>
 #include <dw/evl.h>
 #include <dw/evolution.h>
 #include <dw/file.h>
+#include <dw/font.h>
 #include <dw/item.h>
 #include <dw/map_object.h>
 #include <dw/math.h>
@@ -21,9 +20,8 @@
 #include <dw/partner.h>
 #include <dw/sound.h>
 #include <dw/tamer.h>
+#include <dw/types.h>
 #include <dw/world_object.h>
-
-#include "common.h"
 
 extern int8_t PARTNER_ANIMATION;
 extern int32_t NANIMON_TRIGGER;

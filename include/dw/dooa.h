@@ -8,6 +8,26 @@
 #include <dw/types.h>
 
 typedef struct {
+	int16_t targetY;
+	int16_t pad;
+	VECTOR pos;
+} DooaFlash;
+
+typedef struct {
+	int32_t frame;
+	Entity *entity;
+	int16_t phase;
+	int16_t phaseInitPending;
+	int16_t fadeLevel;
+	int16_t eggSlot;
+	DooaFlash flash;
+	int32_t modelData[6];
+	int16_t sparkleIndex;
+	int8_t isModelLoading;
+	int8_t unk_3F;
+} DooaSequence;
+
+typedef struct {
 	int16_t state;
 	int16_t prevState;
 	Entity *entity;
@@ -34,9 +54,13 @@ extern int16_t DOOA_FADED_CLUT[];
 extern GsOT DOOA_ORDERING_TABLE[];
 extern int8_t DOOA_SAVED_ENTITY_VISIBILITY[];
 extern DooaShardEffect DOOA_SHARD_EFFECT;
+extern DooaSequence DOOA_REINCARNATION_SEQ;
 
 extern int16_t EGG_DIGIMON_TYPES[4];
 extern SVECTOR MAIN_D_80134BB4;
 extern int8_t DOOA_ENTITIES_VISIBLE;
+
+int32_t DOOA_getSequenceState(int32_t unused, int32_t isInitialized);
+int32_t DOOA_tick(PartnerEntity *partner, void *buffer, int32_t isInitialized);
 
 #endif

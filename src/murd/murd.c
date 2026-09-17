@@ -4,7 +4,7 @@
 #include <libgte.h>
 
 #include <dw/btl.h>
-#include <dw/doo.h>
+#include <dw/dooa.h>
 #include <dw/entity.h>
 #include <dw/file.h>
 #include <dw/file_queue.h>

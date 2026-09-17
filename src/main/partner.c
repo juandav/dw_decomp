@@ -3,8 +3,8 @@
 #include <dw/anim.h>
 #include <dw/butterfly.h>
 #include <dw/clock.h>
+#include <dw/dooa.h>
 #include <dw/entity.h>
-#include <dw/doo.h>
 #include <dw/evl.h>
 #include <dw/fade.h>
 #include <dw/item.h>
@@ -18,8 +18,6 @@
 #include <dw/tamer.h>
 #include <dw/ui.h>
 #include <dw/utils.h>
-
-#include "common.h"
 
 extern int32_t HAS_BUTTERFLY;
 extern int32_t BUTTERFLY_ID;

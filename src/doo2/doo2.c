@@ -5,27 +5,13 @@
 #include <libgte.h>
 
 #include <dw/btl.h>
-#include <dw/doo.h>
+#include <dw/doo2.h>
+#include <dw/dooa.h>
 #include <dw/model.h>
 #include <dw/sound.h>
 #include <dw/types.h>
 #include <dw/ui.h>
 #include <dw/world_object.h>
-
-typedef struct {
-	int16_t timer;
-	int16_t primitiveCount;
-	int32_t centers;
-	int32_t vertices;
-	int32_t primitives;
-	int16_t centerCount;
-} Doo2ShardSet;
-
-typedef struct {
-	int16_t vx;
-	int16_t vy;
-	int16_t vz;
-} Doo2ModelVertex;
 
 typedef struct {
 	int16_t centerX;
@@ -58,16 +44,6 @@ typedef struct {
 	int32_t unk18;
 } Doo2ModelDesc;
 
-extern int32_t MAIN_D_80135310;
-extern Doo2ShardSet DOO2_SHARD_SETS[];
-extern uint8_t *MAIN_D_80135314;
-extern Doo2ModelVertex *MAIN_D_80135318;
-extern int16_t MAIN_D_8013531C[3];
-extern Doo2ShardParams DOO2_SHARD_PARAMS;
-extern GsSPRITE DOO2_EGG_ICON_SPRITE;
-extern GsSPRITE DOO2_EGG_CURSOR_SPRITE;
-
-int32_t removeObject();
 void MAIN_func_80092B60(POLY_FT4 *prim);
 void addScreenPolyFT3(void *prim, SVECTOR *v0, SVECTOR *v1, SVECTOR *v2);
 int32_t add3DSpritePrim(POLY_FT4 *poly, SVECTOR *v0, SVECTOR *v1, SVECTOR *v2, SVECTOR *v3);
@@ -79,19 +55,10 @@ void DOO2_renderQuadShard(Doo2Shard *fragment, int32_t arg1, int32_t duration,
                           int32_t arg3, Doo2ShardParams *sheet);
 void DOO2_tickEggBox(void);
 void DOO2_renderEggIcons(void);
-void DOO2_saveModelClut(u_long *pixels);
-void DOO2_saveClutTile(u_long *pixels, int32_t tile);
-void DOO2_fadeClut(int16_t *srcClut, void *entity, int16_t *dstClut, int32_t startFrame, int32_t endFrame, int32_t frame);
-void DOO2_renderWireframeModel(GsDOBJ2 *obj, int32_t wireThreshold);
-void DOO2_resetShardSets(int32_t size);
-void DOO2_releaseAllShardSets(void);
 void DOO2_renderShardSet(int32_t index);
-int32_t rand(void);
 void setRotTransMatrix(MATRIX *m);
 int32_t customRandom(int32_t a, int32_t b);
-void DOO2_renderSparkStreak(int32_t *pos, SVECTOR *rot);
 void DOO2_renderShardSet(int32_t slot);
-int32_t DOO2_buildShardSet(VECTOR *offset, void *modelList, int32_t modelIndex);
 
 static void *doo2_functions[] = {
 	DOO2_tickEggInput,
@@ -113,6 +80,61 @@ static void *doo2_functions[] = {
 	DOO2_renderShardSet,
 	DOO2_setScratchTop,
 };
+
+Doo2ShardParams DOO2_SHARD_PARAMS = {
+	0,
+	0,
+	0,
+	0,
+	0x39,
+	0,
+	0,
+	0,
+};
+
+// clang-format off
+GsSPRITE DOO2_EGG_ICON_SPRITE = {
+	0x50000000,			/* attribute */
+	0x0,				/* x */
+	-0x1e,				/* y */
+	0x20,				/* w */
+	0x20,				/* h */
+	0x39,				/* tpage */
+	0x60,				/* u */
+	0x0,				/* v */
+	0x80,				/* cx */
+	0x1ec,				/* cy */
+	0x80,				/* r */
+	0x80,				/* g */
+	0x80,				/* b */
+	0x10,				/* mx */
+	0x10,				/* my */
+	0x1000,				/* scalex */
+	0x1000,				/* scaley */
+	0x0,				/* rotate */
+};
+
+GsSPRITE DOO2_EGG_CURSOR_SPRITE = {
+	0x50000000,			/* attribute */
+	0x0,				/* x */
+	-0x1e,				/* y */
+	0x28,				/* w */
+	0x28,				/* h */
+	0x39,				/* tpage */
+	0x60,				/* u */
+	0x20,				/* v */
+	0x80,				/* cx */
+	0x1f0,				/* cy */
+	0x80,				/* r */
+	0x80,				/* g */
+	0x80,				/* b */
+	0x14,				/* mx */
+	0x14,				/* my */
+	0x1000,				/* scalex */
+	0x1000,				/* scaley */
+	0x0,				/* rotate */
+};
+// clang-format on
 
 void DOO2_setScratchTop(int32_t size)
 {
@@ -149,12 +171,12 @@ void DOO2_renderShardSet(int32_t index)
 	while (count-- > 0) {
 		if ((code = ((int8_t *)MAIN_D_80135314)[3]) == 0x34) {
 			DOO2_renderTriShard((Doo2Shard *)shards, 0, 80, entry->timer,
-			                    (Doo2ShardParams *)paramsPtr);
+			                    paramsPtr);
 			shards += 14;
 			MAIN_D_80135314 += 0x1c;
 		} else if (code == 0x3c) {
 			DOO2_renderQuadShard((Doo2Shard *)shards, 0, 80, entry->timer,
-			                     (Doo2ShardParams *)paramsPtr);
+			                     paramsPtr);
 			shards += 14;
 			MAIN_D_80135314 += 0x24;
 		}
@@ -199,13 +221,13 @@ void DOO2_renderTriShard(Doo2Shard *drift, int32_t unused1, int32_t speed, int32
 	vc = &MAIN_D_80135318[tri->v2];
 
 	drift->frame++;
-	drift->offsetY += (int16_t)(drift->frame + (drift->centerY / (speed * 3)));
+	drift->offsetY += (drift->frame + (drift->centerY / (speed * 3)));
 
 	if ((drift->offsetY + ((va->vy + vb->vy + vc->vz) / 3)) > 0) {
 		drift->offsetY = -(va->vy + vb->vy + vc->vz) / 3;
 	} else {
-		drift->offsetX += (int16_t)(drift->centerX / (speed * 3));
-		drift->offsetZ += (int16_t)(drift->centerZ / (speed * 3));
+		drift->offsetX += (drift->centerX / (speed * 3));
+		drift->offsetZ += (drift->centerZ / (speed * 3));
 	}
 
 	a.vx = va->vx + drift->offsetX;
@@ -249,13 +271,13 @@ void DOO2_renderQuadShard(Doo2Shard *fragment, int32_t arg1, int32_t duration,
 	pd = MAIN_D_80135318 + quad->v3;
 
 	fragment->frame++;
-	fragment->offsetY += (int16_t)(fragment->frame + fragment->centerY / (duration * 3));
+	fragment->offsetY += (fragment->frame + fragment->centerY / (duration * 3));
 
 	if ((fragment->offsetY + ((pa->vy + pb->vy + pc->vz + pd->vy) / 4)) > 0) {
 		fragment->offsetY = -(pa->vy + pb->vy + pc->vz + pd->vy) / 4;
 	} else {
-		fragment->offsetX += (int16_t)(fragment->centerX / (duration * 3));
-		fragment->offsetZ += (int16_t)(fragment->centerZ / (duration * 3));
+		fragment->offsetX += (fragment->centerX / (duration * 3));
+		fragment->offsetZ += (fragment->centerZ / (duration * 3));
 	}
 
 	a.vx = pa->vx + fragment->offsetX;
@@ -281,7 +303,7 @@ void DOO2_tickEggBox(void)
 
 void DOO2_renderEggIcons(void)
 {
-	DooSequence *panel = &DOOA_REINCARNATION_SEQ;
+	DooaSequence *panel = &DOOA_REINCARNATION_SEQ;
 	Doo2EggIcons icons;
 	int32_t i = 0;
 
@@ -347,9 +369,9 @@ void DOO2_fadeClut(int16_t *srcClut, void *entity, int16_t *dstClut, int32_t sta
 		b = b * num / den;
 
 		*dst = r;
-		*dst += (int16_t)(g << 5);
-		*dst += (int16_t)(b << 10);
-		*dst++ += (int16_t)(stp << 15);
+		*dst += (g << 5);
+		*dst += (b << 10);
+		*dst++ += (stp << 15);
 	}
 
 	setRECT(&rect, 32, 488, 16, 24);
@@ -388,7 +410,7 @@ void DOO2_renderWireframeModel(GsDOBJ2 *obj, int32_t wireThreshold)
 	tmdPrim = (uint8_t *)tmd[4];
 	primCount = tmd[5];
 
-	packet = (uint8_t *)GsGetWorkBase();
+	packet = GsGetWorkBase();
 
 	lightColor.r = lightColor.g = lightColor.b = 0x80;
 
@@ -485,7 +507,7 @@ void DOO2_renderWireframeModel(GsDOBJ2 *obj, int32_t wireThreshold)
 		}
 	}
 
-	GsSetWorkBase((PACKET *)packet);
+	GsSetWorkBase(packet);
 }
 
 void DOO2_renderSparkStreak(int32_t *pos, SVECTOR *rot)
@@ -563,7 +585,7 @@ int32_t DOO2_buildShardSet(VECTOR *offset, void *modelList, int32_t modelIndex)
 		return -1;
 	}
 
-	anim = (Doo2ShardSet *)&DOO2_SHARD_SETS[slot];
+	anim = &DOO2_SHARD_SETS[slot];
 	src = model->sourceVertices;
 	outStart = out;
 	for (i = 0; i < model->vertexCount; i++) {
@@ -681,7 +703,7 @@ static int32_t doo2__garbage__(int32_t seed)
 
 int32_t DOO2_tickEggInput(void)
 {
-	DooSequence *seq;
+	DooaSequence *seq;
 	RECT boxRect;
 
 	seq = &DOOA_REINCARNATION_SEQ;

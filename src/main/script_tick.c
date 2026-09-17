@@ -1,5 +1,5 @@
 #include <dw/clock.h>
-#include <dw/doo.h>
+#include <dw/doo2.h>
 #include <dw/font.h>
 #include <dw/map_object.h>
 #include <dw/partner.h>
