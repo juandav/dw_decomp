@@ -1915,10 +1915,6 @@ void renderString(int32_t a, int32_t b, int32_t c, int32_t d, int32_t e, int32_t
 void getVRAMModeCoords(int32_t mode, int32_t *outX, int32_t *outClut);
 void renderHorizontalLine(uint8_t boxId, int16_t x, int16_t y, int32_t w);
 extern char MAIN_D_801307CC[];
-extern struct {
-	uint32_t usedRows;
-	TextBoxData box[6];
-} MAIN_D_801BE80C;
 void drawString(char *str, int32_t x, int32_t y);
 
 void MAIN_func_801099E8(void)
