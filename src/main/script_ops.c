@@ -2066,7 +2066,62 @@ void setupNameDisplayBox(void)
 
 INCLUDE_ASM("asm/main/nonmatchings/script_ops", tickNamingBox);
 
-INCLUDE_ASM("asm/main/nonmatchings/script_ops", renderNamingBox);
+
+void renderNamingBox(void)
+{
+	TextBoxData *box;
+	int32_t k;
+	int32_t j;
+	int32_t i;
+	int16_t ty;
+	int16_t y;
+	int16_t x;
+	int16_t bx;
+	int16_t by;
+	int16_t texY;
+	int16_t texX;
+	int16_t *lbl;
+
+	renderSelectionBox();
+	bx = UI_BOX_DATA[1].finalPos.x;
+	by = UI_BOX_DATA[1].finalPos.y;
+	texX = 0;
+	box = &TEXT_BOX_DATA[1];
+	texY = box->backPage * box->vramRows * 12;
+	texY += box->vramRow * 12;
+	lbl = MAIN_D_8013078C;
+	for (j = 0; j < 3; j++, lbl += 3) {
+		renderString(0, bx + lbl[0], by + lbl[1], lbl[2], 12, texX, texY, 5, 1);
+		texX += lbl[2];
+	}
+	if (MAIN_D_801B1D1C[0] == 0) {
+		ty = 0xd;
+	} else {
+		ty = 0;
+	}
+	renderString(ty, bx + lbl[0], by + lbl[1], lbl[2], 12, texX, texY, 5, 1);
+	y = by + 6;
+	ty = texY + 12;
+	for (i = 0; i < 3; i++, ty += 12) {
+		texX = 0;
+		for (j = 0; j < 3; j++, y += 14) {
+			x = bx + 0x4e;
+			for (k = 0; k < 5; k++, x += 18, texX += 12) {
+				renderString(0, x, y, 12, 12, texX, ty, 5, 1);
+			}
+		}
+	}
+	y = by + 6;
+	for (i = 0; i < 3; i++, ty += 12) {
+		texX = 0;
+		for (j = 0; j < 3; j++, y += 14) {
+			x = bx + 0xbe;
+			for (k = 0; k < 5; k++, x += 18, texX += 12) {
+				renderString(0, x, y, 12, 12, texX, ty, 5, 1);
+			}
+		}
+	}
+}
 
 extern char **MAIN_D_80130774[];
 extern char MAIN_D_801345F8[8];
