@@ -1447,7 +1447,60 @@ int32_t MAIN_func_80108A98(void)
 	return 1;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/script_ops", MAIN_func_80108C88);
+void MAIN_func_80108C88(int32_t itemId)
+{
+	int32_t i;
+	int32_t top;
+	int32_t cursor;
+	int32_t count;
+	ItemMenuBox *box;
+	int32_t visible;
+	int32_t d;
+
+	MAIN_D_80134F68->prevTopRow = MAIN_D_80134F68->topRow;
+	MAIN_D_80134F68->prevCursor = MAIN_D_80134F68->cursor;
+	visible = MAIN_D_80134F68->visibleRows;
+	box = MAIN_D_80134F68;
+	count = box->itemCount;
+	top = box->topRow;
+	cursor = box->cursor;
+
+	for (i = 0; i < count * 2; i += 2) {
+		if (MAIN_D_80134F68->buf[i] == itemId) {
+			i >>= 1;
+			goto found;
+		}
+	}
+
+	if (count == 0) {
+		box->topRow = 0;
+		MAIN_D_80134F68->cursor = 0;
+		goto end;
+	}
+	i = top + cursor;
+	if (i >= count) {
+		i = count - 1;
+	}
+	if ((top + visible >= count) && (top != 0)) {
+		box->topRow--;
+		goto end;
+	}
+found:
+	if ((i >= top) && (i < top + visible)) {
+		box->cursor = i - top;
+		goto end;
+	}
+	d = i - visible;
+	if (d < 0) {
+		box->topRow = 0;
+		MAIN_D_80134F68->cursor = i;
+	} else {
+		box->topRow = d + 1;
+		MAIN_D_80134F68->cursor = visible - 1;
+	}
+end:
+	MAIN_func_80108610(0);
+}
 
 void MAIN_func_80108DC0(int32_t item)
 {
