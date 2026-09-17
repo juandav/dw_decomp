@@ -1775,7 +1775,42 @@ void MAIN_func_801097F4(void)
 	}
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/script_ops", MAIN_func_801099E8);
+void renderString(int32_t a, int32_t b, int32_t c, int32_t d, int32_t e, int32_t f, int32_t g, int32_t h, int32_t i);
+void getVRAMModeCoords(int32_t mode, int32_t *outX, int32_t *outClut);
+void renderHorizontalLine(uint8_t boxId, int16_t x, int16_t y, int32_t w);
+extern char MAIN_D_801307CC[];
+extern struct {
+	uint32_t usedRows;
+	TextBoxData box[6];
+} MAIN_D_801BE80C;
+void drawString(char *str, int32_t x, int32_t y);
+
+void MAIN_func_801099E8(void)
+{
+	uint32_t x;
+	int32_t clut;
+	int16_t bx;
+	int16_t by;
+	int16_t y;
+	int32_t id;
+	TextBoxData *box;
+
+	bx = UI_BOX_DATA[1].finalPos.x;
+	id = MAIN_D_80134F68->boxId;
+	by = UI_BOX_DATA[1].finalPos.y;
+	renderHorizontalLine(1, 4, 0x15, 0xd7);
+	box = &MAIN_D_801BE80C.box[id];
+	getVRAMModeCoords(box->vramMode, (int32_t *)&x, &clut);
+	y = 0x6c;
+	y += box->backPage * box->vramRows * 12;
+	drawString(MAIN_D_801307CC, x, y);
+	renderString(0, bx + 0x14, by + 5, 0x42, 0xc, x, y, 5, 1);
+	renderString(0, bx + 0x7a, by + 5, 0x4e, 0xc, x + 0x42, y, 5, 1);
+	y = by + MAIN_D_80134F68->cursor * 0x12 + 0x19;
+draw:
+	renderSelectionCursor(bx + 5, y, 0xd4, 0x12, 5);
+	MAIN_func_800FDC5C(MAIN_D_80134F68, bx + 8, by + 0x1b, 0, 0, 2);
+}
 
 void MAIN_func_80109BBC(void)
 {
