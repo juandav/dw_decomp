@@ -1064,7 +1064,33 @@ void MAIN_func_80107E6C(void)
 	}
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/script_ops", MAIN_func_80108090);
+extern int16_t MAIN_D_801302FC[];
+
+void MAIN_func_80108090(void)
+{
+	int16_t bx;
+	int16_t by;
+	int16_t cy;
+	ItemMenuBox *box;
+
+	bx = UI_BOX_DATA[1].finalPos.x;
+	by = UI_BOX_DATA[1].finalPos.y;
+	MAIN_func_800FD7D8(1, 0, bx + 8, by + 5);
+	if (MAIN_D_80135011 != 6) {
+		MAIN_func_800FD7D8(1, 1, bx + 0x80, by + 5);
+		if (MAIN_D_80135011 == 4) {
+			MAIN_func_800FD7D8(1, 3, bx + 0xb6, by + 5);
+		}
+	} else {
+		MAIN_func_800FD7D8(1, 3, bx + 0x80, by + 5);
+	}
+	box = MAIN_func_800FCC40();
+	MAIN_func_800FD8D4(box);
+	cy = by + box->cursor * 0x12 + 0x11;
+draw:
+	renderSelectionCursor(bx + 5, cy, MAIN_D_801302FC[MAIN_D_80135011], 0x12, 5);
+	MAIN_func_800FDC5C(box, bx + 0x1a, by + 0x13, bx + 8, by + 0x12, 1);
+}
 
 int32_t MAIN_func_80108230(void)
 {
