@@ -18,7 +18,7 @@ typedef struct {
 } SelectionBoxOffsetData;
 
 extern GsOT *ACTIVE_ORDERING_TABLE;
-void MAIN_func_800FD7D8(int32_t boxId, int32_t idx, int16_t x, int16_t y);
+void MAIN_func_800FD7D8(uint8_t boxId, int32_t idx, int16_t x, int16_t y);
 void MAIN_func_800FD8D4(ItemMenuBox *box);
 void MAIN_func_800FDC5C(ItemMenuBox *box, int16_t x1, int16_t y1, int16_t x2, int16_t y2, int32_t flag);
 void renderSelectionCursor(int32_t x, int32_t y, int16_t w, int16_t h, int32_t layer);
@@ -1570,7 +1570,72 @@ done:
 	MAIN_func_80108610(1);
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/script_ops", MAIN_func_80108EB4);
+void MAIN_func_800FF338(uint8_t boxId, int16_t x, int16_t y, int32_t w, int16_t h);
+typedef struct {
+	char s[12];
+} BoxLabel;
+extern BoxLabel MAIN_D_801307B4;
+extern BoxLabel MAIN_D_801307C0;
+extern struct {
+	uint32_t usedRows;
+	TextBoxData box[6];
+} MAIN_D_801BE80C;
+void getVRAMModeCoords(int32_t mode, int32_t *outX, int32_t *outClut);
+void renderString(int32_t a, int32_t b, int32_t c, int32_t d, int32_t e, int32_t f, int32_t g, int32_t h, int32_t i);
+void GsSortBoxFill(GsBOXF *bp, GsOT *otp, u_short pri);
+
+void MAIN_func_80108EB4(ItemMenuBox *box, int8_t flag)
+{
+	GsBOXF rect;
+	int32_t x;
+	int32_t clut;
+	BoxLabel label1;
+	BoxLabel label2;
+	int16_t y;
+	uint8_t boxId;
+	int16_t bx;
+	int16_t by;
+	int32_t color;
+	TextBoxData *tbox;
+
+	boxId = box->boxId;
+	label1 = MAIN_D_801307B4;
+	label2 = MAIN_D_801307C0;
+	bx = UI_BOX_DATA[boxId].finalPos.x;
+	by = UI_BOX_DATA[boxId].finalPos.y;
+	MAIN_func_800FF338(boxId, 4, 0x15, 0x67, 0xb);
+	MAIN_func_800FD7D8(boxId, 0, bx + 8, by + 0x17);
+	MAIN_func_800FF338(boxId, 0x6b, 0x15, 0x25, 0xb);
+	MAIN_func_800FD7D8(boxId, 3, bx + 0x6e, by + 0x17);
+	MAIN_func_800FD8D4(box);
+	y = by + box->cursor * 0x12 + 0x21;
+draw:
+	renderSelectionCursor(bx + 5, y, 0x80, 0x12, 6 - boxId);
+	tbox = &MAIN_D_801BE80C.box[boxId];
+	getVRAMModeCoords(tbox->vramMode, &x, &clut);
+	y = 0x6c;
+	y += tbox->backPage * tbox->vramRows * 12;
+	if (flag != 0) {
+		drawString(label1.s, x, y);
+		color = 0x38;
+	} else {
+		drawString(label2.s, x, y);
+		color = 0x3c;
+	}
+	renderString(0, bx + 0x2d, by + 7, color, 0xc, x, y, 6 - boxId, 1);
+	if (MAIN_D_80134F90 == boxId - 1) {
+		rect.attribute = 0x40000000;
+		rect.g = 0x80;
+		rect.r = 0x80;
+		rect.b = 0xff;
+		rect.x = bx + 4;
+		rect.y = by + 3;
+		rect.w = 0x8c;
+		rect.h = 0x12;
+		GsSortBoxFill(&rect, ACTIVE_ORDERING_TABLE, (uint16_t)(6 - boxId));
+	}
+	MAIN_func_800FDC5C(box, bx + 8, by + 0x24, 0, 0, 2);
+}
 
 void MAIN_func_801091DC(void)
 {
