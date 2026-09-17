@@ -85,6 +85,20 @@ void EVL_brightenDigimonClut(int16_t *clut, Entity *entity, int16_t *dst, int32_
 			     int32_t end, int32_t t);
 void setDigimonRaised(int32_t type);
 
+int32_t lerp(int32_t start, int32_t end, int32_t tMin, int32_t tMax, int32_t t);
+int32_t worldPosToScreenPos(SVECTOR *worldPos, DVECTOR *screenPos);
+extern GsRVIEW2 GS_VIEWPOINT;
+extern GsRVIEW2 EVL_D_800688E8;
+extern int32_t VIEWPORT_DISTANCE;
+extern int32_t DRAWING_OFFSET_X;
+extern int32_t DRAWING_OFFSET_Y;
+extern int32_t MAIN_D_801351E4;
+extern int32_t MAIN_D_801351E8;
+extern int32_t MAIN_D_801351EC;
+extern int32_t MAIN_D_801351F8;
+extern SVECTOR MAIN_D_801349F8;
+extern SVECTOR MAIN_D_80134A00;
+
 void EVL_setScratchTop(int32_t size);
 void EVL_resetParticles(void);
 void EVL_resetSparks(void);
@@ -350,7 +364,70 @@ void EVL_setOtherEntitiesVisible(int32_t restore)
 	}
 }
 
-INCLUDE_ASM("asm/evl/nonmatchings/evl", EVL_updateEvoCamera);
+void EVL_updateEvoCamera(Entity *entity, int32_t unused, int32_t frame)
+{
+	int32_t size;
+	VECTOR viewRef;
+	VECTOR viewPos;
+	SVECTOR pos;
+	DVECTOR screen;
+	SVECTOR rot;
+	SVECTOR rot2;
+	int32_t t;
+
+	if (frame >= 0x11c) {
+		return;
+	}
+
+	if ((frame >= 0x20) && (frame < 0x61)) {
+		pos.vx = entity->posData->location.vx;
+		pos.vy = entity->posData->location.vy;
+		pos.vz = entity->posData->location.vz;
+		worldPosToScreenPos(&pos, &screen);
+		MAIN_D_801351F8 = 0x638;
+		rot = MAIN_D_801349F8;
+		rot.vy = entity->posData->rotation.vy + 0x638;
+		size = (DIGIMON_DATA[entity->type].height < DIGIMON_DATA[entity->type].radius) ?
+		       (int32_t)DIGIMON_DATA[entity->type].radius :
+		       (int32_t)DIGIMON_DATA[entity->type].height;
+		size = (size * 5) + 0x4b0;
+		EVL_calculateCameraVectors(&viewRef, &viewPos, entity, &rot, size, DIGIMON_DATA[entity->type].height);
+		if (frame < 0x41) {
+			GS_VIEWPOINT.vrx = lerp(EVL_D_800688E8.vrx, viewRef.vx, 0x20, 0x40, frame);
+			GS_VIEWPOINT.vry = lerp(EVL_D_800688E8.vry, viewRef.vy, 0x20, 0x40, frame);
+			GS_VIEWPOINT.vrz = lerp(EVL_D_800688E8.vrz, viewRef.vz, 0x20, 0x40, frame);
+			GS_VIEWPOINT.rz = 0;
+			DRAWING_OFFSET_X = lerp(MAIN_D_801351E4, 0xa0, 0x20, 0x40, frame);
+			DRAWING_OFFSET_Y = lerp(MAIN_D_801351E8, 0x78, 0x20, 0x40, frame);
+		} else if (frame < 0x61) {
+			GS_VIEWPOINT.vpx = lerp(EVL_D_800688E8.vpx, viewPos.vx, 0x40, 0x60, frame);
+			GS_VIEWPOINT.vpy = lerp(EVL_D_800688E8.vpy, viewPos.vy, 0x40, 0x60, frame);
+			GS_VIEWPOINT.vpz = lerp(EVL_D_800688E8.vpz, viewPos.vz, 0x40, 0x60, frame);
+			t = lerp(0, 0x14, 0, 0xc8, DIGIMON_DATA[entity->type].height);
+			DRAWING_OFFSET_Y = lerp(0x78, t + 0x78, 0x40, 0x60, frame);
+			VIEWPORT_DISTANCE = lerp(MAIN_D_801351EC, 0x3e8, 0x40, 0x60, frame);
+		}
+	}
+
+	if (frame >= 0x61) {
+		MAIN_D_801351F8 += 0x16;
+		rot2 = MAIN_D_80134A00;
+		rot2.vy = MAIN_D_801351F8 + entity->posData->rotation.vy;
+		if (DIGIMON_DATA[entity->type].height < DIGIMON_DATA[entity->type].radius) {
+			size = DIGIMON_DATA[entity->type].radius;
+		} else {
+			size = DIGIMON_DATA[entity->type].height;
+		}
+		size = (size * 5) + 0x4b0;
+		EVL_calculateCameraVectors(&viewRef, &viewPos, entity, &rot2, size, DIGIMON_DATA[entity->type].height);
+		GS_VIEWPOINT.vrx = viewRef.vx;
+		GS_VIEWPOINT.vry = viewRef.vy;
+		GS_VIEWPOINT.vrz = viewRef.vz;
+		GS_VIEWPOINT.vpx = viewPos.vx;
+		GS_VIEWPOINT.vpy = viewPos.vy;
+		GS_VIEWPOINT.vpz = viewPos.vz;
+	}
+}
 
 int32_t EVL_spawnParticle(VECTOR *position, RGB8 *color)
 {
