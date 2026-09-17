@@ -1936,7 +1936,55 @@ INCLUDE_ASM("asm/main/nonmatchings/script_ops", tickNamingBox);
 
 INCLUDE_ASM("asm/main/nonmatchings/script_ops", renderNamingBox);
 
-INCLUDE_ASM("asm/main/nonmatchings/script_ops", MAIN_func_8010A79C);
+extern char **MAIN_D_80130774[];
+extern char MAIN_D_801345F8[8];
+extern char MAIN_D_80134600[8];
+
+void MAIN_func_8010A79C(void)
+{
+	TextBoxData *box;
+	uint8_t *buf;
+	char **table;
+	int32_t j;
+	int32_t row;
+	int32_t page;
+	uint8_t *line;
+
+	box = &TEXT_BOX_DATA[1];
+	buf = TEXT_BUFFERS_PTR + box->vramRow * 64;
+	buf = (uint8_t *)((uint32_t)buf + (box->backPage ^ 1) * box->vramRows * 64);
+	line = buf;
+	*buf++ = 1;
+	*buf++ = 7;
+	strcpy(buf, MAIN_D_801345F8);
+	buf += strlen(MAIN_D_801345F8);
+	*buf++ = 1;
+	*buf++ = 1;
+	strcpy(buf, MAIN_D_80134600);
+	buf += strlen(MAIN_D_80134600);
+	*buf++ = 0xd;
+	*buf++ = 0;
+	line += 0x40;
+	page = MAIN_D_80134F81 * 2;
+	for (row = 0; row < 2; row++) {
+		table = MAIN_D_80130774[page + row];
+		for (j = 0; j < 9; j += 3) {
+			buf = line + row * 0xc0 + (j / 3) * 64;
+			strcpy(buf, table[j]);
+			buf += strlen(table[j]);
+			strcpy(buf, table[j + 1]);
+			buf += strlen(table[j + 1]);
+			strcpy(buf, table[j + 2]);
+			buf += strlen(table[j + 2]);
+			*buf++ = 0xd;
+			*buf++ = 0;
+		}
+	}
+	buf -= 2;
+	*buf = 0;
+	box->pageReady = 1;
+	box->writeCount++;
+}
 
 void updateNamingPreview(void)
 {
