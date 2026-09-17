@@ -1981,7 +1981,7 @@ void tickNamingBox(void)
 			}
 			str = rows[row];
 			col *= 2;
-			hi = str[col & 0xffffffff];
+			hi = str[col + 0];
 			lo = str[col + 1];
 			if (hi == 0x81 && lo == 0x40 && MAIN_D_80134F82 == 0) {
 				playSound(0, 0xb);
