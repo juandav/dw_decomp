@@ -2064,7 +2064,108 @@ void setupNameDisplayBox(void)
 	updateNamingPreview();
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/script_ops", tickNamingBox);
+extern char **MAIN_D_80130774[];
+int32_t MAIN_func_800FE650(uint8_t boxId);
+extern char MAIN_D_801B1D26[];
+
+void tickNamingBox(void)
+{
+	int16_t row;
+	int16_t col;
+	uint16_t special;
+	char **rows;
+	char *str;
+	uint8_t hi;
+	uint8_t lo;
+	int32_t pos;
+	int16_t idx;
+	uint8_t n;
+
+	if (MAIN_func_800FE650(1) != 0) {
+		return;
+	}
+	if (UI_BOX_DATA[1].state != 1) {
+		return;
+	}
+	if (UI_BOX_DATA[2].state != 1) {
+		return;
+	}
+	if (isXPressedAfterDialogue() == 0) {
+		return;
+	}
+	row = MAIN_D_80134F8C / 5;
+	col = MAIN_D_80134F8C % 5;
+	special = MAIN_D_80134F8C & 0x7fff;
+	if (isKeyDown(0x80)) {
+		MAIN_D_801B1D1C[0] = 0;
+		MAIN_D_80134F82 = 0;
+		updateNamingPreview();
+		playSound(0, 3);
+		return;
+	}
+	if (isKeyDown(0x40)) {
+		if ((MAIN_D_80134F8C & 0x8000) == 0) {
+			if (row < 9) {
+				rows = MAIN_D_80130774[MAIN_D_80134F81 * 2];
+			} else {
+				row -= 9;
+				rows = MAIN_D_80130774[MAIN_D_80134F81 * 2 + 1];
+			}
+			str = rows[row];
+			col *= 2;
+			hi = str[col + 0];
+			lo = str[col + 1];
+			if (hi == 0x81 && lo == 0x40 && MAIN_D_80134F82 == 0) {
+				playSound(0, 0xb);
+				return;
+			}
+			n = MAIN_D_80134F82;
+			idx = n * 2;
+			pos = idx;
+			MAIN_D_801B1D1C[idx] = hi;
+			MAIN_D_801B1D1C[pos + 1] = lo;
+			MAIN_D_801B1D1C[pos + 2] = 0;
+			if (n != 5) {
+				MAIN_D_80134F82++;
+			}
+			updateNamingPreview();
+			if (MAIN_D_801B1D26[0] != 0 && MAIN_D_80134F82 == 5) {
+				MAIN_D_80134F8C = 0x8001;
+			}
+			playSound(0, 3);
+			return;
+		}
+		if (special != 1) {
+			if (special == 0) {
+				namingDeleteLast();
+			}
+		} else {
+			if (MAIN_D_801B1D1C[0] == 0) {
+				playSound(0, 0xb);
+				return;
+			}
+			terminateNamingBuffer();
+			playSound(0, 3);
+			SELECTION_MENU_STATE = 0x15;
+		}
+	} else if (isKeyDown(0x20)) {
+		MAIN_D_80134F8C = 0x8000;
+		playSound(0, 2);
+	} else if (isKeyDown(0x10)) {
+		namingDeleteLast();
+	} else if (isKeyDown(0x800)) {
+		MAIN_D_80134F8C = 0x8001;
+		playSound(0, 2);
+	} else if (isKeyDown(0x8000)) {
+		namingSelectionLeft(col, row, (int16_t)special);
+	} else if (isKeyDown(0x2000)) {
+		namingSelectionRight(col, row, (int16_t)special);
+	} else if (isKeyDown(0x1000)) {
+		namingSelectionUp(col, row);
+	} else if (isKeyDown(0x4000)) {
+		namingSelectionDown(col, row);
+	}
+}
 
 
 void renderNamingBox(void)
@@ -2123,7 +2224,6 @@ void renderNamingBox(void)
 	}
 }
 
-extern char **MAIN_D_80130774[];
 extern char MAIN_D_801345F8[8];
 extern char MAIN_D_80134600[8];
 
