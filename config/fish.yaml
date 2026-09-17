@@ -58,7 +58,8 @@ segments:
     subsegments:
       - [0x40, c, fish]
       - [0x9F18, c, fish_model]
-      - [0xA160, rodata, fish]
-      - [0xA1F4, data]
+      - [0xA160, .rodata, fish]
+      - [0xA1F4, .data, fish]
+      - [0xAB40, .data, fish_bss]
 
   - [0xD96C]

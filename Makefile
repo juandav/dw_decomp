@@ -295,7 +295,8 @@ FISH_ASM_SRC := $(shell find $(ASM_DIR)/fish -path '*.s' \
 FISH_SRC := \
 	$(FISH_ASM_SRC) \
 	src/fish/fish.c \
-	src/fish/fish_model.c
+	src/fish/fish_model.c \
+	src/fish/fish_bss.c
 
 $(BUILDDIR)/src/fish/fish.c.o: MWCCWRAP_FLAGS += -pragma "optimize_for_size on"
 

@@ -245,7 +245,11 @@ SECTIONS
 			build/src/fish/fish.c.o(.data.*);
 			build/src/fish/fish_model.c.o(.data.*);
 			. = ALIGN(., 4);
-			KEEP(build/asm/fish/data/A1F4.data.s.o(.data.*));
+			build/src/fish/fish_bss.c.o(.data.*);
+			. = ALIGN(., 4);
+
+			/* Trailer */
+			LONG(0);
 			. = ALIGN(., 4);
 
 			build/src/fish/fish.c.o(.bss.*);

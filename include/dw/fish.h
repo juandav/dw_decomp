@@ -8,6 +8,32 @@
 #include <dw/types.h>
 
 typedef struct {
+	uint8_t item;
+	uint8_t threshold;
+} FishBaitChance;
+
+typedef struct {
+	uint16_t tpage;
+	uint16_t clut;
+	uint8_t u0;
+	uint8_t v0;
+	uint8_t u1;
+	uint8_t v1;
+	uint8_t ox;
+	uint8_t oy;
+} FishSprite;
+
+typedef struct {
+	int32_t unk0;
+	int32_t lo;
+	int32_t hi;
+	int32_t moveDelayMin;
+	int32_t moveDelayMax;
+	int16_t bait;
+	int16_t unk16;
+} FishKindInfo;
+
+typedef struct {
 	DVECTOR *path;
 	int32_t pathLength;
 	int32_t unk8;
@@ -262,6 +288,10 @@ int32_t isFishing(void);
 void deinitializeFishing(void);
 void checkFishingMap(uint32_t mapId);
 
+int32_t FISH_isFishableWater1(int32_t x, int32_t y);
+int32_t FISH_isFishableWater2(int32_t x, int32_t y);
+void FISH_waterTestStub1(void);
+void FISH_waterTestStub2(void);
 void FISH_loadFishing(FishingRod *rod);
 void FISH_init(void);
 void FISH_deinitialize(void);
