@@ -95,7 +95,8 @@ void namingSelectionRight(int16_t col, int16_t row, int32_t specialIdx);
 int32_t MAIN_func_80108230(void);
 void namingSelectionUp(int16_t column, int16_t row);
 void namingSelectionDown(int16_t column, int16_t row);
-void renderNamingUnderscore(int32_t boxId, int16_t x, int16_t y, int32_t w);
+void renderLinePrimitive(uint32_t color, int32_t x0, int32_t y0, int32_t x1, int32_t y1, int32_t order, uint32_t mode);
+void renderNamingUnderscore(uint8_t boxId, int16_t x, int16_t y, int32_t w);
 void renderSelectionBox(void);
 
 extern uint8_t MAIN_D_80135007;
@@ -2280,4 +2281,19 @@ void renderNameDisplayBox(void)
 	renderNamingUnderscore(2, MAIN_D_80134F82 * 0xc + 4, 0x10, 0xc);
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/script_ops", renderNamingUnderscore);
+void renderNamingUnderscore(uint8_t boxId, int16_t x, int16_t y, int32_t w)
+{
+	int32_t yc;
+
+	x = x + UI_BOX_DATA[boxId].finalPos.x;
+	y = y + UI_BOX_DATA[boxId].finalPos.y;
+	boxId = 6 - boxId;
+	yc = y;
+
+	renderLinePrimitive(0x20202, x, yc, (x + w) - 1, yc, boxId, 0);
+	y++;
+	renderLinePrimitive(0x10c0c0, x, y, (x + w) - 1, y, boxId, 0);
+	y++;
+	renderLinePrimitive(0x20202, x, y, (x + w) - 1, y, boxId, 0);
+}
+
