@@ -58,7 +58,7 @@ void renderBoxBar(int16_t x, int16_t y, int16_t w, int16_t h, uint8_t r,
 int32_t hasMove(int32_t move);
 void sortArray(int16_t *arr, uint8_t count);
 void renderDigimonMoveBox(void);
-void renderDigimonMovesSelected(int32_t arg);
+void renderDigimonMovesSelected(int16_t panel);
 int32_t drawMoveViewHelpStrings(void);
 void removeTriangleMenu(void);
 void removeUIBox1(void);
@@ -129,7 +129,96 @@ static void *overworld_moves_box_functions[] = {
 	renderDigimonMovesSelected,
 };
 
-INCLUDE_ASM("asm/main/nonmatchings/overworld_moves_box", renderDigimonMovesSelected);
+extern int16_t MAIN_D_80124064[];
+extern int16_t MAIN_D_80124118[];
+extern int16_t MAIN_D_80134D3A;
+extern int16_t MAIN_D_80134D38;
+extern char *MOVE_NAMES[];
+void renderSeperatorLines(int16_t *lines, int8_t count, int32_t zIndex);
+void drawString(char *str, int32_t x, int32_t y);
+void renderString(int32_t a, int32_t b, int32_t c, int32_t d, int32_t e, int32_t f, int32_t g, int32_t h, int32_t i);
+void renderNumber(int32_t color, int32_t x, int16_t y, int32_t n, int32_t value, int32_t layer);
+
+void renderDigimonMovesSelected(int16_t panel)
+{
+	RECT rect;
+	Move *move;
+	int32_t i;
+	int32_t y;
+	uint8_t row;
+	uint8_t col;
+	uint8_t moveId;
+
+	if (panel == 0) {
+		renderSeperatorLines(MAIN_D_80124064, 0x12, 4);
+	} else {
+		renderSeperatorLines(MAIN_D_80124118, 0x12, 4);
+	}
+
+	renderRectPolyFT4((panel * 0x9d) - 0x91, 1, 4, 4, 0x78, 0x90, 5, 0x7b06, 4, 0);
+	renderRectPolyFT4((panel * 0x9d) - 0x10, 1, 4, 4, 0x7c, 0x90, 5, 0x7b06, 4, 0);
+	renderRectPolyFT4((panel * 0xcb) - 0x91, 0x5c, 4, 4, 0x78, 0x94, 5, 0x7b06, 4, 0);
+	renderRectPolyFT4((panel * 0xcb) - 0x3e, 0x5c, 4, 4, 0x7c, 0x94, 5, 0x7b06, 4, 0);
+	if (panel == 0) {
+		renderRectPolyFT4(-0x10, 0x15, 4, 4, 0x7c, 0x94, 5, 0x7b06, 4, 0);
+	} else {
+		renderRectPolyFT4(0xc, 0x15, 4, 4, 0x78, 0x94, 5, 0x7b06, 4, 0);
+	}
+	renderBoxBar((panel * 0x9d) - 0x8f, 3, 0x80, 0x13, 0x32, 0x32, 0x80, 0, 4);
+	renderBoxBar((panel * 0xcb) - 0x8f, 0x18, 0x57, 0x45, 0x32, 0x32, 0x80, 0, 4);
+	renderRectPolyFT4((panel * 0x9d) - 0x8c, -2, 0x25, 7, 0x11, 0xb0, 5, 0x7b06, 3, 0);
+	renderRectPolyFT4((panel * 0xcb) - 0x8c, 0x1d, 0x17, 7, 0x5c, 0xa2, 5, 0x7b06, 3, 0);
+	renderRectPolyFT4((panel * 0xcb) - 0x8c, 0x2e, 0xb, 7, 0x74, 0xa2, 5, 0x7b06, 3, 0);
+	renderRectPolyFT4((panel * 0xcb) - 0x8c, 0x3f, 0x13, 7, 0x4c, 0xa9, 5, 0x7b06, 3, 0);
+	renderRectPolyFT4((panel * 0xcb) - 0x8c, 0x50, 0x10, 7, 0, 0xb0, 5, 0x7b06, 3, 0);
+
+	for (i = 0, y = 0x1b; i < 4; i++, y += 0x11) {
+		renderRectPolyFT4((panel * 0xcb) - 0x71, y, 0xa, 0xa, 0x8a, 0x8c, 5, 0x7b06, 3, 0);
+	}
+
+	row = (MAIN_D_80134D3A - 0x73) / 18;
+	col = (MAIN_D_80134D38 - 0x6f) / 15;
+	if (col == 1) {
+		col = 5;
+	} else if (col == 2) {
+		col = 1;
+	} else if (col == 3) {
+		col = 4;
+	} else if (col == 4) {
+		col = 2;
+	} else if (col == 5) {
+		col = 3;
+	}
+	moveId = col * 8 + row;
+	if (col == 6) {
+		moveId++;
+	}
+
+	if (hasMove(moveId)) {
+		move = &MOVE_DATA[moveId];
+		setRECT(&rect, 0, 0x84, 0x78, 0xc);
+		clearTextSubArea(&rect);
+		drawString(MOVE_NAMES[moveId], 0, 0x84);
+		renderString(0, (panel * 0x9d) - 0x8a, 9, 0x78, 0xc, 0, 0x84, 3, 1);
+		renderNumber(0, (panel * 0xcb) - 0x64, 0x1b, 3, move->power, 3);
+		renderNumber(0, (panel * 0xcb) - 0x64, 0x2c, 3, move->mpCost * 3, 3);
+		renderString(0, (panel * 0xcb) - 0x64, 0x3e, 0x24, 0xc, (move->range - 1) * 0x24, 0x78, 3, 1);
+		switch (move->status) {
+		case 1:
+			renderString(0, (panel * 0xcb) - 0x64, 0x4f, 0x1a, 0xc, 0x84, 0x6c, 3, 1);
+			break;
+		case 2:
+			renderString(0, (panel * 0xcb) - 0x64, 0x4f, 0x1c, 0xc, 0xa0, 0x6c, 3, 1);
+			break;
+		case 3:
+			renderString(0, (panel * 0xcb) - 0x64, 0x4f, 0x20, 0xc, 0xbc, 0x6c, 3, 1);
+			break;
+		case 4:
+			renderString(0, (panel * 0xcb) - 0x64, 0x4f, 0x1e, 0xc, 0xdb, 0x6c, 3, 1);
+			break;
+		}
+	}
+}
 
 void renderDigimonMoveBox(void)
 {
