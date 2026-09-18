@@ -3,6 +3,8 @@
 #include <dw/entity.h>
 #include <dw/graphics.h>
 #include <dw/move.h>
+#include <dw/params.h>
+#include <dw/partner.h>
 #include <dw/ui.h>
 
 #include "common.h"
@@ -109,7 +111,141 @@ void renderCardCount(void)
 	renderString(0, 0x6b, 0x4c, 0xc, 0xc, 0xd8, 0xc, 0);
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/overworld_menu_views", renderDigimonStatsView);
+typedef struct {
+	uint8_t v[21];
+} StatsIconClutTable;
+extern StatsIconClutTable MAIN_D_80123DB8;
+extern int16_t MAIN_D_80123F54[];
+extern StringRect MAIN_D_80124334[];
+extern IconRect MAIN_D_8012437C[];
+extern RECT MAIN_D_801242CC[];
+int32_t drawDigimonStatsStrings(void);
+void renderDigimonStatsBar(int32_t a, int32_t b, int32_t c, int16_t d, int16_t e);
+void renderDigimonStatusConditions(int32_t condition);
+extern uint16_t PLAYTIME_FRAMES;
+
+void renderDigimonStatsView(void)
+{
+	StatsIconClutTable cluts;
+	StringRect *sr;
+	IconRect *icon;
+	RECT *r;
+	int32_t i;
+	int32_t j;
+	int16_t k;
+	int32_t x;
+	int16_t special;
+	int16_t clut;
+	int16_t w;
+	int32_t frame;
+
+	cluts = MAIN_D_80123DB8;
+	switch (MENU_STATE) {
+	case 0:
+		if (drawDigimonStatsStrings() == 1) {
+			MENU_STATE = 1;
+		}
+		break;
+	case 1:
+		renderSeperatorLines(MAIN_D_80123F54, 6, 5);
+		for (j = 0; j < 9; j++) {
+			sr = &MAIN_D_80124334[j];
+			renderString(3, sr->posX, sr->posY + 1, sr->uvWidth, 0xc, sr->uvX, sr->uvY, 5, 1);
+		}
+		for (j = 0; j < 0x15; j++) {
+			icon = &MAIN_D_8012437C[j];
+			renderRectPolyFT4((int16_t)icon->posX, (int16_t)icon->posY, icon->width, icon->height, icon->texX,
+					  icon->texY + 0x80, 5, GetClut(0x60, cluts.v[j] + 0x1e8), 5, 0);
+		}
+		renderString(0, -0x6d, -0x42, 0x48, 0xc, 0, 0x3c, 5, 0);
+		w = strlen(DIGIMON_DATA[ENTITY_TABLE[1]->type].name);
+		w = w * 10;
+		if (w >= 0x79) {
+			w = 0x78;
+		}
+		renderString(0, -0x6c, -0x32, w, 0xc, 0, 0x48, 5, 0);
+		renderNumber(0, -0x6d, -0x22, 2, PARTNER_PARA.age, 5);
+		renderNumber(0, -0x23, -0x22, 2, PARTNER_PARA.weight, 5);
+		renderNumber(0, 0x23, 1, 4, PARTNER_ENTITY.digimonEntity.stats.current.currentHP, 5);
+		renderNumber(0, 0x5f, 1, 4, PARTNER_ENTITY.digimonEntity.stats.base.hp, 5);
+		renderNumber(0, 0x23, 0x10, 4, PARTNER_ENTITY.digimonEntity.stats.current.currentMP, 5);
+		renderNumber(0, 0x5f, 0x10, 4, PARTNER_ENTITY.digimonEntity.stats.base.mp, 5);
+		renderNumber(0, 0x23, 0x1f, 4, PARTNER_ENTITY.digimonEntity.stats.base.off, 5);
+		renderNumber(0, 0x23, 0x2e, 4, PARTNER_ENTITY.digimonEntity.stats.base.def, 5);
+		renderNumber(0, 0x23, 0x3d, 4, PARTNER_ENTITY.digimonEntity.stats.base.speed, 5);
+		renderNumber(0, 0x23, 0x4c, 4, PARTNER_ENTITY.digimonEntity.stats.base.brain, 5);
+		renderDigimonStatsBar(PARTNER_ENTITY.digimonEntity.stats.base.hp, 0x270f, 0x64, 0x24, 0xc);
+		renderDigimonStatsBar(PARTNER_ENTITY.digimonEntity.stats.base.mp, 0x270f, 0x64, 0x24, 0x1b);
+		renderDigimonStatsBar(PARTNER_ENTITY.digimonEntity.stats.base.off, 0x3e7, 0x32, 0x24, 0x2a);
+		renderDigimonStatsBar(PARTNER_ENTITY.digimonEntity.stats.base.def, 0x3e7, 0x32, 0x24, 0x39);
+		renderDigimonStatsBar(PARTNER_ENTITY.digimonEntity.stats.base.speed, 0x3e7, 0x32, 0x24, 0x48);
+		renderDigimonStatsBar(PARTNER_ENTITY.digimonEntity.stats.base.brain, 0x3e7, 0x32, 0x24, 0x57);
+		for (i = 0, k = 0, x = 9; i < 3; i++) {
+			special = DIGIMON_DATA[ENTITY_TABLE[1]->type].special[i];
+			if (special != 0xff) {
+				clut = 0x7a06;
+				if ((special == 2) || (special == 3) || (special == 4)) {
+					clut = 0x7a46;
+				} else if (special == 5) {
+					clut = 0x7a86;
+				}
+				if (PLAYTIME_FRAMES % 10 < 5) {
+					frame = 0;
+				} else {
+					frame = 0xc;
+				}
+				renderRectPolyFT4(x, -0x33, 0xc, 0xc, frame + (special * 0x18 + 0x24), 0x80, 5, clut, 5, 0);
+				k += 0xc;
+				x += 0xc;
+			}
+		}
+		if (DIGIMON_DATA[ENTITY_TABLE[1]->type].type != 0) {
+			renderRectPolyFT4(0x3b, -0x33, 0xc, 0xc, (DIGIMON_DATA[ENTITY_TABLE[1]->type].type - 1) * 0xc, 0x80, 5, 0x7a06, 5, 0);
+		}
+		if (RAISE_DATA[PARTNER_ENTITY.digimonEntity.entity.type].sleepCycle == 5) {
+			renderString(0, 0x55, -0x33, 0x30, 0xc, 0xcc, 0x30, 5, 0);
+		}
+		if (RAISE_DATA[PARTNER_ENTITY.digimonEntity.entity.type].sleepCycle < 5) {
+			renderString(0, 0x55, -0x33, 0x30, 0xc, RAISE_DATA[PARTNER_ENTITY.digimonEntity.entity.type].sleepCycle * 0x30, 0x18, 5, 0);
+		}
+		for (i = 0; i < 3; i++) {
+			if (i < PARTNER_ENTITY.lives) {
+				renderRectPolyFT4(i * 0xe - 0x54, 0x22, 0xc, 0xb, 0xe8, 0x8c, 5, 0x7b86, 5, 0);
+			}
+			renderRectPolyFT4(i * 0xe - 0x54, 0x22, 0xc, 0xb, 0xf4, 0x8c, 5, 0x7b86, 5, 0);
+		}
+		renderDigimonStatusConditions(PARTNER_PARA.condition);
+		if (PARTNER_PARA.happiness >= 0) {
+			renderRectPolyFT4(-0x8a, 0x31, 0xb, 0xb, 0, 0xf4, 5, GetClut(0x60, 0x1f2), 5, 0);
+		} else {
+			renderRectPolyFT4(-0x8a, 0x31, 0xb, 0xb, 0xb, 0xf4, 5, GetClut(0x60, 0x1f2), 5, 0);
+		}
+		if (PARTNER_PARA.happiness >= 0) {
+			renderRectPolyFT4(-0x54, 0x35, (uint8_t)(0x32 - (0x32 - PARTNER_PARA.happiness / 2)), 6, 0x18, 0xf0, 0x18, GetClut(0x70, 0x1f6), 5, 0);
+			renderRectPolyFT4(-0x54, 0x35, 0x32, 6, 0x4a, 0xf0, 0x18, GetClut(0x70, 0x1f5), 5, 0);
+		} else {
+			renderRectPolyFT4(-0x54, 0x35, (uint8_t)(0x32 - (0x32 - (PARTNER_PARA.happiness + 0x64) / 2)), 6, 0x4a, 0xf0, 0x18, GetClut(0x70, 0x1f5), 5, 0);
+		}
+		if (PARTNER_PARA.discipline >= 0x32) {
+			renderRectPolyFT4(-0x8a, 0x40, 0xb, 0xb, 0x16, 0xf4, 5, GetClut(0x60, 0x1f2), 5, 0);
+		} else {
+			renderRectPolyFT4(-0x8a, 0x40, 0xb, 0xb, 0x21, 0xf4, 5, GetClut(0x60, 0x1f2), 5, 0);
+		}
+		if (PARTNER_PARA.discipline >= 0x32) {
+			renderRectPolyFT4(-0x54, 0x44, (uint8_t)(PARTNER_PARA.discipline - 0x32), 6, 0x18, 0xf0, 0x18, GetClut(0x70, 0x1f6), 5, 0);
+			renderRectPolyFT4(-0x54, 0x44, 0x32, 6, 0x4a, 0xf0, 0x18, GetClut(0x70, 0x1f5), 5, 0);
+		} else {
+			renderRectPolyFT4(-0x54, 0x44, (uint8_t)PARTNER_PARA.discipline, 6, 0x4a, 0xf0, 0x18, GetClut(0x70, 0x1f5), 5, 0);
+		}
+		renderBoxBar(-0x54, 0x52, PARTNER_PARA.virusBar * 3, 6, 0xc8, 0xc8, 0x3c, 0, 5);
+		for (j = 0; j < 0xd; j++) {
+			r = &MAIN_D_801242CC[j];
+			renderInsetBox(r->x, r->y, r->w, r->h, 5);
+		}
+		renderDigiviceEntity(ENTITY_TABLE[1], 1);
+		break;
+	}
+}
 
 void renderDigimonMovesView(void)
 {
