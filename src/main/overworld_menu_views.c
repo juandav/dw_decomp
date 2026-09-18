@@ -67,7 +67,7 @@ int32_t loadStackedTIMEntry(char *path, void *buffer, int32_t offset,
 void renderNumber(int32_t a, int32_t b, int32_t c, int32_t d, int32_t e,
 		  int32_t f);
 void renderSeperatorLines(int16_t *lines, int32_t b, ...);
-void renderDigimonMovesSelected(int32_t arg);
+void renderDigimonMovesSelected(int16_t panel);
 int32_t drawMoveViewHelpStrings(void);
 void renderDigimonMovesView(void);
 int32_t loadCardImage(int32_t id);
