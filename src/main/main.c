@@ -553,7 +553,169 @@ void newGameScene(void)
 	unloadNewGameScene();
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/main", MAIN_func_800EF38C);
+extern VECTOR SAVE_TAMER_POS;
+extern VECTOR SAVE_PARTNER_POS;
+extern VECTOR STORED_TAMER_POS;
+typedef struct {
+	uint8_t *imagePtr;
+	int16_t tileId;
+	int16_t posX;
+	int16_t posY;
+	int16_t texU;
+	int16_t texV;
+	int16_t tpage;
+	int16_t clut;
+} MapTileData;
+extern MapTileData MAP_TILE_DATA[];
+void MAIN_func_800D6A4C(MapTileData *tiles);
+int16_t entityCheckCollision(Entity *source, Entity *entity, int32_t arg2, int32_t arg3);
+extern uint8_t SAVE_CURRENT_EXIT[];
+extern Stats SAVE_STATS;
+extern int8_t MAIN_D_8015571C[];
+extern int32_t MAIN_D_80155674[];
+extern int32_t MONEY;
+extern PartnerPara SAVE_PARTNER_PARA;
+extern uint8_t SAVE_PREVIOUS_SCREEN[];
+extern uint8_t PREVIOUS_SCREEN;
+extern uint8_t SAVE_PREVIOUS_EXIT[];
+extern uint8_t PREVIOUS_EXIT;
+extern int8_t SAVE_TAMER_WAYPOINT_X[];
+extern int8_t SAVE_TAMER_WAYPOINT_Y[];
+extern int8_t SAVE_TAMER_PREVIOUS_TILE_X[];
+extern int8_t SAVE_TAMER_PREVIOUS_TILE_Y[];
+extern int8_t TAMER_PREVIOUS_TILE_X;
+extern int8_t TAMER_PREVIOUS_TILE_Y;
+extern int8_t SAVE_TAMER_WAYPOINT_CURRENT[];
+extern int8_t TAMER_WAYPOINT_CURRENT;
+extern int8_t SAVE_TAMER_WAYPOINT_COUNT[];
+extern int8_t SAVE_TAMER_START_TILE_X[];
+extern int8_t SAVE_TAMER_START_TILE_Y[];
+extern int8_t SAVE_TAMER_WAYPOINT_ACTIVE[];
+extern int8_t TAMER_WAYPOINT_ACTIVE;
+extern int32_t CAMERA_UPDATE_TILES;
+void createCameraMovement(VECTOR *target, int32_t instanceId);
+void setImmortalHour(void);
+extern int16_t CAMERA_X[];
+extern int16_t CAMERA_Y[];
+extern int8_t MAP_WIDTH[];
+extern int8_t MAP_HEIGHT[];
+extern int8_t MAP_TILE_X;
+extern int8_t MAP_TILE_Y;
+extern int8_t PREV_TILE_X;
+extern int8_t PREV_TILE_Y;
+void uploadMapTileImages(MapTileData *tiles, int32_t index);
+void memcpy(uint8_t *dst, uint8_t *src, uint32_t size);
+
+void MAIN_func_800EF38C(void)
+{
+	int32_t i;
+	int16_t idx;
+	int32_t type;
+	Entity *entity;
+	PositionData *pos;
+	int16_t x;
+	int16_t y;
+	int16_t z;
+	int16_t rot;
+	int16_t exit;
+
+	pos = TAMER_ENTITY.entity.posData;
+	pos->location = SAVE_TAMER_POS;
+	STORED_TAMER_POS = pos->location;
+	pos = PARTNER_ENTITY.digimonEntity.entity.posData;
+	pos->location = SAVE_PARTNER_POS;
+	MAIN_func_800D6A4C(MAP_TILE_DATA);
+
+	for (i = 0; i < 8; i++) {
+		if ((NPC_ENTITIES[i].digimonEntity.entity.type != -1) &&
+		    (NPC_ENTITIES[i].digimonEntity.entity.type != 0)) {
+			NPC_ENTITIES[i].digimonEntity.entity.isOnScreen = 1;
+		}
+	}
+
+	startAnimation(ENTITY_TABLE[0], 0);
+	startAnimation(ENTITY_TABLE[1], 0);
+
+	idx = entityCheckCollision(&PARTNER_ENTITY.digimonEntity.entity, &TAMER_ENTITY.entity, 0, 0);
+	if ((idx >= 2) && (idx < 10)) {
+		entity = ENTITY_TABLE[idx];
+		type = entity->type;
+		if ((type == 0x6d) || (type >= 0x75) ||
+		    ((type == 0x5c) && (MAIN_D_80155725[0] == 0x9b)) ||
+		    ((type == 0x6a) && (MAIN_D_80155725[0] == 0x55)) ||
+		    (type == 1) || (type == 2) || (type == 0xf) || (type == 0x10) ||
+		    (type == 0x1d) || (type == 0x1e) || (type == 0x2b) || (type == 0x2c)) {
+			exit = SAVE_CURRENT_EXIT[0];
+			x = MAP_WARPS.spawnX[exit];
+			y = MAP_WARPS.spawnY[exit];
+			z = MAP_WARPS.spawnZ[exit];
+			rot = MAP_WARPS.rotation[exit];
+			TAMER_ENTITY.entity.posData->location.vx = x;
+			TAMER_ENTITY.entity.posData->location.vy = y;
+			TAMER_ENTITY.entity.posData->location.vz = z;
+			STORED_TAMER_POS = TAMER_ENTITY.entity.posData->location;
+			TAMER_ENTITY.entity.posData->rotation.vy = rot;
+
+			if ((rot <= 0x200) || (rot > 0xe00)) {
+				z += 0xc8;
+			} else if ((rot > 0x200) && (rot <= 0x600)) {
+				x += 0xc8;
+			} else if ((rot > 0x600) && (rot <= 0xa00)) {
+				z -= 0xc8;
+			} else if ((rot > 0xa00) && (rot <= 0xe00)) {
+				x -= 0xc8;
+			}
+
+			PARTNER_ENTITY.digimonEntity.entity.posData->location.vx = x;
+			PARTNER_ENTITY.digimonEntity.entity.posData->location.vy = y;
+			PARTNER_ENTITY.digimonEntity.entity.posData->location.vz = z;
+			startAnimation(ENTITY_TABLE[0], 0);
+			startAnimation(ENTITY_TABLE[1], 0);
+		} else {
+			entity->isOnMap = 0;
+		}
+	}
+
+	PARTNER_ENTITY.digimonEntity.stats = SAVE_STATS;
+	PARTNER_ENTITY.lives = MAIN_D_8015571C[0];
+	MONEY = MAIN_D_80155674[0];
+	PARTNER_PARA = SAVE_PARTNER_PARA;
+	PREVIOUS_SCREEN = SAVE_PREVIOUS_SCREEN[0];
+	CURRENT_EXIT = SAVE_CURRENT_EXIT[0];
+	PREVIOUS_EXIT = SAVE_PREVIOUS_EXIT[0];
+	memcpy((uint8_t *)TAMER_WAYPOINT_X, (uint8_t *)SAVE_TAMER_WAYPOINT_X, 0x1e);
+	memcpy((uint8_t *)TAMER_WAYPOINT_Y, (uint8_t *)SAVE_TAMER_WAYPOINT_Y, 0x1e);
+	TAMER_PREVIOUS_TILE_X = SAVE_TAMER_PREVIOUS_TILE_X[0];
+	TAMER_PREVIOUS_TILE_Y = SAVE_TAMER_PREVIOUS_TILE_Y[0];
+	TAMER_WAYPOINT_CURRENT = SAVE_TAMER_WAYPOINT_CURRENT[0];
+	TAMER_WAYPOINT_COUNT = SAVE_TAMER_WAYPOINT_COUNT[0];
+	TAMER_START_TILE_X = SAVE_TAMER_START_TILE_X[0];
+	TAMER_START_TILE_Y = SAVE_TAMER_START_TILE_Y[0];
+	TAMER_WAYPOINT_ACTIVE = SAVE_TAMER_WAYPOINT_ACTIVE[0];
+	CAMERA_UPDATE_TILES = 1;
+	createCameraMovement(&TAMER_ENTITY.entity.posData->location, 2);
+	setImmortalHour();
+	MAIN_func_800D6A4C(MAP_TILE_DATA);
+
+	MAP_TILE_X = CAMERA_X[0] / 128;
+	if (MAP_WIDTH[0] < 5) {
+		MAP_TILE_X = 0;
+	} else if (MAP_WIDTH[0] < (MAP_TILE_X + 4)) {
+		MAP_TILE_X -= (int8_t)((MAP_TILE_X + 4) - MAP_WIDTH[0]);
+	}
+	PREV_TILE_X = MAP_TILE_X;
+
+	MAP_TILE_Y = CAMERA_Y[0] / 128;
+	if (MAP_HEIGHT[0] < 4) {
+		MAP_TILE_Y = 0;
+	} else if (MAP_HEIGHT[0] < (MAP_TILE_Y + 3)) {
+		MAP_TILE_Y -= (int8_t)((MAP_TILE_Y + 3) - MAP_HEIGHT[0]);
+	}
+	PREV_TILE_Y = MAP_TILE_Y;
+
+	uploadMapTileImages(MAP_TILE_DATA, MAP_TILE_X + MAP_TILE_Y * MAP_WIDTH[0]);
+	updateMinuteHand(HOUR, MINUTE);
+}
 
 void recalculatePPandArena(void)
 {
