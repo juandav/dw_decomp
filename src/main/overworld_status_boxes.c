@@ -379,7 +379,52 @@ void renderDigimonStatsBar(int32_t a, int32_t b, int32_t c, int16_t d, int16_t e
 	renderBoxBar(d, e, (uint8_t)(c * a / b), 2, 0x32, 0xc8, 0xc8, 0, 5);
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/overworld_status_boxes", renderDigimonStatusConditions);
+extern uint16_t PLAYTIME_FRAMES;
+typedef struct {
+	int32_t v[6];
+} ConditionMaskTable;
+extern ConditionMaskTable MAIN_D_80123DD0;
+
+void renderDigimonStatusConditions(int32_t condition)
+{
+	ConditionMaskTable masks;
+	int32_t i;
+	uint8_t bobY;
+	int16_t clut;
+
+	masks = MAIN_D_80123DD0;
+	if (PLAYTIME_FRAMES % 16 < 3) {
+		bobY = 0x82;
+	} else if (PLAYTIME_FRAMES % 16 < 5) {
+		bobY = 0x80;
+	} else if (PLAYTIME_FRAMES % 16 < 7) {
+		bobY = 0x7d;
+	} else if (PLAYTIME_FRAMES % 16 < 9) {
+		bobY = 0x79;
+	} else if (PLAYTIME_FRAMES % 16 < 11) {
+		bobY = 0x7d;
+	} else if (PLAYTIME_FRAMES % 16 < 13) {
+		bobY = 0x80;
+	} else {
+		bobY = 0x82;
+	}
+	for (i = 0; i < 6; i++) {
+		if (condition & masks.v[i]) {
+			clut = 0x7a06;
+			if ((i == 0) || (i == 4)) {
+				clut = 0x7a86;
+			}
+			if (i == 5) {
+				clut = 0x7a46;
+			}
+			renderRectPolyFT4(i * 0xf - 0x8a, bobY - 0x78, 0xc, 0xc, i * 0xc + 0x30, 0x8c, 5, clut, 5, 0);
+		}
+	}
+
+	if (condition & 8) {
+		renderRectPolyFT4(-0x30, bobY - 0x78, 0xc, 0xc, 0x60, 0xc8, 5, 0x7a06, 5, 0);
+	}
+}
 
 static int32_t renderDigiviceEntity__garbage__(int32_t seed)
 {
