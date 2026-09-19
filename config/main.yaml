@@ -197,7 +197,7 @@ segments:
       - [0x9A9F8, .data, clock]
       - [0x9AA28, .data, entity_text]
       - [0x9AA40, .data, map_object]
-      - [0x9ABEC, data, evolution]
+      - [0x9ABEC, .data, evolution]
       - [0x9B918, .data, utils]
       - [0x9BB34, .data, efe_table]
       - [0x9BB74, .data, sound_async]

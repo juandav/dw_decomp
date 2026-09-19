@@ -506,7 +506,7 @@ SECTIONS
         . = ALIGN(., 4);
         build/src/main/map_object.c.o(.data.*);
         . = ALIGN(., 4);
-        build/asm/main/data/evolution.data.s.o(.data.*);
+        build/src/main/evolution.c.o(.data.*);
         . = ALIGN(., 4);
         build/src/main/file_queue.c.o(.data.*);
         . = ALIGN(., 4);
