@@ -624,7 +624,7 @@ SECTIONS
         . = ALIGN(., 4);
         build/src/main/file_queue.c.o(.sdata.*);
         . = ALIGN(., 4);
-        build/asm/main/data/graphics2.sdata.s.o(.sdata.*);
+        build/src/main/graphics2.c.o(.sdata.*);
         . = ALIGN(., 4);
         build/asm/main/data/utils.sdata.s.o(.sdata.*);
         . = ALIGN(., 4);

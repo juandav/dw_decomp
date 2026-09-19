@@ -226,7 +226,7 @@ segments:
       - [0xA43EC, .sdata, entity_text]
       - [0xA43F4, .sdata, map_object]
       - [0xA4428, .sdata, file_queue]
-      - [0xA442C, sdata, graphics2]
+      - [0xA442C, .sdata, graphics2]
       - [0xA4430, sdata, utils]
       - [0xA4438, .sdata, efe_table]
       - [0xA443C, .sdata, sound_async]

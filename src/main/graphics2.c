@@ -17,7 +17,6 @@ extern GsOT *ACTIVE_ORDERING_TABLE;
 extern int32_t VIEWPORT_DISTANCE;
 
 extern uint32_t CUSTOM_RNG_1;
-extern uint32_t CUSTOM_RNG_2;
 
 void calculatePosition(GsCOORDINATE2 *coord, MATRIX *matrix);
 
@@ -72,6 +71,10 @@ void MAIN_func_800E4470(MATRIX *matrix, SVECTOR *output);
 void matrixToEuler2(MATRIX *matrix, SVECTOR *output);
 void multiplyRotations(SVECTOR *rotation1, SVECTOR *rotation2);
 int32_t customRandom(int32_t min, int32_t max);
+
+// clang-format off
+uint32_t CUSTOM_RNG_2 = 0x0013cc25;
+// clang-format on
 
 void setLineBlendingMode(int32_t mode, int32_t order)
 {
