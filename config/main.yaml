@@ -207,7 +207,7 @@ segments:
       - [0x9CB8C, .data, bubble]
       - [0x9CE64, data, main]
       - [0x9F39C, .data, sjis]
-      - [0x9F42C, data, vs]
+      - [0x9F42C, .data, vs]
       - [0x9F6D0, data, script]
       - [0xA07E0, .data, font]
       - [0xA1008, data, main_menu]

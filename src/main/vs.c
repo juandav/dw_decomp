@@ -51,10 +51,6 @@ extern int16_t MAIN_D_801B1C74[];
 extern int16_t MAIN_D_801B1C76[];
 extern int16_t MAIN_D_801B1C78[];
 extern int16_t MAIN_D_801B1C7A[];
-extern int16_t MAIN_D_8012F42C[];
-extern uint8_t MAIN_D_8012F438[];
-extern uint8_t MAIN_D_8012F439[];
-extern uint8_t MAIN_D_8012F43A[];
 extern uint8_t MAIN_D_80135274;
 extern GsOT *ACTIVE_ORDERING_TABLE;
 extern int32_t DRAWING_OFFSET_X;
@@ -96,26 +92,15 @@ extern int16_t MAIN_D_80135264;
 extern char *MAIN_D_8013526C;
 extern char *MAIN_D_80135270;
 extern char MAIN_D_80134518[8];
-extern char MAIN_D_8012F458[];
 extern Entity *MAIN_D_80134D60;
 extern int32_t MAIN_D_80134F48;
 extern int16_t MAIN_D_80134510[4];
 extern int32_t COMBAT_AREA_CENTER_Y;
 extern int32_t COMBAT_AREA_CENTER_X;
-extern char MAIN_D_8012F48C[];
-extern char MAIN_D_8012F4A4[];
-extern char MAIN_D_8012F4B8[];
-extern char MAIN_D_8012F4CC[];
-extern char MAIN_D_8012F4E4[];
-extern char MAIN_D_8012F4FC[];
 extern uint8_t MAIN_D_801B1C7C[];
 extern int8_t MAIN_D_80134F52[2];
 extern int32_t MAIN_D_80134F54;
-extern char MAIN_D_8012F510[];
-extern char MAIN_D_8012F51C[];
 extern int16_t MAIN_D_80134F50;
-extern char MAIN_D_8012F464[];
-extern char MAIN_D_8012F478[];
 extern uint8_t MAIN_D_801B1CB2[];
 extern uint8_t MAIN_D_801B1D02[];
 extern uint8_t MAIN_D_80134550[4];
@@ -124,8 +109,6 @@ extern uint8_t MAIN_D_80134F59;
 extern uint8_t MAIN_D_80134F5A;
 extern uint8_t MAIN_D_80134F5B;
 extern uint8_t MAIN_D_80134F5C;
-extern VsUISprite MAIN_D_8012F650[];
-extern VsUISprite MAIN_D_8012F690[];
 
 uint32_t PadRead(int32_t id);
 void fadeFromBlack(int32_t frames);
@@ -394,6 +377,115 @@ SVECTOR MAIN_D_80134B78 = { 0, -50, 50, 0 };
 SVECTOR MAIN_D_80134B80 = { 0, 50, -50, 0 };
 SVECTOR MAIN_D_80134B88 = { 0, 50, 50, 0 };
 
+// clang-format off
+int16_t MAIN_D_8012F42C[6] = {
+	0x270f, 0x270f, 0x03e7, 0x03e7, 0x03e7, 0x03e7,
+};
+
+RGB8 MAIN_D_8012F438[10] = {
+	{ 0x80, 0x80, 0x80 },
+	{ 0xc8, 0x64, 0x32 },
+	{ 0x1e, 0xff, 0x1e },
+	{ 0xd0, 0x1e, 0x50 },
+	{ 0x1e, 0x80, 0x80 },
+	{ 0xc8, 0xc8, 0x00 },
+	{ 0x32, 0xb4, 0xc8 },
+	{ 0x00, 0x00, 0x00 },
+	{ 0x00, 0x00, 0x00 },
+	{ 0x00, 0x00, 0x00 },
+};
+
+char MAIN_D_8012F458[12] = {
+	0x83, 0x5f, 0x83, 0x81, 0x81, 0x5b, 0x83, 0x57,
+	0x00, 0x00, 0x00, 0x00,
+};
+
+char MAIN_D_8012F464[20] = "\\ETCDAT\\ETCTIM.BIN";
+
+char MAIN_D_8012F478[20] = "\\ETCNA\\TITLE2.TIM";
+
+char MAIN_D_8012F48C[24] = "\\ETCDAT\\SYSTEM_W.TIM";
+
+char MAIN_D_8012F4A4[20] = "\\STDDAT\\TAISEN1.TIM";
+
+char MAIN_D_8012F4B8[20] = "\\STDDAT\\TAISEN2.TIM";
+
+char MAIN_D_8012F4CC[24] = "\\STDDAT\\16TAISEN.TIM";
+
+char MAIN_D_8012F4E4[24] = "\\STDDAT\\TAISEN_F.TIM";
+
+char MAIN_D_8012F4FC[20] = "\\STDDAT\\TIME.TIM";
+
+char MAIN_D_8012F510[12] = "Press Start";
+
+char MAIN_D_8012F51C[12] = "to begin.";
+
+uint8_t MAIN_D_8012F528[68] = {
+	0x00, 0x00, 0x00, 0x00, 0x01, 0x01, 0x03, 0x01,
+	0x00, 0x00, 0x01, 0x01, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x02, 0x00, 0x00, 0x00, 0x00, 0x02, 0x00,
+	0x00, 0x01, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00,
+	0x00, 0x00, 0x01, 0x02, 0x00, 0x00, 0x00, 0x00,
+	0x03, 0x00, 0x00, 0x00, 0x01, 0x02, 0x02, 0x03,
+	0x03, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x01, 0x00, 0x00, 0x00, 0x04, 0x00, 0x02, 0x03,
+	0x04, 0x03, 0x00, 0x00,
+};
+
+int16_t MAIN_D_8012F56C[6] = {
+	0x270f, 0x270f, 0x03e7, 0x03e7, 0x03e7, 0x03e7,
+};
+
+uint8_t MAIN_D_8012F578[12] = {
+	0x08, 0x14, 0x20, 0x2c, 0x38, 0x44, 0x4a, 0x54,
+	0x62, 0x6c, 0x7a, 0x84,
+};
+
+int32_t MAIN_D_8012F584[3] = {
+	0x45835c83, 0x69837283, 0x00005683,
+};
+
+int32_t MAIN_D_8012F590[36] = {
+	0x01e80000, 0xd7960000, 0x00000006, 0x01ea0000,
+	0x27440096, 0x001b0606, 0x01eb0000, 0x27442796,
+	0x00440606, 0x01ec0000, 0x27444e96, 0x001b4c06,
+	0x01ed0000, 0x27447596, 0x00444c06, 0x01e80000,
+	0x0a149c96, 0x00021806, 0x01e90000, 0xd7960000,
+	0x00000006, 0x01ea0000, 0x27440096, 0x001b0606,
+	0x01eb0000, 0x27442796, 0x00440606, 0x01ec0000,
+	0x27444e96, 0x001b4c06, 0x01ed0000, 0x27447596,
+	0x00444c06, 0x01e90000, 0x0a149caa, 0x00021806,
+};
+
+int32_t MAIN_D_8012F620[12] = {
+	0x01e80040, 0x16290000, 0x001e0905, 0x01e80040,
+	0x16290000, 0x00510905, 0x01e80040, 0x16290000,
+	0x001e6205, 0x01e80040, 0x16290000, 0x00516205,
+};
+
+VsUISprite MAIN_D_8012F650[8] = {
+	{ 0x01e9, 0x78, 0x00, 0x7c, 0x0e, 0x1c, 0x07 },
+	{ 0x01ee, 0x00, 0x88, 0x28, 0x30, 0x0e, 0x25 },
+	{ 0x01ee, 0x50, 0x88, 0x28, 0x30, 0x46, 0x25 },
+	{ 0x01ef, 0xa0, 0x88, 0x28, 0x30, 0x7e, 0x25 },
+	{ 0x01f4, 0x00, 0xe8, 0x34, 0x17, 0x0a, 0x60 },
+	{ 0x01f4, 0x34, 0xe8, 0x34, 0x17, 0x41, 0x60 },
+	{ 0x01f4, 0x68, 0xe8, 0x34, 0x17, 0x7a, 0x60 },
+	{ 0x01ee, 0x78, 0x4c, 0x34, 0x3c, 0x08, 0x1f },
+};
+
+VsUISprite MAIN_D_8012F690[8] = {
+	{ 0x01ea, 0x78, 0x0e, 0x7c, 0x0e, 0x1c, 0x07 },
+	{ 0x01f0, 0x00, 0xb8, 0x28, 0x30, 0x0e, 0x25 },
+	{ 0x01f1, 0x50, 0xb8, 0x28, 0x30, 0x46, 0x25 },
+	{ 0x01f2, 0xa0, 0xb8, 0x28, 0x30, 0x7e, 0x25 },
+	{ 0x01eb, 0x78, 0x34, 0x34, 0x18, 0x08, 0x60 },
+	{ 0x01eb, 0x78, 0x1c, 0x34, 0x18, 0x40, 0x60 },
+	{ 0x01eb, 0xac, 0x1c, 0x30, 0x18, 0x7a, 0x60 },
+	{ 0x01ee, 0x78, 0x4c, 0x34, 0x3c, 0x08, 0x1f },
+};
+// clang-format on
+
 void VS__placePlayer1(int32_t stage)
 {
 	int16_t startX;
@@ -556,10 +648,10 @@ void VS__renderIntroNameChar(int16_t x, int16_t y, int16_t size,
 	MAIN_func_80092BB0(prim);
 	prim->tpage = getTPage(0, 0, 768, 0);
 	setClut(prim, 0, 480);
-	setRGB0(prim, MAIN_D_8012F438[MAIN_D_80134F28 * 3], MAIN_D_8012F439[MAIN_D_80134F28 * 3], MAIN_D_8012F43A[MAIN_D_80134F28 * 3]);
-	setRGB1(prim, MAIN_D_8012F438[MAIN_D_80134F28 * 3], MAIN_D_8012F439[MAIN_D_80134F28 * 3], MAIN_D_8012F43A[MAIN_D_80134F28 * 3]);
-	setRGB2(prim, MAIN_D_8012F438[MAIN_D_80134F28 * 3] / 10, MAIN_D_8012F439[MAIN_D_80134F28 * 3] / 10, MAIN_D_8012F43A[MAIN_D_80134F28 * 3] / 10);
-	setRGB3(prim, MAIN_D_8012F438[MAIN_D_80134F28 * 3] / 10, MAIN_D_8012F439[MAIN_D_80134F28 * 3] / 10, MAIN_D_8012F43A[MAIN_D_80134F28 * 3] / 10);
+	setRGB0(prim, MAIN_D_8012F438[MAIN_D_80134F28].r, MAIN_D_8012F438[MAIN_D_80134F28].g, MAIN_D_8012F438[MAIN_D_80134F28].b);
+	setRGB1(prim, MAIN_D_8012F438[MAIN_D_80134F28].r, MAIN_D_8012F438[MAIN_D_80134F28].g, MAIN_D_8012F438[MAIN_D_80134F28].b);
+	setRGB2(prim, MAIN_D_8012F438[MAIN_D_80134F28].r / 10, MAIN_D_8012F438[MAIN_D_80134F28].g / 10, MAIN_D_8012F438[MAIN_D_80134F28].b / 10);
+	setRGB3(prim, MAIN_D_8012F438[MAIN_D_80134F28].r / 10, MAIN_D_8012F438[MAIN_D_80134F28].g / 10, MAIN_D_8012F438[MAIN_D_80134F28].b / 10);
 
 	u = (character % 32) * 32;
 	v = (character / 8) * 32;
