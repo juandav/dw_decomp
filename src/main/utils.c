@@ -5,6 +5,8 @@
 
 #include <dw/btl.h>
 #include <dw/combat.h>
+#include <dw/main.h>
+#include <dw/std.h>
 #include <dw/ui.h>
 #include <dw/utils.h>
 
@@ -20,12 +22,151 @@ void setEntityTextDigit(POLY_FT4* poly, int32_t x, int32_t y);
 void setPosDataPolyFT4(POLY_FT4 *prim, int16_t posX, int16_t posY, int16_t width, int16_t height);
 void setUVDataPolyFT4(POLY_FT4 *prim, int16_t xPos, int16_t yPos, int16_t width, int16_t height);
 
-extern char MAIN_D_8012B94C[];
 extern int32_t ACTIVE_FRAMEBUFFER;
 extern GsOT GS_ORDERING_TABLE[];
 extern PACKET GS_WORK_BASES[];
 extern char DRAW_OFFSETS[];
-extern RGB8 TEXT_COLORS[];
+extern char BTL_EMBEDDED_TEXTURE1[];
+extern char DGET_D_80080800[];
+extern char DOO2_D_80070000[];
+extern char DOOA_D_80080000[];
+extern char EAB_D_80060000[];
+extern char ENDI_D_80060000[];
+extern char EVL_D_80060000[];
+extern char FISH_D_80070000[];
+extern char KAR_D_80053800[];
+extern char MURD_D_8007C000[];
+extern char VS_D_80052AE0[];
+
+// clang-format off
+RGB8 TEXT_COLORS[17] = {
+	{ 0x80, 0x80, 0x80 },
+	{ 0x19, 0x55, 0x80 },
+	{ 0x69, 0xc2, 0xff },
+	{ 0xff, 0x96, 0x46 },
+	{ 0xc8, 0xb4, 0x32 },
+	{ 0x1e, 0x80, 0x80 },
+	{ 0xd0, 0x1e, 0x50 },
+	{ 0x1e, 0xff, 0x1e },
+	{ 0x50, 0x50, 0x50 },
+	{ 0x6e, 0x6e, 0x6e },
+	{ 0x46, 0x46, 0x46 },
+	{ 0x00, 0x80, 0x00 },
+	{ 0x80, 0x00, 0x80 },
+	{ 0x40, 0x40, 0x40 },
+	{ 0x70, 0x44, 0x2c },
+	{ 0x48, 0x54, 0x7c },
+	{ 0x7c, 0x4c, 0x68 },
+};
+
+char MAIN_D_8012B94C[32] = {
+	0x25, 0x30, 0x31, 0x64, 0x00, 0x25, 0x30, 0x32,
+	0x64, 0x00, 0x25, 0x30, 0x33, 0x64, 0x00, 0x25,
+	0x30, 0x34, 0x64, 0x00, 0x25, 0x30, 0x35, 0x64,
+	0x00, 0x25, 0x30, 0x36, 0x64, 0x00, 0x00, 0x00,
+};
+
+void *MAIN_D_8012B96C[16] = {
+	BTL_EMBEDDED_TEXTURE1,
+	STD_D_80052AE0,
+	FISH_D_80070000,
+	EVL_D_80060000,
+	KAR_D_80053800,
+	VS_D_80052AE0,
+	GENERAL_BUFFER,
+	DOO2_D_80070000,
+	DOOA_D_80080000,
+	TEXTURE_BUFFER,
+	(char *)0x80080800,
+	DGET_D_80080800,
+	TEXTURE_BUFFER,
+	MURD_D_8007C000,
+	ENDI_D_80060000,
+	EAB_D_80060000,
+};
+
+char MAIN_D_8012B9AC[12] = "BTL_REL.BIN";
+
+char MAIN_D_8012B9B8[12] = "STD_REL.BIN";
+
+char MAIN_D_8012B9C4[16] = "FISH_REL.BIN";
+
+char MAIN_D_8012B9D4[12] = "EVL_REL.BIN";
+
+char MAIN_D_8012B9E0[12] = "KAR_REL.BIN";
+
+char MAIN_D_8012B9EC[12] = "VS_REL.BIN";
+
+char MAIN_D_8012B9F8[12] = "MOV_REL.BIN";
+
+char MAIN_D_8012BA04[16] = "DOO2_REL.BIN";
+
+char MAIN_D_8012BA14[16] = "DOOA_REL.BIN";
+
+char MAIN_D_8012BA24[12] = "TRN_REL.BIN";
+
+char MAIN_D_8012BA30[16] = "SHOP_REL.BIN";
+
+char MAIN_D_8012BA40[16] = "DGET_REL.BIN";
+
+char MAIN_D_8012BA50[16] = "TRN2_REL.BIN";
+
+char MAIN_D_8012BA60[16] = "MURD_REL.BIN";
+
+char MAIN_D_8012BA70[16] = "ENDI_REL.BIN";
+
+char MAIN_D_8012BA80[12] = "EAB_REL.BIN";
+
+char *MAIN_D_8012BA8C[16] = {
+	MAIN_D_8012B9AC,
+	MAIN_D_8012B9B8,
+	MAIN_D_8012B9C4,
+	MAIN_D_8012B9D4,
+	MAIN_D_8012B9E0,
+	MAIN_D_8012B9EC,
+	MAIN_D_8012B9F8,
+	MAIN_D_8012BA04,
+	MAIN_D_8012BA14,
+	MAIN_D_8012BA24,
+	MAIN_D_8012BA30,
+	MAIN_D_8012BA40,
+	MAIN_D_8012BA50,
+	MAIN_D_8012BA60,
+	MAIN_D_8012BA70,
+	MAIN_D_8012BA80,
+};
+
+uint16_t TOURNAMENT_MEDAL_IDS[6] = {
+	0x0000, 0x0001, 0x0002, 0x0003, 0x0004, 0x000c,
+};
+
+uint8_t FLEE_BUBBLE_SCALE[12] = {
+	0x64, 0x68, 0x6c, 0x70, 0x74, 0x78, 0x74, 0x70,
+	0x6c, 0x68, 0x00, 0x00,
+};
+
+uint8_t BATTLE_MUSIC[48] = {
+	0x02, 0x02, 0x02, 0x02, 0x02, 0x01, 0x02, 0x02,
+	0x02, 0x01, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02,
+	0x02, 0x02, 0x01, 0x02, 0x02, 0x01, 0x01, 0x01,
+	0x01, 0x01, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02,
+	0x02, 0x01, 0x02, 0x02, 0x02, 0x01, 0x01, 0x01,
+	0x02, 0x01, 0x02, 0x02, 0x02, 0x00, 0x00, 0x00,
+};
+
+uint8_t FLEE_CHANCE_TABLE[12] = {
+	0x3c, 0x46, 0x64, 0x50, 0x3c, 0x64, 0x5a, 0x64,
+	0x1e, 0x00, 0x00, 0x00,
+};
+
+uint8_t CONCAVE_SCREENS[20] = {
+	0xa6, 0xa7, 0xd2, 0xd4, 0xdb, 0xe2, 0xe3, 0xe4,
+	0xf7, 0xf8, 0xf9, 0xfd, 0xfe, 0xa1, 0x84, 0x02,
+	0x0d, 0x65, 0x00, 0x00,
+};
+
+char MAIN_D_80134430[8] = "Pause";
+// clang-format on
 
 void pauseFrame(void)
 {

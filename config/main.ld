@@ -514,7 +514,7 @@ SECTIONS
         . = ALIGN(., 4);
         build/src/main/fish.c.o(.data.*);
         . = ALIGN(., 4);
-        build/asm/main/data/utils.data.s.o(.data.*);
+        build/src/main/utils.c.o(.data.*);
         . = ALIGN(., 4);
         build/src/main/utils2.c.o(.data.*);
         . = ALIGN(., 4);
@@ -626,7 +626,7 @@ SECTIONS
         . = ALIGN(., 4);
         build/src/main/graphics2.c.o(.sdata.*);
         . = ALIGN(., 4);
-        build/asm/main/data/utils.sdata.s.o(.sdata.*);
+        build/src/main/utils.c.o(.sdata.*);
         . = ALIGN(., 4);
         build/src/main/efe_table.c.o(.sdata.*);
         . = ALIGN(., 4);
