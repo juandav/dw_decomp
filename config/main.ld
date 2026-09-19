@@ -426,7 +426,7 @@ SECTIONS
         . = ALIGN(., 4);
         KEEP(build/asm/main/data/psyq/libgte2.data.s.o(.data.*));
         . = ALIGN(., 4);
-        build/asm/main/data/model.data.s.o(.data.*);
+        build/src/main/model.c.o(.data.*);
         . = ALIGN(., 4);
         build/src/main/world_object.c.o(.data.*);
         . = ALIGN(., 4);
@@ -594,7 +594,7 @@ SECTIONS
         main_DATA_SIZE = ABSOLUTE(main_DATA_END - main_DATA_START);
 
         main_SDATA_START = .;
-        build/asm/main/data/model.sdata.s.o(.sdata.*);
+        build/src/main/model.c.o(.sdata.*);
         . = ALIGN(., 4);
         build/src/main/file_table.c.o(.sdata.*);
         . = ALIGN(., 4);
