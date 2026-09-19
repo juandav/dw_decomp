@@ -33,6 +33,15 @@ typedef struct {
 extern BattleEntry MAIN_D_8013024C[];
 
 typedef struct {
+	uint8_t digimonId;
+	uint8_t spriteId;
+	uint8_t unk2;
+	uint8_t unk3;
+} CardData;
+
+extern CardData CARD_DATA[];
+
+typedef struct {
 	uint8_t *buf;
 	int32_t isOpen;
 	uint8_t itemCount;

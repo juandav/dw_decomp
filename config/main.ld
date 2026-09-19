@@ -548,7 +548,7 @@ SECTIONS
         . = ALIGN(., 4);
         build/src/main/vs.c.o(.data.*);
         . = ALIGN(., 4);
-        KEEP(build/asm/main/data/script.data.s.o(.data.*));
+        build/src/main/script_common.c.o(.data.*);
         . = ALIGN(., 4);
         build/src/main/font.c.o(.data.*);
         . = ALIGN(., 4);
@@ -558,7 +558,7 @@ SECTIONS
         . = ALIGN(., 4);
         build/src/main/vs.c.o(.data.*);
         . = ALIGN(., 4);
-        KEEP(build/asm/main/data/script.data.s.o(.data.*));
+        build/src/main/script_common.c.o(.data.*);
         . = ALIGN(., 4);
         build/src/main/font.c.o(.data.*);
         . = ALIGN(., 4);

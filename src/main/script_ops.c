@@ -34,7 +34,6 @@ extern SelectionBoxOffsetData MAIN_D_80134644;
 extern SelectionBoxOffsetData MAIN_D_8013464C;
 extern SelectionBoxOffsetData MAIN_D_80134654;
 extern int16_t MAIN_D_8013078C[];
-extern int16_t MAIN_D_8013078E[];
 extern GsOT *ACTIVE_ORDERING_TABLE;
 int32_t random(int32_t limit);
 void *allocateArray(uint32_t size);
@@ -103,9 +102,6 @@ extern uint8_t MAIN_D_80135007;
 extern uint8_t MAIN_D_80134F82;
 extern uint16_t MAIN_D_801307A0[10];
 extern char MAIN_D_801345F4[4];
-extern uint8_t MAIN_D_8012FFD9[];
-extern uint8_t MAIN_D_8012FFDA[];
-extern uint8_t CARD_DATA[];
 extern uint8_t MAIN_D_80130438[];
 extern uint8_t MAIN_D_80130444[];
 extern uint8_t MAIN_D_801303B8[];
@@ -117,7 +113,6 @@ extern uint8_t MAIN_D_80134F81;
 void terminateNamingBuffer(void);
 void namingDeleteLast(void);
 extern uint32_t POLLED_INPUT;
-extern int32_t MAIN_D_80130250[];
 extern RECT MAIN_D_801302BC[];
 
 static void *script_ops_functions[] = {
@@ -366,9 +361,8 @@ int32_t MAIN_func_80107000(void)
 		id = SCRIPT_STATE_PTR->smth[i];
 		*buf++ = id;
 		if (id != 0xff) {
-			if (MAIN_D_8012FFC4[MAIN_D_8012FFD9[id *
-			    4]] <= MONEY &&
-			    (uint32_t)getCardAmount(id) < 9) {
+			if ((MAIN_D_8012FFC4[CARD_DATA[id].spriteId] <= MONEY) &&
+			    ((uint32_t)getCardAmount(id) < 9)) {
 				*buf++ = 1;
 			} else {
 				*buf++ = 0;
@@ -391,9 +385,9 @@ void showCardTextbox(void)
 	cardId = readPStat(PSTAT_249) & 0xff;
 	amount = getCardAmount(cardId);
 	if (amount == 0) {
-		if (MAIN_D_8012FFD9[cardId * 4] == 0) {
+		if (CARD_DATA[cardId].spriteId == 0) {
 			line = 2;
-		} else if (MAIN_D_8012FFD9[cardId * 4] == 1) {
+		} else if (CARD_DATA[cardId].spriteId == 1) {
 			line = 3;
 		} else {
 			line = 4;
@@ -409,7 +403,7 @@ void showCardTextbox(void)
 		setCardAmount(cardId, amount);
 	}
 
-	writePStat(PSTAT_249, (CARD_DATA)[cardId * 4]);
+	writePStat(PSTAT_249, CARD_DATA[cardId].digimonId);
 	showMapHeadTextbox(line, 0xfd, 0, 0x4d3);
 }
 
@@ -662,7 +656,6 @@ uint8_t rollCard(void)
 	uint8_t count;
 	uint8_t i;
 	uint32_t rarity;
-	int32_t off;
 
 	rarity = (uint8_t)random(100);
 	if (rarity == 0) {
@@ -680,8 +673,8 @@ uint8_t rollCard(void)
 	cards = (uint8_t *)allocateArray(0x42);
 	p = cards;
 	count = 0;
-	for (i = 0, off = 0; i < 0x42; i++, off += 4) {
-		if (rarity == MAIN_D_8012FFD9[off]) {
+	for (i = 0; i < 0x42; i++) {
+		if (rarity == CARD_DATA[i].spriteId) {
 			*p++ = i;
 			count++;
 		}
@@ -1178,8 +1171,8 @@ int32_t MAIN_func_80108230(void)
 		kind = box->buf[off + 1];
 		if (kind != 0) {
 			idx = MAIN_D_80134F78 * 4;
-			MAIN_D_8013500C = *(int16_t *)&MAIN_D_8012FFDA[idx];
-			kind = MAIN_D_8012FFD9[MAIN_D_80134F78 * 4] + 7;
+			MAIN_D_8013500C = *(int16_t *)((uint8_t *)&CARD_DATA[0].unk2 + idx);
+			kind = ((uint8_t *)&CARD_DATA[0].spriteId)[MAIN_D_80134F78 * 4] + 7;
 			showMapHeadTextbox(kind, readPStat(0xfe), 0, 0x4d4);
 			SELECTION_MENU_STATE = 1;
 			SCRIPT_STATE_4 = 7;
@@ -1811,7 +1804,7 @@ void MAIN_func_801094F0(void)
 					     MAIN_D_80134F68->cursor) * 2];
 		if ((item & 0x80) != 0) {
 			showMapHeadTextbox(6, readPStat(PSTAT_254), 0, 0x4d6);
-			MAIN_D_8013500C = MAIN_D_80130250[(item & 0x7f) * 2];
+			MAIN_D_8013500C = MAIN_D_8013024C[item & 0x7f].cost;
 			SELECTION_MENU_STATE = 1;
 			SCRIPT_STATE_4 = 4;
 			SCRIPT_STATE_3 = 1;
@@ -2511,7 +2504,7 @@ void renderSelectionBox(void)
 		sel = MAIN_D_80134F8C;
 		idx = ((sel & 0x7fff) * 3) + 3;
 		baseX = (bx + MAIN_D_8013078C[idx]) - 4;
-		baseY = (by + MAIN_D_8013078E[idx]) - 4;
+		baseY = (by + (&MAIN_D_8013078C[1])[idx]) - 4;
 	}
 
 	tag = &ACTIVE_ORDERING_TABLE->org[5];
