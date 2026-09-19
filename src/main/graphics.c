@@ -54,8 +54,18 @@ extern _GsFCALL GS_TMD_MAP;
 extern int32_t MAIN_D_80137BE8[];
 extern int32_t MAIN_D_80137BE4[];
 extern GsOT *ACTIVE_ORDERING_TABLE;
-extern AttackObject RESET_ATTACK_OBJECT;
 extern AttackObject ATTACK_OBJECTS[];
+
+// clang-format off
+AttackObject RESET_ATTACK_OBJECT = {
+	0xffffffff,
+	0xffffffff,
+	{ 0x0000, 0x0000, 0x0000, 0x0000 },
+	0x00000000,
+	0x00000000,
+	0x00000000,
+};
+// clang-format on
 
 void setRotTransMatrix(MATRIX *m)
 {

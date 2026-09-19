@@ -436,7 +436,7 @@ SECTIONS
         . = ALIGN(., 4);
         build/src/main/file_table.c.o(.data.*);
         . = ALIGN(., 4);
-        build/asm/main/data/graphics.data.s.o(.data.*);
+        build/src/main/graphics.c.o(.data.*);
         . = ALIGN(., 4);
         KEEP(build/src/main/_psstart.c.o(.data.*));
         . = ALIGN(., 4);

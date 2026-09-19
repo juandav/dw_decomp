@@ -181,7 +181,7 @@ segments:
       - [0x86CDC, data, psyq/libgte2]
       - [0x8C170, data, model]
       - [0x8D490, .data, file_table]
-      - [0x92584, data, graphics]
+      - [0x92584, .data, graphics]
       - [0x925A0, .data, partner_impl]
       - [0x92D68, .data, tamer]
       - [0x92E10, .data, toilet_data]
