@@ -2681,7 +2681,67 @@ void MAIN_func_800FD7D8(int32_t boxId, int32_t idx, int16_t x, int16_t y)
 
 INCLUDE_ASM("asm/main/nonmatchings/script_common", MAIN_func_800FD8D4);
 
-INCLUDE_ASM("asm/main/nonmatchings/script_common", MAIN_func_800FDC5C);
+void MAIN_func_800FDC5C(ItemMenuBox *box, int16_t x1, int16_t y1, int16_t x2,
+			int16_t y2, int32_t mode)
+{
+	TextBoxData *tbox;
+	int16_t boxId;
+	int32_t off;
+	int32_t outX;
+	int32_t outW;
+	int32_t i;
+	int32_t count;
+	int32_t top;
+	int32_t order;
+	int32_t order2;
+	int32_t yy2;
+	int16_t texY;
+	uint8_t item;
+	uint8_t row;
+
+	boxId = box->boxId;
+	tbox = &MAIN_D_801BE80C.box[boxId];
+	if (mode != 2) {
+		if (MAIN_func_800FCF88(box) != 0) {
+			top = box->prevTopRow;
+			count = box->itemCount - top;
+			if (box->visibleRows < count) {
+				count = box->visibleRows;
+			}
+		} else {
+			top = box->topRow;
+			count = box->itemCount - top;
+			if (box->visibleRows < count) {
+				count = box->visibleRows;
+			}
+		}
+		off = top * 2;
+		order = 6 - boxId;
+		for (i = 0, yy2 = y2 + 2; i < count; i++, off += 2, top++, y2 += 0x12, yy2 += 0x12) {
+			item = box->buf[off];
+			if (item != 0xff) {
+				if (mode == 0) {
+					renderItemSprite(item, x2, y2, order);
+				} else if (mode == 1) {
+					MAIN_func_800FE258(MAIN_D_8012FFD9[item * 4], x2 + 2, yy2, order);
+				}
+			}
+		}
+	}
+
+	getVRAMModeCoords(tbox->vramMode, &outX, &outW);
+	texY = tbox->backPage * tbox->vramRows * 12;
+	count = box->itemCount - box->topRow;
+	if (box->visibleRows < count) {
+		count = box->visibleRows;
+	}
+	for (i = 0, order2 = 6 - boxId; i < count; i++, y1 += 0x12) {
+		if (box->buf[(box->topRow + i) * 2] != 0xff) {
+			row = box->itemRow[i];
+			renderString(0, x1, y1, outW, 0xc, outX, (int16_t)(texY + row * 12), order2, 1);
+		}
+	}
+}
 
 void MAIN_func_800FDF84(void)
 {
