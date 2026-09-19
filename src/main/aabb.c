@@ -4,7 +4,7 @@
 #include <dw/entity.h>
 #include <dw/params.h>
 
-void unusedAABB(void)
+void unusedAABB(AABB *aabb)
 {
 }
 

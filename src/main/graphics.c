@@ -3,6 +3,7 @@
 #include <libgte.h>
 #include <mwinline_n.h>
 
+#include <dw/aabb.h>
 #include <dw/attack_object.h>
 #include <dw/entity.h>
 #include <dw/model.h>
@@ -10,11 +11,6 @@
 #include <dw/types.h>
 
 #include "common.h"
-
-typedef struct {
-	SVECTOR *center;
-	SVECTOR extent;
-} AABB;
 
 PACKET *GsTMDfastF3L();
 PACKET *GsTMDfastG3L();
@@ -46,7 +42,6 @@ PACKET *GsTMDdivTNG4();
 void setRotTransMatrix(MATRIX *m);
 void initializeGsTMDMap(void);
 int32_t getTileTrigger(VECTOR *loc);
-void unusedAABB(AABB *box);
 void updateTMDTextureData(char *tmd, int32_t clutX, int32_t x, int32_t y, int32_t tpage);
 void renderDropShadow(Entity *entity);
 

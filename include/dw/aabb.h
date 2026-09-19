@@ -11,7 +11,7 @@ typedef struct {
 	SVECTOR extent;
 } AABB;
 
-void unusedAABB(void);
+void unusedAABB(AABB *aabb);
 int32_t findAABBHitEntity(AABB *aabb, Entity *ignoreEntity, int32_t startId);
 int32_t hasAABBOverlap(AABB *a, AABB *b);
 
