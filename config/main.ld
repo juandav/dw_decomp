@@ -494,7 +494,7 @@ SECTIONS
         . = ALIGN(., 4);
         KEEP(build/asm/main/data/psyq/libsnd.data.s.o(.data.*));
         . = ALIGN(., 4);
-        build/asm/main/data/map.data.s.o(.data.*);
+        build/src/main/map.c.o(.data.*);
         . = ALIGN(., 4);
         build/src/main/inventory.c.o(.data.*);
         . = ALIGN(., 4);
@@ -612,7 +612,7 @@ SECTIONS
         . = ALIGN(., 4);
         build/src/main/sound.c.o(.sdata.*);
         . = ALIGN(., 4);
-        build/asm/main/data/map.sdata.s.o(.sdata.*);
+        build/src/main/map.c.o(.sdata.*);
         . = ALIGN(., 4);
         build/src/main/inventory.c.o(.sdata.*);
         . = ALIGN(., 4);
