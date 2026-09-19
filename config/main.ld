@@ -542,7 +542,7 @@ SECTIONS
         . = ALIGN(., 4);
         build/src/main/battle_ui.c.o(.data.*);
         . = ALIGN(., 4);
-        KEEP(build/asm/main/data/main.data.s.o(.data.*));
+        build/src/main/main.c.o(.data.*);
         . = ALIGN(., 4);
         build/src/main/sjis.c.o(.data.*);
         . = ALIGN(., 4);
@@ -636,7 +636,7 @@ SECTIONS
         . = ALIGN(., 4);
         build/src/main/battle_ui.c.o(.sdata.*);
         . = ALIGN(., 4);
-        build/asm/main/data/main.sdata.s.o(.sdata.*);
+        build/src/main/main.c.o(.sdata.*);
         . = ALIGN(., 4);
         build/src/main/font.c.o(.sdata.*);
         . = ALIGN(., 4);

@@ -9,7 +9,7 @@
 #include <dw/ui.h>
 
 extern uint8_t MAIN_D_80134F90;
-extern char MAIN_D_80134607[1];
+extern char MAIN_D_80134600[8];
 
 static void *script_draw_functions[] = {
 	newGameStateMachine,
@@ -587,7 +587,7 @@ int32_t newGameStateMachine(void)
 	switch (SELECTION_MENU_STATE) {
 	case 0:
 		setTrigger(TRIGGER_49);
-		strcpy(DIGIMON_DATA[0].name, MAIN_D_80134607);
+		strcpy(DIGIMON_DATA[0].name, &MAIN_D_80134600[7]);
 		setupNewGameDialogueBox();
 		showNewgameDialogue(0x10, 2);
 		MAIN_D_80134F98 = 0;

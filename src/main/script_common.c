@@ -157,7 +157,7 @@ extern int32_t MAIN_D_80135028;
 extern uint32_t MAIN_D_80134F64;
 extern uint8_t *MAIN_D_801345B0;
 extern int16_t MAIN_D_801345C0[1];
-extern uint8_t MAIN_D_801345C2[2];
+extern uint16_t MAIN_D_801345C2;
 typedef struct {
 	int32_t v[6];
 } Pow10Table;
@@ -2701,7 +2701,8 @@ void MAIN_func_800FDFB4(void)
 	for (i = 0; i <= 0; i++) {
 		if (mapId == MAIN_D_801345C0[i]) {
 			i = i * 2;
-			playSound(MAIN_D_801345C2[i], MAIN_D_801345C2[i + 1]);
+			playSound(((uint8_t *)&MAIN_D_801345C2)[i],
+			          ((uint8_t *)&MAIN_D_801345C2)[i + 1]);
 
 			return;
 		}
