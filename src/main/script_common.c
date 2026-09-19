@@ -2723,7 +2723,8 @@ void MAIN_func_800FDC5C(ItemMenuBox *box, int16_t x1, int16_t y1, int16_t x2,
 				if (mode == 0) {
 					renderItemSprite(item, x2, y2, order);
 				} else if (mode == 1) {
-					MAIN_func_800FE258(MAIN_D_8012FFD9[item * 4], x2 + 2, yy2, order);
+					uint8_t spriteId = CARD_DATA[item].spriteId;
+					MAIN_func_800FE258(spriteId, x2 + 2, yy2, order);
 				}
 			}
 		}
