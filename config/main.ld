@@ -552,7 +552,7 @@ SECTIONS
         . = ALIGN(., 4);
         build/src/main/font.c.o(.data.*);
         . = ALIGN(., 4);
-        KEEP(build/asm/main/data/main_menu.data.s.o(.data.*));
+        build/src/main/main_menu.c.o(.data.*);
         . = ALIGN(., 4);
         build/src/main/sjis.c.o(.data.*);
         . = ALIGN(., 4);
@@ -562,7 +562,7 @@ SECTIONS
         . = ALIGN(., 4);
         build/src/main/font.c.o(.data.*);
         . = ALIGN(., 4);
-        KEEP(build/asm/main/data/main_menu.data.s.o(.data.*));
+        build/src/main/main_menu.c.o(.data.*);
         . = ALIGN(., 4);
         build/src/main/vs.c.o(.data.*);
         . = ALIGN(., 4);
@@ -640,7 +640,7 @@ SECTIONS
         . = ALIGN(., 4);
         build/src/main/font.c.o(.sdata.*);
         . = ALIGN(., 4);
-        KEEP(build/asm/main/data/main_menu.sdata.s.o(.sdata.*));
+        build/src/main/main_menu.c.o(.sdata.*);
         . = ALIGN(., 4);
         KEEP(build/src/main/btl.c.o(.sdata.*));
         . = ALIGN(., 4);
