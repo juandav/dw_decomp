@@ -3698,7 +3698,82 @@ void MAIN_func_8010020C(void)
 	TEXTBOX_OPEN_TIMER = 0;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/script_common", MAIN_func_80100258);
+void MAIN_func_80100258(int32_t flag)
+{
+	RECT area;
+	int32_t x;
+	int32_t clut;
+	TextBoxData *box;
+	int32_t i;
+	int32_t drew;
+	uint8_t flags;
+	int16_t mode;
+	uint8_t features;
+	uint8_t color;
+
+	drew = 0;
+	if (ACTIVE_INSTRUCTION != 0xff) {
+		box = TEXT_BOX_DATA;
+		for (i = 0; i < 6; i++, box++) {
+			if (box->vramRows != 0) {
+				if (box->registered == 1 && box->writeCount != box->renderCount) {
+					if (box->doubleBuffered == 1) {
+						box->writeRow = (box->backPage ^ 1) * box->vramRows;
+						getVRAMModeCoords(box->vramMode, &x, &clut);
+						area.x = x;
+						area.y = (box->vramRow + box->writeRow) * 12;
+						area.w = clut;
+						area.h = box->vramRows * 12;
+						clearTextSubArea(&area);
+					} else {
+						box->writeRow = 0;
+					}
+					box->registered = 0;
+				}
+				if (drew == 0 && box->registered == 0) {
+					drew = MAIN_func_800FFA4C(i & 0xff, flag);
+				}
+				flags = box->flags;
+				mode = flags & 0xf;
+				if (mode != UI_BOX_DATA[i].state) {
+					if ((flags & 0xf) == 1) {
+						if (box->registered == 1 && UI_BOX_DATA[i].state == 0) {
+							features = (flags >> 4) & 3;
+							if (features == 0) {
+								color = 1;
+							} else {
+								color = 0;
+							}
+							if ((flags & 0x80) == 0) {
+								createStaticUIBox((int16_t)i, color, features, &box->rect, box->tick, box->render);
+							} else {
+								createAnimatedUIBox((int16_t)i, color, features, &box->rect, &box->origin, box->tick, box->render);
+							}
+						}
+					} else if (UI_BOX_DATA[i].state == 1) {
+						closeTextbox(i & 0xff, 0);
+					}
+				}
+			}
+		}
+		if (MAIN_D_80134FFC != 0) {
+			MAIN_D_80134FFC--;
+		}
+		if (MAIN_D_80135010 != 0) {
+			MAIN_D_80135010--;
+		}
+		MAIN_D_80134F94 = 0;
+		TEXTBOX_OPEN_TIMER++;
+		return;
+	}
+	for (i = 0; i < 6; i++) {
+		if (UI_BOX_DATA[i].state != 0) {
+			break;
+		}
+		setTextColor(1);
+		IS_SCRIPT_PAUSED = 1;
+	}
+}
 
 void getVRAMModeCoords(int32_t mode, int32_t *outX, int32_t *outClut)
 {
