@@ -23,8 +23,6 @@ void renderLinePrimitive(int32_t color, int32_t x0, int32_t y0,
 			 int32_t layer, int32_t blend);
 
 extern GsOT *ACTIVE_ORDERING_TABLE;
-extern uint8_t MAIN_D_80134330[4];
-extern uint8_t MAIN_D_80134334[4];
 
 static void *ui_functions[] = {
 	renderUIBoxAnim,
@@ -38,6 +36,26 @@ static void *ui_functions[] = {
 	createStaticUIBox,
 	initializeUIBoxData,
 };
+
+// clang-format off
+uint8_t MAIN_D_80134330[4] = {
+	0x78, 0x7c, 0x78, 0x7c,
+};
+
+uint8_t MAIN_D_80134334[4] = {
+	0x10, 0x10, 0x14, 0x14,
+};
+
+char MAIN_D_80134338[4] = "Bug";
+
+char MAIN_D_8013433C[8] = "Tremar";
+
+char MAIN_D_80134344[8] = "War Cry";
+
+char MAIN_D_8013434C[8] = "Counter";
+
+char MAIN_D_80134354[8] = "Bubble";
+// clang-format on
 
 void initializeUIBoxData(void)
 {

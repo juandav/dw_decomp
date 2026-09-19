@@ -606,7 +606,7 @@ SECTIONS
         . = ALIGN(., 4);
         build/asm/main/data/overworld.sdata.s.o(.sdata.*);
         . = ALIGN(., 4);
-        build/asm/main/data/ui.sdata.s.o(.sdata.*);
+        build/src/main/ui.c.o(.sdata.*);
         . = ALIGN(., 4);
         build/src/main/item.c.o(.sdata.*);
         . = ALIGN(., 4);
