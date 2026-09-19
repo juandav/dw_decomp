@@ -49,8 +49,6 @@ extern int32_t CHECKED_MEMORY_CARD;
 
 extern VECTOR STORED_TAMER_POS;
 
-typedef void (*ItemFunction)(int16_t);
-extern ItemFunction ITEM_FUNCTIONS[128];
 
 extern int8_t ITEM_TAKE_DISTANCE[68];
 

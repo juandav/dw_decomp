@@ -43,7 +43,6 @@ extern GsOT_TAG GS_ORDERING_TABLE_1[];
 extern GsOT GS_ORDERING_TABLE[2];
 
 extern int32_t ACTIVE_FRAMEBUFFER;
-typedef void (*ItemFunction)(int16_t);
 
 extern int32_t MAIN_D_80134EAC;
 typedef struct {
@@ -130,7 +129,6 @@ void addThrownItem(int32_t type);
 void startThrowingItem(void);
 void tickThrownItem(int32_t instanceId);
 void renderThrownItem(int32_t instanceId);
-void handleBuffDisks(int32_t type);
 void MAIN_func_800F1794(void);
 int32_t removeBuffModelObject(void);
 void tickPartnerBattle(int32_t instanceId);

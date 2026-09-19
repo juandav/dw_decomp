@@ -44,10 +44,13 @@ typedef struct {
 	uint8_t size;
 } Inventory;
 
+typedef void (*ItemFunction)(int16_t);
+
 extern Item ITEM_PARA[];
 extern TamerItem TAMER_ITEM;
 extern Inventory INVENTORY;
 extern DroppedItem DROPPED_ITEMS[11];
+extern ItemFunction ITEM_FUNCTIONS[128];
 
 void initializeInventory(void);
 void setInventorySize(uint8_t size);
@@ -64,5 +67,15 @@ void removeTamerItem(void);
 void renderOverworldItem(WorldItem *item);
 
 void addWithLimit(/* int16_t *value, int16_t amount, int16_t limit */);
+
+void handleBuffDisks(int32_t type);
+void handleChips(int32_t chipId);
+void handleDoubleFloppy(int32_t itemId);
+void handleEvoItems(int16_t arg);
+void handleFood(int16_t arg);
+void handleHPHealingItem(unsigned char idx);
+void handleMPHealingItem(unsigned char idx);
+void handleRestore(int16_t arg);
+void handleStatusItems(int32_t itemId);
 
 #endif

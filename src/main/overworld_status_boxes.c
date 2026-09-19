@@ -28,8 +28,7 @@ extern int32_t VIEWPORT_DISTANCE;
 extern GsF_LIGHT LIGHT_DATA[3];
 void startAnimation(Entity *entity, int32_t animId);
 void tickAnimation(Entity *entity);
-extern char *MAIN_D_801247BC[];
-extern char *MAIN_D_801247C0[];
+extern char *MAIN_D_801247B8[];
 extern char MAIN_D_80124C24[];
 extern char MAIN_D_80124C30[];
 extern char MAIN_D_80124C54[];
@@ -362,11 +361,11 @@ int32_t drawDigimonStatsStrings(void)
 		MENU_SUB_STATE = 2;
 		break;
 	case 2:
-		drawString(MAIN_D_801247BC[0], 0, 0x30);
+		drawString(MAIN_D_801247B8[1], 0, 0x30);
 		MENU_SUB_STATE = 3;
 		break;
 	case 3:
-		drawString(MAIN_D_801247C0[0], 0, 0x18);
+		drawString(MAIN_D_801247B8[2], 0, 0x18);
 
 		return 1;
 	}

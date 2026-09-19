@@ -7,7 +7,7 @@ extern int8_t MEDAL_SELECTOR_INDEX;
 extern RECT MAIN_D_80134318;
 extern RECT MAIN_D_80134320;
 extern char MAIN_D_80124C54[];
-extern char *MAIN_D_80124804[];
+extern char *MAIN_D_80124800[];
 extern char *MAIN_D_80124828[];
 extern char *MAIN_D_80124864[];
 
@@ -28,7 +28,7 @@ int32_t drawMedalViewStrings(void)
 		MENU_SUB_STATE = 1;
 		break;
 	case 1:
-		drawString(MAIN_D_80124804[0], 0, 0xc);
+		drawString(MAIN_D_80124800[1], 0, 0xc);
 		MENU_SUB_STATE = 2;
 		break;
 	case 2:

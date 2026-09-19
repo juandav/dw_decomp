@@ -7,11 +7,7 @@ extern RECT MAIN_D_801342E8;
 extern uint8_t MAIN_D_80134234[4];
 extern int16_t MAIN_D_80134D38;
 extern int16_t MAIN_D_80134D3A;
-extern char *MAIN_D_801247C4[];
-extern char *MAIN_D_801247C8[];
-extern char *MAIN_D_801247CC[];
-extern char *MAIN_D_801247D0[];
-extern char *MAIN_D_801247D4[];
+extern char *MAIN_D_801247B8[];
 extern char *MAIN_D_801247D8[];
 extern char *MOVE_NAMES[];
 
@@ -37,7 +33,7 @@ int32_t drawDigimonMovesText(void)
 		MENU_SUB_STATE = 1;
 		break;
 	case 1:
-		drawString(MAIN_D_801247C4[0], 0, 0x48);
+		drawString(MAIN_D_801247B8[3], 0, 0x48);
 		if (PARTNER_ENTITY.digimonEntity.stats.base.moves[1] != 0xff) {
 			MAIN_D_80134234[1] = entityGetTechFromAnim(ENTITY_TABLE[1],
 				PARTNER_ENTITY.digimonEntity.stats.base.moves[1]);
@@ -49,7 +45,7 @@ int32_t drawDigimonMovesText(void)
 		DrawSync(0);
 		return 0;
 	case 2:
-		drawString(MAIN_D_801247D0[0], 0x84, 0x6c);
+		drawString(MAIN_D_801247B8[6], 0x84, 0x6c);
 		if (PARTNER_ENTITY.digimonEntity.stats.base.moves[2] != 0xff) {
 			MAIN_D_80134234[2] = entityGetTechFromAnim(ENTITY_TABLE[1],
 				PARTNER_ENTITY.digimonEntity.stats.base.moves[2]);
@@ -68,16 +64,16 @@ int32_t drawDigimonMovesText(void)
 		} else {
 			MAIN_D_80134234[3] = 0xff;
 		}
-		drawString(MAIN_D_801247C8[0], 0, 0x6c);
+		drawString(MAIN_D_801247B8[4], 0, 0x6c);
 		MENU_SUB_STATE = 4;
 		DrawSync(0);
 		return 0;
 	case 4:
-		drawString(MAIN_D_801247CC[0], 0, 0x54);
+		drawString(MAIN_D_801247B8[5], 0, 0x54);
 		MENU_SUB_STATE = 5;
 		break;
 	case 5:
-		drawString(MAIN_D_801247D4[0], 0, 0x60);
+		drawString(MAIN_D_801247B8[7], 0, 0x60);
 		drawString(MAIN_D_801247D8[0], 0, 0x78);
 		MAIN_D_80134D3A = 0x73;
 		MAIN_D_80134D38 = 0x6f;

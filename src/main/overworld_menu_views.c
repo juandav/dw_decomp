@@ -42,7 +42,6 @@ extern uint8_t MAIN_D_80134234[4];
 extern int16_t MAIN_D_80134D38;
 extern int16_t MAIN_D_80134D3A;
 extern int16_t TECH_VIEW_LINES1[];
-extern int16_t TECH_VIEW_LINES2[];
 extern int16_t TECH_VIEW_LINES3[];
 extern IconRect MAIN_D_801241CC[];
 extern IconRect MAIN_D_80124044[];
@@ -309,7 +308,7 @@ void renderDigimonMovesView(void)
 					  icon->texY + 0x80, 5, 0x7b06, 5, 0);
 		}
 		renderRectPolyFT4(0x75, 4, 4, 4, 0x78, 0x8c, 5, 0x7b06, 5, 0);
-		renderSeperatorLines(TECH_VIEW_LINES2, 3, 5);
+		renderSeperatorLines(&TECH_VIEW_LINES1[15], 3, 5);
 		if (MAIN_D_80134237 != 0xff) {
 			renderString(3, -0x8e, -0xf, 0x24, 0xc, 0x3c, 0x48, 5, 1);
 			renderString(0, -0x7c, 1, 0x84, 0xc, 0, 0x3c, 5, 1);

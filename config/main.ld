@@ -456,7 +456,7 @@ SECTIONS
         . = ALIGN(., 4);
         KEEP(build/asm/main/data/psyq/libcd.data.s.o(.data.*));
         . = ALIGN(., 4);
-        build/asm/main/data/overworld.data.s.o(.data.*);
+        build/src/main/overworld.c.o(.data.*);
         . = ALIGN(., 4);
         build/src/main/overworld_evochart_detail.c.o(.data.*);
         . = ALIGN(., 4);
@@ -604,7 +604,7 @@ SECTIONS
         . = ALIGN(., 4);
         build/src/main/efe.c.o(.sdata.*);
         . = ALIGN(., 4);
-        build/asm/main/data/overworld.sdata.s.o(.sdata.*);
+        build/src/main/overworld.c.o(.sdata.*);
         . = ALIGN(., 4);
         build/src/main/ui.c.o(.sdata.*);
         . = ALIGN(., 4);

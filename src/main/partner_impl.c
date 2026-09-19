@@ -202,7 +202,7 @@ int8_t ITEM_TAKE_DISTANCE[68] = {
 };
 
 extern uint8_t MAIN_D_80137C00[2048];
-extern uint8_t MAIN_D_80127C15[];
+extern uint8_t MAIN_D_80127BDC[];
 extern GsDOBJ2 POOP_OBJECT;
 extern GsCOORDINATE2 POOP_COORDINATES;
 
@@ -1378,7 +1378,7 @@ int32_t partnerWillRefuseItem(void)
 				return 1;
 		} else {
 			if (((level = DIGIMON_DATA[PARTNER_ENTITY.digimonEntity.entity.type].level) ==
-			     (targetLevel = DIGIMON_DATA[MAIN_D_80127C15[item]].level)) ||
+			     (targetLevel = DIGIMON_DATA[(&MAIN_D_80127BDC[0x39])[item]].level)) ||
 			    (level + 2 == targetLevel) ||
 			    (level - 1 == targetLevel))
 				return 1;
