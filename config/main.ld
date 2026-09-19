@@ -602,7 +602,7 @@ SECTIONS
         . = ALIGN(., 4);
         build/src/main/tamer.c.o(.sdata.*);
         . = ALIGN(., 4);
-        build/asm/main/data/efe.sdata.s.o(.sdata.*);
+        build/src/main/efe.c.o(.sdata.*);
         . = ALIGN(., 4);
         build/asm/main/data/overworld.sdata.s.o(.sdata.*);
         . = ALIGN(., 4);

@@ -173,7 +173,6 @@ void renderParticleFlash();
 
 extern int16_t MAIN_D_80138AA4[];
 extern int16_t MAIN_D_801389B4[];
-extern char MAIN_D_80134220[4];
 extern u_long SOME_IMAGE_DATA[];
 extern uint8_t MAIN_D_801387B8[];
 extern EfeParticleField MAIN_D_80138888[];
@@ -184,9 +183,6 @@ extern int32_t FLASH_INSTANCE;
 extern int32_t DRAWING_OFFSET_X;
 extern int32_t DRAWING_OFFSET_Y;
 extern int32_t VIEWPORT_DISTANCE;
-extern int8_t MAIN_D_80134214[4];
-extern uint8_t MAIN_D_8013421C[4];
-extern int8_t MAIN_D_80134218[4];
 
 static void *efe_functions[] = {
 	renderParticleFlash,
@@ -216,6 +212,22 @@ static void *efe_functions[] = {
 	createParticleFX,
 	initializeParticleFX,
 };
+
+// clang-format off
+int8_t MAIN_D_80134214[4] = {
+	0x02, 0x03, 0x02, 0x00,
+};
+
+int8_t MAIN_D_80134218[4] = {
+	0x19, 0x30, 0x14, 0x00,
+};
+
+uint8_t MAIN_D_8013421C[4] = {
+	0x40, 0x00, 0x00, 0x00,
+};
+
+char MAIN_D_80134220[4] = ";1";
+// clang-format on
 
 static void createParticleFX__garbage__(void)
 {

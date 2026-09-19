@@ -215,7 +215,7 @@ segments:
       - [0xA40FC, .sdata, file_table]
       - [0xA41EC, .sdata, partner_impl]
       - [0xA41F4, .sdata, tamer]
-      - [0xA4214, sdata, efe]
+      - [0xA4214, .sdata, efe]
       - [0xA4224, sdata, overworld]
       - [0xA4330, sdata, ui]
       - [0xA435C, .sdata, item]
