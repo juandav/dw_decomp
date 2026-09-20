@@ -4,14 +4,14 @@
 #include <dw/params.h>
 #include <dw/pstat.h>
 #include <dw/script.h>
-#include <dw/sjis.h>
 #include <dw/trigger.h>
 #include <dw/ui.h>
 
 extern uint8_t MAIN_D_80134F90;
 extern char MAIN_D_80134600[8];
+extern int32_t CURRENT_SCRIPT_PTR;
 
-static void *script_draw_functions[] = {
+static void *script_menu_text_order[] = {
 	newGameStateMachine,
 	initializeNamingBuffer,
 	MAIN_func_8010C4B0,
@@ -30,28 +30,27 @@ void MAIN_func_8010B648(void)
 	uint8_t owner = readPStat(PSTAT_254);
 
 	switch (SELECTION_MENU_STATE) {
-	case 0:
-		{
-			int32_t hasItems;
-			initializeItemMenuBox(&MAIN_D_80134F68, 0x9c, 6, 0xd2,
-					      0x18, 6, 0x5a);
-			hasItems = MAIN_func_80106D28();
-			MAIN_D_80134F70 = 0;
-			MAIN_D_80134F74 = 0;
+	case 0: {
+		int32_t hasItems;
+		initializeItemMenuBox(&MAIN_D_80134F68, 0x9c, 6, 0xd2,
+		                      0x18, 6, 0x5a);
+		hasItems = MAIN_func_80106D28();
+		MAIN_D_80134F70 = 0;
+		MAIN_D_80134F74 = 0;
 
-			if (hasItems != 0) {
-				showShopkeeperTextbox(0, owner, 0);
-				SELECTION_MENU_STATE = 1;
-				SCRIPT_STATE_4 = 3;
-				SCRIPT_STATE_3 = 1;
-			} else {
-				showShopkeeperTextbox(1, owner, 0);
-				SELECTION_MENU_STATE = 1;
-				SCRIPT_STATE_4 = 2;
-				SCRIPT_STATE_3 = 1;
-			}
-			break;
+		if (hasItems != 0) {
+			showShopkeeperTextbox(0, owner, 0);
+			SELECTION_MENU_STATE = 1;
+			SCRIPT_STATE_4 = 3;
+			SCRIPT_STATE_3 = 1;
+		} else {
+			showShopkeeperTextbox(1, owner, 0);
+			SELECTION_MENU_STATE = 1;
+			SCRIPT_STATE_4 = 2;
+			SCRIPT_STATE_3 = 1;
 		}
+		break;
+	}
 	case 1:
 		break;
 	case 2:
@@ -160,7 +159,7 @@ void MAIN_func_8010B9D8(void)
 	switch (SELECTION_MENU_STATE) {
 	case 0:
 		initializeItemMenuBox(&MAIN_D_80134F68, 0xc, 6, 0xb2, 0x18, 6,
-				      0x5a);
+		                      0x5a);
 		if (MAIN_func_80107000() != 0) {
 			SELECTION_MENU_STATE = 3;
 			SCRIPT_STATE_3 = 0;
@@ -200,7 +199,7 @@ void MAIN_func_8010BB0C(void)
 	switch (SELECTION_MENU_STATE) {
 	case 0:
 		initializeItemMenuBox(&MAIN_D_80134F68, 0x84, 6, 0xd2, 0x18,
-				      6, 0x5a);
+		                      6, 0x5a);
 		MAIN_func_80107200();
 		SELECTION_MENU_STATE = 3;
 		SCRIPT_STATE_3 = 0;
@@ -235,9 +234,9 @@ void MAIN_func_8010BC10(void)
 	switch (SELECTION_MENU_STATE) {
 	case 0:
 		initializeItemMenuBox(&MAIN_D_80134F68, 0x84, 6, 0x9a, 0x18,
-				      6, 0x5a);
+		                      6, 0x5a);
 		initializeItemMenuBox(&MAIN_D_80134F6C, 0x100, 6, 0xb2, 0x18,
-				      6, 0x5a);
+		                      6, 0x5a);
 		showMapHeadTextbox(0, owner, 0, 0x4d4);
 		SELECTION_MENU_STATE = 1;
 		SCRIPT_STATE_4 = 3;
@@ -292,7 +291,9 @@ void MAIN_func_8010BC10(void)
 	case 8:
 		triggerBoxCloseFlag(1);
 		MERIT += MAIN_D_8013500C;
-		if (MERIT > 9999) MERIT = 9999;
+		if (MERIT > 9999) {
+			MERIT = 9999;
+		}
 		MAIN_D_80134F84 = 1;
 		owner = getCardAmount(MAIN_D_80134F78);
 		owner = (owner - 1u);
@@ -337,10 +338,10 @@ void MAIN_func_8010BF68(void)
 	switch (SELECTION_MENU_STATE) {
 	case 0:
 		initializeItemMenuBox(&MAIN_D_80134F68, 0x100, 5, 0x88, 0x28,
-				      6, 0x4a);
+		                      6, 0x4a);
 		initializeItemMenuBox(&MAIN_D_80134F6C,
-				      INVENTORY.size << 1, 5, 0x88, 0x28,
-				      6, 0x4a);
+		                      INVENTORY.size << 1, 5, 0x88, 0x28,
+		                      6, 0x4a);
 		showMapHeadTextbox(0, owner, 0, 0x4d5);
 		SELECTION_MENU_STATE = 1;
 		SCRIPT_STATE_4 = 3;
@@ -391,7 +392,7 @@ void openJukebox(void)
 	switch (SELECTION_MENU_STATE) {
 	case 0:
 		initializeItemMenuBox(&MAIN_D_80134F68, 0x7e, 6, 0xd2, 0x18,
-				      6, 0x5a);
+		                      6, 0x5a);
 		MAIN_func_80107784();
 		showMapHeadTextbox(3, owner, 0, 0x4d6);
 		SELECTION_MENU_STATE = 1;
@@ -432,7 +433,7 @@ void MAIN_func_8010C28C(void)
 	switch (SELECTION_MENU_STATE) {
 	case 0:
 		initializeItemMenuBox(&MAIN_D_80134F68, 0xc, 6, 0xd2, 0x18, 6,
-				      0x5a);
+		                      0x5a);
 		MAIN_func_80107AB8();
 		showMapHeadTextbox(4, owner, 0, 0x4d6);
 		SELECTION_MENU_STATE = 1;
@@ -458,22 +459,21 @@ void MAIN_func_8010C28C(void)
 		SCRIPT_STATE_4 = 5;
 		SCRIPT_STATE_3 = 2;
 		break;
-	case 5:
-		{
-			uint8_t idx;
+	case 5: {
+		uint8_t idx;
 
-			triggerBoxCloseFlag(2);
-			triggerBoxCloseFlag(1);
+		triggerBoxCloseFlag(2);
+		triggerBoxCloseFlag(1);
 
-			idx = MAIN_D_80134F68->buf[(MAIN_D_80134F68->topRow + MAIN_D_80134F68->cursor) * 2] & 0x7f;
-			writePStat(PSTAT_247, MAIN_D_8013024C[idx].mapId);
-			writePStat(PSTAT_248, MAIN_D_8013024C[idx].unk_0x1);
-			CURRENT_SCRIPT_PTR = (int32_t)getScript(0);
-			MAIN_D_80134FDC = getScriptSection((uint8_t *)CURRENT_SCRIPT_PTR, 0x4e3);
-			MONEY -= MAIN_D_8013500C;
-			SELECTION_MENU_STATE = 2;
-			break;
-		}
+		idx = MAIN_D_80134F68->buf[(MAIN_D_80134F68->topRow + MAIN_D_80134F68->cursor) * 2] & 0x7f;
+		writePStat(PSTAT_247, MAIN_D_8013024C[idx].mapId);
+		writePStat(PSTAT_248, MAIN_D_8013024C[idx].unk_0x1);
+		CURRENT_SCRIPT_PTR = (int32_t)getScript(0);
+		MAIN_D_80134FDC = getScriptSection((uint8_t *)CURRENT_SCRIPT_PTR, 0x4e3);
+		MONEY -= MAIN_D_8013500C;
+		SELECTION_MENU_STATE = 2;
+		break;
+	}
 	case 6:
 		setInputRepeatMask(0);
 		triggerBoxCloseFlag(2);
@@ -523,15 +523,15 @@ void MAIN_func_8010C4B0(void)
 		SCRIPT_STATE_4 = 5;
 		SCRIPT_STATE_3 = 2;
 		break;
-	case 5:
-	{
+	case 5: {
 		int32_t giveResult;
 
 		triggerBoxCloseFlag(1);
 
-		giveResult = giveItem(MAIN_D_80134F6C->buf[
-			(MAIN_D_80134F68->topRow +
-			 MAIN_D_80134F68->cursor) * 2], 1);
+		giveResult = giveItem(MAIN_D_80134F6C->buf[(MAIN_D_80134F68->topRow +
+		                                            MAIN_D_80134F68->cursor) *
+		                                           2],
+		                      1);
 		if (giveResult != 0) {
 			uint8_t itemId = readPStat(PSTAT_249);
 			removeItem(itemId, 1);

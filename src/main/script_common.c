@@ -15,8 +15,6 @@
 #include <dw/ui.h>
 #include <dw/utils.h>
 
-#include "common.h"
-
 typedef struct {
 	uint8_t b[11];
 } ShopkeeperIdTable;
@@ -38,21 +36,81 @@ typedef struct {
 	TextBoxData box[6];
 } TextBoxTable;
 
-void renderSelectionCursor(int32_t a0, int32_t a1, int32_t a2, int32_t a3,
-			   int32_t a4);
+typedef struct {
+	int32_t v[6];
+} Pow10Table;
+
+extern ScriptCameraMovement MAIN_D_801BE6B4[];
+extern TextBoxTable MAIN_D_801BE80C;
+extern uint8_t TEXTBOX_OPEN_TIMER;
+extern uint32_t MAIN_D_8013501C;
+extern int32_t MAIN_D_80135028;
+extern uint32_t MAIN_D_80134F64;
+extern uint8_t *MAIN_D_801345B0;
+extern int16_t MAIN_D_801345C0[1];
+extern uint16_t MAIN_D_801345C2;
+extern int16_t MAIN_D_80134F60;
+extern int32_t MAIN_D_80135024;
+extern int32_t MAIN_D_80135020;
+extern uint16_t MAIN_D_80135016;
+extern int32_t MAIN_D_80135018;
+extern uint32_t POLLED_INPUT;
+extern int32_t MAIN_D_80134F94;
+extern uint16_t MAIN_D_801BE952[];
+extern uint16_t MAIN_D_801BE954[];
+extern uint16_t MAIN_D_801BE956[];
+extern BabyTypeTable MAIN_D_801345B4;
+extern int32_t MAIN_D_80134F88;
+extern int16_t MAIN_D_801345BC[2];
+extern uint32_t POLLED_INPUT_PREVIOUS;
+extern uint16_t MAIN_D_801BE950[];
+extern int32_t MAIN_D_801BE948[];
+extern int32_t MAIN_D_801BE94C[];
+extern uint8_t MAIN_D_80134F81;
+extern uint8_t MAIN_D_80134F82;
+extern uint8_t MAIN_D_80134F80;
+extern int32_t MAIN_D_80134F7C;
+extern GsOT *ACTIVE_ORDERING_TABLE;
+extern char *MOVE_NAMES[];
+extern char *MAP_NAME_PTR[];
+extern char *ITEM_DESC_PTR[];
+extern int8_t MAIN_D_80134F98;
+extern int32_t MAIN_D_80134FA8;
+extern char MAIN_D_801345F0[8];
+extern char MAIN_D_80134554[];
+extern char MAIN_D_8013455C[];
+extern char MAIN_D_80134564[];
+extern char MAIN_D_8013456C[];
+extern char MAIN_D_80134574[];
+extern char MAIN_D_8013457C[];
+extern char MAIN_D_80134584[];
+extern char MAIN_D_80134588[];
+extern char MAIN_D_8013458C[];
+extern char MAIN_D_80134590[];
+extern char MAIN_D_80134594[];
+extern char MAIN_D_80134598[];
+extern char MAIN_D_8013459C[];
+extern char MAIN_D_801345A0[];
+extern char MAIN_D_801345A4[];
+extern char MAIN_D_801345A8[];
+extern char MAIN_D_801345AC[];
+extern char MAIN_D_801345CC[];
+extern char MAIN_D_801345D4[];
+extern char MAIN_D_801345D8[];
+extern char MAIN_D_801345E0[];
+extern char MAIN_D_801345E8[];
+extern int32_t CURRENT_SCRIPT_PTR;
+
+void renderSelectionCursor(int32_t a0, int32_t a1, int32_t a2, int32_t a3, int32_t a4);
 int32_t MAIN_func_80106730(uint8_t op, uint32_t lhs, uint32_t rhs);
 void renderItemSprite(int32_t itemId, int32_t x, int32_t y, int32_t depth);
-void setPosDataPolyFT4(POLY_FT4 *prim, int32_t posX, int32_t posY,
-		       int32_t width, int32_t height);
-void setUVDataPolyFT4(POLY_FT4 *prim, int32_t xPos, int32_t yPos,
-		      int32_t width, int32_t height);
-void renderString(int32_t a0, int32_t a1, int32_t a2, int32_t a3, int32_t a4,
-		  int32_t a5, int32_t a6, int32_t a7, int32_t a8);
+void setPosDataPolyFT4(POLY_FT4 *prim, int32_t posX, int32_t posY, int32_t width, int32_t height);
+void setUVDataPolyFT4(POLY_FT4 *prim, int32_t xPos, int32_t yPos, int32_t width, int32_t height);
+void renderString(int32_t a0, int32_t a1, int32_t a2, int32_t a3, int32_t a4, int32_t a5, int32_t a6, int32_t a7, int32_t a8);
 int32_t MAIN_func_80100E40(int32_t boxId);
 int32_t hasMove(int32_t moveId);
 void unlearnMove(int32_t moveId);
 void loadMap(uint16_t mapId);
-
 void renderMonochromonMoodBubble(int32_t instanceId);
 void translateConditionFXToEntity(Entity *entity, SVECTOR *out);
 int32_t worldPosToScreenPos(SVECTOR *worldPos, DVECTOR *screenPos);
@@ -105,10 +163,6 @@ void getVRAMModeCoords(int32_t mode, int32_t *outX, int32_t *outClut);
 int32_t advanceTextbox(int32_t boxId);
 void setupDialogueBox(uint8_t owner);
 int32_t MAIN_func_80101EF8(int32_t boxId, int32_t speakerId);
-uint8_t *resolveMapHeadEntry(int32_t section, int32_t idx);
-void *allocateArray(uint32_t size);
-uint8_t *MAIN_func_800FF444(uint8_t *data, int32_t index);
-uint8_t *padWithSpaces(uint8_t *str, int32_t width, int32_t used);
 void MAIN_func_800FB700(void);
 void MAIN_func_800FB8D4(void);
 void MAIN_func_800FBAA0(void);
@@ -116,15 +170,10 @@ int32_t MAIN_func_800FCFB8(RECT *origin);
 int32_t MAIN_func_800FD244(RECT *origin);
 void MAIN_func_800FD7D8(int32_t boxId, int32_t idx, int16_t x, int16_t y);
 void MAIN_func_800FD8D4(ItemMenuBox *box);
-void MAIN_func_800FDC5C(ItemMenuBox *box, int16_t x1, int16_t y1, int16_t x2,
-			int16_t y2, int32_t flag);
-void MAIN_func_800FE150(int32_t boxId, int16_t x, int16_t y, int32_t w,
-			int16_t h);
-void renderTrianglePrimitive(int32_t color, int32_t x0, int32_t y0, int32_t x1,
-			     int32_t y1, int32_t x2, int32_t y2, int32_t otz,
-			     int32_t flag);
-void MAIN_func_800FE258(int32_t spriteId, int16_t x, int16_t y,
-			int32_t depth);
+void MAIN_func_800FDC5C(ItemMenuBox *box, int16_t x1, int16_t y1, int16_t x2, int16_t y2, int32_t flag);
+void MAIN_func_800FE150(int32_t boxId, int16_t x, int16_t y, int32_t w, int16_t h);
+void renderTrianglePrimitive(int32_t color, int32_t x0, int32_t y0, int32_t x1, int32_t y1, int32_t x2, int32_t y2, int32_t otz, int32_t flag);
+void MAIN_func_800FE258(int32_t spriteId, int16_t x, int16_t y, int32_t depth);
 void MAIN_func_800FE704(ItemMenuBox *box, uint8_t row, int32_t isLast);
 void MAIN_func_800FE9F0(ItemMenuBox *box, uint8_t row, int32_t isLast);
 void MAIN_func_800FEC30(ItemMenuBox *box, uint8_t row, int32_t isLast);
@@ -136,83 +185,15 @@ int32_t MAIN_func_800FFC1C(void);
 int32_t MAIN_func_800FFF24(void);
 int32_t drawString2(uint8_t *str, int16_t x, int16_t y, int32_t flag);
 int32_t getSpeakerName(int32_t speakerId, uint8_t *buf);
-uint8_t *intToStringSJIS(uint8_t *buf, int32_t value, uint8_t digits,
-			 int32_t flag);
+uint8_t *intToStringSJIS(uint8_t *buf, int32_t value, uint8_t digits, int32_t flag);
 void renderHorizontalLine(uint8_t boxId, int16_t x, int16_t y, int32_t w);
-void renderLinePrimitive(uint32_t color, int32_t x0, int32_t y0, int32_t x1,
-			 int32_t y1, int32_t order, uint32_t mode);
+void renderLinePrimitive(uint32_t color, int32_t x0, int32_t y0, int32_t x1, int32_t y1, int32_t order, uint32_t mode);
 void renderSellItemBox(void);
 void renderUIBox(int32_t boxId);
 void renderVerticalLine(int32_t boxId, int16_t x, int16_t y, int32_t h);
 void tickSellItemBox(void);
-int32_t getSpeakerName(int32_t speakerId, uint8_t *buf);
-uint8_t *intToStringSJIS(uint8_t *buf, int32_t value, uint8_t digits,
-			 int32_t flag);
 
-extern ScriptCameraMovement MAIN_D_801BE6B4[];
-extern TextBoxTable MAIN_D_801BE80C;
-extern uint8_t TEXTBOX_OPEN_TIMER;
-extern uint32_t MAIN_D_8013501C;
-extern int32_t MAIN_D_80135028;
-extern uint32_t MAIN_D_80134F64;
-extern uint8_t *MAIN_D_801345B0;
-extern int16_t MAIN_D_801345C0[1];
-extern uint16_t MAIN_D_801345C2;
-typedef struct {
-	int32_t v[6];
-} Pow10Table;
-extern int16_t MAIN_D_80134F60;
-extern int32_t MAIN_D_80135024;
-extern int32_t MAIN_D_80135020;
-extern uint16_t MAIN_D_80135016;
-extern int32_t MAIN_D_80135018;
-extern uint32_t POLLED_INPUT;
-extern int32_t MAIN_D_80134F94;
-extern uint16_t MAIN_D_801BE952[];
-extern uint16_t MAIN_D_801BE954[];
-extern uint16_t MAIN_D_801BE956[];
-extern BabyTypeTable MAIN_D_801345B4;
-extern int32_t MAIN_D_80134F88;
-extern int16_t MAIN_D_801345BC[2];
-extern uint32_t POLLED_INPUT_PREVIOUS;
-extern uint16_t MAIN_D_801BE950[];
-extern int32_t MAIN_D_801BE948[];
-extern int32_t MAIN_D_801BE94C[];
-extern uint8_t MAIN_D_80134F81;
-extern uint8_t MAIN_D_80134F82;
-extern uint8_t MAIN_D_80134F80;
-extern int32_t MAIN_D_80134F7C;
-extern GsOT *ACTIVE_ORDERING_TABLE;
-extern char *MOVE_NAMES[];
-extern char *MAP_NAME_PTR[];
-extern char *ITEM_DESC_PTR[];
-extern int8_t MAIN_D_80134F98;
-extern int32_t MAIN_D_80134FA8;
-extern char MAIN_D_801345F0[8];
-extern char MAIN_D_80134554[];
-extern char MAIN_D_8013455C[];
-extern char MAIN_D_80134564[];
-extern char MAIN_D_8013456C[];
-extern char MAIN_D_80134574[];
-extern char MAIN_D_8013457C[];
-extern char MAIN_D_80134584[];
-extern char MAIN_D_80134588[];
-extern char MAIN_D_8013458C[];
-extern char MAIN_D_80134590[];
-extern char MAIN_D_80134594[];
-extern char MAIN_D_80134598[];
-extern char MAIN_D_8013459C[];
-extern char MAIN_D_801345A0[];
-extern char MAIN_D_801345A4[];
-extern char MAIN_D_801345A8[];
-extern char MAIN_D_801345AC[];
-extern char MAIN_D_801345CC[];
-extern char MAIN_D_801345D4[];
-extern char MAIN_D_801345D8[];
-extern char MAIN_D_801345E0[];
-extern char MAIN_D_801345E8[];
-
-static void *script_common_functions[] = {
+static void *script_common_text_order[] = {
 	scriptInstructionFBtoFF,
 	tickScriptedMovements,
 	readFileSection,
@@ -344,168 +325,104 @@ static void *script_common_functions[] = {
 
 // clang-format off
 char MAIN_D_8012F6D0[32] = "Non Bewildering Forest Theme";
-
 char MAIN_D_8012F6F0[36] = "Non Bewildering Forest Night Theme";
-
 char MAIN_D_8012F714[16] = "Tropical Theme";
-
 char MAIN_D_8012F724[24] = "Tropical Night Theme";
-
 char MAIN_D_8012F73C[20] = "Mt. Panorama Theme";
-
 char MAIN_D_8012F750[28] = "Mt. Panorama Night Theme";
-
 char MAIN_D_8012F76C[20] = "Drill Tunnel Theme";
-
 char MAIN_D_8012F780[20] = "Ogre Fortress Theme";
-
 char MAIN_D_8012F794[24] = "Overdell Cemetary Theme";
-
 char MAIN_D_8012F7AC[16] = "Canyon Theme";
-
 char MAIN_D_8012F7BC[20] = "Ogremon Theme No. 2";
-
 char MAIN_D_8012F7D0[24] = "Everything Shop Theme";
-
 char MAIN_D_8012F7E8[20] = "Ogremon ThemeNo. 3";
-
 char MAIN_D_8012F7FC[16] = "Lava Cave Theme";
-
 char MAIN_D_8012F80C[32] = "Dark Aristcrat's Mansion Theme";
-
 char MAIN_D_8012F82C[24] = "Underground Lab Theme";
-
 char MAIN_D_8012F844[20] = "Gear Savanna Theme";
-
 char MAIN_D_8012F858[28] = "Gear Savanna Night Theme";
-
 char MAIN_D_8012F874[16] = "Leomon Theme";
-
 char MAIN_D_8012F884[20] = "Amida Forest Theme";
-
 char MAIN_D_8012F898[28] = "Amida Forest Night Theme";
-
 char MAIN_D_8012F8B4[52] = "The Ancient Region of Dino Speedy Time Zone Theme";
-
 char MAIN_D_8012F8E8[56] = "The Ancient Region of Dino Speedy Time Zone Night Theme";
-
 char MAIN_D_8012F920[52] = "The Ancient Region of Dino Glacial Time Zone Theme";
-
 char MAIN_D_8012F954[60] = "The Ancient Region of Dino Glacial Time Zone Night Theme";
-
 char MAIN_D_8012F990[20] = "Freezeland Theme";
-
 char MAIN_D_8012F9A4[24] = "Freezeland Night Theme";
-
 char MAIN_D_8012F9BC[12] = "Igloo Theme";
-
 char MAIN_D_8012F9C8[16] = "Curling Theme";
-
 char MAIN_D_8012F9D8[16] = "Sanctuary Theme";
-
 char MAIN_D_8012F9E8[24] = "Sanctuary Below Theme";
-
 char MAIN_D_8012FA00[20] = "Gecko Swamp Theme";
-
 char MAIN_D_8012FA14[24] = "Gecko Swamp Night Theme";
-
 char MAIN_D_8012FA2C[20] = "Misty Trees Theme";
-
 char MAIN_D_8012FA40[24] = "Misty Trees Night Theme";
-
 char MAIN_D_8012FA58[20] = "WaruMonzaemon Theme";
-
 char MAIN_D_8012FA6C[16] = "Toy Town Theme";
-
 char MAIN_D_8012FA7C[20] = "Theme of Factorial";
-
 char MAIN_D_8012FA90[24] = "Factorial Night Theme";
-
 char MAIN_D_8012FAA8[12] = "Sewer Theme";
-
 char MAIN_D_8012FAB4[24] = "Trash Mountain Theme";
-
 char MAIN_D_8012FACC[28] = "Trash Mountain Night Theme";
-
 char MAIN_D_8012FAE8[16] = "Beatland Theme";
-
 char MAIN_D_8012FAF8[24] = "Beatland Night Theme";
-
 char MAIN_D_8012FB10[24] = "Secret Beach Cave Theme";
-
 char MAIN_D_8012FB28[16] = "Last Room Theme";
-
 char MAIN_D_8012FB38[16] = "File City Theme";
-
 char MAIN_D_8012FB48[24] = "File City Night Theme";
-
 char MAIN_D_8012FB60[24] = "Tornament Opening Theme";
-
 char MAIN_D_8012FB78[28] = "Tornament Progress Theme";
-
 char MAIN_D_8012FB94[32] = "Tornament Championship Theme";
-
 char MAIN_D_8012FBB4[28] = "Partner's Entrance Theme";
-
 char MAIN_D_8012FBD0[48] = "Competition Battle Opponent's Entrance Theme";
-
 char MAIN_D_8012FC00[28] = "Arena Battle Theme No. 1";
-
 char MAIN_D_8012FC1C[20] = "Partner's Win Theme";
-
 char MAIN_D_8012FC30[24] = "Partner's Loss Theme";
-
 char MAIN_D_8012FC48[28] = "Arena Battle Theme No. 2";
-
 char MAIN_D_8012FC64[28] = "Arena Battle Theme No. 3";
-
 char MAIN_D_8012FC80[20] = "Event Battle Theme";
-
 char MAIN_D_8012FC94[20] = "Normal Battle Theme";
-
 char MAIN_D_8012FCA8[28] = "Normal Battle  Theme No.2";
-
 char MAIN_D_8012FCC4[20] = "Last Battle Theme";
-
 char MAIN_D_8012FCD8[16] = "Version 1 Cup";
-
 char MAIN_D_8012FCE8[16] = "Version 2 Cup";
-
 char MAIN_D_8012FCF8[16] = "Version 3 Cup";
-
 char MAIN_D_8012FD08[16] = "Version 4 Cup";
-
 char MAIN_D_8012FD18[16] = "Version 0 Cup";
-
 char MAIN_D_8012FD28[12] = "Fire Cup";
-
 char MAIN_D_8012FD34[12] = "Grapple Cup";
-
 char MAIN_D_8012FD40[20] = "Thunder Wind Cup";
-
 char MAIN_D_8012FD54[12] = "Cool Cup";
-
 char MAIN_D_8012FD60[12] = "Nature Cup";
-
 char MAIN_D_8012FD6C[12] = "Metalic Cup";
-
 char MAIN_D_8012FD78[12] = "Filth Cup";
-
 char MAIN_D_8012FD84[12] = "Dino Cup";
-
 char MAIN_D_8012FD90[12] = "Wing Cup";
-
 char MAIN_D_8012FD9C[12] = "Animal Cup";
-
 char MAIN_D_8012FDA8[12] = "Human Cup";
-
 char MAIN_D_8012FDB4[12] = "Beetle Cup";
 
 GsSPRITE MAIN_D_8012FDC0 = {
-	0x50000000, 0x0000, 0x0000, 0x0020, 0x0020,
-	0x000a, 0x80, 0x00, 0x0000, 0x01e6,
-	0x80, 0x80, 0x80, 0x0010, 0x0010,
-	0x1000, 0x1000, 0x00000000,
+	0x50000000,			/* attribute */
+	0,				/* x */
+	0,				/* y */
+	32,				/* w */
+	32,				/* h */
+	getTPage(0, 0, 640, 0),		/* tpage */
+	128,				/* u */
+	0,				/* v */
+	0,				/* cx */
+	486,				/* cy */
+	0x80,				/* r */
+	0x80,				/* g */
+	0x80,				/* b */
+	16,				/* mx */
+	16,				/* my */
+	0x1000,				/* scalex */
+	0x1000,				/* scaley */
+	0,				/* rotate */
 };
 
 MenuTextLayout MAIN_D_8012FDE4 = {
@@ -539,10 +456,7 @@ BoxUVTable MAIN_D_8012FE24 = {
 };
 
 ShopkeeperIdTable MAIN_D_8012FE5C = {
-	{
-		0x97, 0x99, 0xa3, 0xa5, 0x82, 0x89, 0x87, 0xaa,
-		0x76, 0x80, 0xff,
-	},
+	{ 0x97, 0x99, 0xa3, 0xa5, 0x82, 0x89, 0x87, 0xaa, 0x76, 0x80, 0xff },
 };
 
 int16_t MAIN_D_8012FE68[8] = {
@@ -836,11 +750,8 @@ char *MAIN_D_8013035C[6] = {
 };
 
 char MAIN_D_80130374[20] = "\\SCN\\MAPHEAD.SCN";
-
 char MAIN_D_80130388[12] = "\\SCN\\DG.SCN";
-
 char MAIN_D_80130394[20] = "\\ETCHI\\BOSS_EFE.TMD";
-
 char MAIN_D_801303A8[16] = "\\ETCHI\\OP.TIM";
 
 uint8_t MAIN_D_801303B8[128] = {
@@ -1221,67 +1132,73 @@ uint8_t MAIN_D_801307C0[12] = {
 char MAIN_D_801307CC[20] = "You have Will trade";
 // clang-format on
 
-int32_t shopFillBuyItemList() {
-  uint8_t itemId;
-  uint8_t slotId;
-  int32_t hasSpace;
-  uint8_t *itemList;
-  uint32_t inventorySize;
-  int32_t canBuyAnything;
+int32_t shopFillBuyItemList()
+{
+	uint8_t itemId;
+	uint8_t slotId;
+	int32_t hasSpace;
+	uint8_t *itemList;
+	uint32_t inventorySize;
+	int32_t canBuyAnything;
+	inventorySize = INVENTORY.size;
+	itemList = MAIN_D_80134F68->buf;
+	canBuyAnything = 0;
+	hasSpace = 0;
+	MAIN_D_80134F68->itemCount = 0;
 
-  inventorySize = INVENTORY.size;
-  itemList = MAIN_D_80134F68->buf;
-  canBuyAnything = 0;
-  hasSpace = 0;
-  MAIN_D_80134F68->itemCount = 0;
+	for (slotId = 0; slotId < inventorySize; slotId++) {
+		if (INVENTORY.types.array[slotId] == 0xff) {
+			hasSpace = 1;
 
-  for (slotId = 0; slotId < inventorySize; slotId++) {
-    if (INVENTORY.types.array[slotId] == 0xff) {
-      hasSpace = 1;
-      break;
-    }
-  }
+			break;
+		}
+	}
 
-  for (itemId = 0; itemId < 128; itemId++) {
+	for (itemId = 0; itemId < 128; itemId++) {
+		if (!isTriggerSet(0x180 + itemId)) {
+			continue;
+		}
 
-    if (!isTriggerSet(0x180 + itemId))
-      continue;
+		MAIN_D_80134F68->itemCount++;
+		*itemList++ = itemId;
 
-    MAIN_D_80134F68->itemCount++;
-    *itemList++ = itemId;
+		if (ITEM_PARA[itemId].value > MONEY) {
+			*itemList++ = 0;
 
-    if (ITEM_PARA[itemId].value > MONEY) {
-      *itemList++ = 0;
-      continue;
-    }
+			continue;
+		}
 
-    if (hasSpace) {
-      for (slotId = 0; slotId < inventorySize; slotId++) {
-        if (INVENTORY.types.array[slotId] == itemId &&
-            INVENTORY.amounts.array[slotId] == 99) {
-          *itemList++ = 0;
-          goto end;
-        }
-      }
-      *itemList++ = 1;
-      canBuyAnything = 1;
-    } else {
-      for (slotId = 0; slotId < inventorySize; slotId++) {
-        if (INVENTORY.types.array[slotId] == itemId &&
-            INVENTORY.amounts.array[slotId] != 99) {
-          *itemList++ = 1;
-          canBuyAnything = 1;
-          goto end;
-        }
-      }
-      *itemList++ = 0;
-    }
+		if (hasSpace) {
+			for (slotId = 0; slotId < inventorySize; slotId++) {
+				if (INVENTORY.types.array[slotId] == itemId &&
+				    INVENTORY.amounts.array[slotId] == 99) {
+					*itemList++ = 0;
 
-  end:
-    continue;
-  }
+					goto end;
+				}
+			}
+			*itemList++ = 1;
 
-  return canBuyAnything;
+			canBuyAnything = 1;
+
+		} else {
+			for (slotId = 0; slotId < inventorySize; slotId++) {
+				if (INVENTORY.types.array[slotId] == itemId &&
+				    INVENTORY.amounts.array[slotId] != 99) {
+					*itemList++ = 1;
+
+					canBuyAnything = 1;
+					goto end;
+				}
+			}
+			*itemList++ = 0;
+		}
+
+end:
+		continue;
+	}
+
+	return canBuyAnything;
 }
 
 int32_t MAIN_func_800FAA68(void)
@@ -1441,8 +1358,8 @@ void MAIN_func_800FB070(void)
 void MAIN_func_800FB0CC(void)
 {
 	renderString(0, (int16_t)(UI_BOX_DATA[3].finalPos.x + 6),
-		     (int16_t)(UI_BOX_DATA[3].finalPos.y + 5), 0xfc, 0xc, 0,
-		     (int16_t)(TEXT_BOX_DATA[3].vramRow * 12), 3, 1);
+	             (int16_t)(UI_BOX_DATA[3].finalPos.y + 5), 0xfc, 0xc, 0,
+	             (int16_t)(TEXT_BOX_DATA[3].vramRow * 12), 3, 1);
 }
 
 void renderSellItemBox(void)
@@ -1483,13 +1400,12 @@ void renderSellItemBox(void)
 	srcCol = 0;
 	while (i < 4) {
 		renderString(0, entry[0] + x, entry[1] + y, entry[2] * 12,
-			     0xc, srcCol * 12, rowPx, 3, 1);
+		             0xc, srcCol * 12, rowPx, 3, 1);
 		i++;
 		srcCol = (int16_t)(srcCol + entry[2]);
 		entry += 3;
 	}
 }
-
 
 void MAIN_func_800FADE0(void)
 {
@@ -1631,12 +1547,12 @@ void MAIN_func_800FBAA0(void)
 	i = 0;
 	while (i < 3) {
 		renderString(0, x + entry[2], y + entry[3], entry[4], 0xc,
-			     entry[0], rowPx + entry[1], 3, 1);
+		             entry[0], rowPx + entry[1], 3, 1);
 		i++;
 		entry += 5;
 	}
 	renderSelectionCursor(x + 8 + MAIN_D_80134F81 * 47, y + 0x12, 0x28,
-			      0xe, 3);
+	                      0xe, 3);
 }
 
 void MAIN_func_800FBC00(void)
@@ -2112,10 +2028,10 @@ void MAIN_func_800FC508(void)
 	switch (SELECTION_MENU_STATE) {
 	case 0:
 		initializeItemMenuBox(&MAIN_D_80134F68, 0x100, 6, 0xb2, 0x18,
-				      6, 0x5a);
+		                      6, 0x5a);
 		initializeItemMenuBox(&MAIN_D_80134F6C,
-				      INVENTORY.size << 1, 6, 0xd2, 0x18,
-				      6, 0x5a);
+		                      INVENTORY.size << 1, 6, 0xd2, 0x18,
+		                      6, 0x5a);
 		MAIN_D_80134F70 = 0;
 
 		found = 0;
@@ -2214,7 +2130,7 @@ void MAIN_func_800FC508(void)
 }
 
 void initializeItemMenuBox(ItemMenuBox **box, int32_t bufSize, int32_t rows,
-			   int32_t x, uint8_t y, uint8_t w, uint8_t h)
+                           int32_t x, uint8_t y, uint8_t w, uint8_t h)
 {
 	*box = (ItemMenuBox *)allocateArray(0x20);
 	(*box)->buf = allocateArray(bufSize);
@@ -2251,13 +2167,13 @@ void MAIN_func_800FC968(int32_t showBits)
 	setupBoxOrigin(0xfd, &origin);
 	setRECT(&rect, -0x98, -0x62, 0x52, 0x21);
 	createTextbox(2, 0xe1, &rect, &origin, MAIN_func_800FBC00,
-		      MAIN_func_800FBC58);
+	              MAIN_func_800FBC58);
 	registerTextbox(2, 8, 1, 0, 0);
 	MAIN_func_800FBC00();
 }
 
 void MAIN_func_800FCA14(int32_t idx, int32_t owner, int32_t boxId,
-			int32_t *outSelection)
+                        int32_t *outSelection)
 {
 	showMapheadSelection(idx, owner, boxId, outSelection, 0xff);
 }
@@ -2281,7 +2197,7 @@ void MAIN_func_800FCA3C(void)
 	dims = (int16_t *)((uint8_t *)MAIN_D_8013027C + MAIN_D_80135011 * 8);
 	setRECT(&rect, dims[0], dims[1], dims[2], dims[3]);
 	createTextbox(1, 0xf1, &rect, &origin, MAIN_func_800FAB30,
-		      MAIN_func_800FADE0);
+	              MAIN_func_800FADE0);
 	registerTextbox(1, 9, 6, 1, 0);
 	MAIN_func_800FCC98(result, 1, 9);
 	MAIN_func_800FCCFC(result, 9, 0);
@@ -2293,8 +2209,8 @@ void MAIN_func_800FCB3C(void)
 	switch (SELECTION_MENU_STATE) {
 	case 0:
 		initializeItemMenuBox(&MAIN_D_80134F6C,
-				      INVENTORY.size << 1, 6, 0x9a, 0x18,
-				      6, 0x5a);
+		                      INVENTORY.size << 1, 6, 0x9a, 0x18,
+		                      6, 0x5a);
 
 		if (MAIN_func_800FAA68()) {
 			SELECTION_MENU_STATE = 3;
@@ -2500,7 +2416,7 @@ int32_t MAIN_func_800FCFB8(RECT *origin)
 	origin->y += (boxY + box->cursor * 18);
 	setRECT(&rect, -0x41, -0x2a, 0x82, 0x53);
 	createTextbox(3, 0xc1, &rect, origin, tickSellItemBox,
-		      renderSellItemBox);
+	              renderSellItemBox);
 	registerTextbox(3, MAIN_D_80135018, 1, 0, 0);
 	MAIN_func_800FB700();
 	playSound(0, 3);
@@ -2544,7 +2460,7 @@ int32_t MAIN_func_800FD244(RECT *origin)
 	origin->y += (boxY + box->cursor * 18);
 	setRECT(&rect, -0x38, -0x15, 0x70, 0x2a);
 	createTextbox(3, 0xc1, &rect, origin, MAIN_func_800FB8D4,
-		      MAIN_func_800FBAA0);
+	              MAIN_func_800FBAA0);
 	registerTextbox(3, MAIN_D_80135018, 2, 0, 0);
 	showMapHeadTextbox(0, 0xff, 3, 0x4d8);
 	MAIN_D_80134F81 = 0;
@@ -2648,7 +2564,7 @@ int32_t MAIN_func_800FD61C(ItemMenuBox *box, RECT *origin, int32_t uiBoxId)
 	origin->y += (boxY + box->cursor * 18);
 	setRECT(&rect, -0x84, -0xb, 0x108, 0x16);
 	createTextbox(3, 0xc1, &rect, origin, MAIN_func_800FB070,
-		      MAIN_func_800FB0CC);
+	              MAIN_func_800FB0CC);
 	registerTextbox(3, MAIN_D_80135018, 1, 0, 0);
 	strcpy((out = TEXT_BUFFERS_PTR + (MAIN_D_80135018 << 6), out),
 	       ITEM_DESC_PTR[item]);
@@ -2682,7 +2598,7 @@ void MAIN_func_800FD7D8(int32_t boxId, int32_t idx, int16_t x, int16_t y)
 INCLUDE_ASM("asm/main/nonmatchings/script_common", MAIN_func_800FD8D4);
 
 void MAIN_func_800FDC5C(ItemMenuBox *box, int16_t x1, int16_t y1, int16_t x2,
-			int16_t y2, int32_t mode)
+                        int16_t y2, int32_t mode)
 {
 	TextBoxData *tbox;
 	int16_t boxId;
@@ -2859,7 +2775,7 @@ void MAIN_func_800FE258(int32_t spriteId, int16_t x, int16_t y, int32_t depth)
 }
 
 void showMapHeadTextbox(int32_t idx, int32_t owner, int32_t boxId,
-			int32_t section)
+                        int32_t section)
 {
 	uint8_t *savedCursor;
 
@@ -3212,7 +3128,7 @@ void MAIN_func_800FF0FC(ItemMenuBox *box, int32_t style)
 	row = box->itemRow[row];
 	if (entry->doubleBuffered == 1) {
 		row = row + (int16_t)(((int32_t *)entry)[6] *
-				      ((int32_t *)entry)[9]);
+		                      ((int32_t *)entry)[9]);
 	}
 
 	getVRAMModeCoords(((int32_t *)entry)[7], &outX, &outClut);
@@ -3276,8 +3192,9 @@ uint8_t *MAIN_func_800FF444(uint8_t *data, int32_t index)
 
 	if (entry->doubleBuffered == 1) {
 		row = (uint8_t *)(row +
-				(((((int32_t *)entry)[6] ^ 1) *
-				  ((int32_t *)entry)[9]) << 6));
+		                  (((((int32_t *)entry)[6] ^ 1) *
+		                    ((int32_t *)entry)[9])
+		                   << 6));
 	}
 
 	return row;
@@ -3336,7 +3253,7 @@ void setDialogueOwner(int32_t owner)
 }
 
 void showMapheadSelection(int32_t idx, int32_t owner, int32_t x,
-			  int32_t *outSel, uint16_t section)
+                          int32_t *outSel, uint16_t section)
 {
 	uint8_t *saved;
 	uint16_t rows;
@@ -3677,8 +3594,8 @@ void MAIN_func_800FFF80(int32_t x, int32_t y)
 	}
 
 	renderSelectionCursor(x - 1,
-			      y + MAIN_D_801BE954[0] + MAIN_D_801BE952[0] * 13 - 2,
-			      MAIN_D_801BE956[0], 0xd, 6);
+	                      y + MAIN_D_801BE954[0] + MAIN_D_801BE952[0] * 13 - 2,
+	                      MAIN_D_801BE956[0], 0xd, 6);
 }
 
 void MAIN_func_800FFFF0(void)
@@ -3885,7 +3802,7 @@ void MAIN_func_8010064C(void)
 }
 
 void createTextbox(int32_t boxId, int32_t flags, RECT *rect, RECT *origin,
-		   void *tick, void *render)
+                   void *tick, void *render)
 {
 	TextBoxData *entry;
 
@@ -3918,7 +3835,7 @@ void triggerBoxCloseFlag(int32_t boxId)
 }
 
 void registerTextbox(int32_t boxId, int32_t row, int32_t rows,
-		     int32_t doubleBuffer, int32_t mode)
+                     int32_t doubleBuffer, int32_t mode)
 {
 	TextBoxData *entry;
 	int32_t usedRows;
@@ -4180,7 +4097,7 @@ void setupDialogueBox(uint8_t owner)
 
 	setRECT(&rect, -0x82, 0x2a, 0x106, 0x3b);
 	createTextbox(0, flags, &rect, &origin, tickScriptDialogueBox,
-		      renderScriptDialogueBox);
+	              renderScriptDialogueBox);
 	registerTextbox(0, 0, 4, 1, 0);
 }
 
@@ -4194,7 +4111,7 @@ int32_t setupBoxOrigin(int32_t ownerId, RECT *origin)
 
 	if (MAIN_D_80134FD2 != -0x270f) {
 		worldPosToScreenPos2(&MAIN_D_80134FD2, &MAIN_D_80134FD4,
-				     &MAIN_D_80134FD6);
+		                     &MAIN_D_80134FD6);
 		pos[0] = MAIN_D_80134FD2 - 5;
 		pos[1] = MAIN_D_80134FD4 - 5;
 		MAIN_D_80134FD2 = -0x270f;
@@ -4221,10 +4138,10 @@ void tickScriptDialogueBox(void)
 		if (sel != 0xffff) {
 			MAIN_D_80134FDC =
 				(uint8_t *)((uint32_t)MAIN_D_801BE948[0] +
-					    MAIN_D_801BE952[0] * 2);
+			                    MAIN_D_801BE952[0] * 2);
 			MAIN_D_80134FDC =
 				(uint8_t *)((uint32_t)CURRENT_SCRIPT_PTR +
-					    *(uint16_t *)MAIN_D_80134FDC);
+			                    *(uint16_t *)MAIN_D_80134FDC);
 		}
 	} else if (ACTIVE_INSTRUCTION == 0x1a) {
 		MAIN_func_800FFDF4();
@@ -4380,169 +4297,169 @@ uint32_t showTextbox(int32_t boxId, uint32_t speakerId)
 		out = base + (row << 6);
 	}
 	rowOffset = row << 6;
-top:
+top: {
+	ctrl = *MAIN_D_80134FDC++;
 	{
-		ctrl = *MAIN_D_80134FDC++;
-		{
-			switch (ctrl) {
-			case 3:
-				*out++ = ctrl;
-				*out++ = *MAIN_D_80134FDC++;
-				*out++ = *MAIN_D_80134FDC++;
-				*out++ = *MAIN_D_80134FDC++;
-				goto top;
-			case 4:
-				ctrl = *MAIN_D_80134FDC++;
+		switch (ctrl) {
+		case 3:
+			*out++ = ctrl;
+			*out++ = *MAIN_D_80134FDC++;
+			*out++ = *MAIN_D_80134FDC++;
+			*out++ = *MAIN_D_80134FDC++;
+			goto top;
+		case 4:
+			ctrl = *MAIN_D_80134FDC++;
+			ctrl = readPStat(ctrl);
+			out = intToStringSJIS(out, ctrl, 3, 1);
+			goto top;
+		case 5:
+			MAIN_D_80134FDC++;
+			lines = getSpeakerName(0xfd, out);
+			out += lines;
+			col = (col + ((lines >> 1) &
+			              0xffff)) &
+			      0xffff;
+			goto top;
+		case 6:
+			MAIN_D_80134FDC++;
+			lines = getSpeakerName(0xfc, out);
+			out += lines;
+			col = (col + ((lines >> 1) &
+			              0xffff)) &
+			      0xffff;
+			goto top;
+		case 7:
+			ctrl = *MAIN_D_80134FDC++;
+			{
 				ctrl = readPStat(ctrl);
-				out = intToStringSJIS(out, ctrl, 3, 1);
-				goto top;
-			case 5:
-				MAIN_D_80134FDC++;
-				lines = getSpeakerName(0xfd, out);
+				strcpy(out,
+				       (const char *)&DIGIMON_DATA[ctrl]);
+				lines = strlen(
+					(const char *)&DIGIMON_DATA[ctrl]);
 				out += lines;
 				col = (col + ((lines >> 1) &
-					      0xffff)) & 0xffff;
-				goto top;
-			case 6:
-				MAIN_D_80134FDC++;
-				lines = getSpeakerName(0xfc, out);
+				              0xffff)) &
+				      0xffff;
+			}
+			goto top;
+		case 8:
+			ctrl = *MAIN_D_80134FDC++;
+			{
+				ctrl = readPStat(ctrl);
+				strcpy(out, MOVE_NAMES[ctrl]);
+				lines = strlen(MOVE_NAMES[ctrl]);
 				out += lines;
 				col = (col + ((lines >> 1) &
-					      0xffff)) & 0xffff;
-				goto top;
-			case 7:
-				ctrl = *MAIN_D_80134FDC++;
-				{
-					ctrl = readPStat(ctrl);
-					strcpy(out,
-					       (const char *)
-						       &DIGIMON_DATA[ctrl]);
-					lines = strlen(
-						(const char *)
-							&DIGIMON_DATA[ctrl]);
-					out += lines;
-					col = (col + ((lines >> 1) &
-						      0xffff)) & 0xffff;
-				}
-				goto top;
-			case 8:
-				ctrl = *MAIN_D_80134FDC++;
-				{
-					ctrl = readPStat(ctrl);
-					strcpy(out, MOVE_NAMES[ctrl]);
-					lines = strlen(MOVE_NAMES[ctrl]);
-					out += lines;
-					col = (col + ((lines >> 1) &
-						      0xffff)) & 0xffff;
-				}
-				goto top;
-			case 9:
-				ctrl = *MAIN_D_80134FDC++;
-				{
-					ctrl = readPStat(ctrl);
-					strcpy(out,
-					       (const char *)
-						       &ITEM_PARA[ctrl]);
-					lines = strlen(
-						(const char *)
-							&ITEM_PARA[ctrl]);
-					out += lines;
-					col = (col + ((lines >> 1) &
-						      0xffff)) & 0xffff;
-				}
-				goto top;
-			case 10:
-				MAIN_D_80134FDC++;
-				out = intToStringSJIS(out, MONEY, 6, 0);
-				goto top;
-			case 11:
-				MAIN_D_80134FDC++;
-				out = intToStringSJIS(out, MERIT, 4, 0);
-				goto top;
-			case 16:
-				MAIN_D_80134FDC++;
-				out = intToStringSJIS(out, MAIN_D_8013500C, 5, 1);
-				goto top;
-			case 19:
-				MAIN_D_80134FDC++;
-				out = intToStringSJIS(out, MAIN_D_80134FCC, 3, 1);
-				goto top;
-			case 20:
-				MAIN_D_80134FDC++;
-				out = intToStringSJIS(out, TOURNAMENTS_LOST, 3, 1);
-				goto top;
-			case 21:
-				MAIN_D_80134FDC++;
-				out = intToStringSJIS(out, MAIN_D_80134FD0, 3, 1);
-				goto top;
-			case 17:
-				ctrl = *MAIN_D_80134FDC++;
-				{
-					ctrl = readPStat(ctrl);
-					strcpy(out,
-					       MAIN_D_8012FEC8[ctrl]);
-					lines = strlen(MAIN_D_8012FEC8[ctrl]);
-					out += lines;
-					col = (col + ((lines >> 1) & 0xffff)) & 0xffff;
-				}
-				goto top;
-			case 18:
-				ctrl = *MAIN_D_80134FDC++;
-				{
-					ctrl = readPStat(ctrl);
-					strcpy(out,
-					       MAIN_D_801300E0[ctrl]);
-					lines = strlen(MAIN_D_801300E0[ctrl]);
-					out += lines;
-					col = (col + ((lines >> 1) & 0xffff)) & 0xffff;
-				}
-				goto top;
-			case 12:
-				*out++ = ctrl;
-				*out++ = *MAIN_D_80134FDC++;
-				goto top;
-			case 14:
-				*out++ = ctrl;
-				*out++ = *MAIN_D_80134FDC++;
-				goto top;
-			case 13:
-				*out++ = ctrl;
-				*out++ = *MAIN_D_80134FDC++;
-				if (maxCol < col) {
-					maxCol = col;
-				}
-				col = 0;
+				              0xffff)) &
+				      0xffff;
+			}
+			goto top;
+		case 9:
+			ctrl = *MAIN_D_80134FDC++;
+			{
+				ctrl = readPStat(ctrl);
+				strcpy(out,
+				       (const char *)&ITEM_PARA[ctrl]);
+				lines = strlen(
+					(const char *)&ITEM_PARA[ctrl]);
+				out += lines;
+				col = (col + ((lines >> 1) &
+				              0xffff)) &
+				      0xffff;
+			}
+			goto top;
+		case 10:
+			MAIN_D_80134FDC++;
+			out = intToStringSJIS(out, MONEY, 6, 0);
+			goto top;
+		case 11:
+			MAIN_D_80134FDC++;
+			out = intToStringSJIS(out, MERIT, 4, 0);
+			goto top;
+		case 16:
+			MAIN_D_80134FDC++;
+			out = intToStringSJIS(out, MAIN_D_8013500C, 5, 1);
+			goto top;
+		case 19:
+			MAIN_D_80134FDC++;
+			out = intToStringSJIS(out, MAIN_D_80134FCC, 3, 1);
+			goto top;
+		case 20:
+			MAIN_D_80134FDC++;
+			out = intToStringSJIS(out, TOURNAMENTS_LOST, 3, 1);
+			goto top;
+		case 21:
+			MAIN_D_80134FDC++;
+			out = intToStringSJIS(out, MAIN_D_80134FD0, 3, 1);
+			goto top;
+		case 17:
+			ctrl = *MAIN_D_80134FDC++;
+			{
+				ctrl = readPStat(ctrl);
+				strcpy(out,
+				       MAIN_D_8012FEC8[ctrl]);
+				lines = strlen(MAIN_D_8012FEC8[ctrl]);
+				out += lines;
+				col = (col + ((lines >> 1) & 0xffff)) & 0xffff;
+			}
+			goto top;
+		case 18:
+			ctrl = *MAIN_D_80134FDC++;
+			{
+				ctrl = readPStat(ctrl);
+				strcpy(out,
+				       MAIN_D_801300E0[ctrl]);
+				lines = strlen(MAIN_D_801300E0[ctrl]);
+				out += lines;
+				col = (col + ((lines >> 1) & 0xffff)) & 0xffff;
+			}
+			goto top;
+		case 12:
+			*out++ = ctrl;
+			*out++ = *MAIN_D_80134FDC++;
+			goto top;
+		case 14:
+			*out++ = ctrl;
+			*out++ = *MAIN_D_80134FDC++;
+			goto top;
+		case 13:
+			*out++ = ctrl;
+			*out++ = *MAIN_D_80134FDC++;
+			if (maxCol < col) {
+				maxCol = col;
+			}
+			col = 0;
+			ctrl = *MAIN_D_80134FDC;
+			if (ctrl == 0) {
+				MAIN_D_80134FDC += 2;
+				out -= 2;
+				*out = ctrl;
 				ctrl = *MAIN_D_80134FDC;
-				if (ctrl == 0) {
-					MAIN_D_80134FDC += 2;
-					out -= 2;
-					*out = ctrl;
-					ctrl = *MAIN_D_80134FDC;
-					if (ctrl == 0x1a) {
-						goto done;
-					}
-					entry->pageReady = 1;
+				if (ctrl == 0x1a) {
 					goto done;
 				}
-				rowOffset += 0x40;
-				row++;
-				lines = rowOffset;
-				out = base + lines;
-				goto top;
-			case 1:
-			case 2:
-				*out++ = ctrl;
-				*out++ = *MAIN_D_80134FDC++;
-				goto top;
-			case 15:
-			default:
-				*out++ = ctrl;
-				*out++ = *MAIN_D_80134FDC++;
-				col = (col + 1) & 0xffff;
-				goto top;
+				entry->pageReady = 1;
+				goto done;
 			}
+			rowOffset += 0x40;
+			row++;
+			lines = rowOffset;
+			out = base + lines;
+			goto top;
+		case 1:
+		case 2:
+			*out++ = ctrl;
+			*out++ = *MAIN_D_80134FDC++;
+			goto top;
+		case 15:
+		default:
+			*out++ = ctrl;
+			*out++ = *MAIN_D_80134FDC++;
+			col = (col + 1) & 0xffff;
+			goto top;
 		}
 	}
+}
 done:
 	entry->writeCount++;
 	ACTIVE_INSTRUCTION = 0x1a;
@@ -4573,7 +4490,7 @@ void scriptSetTextboxSize(void)
 	height = rows * 13 + 7;
 	setRECT(&rect1, (0x140 - width) / 2 - 0xa0, (0xf0 - height) / 2 - 0x78, width, height);
 	createTextbox(0, boxFlags, &rect1, &origin, MAIN_func_800FFFF0,
-		      MAIN_func_801000E4);
+	              MAIN_func_801000E4);
 	registerTextbox(0, 0, rows, 1, 0);
 }
 
@@ -4670,8 +4587,7 @@ int32_t scriptIdToEntityId(int32_t scriptId)
 	}
 
 	for (i = 0; i < 8; i++) {
-		if (ENTITY_TABLE[i + 2] != 0
-		    && scriptId == NPC_ENTITIES[i].scriptId) {
+		if (ENTITY_TABLE[i + 2] != 0 && scriptId == NPC_ENTITIES[i].scriptId) {
 			return (uint8_t)(i + 2);
 		}
 	}
@@ -4705,8 +4621,7 @@ void scriptCompareDate(void)
 	v3 = readPStat((uint8_t)(statIdx + 2));
 	now = dateToSeconds(v1, v2, v3, readPStat((uint8_t)(statIdx + 3)));
 
-	if (scriptCompareValues(op, now, dateToSeconds(years, days, hours,
-						       minutes)) != 0) {
+	if (scriptCompareValues(op, now, dateToSeconds(years, days, hours, minutes)) != 0) {
 		setTrigger(trigger);
 	} else {
 		unsetTrigger(trigger);
@@ -4884,7 +4799,7 @@ int32_t MAIN_func_801025E8(void)
 }
 
 void readFileSection(char *filename, void *dest, uint32_t offset,
-		     uint32_t size)
+                     uint32_t size)
 {
 	CdlFILE file;
 	char path[64];
@@ -4900,18 +4815,23 @@ void readFileSection(char *filename, void *dest, uint32_t offset,
 			return;
 		}
 
-		while (CdControl(0xe, &mode, 0) == 0);
+		while (CdControl(0xe, &mode, 0) == 0)
+			;
 
 		MAIN_D_80134FA8 = CdPosToInt(&file.pos);
 	} else {
-		while (CdControl(0xe, &mode, 0) == 0);
+		while (CdControl(0xe, &mode, 0) == 0)
+			;
 	}
 
 	file.pos = *CdIntToPos(MAIN_D_80134FA8 + (offset >> 11), &file.pos);
 
-	while (CdControl(2, (u_char *)&file.pos, 0) == 0);
-	while (CdRead(size >> 11, dest, mode) == 0);
-	while (CdReadSync(0, 0) > 0);
+	while (CdControl(2, (u_char *)&file.pos, 0) == 0)
+		;
+	while (CdRead(size >> 11, dest, mode) == 0)
+		;
+	while (CdReadSync(0, 0) > 0)
+		;
 }
 
 void tickScriptedMovements(void)
