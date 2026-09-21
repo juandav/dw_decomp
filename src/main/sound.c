@@ -336,7 +336,7 @@ int16_t SEQ_ACCESS_NUM;
 int16_t CURRENT_SEQ_FONT;
 int16_t CURRENT_SEQ_TRACK;
 
-char SEQ_TABLE[0xb0];
+char SEQ_TABLE[SS_SEQ_TABSIZ];
 uint8_t SEQ_BUFFER[0x5678];
 
 char VHB_EXT[] = ".VHB";
@@ -406,7 +406,7 @@ int32_t readVHBFile(int32_t vabId, char *filename, uint8_t *buffer)
 		return -1;
 	}
 
-	SsVabTransCompleted(1);
+	SsVabTransCompleted(SS_WAIT_COMPLETED);
 	SsUtGetVBaddrInSB(vabid);
 
 	return vabid;
@@ -462,7 +462,7 @@ int32_t readVHBFileSectors(int32_t vabId, char *filename, uint8_t *buffer,
 		return -1;
 	}
 
-	SsVabTransCompleted(1);
+	SsVabTransCompleted(SS_WAIT_COMPLETED);
 	SsUtGetVBaddrInSB(vabid);
 
 	return vabid;
@@ -497,9 +497,9 @@ void seqPlay(void)
 	    ((CURRENT_SEQ_FONT == 0x1e) && (CURRENT_SEQ_TRACK != 2)) ||
 	    ((CURRENT_SEQ_FONT == 0x1f) && (CURRENT_SEQ_TRACK != 2)) ||
 	    ((CURRENT_SEQ_FONT == 0x20) && (CURRENT_SEQ_TRACK != 2))) {
-		SsSeqPlay(SEQ_ACCESS_NUM, 1, 1);
+		SsSeqPlay(SEQ_ACCESS_NUM, SSPLAY_PLAY, 1);
 	} else {
-		SsSeqPlay(SEQ_ACCESS_NUM, 1, 0);
+		SsSeqPlay(SEQ_ACCESS_NUM, SSPLAY_PLAY, SSPLAY_INFINITY);
 	}
 }
 
@@ -521,7 +521,7 @@ int32_t initializeMusic(void)
 	ResetCallback();
 	SsInit();
 	SsSetTableSize(SEQ_TABLE, 1, 1);
-	SsSetTickMode(2);
+	SsSetTickMode(SS_TICK240);
 
 	if (readVHBFile(0, "SOUND\\SS", GENERAL_BUFFER) == -1) {
 		return 0;
@@ -537,15 +537,15 @@ int32_t initializeMusic(void)
 	SEQ_ACCESS_NUM = -1;
 	CURRENT_SEQ_FONT = -1;
 
-	attr.mask = 7;
-	attr.mode = 0x103;
+	attr.mask = SPU_REV_MODE | SPU_REV_DEPTHL | SPU_REV_DEPTHR;
+	attr.mode = SPU_REV_MODE_CLEAR_WA | SPU_REV_MODE_STUDIO_B;
 	attr.depth.right = 0x7000;
 	attr.depth.left = 0x7000;
 	SpuSetReverbModeParam(&attr);
-	SpuClearReverbWorkArea(3);
+	SpuClearReverbWorkArea(SPU_REV_MODE_STUDIO_B);
 	SpuSetReverbDepth(&attr);
-	SpuSetReverbVoice(1, 0x7fffff);
-	SpuSetReverb(1);
+	SpuSetReverbVoice(SPU_ON, 0x7fffff);
+	SpuSetReverb(SPU_ON);
 
 	return 1;
 }
@@ -572,7 +572,7 @@ uint32_t getNextFreeChannel(int32_t arg)
 
 	for (i = 0; i < 14; ++i) {
 		val = (i + FREE_CHANNEL_INDEX) % 14 + 10;
-		if (SpuGetKeyStatus(1 << val) != 1) {
+		if (SpuGetKeyStatus(1 << val) != SPU_ON) {
 			break;
 		}
 	}
@@ -654,7 +654,7 @@ void stopSound(void)
 	SsUtAllKeyOff(0);
 
 	for (i = 10; i < 0x18; ++i) {
-		if (SpuGetKeyStatus(1 << i) == 1) {
+		if (SpuGetKeyStatus(1 << i) == SPU_ON) {
 			SsUtAutoVol(i, 0x7f, 0, 6);
 			SsUtKeyOffV(i);
 		}
