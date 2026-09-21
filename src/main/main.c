@@ -127,6 +127,7 @@ void view_init(void);
 void initializeEffectData(void);
 void addThrownItem(int32_t type);
 void startThrowingItem(void);
+int32_t BTL_addItemParticles(Entity *e);
 void tickThrownItem(int32_t instanceId);
 void renderThrownItem(int32_t instanceId);
 void MAIN_func_800F1794(void);
@@ -4812,7 +4813,56 @@ void startThrowingItem(void)
 	removeItem(INVENTORY.types.array[INVENTORY_POINTER], 1);
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/main", tickThrownItem);
+void tickThrownItem(int32_t instanceId)
+{
+	MATRIX *workm;
+	VECTOR *loc;
+	int32_t dx;
+	int32_t dz;
+	int16_t sx;
+	int16_t sy;
+	int16_t sz;
+	int32_t t;
+	int32_t n;
+	if (TAMER_ENTITY.entity.anim.animId == 6 &&
+	    TAMER_ENTITY.entity.anim.animFrame < 7) {
+		workm = &TAMER_ENTITY.entity.posData[9].posMatrix.workm;
+		TAMER_ITEM.worldItem.spriteLocation.vx = workm->t[0];
+		TAMER_ITEM.worldItem.spriteLocation.vy = workm->t[1];
+		TAMER_ITEM.worldItem.spriteLocation.vz = workm->t[2];
+		return;
+	}
+
+	loc = &PARTNER_ENTITY.digimonEntity.entity.posData->location;
+	dx = loc->vx - TAMER_ITEM.worldItem.spriteLocation.vx;
+	dz = loc->vz - TAMER_ITEM.worldItem.spriteLocation.vz;
+	t = TAMER_ITEM.time;
+	if (t == 0) {
+		sy = MAIN_D_8012F36C[t];
+		sx = 0;
+		sz = 0;
+	} else {
+		n = (int32_t)((uint32_t)t + 1u - 1u);
+		sx = dx / (0x19 - t);
+		sy = MAIN_D_8012F36C[n];
+		sz = dz / (0x19 - t);
+		t = n;
+	}
+
+	TAMER_ITEM.worldItem.spriteLocation.vy = 0;
+	TAMER_ITEM.worldItem.spriteLocation.vx += sx;
+	TAMER_ITEM.worldItem.spriteLocation.vy += sy;
+	TAMER_ITEM.worldItem.spriteLocation.vz += sz;
+	TAMER_ITEM.time++;
+
+	if (TAMER_ITEM.time >= 0x18) {
+		if (ITEM_FUNCTIONS[TAMER_ITEM.worldItem.type] != NULL) {
+			ITEM_FUNCTIONS[TAMER_ITEM.worldItem.type](TAMER_ITEM.worldItem.type);
+		}
+		BTL_addItemParticles(ENTITY_TABLE[1]);
+		removeTamerItem();
+	}
+}
 
 void renderThrownItem(int32_t instanceId)
 {
