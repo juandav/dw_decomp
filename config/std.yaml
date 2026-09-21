@@ -95,11 +95,7 @@ segments:
       - [0x59B4, c, std_main]
       - [0x16654, c, std_hud]
       - [0x194D4, c, std_effect]
-      - [0x26E0C, .rodata]
-      - [0x26E58, rodata]
-      - [0x26E78, bin]
-      - [0x26E8C, rodata]
-      - [0x26EAC, bin]
+      - [0x26E0C, .rodata, std_main]
       - [0x26ED4, .data, std]
       - [0x28B84, .data, std_bss]
 
