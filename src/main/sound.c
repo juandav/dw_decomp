@@ -9,7 +9,14 @@
 #include <dw/sound.h>
 #include <dw/types.h>
 
-#include "common.h"
+#define VAB_MAX_PROGRAMS	128
+#define VAB_TONES_PER_PROGRAM	16
+
+typedef struct {
+	VabHdr hdr;
+	ProgAtr programs[VAB_MAX_PROGRAMS];
+	VagAtr tones[][VAB_TONES_PER_PROGRAM];
+} VhbFile;
 
 uint8_t VHB_HEADER_SS[0x1000];
 uint8_t VHB_HEADER_SL[0x1000];
@@ -579,7 +586,45 @@ uint32_t getNextFreeChannel(int32_t arg)
 	return val;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/sound", startSound);
+static void startSound__garbage__(void)
+{
+	int16_t a;
+	int16_t b;
+
+	a = FREE_CHANNEL_INDEX;
+	b = VHB_HEADER_SS[0];
+	a = (a * 100) / b;
+	a = (a * 100) / (b + 1);
+	FREE_CHANNEL_INDEX = a;
+}
+
+uint32_t startSound(int32_t vabId, char prog, char note)
+{
+	VhbFile *vhb;
+	VagAtr *tones;
+	int32_t channel;
+	uint32_t mask;
+	int32_t i;
+
+	vhb = (VhbFile *)VHB_HEADER_ADDR[vabId];
+	tones = vhb->tones[0];
+	tones = (VagAtr *)((int32_t)tones + (prog * (int32_t)sizeof(vhb->tones[0])));
+	mask = 0;
+	channel = 0x18;
+
+	for (i = 0; i < VAB_TONES_PER_PROGRAM; i++) {
+		if (note == tones[i].max) {
+			if ((channel = getNextFreeChannel(channel)) == -1) {
+				break;
+			}
+
+			SsUtKeyOnV(channel, vabId, prog, i, note, 0, 0x7f, 0x7f);
+			mask |= 1 << channel;
+		}
+	}
+
+	return mask;
+}
 
 void _stopSoundMask(uint32_t mask)
 {
