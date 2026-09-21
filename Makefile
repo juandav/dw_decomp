@@ -73,14 +73,21 @@ MAIN_SBSS := \
 	$(BUILDDIR)/generated/unk_0x801353F0.sbss.s
 
 MAIN_BSS := \
-	$(BUILDDIR)/generated/unk_0x801353F8.bss.s \
+	$(BUILDDIR)/generated/libapi.bss.s \
+	$(BUILDDIR)/generated/libetc.bss.s \
+	$(BUILDDIR)/generated/libgpu.bss.s \
 	$(BUILDDIR)/generated/libgs.bss.s \
 	$(BUILDDIR)/generated/libgte.bss.s \
 	$(BUILDDIR)/generated/model.bss.s \
 	$(BUILDDIR)/generated/unk_0x80137A24.bss.s \
+	$(BUILDDIR)/generated/libcd.bss.s \
+	$(BUILDDIR)/generated/unk_0x8013C038.bss.s \
 	$(BUILDDIR)/generated/unk_0x8013D590.bss.s \
-	$(BUILDDIR)/generated/unk_0x8014DBEC.bss.s \
+	$(BUILDDIR)/generated/libspu.bss.s \
+	$(BUILDDIR)/generated/libsnd.bss.s \
+	$(BUILDDIR)/generated/unk_0x8014F060.bss.s \
 	$(BUILDDIR)/generated/unk_0x80154F80.bss.s \
+	$(BUILDDIR)/generated/libds.bss.s \
 	$(BUILDDIR)/generated/butterfly.bss.s \
 	$(BUILDDIR)/generated/libmrcd.bss.s \
 	$(BUILDDIR)/generated/bubble.bss.s \

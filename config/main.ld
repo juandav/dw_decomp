@@ -693,7 +693,11 @@ SECTIONS
     bss_ROM_START = __romPos;
     .bss main_BSS_START : AT(bss_ROM_START)
     {
-        build/build/generated/unk_0x801353F8.bss.s.o(.bss.*);
+        build/build/generated/libapi.bss.s.o(.bss.*);
+        . = ALIGN(., 4);
+        build/build/generated/libetc.bss.s.o(.bss.*);
+        . = ALIGN(., 4);
+        build/build/generated/libgpu.bss.s.o(.bss.*);
         . = ALIGN(., 4);
         build/build/generated/libgs.bss.s.o(.bss.*);
         . = ALIGN(., 4);
@@ -705,19 +709,29 @@ SECTIONS
         . = ALIGN(., 4);
         KEEP(build/build/generated/unk_0x80137A24.bss.s.o(.bss.*));
         . = ALIGN(., 4);
+        KEEP(build/build/generated/libcd.bss.s.o(.bss.*));
+        . = ALIGN(., 4);
+        KEEP(build/build/generated/unk_0x8013C038.bss.s.o(.bss.*));
+        . = ALIGN(., 4);
         KEEP(build/src/main/item.c.o(.bss.*));
         . = ALIGN(., 4);
         KEEP(build/build/generated/unk_0x8013D590.bss.s.o(.bss.*));
         . = ALIGN(., 4);
         build/src/main/sound.c.o(.bss.*);
         . = ALIGN(., 4);
-        KEEP(build/build/generated/unk_0x8014DBEC.bss.s.o(.bss.*));
+        KEEP(build/build/generated/libspu.bss.s.o(.bss.*));
+        . = ALIGN(., 4);
+        KEEP(build/build/generated/libsnd.bss.s.o(.bss.*));
+        . = ALIGN(., 4);
+        KEEP(build/build/generated/unk_0x8014F060.bss.s.o(.bss.*));
         . = ALIGN(., 4);
         build/src/main/map_object.c.o(.bss.*);
         . = ALIGN(., 4);
         build/src/main/file_queue.c.o(.bss.*);
         . = ALIGN(., 4);
         build/build/generated/unk_0x80154F80.bss.s.o(.bss.*);
+        . = ALIGN(., 4);
+        build/build/generated/libds.bss.s.o(.bss.*);
         . = ALIGN(., 4);
         build/src/main/butterfly.c.o(.bss.*);
         . = ALIGN(., 4);
