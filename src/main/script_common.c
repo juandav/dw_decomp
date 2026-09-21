@@ -2595,7 +2595,70 @@ void MAIN_func_800FD7D8(int32_t boxId, int32_t idx, int16_t x, int16_t y)
 	GsSortPoly(&poly, ACTIVE_ORDERING_TABLE, (6 - boxId));
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/script_common", MAIN_func_800FD8D4);
+static void MAIN_func_800FD8D4__garbage__(void)
+{
+	int16_t a;
+	int16_t b;
+
+	a = MAIN_D_80134F60;
+	b = MAIN_D_80134F82;
+	a = (a * 100) / (b + 0);
+	a = (a * 100) / (b + 1);
+	a = (a * 100) / (b + 2);
+	a = (a * 100) / (b + 3);
+	a = (a * 100) / (b + 4);
+	MAIN_D_80134F60 = a;
+}
+
+void MAIN_func_800FD8D4(ItemMenuBox *box)
+{
+	int16_t track;
+	POLY_F4 *prim;
+	int16_t boxId;
+	int16_t h;
+	int16_t x;
+	int16_t rows;
+	int16_t y;
+	GsOT_TAG *otp;
+	int16_t thumbY;
+	int32_t bottom;
+	int32_t offset = 0;
+	int32_t scale = 1;
+	int16_t w;
+
+	boxId = box->boxId;
+	x = box->rect.x + UI_BOX_DATA[boxId].finalPos.x;
+	y = box->rect.y + UI_BOX_DATA[boxId].finalPos.y;
+	boxId = 6 - boxId;
+	otp = ACTIVE_ORDERING_TABLE->org + boxId;
+	w = box->rect.w;
+	h = box->rect.h;
+	if (box->itemCount < box->visibleRows) {
+		rows = box->visibleRows;
+	} else {
+		rows = box->itemCount;
+	}
+	track = (h * 100) / rows;
+	thumbY = y + 1 + ((track * box->topRow) / 100);
+	track = (track * box->visibleRows) / 100;
+
+	bottom = y + h;
+	renderTrianglePrimitive(0x20202, x + w + 1, y, x, y, x, bottom + offset, boxId, 0);
+	renderTrianglePrimitive(0xa08769, x, y + h + 1, x + w + 1, y + h + 1, x + w + 1, y + 1, boxId, 0);
+	renderTrianglePrimitive(0xa08769, x + offset + w * scale, thumbY, x + 1, thumbY, x + 1, thumbY + track - 2, boxId, 0);
+	renderTrianglePrimitive(0x20202, x + 1, thumbY + track - 1, x + offset + w * scale, thumbY + track - 1, x + offset + w * scale, thumbY + 1, boxId, 0);
+
+	prim = (POLY_F4 *)GsGetWorkBase();
+	SetPolyF4(prim);
+	setRGB0(prim, 0x5b, 0x70, 0x80);
+	setXYWH(prim, x + 2, thumbY + 1, w - 2, track - 2);
+	AddPrim(otp, prim++);
+	SetPolyF4(prim);
+	setRGB0(prim, 0x35, 0x4b, 0x5c);
+	setXYWH(prim, x + 1, y + 1, w, h);
+	AddPrim(otp, prim++);
+	GsSetWorkBase((PACKET *)prim);
+}
 
 void MAIN_func_800FDC5C(ItemMenuBox *box, int16_t x1, int16_t y1, int16_t x2,
                         int16_t y2, int32_t mode)
