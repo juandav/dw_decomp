@@ -107,7 +107,7 @@ extern int16_t CAMERA_Y[];
 int32_t getDistance(int32_t x, int32_t y, int32_t z);
 int32_t customRandom(int32_t a, int32_t b);
 void renderSelectionCursor(int32_t a0, int32_t a1, int32_t a2, int32_t a3, int32_t a4);
-void MAIN_func_800E58A4(int32_t a, int32_t b, int32_t x, int32_t y, int32_t n, int32_t layer);
+void renderSmallNumber(int32_t color, int32_t n, int32_t x, int32_t y, int32_t value, int32_t layer);
 void renderLinePrimitive(uint32_t color, int32_t x0, int32_t y0, int32_t x1, int32_t y1, int32_t layer, int32_t semiTrans);
 void setCameraFollowPlayer(void);
 void unsetCameraFollowPlayer(void);
@@ -1317,7 +1317,7 @@ void FISH_renderBaitMenu(int32_t boxId)
 			addPrim(ACTIVE_ORDERING_TABLE->org + layer, prim);
 			GsSetWorkBase((PACKET *)(prim + 1));
 
-			MAIN_func_800E58A4(0, 2, x + ((col != 0) ? 0x116 : 0x86),
+			renderSmallNumber(0, 2, x + ((col != 0) ? 0x116 : 0x86),
 			                   y + 0x12 + row * 0x12,
 			                   (INVENTORY.types.array + item)[0x1e], layer);
 		}

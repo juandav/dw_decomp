@@ -9,13 +9,75 @@
 #include <dw/ui.h>
 #include <dw/world_object.h>
 
+extern int32_t POLLED_INPUT;
+extern int32_t POLLED_INPUT_PREVIOUS;
+extern int8_t GAME_STATE;
+extern char *COMBAT_DATA_PTR;
+extern TamerEntity TAMER_ENTITY;
+extern char *ITEM_DESC_PTR[];
+
+void addGameMenu(void);
+void closeTriangleMenu(void);
+void startFeedingItem(uint8_t type);
+void startThrowingItem(void);
+void getEntityScreenPos(Entity *e, int32_t mode, int16_t *out);
+void renderString(int32_t color, int32_t x, int32_t y, int32_t w, int32_t h,
+                  int32_t u, int32_t v, int32_t layer, int32_t shadow);
+void renderSelectionCursor(int32_t x, int32_t y, int16_t w, int16_t h, int32_t layer);
+void swapByte(uint8_t *a, uint8_t *b);
+void playSound(int32_t vabId, uint32_t note);
+void sortItems(int16_t mode);
+void sortItemsById(uint8_t *data, int32_t count);
+void renderItemSprite(int32_t type, int32_t x, int32_t y, int32_t layer);
+void renderSmallNumber(int32_t color, int32_t n, int32_t x, int32_t y,
+                       int32_t value, int32_t layer);
+void renderTrianglePrimitive(uint32_t color, int32_t x0, int32_t y0,
+                             int32_t x1, int32_t y1, int32_t x2, int32_t y2,
+                             int32_t layer, uint32_t mode);
+
+int32_t getActionColor(int32_t mode);
+void drawInventoryText(void);
+void drawInventoryTextLine(int16_t startSlot);
+void resetInventoryFlags();
+void initializeInventoryObject();
+void tickInventoryObject(int32_t instanceId);
+void closeInventoryBoxes();
+int32_t createInventoryUI(void);
+void tickInventoryTop();
+void renderInventoryTop(int16_t boxId);
+void renderInventoryBottom(int32_t boxId);
+void closeInventoryBoxes2();
+void openActionMenu(void);
+void tickActionMenu();
+void renderActionMenu(int16_t boxId);
+int32_t closeActionMenu(void);
+void openSortTypeMenu();
+void tickSortTypeMenu();
+void renderSortTypeMenu(int16_t boxId);
+void closeSubMenu();
+void openDropConfirm();
+void tickDropConfirm();
+void renderDropConfirm(int16_t boxId);
+void closeSubMenuThunk();
+void updateItemNames();
+void moveItem();
+void selectSorting();
+void confirmDrop();
+void selectAction();
+void selectInventoryItem();
+
+void copyItemArray(uint8_t *src, uint8_t *dst, int32_t n);
+void updateInputHold();
+int32_t isInputTriggered(int32_t mask);
+void moveMenuCursor(uint8_t *cursor, int32_t unused, int32_t max);
+
 char CONFIRM_PROMPT[16] = "Are you sure?";
-uint8_t MAIN_D_8012A9C4[3][6] = {
-	{0, 1, 3, 2, 5, 4},
-	{2, 5, 0, 1, 4, 3},
-	{2, 0, 1, 3, 5, 4}
+uint8_t SORT_CATEGORY_ORDER[3][6] = {
+	{ 0x00, 0x01, 0x03, 0x02, 0x05, 0x04 },
+	{ 0x02, 0x05, 0x00, 0x01, 0x04, 0x03 },
+	{ 0x02, 0x00, 0x01, 0x03, 0x05, 0x04 },
 };
-char ACTION_LABELS[4][8] = {"Use", "Move", "Sort", "Drop"};
+char ACTION_LABELS[4][8] = { "Use", "Move", "Sort", "Drop" };
 
 char SORT_LABEL_BATTLE[8] = "Battle";
 char SORT_LABEL_RAISE[8] = "Raise";
@@ -23,7 +85,7 @@ char SORT_LABEL_BASIC[8] = "Basic";
 char CONFIRM_LABEL_YES[4] = "Yes";
 char CONFIRM_LABEL_NO[4] = "No";
 
-int32_t MAIN_D_80134E00;
+int32_t INVENTORY_UNUSED;
 int32_t INVENTORY_STATE;
 int32_t INVENTORY_OPEN;
 int16_t INVENTORY_SCROLL_ROW;
@@ -48,77 +110,10 @@ static void *inventory_sbss_order[] = {
 	&INVENTORY_SCROLL_ROW,
 	&INVENTORY_OPEN,
 	&INVENTORY_STATE,
-	&MAIN_D_80134E00,
+	&INVENTORY_UNUSED,
 };
 
-extern int32_t POLLED_INPUT;
-extern int32_t POLLED_INPUT_PREVIOUS;
-extern int8_t GAME_STATE;
-extern char *COMBAT_DATA_PTR;
-extern TamerEntity TAMER_ENTITY;
-void addGameMenu(void);
-void closeTriangleMenu(void);
-void startFeedingItem(uint8_t type);
-void startThrowingItem(void);
-void getEntityScreenPos(Entity *e, int32_t mode, int16_t *out);
-void renderString(int32_t a, int32_t b, int32_t c, int32_t d, int32_t e,
-		  int32_t f, int32_t g, int32_t h, int32_t i);
-void renderSelectionCursor(int32_t x, int32_t y, int16_t w, int16_t h, int32_t layer);
-extern char *ITEM_DESC_PTR[];
-void swapByte(uint8_t *a, uint8_t *b);
-void playSound(int32_t vabId, uint32_t note);
-void sortItems(int16_t mode);
-void sortItemsById(uint8_t *data, int32_t count);
-/* These legacy local declarations retain the retail O32 argument words.
- * The rendering helpers narrow their coordinate/value inputs. */
-void renderItemSprite(int32_t type, int32_t x, int32_t y, int32_t layer);
-void MAIN_func_800E58A4(int32_t color, int32_t n, int32_t x, int32_t y,
-			int32_t value, int32_t layer);
-void renderTrianglePrimitive(uint32_t color, int32_t x0, int32_t y0,
-			     int32_t x1, int32_t y1, int32_t x2, int32_t y2,
-			     int32_t layer, uint32_t mode);
-
-int32_t getActionColor(int32_t mode);
-void drawInventoryText(void);
-void drawInventoryTextLine(int16_t startSlot);
-void resetInventoryFlags();
-void initializeInventoryObject();
-void tickInventoryObject(int32_t instanceId);
-void closeInventoryBoxes();
-int32_t createInventoryUI(void);
-void tickInventoryTop();
-/* UI dispatch sign-extends the 16-bit instanceId. The explicit RenderFunction
- * casts retain the narrow callbacks' legacy MIPS ABI, not C type compatibility. */
-void renderInventoryTop(int16_t boxId);
-void renderInventoryBottom(int32_t arg);
-void closeInventoryBoxes2();
-void openActionMenu(void);
-void tickActionMenu();
-void renderActionMenu(int16_t boxId);
-int32_t closeActionMenu(void);
-void openSortTypeMenu();
-void tickSortTypeMenu();
-void renderSortTypeMenu(int16_t boxId);
-void closeSubMenu();
-void openDropConfirm();
-void tickDropConfirm();
-void renderDropConfirm(int16_t boxId);
-void closeSubMenuThunk();
-void updateItemNames();
-void moveItem();
-void selectSorting();
-void confirmDrop();
-void selectAction();
-void selectInventoryItem();
-
-void copyItemArray(uint8_t *src, uint8_t *dst, int32_t n);
-void updateInputHold();
-int32_t isInputTriggered(int32_t mask);
-void moveMenuCursor(uint8_t *p, int32_t unused, int32_t max);
-
-/* Definition placement preserves CodeWarrior scheduling; this anchor keeps
- * the retail function order independently of the definitions below. */
-void *inventory_order_anchor[] = {
+void *inventory_text_order[] = {
 	moveMenuCursor,
 	isInputTriggered,
 	updateInputHold,
@@ -159,22 +154,22 @@ void *inventory_order_anchor[] = {
 int32_t getActionColor(int32_t mode)
 {
 	Item *item;
-	uint8_t t;
+	uint8_t type;
 
 	if ((mode == 1) || (mode == 2)) {
 		return 9;
 	}
-	t = INVENTORY.types.array[INVENTORY_POINTER];
+	type = INVENTORY.types.array[INVENTORY_POINTER];
 	if (mode == 0) {
-		if (t != 0xFF) {
-			item = &ITEM_PARA[t];
+		if (type != 0xff) {
+			item = &ITEM_PARA[type];
 			switch (GAME_STATE) {
 			case 0:
 				if ((item->itemColor == 0) ||
 				    (item->itemColor == 2)) {
 					return 9;
 				}
-				return 0xA;
+				return 0xa;
 			case 1:
 			case 2:
 			case 3:
@@ -182,22 +177,22 @@ int32_t getActionColor(int32_t mode)
 				    (item->itemColor == 2)) {
 					return 9;
 				}
-				return 0xA;
+				return 0xa;
 			}
 		}
-		return 0xA;
+		return 0xa;
 	} else if (mode == 3) {
 		if (GAME_STATE == 1) {
-			return 0xA;
+			return 0xa;
 		}
-		if (t != 0xFF) {
-			item = &ITEM_PARA[t];
+		if (type != 0xff) {
+			item = &ITEM_PARA[type];
 			if (item->droppable == 1) {
 				return 9;
 			}
-			return 0xA;
+			return 0xa;
 		} else {
-			return 0xA;
+			return 0xa;
 		}
 	}
 }
@@ -210,7 +205,7 @@ void drawInventoryText(void)
 
 	clearTextArea();
 	for (i = 0, slot = 0; i < (INVENTORY.size / 2); ++i, slot += 2) {
-		drawInventoryTextLine((int16_t)slot);
+		drawInventoryTextLine(slot);
 	}
 	for (i = 0, y = 0; i < 4; ++i, y += 0xc) {
 		drawString(ACTION_LABELS[i], 0xc0, y);
@@ -244,11 +239,11 @@ void openActionMenu(void)
 		setRECT(&finalPos, x, y, 0x3a, 0x54);
 		startPos.x = x - 3;
 		startPos.y = UI_BOX_DATA[0].finalPos.y + 7 +
-			     (INVENTORY_POINTER / 2 - INVENTORY_SCROLL_ROW) * 0x12;
+		             (INVENTORY_POINTER / 2 - INVENTORY_SCROLL_ROW) * 0x12;
 		setWH(&startPos, 0x8a, 0x12);
 		createAnimatedUIBox(2, 1, 0, &finalPos, &startPos,
-				    (TickFunction)tickActionMenu,
-				    (RenderFunction)renderActionMenu);
+		                    (TickFunction)tickActionMenu,
+		                    (RenderFunction)renderActionMenu);
 	}
 }
 
@@ -257,11 +252,11 @@ void drawInventoryTextLine(int16_t startSlot)
 	int32_t slot;
 	int32_t i;
 
-	for (i = 0, slot = (int32_t)startSlot + i; i < 2; ++i, ++slot) {
-		if ((INVENTORY.types.array + (int32_t)startSlot)[i] != 0xFF) {
+	for (i = 0, slot = startSlot + i; i < 2; ++i, ++slot) {
+		if ((INVENTORY.types.array + (int32_t)startSlot)[i] != 0xff) {
 			(INVENTORY.names.array + (int32_t)startSlot)[i] = slot;
 			drawString(ITEM_PARA[INVENTORY.types.array[startSlot + i]].name,
-				   (slot & 1) * 0x60, (slot / 2) * 0xC);
+			           (slot & 1) * 0x60, (slot / 2) * 0xc);
 		}
 	}
 	DrawSync(0);
@@ -276,226 +271,172 @@ void resetInventoryFlags(void)
 void initializeInventoryObject(void)
 {
 	if ((INVENTORY_OPEN != 1) && (UI_BOX_DATA[0].state == 0) &&
-	    (TAMER_ITEM.worldItem.type == 0xFF)) {
+	    (TAMER_ITEM.worldItem.type == 0xff)) {
 		INVENTORY_OPEN = 1;
 		INVENTORY_STATE = 1;
-		addObject(0x1A5, 0, tickInventoryObject, 0);
+		addObject(0x1a5, 0, tickInventoryObject, 0);
 	}
 }
 
-
 static void tickInventoryObject__garbage__(void)
 {
-        int32_t v0;
-        int32_t v1;
-        int32_t v2;
-        int32_t v3;
+	int32_t v0;
+	int32_t v1;
+	int32_t v2;
+	int32_t v3;
 
-        v0 = INVENTORY.amounts.array[0] + 0;
-        v1 = INVENTORY.amounts.array[1] + 1;
-        v2 = INVENTORY.amounts.array[2] + 2;
-        v3 = INVENTORY.amounts.array[3] + 3;
-        INVENTORY.amounts.array[0] = (uint8_t)((v0 * v1) + v2);
-        INVENTORY.amounts.array[1] = (uint8_t)((v1 * v2) + v3);
-        INVENTORY.amounts.array[2] = (uint8_t)((v2 * v3) + v0);
-        INVENTORY.amounts.array[3] = (uint8_t)((v3 * v0) + v1);
+	v0 = INVENTORY.amounts.array[0] + 0;
+	v1 = INVENTORY.amounts.array[1] + 1;
+	v2 = INVENTORY.amounts.array[2] + 2;
+	v3 = INVENTORY.amounts.array[3] + 3;
+	INVENTORY.amounts.array[0] = (uint8_t)((v0 * v1) + v2);
+	INVENTORY.amounts.array[1] = (uint8_t)((v1 * v2) + v3);
+	INVENTORY.amounts.array[2] = (uint8_t)((v2 * v3) + v0);
+	INVENTORY.amounts.array[3] = (uint8_t)((v3 * v0) + v1);
 }
-
 
 void tickInventoryObject(int32_t instanceId)
 {
-  TamerEntity *tam;
-  int new_var;
-  uint8_t *it;
-  if ((*((uint8_t *) (COMBAT_DATA_PTR + 0x64E))) != 1)
-  {
-    tam = &TAMER_ENTITY;
-    if ((POLLED_INPUT & (~POLLED_INPUT_PREVIOUS)) & 0x40)
-    {
-      if (UI_BOX_DATA[3].state == 1)
-      {
-        if (ACTION_CURSOR == 2)
-        {
-          selectSorting();
-        }
-        else
-        {
-          confirmDrop();
-        }
-      }
-      else
-        if (UI_BOX_DATA[2].state == 1)
-      {
-        selectAction();
-      }
-      else
-      {
-        selectInventoryItem();
-      }
-    }
-    if ((POLLED_INPUT & (~POLLED_INPUT_PREVIOUS)) & 0x10)
-    {
-      if (UI_BOX_DATA[3].state == 1)
-      {
-        if (ACTION_CURSOR == 2)
-        {
-          INVENTORY_STATE = 9;
-        }
-        else
-        {
-          INVENTORY_STATE = 0xF;
-        }
-      }
-      else
-        if (UI_BOX_DATA[2].state == 0)
-      {
-        new_var = 1;
-        if (UI_BOX_DATA[0].state == 4)
-        {
-          playSound(0, 3);
-          UI_BOX_DATA[0].state = new_var;
-          INVENTORY_STATE = 0;
-        }
-        else
-          if (UI_BOX_DATA[1].state == 1)
-        {
-          INVENTORY_STATE = 2;
-        }
-      }
-      else
-        if (UI_BOX_DATA[2].state == 1)
-      {
-        INVENTORY_STATE = 4;
-      }
-    }
-    switch (INVENTORY_STATE)
-    {
-      case 1:
-        createInventoryUI();
-        if (tam->entity.anim.animId != 4)
-      {
-        startAnimation(&tam->entity, 4);
-      }
-        break;
+	TamerEntity *tam;
+	int32_t boxState;
+	uint8_t *it;
+	if (*(uint8_t *)(COMBAT_DATA_PTR + 0x64e) != 1) {
+		tam = &TAMER_ENTITY;
+		if ((POLLED_INPUT & ~POLLED_INPUT_PREVIOUS) & 0x40) {
+			if (UI_BOX_DATA[3].state == 1) {
+				if (ACTION_CURSOR == 2) {
+					selectSorting();
+				} else {
+					confirmDrop();
+				}
+			} else if (UI_BOX_DATA[2].state == 1) {
+				selectAction();
+			} else {
+				selectInventoryItem();
+			}
+		}
+		if ((POLLED_INPUT & ~POLLED_INPUT_PREVIOUS) & 0x10) {
+			if (UI_BOX_DATA[3].state == 1) {
+				if (ACTION_CURSOR == 2) {
+					INVENTORY_STATE = 9;
+				} else {
+					INVENTORY_STATE = 0xf;
+				}
+			} else if (UI_BOX_DATA[2].state == 0) {
+				boxState = 1;
+				if (UI_BOX_DATA[0].state == 4) {
+					playSound(0, 3);
+					UI_BOX_DATA[0].state = boxState;
+					INVENTORY_STATE = 0;
+				} else if (UI_BOX_DATA[1].state == 1) {
+					INVENTORY_STATE = 2;
+				}
+			} else if (UI_BOX_DATA[2].state == 1) {
+				INVENTORY_STATE = 4;
+			}
+		}
+		switch (INVENTORY_STATE) {
+		case 1:
+			createInventoryUI();
+			if (tam->entity.anim.animId != 4) {
+				startAnimation(&tam->entity, 4);
+			}
+			break;
 
-      case 2:
-        closeInventoryBoxes2();
-        if ((GAME_STATE == 0) && (UI_BOX_DATA[0].frame == 0))
-      {
-        closeTriangleMenu();
-        addGameMenu();
-        startAnimation(&(&TAMER_ENTITY)->entity, 0);
-      }
-        break;
+		case 2:
+			closeInventoryBoxes2();
+			if ((GAME_STATE == 0) && (UI_BOX_DATA[0].frame == 0)) {
+				closeTriangleMenu();
+				addGameMenu();
+				startAnimation(&(&TAMER_ENTITY)->entity, 0);
+			}
+			break;
 
-      case 3:
-        openActionMenu();
-        break;
+		case 3:
+			openActionMenu();
+			break;
 
-      case 4:
+		case 4:
 
-      case 6:
-        closeActionMenu();
-        break;
+		case 6:
+			closeActionMenu();
+			break;
 
-      case 5:
-        if (closeActionMenu() != 0)
-      {
-        closeInventoryBoxes2();
-      }
-        if (UI_BOX_DATA[0].state == 0)
-      {
-        if (GAME_STATE == 0)
-        {
-          startFeedingItem(INVENTORY.types.array[INVENTORY_POINTER]);
-          INVENTORY_STATE = 0;
-        }
-        else
-          if (GAME_STATE == 1)
-        {
-          startThrowingItem();
-          INVENTORY_STATE = 0;
-        }
-      }
-        break;
+		case 5:
+			if (closeActionMenu() != 0) {
+				closeInventoryBoxes2();
+			}
+			if (UI_BOX_DATA[0].state == 0) {
+				if (GAME_STATE == 0) {
+					startFeedingItem(INVENTORY.types.array[INVENTORY_POINTER]);
+					INVENTORY_STATE = 0;
+				} else if (GAME_STATE == 1) {
+					startThrowingItem();
+					INVENTORY_STATE = 0;
+				}
+			}
+			break;
 
-      case 7:
-        if (UI_BOX_DATA[3].state != 0)
-      {
-        closeSubMenuThunk();
-      }
-      else
-        if (UI_BOX_DATA[2].state != 0)
-      {
-        closeActionMenu();
-      }
-      else
-      {
-        INVENTORY_STATE = 0;
-        it = &INVENTORY.types.array[INVENTORY_POINTER];
-        removeItem(it[0], it[0x1E]);
-      }
-        break;
+		case 7:
+			if (UI_BOX_DATA[3].state != 0) {
+				closeSubMenuThunk();
+			} else if (UI_BOX_DATA[2].state != 0) {
+				closeActionMenu();
+			} else {
+				INVENTORY_STATE = 0;
+				it = &INVENTORY.types.array[INVENTORY_POINTER];
+				removeItem(it[0], it[0x1e]);
+			}
+			break;
 
-      case 8:
-        openSortTypeMenu();
-        break;
+		case 8:
+			openSortTypeMenu();
+			break;
 
-      case 9:
-        closeSubMenu();
-        break;
+		case 9:
+			closeSubMenu();
+			break;
 
-      case 11:
+		case 11:
 
-      case 12:
+		case 12:
 
-      case 13:
-        if (UI_BOX_DATA[3].state != 0)
-      {
-        closeSubMenu();
-      }
-      else
-        if (UI_BOX_DATA[2].state != 0)
-      {
-        closeActionMenu();
-      }
-      else
-      {
-        INVENTORY_STATE = 0;
-      }
-        break;
+		case 13:
+			if (UI_BOX_DATA[3].state != 0) {
+				closeSubMenu();
+			} else if (UI_BOX_DATA[2].state != 0) {
+				closeActionMenu();
+			} else {
+				INVENTORY_STATE = 0;
+			}
+			break;
 
-      case 14:
-        openDropConfirm();
-        break;
+		case 14:
+			openDropConfirm();
+			break;
 
-      case 15:
-        closeSubMenuThunk();
-        break;
-
-    }
-
-  }
+		case 15:
+			closeSubMenuThunk();
+			break;
+		}
+	}
 }
 
 void closeInventoryBoxes(void)
 {
-  int16_t new_var;
-  int i;
-  if (INVENTORY_OPEN != 0)
-  {
-    INVENTORY_OPEN = 0;
-    INVENTORY_STATE = 0;
-    for (i = 0; i < 4; i++)
-    {
-      if (UI_BOX_DATA[i].state != 0)
-      {
-        removeStaticUIBox(new_var = i);
-      }
-    }
+	int16_t boxId; /* the narrowing temp is what the ROM's argument setup needs */
+	int32_t i;
+	if (INVENTORY_OPEN != 0) {
+		INVENTORY_OPEN = 0;
+		INVENTORY_STATE = 0;
+		for (i = 0; i < 4; i++) {
+			if (UI_BOX_DATA[i].state != 0) {
+				removeStaticUIBox(boxId = i);
+			}
+		}
 
-    removeObject(0x1A5, 0);
-  }
+		removeObject(0x1a5, 0);
+	}
 }
 
 int32_t createInventoryUI(void)
@@ -513,7 +454,7 @@ int32_t createInventoryUI(void)
 	if (UI_BOX_DATA[0].frame == 0) {
 		INVENTORY_SCROLL_ROW = 0;
 		INVENTORY_ROW_OFFSET = 0;
-		MAIN_D_80134E00 = 0;
+		INVENTORY_UNUSED = 0;
 		INVENTORY_POINTER = 0;
 		box->rowOffset = 0;
 		box->visibleRows = 9;
@@ -523,25 +464,25 @@ int32_t createInventoryUI(void)
 			features |= 4;
 			box->totalRows = INVENTORY.size == 20 ? 10 : 15;
 		}
-		setRECT(&finalPos, -0x98, -0x68, 0x130, INVENTORY.size == 10 ? 0x6E : 0xB6);
+		setRECT(&finalPos, -0x98, -0x68, 0x130, INVENTORY.size == 10 ? 0x6e : 0xb6);
 		getEntityScreenPos(ENTITY_TABLE[0], 1, xy);
 		setRECT(&startPos, xy[0] - 5, xy[1] - 5, 10, 10);
 		createAnimatedUIBox(0, 0, features, &finalPos, &startPos,
-				    (TickFunction)tickInventoryTop, (RenderFunction)renderInventoryTop);
+		                    (TickFunction)tickInventoryTop, (RenderFunction)renderInventoryTop);
 	}
 	if (box->state != 1) {
 		return 0;
 	}
 	if (UI_BOX_DATA[1].frame == 0) {
-		INVENTORY_LAST_POINTER = 0xFF;
+		INVENTORY_LAST_POINTER = 0xff;
 		finalPos.x = -0x98;
-		finalPos.y = 0x4D;
+		finalPos.y = 0x4d;
 		finalPos.w = 0x130;
 		UI_BOX_DATA[1].features = 2;
-		finalPos.h = 0x1C;
-		setRECT(&startPos, box->finalPos.x + 8, box->finalPos.y + 0xE, 0x10, 0x10);
+		finalPos.h = 0x1c;
+		setRECT(&startPos, box->finalPos.x + 8, box->finalPos.y + 0xe, 0x10, 0x10);
 		createAnimatedUIBox(1, 0, 2, &finalPos, &startPos,
-				    NULL, renderInventoryBottom);
+		                    NULL, renderInventoryBottom);
 	}
 	return 0;
 }
@@ -571,7 +512,6 @@ void tickInventoryTop(void)
 		if (INVENTORY_POINTER < INVENTORY_SCROLL_ROW * 2) {
 			--INVENTORY_SCROLL_ROW;
 		}
-		/* Retail reloads this cursor byte after the preceding scroll update. */
 		if (*(volatile uint8_t *)&INVENTORY_POINTER >
 		    (INVENTORY_SCROLL_ROW + UI_BOX_DATA[0].visibleRows - 1) * 2 + 1) {
 			++INVENTORY_SCROLL_ROW;
@@ -598,68 +538,68 @@ void renderInventoryTop(int16_t boxId)
 	count = INVENTORY.size == 10 ? 10 : 18;
 	for (i = 0; i < count; ++i, ++slot) {
 		type = INVENTORY.types.array[slot];
-		if (type != 0xFF) {
-			renderItemSprite(type, (i & 1) ? x + 0x9A : x + 0xA,
-					 y + 8 + (i / 2) * 0x12, 6 - boxId);
-			if (ITEM_PARA[type].itemColor == 0xFF) {
+		if (type != 0xff) {
+			renderItemSprite(type, (i & 1) ? x + 0x9a : x + 0xa,
+			                 y + 8 + (i / 2) * 0x12, 6 - boxId);
+			if (ITEM_PARA[type].itemColor == 0xff) {
 				color = 8;
 			} else {
 				color = ITEM_PARA[type].itemColor + 5;
 			}
-			renderString(color, (i & 1) ? x + 0xAD : x + 0x1D,
-				     y + 0xA + (i / 2) * 0x12, 0x60, 0xC,
-				     ((int32_t)INVENTORY.names.array[slot] & 1) * 0x60,
-				     ((int32_t)INVENTORY.names.array[slot] / 2) * 0xC,
-				     6 - boxId, 1);
-			MAIN_func_800E58A4(0, 2, (i & 1) ? x + 0x113 : x + 0x83,
-					  y + 0xC + (i / 2) * 0x12,
-					  INVENTORY.amounts.array[slot], 6 - boxId);
+			renderString(color, (i & 1) ? x + 0xad : x + 0x1d,
+			             y + 0xa + (i / 2) * 0x12, 0x60, 0xc,
+			             (INVENTORY.names.array[slot] & 1) * 0x60,
+			             (INVENTORY.names.array[slot] / 2) * 0xc,
+			             6 - boxId, 1);
+			renderSmallNumber(0, 2, (i & 1) ? x + 0x113 : x + 0x83,
+			                  y + 0xc + (i / 2) * 0x12,
+			                  INVENTORY.amounts.array[slot], 6 - boxId);
 		}
 	}
 	if (box->state == 4) {
-		row = (int32_t)INVENTORY_MOVE_SRC / 2 - INVENTORY_SCROLL_ROW;
+		row = INVENTORY_MOVE_SRC / 2 - INVENTORY_SCROLL_ROW;
 		if (0 <= row && row < box->visibleRows) {
 			if (INVENTORY_MOVE_SRC & 1) {
-			x = box->finalPos.x + 0x97;
-		} else {
-			x = box->finalPos.x + 7;
-		}
+				x = box->finalPos.x + 0x97;
+			} else {
+				x = box->finalPos.x + 7;
+			}
 			y = box->finalPos.y + 7 + row * 0x12;
-			renderTrianglePrimitive(0x5D4AF1, x, y + 0x12, x, y,
-						x + 0x8A, y, 6 - boxId, 0);
-			renderTrianglePrimitive(0x5D4AF1, x + 0x8A, y,
-						x + 0x8A, y + 0x12, x, y + 0x12,
-						6 - boxId, 0);
+			renderTrianglePrimitive(0x5d4af1, x, y + 0x12, x, y,
+			                        x + 0x8a, y, 6 - boxId, 0);
+			renderTrianglePrimitive(0x5d4af1, x + 0x8a, y,
+			                        x + 0x8a, y + 0x12, x, y + 0x12,
+			                        6 - boxId, 0);
 		}
 	}
 	if (INVENTORY_POINTER & 1) {
-			x = box->finalPos.x + 0x97;
-		} else {
-			x = box->finalPos.x + 7;
-		}
-	y = box->finalPos.y + 7 + ((int32_t)INVENTORY_POINTER / 2 - INVENTORY_SCROLL_ROW) * 0x12;
-	renderSelectionCursor(x, y, 0x8A, 0x12, 6 - boxId);
+		x = box->finalPos.x + 0x97;
+	} else {
+		x = box->finalPos.x + 7;
+	}
+	y = box->finalPos.y + 7 + (INVENTORY_POINTER / 2 - INVENTORY_SCROLL_ROW) * 0x12;
+	renderSelectionCursor(x, y, 0x8a, 0x12, 6 - boxId);
 	box->rowOffset = INVENTORY_SCROLL_ROW;
 	INVENTORY_ROW_OFFSET = box->rowOffset;
 }
 
-void renderInventoryBottom(int32_t arg)
+void renderInventoryBottom(int32_t boxId)
 {
-	if (INVENTORY.types.array[INVENTORY_POINTER] != 0xFF) {
+	if (INVENTORY.types.array[INVENTORY_POINTER] != 0xff) {
 		if (INVENTORY_POINTER != INVENTORY_LAST_POINTER) {
 			updateItemNames();
 		}
 		INVENTORY_LAST_POINTER = INVENTORY_POINTER;
-		renderString(9, UI_BOX_DATA[1].finalPos.x + 0x1A,
-			     UI_BOX_DATA[1].finalPos.y + 8, 0xFC, 0xC, 0, 0xB4,
-			     6 - arg, 1);
+		renderString(9, UI_BOX_DATA[1].finalPos.x + 0x1a,
+		             UI_BOX_DATA[1].finalPos.y + 8, 0xfc, 0xc, 0, 0xb4,
+		             6 - boxId, 1);
 	}
 }
 
 void closeInventoryBoxes2(void)
 {
 	int16_t xy[2];
-	RECT r;
+	RECT rect;
 	int16_t x;
 
 	if (UI_BOX_DATA[0].frame == 0) {
@@ -668,23 +608,22 @@ void closeInventoryBoxes2(void)
 	}
 	if (UI_BOX_DATA[1].state == 1) {
 		if (INVENTORY_POINTER & 1) {
-			x = UI_BOX_DATA[0].finalPos.x + 0x9A;
+			x = UI_BOX_DATA[0].finalPos.x + 0x9a;
 		} else {
-			x = UI_BOX_DATA[0].finalPos.x + 0xA;
+			x = UI_BOX_DATA[0].finalPos.x + 0xa;
 		}
-		r.x = x;
-		r.y = UI_BOX_DATA[0].finalPos.y + 8 +
-		      ((int16_t)((INVENTORY_POINTER / 2) - INVENTORY_SCROLL_ROW) * 0x12);
-		setWH(&r, 0x10, 0x10);
-		removeAnimatedUIBox(1, &r);
+		rect.x = x;
+		rect.y = UI_BOX_DATA[0].finalPos.y + 8 +
+		         ((int16_t)((INVENTORY_POINTER / 2) - INVENTORY_SCROLL_ROW) * 0x12);
+		setWH(&rect, 0x10, 0x10);
+		removeAnimatedUIBox(1, &rect);
 	}
 	if ((UI_BOX_DATA[1].frame <= 0) && (UI_BOX_DATA[0].state == 1)) {
 		getEntityScreenPos(ENTITY_TABLE[0], 1, xy);
-		setRECT(&r, xy[0] - 5, xy[1] - 5, 0xA, 0xA);
-		removeAnimatedUIBox(0, &r);
+		setRECT(&rect, xy[0] - 5, xy[1] - 5, 0xa, 0xa);
+		removeAnimatedUIBox(0, &rect);
 	}
 }
-
 
 void tickActionMenu(void)
 {
@@ -692,8 +631,6 @@ void tickActionMenu(void)
 		moveMenuCursor(&ACTION_CURSOR, 2, 4);
 	}
 }
-
-
 
 int32_t closeActionMenu(void)
 {
@@ -712,15 +649,15 @@ void openSortTypeMenu(void)
 	RECT r2;
 
 	if ((UI_BOX_DATA[2].state == 1) && (UI_BOX_DATA[3].state == 0)) {
-		drawString(SORT_LABEL_BATTLE, 0xC0, 0x30);
-		drawString(SORT_LABEL_RAISE, 0xC0, 0x3C);
-		drawString(SORT_LABEL_BASIC, 0xC0, 0x48);
+		drawString(SORT_LABEL_BATTLE, 0xc0, 0x30);
+		drawString(SORT_LABEL_RAISE, 0xc0, 0x3c);
+		drawString(SORT_LABEL_BASIC, 0xc0, 0x48);
 		SORT_TYPE_CURSOR = 0;
 		setRECT(&r1, UI_BOX_DATA[2].finalPos.x + UI_BOX_DATA[2].finalPos.w, UI_BOX_DATA[2].finalPos.y, 0x48, 0x42);
 		setRECT(&r2, UI_BOX_DATA[2].finalPos.x + 9, UI_BOX_DATA[2].finalPos.y + 6 + (ACTION_CURSOR * 0x12), 0x28, 0x10);
 		createAnimatedUIBox(3, 1, 0, &r1, &r2,
-				    (TickFunction)tickSortTypeMenu,
-				    (RenderFunction)renderSortTypeMenu);
+		                    (TickFunction)tickSortTypeMenu,
+		                    (RenderFunction)renderSortTypeMenu);
 	}
 }
 
@@ -738,8 +675,8 @@ void renderActionMenu(int16_t boxId)
 
 	for (; i < 4; ++i) {
 		renderString(getActionColor(i), x + 3,
-			     box->finalPos.y + 8 + i * 0x12, 0x24, 0xC,
-			     0xC0, i * 0xC, 6 - boxId, 1);
+		             box->finalPos.y + 8 + i * 0x12, 0x24, 0xc,
+		             0xc0, i * 0xc, 6 - boxId, 1);
 	}
 	renderSelectionCursor(x, y, 0x28, 0x10, 6 - boxId);
 }
@@ -762,7 +699,7 @@ void renderSortTypeMenu(int16_t boxId)
 
 	for (i = 0; i < 3; ++i) {
 		renderString(9, x + 3, pos->y + 8 + i * 0x12, 0x30,
-			     0xC, 0xC0, 0x30 + i * 0xC, 6 - boxId, 1);
+		             0xc, 0xc0, 0x30 + i * 0xc, 6 - boxId, 1);
 	}
 	renderSelectionCursor(x, y, 0x36, 0x10, 6 - boxId);
 }
@@ -780,17 +717,17 @@ void openDropConfirm(void)
 	RECT r2;
 
 	if ((UI_BOX_DATA[2].state == 1) && (UI_BOX_DATA[3].state == 0)) {
-		drawString(CONFIRM_LABEL_YES, 0xC5, 0x54);
-		drawString(CONFIRM_LABEL_NO, 0xC0, 0x60);
-		drawString(CONFIRM_PROMPT, 0, 0xC0);
+		drawString(CONFIRM_LABEL_YES, 0xc5, 0x54);
+		drawString(CONFIRM_LABEL_NO, 0xc0, 0x60);
+		drawString(CONFIRM_PROMPT, 0, 0xc0);
 		setRECT(&r1, -0x40, -0x26, 0x80, 0x35);
 		r2.x = UI_BOX_DATA[2].finalPos.x + 9;
 		CONFIRM_CURSOR = 1;
 		r2.y = UI_BOX_DATA[2].finalPos.y + 6 + (ACTION_CURSOR * 0x12);
 		setWH(&r2, 0x28, 0x10);
 		createAnimatedUIBox(3, 1, 0, &r1, &r2,
-				    (TickFunction)tickDropConfirm,
-				    (RenderFunction)renderDropConfirm);
+		                    (TickFunction)tickDropConfirm,
+		                    (RenderFunction)renderDropConfirm);
 	}
 }
 
@@ -817,16 +754,16 @@ void renderDropConfirm(int16_t boxId)
 
 	box = &UI_BOX_DATA[boxId];
 	x = box->finalPos.x + 0x12 + CONFIRM_CURSOR * 0x35;
-	y = box->finalPos.y + 0x1E;
+	y = box->finalPos.y + 0x1e;
 
-	renderString(9, -0x34, -0x1E, 0x6C, 0xC, 0, 0xC0, 6 - boxId, 1);
+	renderString(9, -0x34, -0x1e, 0x6c, 0xc, 0, 0xc0, 6 - boxId, 1);
 	for (i = 0; i < 2; ++i) {
 		labelX = box->finalPos.x + 0x12 + i * 0x34;
 		renderString(9, labelX + 5,
-			     y + 2, 0x24, 0xC, 0xC0, 0x54 + i * 0xC,
-			     6 - boxId, 1);
+		             y + 2, 0x24, 0xc, 0xc0, 0x54 + i * 0xc,
+		             6 - boxId, 1);
 	}
-	renderSelectionCursor(x, y, 0x2A, 0x10, 6 - boxId);
+	renderSelectionCursor(x, y, 0x2a, 0x10, 6 - boxId);
 }
 
 void closeSubMenuThunk(void)
@@ -838,9 +775,9 @@ void updateItemNames(void)
 {
 	RECT area;
 
-	setRECT(&area, 0, 0xB4, 0xFC, 0xC);
+	setRECT(&area, 0, 0xb4, 0xfc, 0xc);
 	clearTextSubArea(&area);
-	drawString(ITEM_DESC_PTR[INVENTORY.types.array[INVENTORY_POINTER]], 0, 0xB4);
+	drawString(ITEM_DESC_PTR[INVENTORY.types.array[INVENTORY_POINTER]], 0, 0xb4);
 	DrawSync(0);
 }
 
@@ -850,20 +787,20 @@ void moveItem(void)
 
 	p = &INVENTORY.types.array[INVENTORY_POINTER];
 	swapByte(p, &INVENTORY.types.array[INVENTORY_MOVE_SRC]);
-	swapByte(&INVENTORY.types.array[INVENTORY_POINTER] + 0x1E,
-		 &INVENTORY.types.array[INVENTORY_MOVE_SRC] + 0x1E);
-	swapByte(&INVENTORY.types.array[INVENTORY_POINTER] + 0x3C,
-		 &INVENTORY.types.array[INVENTORY_MOVE_SRC] + 0x3C);
-	if (*p != 0xFF) {
+	swapByte(&INVENTORY.types.array[INVENTORY_POINTER] + 0x1e,
+	         &INVENTORY.types.array[INVENTORY_MOVE_SRC] + 0x1e);
+	swapByte(&INVENTORY.types.array[INVENTORY_POINTER] + 0x3c,
+	         &INVENTORY.types.array[INVENTORY_MOVE_SRC] + 0x3c);
+	if (*p != 0xff) {
 		updateItemNames();
 	}
 }
 
 void selectSorting(void)
 {
-	if (INVENTORY_STATE != SORT_TYPE_CURSOR + 0xB) {
-		sortItems(SORT_TYPE_CURSOR + 0xB);
-		INVENTORY_STATE = SORT_TYPE_CURSOR + 0xB;
+	if (INVENTORY_STATE != SORT_TYPE_CURSOR + 0xb) {
+		sortItems(SORT_TYPE_CURSOR + 0xb);
+		INVENTORY_STATE = SORT_TYPE_CURSOR + 0xb;
 	}
 }
 
@@ -872,7 +809,7 @@ void confirmDrop(void)
 	if (CONFIRM_CURSOR == 0) {
 		INVENTORY_STATE = 7;
 	} else {
-		INVENTORY_STATE = 0xF;
+		INVENTORY_STATE = 0xf;
 	}
 }
 
@@ -881,12 +818,12 @@ void selectAction(void)
 	Item *item;
 	uint8_t t;
 
-	if ((INVENTORY_STATE != 0xB) && (INVENTORY_STATE != 0xC) &&
-	    (INVENTORY_STATE != 0xD) && (UI_BOX_DATA[3].state == 0)) {
+	if ((INVENTORY_STATE != 0xb) && (INVENTORY_STATE != 0xc) &&
+	    (INVENTORY_STATE != 0xd) && (UI_BOX_DATA[3].state == 0)) {
 		switch (ACTION_CURSOR) {
 		case 0:
 			t = INVENTORY.types.array[INVENTORY_POINTER];
-			if (t != 0xFF) {
+			if (t != 0xff) {
 				item = &ITEM_PARA[INVENTORY.types.array[INVENTORY_POINTER]];
 				switch (GAME_STATE) {
 				case 0:
@@ -915,8 +852,8 @@ void selectAction(void)
 		case 3:
 			if (GAME_STATE == 0) {
 				t = INVENTORY.types.array[INVENTORY_POINTER];
-				if ((t != 0xFF) && ITEM_PARA[INVENTORY.types.array[INVENTORY_POINTER]].droppable == 1) {
-					INVENTORY_STATE = 0xE;
+				if ((t != 0xff) && ITEM_PARA[INVENTORY.types.array[INVENTORY_POINTER]].droppable == 1) {
+					INVENTORY_STATE = 0xe;
 				}
 			}
 			break;
@@ -926,8 +863,8 @@ void selectAction(void)
 
 void selectInventoryItem(void)
 {
-	if ((INVENTORY_STATE != 0xB) && (INVENTORY_STATE != 0xC) &&
-	    (INVENTORY_STATE != 0xD) && (INVENTORY_STATE != 5) &&
+	if ((INVENTORY_STATE != 0xb) && (INVENTORY_STATE != 0xc) &&
+	    (INVENTORY_STATE != 0xd) && (INVENTORY_STATE != 5) &&
 	    (UI_BOX_DATA[2].state == 0)) {
 		if (UI_BOX_DATA[0].state == 0) {
 			INVENTORY_STATE = 1;
@@ -940,7 +877,7 @@ void selectInventoryItem(void)
 			moveItem();
 			return;
 		}
-		if ((INVENTORY_STATE < 5) && (TAMER_ITEM.worldItem.type == 0xFF) &&
+		if ((INVENTORY_STATE < 5) && (TAMER_ITEM.worldItem.type == 0xff) &&
 		    (UI_BOX_DATA[1].state == 1)) {
 			INVENTORY_STATE = 3;
 		}
@@ -958,14 +895,14 @@ void sortItems(int16_t mode)
 	uint8_t *other;
 	uint8_t *order;
 
-	INVENTORY_LAST_POINTER = 0xFF;
+	INVENTORY_LAST_POINTER = 0xff;
 	for (i = 0; i < INVENTORY.size; ++i) {
-		desired[i] = 0xFF;
+		desired[i] = 0xff;
 	}
 	for (i = 0; i < 6; ++i) {
 		counts[i] = 0;
 		for (j = 0; j < INVENTORY.size; ++j) {
-			if (INVENTORY.types.array[j] != 0xFF) {
+			if (INVENTORY.types.array[j] != 0xff) {
 				type = INVENTORY.types.array[j];
 				if (i == ITEM_PARA[type].sortingValue) {
 					categories[i][counts[i]] = type;
@@ -976,14 +913,14 @@ void sortItems(int16_t mode)
 		sortItemsById(categories[i], counts[i]);
 	}
 	i = 0;
-	order = MAIN_D_8012A9C4[mode - 11];
+	order = SORT_CATEGORY_ORDER[mode - 11];
 	for (j = 0; j < 6; ++j, ++order) {
 		copyItemArray(categories[*order],
-			      desired + i, counts[*order]);
+		              desired + i, counts[*order]);
 		i += counts[*order];
 	}
 	for (i = 0; i < INVENTORY.size; ++i) {
-		if (desired[i] == 0xFF) {
+		if (desired[i] == 0xff) {
 			break;
 		}
 		if (INVENTORY.types.array[i] != desired[i]) {
@@ -993,9 +930,9 @@ void sortItems(int16_t mode)
 				}
 			}
 			swapByte(((uint8_t *)&INVENTORY + i),
-				 other = ((uint8_t *)&INVENTORY + j));
-			swapByte(((uint8_t *)&INVENTORY + i) + 0x1E, other + 0x1E);
-			swapByte(((uint8_t *)&INVENTORY + i) + 0x3C, other + 0x3C);
+			         other = ((uint8_t *)&INVENTORY + j));
+			swapByte(((uint8_t *)&INVENTORY + i) + 0x1e, other + 0x1e);
+			swapByte(((uint8_t *)&INVENTORY + i) + 0x3c, other + 0x3c);
 		}
 	}
 }
@@ -1021,21 +958,21 @@ void updateInputHold(void)
 int32_t isInputTriggered(int32_t mask)
 {
 	if ((mask & (POLLED_INPUT & ~POLLED_INPUT_PREVIOUS)) ||
-	    ((INPUT_HOLD_FRAMES >= 0xB) && (mask & POLLED_INPUT))) {
+	    ((INPUT_HOLD_FRAMES >= 0xb) && (mask & POLLED_INPUT))) {
 		return 1;
 	}
 	return 0;
 }
 
-void moveMenuCursor(uint8_t *p, int32_t unused, int32_t max)
+void moveMenuCursor(uint8_t *cursor, int32_t unused, int32_t max)
 {
 	updateInputHold();
-	if ((isInputTriggered(0x1000) != 0) && (*p != 0)) {
+	if ((isInputTriggered(0x1000) != 0) && (*cursor != 0)) {
 		playSound(0, 2);
-		--*p;
+		--*cursor;
 	}
-	if ((isInputTriggered(0x4000) != 0) && (*p < max - 1)) {
+	if ((isInputTriggered(0x4000) != 0) && (*cursor < max - 1)) {
 		playSound(0, 2);
-		++*p;
+		++*cursor;
 	}
 }

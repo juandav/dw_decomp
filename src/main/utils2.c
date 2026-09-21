@@ -51,8 +51,8 @@ uint8_t entityGetTechFromAnim(Entity *e, uint8_t anim);
 void entityLookAtTile(Entity *entity, int32_t tileX, int32_t tileY);
 void setEntityTextDigit(POLY_FT4* poly, int32_t x, int32_t y);
 void MAIN_func_800E642C(void);
-void MAIN_func_800E58A4(int32_t color, int32_t n, int32_t x, int16_t y,
-			int16_t value, int32_t layer);
+void renderSmallNumber(int32_t color, int32_t n, int32_t x, int16_t y,
+		       int16_t value, int32_t layer);
 void MAIN_func_800E5724(int32_t color, int32_t n, int32_t x, int16_t y,
 			int16_t value, int32_t layer);
 int32_t hasMove(int32_t move);
@@ -101,8 +101,8 @@ void MAIN_func_800E5724(int32_t color, int32_t n, int32_t x, int16_t y,
 	GsSetWorkBase((PACKET *)prim);
 }
 
-void MAIN_func_800E58A4(int32_t color, int32_t n, int32_t x, int16_t y,
-			int16_t value, int32_t layer)
+void renderSmallNumber(int32_t color, int32_t n, int32_t x, int16_t y,
+		       int16_t value, int32_t layer)
 {
 	POLY_FT4 *prim;
 	int32_t i;
