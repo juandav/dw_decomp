@@ -996,4 +996,230 @@ void getEFEDATEntry(int32_t id)
 	CdIntToPos(MAIN_D_8012343C[0] + (id * 0xA), &loc);
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/efe", renderParticleFlash);
+void renderParticleFlash(ParticleFlashData *params)
+{
+	POLY_FT4 *prim;
+	int32_t sx;
+	int32_t sy;
+	GsOT_TAG *ot;
+	int16_t r;
+	int16_t g;
+	int16_t b;
+	int32_t rows;
+	int32_t cellW;
+	int32_t cellH;
+	int32_t vStep;
+	int32_t cols;
+	int32_t uStep;
+	int32_t h1;
+	int32_t w1;
+	int32_t i;
+	int32_t j;
+	int32_t px;
+	int32_t py;
+
+	if ((params->depth < 0x21) || (params->depth >= 0x1000)) {
+		return;
+	}
+	ot = ACTIVE_ORDERING_TABLE->org;
+	r = (params->color.r * params->colorScale) >> 7;
+	g = (params->color.g * params->colorScale) >> 7;
+	b = (params->color.b * params->colorScale) >> 7;
+	w1 = (uint8_t)(params->sizeX - 1);
+	h1 = (uint8_t)(params->sizeY - 1);
+	if (abs(params->screenPos.vx) >= 0x400) {
+		return;
+	}
+	if (abs(params->screenPos.vy) >= 0x200) {
+		return;
+	}
+	sx = (params->scale * w1) >> 10;
+	if (sx <= 0) {
+		return;
+	}
+	sx += 1;
+	sy = (params->scale * h1) >> 10;
+	if (sy <= 0) {
+		return;
+	}
+	sy += 1;
+	if ((sx < 0x400) && (sy < 0x200)) {
+		cols = 0;
+	} else {
+		cols = ((sx + 1) / 1024) + 1;
+		if (cols != 0) {
+			cols = (cols & ~3u) + 3;
+		}
+		if ((cols & 1) == 0) {
+			cols++;
+		}
+	}
+	rows = ((sy + 1) / 512) + 1;
+	cellW = (sx + 1) / (cols + 1);
+	cellH = (sy + 1) / (rows + 1);
+	uStep = (w1 + 1) / (cols + 1);
+	vStep = (h1 + 1) / (rows + 1);
+	prim = (POLY_FT4 *)GsGetWorkBase();
+
+	for (j = 0; j <= rows; j++) {
+		py = params->screenPos.vy - sy + cellH * j;
+		if ((py + cellH < -DRAWING_OFFSET_Y) || (py > -DRAWING_OFFSET_Y + 0xf0)) {
+			continue;
+		}
+		for (i = 0; i <= cols; i++) {
+			px = params->screenPos.vx - sx + cellW * i;
+			if ((px + cellW < -DRAWING_OFFSET_X) || (px > -DRAWING_OFFSET_X + 0x140)) {
+				continue;
+			}
+			SetPolyFT4(prim);
+			SetSemiTrans(prim, 1);
+			prim->tpage = params->tpage;
+			prim->clut = params->clut;
+			prim->x0 = px;
+			prim->y0 = py;
+			prim->x1 = px + cellW;
+			prim->y1 = py;
+			prim->x2 = px;
+			prim->y2 = py + cellH;
+			prim->x3 = px + cellW;
+			prim->y3 = py + cellH;
+			if (i == cols) {
+				prim->x1 = prim->x3 = params->screenPos.vx;
+			}
+			if (j == rows) {
+				prim->y2 = prim->y3 = params->screenPos.vy;
+			}
+			prim->r0 = r;
+			prim->g0 = g;
+			prim->b0 = b;
+			prim->u0 = prim->u2 = params->uBase + uStep * i;
+			prim->u1 = prim->u3 = params->uBase + uStep * (i + 1) - 1;
+			prim->v0 = prim->v1 = params->vBase + vStep * j;
+			prim->v2 = prim->v3 = params->vBase + vStep * (j + 1) - 1;
+			AddPrim(&ot[params->depth], prim);
+			prim++;
+		}
+	}
+
+	for (j = 0; j <= rows; j++) {
+		py = params->screenPos.vy - sy + cellH * j;
+		if ((py + cellH < -DRAWING_OFFSET_Y) || (py > -DRAWING_OFFSET_Y + 0xf0)) {
+			continue;
+		}
+		for (i = 0; i <= cols; i++) {
+			px = params->screenPos.vx + sx - cellW * i;
+			if ((px < -DRAWING_OFFSET_X) || (-DRAWING_OFFSET_X + 0x140 < px - cellW)) {
+				continue;
+			}
+			SetPolyFT4(prim);
+			SetSemiTrans(prim, 1);
+			prim->tpage = params->tpage;
+			prim->clut = params->clut;
+			prim->x0 = px;
+			prim->y0 = py;
+			prim->x1 = px + (-cellW);
+			prim->y1 = py;
+			prim->x2 = px;
+			prim->y2 = py + cellH;
+			prim->x3 = px + (-cellW);
+			prim->y3 = py + cellH;
+			if (i == cols) {
+				prim->x1 = prim->x3 = params->screenPos.vx;
+			}
+			if (j == rows) {
+				prim->y2 = prim->y3 = params->screenPos.vy;
+			}
+			prim->r0 = r;
+			prim->g0 = g;
+			prim->b0 = b;
+			prim->u0 = prim->u2 = params->uBase + uStep * i;
+			prim->u1 = prim->u3 = params->uBase + uStep * (i + 1) - 1;
+			prim->v0 = prim->v1 = params->vBase + vStep * j;
+			prim->v2 = prim->v3 = params->vBase + vStep * (j + 1) - 1;
+			AddPrim(&ot[params->depth], prim);
+			prim++;
+		}
+	}
+
+	for (j = 0; j <= rows; j++) {
+		py = params->screenPos.vy + sy - cellH * j;
+		if ((py < -DRAWING_OFFSET_Y) || (-DRAWING_OFFSET_Y + 0xf0 < py - cellH)) {
+			continue;
+		}
+		for (i = 0; i <= cols; i++) {
+			px = params->screenPos.vx - sx + cellW * i;
+			if ((px + cellW < -DRAWING_OFFSET_X) || (px > -DRAWING_OFFSET_X + 0x140)) {
+				continue;
+			}
+			SetPolyFT4(prim);
+			SetSemiTrans(prim, 1);
+			prim->tpage = params->tpage;
+			prim->clut = params->clut;
+			prim->x0 = px;
+			prim->y0 = py;
+			prim->x1 = px + cellW;
+			prim->y1 = py;
+			prim->x2 = px;
+			prim->y2 = py + (-cellH);
+			prim->x3 = px + cellW;
+			prim->y3 = py + (-cellH);
+			if (i == cols) {
+				prim->x1 = prim->x3 = params->screenPos.vx;
+			}
+			if (j == rows) {
+				prim->y2 = prim->y3 = params->screenPos.vy;
+			}
+			prim->r0 = r;
+			prim->g0 = g;
+			prim->b0 = b;
+			prim->u0 = prim->u2 = params->uBase + uStep * i;
+			prim->u1 = prim->u3 = params->uBase + uStep * (i + 1) - 1;
+			prim->v0 = prim->v1 = params->vBase + vStep * j;
+			prim->v2 = prim->v3 = params->vBase + vStep * (j + 1) - 1;
+			AddPrim(&ot[params->depth], prim);
+			prim++;
+		}
+	}
+
+	for (j = 0; j <= rows; j++) {
+		py = params->screenPos.vy + sy - cellH * j;
+		if ((py < -DRAWING_OFFSET_Y) || (-DRAWING_OFFSET_Y + 0xf0 < py - cellH)) {
+			continue;
+		}
+		for (i = 0; i <= cols; i++) {
+			px = params->screenPos.vx + sx - cellW * i;
+			if ((px < -DRAWING_OFFSET_X) || (-DRAWING_OFFSET_X + 0x140 < px - cellW)) {
+				continue;
+			}
+			SetPolyFT4(prim);
+			SetSemiTrans(prim, 1);
+			prim->tpage = params->tpage;
+			prim->clut = params->clut;
+			prim->x0 = px;
+			prim->y0 = py;
+			prim->x1 = px + (-cellW);
+			prim->y1 = py;
+			prim->x2 = px;
+			prim->y2 = py + (-cellH);
+			prim->x3 = px + (-cellW);
+			prim->y3 = py + (-cellH);
+			if (i == cols) {
+				prim->x1 = prim->x3 = params->screenPos.vx;
+			}
+			if (j == rows) {
+				prim->y2 = prim->y3 = params->screenPos.vy;
+			}
+			prim->r0 = r;
+			prim->g0 = g;
+			prim->b0 = b;
+			prim->u0 = prim->u2 = params->uBase + uStep * i;
+			prim->u1 = prim->u3 = params->uBase + uStep * (i + 1) - 1;
+			prim->v0 = prim->v1 = params->vBase + vStep * j;
+			prim->v2 = prim->v3 = params->vBase + vStep * (j + 1) - 1;
+			AddPrim(&ot[params->depth], prim);
+			prim++;
+		}
+	}
+
+	GsSetWorkBase((PACKET *)prim);
+}
