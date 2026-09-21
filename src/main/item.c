@@ -21,10 +21,19 @@
 
 #include "common.h"
 
+extern uint8_t MAP_LAYER_ENABLED;
+extern InventoryTable DEFAULT_ITEM_AMOUNTS;
+extern InventoryTable DEFAULT_ITEM_TYPES;
+extern int32_t VIEWPORT_DISTANCE;
+extern char IS_SICK_SUFFIX[];
+extern uint8_t EVOLUTION_ITEM_TARGET[];
+extern int16_t EVOLUTION_TARGET;
+extern uint8_t HAS_USED_EVOITEM;
+
 void deleteDroppedItem(int16_t itemId);
 void setUVDataPolyFT4(POLY_FT4 *p, int32_t u, int32_t v, int32_t w, int32_t h);
 void setPosDataPolyFT4(POLY_FT4 *prim, int32_t posX, int32_t posY, int32_t width,
-		       int32_t height);
+                       int32_t height);
 void setItemTexture(POLY_FT4 *prim, int32_t type);
 void decreasePoopLevel(void);
 void modifyLifetime(int16_t delta);
@@ -41,28 +50,19 @@ void handlePoopWeightLoss(int32_t type);
 void closeInventoryBoxes(void);
 void BTL_healStatusEffect(int32_t arg);
 void addEntityText(Entity *entity, int32_t a, int32_t b, int16_t value,
-		   int32_t kind);
+                   int32_t kind);
 int32_t handleMedicineHealing(int32_t injuryChance, int32_t sicknessChance);
 void handlePortaPotty(void);
 void handleItemSickness(int16_t arg);
 void addTamerLevel(int32_t chance, int32_t amount);
 
-extern uint8_t MAP_LAYER_ENABLED;
-extern InventoryTable DEFAULT_ITEM_AMOUNTS;
-extern InventoryTable DEFAULT_ITEM_TYPES;
-extern int32_t VIEWPORT_DISTANCE;
-extern char MAIN_D_80125F64[];
-extern uint8_t MAIN_D_80127C5C[];
-extern int16_t EVOLUTION_TARGET;
-extern uint8_t HAS_USED_EVOITEM;
-
 Inventory INVENTORY;
 TamerItem TAMER_ITEM;
 DroppedItem DROPPED_ITEMS[11];
 
-int16_t MAIN_D_8013435C[4] = { 500, 1500, 5000, 9999 };
-uint8_t MAIN_D_80134364[4] = { 0, 0, 1, 1 };
-char MAIN_D_80134368[] = "%s";
+int16_t HEAL_AMOUNTS[4] = { 500, 1500, 5000, 9999 };
+uint8_t HEAL_EFFECT_VARIANT[4] = { 0, 0, 1, 1 };
+char NAME_FORMAT[] = "%s";
 
 void *item_text_order[] = {
 	handleItemSickness,
@@ -147,12 +147,12 @@ void handleEvoItems(int16_t item)
 			EVOLUTION_TARGET = 0x41;
 		}
 	} else {
-		target = MAIN_D_80127C5C[item - 0x47];
+		target = EVOLUTION_ITEM_TARGET[item - 0x47];
 		level = DIGIMON_DATA[target].level - 1;
 		if (level != DIGIMON_DATA[ENTITY_TABLE[1]->type].level) {
 			return;
 		}
-		EVOLUTION_TARGET = MAIN_D_80127C5C[item - 0x47];
+		EVOLUTION_TARGET = EVOLUTION_ITEM_TARGET[item - 0x47];
 	}
 	HAS_USED_EVOITEM = 1;
 	removeTamerItem();
@@ -206,15 +206,16 @@ void handleChips(int32_t chipId)
 	int16_t def;
 	int16_t speed;
 	int16_t brain;
-	int16_t s;
+	int16_t zero;
 
+	/* The ROM clears the six stat deltas through one shared temporary. */
 	lifetime = 0;
-	mp = s = 0U;
-	hp = s = 0U;
-	brain = s = 0U;
-	speed = s = 0U;
-	def = s = 0U;
-	off = s = 0U;
+	mp = zero = 0;
+	hp = zero = 0;
+	brain = zero = 0;
+	speed = zero = 0;
+	def = zero = 0;
+	off = zero = 0;
 	switch (chipId) {
 	case 0x16:
 		if (IS_SCRIPT_PAUSED == 1) {
@@ -243,17 +244,17 @@ void handleChips(int32_t chipId)
 	case 0x1d:
 		off = 100;
 		brain = 100;
-		lifetime = 0xffffffe8;
+		lifetime = -24;
 		break;
 	case 0x1e:
 		def = 100;
 		speed = 100;
-		lifetime = 0xffffffe8;
+		lifetime = -24;
 		break;
 	case 0x1f:
 		hp = 1000;
 		mp = 1000;
-		lifetime = 0xffffffe8;
+		lifetime = -24;
 		break;
 	case 0x20:
 		handlePortaPotty();
@@ -267,7 +268,7 @@ void handleChips(int32_t chipId)
 	addWithLimit(&PARTNER_ENTITY.digimonEntity.stats.base.brain, brain, 999);
 	modifyLifetime(lifetime);
 	if ((0x1c < chipId) && (chipId < 0x20)) {
-		addTamerLevel(10, 0xffffffff);
+		addTamerLevel(10, -1);
 	}
 }
 
@@ -296,7 +297,7 @@ void handleRestore(int16_t type)
 	}
 
 	addWithLimit(&PARTNER_ENTITY.digimonEntity.stats.current.currentHP,
-		     amount, PARTNER_ENTITY.digimonEntity.stats.base.hp);
+	             amount, PARTNER_ENTITY.digimonEntity.stats.base.hp);
 	if (GAME_STATE == 1) {
 		addEntityText(ENTITY_TABLE[1], 0, 0xb, amount, 1);
 	}
@@ -308,9 +309,9 @@ void handleDoubleFloppy(int32_t itemId)
 {
 	if (PARTNER_ENTITY.digimonEntity.stats.current.currentHP != 0) {
 		addWithLimit(&PARTNER_ENTITY.digimonEntity.stats.current.currentHP,
-			     0x5dc, PARTNER_ENTITY.digimonEntity.stats.base.hp);
+		             0x5dc, PARTNER_ENTITY.digimonEntity.stats.base.hp);
 		addWithLimit(&PARTNER_ENTITY.digimonEntity.stats.current.currentMP,
-			     0x5dc, PARTNER_ENTITY.digimonEntity.stats.base.mp);
+		             0x5dc, PARTNER_ENTITY.digimonEntity.stats.base.mp);
 		if (GAME_STATE == 1) {
 			addEntityText(ENTITY_TABLE[1], 0, 0xb, 0x5dc, 1);
 			addEntityText(ENTITY_TABLE[1], 0, 0xb, 0x5dc, 2);
@@ -319,31 +320,27 @@ void handleDoubleFloppy(int32_t itemId)
 	}
 }
 
-void handleMPHealingItem(unsigned char idx)
+void handleMPHealingItem(uint8_t idx)
 {
-	if (PARTNER_ENTITY.digimonEntity.stats.current.currentHP != 0)
-	{
-		addWithLimit(&PARTNER_ENTITY.digimonEntity.stats.current.currentMP, MAIN_D_8013435C[idx - 4], PARTNER_ENTITY.digimonEntity.stats.base.mp);
-		if (GAME_STATE == 1)
-		{
-			int16_t new_var;
-			addEntityText(ENTITY_TABLE[1], 0, 0xb, new_var = MAIN_D_8013435C[idx - 4], 2);
+	if (PARTNER_ENTITY.digimonEntity.stats.current.currentHP != 0) {
+		addWithLimit(&PARTNER_ENTITY.digimonEntity.stats.current.currentMP, HEAL_AMOUNTS[idx - 4], PARTNER_ENTITY.digimonEntity.stats.base.mp);
+		if (GAME_STATE == 1) {
+			int16_t amount;
+			addEntityText(ENTITY_TABLE[1], 0, 0xb, amount = HEAL_AMOUNTS[idx - 4], 2);
 		}
-		addHealingParticleEffect(ENTITY_TABLE[1], MAIN_D_80134364[idx - 4]);
+		addHealingParticleEffect(ENTITY_TABLE[1], HEAL_EFFECT_VARIANT[idx - 4]);
 	}
 }
 
-void handleHPHealingItem(unsigned char idx)
+void handleHPHealingItem(uint8_t idx)
 {
-	if (PARTNER_ENTITY.digimonEntity.stats.current.currentHP != 0)
-	{
-		addWithLimit(&PARTNER_ENTITY.digimonEntity.stats.current.currentHP, MAIN_D_8013435C[idx], PARTNER_ENTITY.digimonEntity.stats.base.hp);
-		if (GAME_STATE == 1)
-		{
-			int16_t new_var;
-			addEntityText(ENTITY_TABLE[1], 0, 0xb, new_var = MAIN_D_8013435C[idx], 1);
+	if (PARTNER_ENTITY.digimonEntity.stats.current.currentHP != 0) {
+		addWithLimit(&PARTNER_ENTITY.digimonEntity.stats.current.currentHP, HEAL_AMOUNTS[idx], PARTNER_ENTITY.digimonEntity.stats.base.hp);
+		if (GAME_STATE == 1) {
+			int16_t amount;
+			addEntityText(ENTITY_TABLE[1], 0, 0xb, amount = HEAL_AMOUNTS[idx], 1);
 		}
-		addHealingParticleEffect(ENTITY_TABLE[1], MAIN_D_80134364[idx]);
+		addHealingParticleEffect(ENTITY_TABLE[1], HEAL_EFFECT_VARIANT[idx]);
 	}
 }
 
@@ -381,7 +378,7 @@ void spawnDroppedItems(Entity *e, int32_t type)
 		it->worldItem.spriteLocation.vy = 0;
 		it->worldItem.spriteLocation.vz = loc->vz;
 		getModelTile(loc, (int16_t *)((char *)it + 0xc),
-			     (int16_t *)((char *)it + 0xe));
+		             (int16_t *)((char *)it + 0xe));
 		addObject(0x195, i, 0, renderDroppedItem);
 	}
 }
@@ -494,7 +491,7 @@ void renderOverworldItem(WorldItem *item)
 			setUVWH(prim, prim->u0, prim->v0, 0xf, 0xf);
 		}
 		setPosDataPolyFT4(prim, screen.vx - (width >> 1),
-				  screen.vy - (width >> 1), width, width);
+		                  screen.vy - (width >> 1), width, width);
 		AddPrim(&ACTIVE_ORDERING_TABLE->org[otz], prim++);
 		GsSetWorkBase((PACKET *)prim);
 	}
@@ -564,28 +561,29 @@ int32_t giveItem(uint32_t item, uint8_t amount)
 	int16_t used[30];
 	int32_t i;
 	int32_t j;
-	int32_t n;
-	uint8_t *p;
-	uint8_t *q;
+	int32_t size;
+	uint8_t *count;
 
-	for (i = 0; i < (n = ((volatile uint8_t *)&INVENTORY)[0x5A]); i++) {
+	/* The ROM re-reads the inventory size on every pass of the first loop and
+	 * reuses the last value read as the bound of the second; the volatile view
+	 * is what keeps mwcc from hoisting that load. */
+	for (i = 0; i < (size = ((volatile Inventory *)&INVENTORY)->size); i++) {
 		if (INVENTORY.types.array[i] == item) {
-			q = &INVENTORY.types.array[i] + 0x1e;
-			p = q - 0x1e;
-			if (q[0] != 0x63) {
-				q[0] += amount;
-				if (q[0] >= 0x64) {
-					q[0] = 0x63;
+			count = &INVENTORY.amounts.array[i];
+			if (*count != 99) {
+				*count += amount;
+				if (*count >= 100) {
+					*count = 99;
 				}
 				return 1;
 			}
 			return 0;
 		}
 	}
-	for (i = 0; i < n; i++) {
+
+	for (i = 0; i < size; i++) {
 		if (INVENTORY.types.array[i] == 0xff) {
-			p = &INVENTORY.types.array[i];
-			p[0] = item;
+			INVENTORY.types.array[i] = item;
 			INVENTORY.amounts.array[i] = amount;
 			for (j = 0; j < INVENTORY.size; j++) {
 				used[j] = 0;
@@ -604,48 +602,44 @@ int32_t giveItem(uint32_t item, uint8_t amount)
 			return 1;
 		}
 	}
+
 	return 0;
 }
 
 void removeItem(int32_t type, uint32_t amount)
 {
-	int32_t new_var;
 	int32_t i;
-	uint8_t *new_var2;
-	uint8_t *amt;
-	if (type == 0xff)
-	{
+	uint8_t *count;
+	uint32_t held;
+
+	if (type == 0xff) {
 		return;
 	}
-	for (i = 0; i < INVENTORY.size; i++)
-	{
-		if (INVENTORY.types.array[i] == type)
-		{
-			amt = (&INVENTORY.types.array[i]) + 0x1e;
-			new_var2 = amt;
-			new_var = amount < (*new_var2);
-			if (new_var)
-			{
-				*amt = (*new_var2) - amount;
-			}
-			else
-			{
-				*new_var2 = 0;
+
+	for (i = 0; i < INVENTORY.size; i++) {
+		if (INVENTORY.types.array[i] == type) {
+			count = &INVENTORY.amounts.array[i];
+			held = *count;
+			if (amount < held) {
+				*count = held - amount;
+			} else {
+				*count = 0;
 				INVENTORY.types.array[i] = 0xff;
 				INVENTORY.names.array[i] = 0xff;
 			}
 		}
 	}
-
 }
 
 int32_t pickupItem(int16_t itemId)
 {
-	int32_t *tp;
+	int32_t *type;
 	int32_t got;
 
-	tp = &DROPPED_ITEMS->worldItem.type;
-	got = giveItem((uint8_t)tp[itemId << 2], 1);
+	/* The ROM indexes the type field of element 0 by whole elements rather
+	 * than addressing DROPPED_ITEMS[itemId] and reading the field. */
+	type = &DROPPED_ITEMS[0].worldItem.type;
+	got = giveItem((uint8_t)type[itemId * (sizeof(DroppedItem) / sizeof(int32_t))], 1);
 	if (got != 0) {
 		deleteDroppedItem(itemId);
 	}
@@ -658,7 +652,7 @@ void initializeInventory(void)
 	InventoryTable types;
 	int32_t i;
 
-	for (i = 0; i < 0x1e; ++i) {
+	for (i = 0; i < 30; ++i) {
 		INVENTORY.types.array[i] = 0xff;
 		INVENTORY.amounts.array[i] = 0;
 		INVENTORY.names.array[i] = 0xff;
@@ -668,13 +662,13 @@ void initializeInventory(void)
 	amounts = DEFAULT_ITEM_AMOUNTS;
 	types = DEFAULT_ITEM_TYPES;
 
-	for (i = 0; i < 0x1e; ++i) {
+	for (i = 0; i < 30; ++i) {
 		INVENTORY.types.array[i] = types.array[i];
 		INVENTORY.amounts.array[i] = amounts.array[i];
 		INVENTORY.names.array[i] = i;
 	}
 
-	INVENTORY.size = 0x1e;
+	INVENTORY.size = 30;
 }
 
 void removeTamerItem(void)
@@ -685,10 +679,12 @@ void removeTamerItem(void)
 	}
 }
 
+// clang-format off
 void addWithLimit(value, amount, limit)
 	int16_t *value;
 	int16_t amount;
 	int16_t limit;
+// clang-format on
 {
 	*value += amount;
 	if (*value > limit) {
@@ -701,14 +697,14 @@ int32_t handleMedicineHealing(int32_t injuryChance, int32_t sicknessChance)
 	int32_t roll;
 	int32_t cured;
 
-	if (((PARTNER_PARA.condition & 0x20) != 0) &&
+	if (((PARTNER_PARA.condition & CONDITION_INJURED) != 0) &&
 	    (roll = random(3), (int16_t)roll < injuryChance)) {
-		PARTNER_PARA.condition &= 0xffffffdf;
+		PARTNER_PARA.condition &= ~CONDITION_INJURED;
 		PARTNER_PARA.injuryTimer = 0;
 	}
-	if (((PARTNER_PARA.condition & 0x40) != 0) &&
+	if (((PARTNER_PARA.condition & CONDITION_SICK) != 0) &&
 	    (roll = random(10), (int16_t)roll < sicknessChance)) {
-		PARTNER_PARA.condition &= 0xffffffbf;
+		PARTNER_PARA.condition &= ~CONDITION_SICK;
 		PARTNER_PARA.sicknessTimer = 0;
 		PARTNER_PARA.areaEffectTimer = 0;
 		cured = 1;
@@ -720,10 +716,10 @@ int32_t handleMedicineHealing(int32_t injuryChance, int32_t sicknessChance)
 
 void handlePortaPotty(void)
 {
-	if (PARTNER_PARA.condition & 8) {
+	if (PARTNER_PARA.condition & CONDITION_POOPY) {
 		PARTNER_PARA.poopLevel =
 			RAISE_DATA[ENTITY_TABLE[1]->type].poopTimer;
-		PARTNER_PARA.condition &= ~8;
+		PARTNER_PARA.condition &= ~CONDITION_POOPY;
 		handlePoopWeightLoss(ENTITY_TABLE[1]->type);
 	}
 }
@@ -798,26 +794,24 @@ void setTrainingBoost(int32_t flag, int32_t value, int32_t duration)
 
 void handleItemSickness(int16_t chance)
 {
-	int32_t new_var;
+	int32_t isSick;
 	int16_t r;
 	char buf[0x18];
-	r = (int16_t) random(0x64);
-	new_var = PARTNER_PARA.condition & 0x40;
-	if ((r < chance) && (!new_var))
-	{
-		PARTNER_PARA.condition |= 0x40;
+	r = random(0x64);
+	isSick = PARTNER_PARA.condition & CONDITION_SICK;
+	if ((r < chance) && (!isSick)) {
+		PARTNER_PARA.condition |= CONDITION_SICK;
 		PARTNER_PARA.timesBeingSick++;
 		PARTNER_PARA.sicknessTimer = 1;
-		if (PARTNER_PARA.condition & 0x20)
-		{
-			PARTNER_PARA.condition &= ~0x20;
+		if (PARTNER_PARA.condition & CONDITION_INJURED) {
+			PARTNER_PARA.condition &= ~CONDITION_INJURED;
 			PARTNER_PARA.injuryTimer = 0;
 		}
 		setTamerState(0x14);
 		clearTextArea();
 		setTextColor(0xa);
-		sprintf(buf, MAIN_D_80134368, PARTNER_ENTITY.name);
-		strcat(buf, MAIN_D_80125F64);
+		sprintf(buf, NAME_FORMAT, PARTNER_ENTITY.name);
+		strcat(buf, IS_SICK_SUFFIX);
 		drawString(buf, 0, 0x78);
 	}
 }

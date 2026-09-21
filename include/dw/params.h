@@ -6,6 +6,14 @@
 #define NUM_DIGIMON		180
 #define NUM_PARTNER_DIGIMON	66
 
+#define CONDITION_SLEEPY	(1 << 0)
+#define CONDITION_TIRED		(1 << 1)
+#define CONDITION_HUNGRY	(1 << 2)
+#define CONDITION_POOPY		(1 << 3)
+#define CONDITION_UNHAPPY	(1 << 4)
+#define CONDITION_INJURED	(1 << 5)
+#define CONDITION_SICK		(1 << 6)
+
 typedef struct {
 	char name[20];
 	int32_t boneCount;
