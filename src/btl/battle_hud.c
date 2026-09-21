@@ -20,18 +20,19 @@
 
 #include "common.h"
 
+extern char MAIN_D_80134714[];
+extern char MAIN_D_80134718[];
+extern char MAIN_D_80134720[];
 extern int16_t MAIN_D_8013509C;
 extern uint8_t *MAIN_D_801350A4;
 extern uint16_t MAIN_D_801350A8;
 extern uint16_t MAIN_D_801350AA;
 extern uint16_t MAIN_D_801350AC;
-extern char *BTL_D_80072E34[];
 extern int16_t MAIN_D_80135090[2];
 extern int32_t MAIN_D_801350C0;
 extern GsRVIEW2 GS_VIEWPOINT;
 extern int32_t VIEWPORT_DISTANCE;
-extern int16_t BTL_D_80073014[][2];
-extern int16_t BTL_D_80073016[][2];
+extern int16_t BTL_D_80073014[155][2];
 extern uint8_t MAIN_D_801350BC;
 extern StatsGains STATS_GAINS;
 extern char BTL_D_80072EF8[];
@@ -57,7 +58,7 @@ extern uint8_t MAIN_D_801350C7;
 extern uint8_t MAIN_D_801350C8;
 extern uint8_t MAIN_D_801350C9;
 extern int16_t BTL_D_80073280[];
-extern BarSprite BTL_D_800732C0[];
+extern BarSprite BTL_D_800732C0[6];
 extern uint8_t MAIN_D_801350CA;
 extern uint8_t MAIN_D_801350CB;
 extern int32_t BTL_D_80073290[12];
@@ -136,6 +137,89 @@ static void *battle_hud_functions[] = {
 	BTL_initializeFinisherChargeup,
 	BTL_drawHoveredCommandName,
 };
+
+// clang-format off
+const char BTL_D_80072E04[12] = "Your Call";
+const char BTL_D_80072E10[12] = "Moderate";
+const char BTL_D_80072E1C[12] = "Distance";
+const char BTL_D_80072E28[12] = "Defensive";
+
+const char *BTL_D_80072E34[8] = {
+	MAIN_D_80134714,
+	MAIN_D_80134718,
+	BTL_D_80072E04,
+	BTL_D_80072E10,
+	BTL_D_80072E1C,
+	BTL_D_80072E28,
+	MAIN_D_80134720,
+	NULL,
+};
+
+const int8_t BTL_D_80072E54[20] = {
+	0x00, 0xf8, 0xf2, 0xec, 0xe7, 0xe2, 0xde, 0xdc,
+	0xda, 0xd9, 0xd8, 0xd9, 0xda, 0xdc, 0xde, 0xe2,
+	0xde, 0xdc, 0xda, 0xd9,
+};
+
+const int8_t BTL_D_80072E68[20] = {
+	0x00, 0x01, 0x02, 0x04, 0x06, 0x0a, 0x0f, 0x14,
+	0x1a, 0x20, 0x28, 0x24, 0x22, 0x20, 0x1f, 0x1e,
+	0x1f, 0x20, 0x22, 0x24,
+};
+
+const uint8_t BTL_D_80072E7C[6][10] = {
+	{ 0x00, 0x01, 0x03, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff },
+	{ 0x00, 0x01, 0x02, 0x04, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff },
+	{ 0x00, 0x01, 0x02, 0x01, 0x03, 0xff, 0xff, 0xff, 0xff, 0xff },
+	{ 0x00, 0x01, 0x02, 0x01, 0x02, 0x01, 0x03, 0xff, 0xff, 0xff },
+	{ 0x00, 0x01, 0x02, 0x01, 0x02, 0x01, 0x02, 0x04, 0xff, 0xff },
+	{ 0x00, 0x01, 0x02, 0x01, 0x02, 0x01, 0x02, 0x01, 0x03, 0xff },
+};
+
+const int16_t BTL_D_80072EB8[8] = {
+	0xff88,
+	0xff96,
+	0xffa2,
+	0xffac,
+	0xffb3,
+	0xffb8,
+	0xffbb,
+	0xffbc,
+};
+
+const int16_t BTL_D_80072EC8[8] = {
+	0xff68,
+	0xff69,
+	0xff6c,
+	0xff71,
+	0xff78,
+	0xff82,
+	0xff8e,
+	0xff9c,
+};
+
+const uint8_t BTL_D_80072ED8[8][2] = {
+	{ 0x00, 0xc0 },
+	{ 0x20, 0xc0 },
+	{ 0x40, 0xc0 },
+	{ 0x60, 0xc0 },
+	{ 0x80, 0xc0 },
+	{ 0xa0, 0xc0 },
+	{ 0xc0, 0xc0 },
+	{ 0x00, 0x00 },
+};
+
+const uint8_t BTL_D_80072EE8[8][2] = {
+	{ 0x00, 0xd0 },
+	{ 0x20, 0xd0 },
+	{ 0x40, 0xd0 },
+	{ 0x60, 0xd0 },
+	{ 0x80, 0xd0 },
+	{ 0xa0, 0xd0 },
+	{ 0xc0, 0xd0 },
+	{ 0x00, 0x00 },
+};
+// clang-format on
 
 void BTL_drawHoveredCommandName(void)
 {
@@ -664,7 +748,7 @@ void BTL_initializeBattleStartText(void)
 		} else {
 			sgn = -1;
 		}
-		((int16_t *)*p)[5] = BTL_D_80073016[i][0];
+		((int16_t *)*p)[5] = BTL_D_80073014[i][1];
 		(*p)[0x10] = -sgn * ((random(3) + 1) << 5);
 		if ((0 <= i) && (i < 0x33)) {
 			((int16_t *)*p)[4] = (sgn * 500) + random(100) - 50;
@@ -676,7 +760,7 @@ void BTL_initializeBattleStartText(void)
 		r = random(5);
 		t = BTL_D_80073014[i][0];
 		((int16_t *)*p)[6] = (r + 8) * t / 8;
-		t = BTL_D_80073016[i][0];
+		t = BTL_D_80073014[i][1];
 		((int16_t *)*p)[7] = (r + 8) * t / 8;
 		((int16_t *)*p)[0] = 0;
 		((int16_t *)*p)[1] = 0;

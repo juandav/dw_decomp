@@ -53,10 +53,8 @@ extern int8_t PARTNER_WAYPOINT_COUNT;
 extern int8_t PARTNER_WAYPOINT_CURRENT;
 extern int8_t PARTNER_WAYPOINT_X[];
 extern int8_t PARTNER_WAYPOINT_Y[];
-extern uint8_t BTL_D_80072ED8[];
-extern uint8_t BTL_D_80072ED9[];
-extern uint8_t BTL_D_80072EE8[];
-extern uint8_t BTL_D_80072EE9[];
+extern const uint8_t BTL_D_80072ED8[8][2];
+extern const uint8_t BTL_D_80072EE8[8][2];
 
 void removeObject(int32_t objectId, int32_t instanceId);
 void addObject(int32_t objectId, int32_t instanceId, void *tick, void *render);
@@ -3912,8 +3910,8 @@ void BTL_setCommandIconUV(DigimonEntity *digimon, POLY_FT4 *prim, int32_t index)
 
 	if ((index >= 8U) && (index < 0xcU)) {
 		eff = MOVE_DATA[entityGetTechFromAnim(&digimon->entity, digimon->stats.base.moves[index - 8])].special;
-		setUVWH(prim, BTL_D_80072EE8[eff * 2], BTL_D_80072EE9[eff * 2], 0x10, 0xf);
+		setUVWH(prim, BTL_D_80072EE8[eff][0], BTL_D_80072EE8[eff][1], 0x10, 0xf);
 	} else {
-		setUVWH(prim, BTL_D_80072ED8[(index - 1) * 2], BTL_D_80072ED9[(index - 1) * 2], 0x10, 0xf);
+		setUVWH(prim, BTL_D_80072ED8[index - 1][0], BTL_D_80072ED8[index - 1][1], 0x10, 0xf);
 	}
 }

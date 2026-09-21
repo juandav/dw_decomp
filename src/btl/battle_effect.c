@@ -10,6 +10,7 @@
 
 #include <dw/aabb.h>
 #include <dw/attack_object.h>
+#include <dw/battle.h>
 #include <dw/btl.h>
 #include <dw/efe.h>
 #include <dw/graphics.h>
@@ -46,6 +47,11 @@ typedef struct {
 	int32_t w[13];
 } EfeFileHeader;
 
+typedef struct {
+	int32_t opcode;
+	void (*handler)(void);
+} EFESubOpcode;
+
 extern DigimonEntity *MAIN_D_80134EF4;
 extern DigimonEntity *MAIN_D_80134EF8;
 extern int16_t MAIN_D_80134CDC;
@@ -53,8 +59,6 @@ extern int32_t MAIN_D_801350DC;
 extern int32_t MAIN_D_801350D4;
 extern char *MAIN_D_801350E0;
 extern char *MAIN_D_80139B24[];
-extern int32_t BTL_D_800732FC[];
-extern void *BTL_D_80073300[];
 extern char *MAIN_D_801350D8;
 extern int32_t MAIN_D_80139AD0[][2];
 extern int32_t VIEWPORT_DISTANCE;
@@ -209,6 +213,8 @@ void BTL_copyToParentTransform(void);
 void BTL_combineRotations(void);
 void BTL_normalizeRotationAngles2(void);
 void BTL_rotateVectorByAngles(void);
+void createFlash(void);
+void rotateVector(void);
 void BTL_getTargetBoneTransform(void);
 void BTL_centerTransformOnEntities(void);
 void BTL_shiftVectorsRight(void);
@@ -663,6 +669,304 @@ uint8_t BTL_D_80073714[24] = {
 uint8_t BTL_D_8007372C[12] = {
 	0x7c, 0x7c, 0x7c, 0x00, 0x00, 0x7c, 0x7c, 0x00,
 	0x3c, 0x7c, 0x3c, 0x00,
+};
+
+const char BTL_D_80072EF8[32] = "Listens to #C1! #W";
+const char BTL_D_80072F18[20] = "#R#C1dropped #C7";
+const char BTL_D_80072F2C[24] = "#C1#R was injured #W";
+const char BTL_D_80072F44[20] = "#C7set technique #R";
+const char BTL_D_80072F58[24] = "#C7Put up with it! #R";
+const char BTL_D_80072F70[32] = "#C7Move away!#RChange target!#R";
+const char BTL_D_80072F90[20] = "#C7Keep it down!#R";
+const char BTL_D_80072FA4[24] = "#C7Go all the way!#R";
+const char BTL_D_80072FBC[28] = "#C1MP Consumption Bonus!";
+const char BTL_D_80072FD8[12] = "reduced by";
+const char BTL_D_80072FE4[16] = "#R#C1learned!#W";
+
+const MATRIX BTL_D_80072FF4 = {
+	{
+		0x100a, 0x0000, 0x0000, 0x0000,
+		0x08e4, 0xf299, 0x0000, 0x0d5e,
+		0x08e9,
+	},
+	{ 0x00000000, 0xfffffffe, 0x000002d4 },
+};
+
+const int16_t BTL_D_80073014[155][2] = {
+	{ 0xff54, 0xffd0 },
+	{ 0xff5c, 0xffd0 },
+	{ 0xff64, 0xffd0 },
+	{ 0xff6c, 0xffd0 },
+	{ 0xff74, 0xffd0 },
+	{ 0xff54, 0xffdc },
+	{ 0xff5c, 0xffdc },
+	{ 0xff74, 0xffdc },
+	{ 0xff7c, 0xffdc },
+	{ 0xff54, 0xffe8 },
+	{ 0xff5c, 0xffe8 },
+	{ 0xff74, 0xffe8 },
+	{ 0xff7c, 0xffe8 },
+	{ 0xff54, 0xfff4 },
+	{ 0xff5c, 0xfff4 },
+	{ 0xff64, 0xfff4 },
+	{ 0xff6c, 0xfff4 },
+	{ 0xff74, 0xfff4 },
+	{ 0xff54, 0x0000 },
+	{ 0xff5c, 0x0000 },
+	{ 0xff74, 0x0000 },
+	{ 0xff7c, 0x0000 },
+	{ 0xff54, 0x000c },
+	{ 0xff5c, 0x000c },
+	{ 0xff74, 0x000c },
+	{ 0xff7c, 0x000c },
+	{ 0xff54, 0x0018 },
+	{ 0xff5c, 0x0018 },
+	{ 0xff74, 0x0018 },
+	{ 0xff7c, 0x0018 },
+	{ 0xff54, 0x0024 },
+	{ 0xff5c, 0x0024 },
+	{ 0xff64, 0x0024 },
+	{ 0xff6c, 0x0024 },
+	{ 0xff74, 0x0024 },
+	{ 0xffa4, 0xffd0 },
+	{ 0xffac, 0xffd0 },
+	{ 0xffa4, 0xffdc },
+	{ 0xffac, 0xffdc },
+	{ 0xff9c, 0xffe8 },
+	{ 0xffa4, 0xffe8 },
+	{ 0xffac, 0xffe8 },
+	{ 0xffb4, 0xffe8 },
+	{ 0xff94, 0xfff4 },
+	{ 0xff9c, 0xfff4 },
+	{ 0xffb4, 0xfff4 },
+	{ 0xffbc, 0xfff4 },
+	{ 0xff94, 0x0000 },
+	{ 0xff9c, 0x0000 },
+	{ 0xffb4, 0x0000 },
+	{ 0xffbc, 0x0000 },
+	{ 0xff8c, 0x000c },
+	{ 0xff94, 0x000c },
+	{ 0xff9c, 0x000c },
+	{ 0xffa4, 0x000c },
+	{ 0xffac, 0x000c },
+	{ 0xffb4, 0x000c },
+	{ 0xffbc, 0x000c },
+	{ 0xffc4, 0x000c },
+	{ 0xff8c, 0x0018 },
+	{ 0xff94, 0x0018 },
+	{ 0xffbc, 0x0018 },
+	{ 0xffc4, 0x0018 },
+	{ 0xff8c, 0x0024 },
+	{ 0xff94, 0x0024 },
+	{ 0xffbc, 0x0024 },
+	{ 0xffc4, 0x0024 },
+	{ 0xffd4, 0xffd0 },
+	{ 0xffdc, 0xffd0 },
+	{ 0xffe4, 0xffd0 },
+	{ 0xffec, 0xffd0 },
+	{ 0xfff4, 0xffd0 },
+	{ 0xfffc, 0xffd0 },
+	{ 0xffe4, 0xffdc },
+	{ 0xffec, 0xffdc },
+	{ 0xffe4, 0xffe8 },
+	{ 0xffec, 0xffe8 },
+	{ 0xffe4, 0xfff4 },
+	{ 0xffec, 0xfff4 },
+	{ 0xffe4, 0x0000 },
+	{ 0xffec, 0x0000 },
+	{ 0xffe4, 0x000c },
+	{ 0xffec, 0x000c },
+	{ 0xffe4, 0x0018 },
+	{ 0xffec, 0x0018 },
+	{ 0xffe4, 0x0024 },
+	{ 0xffec, 0x0024 },
+	{ 0x0014, 0xffd0 },
+	{ 0x001c, 0xffd0 },
+	{ 0x0024, 0xffd0 },
+	{ 0x002c, 0xffd0 },
+	{ 0x0034, 0xffd0 },
+	{ 0x003c, 0xffd0 },
+	{ 0x0024, 0xffdc },
+	{ 0x002c, 0xffdc },
+	{ 0x0024, 0xffe8 },
+	{ 0x002c, 0xffe8 },
+	{ 0x0024, 0xfff4 },
+	{ 0x002c, 0xfff4 },
+	{ 0x0024, 0x0000 },
+	{ 0x002c, 0x0000 },
+	{ 0x0024, 0x000c },
+	{ 0x002c, 0x000c },
+	{ 0x0024, 0x0018 },
+	{ 0x002c, 0x0018 },
+	{ 0x0024, 0x0024 },
+	{ 0x002c, 0x0024 },
+	{ 0x004c, 0xffd0 },
+	{ 0x0054, 0xffd0 },
+	{ 0x004c, 0xffdc },
+	{ 0x0054, 0xffdc },
+	{ 0x004c, 0xffe8 },
+	{ 0x0054, 0xffe8 },
+	{ 0x004c, 0xfff4 },
+	{ 0x0054, 0xfff4 },
+	{ 0x004c, 0x0000 },
+	{ 0x0054, 0x0000 },
+	{ 0x004c, 0x000c },
+	{ 0x0054, 0x000c },
+	{ 0x004c, 0x0018 },
+	{ 0x0054, 0x0018 },
+	{ 0x004c, 0x0024 },
+	{ 0x0054, 0x0024 },
+	{ 0x005c, 0x0024 },
+	{ 0x0064, 0x0024 },
+	{ 0x006c, 0x0024 },
+	{ 0x0074, 0x0024 },
+	{ 0x0084, 0xffd0 },
+	{ 0x008c, 0xffd0 },
+	{ 0x0094, 0xffd0 },
+	{ 0x009c, 0xffd0 },
+	{ 0x00a4, 0xffd0 },
+	{ 0x00ac, 0xffd0 },
+	{ 0x0084, 0xffdc },
+	{ 0x008c, 0xffdc },
+	{ 0x0084, 0xffe8 },
+	{ 0x008c, 0xffe8 },
+	{ 0x0084, 0xfff4 },
+	{ 0x008c, 0xfff4 },
+	{ 0x0094, 0xfff4 },
+	{ 0x009c, 0xfff4 },
+	{ 0x00a4, 0xfff4 },
+	{ 0x00ac, 0xfff4 },
+	{ 0x0084, 0x0000 },
+	{ 0x008c, 0x0000 },
+	{ 0x0084, 0x000c },
+	{ 0x008c, 0x000c },
+	{ 0x0084, 0x0018 },
+	{ 0x008c, 0x0018 },
+	{ 0x0084, 0x0024 },
+	{ 0x008c, 0x0024 },
+	{ 0x0094, 0x0024 },
+	{ 0x009c, 0x0024 },
+	{ 0x00a4, 0x0024 },
+	{ 0x00ac, 0x0024 },
+};
+
+const int16_t BTL_D_80073280[8] = {
+	0x00a0, 0x0081, 0x0068, 0x0053, 0x0042, 0x0037, 0x0030, 0x002e,
+};
+
+const int32_t BTL_D_80073290[12] = {
+	0x00000020, 0x00000040, 0x00000060, 0x00000080,
+	0x000000a0, 0x000000c0, 0x000000e0, 0x000000ff,
+	0x000000e0, 0x000000c0, 0x000000a0, 0x00000080,
+};
+
+const BarSprite BTL_D_800732C0[6] = {
+	{ 0x01ec, 0x80, 0xa8, 0x68, 0x08, 0x0000, 0x0000 },
+	{ 0x01eb, 0x90, 0xb0, 0x0b, 0x0b, 0x0003, 0xfffe },
+	{ 0x01eb, 0x80, 0xb0, 0x02, 0x02, 0x0012, 0x0003 },
+	{ 0x01ec, 0x80, 0xa8, 0x68, 0x08, 0x0000, 0x0000 },
+	{ 0x01eb, 0x9b, 0xb0, 0x0b, 0x0b, 0x0003, 0xfffe },
+	{ 0x01eb, 0x84, 0xb0, 0x02, 0x02, 0x0012, 0x0003 },
+};
+
+const EFESubOpcode BTL_D_800732FC[97] = {
+	{ 0, BTL_checkTechCompatibility },
+	{ 1, BTL_initializeUVAnim },
+	{ 2, BTL_initializeSubEffectInstructions },
+	{ 3, BTL_drawTMD },
+	{ 5, BTL_initializeEFETransform },
+	{ 7, rotateVector },
+	{ 4, BTL_renderCenteredSprite },
+	{ 8, BTL_setTransformToTargetBone },
+	{ 9, BTL_addAttackObjectToTarget },
+	{ 6, BTL_checkCollisionWithDefaultPower },
+	{ 10, BTL_getScatteredSpawnPosition },
+	{ 11, BTL_discardEFEOperandPair },
+	{ 12, BTL_interpolateVector },
+	{ 13, BTL_steerTransformTowardPoint },
+	{ 14, BTL_copyTargetEntityPosition },
+	{ 15, BTL_setEFEModelObjectColor },
+	{ 16, BTL_addParticleEmitter },
+	{ 17, BTL_selectNextTargetEntity },
+	{ 18, createFlash },
+	{ 19, BTL_addCloudEffect },
+	{ 20, BTL_renderScreenSprite },
+	{ 21, BTL_projectPositionToScreen },
+	{ 22, BTL_renderParticleFlashSprite },
+	{ 23, BTL_getTargetDigimonSize },
+	{ 24, BTL_renderProjectedSprite },
+	{ 25, BTL_calculatePolarOffset },
+	{ 26, BTL_copyFromParentTransform },
+	{ 27, BTL_addSourceEntityParticleFX },
+	{ 28, BTL_playEFESound },
+	{ 29, BTL_setTransformToBoneOffset },
+	{ 30, BTL_renderScrollingBackground },
+	{ 31, BTL_renderParallaxSprites },
+	{ 32, BTL_setTransformToSourceBone },
+	{ 33, BTL_rotateTransformTowardPoint },
+	{ 34, BTL_checkTargetCollision },
+	{ 35, BTL_getUVAnimTimer },
+	{ 36, BTL_applyHomingMovement },
+	{ 37, BTL_getSourceDigimonSize },
+	{ 38, BTL_calculateSine },
+	{ 39, BTL_calculateCosine },
+	{ 40, BTL_interpolateValue },
+	{ 41, BTL_getRandomInRange },
+	{ 42, BTL_printDebugValue },
+	{ 43, BTL_getVectorEulerAngles },
+	{ 44, BTL_findHitEntity },
+	{ 45, BTL_normalizeRotationAngles },
+	{ 46, BTL_setTargetToHitEntity },
+	{ 47, BTL_getVectorLength },
+	{ 48, BTL_copyVector },
+	{ 49, BTL_addVectors },
+	{ 50, BTL_subtractVectors },
+	{ 51, BTL_multiplyVectors },
+	{ 52, BTL_divideVectors },
+	{ 53, BTL_maskVectors },
+	{ 54, BTL_shiftVectorsRight },
+	{ 55, BTL_centerTransformOnEntities },
+	{ 56, BTL_getTargetBoneTransform },
+	{ 57, BTL_rotateVectorByAngles },
+	{ 58, BTL_normalizeRotationAngles2 },
+	{ 59, BTL_combineRotations },
+	{ 60, BTL_renderEFELine },
+	{ 61, BTL_copyToParentTransform },
+	{ 62, BTL_getSourceBoneTransform },
+	{ 63, BTL_setupFixedCamera },
+	{ 64, BTL_restoreCameraView },
+	{ 65, BTL_render2DTexturedQuad },
+	{ 66, BTL_renderWireframeGrid },
+	{ 67, BTL_discardEFEOperand },
+	{ 68, BTL_renderWireframeBox },
+	{ 69, BTL_setTransformToBoneMatrix },
+	{ 70, BTL_render3DTexturedQuad },
+	{ 71, BTL_multiplyVectorByScalar },
+	{ 72, BTL_divideVectorByScalar },
+	{ 73, BTL_maskVectorByScalar },
+	{ 74, BTL_convertToViewSpace },
+	{ 75, BTL_selectRandomTargetEntity },
+	{ 76, BTL_getCameraRotation },
+	{ 77, BTL_drawTMDYXZ },
+	{ 78, BTL_loadClutColors },
+	{ 79, BTL_drawTMDScreenSpace },
+	{ 80, BTL_addClutLoadPrim },
+	{ 81, BTL_getViewportDistance },
+	{ 82, BTL_renderRadialWaves },
+	{ 83, BTL_initializeRibbonPoints },
+	{ 84, BTL_tickRibbonPoints },
+	{ 85, BTL_renderRibbonStrip },
+	{ 86, BTL_renderRingTube },
+	{ 87, BTL_renderScreenOverlay },
+	{ 88, BTL_faceTargetEntity },
+	{ 89, BTL_applyLineAttackHit },
+	{ 90, BTL_applyRadiusAttackHit },
+	{ 91, BTL_applyBoxAttackHit },
+	{ 92, BTL_renderScreenFade },
+	{ 93, BTL_disableMapLayer },
+	{ 94, BTL_getViewportDistance2 },
+	{ 95, BTL_markEFEFinished },
+	{ 96, BTL_isTargetUnhit },
 };
 
 GsSPRITE BTL_POISON_BUBBLE_SPRITE = {
@@ -4943,10 +5247,10 @@ void BTL_initializeEFESubOpcodeTable(void)
 	int32_t i;
 
 	for (i = 0; (uint32_t)i < 0x61; i++) {
-		if ((uint32_t)((int32_t (*)[2])BTL_D_800732FC)[i][0] >= 0x61) {
+		if ((uint32_t)BTL_D_800732FC[i].opcode >= 0x61) {
 			exit(1);
 		}
-		BTL_D_80074EBC[((int32_t (*)[2])BTL_D_800732FC)[i][0]] = (void (*)(void))((void *(*)[2])BTL_D_80073300)[i][0];
+		BTL_D_80074EBC[BTL_D_800732FC[i].opcode] = BTL_D_800732FC[i].handler;
 	}
 }
 

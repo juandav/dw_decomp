@@ -7,7 +7,9 @@
 #include <dw/script.h>
 #include <dw/world_object.h>
 
-extern char *BTL_D_80072DE8[];
+extern char MAIN_D_801346FC[];
+extern char MAIN_D_80134704[];
+extern char MAIN_D_8013470C[];
 extern volatile int32_t BTL_D_80072DAC[];
 extern int16_t BTL_D_80072DB0[];
 extern int16_t BTL_D_80072DB2[];
@@ -19,6 +21,21 @@ int16_t entityGetTechFromAnim(Entity *entity, int32_t anim);
 void BTL_drawCommandShout(uint32_t arg0);
 void BTL_removeCommandShout(void);
 void BTL_renderCommandShout(void);
+
+const char BTL_D_80072DB8[12] = "Your Call!";
+const char BTL_D_80072DC4[12] = "Moderate!";
+const char BTL_D_80072DD0[12] = "Distance!";
+const char BTL_D_80072DDC[12] = "Defense!";
+
+const char *const BTL_D_80072DE8[7] = {
+	MAIN_D_801346FC,
+	MAIN_D_80134704,
+	BTL_D_80072DB8,
+	BTL_D_80072DC4,
+	BTL_D_80072DD0,
+	BTL_D_80072DDC,
+	MAIN_D_8013470C,
+};
 
 void BTL_drawCommandShout(uint32_t arg0)
 {

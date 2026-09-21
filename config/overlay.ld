@@ -38,15 +38,11 @@ SECTIONS
 			. = ALIGN(., 4);
 			build/src/btl/command_menu.c.o(.rodata.*);
 			. = ALIGN(., 4);
-			KEEP(build/asm/btl/data/command_shout.rodata.s.o(.rodata.*));
-			. = ALIGN(., 4);
 			build/src/btl/command_shout.c.o(.rodata.*);
-			. = ALIGN(., 4);
-			KEEP(build/asm/btl/data/battle_hud.rodata.s.o(.rodata.*));
 			. = ALIGN(., 4);
 			build/src/btl/battle_hud.c.o(.rodata.*);
 			. = ALIGN(., 4);
-			KEEP(build/asm/btl/data/battle_effect.rodata.s.o(.rodata.*));
+			build/src/btl/battle_effect.c.o(.rodata.*);
 			. = ALIGN(., 4);
 
 			build/src/btl/battle_setup.c.o(.data.*);
