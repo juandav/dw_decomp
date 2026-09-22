@@ -40,6 +40,8 @@ options:
 
   migrate_rodata_to_functions: False
 
+  create_data_pads: False
+
   use_gp_rel_macro: True
 
 segments:
