@@ -1,13 +1,18 @@
 #include <string.h>
 
+#include <libetc.h>
 #include <libgpu.h>
 #include <libgs.h>
 #include <mwinline_n.h>
 
 #include <dw/anim.h>
 #include <dw/attack_object.h>
+#include <dw/btl.h>
 #include <dw/combat.h>
 #include <dw/entity.h>
+#include <dw/fade.h>
+#include <dw/file.h>
+#include <dw/file_queue.h>
 #include <dw/font.h>
 #include <dw/graphics.h>
 #include <dw/main.h>
@@ -15,12 +20,24 @@
 #include <dw/model.h>
 #include <dw/move.h>
 #include <dw/params.h>
+#include <dw/sound.h>
 #include <dw/types.h>
 #include <dw/ui.h>
 #include <dw/vs.h>
 #include <dw/world_object.h>
 
-#include "common.h"
+
+typedef struct {
+	int16_t clutX;
+	int16_t clutY;
+	uint8_t u;
+	uint8_t v;
+	uint8_t w;
+	uint8_t h;
+	uint8_t tpage;
+	uint8_t x;
+	uint8_t y;
+} VsListPanel;
 
 typedef struct {
 	int16_t clut;
@@ -52,18 +69,11 @@ extern int16_t MAIN_D_801B1C76[];
 extern int16_t MAIN_D_801B1C78[];
 extern int16_t MAIN_D_801B1C7A[];
 extern uint8_t MAIN_D_80135274;
-extern GsOT *ACTIVE_ORDERING_TABLE;
-extern int32_t DRAWING_OFFSET_X;
-extern int32_t DRAWING_OFFSET_Y;
 extern int32_t VIEWPORT_DISTANCE;
 extern uint8_t MAIN_D_80134F2E;
 extern uint8_t MAIN_D_801344F8[4];
 extern uint8_t MAIN_D_801344FC[4];
 extern int16_t MAIN_D_80135280[2];
-extern int16_t MAIN_D_80134D66;
-extern int16_t ENEMY_COUNT;
-extern int32_t MAIN_D_80134D74;
-extern int32_t MAIN_D_80134D7C[2];
 extern int32_t MAIN_D_80134D84;
 extern int32_t MAIN_D_80134F40;
 extern int32_t MAIN_D_80134F4C;
@@ -71,12 +81,9 @@ extern int32_t MAIN_D_8013528C;
 extern int32_t MAIN_D_80135290;
 extern uint8_t MAIN_D_80134520[8];
 extern uint8_t MAIN_D_80134F3C;
-extern int16_t INITIAL_COMBAT_STATS[][6];
-extern int8_t GAME_STATE;
 extern int16_t MAIN_D_80135294;
 extern int32_t MAIN_D_80135268;
 extern uint8_t MAIN_D_8013529C;
-extern uint8_t *GENERAL_BUFFER_PTR;
 extern int16_t MAIN_D_8013527E;
 extern uint8_t MAIN_D_80135288;
 extern int16_t MAIN_D_80135278[2];
@@ -85,19 +92,21 @@ extern uint8_t MAIN_D_80134F30;
 extern uint8_t MAIN_D_80134F3D;
 extern uint32_t MAIN_D_80134F34;
 extern uint32_t MAIN_D_80134F38;
-extern uint32_t POLLED_INPUT;
-extern uint32_t POLLED_INPUT_PREVIOUS;
 extern uint8_t MAIN_D_80134F44;
 extern int16_t MAIN_D_80135264;
 extern char *MAIN_D_8013526C;
 extern char *MAIN_D_80135270;
 extern char MAIN_D_80134518[8];
-extern Entity *MAIN_D_80134D60;
 extern int32_t MAIN_D_80134F48;
 extern int16_t MAIN_D_80134510[4];
 extern int32_t COMBAT_AREA_CENTER_Y;
 extern int32_t COMBAT_AREA_CENTER_X;
 extern uint8_t MAIN_D_801B1C7C[];
+extern int16_t MAIN_D_80134528[4];
+extern int16_t MAIN_D_80134530[4];
+extern int16_t MAIN_D_80134538[4];
+extern int16_t MAIN_D_80134540[4];
+extern uint8_t MAIN_D_80134548[8];
 extern int8_t MAIN_D_80134F52[2];
 extern int32_t MAIN_D_80134F54;
 extern int16_t MAIN_D_80134F50;
@@ -110,32 +119,20 @@ extern uint8_t MAIN_D_80134F5A;
 extern uint8_t MAIN_D_80134F5B;
 extern uint8_t MAIN_D_80134F5C;
 
-uint32_t PadRead(int32_t id);
-void fadeFromBlack(int32_t frames);
-int32_t playMusic(int32_t font, int32_t track);
-void stopBGM(void);
-void stopSound(void);
 void renderString(int32_t a, int32_t b, int32_t c, int32_t d, int32_t e,
                   int32_t f, int32_t g, int32_t h, int32_t i);
-uint32_t playSound(int32_t vabId, int32_t val);
 void convertValueToDigits(int32_t n, int32_t value, int32_t *outCount,
                           int32_t *digits);
 void setUVDataPolyFT4(POLY_FT4 *prim, int32_t uvX, int32_t uvY,
                       int32_t width, int32_t height);
 void setPosDataPolyFT4(POLY_FT4 *prim, int32_t posX, int32_t posY,
                        int32_t width, int32_t height);
-void entityLookAtLocation(Entity *entity, VECTOR *pos);
-void tickFileReadQueue(int32_t instanceId);
 void createPauseBox(void);
 void MAIN_func_800E642C(void);
 void MAIN_func_80092BB0(POLY_GT4 *prim);
 void handleBattleIdle(DigimonEntity *entity, Stats *stats, int32_t flags);
 int32_t entityGetTechFromAnim(Entity *entity, int32_t anim);
 void collisionGrace(Entity *target, Entity *entity, int32_t dx, int32_t dy);
-int32_t entityCheckCollision(Entity *a, Entity *entity, int32_t c, int32_t d);
-int32_t loadTIMFile(char *path, void *buffer);
-void fadeToBlack(int32_t frames);
-void removeStaticUIBox(int32_t id);
 void loadStackedTIMFile(char *path);
 void removeEntityText(int32_t id);
 
@@ -441,26 +438,29 @@ uint8_t MAIN_D_8012F578[12] = {
 	0x62, 0x6c, 0x7a, 0x84,
 };
 
-int32_t MAIN_D_8012F584[3] = {
-	0x45835c83, 0x69837283, 0x00005683,
+/* "ソウビナシ" (not equipped) */
+char MAIN_D_8012F584[12] = "\x83\x5c\x83\x45\x83\x72\x83\x69\x83\x56";
+
+VsListPanel MAIN_D_8012F590[12] = {
+	{ 0x0000, 0x01e8, 0x00, 0x00, 0x96, 0xd7, 0x06, 0x00, 0x00 },
+	{ 0x0000, 0x01ea, 0x96, 0x00, 0x44, 0x27, 0x06, 0x06, 0x1b },
+	{ 0x0000, 0x01eb, 0x96, 0x27, 0x44, 0x27, 0x06, 0x06, 0x44 },
+	{ 0x0000, 0x01ec, 0x96, 0x4e, 0x44, 0x27, 0x06, 0x4c, 0x1b },
+	{ 0x0000, 0x01ed, 0x96, 0x75, 0x44, 0x27, 0x06, 0x4c, 0x44 },
+	{ 0x0000, 0x01e8, 0x96, 0x9c, 0x14, 0x0a, 0x06, 0x18, 0x02 },
+	{ 0x0000, 0x01e9, 0x00, 0x00, 0x96, 0xd7, 0x06, 0x00, 0x00 },
+	{ 0x0000, 0x01ea, 0x96, 0x00, 0x44, 0x27, 0x06, 0x06, 0x1b },
+	{ 0x0000, 0x01eb, 0x96, 0x27, 0x44, 0x27, 0x06, 0x06, 0x44 },
+	{ 0x0000, 0x01ec, 0x96, 0x4e, 0x44, 0x27, 0x06, 0x4c, 0x1b },
+	{ 0x0000, 0x01ed, 0x96, 0x75, 0x44, 0x27, 0x06, 0x4c, 0x44 },
+	{ 0x0000, 0x01e9, 0xaa, 0x9c, 0x14, 0x0a, 0x06, 0x18, 0x02 },
 };
 
-int32_t MAIN_D_8012F590[36] = {
-	0x01e80000, 0xd7960000, 0x00000006, 0x01ea0000,
-	0x27440096, 0x001b0606, 0x01eb0000, 0x27442796,
-	0x00440606, 0x01ec0000, 0x27444e96, 0x001b4c06,
-	0x01ed0000, 0x27447596, 0x00444c06, 0x01e80000,
-	0x0a149c96, 0x00021806, 0x01e90000, 0xd7960000,
-	0x00000006, 0x01ea0000, 0x27440096, 0x001b0606,
-	0x01eb0000, 0x27442796, 0x00440606, 0x01ec0000,
-	0x27444e96, 0x001b4c06, 0x01ed0000, 0x27447596,
-	0x00444c06, 0x01e90000, 0x0a149caa, 0x00021806,
-};
-
-int32_t MAIN_D_8012F620[12] = {
-	0x01e80040, 0x16290000, 0x001e0905, 0x01e80040,
-	0x16290000, 0x00510905, 0x01e80040, 0x16290000,
-	0x001e6205, 0x01e80040, 0x16290000, 0x00516205,
+VsListPanel MAIN_D_8012F620[4] = {
+	{ 0x0040, 0x01e8, 0x00, 0x00, 0x29, 0x16, 0x05, 0x09, 0x1e },
+	{ 0x0040, 0x01e8, 0x00, 0x00, 0x29, 0x16, 0x05, 0x09, 0x51 },
+	{ 0x0040, 0x01e8, 0x00, 0x00, 0x29, 0x16, 0x05, 0x62, 0x1e },
+	{ 0x0040, 0x01e8, 0x00, 0x00, 0x29, 0x16, 0x05, 0x62, 0x51 },
 };
 
 VsUISprite MAIN_D_8012F650[8] = {
@@ -953,7 +953,7 @@ void VS__combatInit(void)
 	for (i = 0; i <= ENEMY_COUNT; ++i) {
 		stats = &((DigimonEntity *)ENTITY_TABLE[COMBAT_DATA_PTR->player.entityIds[i]])->stats;
 		MAIN_D_8013527C[i] = stats->current.currentHP;
-		out = INITIAL_COMBAT_STATS[i];
+		out = (int16_t *)&INITIAL_COMBAT_STATS[i];
 		*out++ = stats->base.hp;
 		*out++ = stats->base.mp;
 		*out++ = stats->base.off;
@@ -1621,9 +1621,9 @@ int32_t VS__deinitializeCombat(int16_t lostP1, int16_t lostP2)
 
 	for (i = 0; i < 2; ++i) {
 		stats = &((DigimonEntity *)ENTITY_TABLE[COMBAT_DATA_PTR->player.entityIds[i]])->stats;
-		stats->base.off = INITIAL_COMBAT_STATS[i][2];
-		stats->base.def = INITIAL_COMBAT_STATS[i][3];
-		stats->base.speed = INITIAL_COMBAT_STATS[i][4];
+		stats->base.off = INITIAL_COMBAT_STATS[i].offense;
+		stats->base.def = INITIAL_COMBAT_STATS[i].defense;
+		stats->base.speed = INITIAL_COMBAT_STATS[i].speed;
 	}
 
 	GAME_STATE = 0;
@@ -3342,7 +3342,394 @@ void VS__func_800F8148(uint8_t id)
 	}
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/vs", VS__func_800F87E0);
+// clang-format off
+void VS__func_800F87E0(id)
+	int16_t id;
+// clang-format on
+{
+	uint8_t baseIdx;
+	int16_t glyph;
+	int32_t clutId;
+	int32_t i;
+	int32_t j;
+	int32_t rowCount;
+	int32_t halfLen;
+	int16_t *stats;
+	uint16_t *text;
+	char *names;
+	uint8_t *rec;
+	int32_t uvX;
+	int32_t cursorY;
+	int32_t cursorX;
+	int32_t iconX;
+	int16_t glyphTop;
+	int16_t rowX;
+	int16_t y;
+	int16_t y4;
+	int16_t rowX4;
+	int16_t baseX;
+	POLY_F4 *bar;
+	POLY_FT4 *prim;
+	VsListPanel *panel;
+	uint8_t *st;
+	int32_t type;
+	int32_t spriteU;
+	int32_t spriteV;
+	int32_t ch;
+	int32_t rowY;
+	int32_t iconY;
+	int32_t glyphY;
+	int32_t barY;
+	int32_t dx;
+	int32_t mx;
+	int16_t value;
+	int16_t width;
+	int32_t swidth;
+	int16_t height;
+	int16_t posY;
+	int16_t moveRow;
+	int32_t l;
+	int32_t k;
+	char buf[24];
+	int32_t count;
+	int32_t digits[4];
+
+	baseX = (int16_t)(id * 154 - 152);
+	if (id == 0) {
+		names = MAIN_D_8013526C;
+	} else {
+		names = MAIN_D_80135270;
+	}
+	clutId = id;
+	st = &MAIN_D_801B1C7C[(int16_t)id * 0x50];
+
+	if (st[0x29] == st[0x2a] - 1) {
+		rowCount = st[0x2b] - (st[0x2a] - 1) * 4;
+	} else {
+		rowCount = 4;
+	}
+	baseIdx = st[0x29] * 4;
+
+	bar = (POLY_F4 *)GsGetWorkBase();
+	for (i = 0; i < rowCount; i++) {
+		panel = &MAIN_D_8012F620[i];
+		stats = (int16_t *)(names + (st + baseIdx)[i] * 64);
+		y = -109;
+		for (j = 0; j < 6; j++, stats++) {
+			width = (int16_t)(*stats * 34 / MAIN_D_8012F56C[j]);
+			if (st[0x2e] < MAIN_D_8012F578[j] + 2 &&
+			    st[0x2e] + 22 >= MAIN_D_8012F578[j]) {
+				SetPolyF4(bar);
+				setRGB0(bar, 0, 255, 255);
+				setXY4(bar,
+				       baseX + panel->x + 7,
+				       (y + panel->y) + (MAIN_D_8012F578[j] - (uint8_t)st[0x2e]),
+				       width + (baseX + panel->x + 7),
+				       (y + panel->y) + (MAIN_D_8012F578[j] - (uint8_t)st[0x2e]),
+				       baseX + panel->x + 7,
+				       (y + panel->y) + (MAIN_D_8012F578[j] - (uint8_t)st[0x2e]) + 2,
+				       width + (baseX + panel->x + 7),
+				       (y + panel->y) + (MAIN_D_8012F578[j] - (uint8_t)st[0x2e]) + 2);
+				AddPrim(ACTIVE_ORDERING_TABLE->org + 10, bar++);
+			}
+		}
+	}
+	GsSetWorkBase((PACKET *)bar);
+
+	prim = (POLY_FT4 *)GsGetWorkBase();
+	if (st[0x2a] != 1) {
+		dx = (int16_t)((baseX + 75) - st[0x2a] * 11 / 2);
+		y = -109;
+		for (i = 0; i < st[0x2a]; i++) {
+			VS__func_800F8024(prim);
+			prim->tpage = 6;
+			prim->clut = GetClut(0, clutId + 0x1e8);
+			setUVDataPolyFT4(prim, (i != st[0x29]) ? 0xc8 : 0xbe,
+			                 0x9c, 10, 6);
+			setPosDataPolyFT4(prim, dx + i * 11, y + 19, 10, 6);
+			AddPrim(ACTIVE_ORDERING_TABLE->org + 10, prim++);
+		}
+		for (i = 0; i < 2; i++) {
+			VS__func_800F8024(prim);
+			prim->tpage = 6;
+			prim->clut = GetClut(0, clutId + 0x1e8);
+			setUVDataPolyFT4(prim, (i == 0) ? 0xd2 : 0xd6, 0x9c, 5,
+			                 8);
+			setPosDataPolyFT4(prim, (baseX + 7) + i * 132,
+			                  y + 18, 4, 7);
+			AddPrim(ACTIVE_ORDERING_TABLE->org + 10, prim++);
+		}
+	}
+
+	uvX = 0x96;
+	cursorY = 5;
+	cursorX = baseX + 15;
+	iconX = baseX + 33;
+	glyphTop = 7;
+	i = 0;
+	rowX = baseX;
+	iconY = 3;
+	glyphY = 0;
+	barY = 1;
+	for (; i < VS_D_800716A8[11];
+	     i++, barY += 20, cursorY += 20, glyphY += 20, uvX += 12,
+	     iconY += 20) {
+		VS__func_800F8024(prim);
+		prim->tpage = 6;
+		prim->clut = GetClut(0, 0x1ef);
+		if (i == st[0x34] && st[0x36] == 0) {
+			setUVDataPolyFT4(prim, st[0x32] * 12 + 0x96, 0xb2, 12,
+			                 12);
+			if (st[0x33] % 5 == 0) {
+				st[0x32]++;
+			}
+			st[0x33]++;
+			if (st[0x33] >= 5) {
+				st[0x33] = 0;
+			}
+			st[0x32] &= 7;
+		} else {
+			setUVDataPolyFT4(prim, uvX, 0xa6, 12, 12);
+		}
+		setPosDataPolyFT4(prim, cursorX, cursorY, 12, 12);
+		AddPrim(ACTIVE_ORDERING_TABLE->org + 10, prim++);
+		if ((st[0x35] & (1 << i)) != 0) {
+			VS__func_800F8024(prim);
+			prim->tpage = 6;
+			prim->clut = GetClut(0, 0x1f1);
+			setUVDataPolyFT4(prim, 0x98, 0xc8, 16, 16);
+			setPosDataPolyFT4(prim, iconX, iconY, 16, 16);
+			AddPrim(ACTIVE_ORDERING_TABLE->org + 10, prim++);
+			rowY = glyphTop + glyphY;
+			for (j = 0; j < 6; j++) {
+				VS__func_800F8024(prim);
+				prim->tpage = 7;
+				prim->clut = GetClut(0x30, 0x1e8);
+				setUVDataPolyFT4(prim, 0x70, 0x48, 8, 8);
+				setPosDataPolyFT4(prim, (rowX + 0x39) + j * 8,
+				                  rowY, 8, 8);
+				AddPrim(ACTIVE_ORDERING_TABLE->org + 10,
+				        prim++);
+			}
+		}
+		VS__func_800F8024(prim);
+		prim->tpage = 6;
+		prim->clut = GetClut(0, clutId + 0x1e8);
+		setUVDataPolyFT4(prim, 0,
+		                 ((st[0x35] & (1 << i)) != 0) ? 0xd8 : 0xec, 0x85,
+		                 ((st[0x35] & (1 << i)) != 0) ? 0x14 : 0x13);
+		setPosDataPolyFT4(prim, baseX + 8, barY, 0x85, 0x14);
+		AddPrim(ACTIVE_ORDERING_TABLE->org + 10, prim++);
+	}
+
+	y4 = -109;
+	rowX4 = baseX;
+	for (i = 0; i < rowCount; i++) {
+		panel = &MAIN_D_8012F620[i];
+		type = ((uint8_t *)names + (st + baseIdx)[i] * 64)[0x1c];
+		VS__func_800F8024(prim);
+		prim->tpage = 14;
+		prim->clut = GetClut(0x120, MAIN_D_8012F528[type] + 0x1e0);
+		if (type == 0x73) {
+			spriteU = (uint8_t)(st[0x30] * 16 + 0x3e0);
+			spriteV = 0xe0;
+		} else {
+			spriteU = (uint8_t)(((type - 3) % 32) * 32 +
+			                    st[0x30] * 16);
+			spriteV = (uint8_t)(((type - 3) / 8) * 32);
+		}
+		width = (int16_t)((spriteU != 0xf0) ? 16 : 15);
+		height = (spriteV != 0xf0) ? 16 : 15;
+		setUVDataPolyFT4(prim, spriteU, spriteV, width, height);
+		setPosDataPolyFT4(prim, rowX4 + MAIN_D_80134528[i],
+		                  y4 + MAIN_D_80134530[i], width, height);
+		AddPrim(ACTIVE_ORDERING_TABLE->org + 10, prim++);
+
+		text = (uint16_t *)(names + (st + baseIdx)[i] * 64 + 14);
+		halfLen = strlen((char *)text) / 2;
+		y = -109;
+		for (j = 0; j < halfLen; j++) {
+			VS__func_800F8024(prim);
+			prim->tpage = 7;
+			prim->clut = GetClut(0x30, 0x1e8);
+			ch = *text++;
+			ch = (uint16_t)(((ch & 0xff) << 8) +
+			                ((ch & 0xff00) >> 8));
+			for (k = 0; k < 216; k++) {
+				if (ch == VS_D_8006FBC0[k]) {
+					glyph = k;
+					break;
+				}
+			}
+			setUVDataPolyFT4(prim, (VS_D_8006FD70[glyph] % 15) * 8,
+			                 (VS_D_8006FD70[glyph] / 15) * 8, 8, 8);
+			setPosDataPolyFT4(prim,
+			                  (baseX + MAIN_D_80134538[i]) + j * 8,
+			                  y + MAIN_D_80134540[i], 8, 8);
+		}
+
+		rec = (uint8_t *)(names + (st + baseIdx)[i] * 64);
+		for (j = 0; j < 3; j++) {
+			if ((rec + j)[0x1d] == 0xff) {
+				strcpy(buf, MAIN_D_8012F584);
+				text = (uint16_t *)buf;
+			} else {
+				text = (uint16_t *)MOVE_NAMES[DIGIMON_DATA[rec[0x1c]]
+				                                      .moves[(rec + j)[0x1d] -
+				                                             0x2e]];
+			}
+			halfLen = strlen((char *)text) / 2;
+			y = -109;
+			for (k = 0; k < halfLen; k++) {
+				ch = *text++;
+				if (k < 5) {
+					moveRow = j * 2 + 6;
+				} else {
+					moveRow = j * 2 + 7;
+				}
+				if (st[0x2e] <= MAIN_D_8012F578[moveRow] + 8 &&
+				    MAIN_D_8012F578[moveRow] <= st[0x2e] + 22) {
+					VS__func_800F8024(prim);
+					prim->tpage = 7;
+					prim->clut = GetClut(0x30, 0x1e8);
+					ch = (uint16_t)(((ch & 0xff) << 8) +
+					                ((ch & 0xff00) >> 8));
+					glyph = 0;
+					for (l = 0; l < 216; l++) {
+						if (ch == VS_D_8006FBC0[l]) {
+							glyph = l;
+							break;
+						}
+					}
+					if (st[0x2e] > MAIN_D_8012F578[moveRow]) {
+						height = st[0x2e] -
+						         MAIN_D_8012F578[moveRow];
+						value = VS_D_8006FD70[glyph];
+						setUVDataPolyFT4(
+							prim,
+							(value % 15) * 8,
+							height + (value / 15) * 8,
+							8, 8 - height);
+						height = 8 - height;
+						posY = y + panel->y;
+					} else if (st[0x2e] + 22 <
+					           MAIN_D_8012F578[moveRow] + 8) {
+						height = (MAIN_D_8012F578[moveRow] +
+						          8) -
+						         (st[0x2e] + 22);
+						setUVDataPolyFT4(
+							prim,
+							(VS_D_8006FD70[glyph] % 15) * 8,
+							(VS_D_8006FD70[glyph] / 15) * 8, 8,
+							8 - height);
+						height = 8 - height;
+						posY = MAIN_D_8012F578[moveRow] +
+						       (y + panel->y) -
+						       st[0x2e];
+					} else {
+						height = 8;
+						setUVDataPolyFT4(
+							prim,
+							(VS_D_8006FD70[glyph] % 15) * 8,
+							(VS_D_8006FD70[glyph] / 15) * 8, 8, 8);
+						posY = MAIN_D_8012F578[moveRow] +
+						       (y + panel->y) -
+						       st[0x2e];
+					}
+					if (k < 5) {
+						mx = ((baseX + panel->x) + 1) +
+						     k * 8;
+					} else {
+						mx = ((baseX + panel->x) + 1) +
+						     (k - 5) * 8;
+					}
+					setPosDataPolyFT4(prim, mx, posY, 8,
+					                  height);
+				}
+			}
+		}
+
+		stats = (int16_t *)(names + (st + baseIdx)[i] * 64);
+		for (j = 0; j < 6; j++, stats++) {
+			if (st[0x2e] <= MAIN_D_80134548[j] + 7 &&
+			    MAIN_D_80134548[j] <= st[0x2e] + 22) {
+				convertValueToDigits(4, *stats, &count, digits);
+				y = -109;
+				for (k = count - 1; k >= 0; k--) {
+					VS__func_800F8024(prim);
+					prim->tpage = 6;
+					prim->clut = GetClut(0, 0x1f1);
+					if (st[0x2e] > MAIN_D_80134548[j]) {
+						height = st[0x2e] -
+						         MAIN_D_80134548[j];
+						setUVDataPolyFT4(
+							prim,
+							digits[k] * 5 + 0x98,
+							height + 0xc0, 5,
+							7 - height);
+						height = 7 - height;
+						posY = y + panel->y;
+					} else if (st[0x2e] + 22 <
+					           MAIN_D_80134548[j] + 7) {
+						height = (MAIN_D_80134548[j] +
+						          7) -
+						         (st[0x2e] + 22);
+						setUVDataPolyFT4(
+							prim,
+							digits[k] * 5 + 0x98,
+							0xc0, 5, 7 - height);
+						height = 7 - height;
+						posY = MAIN_D_80134548[j] +
+						       (y + panel->y) -
+						       st[0x2e];
+					} else {
+						swidth = 7;
+						height = swidth;
+						setUVDataPolyFT4(
+							prim,
+							digits[k] * 5 + 0x98,
+							0xc0, 5, 7);
+						posY = MAIN_D_80134548[j] +
+						       (y + panel->y) -
+						       st[0x2e];
+					}
+					setPosDataPolyFT4(
+						prim,
+						((baseX + panel->x) + 22) +
+							(3 - k) * 5,
+						posY, 5, height);
+					AddPrim(ACTIVE_ORDERING_TABLE->org + 10,
+					        prim++);
+				}
+			}
+		}
+
+		VS__func_800F8024(prim);
+		prim->tpage = panel->tpage;
+		prim->clut = GetClut(panel->clutX, panel->clutY);
+		setUVDataPolyFT4(prim, panel->u,
+		                 panel->v +
+		                         (MAIN_D_801B1C7C + (int16_t)id * 0x50)[0x2e],
+		                 panel->w, panel->h);
+		setPosDataPolyFT4(prim, rowX4 + panel->x, y4 + panel->y,
+		                  panel->w, panel->h);
+		AddPrim(ACTIVE_ORDERING_TABLE->org + 10, prim++);
+	}
+
+	y = -109;
+	for (i = 5; i >= 0; i--) {
+		panel = &MAIN_D_8012F590[id * 6 + i];
+		VS__func_800F8024(prim);
+		prim->tpage = panel->tpage;
+		prim->clut = GetClut(panel->clutX, panel->clutY);
+		setUVDataPolyFT4(prim, panel->u, panel->v, panel->w,
+		                 panel->h);
+		setPosDataPolyFT4(prim, baseX + panel->x, y + panel->y,
+		                  panel->w, panel->h);
+		AddPrim(ACTIVE_ORDERING_TABLE->org + 10, prim++);
+	}
+	GsSetWorkBase((PACKET *)prim);
+}
 
 void VS__func_800F9DC8(int32_t id)
 {

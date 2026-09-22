@@ -58,6 +58,8 @@ extern SVECTOR MAIN_D_80134B70;
 extern SVECTOR MAIN_D_80134B78;
 extern SVECTOR MAIN_D_80134B80;
 extern SVECTOR MAIN_D_80134B88;
+extern uint16_t VS_D_8006FBC0[];
+extern int16_t VS_D_8006FD70[];
 extern uint8_t VS_D_8006FF20[][14];
 
 extern int8_t VS_D_80071690[2][5];
