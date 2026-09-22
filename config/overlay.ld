@@ -220,8 +220,6 @@ SECTIONS
 
 			build/src/evl/evl.c.o(.rodata.*);
 			. = ALIGN(., 4);
-			KEEP(build/asm/evl/data/3EE8.rodata.s.o(.rodata.*));
-			. = ALIGN(., 4);
 
 			build/src/evl/evl.c.o(.data.*);
 			. = ALIGN(., 4);
