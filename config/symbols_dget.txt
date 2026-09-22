@@ -1,4 +1,4 @@
-DGET_D_80080800 = 0x80080800;
+DGET_D_80080800 = 0x80080800; // size:0x40
 fillEnabledTournamentTable = 0x80080840;
 buildScheduleLabels = 0x800809DC;
 buildScheduleEntries = 0x80080B48;
