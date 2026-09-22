@@ -4,7 +4,9 @@
 #include <libgs.h>
 #include <libgte.h>
 
+#include <dw/anim.h>
 #include <dw/efe.h>
+#include <dw/file_queue.h>
 #include <dw/entity.h>
 #include <dw/evl.h>
 #include <dw/graphics.h>
@@ -13,6 +15,8 @@
 #include <dw/params.h>
 #include <dw/partner.h>
 #include <dw/script.h>
+#include <dw/sound.h>
+#include <dw/sound_async.h>
 #include <dw/types.h>
 #include <dw/world_object.h>
 
@@ -64,6 +68,23 @@ extern int32_t MAIN_D_801351EC;
 extern int32_t MAIN_D_801351F8;
 extern SVECTOR MAIN_D_801349F8;
 extern SVECTOR MAIN_D_80134A00;
+extern GsRVIEW2 EVL_D_80068918;
+extern int16_t EVL_D_800679E4[];
+extern int32_t MAIN_D_801351FC;
+extern int32_t MAIN_D_80135200;
+extern int32_t MAIN_D_80135204;
+extern RGB8 MAIN_D_801349E8;
+extern SVECTOR MAIN_D_801349EC;
+extern SVECTOR MAIN_D_801351F0;
+extern uint8_t CURRENT_SCREEN;
+extern uint8_t *MAIN_D_801349E4;
+extern VECTOR EVL_D_80068908;
+int32_t getMapSoundId(int32_t mapId);
+void createFlash(void);
+void forceUpdateBGM(void);
+void MAIN_func_800D9BA8(int32_t level, int16_t *src, int32_t unused);
+void MAIN_func_800D9F14(int32_t fade, char *src, int32_t unused);
+void setMapLayerEnabled(int32_t enabled);
 
 void initializeEvolvedPartner(int32_t type, int32_t posX, int32_t posY, int32_t posZ,
                               int32_t rotationX, int32_t rotationY, int32_t rotationZ);
@@ -107,7 +128,7 @@ void EVL_renderTriShard(EvlModelVertex *drift, int32_t unused1, int16_t speed, i
 void EVL_renderQuadShard(EvlModelVertex *drift, int32_t unused1, int16_t speed, int16_t timer, ModelComponent *model);
 void EVL_renderSparkStreak(int32_t id);
 void EVL_tickSpark(int32_t id);
-void EVL_applyEvolution(Entity *entity, Stats *stats, PartnerPara *para, int32_t digimonId);
+void EVL_applyEvolution(Entity *entity, Stats *stats, PartnerPara *para, int16_t digimonId);
 void EVL_scaleBaseStats(Stats *stats, int16_t pct, int32_t unused);
 void EVL_clampBaseStats(void);
 void EVL_renderEvoSequence(void);
@@ -243,7 +264,246 @@ void EVL_resetSparks(void)
 	}
 }
 
-INCLUDE_ASM("asm/evl/nonmatchings/evl", EVL_tickEvoSequence);
+void EVL_tickEvoSequence(int32_t instanceId)
+{
+	VECTOR colorStart;
+	VECTOR colorEnd;
+	VECTOR viewRef;
+	VECTOR viewPos;
+	RGB8 color;
+	SVECTOR rot;
+	int32_t bone;
+	int8_t obj;
+	PartnerEntity *partner;
+	EvoSequenceData *data;
+	int32_t frame;
+	int32_t tmp;
+	int32_t size;
+	int32_t height;
+	int32_t alpha;
+	VECTOR *scale;
+	int32_t hRatio;
+	int32_t rRatio;
+	MATRIX *workm;
+	int32_t i;
+	int32_t t;
+	int32_t t2;
+
+	partner = EVO_SEQUENCE_DATA.partner;
+	frame = EVO_SEQUENCE_DATA.timer;
+	data = &EVO_SEQUENCE_DATA;
+
+	if ((partner->digimonEntity.entity.anim.animId == 0xc) &&
+	    (partner->digimonEntity.entity.anim.animFrame == partner->digimonEntity.entity.anim.frameCount)) {
+		startAnimation(&PARTNER_ENTITY.digimonEntity.entity, 1);
+	}
+
+	switch (data->state) {
+	case 0:
+		alpha = (frame < 0x20) ? lerp(0, 0xff, 0, 0x20, frame) : 0xff;
+		MAIN_func_800D9BA8(alpha, EVL_D_80063F3C, 0);
+		MAIN_func_800D9F14(alpha, EVL_D_80064D50, 0);
+		if ((frame & 1) == 0) {
+			EVL_fadeClutBank0((int16_t *)EVL_D_80065398, partner, EVL_D_800679E4, 0, 0x20, data->timer);
+		} else {
+			EVL_fadeClutBank1((int16_t *)EVL_D_8006569C, partner, EVL_D_800679E4, 0, 0x20, data->timer);
+		}
+		if (data->timer < 0x20) {
+			break;
+		}
+		data->state = 1;
+		EVL_setOtherEntitiesVisible(0);
+		setMapLayerEnabled(0);
+		EVL_D_800688E8 = GS_VIEWPOINT;
+		MAIN_D_801351E4 = DRAWING_OFFSET_X;
+		MAIN_D_801351E8 = DRAWING_OFFSET_Y;
+		MAIN_D_801351EC = VIEWPORT_DISTANCE;
+		EVL_D_80068908 = ENTITY_TABLE[1]->posData->location;
+		MAIN_D_801351F0 = ENTITY_TABLE[1]->posData->rotation;
+		loadMMDAsync(data->digimonId, 3, MAIN_D_801349E4, &data->modelData, (uint8_t *)&data->hasFinishedLoading);
+		break;
+	case 1:
+		EVL_updateEvoCamera(&partner->digimonEntity.entity, 0, data->timer);
+		if (data->timer != 0x6a) {
+			break;
+		}
+		data->state = 2;
+		playSound2(8, 1);
+		playSound2(8, 0);
+		startAnimation(&PARTNER_ENTITY.digimonEntity.entity, 0xc);
+		goto shards;
+	case 2:
+		if (EVL_D_80063F28[frame % 18] != 0) {
+			color = MAIN_D_801349E8;
+			color.g = lerp(0x32, 0xe6, 1, 5, EVL_D_80063F28[frame % 18]);
+			EVL_spawnParticle(&EVL_D_80064D40, &color);
+		}
+		t = data->timer;
+		if ((t >= 0x70) && (t < 0xcd)) {
+			EVL_brightenDigimonClut((int16_t *)EVL_D_80065094, &partner->digimonEntity.entity, EVL_D_800679E4, 0x70, 0x9a, data->timer);
+		}
+		t = data->timer;
+		if ((t >= 0x70) && (t < 0x9b)) {
+			tmp = (EVL_D_80063EFC - 0x70)[data->timer];
+			if (tmp >= 0) {
+shards:
+				if (data->unk_0x8 < DIGIMON_DATA[partner->digimonEntity.entity.type].boneCount - 1) {
+					bone = (&EVL_D_80067990[2])[data->unk_0x8++];
+					obj = DIGIMON_SKELETONS[partner->digimonEntity.entity.type][bone].objIndex;
+					if (obj == -1) {
+						goto shards;
+					}
+					playSound2(8, (rand() % 3) + 2);
+					EVL_buildShardSet(&partner->digimonEntity.entity, obj, bone);
+					PARTNER_WIREFRAME_SUB[bone] = 0;
+					EVL_spawnSpark(partner, (int16_t)bone, (int16_t)(0x11c - data->timer));
+					workm = &partner->digimonEntity.entity.posData[bone].posMatrix.workm;
+					*EFE_DATA_STACK++ = 1;
+					*EFE_DATA_STACK++ = (int32_t)workm->t;
+					*EFE_DATA_STACK++ = -1;
+					*EFE_DATA_STACK++ = 0xa;
+					*EFE_DATA_STACK++ = 0;
+					*EFE_DATA_STACK++ = 0x333;
+					colorStart.vx = colorStart.vy = colorStart.vz = 0x96;
+					colorEnd.vx = colorEnd.vy = colorEnd.vz = 0x14;
+					*EFE_DATA_STACK++ = (int32_t)&colorStart;
+					*EFE_DATA_STACK++ = (int32_t)&colorEnd;
+					createFlash();
+				}
+			}
+		} else {
+			if ((int32_t)*(uint8_t **)&data->timer >= 0x9b) {
+				t2 = (int32_t)*(uint8_t **)&data->timer;
+				if (t2 < 0x11c) {
+					goto shards;
+				}
+			}
+		}
+		if ((int32_t)*(uint8_t **)&data->timer < 0xcc) {
+			tmp = DIGIMON_DATA[partner->digimonEntity.entity.type].radius;
+			size = DIGIMON_DATA[partner->digimonEntity.entity.type].height;
+			height = size;
+		} else if (((int32_t)*(uint8_t **)&data->timer >= 0xcc) && ((int32_t)*(uint8_t **)&data->timer < 0x108)) {
+			scale = &partner->digimonEntity.entity.posData->scale;
+			hRatio = (DIGIMON_DATA[data->digimonId].height << 12) / DIGIMON_DATA[partner->digimonEntity.entity.type].height;
+			rRatio = (DIGIMON_DATA[data->digimonId].radius << 12) / DIGIMON_DATA[partner->digimonEntity.entity.type].radius;
+			scale->vx = lerp(0x1000, rRatio, 0xcc, 0x108, data->timer);
+			scale->vy = lerp(0x1000, hRatio, 0xcc, 0x108, data->timer);
+			scale->vz = scale->vx;
+			tmp = lerp(DIGIMON_DATA[partner->digimonEntity.entity.type].radius, DIGIMON_DATA[data->digimonId].radius, 0xcc, 0x108, data->timer);
+			size = lerp(DIGIMON_DATA[partner->digimonEntity.entity.type].height, DIGIMON_DATA[data->digimonId].height, 0xcc, 0x108, data->timer);
+			height = lerp(DIGIMON_DATA[partner->digimonEntity.entity.type].height, DIGIMON_DATA[data->digimonId].height, 0xcc, 0x108, data->timer);
+		} else if ((int32_t)*(uint8_t **)&data->timer >= 0x108) {
+			tmp = DIGIMON_DATA[data->digimonId].radius;
+			size = DIGIMON_DATA[data->digimonId].height;
+			height = size;
+		}
+		if (data->timer >= 0xa5) {
+			if (data->timer >= 0xc3) {
+				MAIN_D_801351F8 += 0x16;
+			} else {
+				MAIN_D_801351F8 += lerp(0, 0x16, 0xa4, 0xc2, (int32_t)*(uint8_t **)&data->timer);
+			}
+			rot = MAIN_D_801349EC;
+			rot.vy = MAIN_D_801351F8 + partner->digimonEntity.entity.posData->rotation.vy;
+			size = (tmp < size) ? size : tmp;
+			size = (size * 5) + 0x4b0;
+			EVL_calculateCameraVectors(&viewRef, &viewPos, &partner->digimonEntity.entity, &rot, size, height);
+			tmp = size;
+			GS_VIEWPOINT.vrx = viewRef.vx;
+			GS_VIEWPOINT.vry = viewRef.vy;
+			GS_VIEWPOINT.vrz = viewRef.vz;
+			GS_VIEWPOINT.vpx = viewPos.vx;
+			GS_VIEWPOINT.vpy = viewPos.vy;
+			GS_VIEWPOINT.vpz = viewPos.vz;
+		}
+		if (frame == 0xd6) {
+			stopSound();
+			playSound(8, 5);
+		}
+		if ((frame >= 0xd7) && (frame < 0x11c) && ((frame & 1) == 0)) {
+			workm = &partner->digimonEntity.entity.posData[1].posMatrix.workm;
+			*EFE_DATA_STACK++ = 0;
+			*EFE_DATA_STACK++ = (int32_t)workm->t;
+			tmp = lerp(5, 1, 0xd6, 0x11c, frame);
+			if ((frame & tmp) == 0) {
+				*EFE_DATA_STACK++ = 0x21;
+			} else {
+				*EFE_DATA_STACK++ = 0xfa0;
+			}
+			*EFE_DATA_STACK++ = 0xa;
+			*EFE_DATA_STACK++ = 0;
+			tmp = lerp(0x333, 0x4800, 0xd6, 0x11c, frame);
+			*EFE_DATA_STACK++ = tmp;
+			tmp = lerp(0x32, 0x78, 0xd6, 0x11c, frame);
+			colorStart.vx = tmp + (rand() % 100);
+			colorStart.vy = tmp + (rand() % 100);
+			colorStart.vz = tmp + (rand() % 100);
+			colorEnd.vx = colorEnd.vy = colorEnd.vz = 0x14;
+			*EFE_DATA_STACK++ = (int32_t)&colorStart;
+			*EFE_DATA_STACK++ = (int32_t)&colorEnd;
+			createFlash();
+		}
+		if (frame == 0x11c) {
+			PARTNER_WIREFRAME_TOTAL = 0;
+			for (i = 0; i < 0x28; i++) {
+				PARTNER_WIREFRAME_SUB[i] = 0x10;
+			}
+			while (data->hasFinishedLoading != 0) {
+				tickFileReadQueue(0);
+			}
+			EVL_applyEvolution(ENTITY_TABLE[1], &PARTNER_ENTITY.digimonEntity.stats, data->para, data->evoTarget);
+			waitForSoundBufferLoading(3);
+			partner = (PartnerEntity *)((uint32_t)&PARTNER_ENTITY);
+			data->partner = partner;
+			startAnimation(&PARTNER_ENTITY.digimonEntity.entity, 0);
+		}
+		if ((frame >= 0x126) && (frame < 0x14f)) {
+			PARTNER_WIREFRAME_TOTAL = lerp(0, 0x10, 0x126, 0x14e, frame);
+		}
+		if (frame < 0x162) {
+			break;
+		}
+		data->state = 3;
+		PARTNER_WIREFRAME_TOTAL = 0x10;
+		EVL_D_80068918 = GS_VIEWPOINT;
+		MAIN_D_801351FC = DRAWING_OFFSET_X;
+		MAIN_D_80135200 = DRAWING_OFFSET_Y;
+		MAIN_D_80135204 = VIEWPORT_DISTANCE;
+		GS_VIEWPOINT = EVL_D_800688E8;
+		DRAWING_OFFSET_X = MAIN_D_801351E4;
+		DRAWING_OFFSET_Y = MAIN_D_801351E8;
+		VIEWPORT_DISTANCE = MAIN_D_801351EC;
+		break;
+	case 3:
+		data->state = 4;
+		GS_VIEWPOINT = EVL_D_800688E8;
+		DRAWING_OFFSET_X = MAIN_D_801351E4;
+		DRAWING_OFFSET_Y = MAIN_D_801351E8;
+		VIEWPORT_DISTANCE = MAIN_D_801351EC;
+		MAIN_func_800D9BA8(0, EVL_D_80063F3C, 0);
+		MAIN_func_800D9F14(0, EVL_D_80064D50, 0);
+		EVL_fadeClutBank0((int16_t *)EVL_D_80065398, partner, EVL_D_800679E4, 0, 1, 0);
+		EVL_fadeClutBank1((int16_t *)EVL_D_8006569C, partner, EVL_D_800679E4, 0, 1, 0);
+		EVL_setOtherEntitiesVisible(1);
+		setMapLayerEnabled(1);
+		forceUpdateBGM();
+		startAnimation(&PARTNER_ENTITY.digimonEntity.entity, 0xb);
+		EVL_releaseAllParticles();
+		loadMapSounds2(getMapSoundId(CURRENT_SCREEN));
+		break;
+	case 4:
+		if (partner->digimonEntity.entity.anim.animFrame == partner->digimonEntity.entity.anim.frameCount) {
+			isSoundLoaded(0, 8);
+			data->timer = -1;
+			removeObject(0x80a, instanceId);
+			return;
+		}
+		break;
+	}
+
+	data->timer += 1;
+}
 
 void EVL_renderEvoSequence(void)
 {
@@ -935,13 +1195,7 @@ void EVL_initEvoSequence(void)
 	addObject(0x80a, 0, EVL_tickEvoSequence, (RenderFunction)EVL_renderEvoSequence);
 }
 
-// clang-format off
-void EVL_applyEvolution(entity, stats, para, digimonId)
-	Entity *entity;
-	Stats *stats;
-	PartnerPara *para;
-	int16_t digimonId;
-// clang-format on
+void EVL_applyEvolution(Entity *entity, Stats *stats, PartnerPara *para, int16_t digimonId)
 {
 	EvoStatsGains *gains;
 	int32_t newId;
