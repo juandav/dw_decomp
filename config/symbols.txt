@@ -2793,7 +2793,6 @@ MAIN_jtbl_80114C08 = 0x80114C08; // align:0x4
 MAIN_jtbl_80114C20 = 0x80114C20; // align:0x4
 MAIN_jtbl_80114C60 = 0x80114C60; // align:0x4
 MAIN_jtbl_80114C80 = 0x80114C80; // align:0x4
-MAIN_D_80114C98 = 0x80114C98; // type:jtbl align:0x4
 MAIN_jtbl_80114CA4 = 0x80114CA4; // align:0x4
 MAIN_jtbl_80114CB8 = 0x80114CB8; // align:0x4
 MAIN_jtbl_80114CE4 = 0x80114CE4; // align:0x4

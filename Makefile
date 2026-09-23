@@ -516,6 +516,9 @@ $(BUILDDIR)/%.s.o: %.s
 				--set-section-alignment .sbss=4 \
 				--set-section-alignment .sdata=4 $@
 
+# PsyQ jumptables are assembled from separate .rodata files
+$(BUILDDIR)/$(ASM_DIR)/main/psyq/%.s.o: ASFLAGS += -Wa,--defsym,_GLOBAL_JLABELS=1
+
 $(MAIN_SBSS) &: config/sbss.yaml config/symbols.txt
 	@mkdir -p $(dir $@)
 	tools/gen_bss.py $^ $(BUILDDIR)/generated/
