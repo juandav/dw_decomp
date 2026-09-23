@@ -570,7 +570,6 @@ void EAB_renderParticle(int32_t id)
 	EabParticle *e;
 	LINE_F2 *prim;
 	int32_t size;
-	int32_t d;
 	int32_t i;
 	int32_t j;
 
@@ -592,11 +591,9 @@ void EAB_renderParticle(int32_t id)
 
 	prim = (LINE_F2 *)GsGetWorkBase();
 	for (i = 0; i < 4; i++) {
-		d = depth[i];
-		if ((d > 0x20) && (d < 0x1000)) {
+		if ((*(int32_t *)&depth[i] > 0x20) && (depth[i] < 0x1000)) {
 			j = (i + 1) % 4;
-			d = depth[j];
-			if ((d > 0x20) && (d < 0x1000)) {
+			if ((*(int32_t *)&depth[j] > 0x20) && (depth[j] < 0x1000)) {
 				SetLineF2(prim);
 				setRGB0(prim, lerp(e->r, 0, 0, 0x56, e->timer), lerp(e->g, 0, 0, 0x56, e->timer), lerp(e->b, 0, 0, 0x56, e->timer));
 				setXY2(prim, screen[i].vx, screen[i].vy, screen[j].vx, screen[j].vy);
