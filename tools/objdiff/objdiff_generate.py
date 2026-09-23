@@ -4,6 +4,7 @@ from pathlib import Path
 from argparse import ArgumentParser
 from dataclasses import dataclass, asdict
 from elftools.elf.elffile import ELFFile
+from elftools.elf.relocation import RelocationSection
 import logging
 import yaml
 import json
@@ -82,6 +83,45 @@ def _normalize_suffixed_symbols(path: Path):
 
     return normalized
 
+def _read_relocation_sites(path: Path):
+    """Map each relocation site (section, offset, type) to the relocated word and the name of the target symbol"""
+    sites = {}
+    with open(path, 'rb') as f:
+        elffile = ELFFile(f)
+        symtab = elffile.get_section_by_name('.symtab')
+        for section in elffile.iter_sections():
+            if not isinstance(section, RelocationSection):
+                continue
+            relocated = elffile.get_section(section['sh_info'])
+            data = relocated.data()
+            for reloc in section.iter_relocations():
+                symbol = symtab.get_symbol(reloc['r_info_sym'])
+                if symbol['st_info']['type'] == 'STT_SECTION':
+                    continue
+                offset = reloc['r_offset']
+                sites[(relocated.name, offset, reloc['r_info_type'])] = (data[offset:offset + 4], symbol.name)
+    return sites
+
+def _map_compiler_generated_symbols(target_path: Path, base_path: Path):
+    """Pair compiler-generated base symbols (e.g. mwcc jump tables @123) with the target
+    symbols that the same instructions reference, return a dictionary of target -> base names"""
+    target_sites = _read_relocation_sites(target_path)
+    candidates = set()
+    for site, (base_word, base_name) in _read_relocation_sites(base_path).items():
+        if not re.fullmatch(r'@\d+', base_name) or site not in target_sites:
+            continue
+        target_word, target_name = target_sites[site]
+        if target_word == base_word:
+            candidates.add((target_name, base_name))
+
+    # Only keep unambiguous pairs
+    target_names = [target_name for target_name, _ in candidates]
+    base_names = [base_name for _, base_name in candidates]
+    return {
+        target_name: base_name for target_name, base_name in sorted(candidates)
+        if target_names.count(target_name) == 1 and base_names.count(base_name) == 1
+    }
+
 EXCLUDED_NAMES = {"data", "rodata", "sdata", "bss"}
 
 def _collect_objects(path: Path, config) -> list[Path]:
@@ -116,10 +156,9 @@ def main():
         processed_path = _determine_categories(file, config)
         base_path = "build/src/" + re.sub(r"\\", r"/", processed_path[1]).removesuffix(".s.o").removesuffix(".c.o") + ".c.o"
         
-        # Create mappings for clone/disambiguation symbol suffixes in base object
-        # (disabled as objdiff report doesn't appear to support symbol mappings right now)
-        #symbol_mappings = _normalize_suffixed_symbols(base_path) if Path(base_path).exists() else {}
-        symbol_mappings = {}
+        # Create mappings for compiler-generated symbols in base object
+        # (objdiff report supports symbol mappings since v3.7.3)
+        symbol_mappings = _map_compiler_generated_symbols(file, base_path) if Path(base_path).exists() else {}
 
         unit = Unit(
             re.sub(r"\\", r"/", processed_path[1]).removesuffix(".s.o").removesuffix(".c.o"),

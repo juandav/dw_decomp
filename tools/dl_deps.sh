@@ -26,7 +26,7 @@ unzip -d "$BIN_DIR" "$BIN_DIR/mkpsxiso-2.20-Linux.zip"
 rm -rf "$BIN_DIR/mkpsxiso-2.20-Linux.zip"
 
 rm -rf "$BIN_DIR/objdiff-cli-linux-x86_64"
-wget -O "$BIN_DIR/objdiff-cli-linux-x86_64" https://github.com/encounter/objdiff/releases/download/v3.7.1/objdiff-cli-linux-x86_64
+wget -O "$BIN_DIR/objdiff-cli-linux-x86_64" https://github.com/encounter/objdiff/releases/download/v3.8.1/objdiff-cli-linux-x86_64
 sha256sum -c "$BIN_DIR/objdiff-cli-linux-x86_64.sha256"
 chmod a+x "$BIN_DIR/objdiff-cli-linux-x86_64"
 
