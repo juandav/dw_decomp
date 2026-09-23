@@ -490,10 +490,20 @@ $(EXE): $(ELF) $(OVERLAY:%=$(BUILDDIR)/%_REL.BIN)
 
 -include $(DEP)
 
+# objdiff only merges .rodata.*/.data.*/.sdata.* sections under the plain name
+# when there are at least two of them. The expected objects also contain an
+# empty plain section, so add one here too, or a file with a single symbol in
+# one of them is never compared. The empty sections are discarded at link time.
 $(BUILDDIR)/%.c.o: %.c
 	@mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEPFLAGS) $<
 	$(METROWRAP) -o $@ $(METROWRAP_FLAGS) $(MWCCWRAP_FLAGS) $(CPPFLAGS) $<
+	@$(OBJCOPY) --add-section .rodata=/dev/null \
+				--set-section-flags .rodata=alloc,load,readonly,data \
+				--add-section .data=/dev/null \
+				--set-section-flags .data=alloc,load,data \
+				--add-section .sdata=/dev/null \
+				--set-section-flags .sdata=alloc,load,data $@
 
 $(BUILDDIR)/%.s.o: %.s
 	@mkdir -p $(dir $@)
