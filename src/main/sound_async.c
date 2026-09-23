@@ -31,6 +31,11 @@ SoundBuffer SOUND_BUFFERS[NUM_SOUND_BUFFERS] = {
 
 char SOUND_SB_PATH[] = "SOUND\\SB";
 
+char MAIN_D_8013443C[8] = ".VHB";
+char MAIN_D_80134444[8] = "VBALL";
+char MAIN_D_8013444C[8] = "ESALL";
+char MAIN_D_80134454[8] = "VLALL";
+
 int32_t LOAD_SOUND_COMPLETE_STATE;
 
 void loadFullVHB(int32_t vabId, char *path, uint8_t *buffer);
@@ -71,7 +76,7 @@ void loadFullVHB(int32_t vabId, char *path, uint8_t *buffer)
 		++filename;
 	}
 
-	concatStrings2(pathBuf, filename, ".VHB");
+	concatStrings2(pathBuf, filename, MAIN_D_8013443C);
 	sb->buffer = buffer;
 	addFileReadRequestLookup(pathBuf, buffer, (uint8_t *)&sb->isLoading,
 				 loadSoundFinishCallback, (void *)vabId);
@@ -111,7 +116,7 @@ void loadVHBFile(int32_t vabId, char *path, uint8_t *buffer, int32_t offset,
 		++filename;
 	}
 
-	concatStrings2(pathBuf, filename, ".VHB");
+	concatStrings2(pathBuf, filename, MAIN_D_8013443C);
 
 	sb->buffer = buffer;
 	addFileReadRequestSection(pathBuf, buffer, offset, sectors,
@@ -223,7 +228,7 @@ int32_t readVBALLSection(int32_t vabId, int32_t idx)
 		sb->vabId = -1;
 	}
 
-	loadVHBFile(vabId, "VBALL", GENERAL_BUFFER,
+	loadVHBFile(vabId, MAIN_D_80134444, GENERAL_BUFFER,
 		    DIGIMON_VBALL_SOUND_ID[idx] * 7, 7);
 
 	return vabId;
@@ -245,7 +250,7 @@ int32_t loadMapSounds2(int32_t mapSoundId)
 	sectors = para->sectorCount / 2;
 	offset = MAP_SOUND_PARA[mapSoundId].sectorId / 2;
 
-	loadVHBFile(8, "ESALL", GENERAL_BUFFER, offset, sectors);
+	loadVHBFile(8, MAIN_D_8013444C, GENERAL_BUFFER, offset, sectors);
 
 	return 8;
 }
@@ -283,7 +288,8 @@ int32_t loadVLALL(int32_t idx, uint8_t *buffer)
 		soundId = 0xf;
 	}
 
-	path = "VLALL";
+	/* Cast needed for match */
+	path = (char *)MAIN_D_80134454;
 	sb = &SOUND_BUFFERS[3];
 
 	if ((filename = strrchr(path, '\\')) == NULL) {
@@ -292,7 +298,7 @@ int32_t loadVLALL(int32_t idx, uint8_t *buffer)
 		++filename;
 	}
 
-	concatStrings2(pathBuf, filename, ".VHB");
+	concatStrings2(pathBuf, filename, MAIN_D_8013443C);
 
 	/* Original code stores buffer twice */
 	sb->buffer = buffer;

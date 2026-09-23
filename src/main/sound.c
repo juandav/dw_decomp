@@ -18,26 +18,30 @@ typedef struct {
 	VagAtr tones[][VAB_TONES_PER_PROGRAM];
 } VhbFile;
 
-uint8_t VHB_HEADER_SS[0x1000];
-uint8_t VHB_HEADER_SL[0x1000];
-uint8_t VHB_HEADER_FAALL[0x2000];
-uint8_t VHB_HEADER_VLALL[0x1000];
-uint8_t VHB_HEADER_VBALL_0[0x1000];
-uint8_t VHB_HEADER_VBALL_1[0x1000];
-uint8_t VHB_HEADER_VBALL_2[0x1000];
-uint8_t VHB_HEADER_VBALL_3[0x1000];
-uint8_t VHB_HEADER_ESALL_SB[0x1800];
+uint8_t SS_VHB_HEADER[0x1000];
+uint8_t SL_VHB_HEADER[0x1000];
+uint8_t FAALL_VHB_HEADER[0x2000];
+uint8_t VLALL_VHB_HEADER[0x1000];
+uint8_t VBALL_VHB_HEADER_0[0x1000];
+uint8_t VBALL_VHB_HEADER_1[0x1000];
+uint8_t VBALL_VHB_HEADER_2[0x1000];
+uint8_t VBALL_VHB_HEADER_3[0x1000];
+uint8_t SB_VHB_HEADER[0x1800];
+
+char MAIN_D_80127E88[12] = "SOUND\\SS";
+char MAIN_D_80127E94[12] = "SOUND\\SL";
+char MAIN_D_80127EA0[12] = "SOUND\\SB";
 
 void *VHB_HEADER_ADDR[NUM_SOUND_BUFFERS] = {
-	VHB_HEADER_SS,
-	VHB_HEADER_SL,
-	VHB_HEADER_FAALL,
-	VHB_HEADER_VLALL,
-	VHB_HEADER_VBALL_0,
-	VHB_HEADER_VBALL_1,
-	VHB_HEADER_VBALL_2,
-	VHB_HEADER_VBALL_3,
-	VHB_HEADER_ESALL_SB,
+	SS_VHB_HEADER,
+	SL_VHB_HEADER,
+	FAALL_VHB_HEADER,
+	VLALL_VHB_HEADER,
+	VBALL_VHB_HEADER_0,
+	VBALL_VHB_HEADER_1,
+	VBALL_VHB_HEADER_2,
+	VBALL_VHB_HEADER_3,
+	SB_VHB_HEADER,
 	NULL,
 };
 
@@ -339,6 +343,11 @@ int16_t CURRENT_SEQ_TRACK;
 char SEQ_TABLE[SS_SEQ_TABSIZ];
 uint8_t SEQ_BUFFER[0x5678];
 
+char MAIN_D_8013436C[8] = "VLALL";
+char MAIN_D_80134374[8] = "VBALL";
+char MAIN_D_8013437C[8] = "ESALL";
+char MAIN_D_80134384[8] = "FAALL";
+
 char VHB_EXT[] = ".VHB";
 
 int32_t ACTIVE_MAP_SOUND_ID = -1;
@@ -523,11 +532,11 @@ int32_t initializeMusic(void)
 	SsSetTableSize(SEQ_TABLE, 1, 1);
 	SsSetTickMode(SS_TICK240);
 
-	if (readVHBFile(0, "SOUND\\SS", GENERAL_BUFFER) == -1) {
+	if (readVHBFile(0, MAIN_D_80127E88, GENERAL_BUFFER) == -1) {
 		return 0;
 	}
 
-	if (readVHBFile(1, "SOUND\\SL", GENERAL_BUFFER) == -1) {
+	if (readVHBFile(1, MAIN_D_80127E94, GENERAL_BUFFER) == -1) {
 		return 0;
 	}
 
@@ -592,7 +601,7 @@ static void startSound__garbage__(void)
 	int16_t b;
 
 	a = FREE_CHANNEL_INDEX;
-	b = VHB_HEADER_SS[0];
+	b = SS_VHB_HEADER[0];
 	a = (a * 100) / b;
 	a = (a * 100) / (b + 1);
 	FREE_CHANNEL_INDEX = a;
@@ -681,7 +690,7 @@ int32_t loadPartnerSounds(int32_t type)
 		soundId = 15;
 	}
 
-	if (readVHBFileSectors(3, "VLALL", GENERAL_BUFFER, soundId * 15,
+	if (readVHBFileSectors(3, MAIN_D_8013436C, GENERAL_BUFFER, soundId * 15,
 			       15) == -1) {
 		return 0;
 	}
@@ -695,7 +704,7 @@ int32_t loadDigimonSounds(int32_t vabId, int32_t type)
 		return 0;
 	}
 
-	if (readVHBFileSectors(vabId, "VBALL", GENERAL_BUFFER,
+	if (readVHBFileSectors(vabId, MAIN_D_80134374, GENERAL_BUFFER,
 			       DIGIMON_VBALL_SOUND_ID[type] * 7, 7) == -1) {
 		return 0;
 	}
@@ -707,7 +716,7 @@ int32_t loadVSSounds(void)
 {
 	ACTIVE_MAP_SOUND_ID = -1;
 
-	if (readVHBFile(8, "SOUND\\SB", GENERAL_BUFFER) == -1) {
+	if (readVHBFile(8, MAIN_D_80127EA0, GENERAL_BUFFER) == -1) {
 		return 0;
 	}
 
@@ -722,7 +731,7 @@ int32_t loadMapSounds(int32_t mapSoundId)
 
 	ACTIVE_MAP_SOUND_ID = mapSoundId;
 
-	if (readVHBFileSectors(8, "ESALL", GENERAL_BUFFER,
+	if (readVHBFileSectors(8, MAIN_D_8013437C, GENERAL_BUFFER,
 			       MAP_SOUND_PARA[mapSoundId].sectorId / 2,
 			       MAP_SOUND_PARA[mapSoundId].sectorCount / 2) == -1) {
 		return 0;
@@ -736,7 +745,7 @@ int32_t loadMusicFont(int32_t font)
 	uint32_t start;
 	uint32_t end;
 
-	if (readVHBFileSectors(2, "FAALL", GENERAL_BUFFER,
+	if (readVHBFileSectors(2, MAIN_D_80134384, GENERAL_BUFFER,
 			       (font - 1) * 0x27, 0x27) == -1) {
 		return 0;
 	}

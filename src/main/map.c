@@ -406,7 +406,9 @@ int8_t MAIN_D_801343B4 = 0x01;
 
 uint8_t MERAMON_SHAKE_COLOR_G = 0xff;
 
-uint8_t MERAMON_SHAKE_COLOR_B = 0xff;
+// splat folds the padding before MERAMON_SHAKE_STEP into this symbol, and mwcc
+// aligns every array to four, so the two-byte blue component can only be a scalar
+int16_t MERAMON_SHAKE_COLOR_B = 0xff;
 
 int16_t MERAMON_SHAKE_STEP = 0x0020;
 
@@ -6496,7 +6498,7 @@ void tickMeramonShake(int32_t arg0)
 	setUVDataPolyFT4(prim, 64, 128, 63, 63);
 	setPosDataPolyFT4(prim, MERAMON_SHAKE_POS_X, MERAMON_SHAKE_POS_Y,
 			  MERAMON_SHAKE_WIDTH, MERAMON_SHAKE_HEIGHT);
-	setRGB0(prim, MERAMON_SHAKE_COLOR_R, MERAMON_SHAKE_COLOR_G, MERAMON_SHAKE_COLOR_B);
+	setRGB0(prim, MERAMON_SHAKE_COLOR_R, MERAMON_SHAKE_COLOR_G, *(uint8_t *)&MERAMON_SHAKE_COLOR_B);
 	AddPrim(&ACTIVE_ORDERING_TABLE->org[9], prim);
 	prim++;
 

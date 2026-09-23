@@ -77,6 +77,8 @@ static void *dget_functions[] = {
 	fillEnabledTournamentTable,
 };
 
+char DGET_D_80081CE8[] = "Tournament";
+
 void fillEnabledTournamentTable(void)
 {
 	int32_t day;
@@ -461,7 +463,7 @@ void renderTournamentTextbox(void)
 	posX = UI_BOX_DATA[1].finalPos.x + 6;
 	posY = UI_BOX_DATA[1].finalPos.y + 3;
 
-	drawString("Tournament", 0, (uint32_t)uvY);
+	drawString(DGET_D_80081CE8, 0, (uint32_t)uvY);
 	renderString(0, posX, posY, 0x54, 0xc, 0, uvY, 5, 1);
 }
 
