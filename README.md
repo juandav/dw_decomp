@@ -69,6 +69,23 @@ script interpreter does, for example `tools/dump_dialogue.py 3`. With
 `--actions` it prints every instruction of the scripts, using the opcodes
 documented in `include/dw/script.h`.
 
+`tools/scn.py` turns both script files into source that can be read and
+edited, one file per script, and builds them back. `make scn` writes the
+source to `build/scn/DG` and `build/scn/MAPHEAD` and checks that it builds
+the original files byte for byte. Comments say who speaks each text and
+name the ids; this is the start of section 0x33 of script 24:
+
+```
+@sec_33:
+	condition [trigger 0x96] [and not trigger 0xea] [else @L4]	; 0xea=DIGIMON_MET+Ogremon
+	speaker 0xfd	; player
+	text "I got bad feeling."	; player
+	look_at 0xfd 0xfc	; player, target=partner
+	look_at 0xfc 0xfd	; partner, target=player
+	wait 5
+	speaker 0xfd	; player
+```
+
 ## Links
 
 Symbols and reverse engineering is based on work by SydMontague:  

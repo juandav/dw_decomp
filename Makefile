@@ -459,6 +459,17 @@ regenerate: reset
 compare:
 	@tools/cmp_bins.sh
 
+# Turn the script files into source and build them back; see tools/scn.py.
+SCN_FILES := DG MAPHEAD
+
+scn:
+	@for f in $(SCN_FILES); do \
+		$(PYTHON) tools/scn.py disasm disks/us/SCN/$$f.SCN $(BUILDDIR)/scn/$$f && \
+		$(PYTHON) tools/scn.py asm $(BUILDDIR)/scn/$$f $(BUILDDIR)/scn/$$f.SCN && \
+		cmp disks/us/SCN/$$f.SCN $(BUILDDIR)/scn/$$f.SCN && \
+		echo "$$f.SCN: OK" || exit 1; \
+	done
+
 expected: $(OBJ)
 	rm -rf $(EXPECTEDDIR)
 	@mkdir -p $(EXPECTEDDIR)
@@ -542,4 +553,4 @@ clean:
 reset: clean
 	rm -rf $(ASM_DIR)
 
-.PHONY: all clean
+.PHONY: all clean scn
