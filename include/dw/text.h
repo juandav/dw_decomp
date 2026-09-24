@@ -82,6 +82,22 @@
 #define MAPHEAD_TEXT_MEDALS		0x4DB
 #define MAPHEAD_TEXT_CURRENT_SHOP	0xFF	/* the shop of the NPC in pstat 254 */
 
+/* The messages of every MAPHEAD_TEXT_SHOP table, worded by each shopkeeper. */
+#define SHOP_TEXT_WELCOME		0
+#define SHOP_TEXT_NOTHING_TO_SELL	1
+#define SHOP_TEXT_BUY_SELL_LEAVE	2	/* choice */
+#define SHOP_TEXT_BUY_LEAVE		3	/* choice */
+#define SHOP_TEXT_COME_AGAIN		4
+#define SHOP_TEXT_BOUGHT_NOTHING	5
+#define SHOP_TEXT_BITS			6	/* the money box */
+#define SHOP_TEXT_POINTS		7	/* the money box, with merit */
+#define SHOP_TEXT_WHAT_TO_BUY		8
+#define SHOP_TEXT_WHAT_TO_SELL		9
+#define SHOP_TEXT_THANKS		10
+#define SHOP_TEXT_ANYTHING_ELSE		11
+#define SHOP_TEXT_NO			12
+#define SHOP_TEXT_BABY_DISCOUNT		13
+
 /* Laid out text: one row of the text buffer per line of a textbox. */
 #define TEXT_ROW_SIZE		0x40
 #define TEXT_LINE_HEIGHT	12

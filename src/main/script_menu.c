@@ -8,25 +8,25 @@
 #include <dw/trigger.h>
 #include <dw/ui.h>
 
-extern uint8_t MAIN_D_80134F90;
+extern uint8_t ITEM_KEEPER_SIDE;
 extern char NAMING_BUTTON_LABELS[8];
 extern int32_t CURRENT_SCRIPT_PTR;
 
 static void *script_menu_text_order[] = {
 	newGameStateMachine,
 	initializeNamingBuffer,
-	MAIN_func_8010C4B0,
-	MAIN_func_8010C28C,
+	tickCollectorTrade,
+	tickTransport,
 	openJukebox,
-	MAIN_func_8010BF68,
-	MAIN_func_8010BC10,
-	MAIN_func_8010BB0C,
-	MAIN_func_8010B9D8,
+	tickItemKeeper,
+	tickMeritShop,
+	tickCardSellShop,
+	tickCardShop,
 	rollCardPack,
-	MAIN_func_8010B648,
+	tickLostItemShop,
 };
 
-void MAIN_func_8010B648(void)
+void tickLostItemShop(void)
 {
 	uint8_t owner = readPStat(PSTAT_254);
 
@@ -35,17 +35,17 @@ void MAIN_func_8010B648(void)
 		int32_t hasItems;
 		initializeItemMenuBox(&MAIN_D_80134F68, 0x9c, 6, 0xd2,
 		                      0x18, 6, 0x5a);
-		hasItems = MAIN_func_80106D28();
+		hasItems = fillLostItemList();
 		MAIN_D_80134F70 = 0;
 		MAIN_D_80134F74 = 0;
 
 		if (hasItems != 0) {
-			showShopkeeperTextbox(0, owner, 0);
+			showShopkeeperTextbox(SHOP_TEXT_WELCOME, owner, 0);
 			SELECTION_MENU_STATE = 1;
 			SCRIPT_STATE_4 = 3;
 			SCRIPT_STATE_3 = 1;
 		} else {
-			showShopkeeperTextbox(1, owner, 0);
+			showShopkeeperTextbox(SHOP_TEXT_NOTHING_TO_SELL, owner, 0);
 			SELECTION_MENU_STATE = 1;
 			SCRIPT_STATE_4 = 2;
 			SCRIPT_STATE_3 = 1;
@@ -59,17 +59,17 @@ void MAIN_func_8010B648(void)
 		ACTIVE_INSTRUCTION = 0;
 		break;
 	case 3:
-		MAIN_func_800FC968(1);
-		MAIN_func_800FCA14(3, 0xfd, 2, &MAIN_D_80134F70);
+		openMoneyBox(1);
+		showShopkeeperSelection(SHOP_TEXT_BUY_LEAVE, SPEAKER_PLAYER, 2, &MAIN_D_80134F70);
 		SELECTION_MENU_STATE = 1;
 		SCRIPT_STATE_4 = 4;
 		SCRIPT_STATE_3 = 2;
 		break;
 	case 4:
 		setInputRepeatMask(0x5000);
-		MAIN_D_80135011 = 2;
-		MAIN_func_800FCA3C();
-		showShopkeeperTextbox(8, owner, 0);
+		ITEM_MENU_MODE = ITEM_MENU_BUY_LOST;
+		openItemMenuBox();
+		showShopkeeperTextbox(SHOP_TEXT_WHAT_TO_BUY, owner, 0);
 		SELECTION_MENU_STATE = 1;
 		SCRIPT_STATE_3 = 3;
 		break;
@@ -77,9 +77,9 @@ void MAIN_func_8010B648(void)
 	case 6:
 		triggerBoxCloseFlag(2);
 		if (MAIN_D_80134F74 != 0) {
-			showShopkeeperTextbox(4, owner, 0);
+			showShopkeeperTextbox(SHOP_TEXT_COME_AGAIN, owner, 0);
 		} else {
-			showShopkeeperTextbox(5, owner, 0);
+			showShopkeeperTextbox(SHOP_TEXT_BOUGHT_NOTHING, owner, 0);
 		}
 		SELECTION_MENU_STATE = 1;
 		SCRIPT_STATE_4 = 2;
@@ -89,12 +89,12 @@ void MAIN_func_8010B648(void)
 		setInputRepeatMask(0);
 		triggerBoxCloseFlag(1);
 		if (isPartnerBaby() != 0) {
-			showShopkeeperTextbox(0xd, owner, 0);
+			showShopkeeperTextbox(SHOP_TEXT_BABY_DISCOUNT, owner, 0);
 		} else {
-			showShopkeeperTextbox(10, owner, 0);
+			showShopkeeperTextbox(SHOP_TEXT_THANKS, owner, 0);
 		}
 		MAIN_D_80134F74 = 1;
-		if (MAIN_func_80106D28() != 0) {
+		if (fillLostItemList() != 0) {
 			SCRIPT_STATE_4 = 3;
 		} else {
 			SCRIPT_STATE_4 = 9;
@@ -105,7 +105,7 @@ void MAIN_func_8010B648(void)
 	case 8:
 		setInputRepeatMask(0);
 		triggerBoxCloseFlag(1);
-		showShopkeeperTextbox(0xb, owner, 0);
+		showShopkeeperTextbox(SHOP_TEXT_ANYTHING_ELSE, owner, 0);
 		SELECTION_MENU_STATE = 1;
 		SCRIPT_STATE_4 = 3;
 		SCRIPT_STATE_3 = 1;
@@ -113,7 +113,7 @@ void MAIN_func_8010B648(void)
 	case 9:
 		setInputRepeatMask(0);
 		triggerBoxCloseFlag(1);
-		showShopkeeperTextbox(0xc, owner, 0);
+		showShopkeeperTextbox(SHOP_TEXT_NO, owner, 0);
 		SELECTION_MENU_STATE = 1;
 		SCRIPT_STATE_4 = 6;
 		SCRIPT_STATE_3 = 1;
@@ -153,7 +153,7 @@ void rollCardPack(void)
 	}
 }
 
-void MAIN_func_8010B9D8(void)
+void tickCardShop(void)
 {
 	uint8_t owner = readPStat(PSTAT_254);
 
@@ -161,7 +161,7 @@ void MAIN_func_8010B9D8(void)
 	case 0:
 		initializeItemMenuBox(&MAIN_D_80134F68, 0xc, 6, 0xb2, 0x18, 6,
 		                      0x5a);
-		if (MAIN_func_80107000() != 0) {
+		if (fillCardShopList() != 0) {
 			SELECTION_MENU_STATE = 3;
 			SCRIPT_STATE_3 = 0;
 		} else {
@@ -180,8 +180,8 @@ void MAIN_func_8010B9D8(void)
 		break;
 	case 3:
 		setInputRepeatMask(0x5000);
-		MAIN_D_80135011 = 3;
-		MAIN_func_80107110();
+		ITEM_MENU_MODE = ITEM_MENU_BUY_CARD;
+		openCardMenuBox();
 		/* "Look what we got today." */
 		showMapHeadTextbox(0, owner, 0, MAPHEAD_TEXT_CARD_SHOP);
 		SELECTION_MENU_STATE = 1;
@@ -195,7 +195,7 @@ void MAIN_func_8010B9D8(void)
 	}
 }
 
-void MAIN_func_8010BB0C(void)
+void tickCardSellShop(void)
 {
 	uint8_t owner = readPStat(PSTAT_254);
 
@@ -203,7 +203,7 @@ void MAIN_func_8010BB0C(void)
 	case 0:
 		initializeItemMenuBox(&MAIN_D_80134F68, 0x84, 6, 0xd2, 0x18,
 		                      6, 0x5a);
-		MAIN_func_80107200();
+		fillOwnedCardList();
 		SELECTION_MENU_STATE = 3;
 		SCRIPT_STATE_3 = 0;
 		break;
@@ -215,8 +215,8 @@ void MAIN_func_8010BB0C(void)
 		break;
 	case 3:
 		setInputRepeatMask(0x5000);
-		MAIN_D_80135011 = 4;
-		MAIN_func_80107110();
+		ITEM_MENU_MODE = ITEM_MENU_SELL_CARD;
+		openCardMenuBox();
 		/* "Which card do you want / to sell?" */
 		showMapHeadTextbox(8, owner, 0, MAPHEAD_TEXT_CARD_SHOP);
 		SELECTION_MENU_STATE = 1;
@@ -230,7 +230,7 @@ void MAIN_func_8010BB0C(void)
 	}
 }
 
-void MAIN_func_8010BC10(void)
+void tickMeritShop(void)
 {
 	int32_t selection = 0;
 	uint8_t owner = readPStat(PSTAT_254);
@@ -256,7 +256,7 @@ void MAIN_func_8010BC10(void)
 		break;
 	case 3:
 		setInputRepeatMask(0);
-		MAIN_func_800FC968(0);
+		openMoneyBox(0);
 		/* "Show a Digimon card / Use Merit points / See ya" */
 		showMapheadSelection(1, SPEAKER_PLAYER, 3, &selection, MAPHEAD_TEXT_MERIT_SHOP);
 		SELECTION_MENU_STATE = 1;
@@ -265,9 +265,9 @@ void MAIN_func_8010BC10(void)
 		break;
 	case 4:
 		setInputRepeatMask(0x5000);
-		MAIN_D_80135011 = 6;
-		MAIN_func_80107200();
-		MAIN_func_80107110();
+		ITEM_MENU_MODE = ITEM_MENU_MERIT_CARD;
+		fillOwnedCardList();
+		openCardMenuBox();
 		/* "What did you bring?" */
 		showMapHeadTextbox(5, owner, 0, MAPHEAD_TEXT_MERIT_SHOP);
 		SELECTION_MENU_STATE = 1;
@@ -275,9 +275,9 @@ void MAIN_func_8010BC10(void)
 		break;
 	case 5:
 		setInputRepeatMask(0x5000);
-		MAIN_D_80135011 = 7;
-		MAIN_func_801072C4();
-		MAIN_func_800FCA3C();
+		ITEM_MENU_MODE = ITEM_MENU_MERIT_ITEM;
+		fillMeritItemList();
+		openItemMenuBox();
 		/* "What do you want?" */
 		showMapHeadTextbox(6, owner, 0, MAPHEAD_TEXT_MERIT_SHOP);
 		SELECTION_MENU_STATE = 1;
@@ -303,10 +303,10 @@ void MAIN_func_8010BC10(void)
 		if (MERIT > 9999) {
 			MERIT = 9999;
 		}
-		MAIN_D_80134F84 = 1;
-		owner = getCardAmount(MAIN_D_80134F78);
+		MONEY_BOX_DIRTY = 1;
+		owner = getCardAmount(SELECTED_ITEM);
 		owner = (owner - 1u);
-		setCardAmount(MAIN_D_80134F78, owner);
+		setCardAmount(SELECTED_ITEM, owner);
 		SELECTION_MENU_STATE = 3;
 		SCRIPT_STATE_3 = 0;
 		MAIN_func_800FDFB4();
@@ -331,8 +331,8 @@ void MAIN_func_8010BC10(void)
 	case 0xc:
 		triggerBoxCloseFlag(1);
 		MERIT -= SCRIPT_PRICE;
-		MAIN_D_80134F84 = 1;
-		giveItem(MAIN_D_80134F78, 1);
+		MONEY_BOX_DIRTY = 1;
+		giveItem(SELECTED_ITEM, 1);
 		SELECTION_MENU_STATE = 3;
 		SCRIPT_STATE_3 = 0;
 		MAIN_func_800FDFB4();
@@ -340,7 +340,7 @@ void MAIN_func_8010BC10(void)
 	}
 }
 
-void MAIN_func_8010BF68(void)
+void tickItemKeeper(void)
 {
 	int32_t selection = 0;
 	uint8_t owner = readPStat(PSTAT_254);
@@ -366,7 +366,7 @@ void MAIN_func_8010BF68(void)
 		ACTIVE_INSTRUCTION = 0;
 		break;
 	case 3:
-		MAIN_D_80134F90 = 0;
+		ITEM_KEEPER_SIDE = 0;
 		/* "Yes / No" */
 		showMapheadSelection(1, SPEAKER_PLAYER, 2, &selection, MAPHEAD_TEXT_ITEM_KEEPER);
 		SELECTION_MENU_STATE = 1;
@@ -375,9 +375,9 @@ void MAIN_func_8010BF68(void)
 		break;
 	case 4:
 		setInputRepeatMask(0x5060);
-		MAIN_D_80135011 = 5;
-		MAIN_func_80107444();
-		MAIN_func_80107660();
+		ITEM_MENU_MODE = ITEM_MENU_PICK_ITEM;
+		fillItemKeeperLists();
+		openItemKeeperBoxes();
 		/* "Use △ to move Items. / Use ○ to move by tens / and □ to move all." */
 		showMapHeadTextbox(3, owner, 0, MAPHEAD_TEXT_ITEM_KEEPER);
 		SELECTION_MENU_STATE = 1;
@@ -407,7 +407,7 @@ void openJukebox(void)
 	case 0:
 		initializeItemMenuBox(&MAIN_D_80134F68, 0x7e, 6, 0xd2, 0x18,
 		                      6, 0x5a);
-		MAIN_func_80107784();
+		fillJukeboxList();
 		/* "Why don't you request a / number that will make me hot?" */
 		showMapHeadTextbox(3, owner, 0, MAPHEAD_TEXT_SERVICES);
 		SELECTION_MENU_STATE = 1;
@@ -424,7 +424,7 @@ void openJukebox(void)
 		break;
 	case 3:
 		setInputRepeatMask(0x5000);
-		MAIN_func_801078F4();
+		openJukeboxMenuBox();
 		/* "Which one do you want?" */
 		showMapHeadTextbox(0, owner, 0, MAPHEAD_TEXT_SERVICES);
 		SELECTION_MENU_STATE = 1;
@@ -442,7 +442,7 @@ void openJukebox(void)
 	}
 }
 
-void MAIN_func_8010C28C(void)
+void tickTransport(void)
 {
 	int32_t selection = 0;
 	uint8_t owner = readPStat(PSTAT_254);
@@ -451,7 +451,7 @@ void MAIN_func_8010C28C(void)
 	case 0:
 		initializeItemMenuBox(&MAIN_D_80134F68, 0xc, 6, 0xd2, 0x18, 6,
 		                      0x5a);
-		MAIN_func_80107AB8();
+		fillTransportList();
 		/* "Where should I take you?" */
 		showMapHeadTextbox(4, owner, 0, MAPHEAD_TEXT_SERVICES);
 		SELECTION_MENU_STATE = 1;
@@ -465,8 +465,8 @@ void MAIN_func_8010C28C(void)
 		ACTIVE_INSTRUCTION = 0;
 		break;
 	case 3:
-		MAIN_func_800FC968(1);
-		MAIN_func_80107B98();
+		openMoneyBox(1);
+		openTransportMenuBox();
 		setInputRepeatMask(0x5000);
 		SELECTION_MENU_STATE = 1;
 		break;
@@ -485,8 +485,8 @@ void MAIN_func_8010C28C(void)
 		triggerBoxCloseFlag(1);
 
 		idx = MAIN_D_80134F68->buf[(MAIN_D_80134F68->topRow + MAIN_D_80134F68->cursor) * 2] & 0x7f;
-		writePStat(PSTAT_247, MAIN_D_8013024C[idx].mapId);
-		writePStat(PSTAT_248, MAIN_D_8013024C[idx].unk_0x1);
+		writePStat(PSTAT_247, TRANSPORT_DESTINATIONS[idx].mapId);
+		writePStat(PSTAT_248, TRANSPORT_DESTINATIONS[idx].unk_0x1);
 		CURRENT_SCRIPT_PTR = (int32_t)getScript(0);
 		SCRIPT_PC = getScriptSection((uint8_t *)CURRENT_SCRIPT_PTR, 0x4e3);
 		MONEY -= SCRIPT_PRICE;
@@ -506,7 +506,7 @@ void MAIN_func_8010C28C(void)
 	}
 }
 
-void MAIN_func_8010C4B0(void)
+void tickCollectorTrade(void)
 {
 	int32_t selection = 0;
 	uint8_t owner = readPStat(PSTAT_254);
@@ -515,7 +515,7 @@ void MAIN_func_8010C4B0(void)
 	case 0:
 		initializeItemMenuBox(&MAIN_D_80134F68, 6, 3, 0, 0, 0, 0);
 		initializeItemMenuBox(&MAIN_D_80134F6C, 6, 3, 0, 0, 0, 0);
-		MAIN_func_80107C4C();
+		fillTradeLists();
 		writePStat(PSTAT_249, 255);
 		/* "I'm a collector. If you got / a thing I want, I'll trade." */
 		showMapHeadTextbox(8, owner, 0, MAPHEAD_TEXT_SERVICES);
@@ -532,7 +532,7 @@ void MAIN_func_8010C4B0(void)
 		break;
 	case 3:
 		setInputRepeatMask(0x5000);
-		MAIN_func_80107D54();
+		openTradeMenuBox();
 		/* "What will you give me?" */
 		showMapHeadTextbox(9, owner, 0, MAPHEAD_TEXT_SERVICES);
 		SELECTION_MENU_STATE = 1;
@@ -558,7 +558,7 @@ void MAIN_func_8010C4B0(void)
 		if (giveResult != 0) {
 			uint8_t itemId = readPStat(PSTAT_249);
 			removeItem(itemId, 1);
-			MAIN_func_80107DFC();
+			markTradeDone();
 			/* "Thanks!" */
 			showMapHeadTextbox(0xd, owner, 0, MAPHEAD_TEXT_SERVICES);
 		} else {

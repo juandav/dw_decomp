@@ -117,23 +117,26 @@ def format_message(speaker, rows):
     return f"{speaker}: {text}" if speaker else text
 
 
-def table_offset(scn, section):
+def section_offsets(scn):
+    offsets = {}
     pos = 2
     while True:
         sid, offset = struct.unpack_from("<HH", scn, pos)
-        if sid == section:
-            return offset
         if sid == 0xFFFF:
-            return None
+            return offsets
+        offsets[sid] = offset
         pos += 4
 
 
 def read_table(scn, section):
     """Yield the messages of a table, in order."""
-    pos = table_offset(scn, section)
+    offsets = section_offsets(scn)
+    pos = offsets.get(section)
     if pos is None:
         return
-    while scn[pos] == OP_JUMP:
+    # Tables are back to back, so stop where the next section starts.
+    starts = set(offsets.values()) - {pos}
+    while scn[pos] == OP_JUMP and pos not in starts:
         target = struct.unpack_from("<H", scn, pos + 2)[0]
         if scn[target] != OP_TEXT:
             break

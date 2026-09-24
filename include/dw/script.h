@@ -24,6 +24,12 @@ typedef struct {
 } StackEntry;
 
 typedef struct {
+	/*
+	 * [0, 6): the cards on sale today, see dailyPStatTrigger().
+	 * [6, 84): how many of each LOST_ITEM_IDS the lost item shop has.
+	 * [84, 212): how many of each item the Item Keeper stores.
+	 * Split into arrays, the + 6 and + 0x54 indexing no longer matches.
+	 */
 	uint8_t smth[212];
 	uint8_t cards[33];
 	uint8_t triggers[100];
@@ -36,9 +42,9 @@ typedef struct {
 	uint8_t unk_0x1;
 	uint16_t trigger;
 	uint32_t cost;
-} BattleEntry;
+} TransportDestination;
 
-extern BattleEntry MAIN_D_8013024C[];
+extern TransportDestination TRANSPORT_DESTINATIONS[];
 
 typedef struct {
 	uint8_t digimonId;
@@ -62,6 +68,16 @@ typedef struct {
 	RECT rect;
 	uint8_t itemRow[8];
 } ItemMenuBox;
+
+/* ITEM_MENU_MODE: what an item menu lists and what picking a row does. */
+#define ITEM_MENU_BUY		0
+#define ITEM_MENU_SELL		1
+#define ITEM_MENU_BUY_LOST	2	/* buy back items lost in battle */
+#define ITEM_MENU_BUY_CARD	3
+#define ITEM_MENU_SELL_CARD	4
+#define ITEM_MENU_PICK_ITEM	5	/* choose an item to give or store */
+#define ITEM_MENU_MERIT_CARD	6	/* trade a card for merit points */
+#define ITEM_MENU_MERIT_ITEM	7	/* buy an item with merit points */
 
 typedef struct {
 	uint8_t type;
@@ -87,7 +103,7 @@ extern ItemMenuBox *MAIN_D_80134F6C;
 extern int8_t TRN_LOADING_COMPLETE;
 extern uint8_t DIALOGUE_SPEAKER;
 extern uint16_t MAIN_D_80134FC6;
-extern int16_t MAIN_D_8013027C[];
+extern int16_t ITEM_MENU_RECTS[];
 extern uint16_t CURRENT_SCRIPT_ID;
 extern uint16_t CURRENT_MAP_ID;
 extern int32_t MAIN_D_80134FEC;
@@ -108,12 +124,12 @@ extern int16_t MAIN_D_80134FD2;
 extern int16_t MAIN_D_80134FD4;
 extern int16_t MAIN_D_80134FD6;
 extern uint16_t NAMING_CURSOR;
-extern uint8_t MAIN_D_80134F78;
+extern uint8_t SELECTED_ITEM;
 extern int16_t MAIN_D_80135002;
 extern int16_t MAIN_D_80135004;
 extern int32_t MAIN_D_80134F70;
 extern int32_t MAIN_D_80134F74;
-extern uint8_t MAIN_D_8012FE78[];
+extern uint8_t LOST_ITEM_IDS[];
 extern int32_t SCRIPT_PRICE;
 extern uint16_t SELECTION_MENU_STATE;
 extern uint16_t SCRIPT_STATE_4;
@@ -122,9 +138,9 @@ extern int32_t MAIN_D_80134FA0;
 extern int32_t MAIN_D_80134FE0;
 extern int32_t MONEY;
 extern char NAMING_BUFFER[];
-extern int32_t MAIN_D_80134F84;
+extern int32_t MONEY_BOX_DIRTY;
 extern uint8_t ACTIVE_INSTRUCTION;
-extern uint8_t MAIN_D_80135011;
+extern uint8_t ITEM_MENU_MODE;
 extern uint8_t DIALOGUE_BOX_MODE;
 extern uint8_t MAIN_D_80134FA4;
 extern uint16_t MAIN_D_80134FF8;
@@ -137,7 +153,7 @@ int32_t scriptIdToEntityId(int32_t scriptId);
 uint32_t showTextbox(int32_t boxId, uint32_t speakerId);
 void closeBox(int32_t boxId);
 void beginScriptEvent(int32_t owner);
-void MAIN_func_800FCCFC(ItemMenuBox *box, int32_t startRow, int32_t style);
+void layoutItemMenu(ItemMenuBox *box, int32_t startRow, int32_t style);
 void startAnimationTamer(int32_t animId);
 void tickScriptDialogueBox(void);
 void renderScriptDialogueBox(void);
@@ -158,23 +174,23 @@ void setMovementEnabled(int32_t a0, int32_t a1);
 void startNPCAnimation(uint32_t scriptId, int32_t animId);
 uint8_t rollCard(void);
 void showCardTextbox(void);
-void MAIN_func_80107C4C(void);
+void fillTradeLists(void);
 void renderNameDisplayBox(void);
 void initialKeyInputs(void);
 void setInputRepeatMask(uint32_t mask);
 int32_t isPartnerBaby(void);
-void MAIN_func_800FC508(void);
+void tickItemShop(void);
 void initializeItemMenuBox(ItemMenuBox **box, int32_t bufSize, int32_t rows,
 			   int32_t x, uint8_t y, uint8_t w, uint8_t h);
 void showShopkeeperTextbox(int32_t idx, int32_t owner, int32_t boxId);
 void destroyItemMenuBox(ItemMenuBox **box);
-void MAIN_func_800FC968(int32_t showBits);
-void MAIN_func_800FCA14(int32_t idx, int32_t owner, int32_t boxId,
+void openMoneyBox(int32_t showBits);
+void showShopkeeperSelection(int32_t idx, int32_t owner, int32_t boxId,
 			int32_t *outSelection);
-void MAIN_func_800FCA3C(void);
-void MAIN_func_800FCB3C(void);
-ItemMenuBox *MAIN_func_800FCC40(void);
-void MAIN_func_800FCC98(ItemMenuBox *box, int32_t boxId, int32_t startRow);
+void openItemMenuBox(void);
+void tickPickItemMenu(void);
+ItemMenuBox *getActiveItemMenu(void);
+void openItemMenu(ItemMenuBox *box, int32_t boxId, int32_t startRow);
 void MAIN_func_800FDFB4(void);
 void showMapHeadTextbox(int32_t idx, int32_t owner, int32_t boxId,
 			int32_t section);
@@ -235,10 +251,10 @@ int32_t scriptCompareValues(uint8_t op, uint32_t lhs, uint32_t rhs);
 void skipOneReadInteger(int32_t *out);
 void scriptLearnMove(int32_t moveId);
 int32_t getCardAmount(int32_t cardId);
-uint32_t dateToSeconds(uint32_t years, uint32_t days, uint32_t hours,
+uint32_t dateToMinutes(uint32_t years, uint32_t days, uint32_t hours,
 		       uint32_t minutes);
 void pollNextInt(int32_t *out);
-void MAIN_func_8010692C(uint32_t totalMinutes, uint8_t *outYear,
+void minutesToDate(uint32_t totalMinutes, uint8_t *outYear,
 			uint8_t *outDay, uint8_t *outHour,
 			uint8_t *outMinute);
 void scriptLoadModel(int32_t modelId);
@@ -248,33 +264,33 @@ void playBGM(int16_t bgmId);
 void scriptUnloadModel(int16_t modelId);
 void getTriggerOffset(int32_t trigger, uint8_t **outPtr, uint8_t *outMask);
 int32_t MAIN_func_80106D1C(int32_t moveId);
-int32_t MAIN_func_80106D28(void);
-int32_t MAIN_func_80107000(void);
-void MAIN_func_80107110(void);
-int32_t MAIN_func_80107200(void);
-int32_t MAIN_func_801072C4(void);
-void MAIN_func_80107444(void);
-void MAIN_func_80107660(void);
-void MAIN_func_80107784(void);
-void MAIN_func_801078F4(void);
-void MAIN_func_80107AB8(void);
-void MAIN_func_80107B98(void);
-void MAIN_func_80107D54(void);
-void MAIN_func_80107DFC(void);
+int32_t fillLostItemList(void);
+int32_t fillCardShopList(void);
+void openCardMenuBox(void);
+int32_t fillOwnedCardList(void);
+int32_t fillMeritItemList(void);
+void fillItemKeeperLists(void);
+void openItemKeeperBoxes(void);
+void fillJukeboxList(void);
+void openJukeboxMenuBox(void);
+void fillTransportList(void);
+void openTransportMenuBox(void);
+void openTradeMenuBox(void);
+void markTradeDone(void);
 void setupNewGameDialogueBox(void);
 void showNewgameDialogue(int32_t textId, int16_t nextState);
 void showNewgameSelection(int32_t textId, int16_t nextState);
 void setupNameSelectorBox(void);
 void setupNameDisplayBox(void);
-void MAIN_func_8010B648(void);
+void tickLostItemShop(void);
 void rollCardPack(void);
-void MAIN_func_8010B9D8(void);
-void MAIN_func_8010BB0C(void);
-void MAIN_func_8010BC10(void);
-void MAIN_func_8010BF68(void);
+void tickCardShop(void);
+void tickCardSellShop(void);
+void tickMeritShop(void);
+void tickItemKeeper(void);
 void openJukebox(void);
-void MAIN_func_8010C28C(void);
-void MAIN_func_8010C4B0(void);
+void tickTransport(void);
+void tickCollectorTrade(void);
 void initializeNamingBuffer(uint8_t flags);
 int32_t newGameStateMachine(void);
 int16_t *getStatsPointer(int32_t stat);
