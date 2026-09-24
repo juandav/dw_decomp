@@ -46,6 +46,8 @@ EXE_PATH = "disks/us/SLUS_010.32"
 MAP_DIR = "disks/us/MAP"
 SYMBOLS_PATH = "config/symbols.txt"
 HEADER_PATH = "include/dw/script.h"
+TRIGGER_PATH = "include/dw/trigger.h"
+PSTAT_PATH = "include/dw/pstat.h"
 HEADER_ENTRIES = 0x800
 
 OP_CHOICE = 0x10
@@ -258,6 +260,45 @@ def read_opcodes(path):
     return opcodes
 
 
+class Labels:
+    """Names of triggers or pstats, from the aliases in their header.
+
+    An alias such as TRIGGER_MEDAL, whose comment starts with "+ medal", is
+    the first of a range and names the ones after it too.
+    """
+
+    def __init__(self, path, prefix):
+        self.prefix = prefix
+        self.names = {}
+        self.ranges = []
+        with open(path) as f:
+            text = f.read()
+        numbers = {m.group(1): int(m.group(2), 0) for m in re.finditer(
+            rf"#define ({prefix}_\d+)\s+(\d+)", text)}
+        pattern = rf"#define {prefix}_([A-Z]\w*)\s+(\w+)(?:\s*/\* (.*?) \*/)?"
+        for m in re.finditer(pattern, text):
+            value = numbers.get(m.group(2))
+            if value is None:
+                value = int(m.group(2), 0)
+            r = re.match(r"\+ (\w+), (\d+) of them", m.group(3) or "")
+            if r:
+                self.ranges.append((value, int(r.group(2)), m.group(1), r.group(1)))
+            else:
+                self.names.setdefault(value, m.group(1))
+
+    def label(self, value, names):
+        if value in self.names:
+            return self.names[value]
+        for start, count, name, kind in self.ranges:
+            if start <= value < start + count:
+                index = value - start
+                table = names.get(kind)
+                if table and index < len(table):
+                    return f"{name}+{table[index]}"
+                return f"{name}+{index}"
+        return f"{value:#x}"
+
+
 def u16(data, pos):
     return struct.unpack_from("<H", data, pos)[0]
 
@@ -422,7 +463,7 @@ def format_arg(script, kind, name, value, names):
     if kind == "_":
         return None
     if kind == "pstat":
-        text = f"pstat {value:#x}"
+        text = "pstat " + LABELS["pstat"].label(value, names)
         return text if name == kind else f"{name.split()[-1]}={text}"
     if kind == "id":
         text = speaker_name(value, script.npcs)
@@ -434,12 +475,17 @@ def format_arg(script, kind, name, value, names):
     for table in ("item", "digimon", "move", "card"):
         if label == table and names and value < len(names[table]):
             return f"{label}={names[table][value]}"
-    if label in ("trigger", "offset", "offsets", "section", "script", "map"):
+    if label == "trigger":
+        return "trigger=" + LABELS["trigger"].label(value, names)
+    if label in ("offset", "offsets", "section", "script", "map"):
         return f"{label}={value:#x}"
     return f"{label}={value}"
 
 
-def format_condition(script, pos):
+LABELS = {}
+
+
+def format_condition(script, pos, names):
     """Describe the entries of a condition block."""
     scn = script.scn
     parts = []
@@ -450,10 +496,12 @@ def format_condition(script, pos):
         join = "and " if op & 0x80 else "or " if op & 0x40 else ""
         if group == 0:
             state = "set" if op & 7 == 0 else "not set"
-            parts.append(f"{join}trigger {u16(scn, pos + 2):#x} {state}")
+            trigger = LABELS["trigger"].label(u16(scn, pos + 2), names)
+            parts.append(f"{join}trigger {trigger} {state}")
             size = 4
         elif group == 1:
-            parts.append(f"{join}pstat {scn[pos + 2]:#x} "
+            pstat = LABELS["pstat"].label(scn[pos + 2], names)
+            parts.append(f"{join}pstat {pstat} "
                          f"{COMPARE[op & 7]} {scn[pos + 3]}")
             size = 4
         elif group in (2, 3):
@@ -477,12 +525,13 @@ def format_action(script, pos, opcodes, names):
         return f"[data {op:#04x}]"
     name, args = opcodes[op]
     if op == OP_CONDITION:
-        return "[" + format_condition(script, pos) + "]"
+        return "[" + format_condition(script, pos, names) + "]"
     if op == OP_SWITCH:
         count = u16(scn, pos + 2)
         targets = ", ".join(f"{u16(scn, pos + 4 + 2 * i):#x}"
                             for i in range(count))
-        return f"[switch on pstat {scn[pos + 1]:#x}: {targets}]"
+        pstat = LABELS["pstat"].label(scn[pos + 1], names)
+        return f"[switch on pstat {pstat}: {targets}]"
     words = [name.lower()]
     at = pos + 1
     for kind, arg in args:
@@ -549,6 +598,8 @@ def main():
     parser.add_argument("--maps", default=MAP_DIR)
     parser.add_argument("--symbols", default=SYMBOLS_PATH)
     parser.add_argument("--header", default=HEADER_PATH)
+    parser.add_argument("--triggers", default=TRIGGER_PATH)
+    parser.add_argument("--pstats", default=PSTAT_PATH)
     parser.add_argument("--actions", action="store_true",
                         help="print every instruction, not only the text")
     parser.add_argument("--unreachable", action="store_true",
@@ -577,6 +628,9 @@ def main():
         name_npcs(scripts, read_map_npcs(exe, args.maps))
         names = read_names(exe)
     opcodes = read_opcodes(args.header) if args.actions else {}
+    if args.actions:
+        LABELS["trigger"] = Labels(args.triggers, "TRIGGER")
+        LABELS["pstat"] = Labels(args.pstats, "PSTAT")
 
     for index in args.scripts or sorted(scripts):
         if index not in scripts:
