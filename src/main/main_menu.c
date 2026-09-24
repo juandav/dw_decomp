@@ -4186,8 +4186,8 @@ void loadSavegame(uint8_t *sv)
 	SAVE_CURRENT_EXIT[0] = savegame->currentExit;
 	SAVE_PREVIOUS_EXIT[0] = savegame->previousExit;
 	MERIT = savegame->meritData[0];
-	MAIN_D_80134FC8 = savegame->meritData[1];
-	MAIN_D_80134FCA = savegame->meritData[2];
+	BATTLES_FOUGHT = savegame->meritData[1];
+	BATTLES_WON = savegame->meritData[2];
 	TOURNAMENT_TITLES = savegame->meritData[3];
 	TOURNAMENT_WINS = savegame->meritData[4];
 	TOURNAMENT_LOSSES = savegame->meritData[5];
@@ -4248,8 +4248,8 @@ void writeSavegame(uint8_t *sv)
 	savegame->currentExit = CURRENT_EXIT;
 	savegame->previousExit = PREVIOUS_EXIT;
 	savegame->meritData[0] = MERIT;
-	savegame->meritData[1] = MAIN_D_80134FC8;
-	savegame->meritData[2] = MAIN_D_80134FCA;
+	savegame->meritData[1] = BATTLES_FOUGHT;
+	savegame->meritData[2] = BATTLES_WON;
 	savegame->meritData[3] = TOURNAMENT_TITLES;
 	savegame->meritData[4] = TOURNAMENT_WINS;
 	savegame->meritData[5] = TOURNAMENT_LOSSES;

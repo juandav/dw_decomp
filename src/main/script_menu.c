@@ -36,8 +36,8 @@ void tickLostItemShop(void)
 		initializeItemMenuBox(&MAIN_D_80134F68, 0x9c, 6, 0xd2,
 		                      0x18, 6, 0x5a);
 		hasItems = fillLostItemList();
-		MAIN_D_80134F70 = 0;
-		MAIN_D_80134F74 = 0;
+		SHOP_CHOICE = 0;
+		SHOP_MADE_A_DEAL = 0;
 
 		if (hasItems != 0) {
 			showShopkeeperTextbox(SHOP_TEXT_WELCOME, owner, 0);
@@ -60,7 +60,7 @@ void tickLostItemShop(void)
 		break;
 	case 3:
 		openMoneyBox(1);
-		showShopkeeperSelection(SHOP_TEXT_BUY_LEAVE, SPEAKER_PLAYER, 2, &MAIN_D_80134F70);
+		showShopkeeperSelection(SHOP_TEXT_BUY_LEAVE, SPEAKER_PLAYER, 2, &SHOP_CHOICE);
 		SELECTION_MENU_STATE = 1;
 		SCRIPT_STATE_4 = 4;
 		SCRIPT_STATE_3 = 2;
@@ -76,7 +76,7 @@ void tickLostItemShop(void)
 	case 5:
 	case 6:
 		triggerBoxCloseFlag(2);
-		if (MAIN_D_80134F74 != 0) {
+		if (SHOP_MADE_A_DEAL != 0) {
 			showShopkeeperTextbox(SHOP_TEXT_COME_AGAIN, owner, 0);
 		} else {
 			showShopkeeperTextbox(SHOP_TEXT_BOUGHT_NOTHING, owner, 0);
@@ -93,7 +93,7 @@ void tickLostItemShop(void)
 		} else {
 			showShopkeeperTextbox(SHOP_TEXT_THANKS, owner, 0);
 		}
-		MAIN_D_80134F74 = 1;
+		SHOP_MADE_A_DEAL = 1;
 		if (fillLostItemList() != 0) {
 			SCRIPT_STATE_4 = 3;
 		} else {

@@ -217,7 +217,7 @@ def read_opcodes(path):
     with open(path) as f:
         text = f.read()
     raw = {}
-    pattern = r"#define SCRIPT_OP_(\w+)\s+(0x[0-9A-Fa-f]+)(?:\s*/\* (.*?) \*/)?"
+    pattern = r"#define SCRIPT_OP_(\w+)\s+(0x[0-9A-Fa-f]+)(?:[ \t]*/\* (.*?) \*/)?"
     for m in re.finditer(pattern, text):
         raw[int(m.group(2), 16)] = (m.group(1), m.group(3) or "")
     names = {op: name for op, (name, _) in raw.items()}
@@ -277,7 +277,7 @@ class Labels:
             text = f.read()
         numbers = {m.group(1): int(m.group(2), 0) for m in re.finditer(
             rf"#define ({prefix}_\d+)\s+(\d+)", text)}
-        pattern = rf"#define {prefix}_([A-Z]\w*)\s+(\w+)(?:\s*/\* (.*?) \*/)?"
+        pattern = rf"#define {prefix}_([A-Z]\w*)\s+(\w+)(?:[ \t]*/\* (.*?) \*/)?"
         for m in re.finditer(pattern, text):
             value = numbers.get(m.group(2))
             if value is None:
@@ -481,6 +481,8 @@ def format_arg(script, kind, name, value, names):
         return "trigger=" + LABELS["trigger"].label(value, names)
     if label == "builtin":
         return LABELS["builtin"].label(value, names)
+    if label == "stat":
+        return "stat=" + LABELS["stat"].label(value, names)
     if label in ("offset", "offsets", "section", "script", "map"):
         return f"{label}={value:#x}"
     return f"{label}={value}"
@@ -636,6 +638,7 @@ def main():
         LABELS["trigger"] = Labels(args.triggers, "TRIGGER")
         LABELS["pstat"] = Labels(args.pstats, "PSTAT")
         LABELS["builtin"] = Labels(args.header, "SCRIPT_BUILTIN")
+        LABELS["stat"] = Labels(args.header, "SCRIPT_STAT")
 
     for index in args.scripts or sorted(scripts):
         if index not in scripts:

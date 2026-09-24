@@ -50,7 +50,7 @@
 #define SCRIPT_OP_SET_MERIT		0x31	/* _, u16 value */
 #define SCRIPT_OP_ADD_MERIT		0x32	/* _, u16 value */
 #define SCRIPT_OP_SUB_MERIT		0x33	/* _, u16 value; sets MERIT to -value */
-#define SCRIPT_OP_SET_STAT		0x34	/* u8 stat, u16 value, see getStatsPointer() */
+#define SCRIPT_OP_SET_STAT		0x34	/* u8 stat, u16 value; a SCRIPT_STAT_* */
 #define SCRIPT_OP_ADD_STAT		0x35	/* u8 stat, u16 value */
 #define SCRIPT_OP_SUB_STAT		0x36	/* u8 stat, u16 value */
 #define SCRIPT_OP_WAIT_UNTIL_DATE	0x37	/* pstat: year, day, hour, minute */
@@ -119,6 +119,31 @@
 #define SCRIPT_OP_NOP_FD		0xFD
 #define SCRIPT_OP_END			0xFE
 #define SCRIPT_OP_END_FF		0xFF
+
+/* The stats that SCRIPT_OP_SET_STAT and the like change, see getStatsPointer(). */
+#define SCRIPT_STAT_OFFENSE		0x00
+#define SCRIPT_STAT_DEFENSE		0x01
+#define SCRIPT_STAT_SPEED		0x02
+#define SCRIPT_STAT_BRAINS		0x03
+#define SCRIPT_STAT_MAX_HP		0x04
+#define SCRIPT_STAT_MAX_MP		0x05
+#define SCRIPT_STAT_HP			0x06
+#define SCRIPT_STAT_MP			0x07
+#define SCRIPT_STAT_TIREDNESS		0x08
+#define SCRIPT_STAT_HAPPINESS		0x09
+#define SCRIPT_STAT_DISCIPLINE		0x0A
+#define SCRIPT_STAT_ENERGY		0x0B
+#define SCRIPT_STAT_VIRUS		0x0C
+#define SCRIPT_STAT_LIFETIME		0x0D
+#define SCRIPT_STAT_MERIT		0x0E
+#define SCRIPT_STAT_BATTLES_FOUGHT	0x0F
+#define SCRIPT_STAT_BATTLES_WON		0x10
+#define SCRIPT_STAT_TOURNAMENT_TITLES	0x11
+#define SCRIPT_STAT_TOURNAMENT_WINS	0x12
+#define SCRIPT_STAT_TOURNAMENT_LOSSES	0x13
+#define SCRIPT_STAT_WEIGHT		0x14
+#define SCRIPT_STAT_TAMER_LEVEL		0x15
+#define SCRIPT_STAT_LIVES		0x16
 
 /*
  * Routines of the engine that SCRIPT_OP_BUILTIN runs. Most take their
@@ -245,7 +270,7 @@ extern ItemMenuBox *MAIN_D_80134F68;
 extern ItemMenuBox *MAIN_D_80134F6C;
 extern int8_t TRN_LOADING_COMPLETE;
 extern uint8_t DIALOGUE_SPEAKER;
-extern uint16_t MAIN_D_80134FC6;
+extern uint16_t SCRIPT_STACK_DEPTH;
 extern int16_t ITEM_MENU_RECTS[];
 extern uint16_t CURRENT_SCRIPT_ID;
 extern uint16_t CURRENT_MAP_ID;
@@ -258,20 +283,20 @@ extern int32_t IS_SCRIPT_PAUSED;
 extern int16_t SCRIPT_TALKED_ENTITY;
 extern uint16_t ACTIVE_MAP_SCRIPT;
 extern int16_t MERIT;
-extern int16_t MAIN_D_80134FC8;
-extern int16_t MAIN_D_80134FCA;
+extern int16_t BATTLES_FOUGHT;
+extern int16_t BATTLES_WON;
 extern int16_t TOURNAMENT_TITLES;
 extern int16_t TOURNAMENT_WINS;
 extern int16_t TOURNAMENT_LOSSES;
-extern int16_t MAIN_D_80134FD2;
-extern int16_t MAIN_D_80134FD4;
-extern int16_t MAIN_D_80134FD6;
+extern int16_t TEXTBOX_ORIGIN_X;
+extern int16_t TEXTBOX_ORIGIN_Y;
+extern int16_t TEXTBOX_ORIGIN_Z;
 extern uint16_t NAMING_CURSOR;
 extern uint8_t SELECTED_ITEM;
-extern int16_t MAIN_D_80135002;
-extern int16_t MAIN_D_80135004;
-extern int32_t MAIN_D_80134F70;
-extern int32_t MAIN_D_80134F74;
+extern int16_t STAT_TAMER_LEVEL_VALUE;
+extern int16_t STAT_LIVES_VALUE;
+extern int32_t SHOP_CHOICE;
+extern int32_t SHOP_MADE_A_DEAL;
 extern uint8_t LOST_ITEM_IDS[];
 extern int32_t SCRIPT_PRICE;
 extern uint16_t SELECTION_MENU_STATE;
@@ -285,9 +310,9 @@ extern int32_t MONEY_BOX_DIRTY;
 extern uint8_t ACTIVE_INSTRUCTION;
 extern uint8_t ITEM_MENU_MODE;
 extern uint8_t DIALOGUE_BOX_MODE;
-extern uint8_t MAIN_D_80134FA4;
+extern uint8_t SCRIPT_WAIT_MOVEMENT_SLOT;
 extern uint16_t MAIN_D_80134FF8;
-extern ScriptCameraMovement MAIN_D_801BE72C;
+extern ScriptCameraMovement SCRIPT_CAMERA_MOVEMENT;
 extern uint8_t NAMING_FLAGS;
 #define NAMING_PARTNER		1	/* name the partner, not the player */
 #define NAMING_FROM_SCRIPT	2	/* a rename, not the new game questions */
