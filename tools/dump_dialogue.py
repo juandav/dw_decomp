@@ -204,6 +204,12 @@ def read_map_npcs(exe, map_dir):
     return maps
 
 
+def read_map_files(exe):
+    """Return the file name of each map, as MAP_ENTRIES lists them."""
+    return [entry[:10].split(b"\0")[0].decode()
+            for entry in exe.table("MAP_ENTRIES", MAP_ENTRY_SIZE, 255)]
+
+
 ARG_SIZES = {"_": 1, "u8": 1, "s8": 1, "id": 1, "pstat": 1,
              "u16": 2, "s16": 2, "s32": 4}
 
@@ -336,22 +342,40 @@ class Script:
         # Position of each instruction reached, mapped to the next one.
         self.code = {}
         self.texts = {}
-        self.speakers = {}
+        self.walks = {}
+        # For each text, the (speaker, maps) it can run with.
+        self.contexts = collections.defaultdict(set)
         # The names of the NPCs of the maps that use the script.
         self.npcs = {}
         self.section_texts = []
+        self.maps = set()
+        self.speaker_names = {}
+        self.default_speakers = {}
+        # For slots whose Digimon depends on the map: name -> map files.
+        self.legend = collections.defaultdict(lambda: collections.defaultdict(set))
 
-    def walk(self, offset):
-        """Follow the code from offset; return the positions of new text."""
-        found = []
-        self.visited = []
-        # callScriptSection() starts with the player as the speaker.
-        work = [(self.start + offset, SPEAKER_PLAYER)]
+    def walk(self, offset, speaker=SPEAKER_PLAYER):
+        """Follow the code from offset, with speaker talking at first.
+
+        Returns the text reached, with who says it, the calls to sections of
+        other scripts, with who is talking when they are made, and every
+        instruction reached. callScriptSection() starts with the player as
+        the speaker, and a called section keeps the speaker of the caller.
+        """
+        key = (offset, speaker)
+        if key in self.walks:
+            return self.walks[key]
+        texts = {}
+        calls = set()
+        visited = []
+        seen = set()
+        work = [(self.start + offset, speaker)]
         scn = self.scn
         while work:
             pos, speaker = work.pop()
-            while self.start <= pos < self.end and pos not in self.code:
-                self.visited.append(pos)
+            while self.start <= pos < self.end and pos not in seen:
+                seen.add(pos)
+                visited.append(pos)
                 op = scn[pos]
                 if op == OP_SPEAKER:
                     speaker = scn[pos + 1]
@@ -360,8 +384,7 @@ class Script:
                 if op == OP_TEXT:
                     nxt = text_end(scn, pos + 2)
                     self.texts[pos] = (pos + 2, None)
-                    self.speakers[pos] = speaker
-                    found.append(pos)
+                    texts.setdefault(pos, speaker)
                 elif op == OP_CHOICE:
                     # The offsets of the options, then a text instruction.
                     count = scn[pos + 1]
@@ -369,7 +392,7 @@ class Script:
                     text = pos + 2 + 2 * (count + 1)
                     self.code[pos] = text_end(scn, text)
                     self.texts[pos] = (text, count)
-                    found.append(pos)
+                    texts.setdefault(pos, speaker)
                     work += [(self.start + t, speaker) for t in targets]
                     break
                 elif op == OP_CONDITION:
@@ -387,6 +410,8 @@ class Script:
                         count = u16(scn, pos + 2)
                         work += [(self.start + u16(scn, nxt + 2 * i), speaker)
                                  for i in range(count)]
+                    elif op in (OP_CALL_SCRIPT, OP_JUMP_SCRIPT):
+                        calls.add((u16(scn, pos + 2), u16(scn, pos + 4), speaker))
                 else:
                     # Not code: some sections hold data read by the engine.
                     self.code[pos] = pos
@@ -395,7 +420,15 @@ class Script:
                 if op in ENDS:
                     break
                 pos = nxt
-        return found
+        self.walks[key] = (texts, calls, visited)
+        return self.walks[key]
+
+    def section_offset(self, section):
+        """Return the offset of section, as getScriptSection() finds it."""
+        for sid, offset in self.sections:
+            if sid == section:
+                return offset
+        return None
 
     def _condition(self, pos, jumps):
         """Skip a condition block and collect where it can jump to."""
@@ -453,7 +486,9 @@ def format_text(script, pos):
         return "choice: " + " / ".join(rows)
     # Text that names its speaker, such as a narrator's line, keeps that name.
     if speaker is None:
-        speaker = speaker_name(script.speakers[pos], script.npcs)
+        speaker = script.speaker_names.get(pos)
+    if speaker is None:
+        speaker = speaker_name(script.default_speakers[pos], script.npcs)
     return format_message(speaker, rows)
 
 
@@ -553,35 +588,99 @@ def format_action(script, pos, opcodes, names):
     return "[" + " ".join(words) + "]"
 
 
-def name_npcs(scripts, maps):
-    """Name the NPCs of each script after the maps it runs on."""
+# MAPHEAD code that a builtin runs on the map of the script that called it:
+# tickTransport() jumps to section 0x4E3 for SCRIPT_BUILTIN_TRANSPORT.
+MAPHEAD_BUILTIN_SECTIONS = {0x4E3: 0x0A}
+OP_BUILTIN = 0x64
+
+
+def trace_contexts(scripts):
+    """Find who talks, and on which maps, for every text of every script.
+
+    Scripts are tied to maps by the warp instruction. Their sections start
+    with the player talking; a section called from another script (0x14,
+    0x17) runs on the maps of the caller and starts with its speaker.
+    """
     uses = collections.defaultdict(set)
-    calls = collections.defaultdict(set)
+    builtins = collections.defaultdict(set)
     for index, script in scripts.items():
         for pos in script.code:
             op = script.scn[pos]
             if op == OP_WARP:
                 script_id, map_id = struct.unpack_from("<HH", script.scn, pos + 2)
                 uses[script_id].add(map_id)
-            elif op in (OP_CALL_SCRIPT, OP_JUMP_SCRIPT):
-                calls[index].add(u16(script.scn, pos + 2))
-    # A script called from another one runs on the maps of the caller.
-    changed = True
-    while changed:
-        changed = False
-        for caller, callees in calls.items():
-            for callee in callees:
-                if not uses[caller] <= uses[callee]:
-                    uses[callee] |= uses[caller]
-                    changed = True
-    for index, map_ids in uses.items():
-        if index not in scripts:
+    for index, script in scripts.items():
+        for pos in script.code:
+            if script.scn[pos] == OP_BUILTIN:
+                builtins[script.scn[pos + 1]] |= uses[index]
+
+    work = []
+    for index, script in scripts.items():
+        for section, _ in script.sections:
+            if index == 0:
+                builtin = MAPHEAD_BUILTIN_SECTIONS.get(section)
+                maps = builtins[builtin] if builtin is not None else set()
+            elif uses[index]:
+                maps = uses[index]
+            else:
+                # An event script with no map only runs when called.
+                continue
+            work.append((index, section, SPEAKER_PLAYER, frozenset(maps)))
+    done = set()
+    while work:
+        item = work.pop()
+        if item in done:
             continue
+        done.add(item)
+        index, section, speaker, maps = item
+        script = scripts.get(index)
+        offset = script.section_offset(section) if script else None
+        if offset is None:
+            continue
+        texts, calls, _ = script.walk(offset, speaker)
+        script.maps |= maps
+        for pos, who in texts.items():
+            script.contexts[pos].add((who, maps))
+        for callee, callee_section, who in calls:
+            work.append((callee, callee_section, who, maps))
+
+
+def name_npcs(scripts, map_npcs, map_files):
+    """Name each speaker after the Digimon of the maps its text runs on.
+
+    A slot that holds different Digimon on different maps gets all their
+    names, and the script a legend of which one is on which map. A slot that
+    none of the maps has is marked, as nobody can say that text.
+    """
+    for script in scripts.values():
         npcs = collections.defaultdict(set)
-        for map_id in map_ids:
-            for npc, name in maps.get(map_id, {}).items():
+        for map_id in script.maps:
+            for npc, name in map_npcs.get(map_id, {}).items():
                 npcs[npc].add(name)
-        scripts[index].npcs = npcs
+        script.npcs = npcs
+        for pos, contexts in script.contexts.items():
+            names = set()
+            unknown = set()
+            where = []
+            for who, maps in contexts:
+                if who in SPEAKERS:
+                    names.add(SPEAKERS[who])
+                    continue
+                found = {map_npcs[m][who] for m in maps
+                         if who in map_npcs.get(m, {})}
+                names |= found
+                if not found:
+                    files = ", ".join(sorted(map_files[m] for m in maps))
+                    unknown.add(f"npc {who} (not on {files or 'any map'})")
+                for m in maps:
+                    name = map_npcs.get(m, {}).get(who)
+                    if name:
+                        where.append((who, name, map_files[m]))
+            if len(names) > 1:
+                for who, name, file in where:
+                    script.legend[who][name].add(file)
+            # An NPC is only unknown if no map names it.
+            script.speaker_names[pos] = "/".join(sorted(names or unknown))
 
 
 def read_scripts(scn):
@@ -624,14 +723,19 @@ def main():
             # MAPHEAD's message tables are shown by tools/maphead_text.py.
             if index == 0 and section in TABLES:
                 continue
-            # A section id can be listed twice, so keep a list.
-            found = script.walk(offset)
-            script.section_texts.append((section, found, script.visited))
+            # A section id can be listed twice, so keep a list. Each text
+            # is listed under the first section that reaches it.
+            texts, _, visited = script.walk(offset)
+            found = [pos for pos in texts if pos not in script.default_speakers]
+            for pos in found:
+                script.default_speakers[pos] = texts[pos]
+            script.section_texts.append((section, found, visited))
 
     names = {}
     if os.path.exists(args.exe) and os.path.exists(args.maps):
         exe = Exe(args.exe, args.symbols)
-        name_npcs(scripts, read_map_npcs(exe, args.maps))
+        trace_contexts(scripts)
+        name_npcs(scripts, read_map_npcs(exe, args.maps), read_map_files(exe))
         names = read_names(exe)
     opcodes = read_opcodes(args.header) if args.actions else {}
     if args.actions:
@@ -647,8 +751,17 @@ def main():
         scn = script.scn
         name = "MAPHEAD.SCN" if index == 0 else f"{script.start:#x}"
         print(f"== script {index} ({name})")
+        for who in sorted(script.legend):
+            where = "; ".join(f"{digimon} on {', '.join(sorted(files))}"
+                              for digimon, files in sorted(script.legend[who].items()))
+            print(f"-- npc {who} is {where}")
+        listed = set()
         for section, found, visited in script.section_texts:
             if args.actions:
+                # Each instruction is listed under the first section that
+                # reaches it.
+                visited = [pos for pos in visited if pos not in listed]
+                listed.update(visited)
                 if not visited:
                     continue
                 print(f"-- section {section:#x}")
