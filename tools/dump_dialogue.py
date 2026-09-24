@@ -23,8 +23,12 @@ and the map table come from the executable.
 Script 0 is SCN/MAPHEAD.SCN, the script shared by every map, as getScript()
 loads it. Its message tables are left out; tools/maphead_text.py prints them.
 
+With --actions it prints every instruction, not only the text, using the
+opcode names and arguments documented in include/dw/script.h.
+
     tools/dump_dialogue.py             # every script
     tools/dump_dialogue.py 0 5         # MAPHEAD.SCN and script 5
+    tools/dump_dialogue.py --actions 3 # the whole code of script 3
 """
 
 import argparse
@@ -41,6 +45,7 @@ MAPHEAD_PATH = "disks/us/SCN/MAPHEAD.SCN"
 EXE_PATH = "disks/us/SLUS_010.32"
 MAP_DIR = "disks/us/MAP"
 SYMBOLS_PATH = "config/symbols.txt"
+HEADER_PATH = "include/dw/script.h"
 HEADER_ENTRIES = 0x800
 
 OP_CHOICE = 0x10
@@ -117,6 +122,7 @@ def speaker_name(speaker, npcs):
 
 
 DIGIMON_PARA_SIZE = 52
+ITEM_SIZE = 32
 MAP_ENTRY_SIZE = 16
 MAP_WARPS_SIZE = 120
 # int16 fields of a Digimon in a map file, before its waypoints.
@@ -141,6 +147,29 @@ class Exe:
         start = self.symbols[symbol] - self.load + 0x800
         return [self.data[start + i * size:start + (i + 1) * size]
                 for i in range(count)]
+
+    def string(self, address):
+        start = address - self.load + 0x800
+        return self.data[start:self.data.index(b"\0", start)].decode()
+
+
+def read_names(exe):
+    """Return the names of the Digimon, items and moves."""
+    def name(entry):
+        return entry[:20].split(b"\0")[0].decode()
+    moves = [exe.string(struct.unpack("<I", p)[0])
+             for p in exe.table("MOVE_NAMES", 4, 121)]
+    digimon = [name(e) for e in exe.table("DIGIMON_DATA", DIGIMON_PARA_SIZE, 180)]
+    # A card shows the Digimon of the first byte of its CardData; card 0
+    # and the last one have none.
+    cards = [digimon[e[0]] + " card" if e[0] else f"card {i}"
+             for i, e in enumerate(exe.table("CARD_DATA", 4, 66))]
+    return {
+        "digimon": digimon,
+        "item": [name(e) for e in exe.table("ITEM_PARA", ITEM_SIZE, 128)],
+        "move": moves,
+        "card": cards,
+    }
 
 
 def read_map_npcs(exe, map_dir):
@@ -171,6 +200,62 @@ def read_map_npcs(exe, map_dir):
             pos += 2 * MAP_DIGIMON_FIELDS + 6 * fields[33]
         maps[map_id] = npcs
     return maps
+
+
+ARG_SIZES = {"_": 1, "u8": 1, "s8": 1, "id": 1, "pstat": 1,
+             "u16": 2, "s16": 2, "s32": 4}
+
+
+def read_opcodes(path):
+    """Read the names and arguments of the opcodes from script.h.
+
+    The comment of each SCRIPT_OP_* lists its arguments as "type name". The
+    sizes they add up to must match SIZES, which follows the handlers.
+    """
+    with open(path) as f:
+        text = f.read()
+    raw = {}
+    pattern = r"#define SCRIPT_OP_(\w+)\s+(0x[0-9A-Fa-f]+)(?:\s*/\* (.*?) \*/)?"
+    for m in re.finditer(pattern, text):
+        raw[int(m.group(2), 16)] = (m.group(1), m.group(3) or "")
+    names = {op: name for op, (name, _) in raw.items()}
+
+    def parse(op):
+        comment = raw[op][1]
+        m = re.match(r"as (\w+)", comment)
+        if m:
+            return parse(next(k for k, n in names.items() if n == m.group(1)))
+        comment = comment.split(";")[0]
+        comment = re.sub(r"\s*(,\s*)?(see|or) .*$", "", comment)
+        comment = re.sub(r":.*$", "", comment)
+        args = []
+        kind = None
+        for token in (t.strip() for t in comment.split(",")):
+            if not token:
+                continue
+            words = token.split()
+            if words[0] in ARG_SIZES:
+                kind = words[0]
+                args.append((kind, " ".join(words[1:]) or kind))
+            elif kind == "s16":
+                # "s16 x, y, z" repeats the type.
+                args.append((kind, token))
+            else:
+                return None
+        return args
+
+    opcodes = {}
+    for op in raw:
+        if op in (OP_CHOICE, OP_SWITCH, OP_CONDITION, OP_TEXT):
+            opcodes[op] = (names[op], None)
+            continue
+        args = parse(op)
+        size = 1 + sum(ARG_SIZES[kind] for kind, _ in args)
+        if SIZES.get(op) != size:
+            sys.exit(f"{path}: SCRIPT_OP_{names[op]} takes {size} bytes, "
+                     f"but its handler reads {SIZES.get(op)}")
+        opcodes[op] = (names[op], args)
+    return opcodes
 
 
 def u16(data, pos):
@@ -216,12 +301,14 @@ class Script:
     def walk(self, offset):
         """Follow the code from offset; return the positions of new text."""
         found = []
+        self.visited = []
         # callScriptSection() starts with the player as the speaker.
         work = [(self.start + offset, SPEAKER_PLAYER)]
         scn = self.scn
         while work:
             pos, speaker = work.pop()
             while self.start <= pos < self.end and pos not in self.code:
+                self.visited.append(pos)
                 op = scn[pos]
                 if op == OP_SPEAKER:
                     speaker = scn[pos + 1]
@@ -327,6 +414,90 @@ def format_text(script, pos):
     return format_message(speaker, rows)
 
 
+COMPARE = ["==", "!=", ">=", "<=", ">", "<"]
+TESTS = ["stat", "card amount", "has move", "partner condition", "item count", "money"]
+
+
+def format_arg(script, kind, name, value, names):
+    if kind == "_":
+        return None
+    if kind == "pstat":
+        text = f"pstat {value:#x}"
+        return text if name == kind else f"{name.split()[-1]}={text}"
+    if kind == "id":
+        text = speaker_name(value, script.npcs)
+        return text if name == kind else f"{name.split()[-1]}={text}"
+    if name == kind:
+        # An argument with no name in script.h.
+        return f"{value}"
+    label = name.split()[-1]
+    for table in ("item", "digimon", "move", "card"):
+        if label == table and names and value < len(names[table]):
+            return f"{label}={names[table][value]}"
+    if label in ("trigger", "offset", "offsets", "section", "script", "map"):
+        return f"{label}={value:#x}"
+    return f"{label}={value}"
+
+
+def format_condition(script, pos):
+    """Describe the entries of a condition block."""
+    scn = script.scn
+    parts = []
+    pos += 2
+    while scn[pos] != OP_CONDITION:
+        op = scn[pos]
+        group = (op >> 3) & 7
+        join = "and " if op & 0x80 else "or " if op & 0x40 else ""
+        if group == 0:
+            state = "set" if op & 7 == 0 else "not set"
+            parts.append(f"{join}trigger {u16(scn, pos + 2):#x} {state}")
+            size = 4
+        elif group == 1:
+            parts.append(f"{join}pstat {scn[pos + 2]:#x} "
+                         f"{COMPARE[op & 7]} {scn[pos + 3]}")
+            size = 4
+        elif group in (2, 3):
+            when = "true" if group == 2 else "false"
+            parts.append(f"if {when} jump {u16(scn, pos + 2):#x}")
+            size = 4
+        else:
+            size = TEST_SIZES.get(op & 7)
+            if size is None:
+                break
+            data = scn[pos + 2:pos + size].hex(" ")
+            parts.append(f"{join}test {TESTS[op & 7]} ({data})")
+        pos += size
+    return "condition: " + "; ".join(parts)
+
+
+def format_action(script, pos, opcodes, names):
+    scn = script.scn
+    op = scn[pos]
+    if op not in opcodes:
+        return f"[data {op:#04x}]"
+    name, args = opcodes[op]
+    if op == OP_CONDITION:
+        return "[" + format_condition(script, pos) + "]"
+    if op == OP_SWITCH:
+        count = u16(scn, pos + 2)
+        targets = ", ".join(f"{u16(scn, pos + 4 + 2 * i):#x}"
+                            for i in range(count))
+        return f"[switch on pstat {scn[pos + 1]:#x}: {targets}]"
+    words = [name.lower()]
+    at = pos + 1
+    for kind, arg in args:
+        size = ARG_SIZES[kind]
+        fmt = {1: "<B", 2: "<H", 4: "<i"}[size]
+        if kind in ("s8", "s16"):
+            fmt = fmt.lower()
+        value = struct.unpack_from(fmt, scn, at)[0]
+        text = format_arg(script, kind, arg, value, names)
+        if text is not None:
+            words.append(text)
+        at += size
+    return "[" + " ".join(words) + "]"
+
+
 def name_npcs(scripts, maps):
     """Name the NPCs of each script after the maps it runs on."""
     uses = collections.defaultdict(set)
@@ -377,6 +548,9 @@ def main():
     parser.add_argument("--exe", default=EXE_PATH)
     parser.add_argument("--maps", default=MAP_DIR)
     parser.add_argument("--symbols", default=SYMBOLS_PATH)
+    parser.add_argument("--header", default=HEADER_PATH)
+    parser.add_argument("--actions", action="store_true",
+                        help="print every instruction, not only the text")
     parser.add_argument("--unreachable", action="store_true",
                         help="also print text the game never reaches")
     args = parser.parse_args()
@@ -394,10 +568,15 @@ def main():
             if index == 0 and section in TABLES:
                 continue
             # A section id can be listed twice, so keep a list.
-            script.section_texts.append((section, script.walk(offset)))
+            found = script.walk(offset)
+            script.section_texts.append((section, found, script.visited))
 
+    names = {}
     if os.path.exists(args.exe) and os.path.exists(args.maps):
-        name_npcs(scripts, read_map_npcs(Exe(args.exe, args.symbols), args.maps))
+        exe = Exe(args.exe, args.symbols)
+        name_npcs(scripts, read_map_npcs(exe, args.maps))
+        names = read_names(exe)
+    opcodes = read_opcodes(args.header) if args.actions else {}
 
     for index in args.scripts or sorted(scripts):
         if index not in scripts:
@@ -406,7 +585,18 @@ def main():
         scn = script.scn
         name = "MAPHEAD.SCN" if index == 0 else f"{script.start:#x}"
         print(f"== script {index} ({name})")
-        for section, found in script.section_texts:
+        for section, found, visited in script.section_texts:
+            if args.actions:
+                if not visited:
+                    continue
+                print(f"-- section {section:#x}")
+                for pos in sorted(visited):
+                    if pos in script.texts:
+                        line = format_text(script, pos)
+                    else:
+                        line = format_action(script, pos, opcodes, names)
+                    print(f"  {pos - script.start:05x} {line}")
+                continue
             if not found:
                 continue
             print(f"-- section {section:#x}")
