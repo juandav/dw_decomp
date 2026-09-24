@@ -48,7 +48,7 @@ extern IconRect MAIN_D_801241CC[];
 extern IconRect MAIN_D_80124044[];
 extern StringRect MAIN_D_80124234[];
 extern IconRect MAIN_D_80124294[];
-extern char MAIN_D_80123E78[];
+extern char PATH_CARD_CARD_ALL[];
 
 int32_t drawDigimonMovesText(void);
 u_short GetTPage(int32_t tp, int32_t abr, int32_t x, int32_t y);
@@ -91,7 +91,7 @@ static void *overworld_menu_views_functions[] = {
 
 int32_t loadCardImage(int32_t id)
 {
-	return loadStackedTIMEntry(MAIN_D_80123E78, TEXTURE_BUFFER,
+	return loadStackedTIMEntry(PATH_CARD_CARD_ALL, TEXTURE_BUFFER,
 				    id * 0xe, 0xe);
 }
 

@@ -1675,8 +1675,8 @@ void VS_playVersusIntroSequence(void)
 	int32_t i;
 
 	clearTextArea();
-	drawString(MAIN_D_80134A50, 0, 0);
-	drawString(MAIN_D_80134A54, 0, 0xc);
+	drawString(VS_TEXT_WIN, 0, 0);
+	drawString(VS_TEXT_LOSE, 0, 0xc);
 	drawString(FULLWIDTH_DIGITS, 0, 0xf0);
 	fadeFromBlack(3);
 	i = 3;

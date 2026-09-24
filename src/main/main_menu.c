@@ -317,29 +317,29 @@ char MAIN_D_8013467C[] = "が";
 
 char MAIN_D_80134680[] = "を";
 
-char MAIN_D_80134684[] = "Name";
+char MAIN_MENU_TEXT_NAME[] = "Name";
 
-char MAIN_D_8013468C[8] = "Digimon";
+char MAIN_MENU_TEXT_DIGIMON[8] = "Digimon";
 
 char MAIN_D_80134694[] = "HP";
 
 char MAIN_D_80134698[] = "MP";
 
-char MAIN_D_8013469C[8] = "Offense";
+char MAIN_MENU_TEXT_OFFENSE[8] = "Offense";
 
-char MAIN_D_801346A4[8] = "Defense";
+char MAIN_MENU_TEXT_DEFENSE[8] = "Defense";
 
-char MAIN_D_801346AC[4] = "Yes";
+char MAIN_MENU_TEXT_YES[4] = "Yes";
 
 char MAIN_D_801346B0[] = "No";
 
 char MAIN_D_801346B4[] = " ";
 
-char MAIN_D_801346B8[] = " is in";
+char MAIN_MENU_TEXT_IS_IN[] = " is in";
 
 char MAIN_D_801346C0[2][2] = { ".", "*" };
 
-char MAIN_D_801346C4[] = "Player";
+char MAIN_MENU_TEXT_PLAYER[] = "Player";
 
 char NUMBER_FORMAT[] = "%i";
 
@@ -417,81 +417,81 @@ char MENU_ITEM_BATTLE_TRY_OUT[] = "Battle Try Out";
 
 char MENU_ITEM_SPECIAL_ITEM_RECORD[20] = "Special Item Record";
 
-char MAIN_D_80131278[] = "Don't remove or insert";
+char MAIN_MENU_TEXT_DONT_REMOVE_OR_INSERT[] = "Don't remove or insert";
 
-char MAIN_D_80131290[] = "a Memory Card.";
+char MAIN_MENU_TEXT_A_MEMORY_CARD[] = "a Memory Card.";
 
-char MAIN_D_801312A0[] = "YOU WON'T BE ABLE TO";
+char MAIN_MENU_TEXT_YOU_WONT_BE_ABLE_TO[] = "YOU WON'T BE ABLE TO";
 
-char MAIN_D_801312B8[] = "SAVE TO A MEMORY CARD";
+char MAIN_MENU_TEXT_SAVE_TO_A_MEMORY_CARD[] = "SAVE TO A MEMORY CARD";
 
-char MAIN_D_801312D0[] = "EVEN IF YOU INSERT";
+char MAIN_MENU_TEXT_EVEN_IF_YOU_INSERT[] = "EVEN IF YOU INSERT";
 
-char MAIN_D_801312E4[] = "ONE DURING GAMEPLAY.";
+char MAIN_MENU_TEXT_ONE_DURING_GAMEPLAY[] = "ONE DURING GAMEPLAY.";
 
-char MAIN_D_801312FC[] = "Memory Card in Slot 1 is";
+char MAIN_MENU_TEXT_MEMORY_CARD_IN_SLOT_1[] = "Memory Card in Slot 1 is";
 
-char MAIN_D_80131318[] = "not formatted.";
+char MAIN_MENU_TEXT_NOT_FORMATTED[] = "not formatted.";
 
-char MAIN_D_80131328[] = "Do you want to format?";
+char MAIN_MENU_TEXT_DO_YOU_WANT_TO_FORMAT[] = "Do you want to format?";
 
-char MAIN_D_80131340[] = "Not used";
+char MAIN_MENU_TEXT_NOT_USED[] = "Not used";
 
 char MAIN_D_8013134C[] = "スロット１のメモリーカードに";
 
-char MAIN_D_8013136C[12] = "Go to sleep";
+char MAIN_MENU_TEXT_GO_TO_SLEEP[12] = "Go to sleep";
 
-char MAIN_D_80131378[] = "Save and go to sleep";
+char MAIN_MENU_TEXT_SAVE_AND_GO_TO_SLEEP[] = "Save and go to sleep";
 
-char MAIN_D_80131390[] = "Data file will be overwritten";
+char MAIN_MENU_TEXT_DATA_FILE_WILL_BE_OVERWRITTEN[] = "Data file will be overwritten";
 
-char MAIN_D_801313B0[] = "Do you want to save data file?";
+char MAIN_MENU_TEXT_DO_YOU_WANT_TO_SAVE[] = "Do you want to save data file?";
 
-char MAIN_D_801313D0[] = "There was an error";
+char MAIN_MENU_TEXT_THERE_WAS_AN_ERROR[] = "There was an error";
 
-char MAIN_D_801313E4[28] = "Please insert a Memory Card";
+char MAIN_MENU_TEXT_PLEASE_INSERT_A_MEMORY_CARD[28] = "Please insert a Memory Card";
 
-char MAIN_D_80131400[] = "which contains Competition";
+char MAIN_MENU_TEXT_WHICH_CONTAINS_COMPETITION[] = "which contains Competition";
 
-char MAIN_D_8013141C[] = "Data for Player 1 in Slot 1 ";
+char MAIN_MENU_TEXT_DATA_FOR_PLAYER_1_IN[] = "Data for Player 1 in Slot 1 ";
 
-char MAIN_D_8013143C[12] = "Technique 1";
+char MAIN_MENU_TEXT_TECHNIQUE_1[12] = "Technique 1";
 
-char MAIN_D_80131448[12] = "Technique 2";
+char MAIN_MENU_TEXT_TECHNIQUE_2[12] = "Technique 2";
 
-char MAIN_D_80131454[12] = "Technique 3";
+char MAIN_MENU_TEXT_TECHNIQUE_3[12] = "Technique 3";
 
-char MAIN_D_80131460[] = "Do you want to register?";
+char MAIN_MENU_TEXT_DO_YOU_WANT_TO_REGISTER[] = "Do you want to register?";
 
-char MAIN_D_8013147C[] = "Select registration slot";
+char MAIN_MENU_TEXT_SELECT_REGISTRATION_SLOT[] = "Select registration slot";
 
-char MAIN_D_80131498[24] = "Do you want to register";
+char MAIN_MENU_TEXT_DO_YOU_WANT_TO_REGISTER_2[24] = "Do you want to register";
 
-char MAIN_D_801314B0[24] = "The Competition Digimon";
+char MAIN_MENU_TEXT_THE_COMPETITION_DIGIMON[24] = "The Competition Digimon";
 
-char MAIN_D_801314C8[] = "data will be saved during";
+char MAIN_MENU_TEXT_DATA_WILL_BE_SAVED_DURING[] = "data will be saved during";
 
-char MAIN_D_801314E4[] = "the registration process";
+char MAIN_MENU_TEXT_THE_REGISTRATION_PROCESS[] = "the registration process";
 
-char MAIN_D_80131500[] = "Since you started the game";
+char MAIN_MENU_TEXT_SINCE_YOU_STARTED_THE_GAME[] = "Since you started the game";
 
-char MAIN_D_8013151C[28] = "without using a Memory Card";
+char MAIN_MENU_TEXT_WITHOUT_USING_A_MEMORY_CARD[28] = "without using a Memory Card";
 
-char MAIN_D_80131538[20] = "you cannot register";
+char MAIN_MENU_TEXT_YOU_CANNOT_REGISTER[20] = "you cannot register";
 
-char MAIN_D_8013154C[28] = "Competition Battle Digimon.";
+char MAIN_MENU_TEXT_COMPETITION_BATTLE_DIGIMON[28] = "Competition Battle Digimon.";
 
-char MAIN_D_80131568[] = "Do you want to save?";
+char MAIN_MENU_TEXT_DO_YOU_WANT_TO_SAVE_2[] = "Do you want to save?";
 
-char MAIN_D_80131580[] = "training, Memory Card cannot";
+char MAIN_MENU_TEXT_TRAINING_MEMORY_CARD_CANNOT[] = "training, Memory Card cannot";
 
-char MAIN_D_801315A0[] = "be registered for Competition";
+char MAIN_MENU_TEXT_BE_REGISTERED_FOR_COMPETITION[] = "be registered for Competition";
 
-char MAIN_D_801315C0[] = "Please Insert";
+char MAIN_MENU_TEXT_PLEASE_INSERT[] = "Please Insert";
 
-char MAIN_D_801315D0[28] = "Memory Card with saved data";
+char MAIN_MENU_TEXT_MEMORY_CARD_WITH_SAVED_DATA[28] = "Memory Card with saved data";
 
-char MAIN_D_801315EC[] = "in Slot 1";
+char MAIN_MENU_TEXT_IN_SLOT_1[] = "in Slot 1";
 
 InventoryTable MAIN_D_801315F8 = {
 	{
@@ -1870,7 +1870,7 @@ uint8_t MAIN_D_80132F2C[2560] = {
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 };
 
-char MAIN_D_8013392C[68] = "Digimon";
+char MAIN_MENU_TEXT_DIGIMON_2[68] = "Digimon";
 
 uint8_t MAIN_D_80133970[32] = {
 	0x00, 0x00, 0x5f, 0x57, 0x7a, 0x3a, 0x75, 0x15,
@@ -2381,20 +2381,20 @@ void drawMainMenuStrings(int32_t menu)
 	case 5:
 		drawString(MEMCARD_OPERATION_TEXT[MEMORY_CARD_OPERATION], 0, 0);
 		DrawSync(0);
-		drawString(MAIN_D_80131278, 0, 0xC);
+		drawString(MAIN_MENU_TEXT_DONT_REMOVE_OR_INSERT, 0, 0xC);
 		DrawSync(0);
-		drawString(MAIN_D_80131290, 0, 0x18);
+		drawString(MAIN_MENU_TEXT_A_MEMORY_CARD, 0, 0x18);
 		break;
 	case 6:
 		drawString(SLOT_ACTION_TITLES[3], 0, 0);
 		DrawSync(0);
-		drawString(MAIN_D_801312A0, 0, 0xC);
+		drawString(MAIN_MENU_TEXT_YOU_WONT_BE_ABLE_TO, 0, 0xC);
 		DrawSync(0);
-		drawString(MAIN_D_801312B8, 0, 0x18);
+		drawString(MAIN_MENU_TEXT_SAVE_TO_A_MEMORY_CARD, 0, 0x18);
 		DrawSync(0);
-		drawString(MAIN_D_801312D0, 0, 0x24);
+		drawString(MAIN_MENU_TEXT_EVEN_IF_YOU_INSERT, 0, 0x24);
 		DrawSync(0);
-		drawString(MAIN_D_801312E4, 0, 0x30);
+		drawString(MAIN_MENU_TEXT_ONE_DURING_GAMEPLAY, 0, 0x30);
 		DrawSync(0);
 		drawString(YES_NO_LABEL, 0, 0xF0);
 		break;
@@ -2417,15 +2417,15 @@ void drawMainMenuStrings(int32_t menu)
 		}
 		break;
 	case 9:
-		drawString(MAIN_D_801312FC, 0, 0);
+		drawString(MAIN_MENU_TEXT_MEMORY_CARD_IN_SLOT_1, 0, 0);
 		DrawSync(0);
 		if (MEMORY_CARD_ID != 0) {
 			drawString((char *)&SLOT_2_DIGIT, 0x76, 0);
 		}
 		DrawSync(0);
-		drawString(MAIN_D_80131318, 0, 0xC);
+		drawString(MAIN_MENU_TEXT_NOT_FORMATTED, 0, 0xC);
 		DrawSync(0);
-		drawString(MAIN_D_80131328, 0, 0x18);
+		drawString(MAIN_MENU_TEXT_DO_YOU_WANT_TO_FORMAT, 0, 0x18);
 		DrawSync(0);
 		drawString(YES_NO_LABEL_SPACED, 0, 0xF0);
 		break;
@@ -2443,7 +2443,7 @@ void drawMainMenuStrings(int32_t menu)
 			}
 		}
 		DrawSync(0);
-		drawString(MAIN_D_80131340, 0x90, 0);
+		drawString(MAIN_MENU_TEXT_NOT_USED, 0x90, 0);
 		DrawSync(0);
 		drawString(SLOT_NUMBER_STRINGS[MEMORY_CARD_SLOT + 1], 0, 0xC);
 		DrawSync(0);
@@ -2481,16 +2481,16 @@ void drawMainMenuStrings(int32_t menu)
 		drawString(MEMCARD_ERROR_TEXT[MEMORY_CARD_ERROR], 0, 0xC);
 		break;
 	case 11:
-		drawString(MAIN_D_8013136C, 0, 0);
-		drawString(MAIN_D_80131378, 0, 0xC);
+		drawString(MAIN_MENU_TEXT_GO_TO_SLEEP, 0, 0);
+		drawString(MAIN_MENU_TEXT_SAVE_AND_GO_TO_SLEEP, 0, 0xC);
 		break;
 	case 12:
-		drawString(MAIN_D_80131390, 0, 0);
+		drawString(MAIN_MENU_TEXT_DATA_FILE_WILL_BE_OVERWRITTEN, 0, 0);
 		DrawSync(0);
-		drawString(MAIN_D_801313B0, 0, 0xC);
+		drawString(MAIN_MENU_TEXT_DO_YOU_WANT_TO_SAVE, 0, 0xC);
 		DrawSync(0);
 		if (MEMORY_CARD_ERROR != -1) {
-			drawString(MAIN_D_801313D0, 0, 0x24);
+			drawString(MAIN_MENU_TEXT_THERE_WAS_AN_ERROR, 0, 0x24);
 			DrawSync(0);
 			if (MEMORY_CARD_ID != 0) {
 				drawString(&EMPTY_STRING, 0x30, 0x24);
@@ -2513,11 +2513,11 @@ void drawMainMenuStrings(int32_t menu)
 	case 13:
 		drawString(SLOT_ACTION_TITLES[5], 0, 0);
 		DrawSync(0);
-		drawString(MAIN_D_801313E4, 0, 0xC);
+		drawString(MAIN_MENU_TEXT_PLEASE_INSERT_A_MEMORY_CARD, 0, 0xC);
 		DrawSync(0);
-		drawString(MAIN_D_80131400, 0, 0x18);
+		drawString(MAIN_MENU_TEXT_WHICH_CONTAINS_COMPETITION, 0, 0x18);
 		DrawSync(0);
-		drawString(MAIN_D_8013141C, 0, 0x24);
+		drawString(MAIN_MENU_TEXT_DATA_FOR_PLAYER_1_IN, 0, 0x24);
 		DrawSync(0);
 		drawString(YES_NO_LABEL, 0, 0xF0);
 		if (VS_PLAYER_INDEX == 1) {
@@ -2528,10 +2528,10 @@ void drawMainMenuStrings(int32_t menu)
 	case 14:
 		drawString(SLOT_ACTION_TITLES[6], 0, 0);
 		DrawSync(0);
-		drawString(MAIN_D_80134684, 0, 0xC);
+		drawString(MAIN_MENU_TEXT_NAME, 0, 0xC);
 		drawString(PARTNER_ENTITY.name, 0x64, 0xC);
 		DrawSync(0);
-		drawString(MAIN_D_8013468C, 0, 0x18);
+		drawString(MAIN_MENU_TEXT_DIGIMON, 0, 0x18);
 		drawString(DIGIMON_DATA[PARTNER_ENTITY.digimonEntity.entity.type].name, 0x64, 0x18);
 		DrawSync(0);
 		drawString(MAIN_D_80134694, 0, 0x24);
@@ -2540,35 +2540,35 @@ void drawMainMenuStrings(int32_t menu)
 		drawString(MAIN_D_80134698, 0, 0x30);
 		drawString(formatNumber(PARTNER_ENTITY.digimonEntity.stats.base.mp, buf, 4), 0x64, 0x30);
 		DrawSync(0);
-		drawString(MAIN_D_8013469C, 0, 0x3C);
+		drawString(MAIN_MENU_TEXT_OFFENSE, 0, 0x3C);
 		drawString(formatNumber(PARTNER_ENTITY.digimonEntity.stats.base.off, buf, 3), 0x64, 0x3C);
 		DrawSync(0);
-		drawString(MAIN_D_801346A4, 0, 0x48);
+		drawString(MAIN_MENU_TEXT_DEFENSE, 0, 0x48);
 		drawString(formatNumber(PARTNER_ENTITY.digimonEntity.stats.base.def, buf, 3), 0x64, 0x48);
 		DrawSync(0);
-		drawString(MAIN_D_8013143C, 0, 0x54);
+		drawString(MAIN_MENU_TEXT_TECHNIQUE_1, 0, 0x54);
 		drawMoveName((type = PARTNER_ENTITY.digimonEntity.entity.type), PARTNER_ENTITY.digimonEntity.stats.base.moves[0], 0x64, 0x54);
 		DrawSync(0);
-		drawString(MAIN_D_80131448, 0, 0x60);
+		drawString(MAIN_MENU_TEXT_TECHNIQUE_2, 0, 0x60);
 		drawMoveName((type = PARTNER_ENTITY.digimonEntity.entity.type), PARTNER_ENTITY.digimonEntity.stats.base.moves[1], 0x64, 0x60);
 		DrawSync(0);
-		drawString(MAIN_D_80131454, 0, 0x6C);
+		drawString(MAIN_MENU_TEXT_TECHNIQUE_3, 0, 0x6C);
 		drawMoveName((type = PARTNER_ENTITY.digimonEntity.entity.type), PARTNER_ENTITY.digimonEntity.stats.base.moves[2], 0x64, 0x6C);
 		DrawSync(0);
-		drawString(MAIN_D_80131460, 0, 0x78);
-		drawString(MAIN_D_801346AC, 0, 0x84);
+		drawString(MAIN_MENU_TEXT_DO_YOU_WANT_TO_REGISTER, 0, 0x78);
+		drawString(MAIN_MENU_TEXT_YES, 0, 0x84);
 		drawString(MAIN_D_801346B0, 0, 0x90);
 		break;
 	case 15:
 		drawString(SLOT_ACTION_TITLES[6], 0, 0);
 		DrawSync(0);
 		drawRegisteredBattleSlots(0);
-		drawString(MAIN_D_8013147C, 0, 0x84);
+		drawString(MAIN_MENU_TEXT_SELECT_REGISTRATION_SLOT, 0, 0x84);
 		break;
 	case 16:
 		drawString(SLOT_ACTION_TITLES[6], 0, 0);
 		DrawSync(0);
-		strcpy(buf, MAIN_D_80131498);
+		strcpy(buf, MAIN_MENU_TEXT_DO_YOU_WANT_TO_REGISTER_2);
 		drawString(buf, 0, 0xC);
 		DrawSync(0);
 		strcpy(buf, PARTNER_ENTITY.name);
@@ -2578,25 +2578,25 @@ void drawMainMenuStrings(int32_t menu)
 		DrawSync(0);
 		drawString(&SLOT_NUMBER_STRINGS[(BATTLE_REGISTRATION_SLOT + 1) % 10][2], 0xC, 0xC);
 		DrawSync(0);
-		drawString(MAIN_D_801346AC, 0, 0x24);
+		drawString(MAIN_MENU_TEXT_YES, 0, 0x24);
 		DrawSync(0);
 		drawString(MAIN_D_801346B0, 0, 0x30);
 		DrawSync(0);
-		drawString(MAIN_D_801314B0, 0, 0x3C);
+		drawString(MAIN_MENU_TEXT_THE_COMPETITION_DIGIMON, 0, 0x3C);
 		DrawSync(0);
-		drawString(MAIN_D_801314C8, 0, 0x48);
-		drawString(MAIN_D_801314E4, 0, 0x54);
+		drawString(MAIN_MENU_TEXT_DATA_WILL_BE_SAVED_DURING, 0, 0x48);
+		drawString(MAIN_MENU_TEXT_THE_REGISTRATION_PROCESS, 0, 0x54);
 		break;
 	case 17:
-		drawString(MAIN_D_80131500, 0, 0);
+		drawString(MAIN_MENU_TEXT_SINCE_YOU_STARTED_THE_GAME, 0, 0);
 		DrawSync(0);
-		drawString(MAIN_D_8013151C, 0, 0xC);
+		drawString(MAIN_MENU_TEXT_WITHOUT_USING_A_MEMORY_CARD, 0, 0xC);
 		DrawSync(0);
-		drawString(MAIN_D_80131538, 0, 0x18);
-		drawString(MAIN_D_8013154C, 0, 0x24);
+		drawString(MAIN_MENU_TEXT_YOU_CANNOT_REGISTER, 0, 0x18);
+		drawString(MAIN_MENU_TEXT_COMPETITION_BATTLE_DIGIMON, 0, 0x24);
 		break;
 	case 18:
-		drawString(MAIN_D_80131568, 0, 0);
+		drawString(MAIN_MENU_TEXT_DO_YOU_WANT_TO_SAVE_2, 0, 0);
 		DrawSync(0);
 		drawString(YES_NO_LABEL_SPACED, 0, 0xC);
 		break;
@@ -2604,12 +2604,12 @@ void drawMainMenuStrings(int32_t menu)
 		strcpy(buf, PARTNER_ENTITY.name);
 		strcat(buf, MAIN_D_801346B4);
 		strcat(buf, DIGIMON_DATA[PARTNER_ENTITY.digimonEntity.entity.type].name);
-		strcat(buf, MAIN_D_801346B8);
+		strcat(buf, MAIN_MENU_TEXT_IS_IN);
 		drawString(buf, 0, 0);
 		DrawSync(0);
-		drawString(MAIN_D_80131580, 0, 0xC);
+		drawString(MAIN_MENU_TEXT_TRAINING_MEMORY_CARD_CANNOT, 0, 0xC);
 		DrawSync(0);
-		drawString(MAIN_D_801315A0, 0, 0x18);
+		drawString(MAIN_MENU_TEXT_BE_REGISTERED_FOR_COMPETITION, 0, 0x18);
 		break;
 	case 20:
 		drawString(BATTLE_MODE_ITEMS[0], 0, 0);
@@ -2620,11 +2620,11 @@ void drawMainMenuStrings(int32_t menu)
 		drawString(BATTLE_MODE_ITEMS[3], 0, 0x24);
 		break;
 	case 21:
-		drawString(MAIN_D_801315C0, 0, 0);
+		drawString(MAIN_MENU_TEXT_PLEASE_INSERT, 0, 0);
 		DrawSync(0);
-		drawString(MAIN_D_801315D0, 0, 0xC);
+		drawString(MAIN_MENU_TEXT_MEMORY_CARD_WITH_SAVED_DATA, 0, 0xC);
 		DrawSync(0);
-		drawString(MAIN_D_801315EC, 0, 0x18);
+		drawString(MAIN_MENU_TEXT_IN_SLOT_1, 0, 0x18);
 		DrawSync(0);
 		drawString(YES_NO_LABEL, 0, 0x24);
 		break;
@@ -3004,7 +3004,7 @@ void tickMainMenu(void)
 		memcpy(MAIN_D_80131A2C, MAIN_D_80133A10, 0x80);
 		memcpy(MAIN_D_80131AAC, MAIN_D_80133A90, 0x80);
 		initializeDefaultSavegame();
-		asciiToShiftJIS((uint8_t *)MAIN_D_8013392C,
+		asciiToShiftJIS((uint8_t *)MAIN_MENU_TEXT_DIGIMON_2,
 				(uint16_t *)(MAIN_D_8013192C + 4));
 		_strncpy((char *)MAIN_D_8013192C + 0xC,
 			 SLOT_NUMBER_STRINGS[MEMORY_CARD_SLOT + 1], 4);
@@ -3360,7 +3360,7 @@ void tickMainMenu(void)
 			memcpy(MAIN_D_80131A2C, MAIN_D_80133A10, 0x80);
 			memcpy(MAIN_D_80131AAC, MAIN_D_80133A90, 0x80);
 			writeSavegame(MAIN_D_80131B2C);
-			asciiToShiftJIS((uint8_t *)MAIN_D_8013392C,
+			asciiToShiftJIS((uint8_t *)MAIN_MENU_TEXT_DIGIMON_2,
 				(uint16_t *)(MAIN_D_8013192C + 4));
 			_strncpy((char *)MAIN_D_8013192C + 0xC,
 				 SLOT_NUMBER_STRINGS[MEMORY_CARD_SLOT + 1], 4);
@@ -3705,7 +3705,7 @@ void tickMainMenu(void)
 			memcpy(MAIN_D_80131A2C, MAIN_D_80133A10, 0x80);
 			memcpy(MAIN_D_80131AAC, MAIN_D_80133A90, 0x80);
 			writeSavegame(MAIN_D_80131B2C);
-			asciiToShiftJIS((uint8_t *)MAIN_D_8013392C,
+			asciiToShiftJIS((uint8_t *)MAIN_MENU_TEXT_DIGIMON_2,
 				(uint16_t *)(MAIN_D_8013192C + 4));
 			_strncpy((char *)MAIN_D_8013192C + 0xC,
 				 SLOT_NUMBER_STRINGS[MEMORY_CARD_SLOT + 1], 4);
@@ -4072,8 +4072,8 @@ void initializeDefaultSavegame(void)
 	savegame->currentScreen = 0xCC;
 	savegame->currentExit = 9;
 	savegame->partnerType = 0x72;
-	strcpy(savegame->playerName, MAIN_D_801346C4);
-	strcpy(savegame->digimonName, MAIN_D_8013468C);
+	strcpy(savegame->playerName, MAIN_MENU_TEXT_PLAYER);
+	strcpy(savegame->digimonName, MAIN_MENU_TEXT_DIGIMON);
 
 	for (i = 0; i < 100; i++) {
 		savegame->worldPoop[i].map = 0xFF;

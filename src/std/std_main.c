@@ -137,10 +137,10 @@ extern int8_t MAIN_D_80134D64;
 extern int16_t INITIAL_COMBAT_STATS[][6];
 extern DigimonEntity *MAIN_D_80134EF4;
 extern DigimonEntity *MAIN_D_80134EF8;
-extern char MAIN_D_80134894[];
-extern char MAIN_D_80134898[];
-extern char MAIN_D_801348A0[];
-extern char MAIN_D_801348A8[];
+extern char STD_TEXT_RUN[];
+extern char STD_TEXT_ATTACK[];
+extern char STD_TEXT_AUTO[];
+extern char STD_TEXT_CHANGE[];
 
 void STD_initializeBattleStartText(void);
 void STD_func_8006A044(void);
@@ -1252,13 +1252,13 @@ char STD_D_8007A670[] = "Distance";
 char STD_D_8007A67C[] = "Defensive";
 
 char *STD_D_8007A688[8] = {
-	MAIN_D_80134894,
-	MAIN_D_80134898,
-	MAIN_D_801348A0,
+	STD_TEXT_RUN,
+	STD_TEXT_ATTACK,
+	STD_TEXT_AUTO,
 	STD_D_8007A664,
 	STD_D_8007A670,
 	STD_D_8007A67C,
-	MAIN_D_801348A8,
+	STD_TEXT_CHANGE,
 	(void *)0x00000000,
 };
 

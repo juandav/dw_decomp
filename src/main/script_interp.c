@@ -83,8 +83,8 @@ extern uint16_t MAIN_D_80134608[2];
 extern uint8_t MAIN_D_80134F81;
 extern uint32_t POLLED_INPUT;
 extern RECT ITEM_MENU_POPUP_ORIGINS[];
-extern char MAIN_D_80130394[];
-extern char MAIN_D_801303A8[];
+extern char PATH_ETCHI_BOSS_EFE_TMD[];
+extern char PATH_ETCHI_OP_TIM[];
 extern uint8_t PREVIOUS_SCREEN;
 extern uint8_t PREVIOUS_EXIT;
 extern uint8_t CURRENT_EXIT;
@@ -1753,7 +1753,7 @@ void scriptInstruction64to7E(int32_t op)
 			createNinjamonEffect();
 			break;
 		case 0x33:
-			addFileReadRequestPath(MAIN_D_80130394,
+			addFileReadRequestPath(PATH_ETCHI_BOSS_EFE_TMD,
 			                       BOSS_EFE_TMD_BUFFER, 0, 0,
 			                       0);
 			loadDynamicLibrary(EAB_REL, 0, 0, 0, 0);
@@ -1761,7 +1761,7 @@ void scriptInstruction64to7E(int32_t op)
 			loadMapSounds2(0x15);
 			break;
 		case 0x34:
-			loadTextureFile(MAIN_D_801303A8, 0, 0);
+			loadTextureFile(PATH_ETCHI_OP_TIM, 0, 0);
 			loadDynamicLibrary(ENDI_REL, 0, 1, 0, 0);
 			loadMapSounds2(0x14);
 			break;

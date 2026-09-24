@@ -4326,7 +4326,7 @@ stateA:
 			                 &FISHING_DATA_PTR->swimmer.pos);
 			goto splash;
 		}
-		FISH_showTextBox(MAIN_D_801349D8, 0, 0, 0,
+		FISH_showTextBox(FISH_TEXT_HOOKED, 0, 0, 0,
 		                 &FISHING_DATA_PTR->swimmer.pos);
 		goto beginTension;
 	}

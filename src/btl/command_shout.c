@@ -7,9 +7,9 @@
 #include <dw/script.h>
 #include <dw/world_object.h>
 
-extern char MAIN_D_801346FC[];
-extern char MAIN_D_80134704[];
-extern char MAIN_D_8013470C[];
+extern char BTL_TEXT_RUN[];
+extern char BTL_TEXT_ATTACK[];
+extern char BTL_TEXT_CHANGE[];
 extern volatile int32_t BTL_D_80072DAC[];
 extern int16_t BTL_D_80072DB0[];
 extern int16_t BTL_D_80072DB2[];
@@ -28,13 +28,13 @@ const char BTL_D_80072DD0[] = "Distance!";
 const char BTL_D_80072DDC[] = "Defense!";
 
 const char *const BTL_D_80072DE8[7] = {
-	MAIN_D_801346FC,
-	MAIN_D_80134704,
+	BTL_TEXT_RUN,
+	BTL_TEXT_ATTACK,
 	BTL_D_80072DB8,
 	BTL_D_80072DC4,
 	BTL_D_80072DD0,
 	BTL_D_80072DDC,
-	MAIN_D_8013470C,
+	BTL_TEXT_CHANGE,
 };
 
 void BTL_drawCommandShout(uint32_t arg0)

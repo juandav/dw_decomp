@@ -68,8 +68,8 @@ void setUVDataPolyFT4(POLY_FT4 *prim, int16_t xPos, int16_t yPos, int16_t width,
 void renderSmallIcon(int16_t x, int16_t y, int16_t u, int32_t otOffset);
 
 extern MapLightUpdateData MAP_LIGHT_UPDATE_DATA[];
-extern char *MAIN_D_8012BA8C[];
-extern void *MAIN_D_8012B96C[];
+extern char *OVERLAY_FILE_NAMES[];
+extern void *OVERLAY_LOAD_ADDRESSES[];
 extern uint8_t MAIN_D_80127BDC[];
 extern uint8_t MAP_LAYER_ENABLED;
 extern RGB8 TEXT_COLORS[];
@@ -77,7 +77,7 @@ extern uint32_t MAIN_D_80134E70;
 extern uint32_t MAIN_D_80134E74;
 extern uint8_t MAIN_D_80134E78[2];
 extern int32_t MAIN_D_80134E7C;
-extern char MAIN_D_80134430;
+extern char TEXT_PAUSE;
 
 void renderEntityTextNumber(int32_t color, int32_t n, int32_t x, int16_t y,
 			int16_t value, int32_t layer)
@@ -292,10 +292,10 @@ void loadDynamicLibrary(Overlay lib, uint8_t *isComplete, dw_bool isAsync,
 	uint8_t *nv;
 
 	if (!isAsync) {
-		readFile(MAIN_D_8012BA8C[lib - 1], (nv = MAIN_D_8012B96C[lib - 1]));
+		readFile(OVERLAY_FILE_NAMES[lib - 1], (nv = OVERLAY_LOAD_ADDRESSES[lib - 1]));
 	} else {
-		addFileReadRequestPath(MAIN_D_8012BA8C[lib - 1],
-				       (nv = MAIN_D_8012B96C[lib - 1]), isComplete,
+		addFileReadRequestPath(OVERLAY_FILE_NAMES[lib - 1],
+				       (nv = OVERLAY_LOAD_ADDRESSES[lib - 1]), isComplete,
 				       (FileRequestCallback)callback, param);
 	}
 }
@@ -362,7 +362,7 @@ void createPauseBox(void)
 	RECT pos;
 
 	if (MAIN_D_80134E7C != 1) {
-		drawString(&MAIN_D_80134430, 0x78, 0xF0);
+		drawString(&TEXT_PAUSE, 0x78, 0xF0);
 		setRECT(&pos, -0x1A, -0xE, 0x38, 0x18);
 		createStaticUIBox(5, 1, 0, &pos, NULL, renderPauseBox);
 		MAIN_D_80134E7C = 1;

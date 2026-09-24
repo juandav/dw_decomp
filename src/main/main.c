@@ -434,13 +434,13 @@ uint8_t MAIN_D_80134654[8] = {
 	0x04, 0x04, 0x04, 0x04, 0x2e, 0x2e, 0x04, 0x04,
 };
 
-char MAIN_D_8012CE64[20] = "\\ETCDAT\\FI_INFO.TIM";
+char PATH_ETCDAT_FI_INFO_TIM[20] = "\\ETCDAT\\FI_INFO.TIM";
 
-char MAIN_D_8012CE78[20] = "\\ETCNA\\TITLE256.TIM";
+char PATH_ETCNA_TITLE256_TIM[20] = "\\ETCNA\\TITLE256.TIM";
 
-char MAIN_D_8012CE8C[] = "\\ETCDAT\\ETCTIM.BIN";
+char PATH_ETCDAT_ETCTIM_BIN[] = "\\ETCDAT\\ETCTIM.BIN";
 
-char MAIN_D_8012CEA0[] = "\\ETCNA\\TITLE2.TIM";
+char PATH_ETCNA_TITLE2_TIM[] = "\\ETCNA\\TITLE2.TIM";
 
 DigimonPara DIGIMON_DATA[180] = {
 	{
@@ -3375,10 +3375,10 @@ int32_t main(void)
 	initializeMedalModel();
 	initializeClockData();
 	initializeStatusObjects();
-	loadTIMFile(MAIN_D_8012CE64, GENERAL_BUFFER_PTR);
+	loadTIMFile(PATH_ETCDAT_FI_INFO_TIM, GENERAL_BUFFER_PTR);
 
 	for (;;) {
-		loadTIMFile(MAIN_D_8012CE78, GENERAL_BUFFER_PTR);
+		loadTIMFile(PATH_ETCNA_TITLE256_TIM, GENERAL_BUFFER_PTR);
 		MAIN_D_80134EB0 = 0;
 		while (MAIN_D_80134EB0 == 0) {
 			playMovie(0, 1);
@@ -3387,7 +3387,7 @@ int32_t main(void)
 			finalizeMusic();
 		}
 
-		loadStackedTIMFile(MAIN_D_8012CE8C);
+		loadStackedTIMFile(PATH_ETCDAT_ETCTIM_BIN);
 		initializeMusic();
 		runMainMenu();
 
@@ -3397,7 +3397,7 @@ int32_t main(void)
 			finalizeMusic();
 			playMovie(1, 1);
 			initializeMusic();
-			loadStackedTIMFile(MAIN_D_8012CE8C);
+			loadStackedTIMFile(PATH_ETCDAT_ETCTIM_BIN);
 			initializeTamer(0, 0, 0, 0, 0, 0, 0);
 			if (readPStat(PSTAT_BUILTIN_ARG) == 0) {
 				partnerId = 0x3;
@@ -3413,7 +3413,7 @@ int32_t main(void)
 			stopGameTime();
 			break;
 		case 1:
-			loadStackedTIMFile(MAIN_D_8012CE8C);
+			loadStackedTIMFile(PATH_ETCDAT_ETCTIM_BIN);
 			initializeTamer(0, 0, 0, 0, 0, 0, 0);
 			initializePartner(MAIN_D_80155670[0], 0, 0, 0, 0, 0, 0);
 			MAIN_func_800D56E0();
@@ -3429,7 +3429,7 @@ int32_t main(void)
 			finalizeMusic();
 			playMovie(2, 1);
 			initializeMusic();
-			loadStackedTIMFile(MAIN_D_8012CE8C);
+			loadStackedTIMFile(PATH_ETCDAT_ETCTIM_BIN);
 			initializeTamer(0, 0, 0, 0, 0, 0, 0);
 			initializePartner(MAIN_D_80155670[0], 0, 0, 0, 0, 0, 0);
 			MAIN_func_800D56E0();
@@ -3564,7 +3564,7 @@ void runMainMenu(void)
 	CHECKED_MEMORY_CARD = 0x10;
 	CURRENT_MENU = -1;
 	TARGET_MENU = 0;
-	loadTIMFile(MAIN_D_8012CEA0, GENERAL_BUFFER_PTR);
+	loadTIMFile(PATH_ETCNA_TITLE2_TIM, GENERAL_BUFFER_PTR);
 	addObject(0x1388, 0, (TickFunction)tickMainMenu, (RenderFunction)renderMainMenu);
 	addObject(0xfa3, 0, NULL, (RenderFunction)renderMainMenuBackground);
 	fadeFromBlack(0x28);

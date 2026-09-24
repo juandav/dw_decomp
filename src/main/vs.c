@@ -326,8 +326,8 @@ static void *vs_functions[] = {
 	VS__placePlayer1,
 };
 
-char MAIN_D_80134A50[] = "Win";
-char MAIN_D_80134A54[] = "Lose";
+char VS_TEXT_WIN[] = "Win";
+char VS_TEXT_LOSE[] = "Lose";
 uint8_t MAIN_D_80134A5C[4] = { 3, 4, 2, 0 };
 uint8_t MAIN_D_80134A60[4] = { 4, 1, 1, 0 };
 SVECTOR MAIN_D_80134A64 = { 0 };
@@ -345,10 +345,10 @@ uint8_t MAIN_D_80134ABC[4] = { 50, 20, 5, 0 };
 uint8_t MAIN_D_80134AC0[4] = { 50, 20, 10, 0 };
 uint8_t MAIN_D_80134AC4[4] = { 10, 5, 0, 0 };
 int8_t MAIN_D_80134AC8[2] = { -1, -1 };
-char MAIN_D_80134ACC[] = "Run";
-char MAIN_D_80134AD0[] = "Attack";
-char MAIN_D_80134AD8[] = "Auto";
-char MAIN_D_80134AE0[] = "Change";
+char VS_TEXT_RUN[] = "Run";
+char VS_TEXT_ATTACK[] = "Attack";
+char VS_TEXT_AUTO[] = "Auto";
+char VS_TEXT_CHANGE[] = "Change";
 uint8_t MAIN_D_80134AE8[5] = { 0, 11, 25, 39, 50 };
 uint8_t MAIN_D_80134AF0[5] = { 11, 14, 14, 11, 11 };
 uint8_t MAIN_D_80134AF8[8] = { 0, 6, 10, 18, 22, 30, 38, 43 };
@@ -394,25 +394,25 @@ RGB8 MAIN_D_8012F438[10] = {
 
 char MAIN_D_8012F458[] = "ダメージ";
 
-char MAIN_D_8012F464[] = "\\ETCDAT\\ETCTIM.BIN";
+char PATH_ETCDAT_ETCTIM_BIN_2[] = "\\ETCDAT\\ETCTIM.BIN";
 
-char MAIN_D_8012F478[] = "\\ETCNA\\TITLE2.TIM";
+char PATH_ETCNA_TITLE2_TIM_2[] = "\\ETCNA\\TITLE2.TIM";
 
-char MAIN_D_8012F48C[] = "\\ETCDAT\\SYSTEM_W.TIM";
+char PATH_ETCDAT_SYSTEM_W_TIM[] = "\\ETCDAT\\SYSTEM_W.TIM";
 
-char MAIN_D_8012F4A4[20] = "\\STDDAT\\TAISEN1.TIM";
+char PATH_STDDAT_TAISEN1_TIM[20] = "\\STDDAT\\TAISEN1.TIM";
 
-char MAIN_D_8012F4B8[20] = "\\STDDAT\\TAISEN2.TIM";
+char PATH_STDDAT_TAISEN2_TIM[20] = "\\STDDAT\\TAISEN2.TIM";
 
-char MAIN_D_8012F4CC[] = "\\STDDAT\\16TAISEN.TIM";
+char PATH_STDDAT_16TAISEN_TIM[] = "\\STDDAT\\16TAISEN.TIM";
 
-char MAIN_D_8012F4E4[] = "\\STDDAT\\TAISEN_F.TIM";
+char PATH_STDDAT_TAISEN_F_TIM[] = "\\STDDAT\\TAISEN_F.TIM";
 
-char MAIN_D_8012F4FC[] = "\\STDDAT\\TIME.TIM";
+char PATH_STDDAT_TIME_TIM[] = "\\STDDAT\\TIME.TIM";
 
-char MAIN_D_8012F510[12] = "Press Start";
+char VS_TEXT_PRESS_START[12] = "Press Start";
 
-char MAIN_D_8012F51C[] = "to begin.";
+char VS_TEXT_TO_BEGIN[] = "to begin.";
 
 uint8_t MAIN_D_8012F528[68] = {
 	0x00, 0x00, 0x00, 0x00, 0x01, 0x01, 0x03, 0x01,
@@ -2972,12 +2972,12 @@ void VS__func_800F7AC0(void)
 	int32_t rows;
 
 	ENTITY_TABLE[0]->isOnScreen = 0;
-	loadTIMFile(MAIN_D_8012F48C, GENERAL_BUFFER);
-	loadTIMFile(MAIN_D_8012F4A4, GENERAL_BUFFER);
-	loadTIMFile(MAIN_D_8012F4B8, GENERAL_BUFFER);
-	loadTIMFile(MAIN_D_8012F4CC, GENERAL_BUFFER);
-	loadTIMFile(MAIN_D_8012F4E4, GENERAL_BUFFER);
-	loadTIMFile(MAIN_D_8012F4FC, GENERAL_BUFFER);
+	loadTIMFile(PATH_ETCDAT_SYSTEM_W_TIM, GENERAL_BUFFER);
+	loadTIMFile(PATH_STDDAT_TAISEN1_TIM, GENERAL_BUFFER);
+	loadTIMFile(PATH_STDDAT_TAISEN2_TIM, GENERAL_BUFFER);
+	loadTIMFile(PATH_STDDAT_16TAISEN_TIM, GENERAL_BUFFER);
+	loadTIMFile(PATH_STDDAT_TAISEN_F_TIM, GENERAL_BUFFER);
+	loadTIMFile(PATH_STDDAT_TIME_TIM, GENERAL_BUFFER);
 
 	entries[0] = (uint8_t *)MAIN_D_8013526C;
 	entries[1] = (uint8_t *)MAIN_D_80135270;
@@ -3112,8 +3112,8 @@ void VS__func_800F7F0C(uint8_t id)
 	RECT rect;
 
 	if (MAIN_D_80134F52[id] == -1) {
-		drawString(MAIN_D_8012F510, 0, 0);
-		drawString(MAIN_D_8012F51C, 0, 12);
+		drawString(VS_TEXT_PRESS_START, 0, 0);
+		drawString(VS_TEXT_TO_BEGIN, 0, 12);
 
 		setRECT(&rect, (id == 0) ? -132 : 22, 32, 108, 36);
 		createStaticUIBox(id, 0, 2, &rect, 0, VS__func_800F9DC8);
@@ -3167,8 +3167,8 @@ void VS__initializeVSMode(char *namesP1, char *namesP2)
 		}
 	}
 
-	loadStackedTIMFile(MAIN_D_8012F464);
-	loadTIMFile(MAIN_D_8012F478, GENERAL_BUFFER_PTR);
+	loadStackedTIMFile(PATH_ETCDAT_ETCTIM_BIN_2);
+	loadTIMFile(PATH_ETCNA_TITLE2_TIM_2, GENERAL_BUFFER_PTR);
 }
 
 void VS__func_800F8148(uint8_t id)

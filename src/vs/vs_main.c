@@ -47,10 +47,10 @@ extern int32_t MAIN_D_80135268;
 extern char **MAIN_D_80135298;
 extern DigimonEntity *MAIN_D_80134EF4;
 extern DigimonEntity *MAIN_D_80134EF8;
-extern char MAIN_D_80134ACC[];
-extern char MAIN_D_80134AD0[];
-extern char MAIN_D_80134AD8[];
-extern char MAIN_D_80134AE0[];
+extern char VS_TEXT_RUN[];
+extern char VS_TEXT_ATTACK[];
+extern char VS_TEXT_AUTO[];
+extern char VS_TEXT_CHANGE[];
 extern char VS_D_80070720[];
 extern char VS_D_8007072C[];
 extern char VS_D_80070738[];
@@ -169,13 +169,13 @@ static void *vs_main_functions[] = {
 
 // clang-format off
 char *VS_D_80070744[8] = {
-	MAIN_D_80134ACC,
-	MAIN_D_80134AD0,
-	MAIN_D_80134AD8,
+	VS_TEXT_RUN,
+	VS_TEXT_ATTACK,
+	VS_TEXT_AUTO,
 	VS_D_80070720,
 	VS_D_8007072C,
 	VS_D_80070738,
-	MAIN_D_80134AE0,
+	VS_TEXT_CHANGE,
 	(void *)0x00000000,
 };
 
