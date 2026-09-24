@@ -87,7 +87,7 @@
 #define SCRIPT_OP_PLAY_BGM		0x5D	/* u8 bgm */
 #define SCRIPT_OP_STOP_BGM		0x5E	/* u8 */
 #define SCRIPT_OP_NOP_5F		0x5F	/* u8 */
-#define SCRIPT_OP_BUILTIN		0x64	/* u8: a shop, the jukebox, the naming screen... */
+#define SCRIPT_OP_BUILTIN		0x64	/* u8 builtin; a SCRIPT_BUILTIN_* */
 #define SCRIPT_OP_CURE_CONDITION	0x65	/* u8 mask of CONDITION_* */
 #define SCRIPT_OP_BATTLE		0x66	/* u8 */
 #define SCRIPT_OP_WAIT			0x67	/* _, u16 frames */
@@ -119,6 +119,46 @@
 #define SCRIPT_OP_NOP_FD		0xFD
 #define SCRIPT_OP_END			0xFE
 #define SCRIPT_OP_END_FF		0xFF
+
+/*
+ * Routines of the engine that SCRIPT_OP_BUILTIN runs. Most take their
+ * argument from PSTAT_BUILTIN_ARG and leave a result in PSTAT_RESULT; the
+ * ones that wait for the player run from tickScript() until they are done.
+ */
+#define SCRIPT_BUILTIN_PICK_ITEM		0x00
+#define SCRIPT_BUILTIN_MERIT_SHOP		0x01
+#define SCRIPT_BUILTIN_COLLECTOR_TRADE		0x02
+#define SCRIPT_BUILTIN_TOURNAMENT		0x06
+#define SCRIPT_BUILTIN_TRAINING			0x07
+#define SCRIPT_BUILTIN_SHOP			0x08
+#define SCRIPT_BUILTIN_JUKEBOX			0x09
+#define SCRIPT_BUILTIN_TRANSPORT		0x0A
+#define SCRIPT_BUILTIN_ITEM_KEEPER		0x0B
+#define SCRIPT_BUILTIN_TAKE_ONE_ITEM		0x0C
+#define SCRIPT_BUILTIN_TAKE_ALL_OF_ITEM		0x0D
+#define SCRIPT_BUILTIN_CARD_SHOP		0x0E
+#define SCRIPT_BUILTIN_OPEN_MONEY_BOX		0x0F
+#define SCRIPT_BUILTIN_CLOSE_MONEY_BOX		0x10
+#define SCRIPT_BUILTIN_TOURNAMENT_SCHEDULE	0x12
+#define SCRIPT_BUILTIN_SET_DIRT_CART		0x13
+#define SCRIPT_BUILTIN_SHRINK_DIRT_PILE		0x14
+#define SCRIPT_BUILTIN_RESET_MAP_OBJECT_ANIM	0x15	/* pstats 0xF7 and 0xF8 */
+#define SCRIPT_BUILTIN_TOURNAMENT_MEDAL		0x16
+#define SCRIPT_BUILTIN_OPEN_CHEST_TRAY		0x17
+#define SCRIPT_BUILTIN_CLOSE_CHEST_TRAY		0x18
+#define SCRIPT_BUILTIN_SET_TIME_SPEED		0x19
+#define SCRIPT_BUILTIN_MOOD_BUBBLE		0x1C	/* over NPC pstat 0xF7, mood pstat 0xF8 */
+#define SCRIPT_BUILTIN_EGG_BOX			0x1D
+#define SCRIPT_BUILTIN_CLEAR_PRICE		0x1E
+#define SCRIPT_BUILTIN_PRICE_FROM_TEXT_ARGS	0x1F
+#define SCRIPT_BUILTIN_NAMING			0x20
+#define SCRIPT_BUILTIN_LOAD_SHOP		0x23
+#define SCRIPT_BUILTIN_REMOVE_MIST		0x25
+#define SCRIPT_BUILTIN_FORGET_MOVES		0x2F	/* after all lives are lost */
+#define SCRIPT_BUILTIN_SAVE_MACHINE		0x30
+#define SCRIPT_BUILTIN_ANGEMON_PEDESTAL		0x32
+#define SCRIPT_BUILTIN_GAME_CLEAR_SAVE		0x36
+#define SCRIPT_BUILTIN_PRICE_TO_TEXT_ARGS	0x38
 
 typedef struct {
 	uint8_t *scriptPtr;
@@ -299,7 +339,7 @@ void showMapHeadTextbox(int32_t idx, int32_t owner, int32_t boxId,
 			int32_t section);
 void setDialogueOwner(int32_t owner);
 void createMonochromonMoodBubble(void);
-void MAIN_func_800FF9AC(void);
+void loadShopLibrary(void);
 void resetTextboxes(void);
 void closeAllTextboxes(void);
 void createTextbox(int32_t boxId, int32_t flags, RECT *rect, RECT *origin,

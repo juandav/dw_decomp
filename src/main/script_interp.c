@@ -373,23 +373,23 @@ int32_t tickScript(void)
 		case 3:
 		case 4:
 		case 5:
-		case 12:
-		case 13:
-		case 15:
-		case 16:
+		case SCRIPT_BUILTIN_TAKE_ONE_ITEM:
+		case SCRIPT_BUILTIN_TAKE_ALL_OF_ITEM:
+		case SCRIPT_BUILTIN_OPEN_MONEY_BOX:
+		case SCRIPT_BUILTIN_CLOSE_MONEY_BOX:
 		case 17:
-		case 19:
-		case 20:
-		case 21:
-		case 25:
+		case SCRIPT_BUILTIN_SET_DIRT_CART:
+		case SCRIPT_BUILTIN_SHRINK_DIRT_PILE:
+		case SCRIPT_BUILTIN_RESET_MAP_OBJECT_ANIM:
+		case SCRIPT_BUILTIN_SET_TIME_SPEED:
 		case 26:
 		case 27:
-		case 28:
-		case 30:
-		case 31:
+		case SCRIPT_BUILTIN_MOOD_BUBBLE:
+		case SCRIPT_BUILTIN_CLEAR_PRICE:
+		case SCRIPT_BUILTIN_PRICE_FROM_TEXT_ARGS:
 		case 33:
 		case 34:
-		case 35:
+		case SCRIPT_BUILTIN_LOAD_SHOP:
 		case 36:
 		case 38:
 		case 39:
@@ -404,22 +404,22 @@ int32_t tickScript(void)
 		case 51:
 		case 52:
 		case 55:
-		case 56:
+		case SCRIPT_BUILTIN_PRICE_TO_TEXT_ARGS:
 			goto done;
-		case 0:
+		case SCRIPT_BUILTIN_PICK_ITEM:
 			tickPickItemMenu();
 			break;
-		case 1:
+		case SCRIPT_BUILTIN_MERIT_SHOP:
 			tickMeritShop();
 			break;
-		case 8:
+		case SCRIPT_BUILTIN_SHOP:
 			if (!isTriggerSet(TRIGGER_3)) {
 				tickItemShop();
 			} else {
 				tickLostItemShop();
 			}
 			break;
-		case 14:
+		case SCRIPT_BUILTIN_CARD_SHOP:
 			if (!isTriggerSet(TRIGGER_3)) {
 				if (!isTriggerSet(TRIGGER_4)) {
 					rollCardPack();
@@ -430,71 +430,71 @@ int32_t tickScript(void)
 				tickCardSellShop();
 			}
 			break;
-		case 11:
+		case SCRIPT_BUILTIN_ITEM_KEEPER:
 			tickItemKeeper();
 			break;
-		case 2:
+		case SCRIPT_BUILTIN_COLLECTOR_TRADE:
 			tickCollectorTrade();
 			break;
-		case 9:
+		case SCRIPT_BUILTIN_JUKEBOX:
 			openJukebox();
 			break;
-		case 10:
+		case SCRIPT_BUILTIN_TRANSPORT:
 			tickTransport();
 			break;
-		case 7:
+		case SCRIPT_BUILTIN_TRAINING:
 			if (isTrainingComplete()) {
 				ACTIVE_INSTRUCTION = 0;
 			}
 			break;
-		case 18:
+		case SCRIPT_BUILTIN_TOURNAMENT_SCHEDULE:
 			initTournamentSchedule();
 			break;
-		case 6:
+		case SCRIPT_BUILTIN_TOURNAMENT:
 			scriptStartTournament();
 			break;
-		case 22:
+		case SCRIPT_BUILTIN_TOURNAMENT_MEDAL:
 			scriptCheckTournamentMedal();
 			break;
-		case 23:
+		case SCRIPT_BUILTIN_OPEN_CHEST_TRAY:
 			if (tickOpenChestTray(readPStat(PSTAT_BUILTIN_ARG))) {
 				ACTIVE_INSTRUCTION = 0;
 			}
 			break;
-		case 24:
+		case SCRIPT_BUILTIN_CLOSE_CHEST_TRAY:
 			if (tickCloseChestTray(readPStat(PSTAT_BUILTIN_ARG))) {
 				ACTIVE_INSTRUCTION = 0;
 			}
 			break;
-		case 29:
+		case SCRIPT_BUILTIN_EGG_BOX:
 			if (DOO2_tickEggInput()) {
 				ACTIVE_INSTRUCTION = 0;
 			}
 			break;
-		case 37:
+		case SCRIPT_BUILTIN_REMOVE_MIST:
 			if (tickRemoveMist()) {
 				ACTIVE_INSTRUCTION = 0;
 			}
 			break;
-		case 47:
+		case SCRIPT_BUILTIN_FORGET_MOVES:
 			lostAllLives();
 			break;
-		case 48:
+		case SCRIPT_BUILTIN_SAVE_MACHINE:
 			if (tickSaveMachine()) {
 				ACTIVE_INSTRUCTION = 0;
 			}
 			break;
-		case 54:
+		case SCRIPT_BUILTIN_GAME_CLEAR_SAVE:
 			if (tickGameClearSave()) {
 				ACTIVE_INSTRUCTION = 0;
 			}
 			break;
-		case 50:
+		case SCRIPT_BUILTIN_ANGEMON_PEDESTAL:
 			if (moveAngemonPedestal()) {
 				ACTIVE_INSTRUCTION = 0;
 			}
 			break;
-		case 32:
+		case SCRIPT_BUILTIN_NAMING:
 			if (newGameStateMachine()) {
 				ACTIVE_INSTRUCTION = 0;
 			}
@@ -1574,27 +1574,27 @@ void scriptInstruction64to7E(int32_t op)
 		pollNextScriptUByte(&byteArg1);
 		MAIN_D_80134FF8 = byteArg1;
 		switch (byteArg1) {
-		case 0x16:
+		case SCRIPT_BUILTIN_TOURNAMENT_MEDAL:
 			if (checkTournamentMedalConditions() == -1) {
 				break;
 			}
 			/* fall through */
-		case 0x00:
-		case 0x01:
-		case 0x02:
-		case 0x06:
-		case 0x08:
-		case 0x09:
-		case 0x0a:
-		case 0x0b:
-		case 0x0e:
-		case 0x12:
-		case 0x2f:
+		case SCRIPT_BUILTIN_PICK_ITEM:
+		case SCRIPT_BUILTIN_MERIT_SHOP:
+		case SCRIPT_BUILTIN_COLLECTOR_TRADE:
+		case SCRIPT_BUILTIN_TOURNAMENT:
+		case SCRIPT_BUILTIN_SHOP:
+		case SCRIPT_BUILTIN_JUKEBOX:
+		case SCRIPT_BUILTIN_TRANSPORT:
+		case SCRIPT_BUILTIN_ITEM_KEEPER:
+		case SCRIPT_BUILTIN_CARD_SHOP:
+		case SCRIPT_BUILTIN_TOURNAMENT_SCHEDULE:
+		case SCRIPT_BUILTIN_FORGET_MOVES:
 			ACTIVE_INSTRUCTION = SCRIPT_OP_BUILTIN;
 			SELECTION_MENU_STATE = 0;
 			SCRIPT_STATE_3 = 0;
 			longjmp(SCRIPT_JMP_BUF, 2);
-		case 0x07:
+		case SCRIPT_BUILTIN_TRAINING:
 			byteArg1 = readPStat(PSTAT_BUILTIN_ARG);
 			if ((CURRENT_MAP_ID == 0x6b) ||
 			    (CURRENT_MAP_ID == 0x6c) ||
@@ -1643,46 +1643,46 @@ void scriptInstruction64to7E(int32_t op)
 			SCRIPT_STATE_3 = 0;
 			longjmp(SCRIPT_JMP_BUF, 2);
 			break;
-		case 0x0c:
+		case SCRIPT_BUILTIN_TAKE_ONE_ITEM:
 			byteArg1 = readPStat(PSTAT_BUILTIN_ARG);
 			if (byteArg1 != 0xff) {
 				removeItem(byteArg1, 1);
 			}
 			break;
-		case 0x0d:
+		case SCRIPT_BUILTIN_TAKE_ALL_OF_ITEM:
 			byteArg1 = readPStat(PSTAT_BUILTIN_ARG);
 			if (byteArg1 != 0xff) {
 				removeItem(byteArg1, 0x63);
 			}
 			break;
-		case 0x0f:
+		case SCRIPT_BUILTIN_OPEN_MONEY_BOX:
 			openMoneyBox(1);
 			break;
-		case 0x10:
+		case SCRIPT_BUILTIN_CLOSE_MONEY_BOX:
 			triggerBoxCloseFlag(2);
 			longjmp(SCRIPT_JMP_BUF, 2);
-		case 0x13:
+		case SCRIPT_BUILTIN_SET_DIRT_CART:
 			byteArg1 = readPStat(PSTAT_BUILTIN_ARG);
 			setDirtCartModel(byteArg1);
 			longjmp(SCRIPT_JMP_BUF, 2);
-		case 0x14:
+		case SCRIPT_BUILTIN_SHRINK_DIRT_PILE:
 			decreaseDirtPileSize();
 			longjmp(SCRIPT_JMP_BUF, 2);
-		case 0x15:
+		case SCRIPT_BUILTIN_RESET_MAP_OBJECT_ANIM:
 			byteArg1 = readPStat(0xf7);
 			byteArg2 = readPStat(0xf8);
 			resetMapObjectAnimation(byteArg1, byteArg2);
 			longjmp(SCRIPT_JMP_BUF, 2);
-		case 0x1d:
+		case SCRIPT_BUILTIN_EGG_BOX:
 			DOO2_openEggBox();
 			/* fall through */
-		case 0x17:
-		case 0x18:
-		case 0x32:
+		case SCRIPT_BUILTIN_OPEN_CHEST_TRAY:
+		case SCRIPT_BUILTIN_CLOSE_CHEST_TRAY:
+		case SCRIPT_BUILTIN_ANGEMON_PEDESTAL:
 			ACTIVE_INSTRUCTION = SCRIPT_OP_BUILTIN;
 			SCRIPT_STATE_3 = 0;
 			longjmp(SCRIPT_JMP_BUF, 2);
-		case 0x19:
+		case SCRIPT_BUILTIN_SET_TIME_SPEED:
 			SCRIPT_SAVED_TIME_SPEED = readPStat(PSTAT_BUILTIN_ARG);
 			break;
 		case 0x1a:
@@ -1691,23 +1691,23 @@ void scriptInstruction64to7E(int32_t op)
 		case 0x1b:
 			loadDirtPileModel();
 			break;
-		case 0x1c:
+		case SCRIPT_BUILTIN_MOOD_BUBBLE:
 			createMonochromonMoodBubble();
 			break;
-		case 0x1e:
+		case SCRIPT_BUILTIN_CLEAR_PRICE:
 			SCRIPT_PRICE = 0;
 			break;
-		case 0x1f: {
+		case SCRIPT_BUILTIN_PRICE_FROM_TEXT_ARGS: {
 			int32_t hi = readPStat(PSTAT_TEXT_ARG_1) << 8;
 			int32_t lo = readPStat(PSTAT_TEXT_ARG_2);
 			posX = lo + hi;
 			SCRIPT_PRICE += posX;
 		} break;
-		case 0x38:
+		case SCRIPT_BUILTIN_PRICE_TO_TEXT_ARGS:
 			writePStat(PSTAT_TEXT_ARG_1, (SCRIPT_PRICE / 256) & 0xff);
 			writePStat(PSTAT_TEXT_ARG_2, SCRIPT_PRICE & 0xff);
 			break;
-		case 0x20:
+		case SCRIPT_BUILTIN_NAMING:
 			initializeNamingBuffer(readPStat(PSTAT_BUILTIN_ARG));
 			longjmp(SCRIPT_JMP_BUF, 2);
 		case 0x21:
@@ -1727,8 +1727,8 @@ void scriptInstruction64to7E(int32_t op)
 		case 0x22:
 			createMeramonShake();
 			break;
-		case 0x23:
-			MAIN_func_800FF9AC();
+		case SCRIPT_BUILTIN_LOAD_SHOP:
+			loadShopLibrary();
 			break;
 		case 0x24:
 			readMapTFS(CURRENT_MAP_ID);
@@ -1736,14 +1736,14 @@ void scriptInstruction64to7E(int32_t op)
 		case 0x27:
 			MAIN_func_800D9360(CURRENT_MAP_ID);
 			break;
-		case 0x30:
+		case SCRIPT_BUILTIN_SAVE_MACHINE:
 			openSaveMachine();
 			/* fall through */
-		case 0x25:
+		case SCRIPT_BUILTIN_REMOVE_MIST:
 			ACTIVE_INSTRUCTION = SCRIPT_OP_BUILTIN;
 			SCRIPT_STATE_3 = 0;
 			longjmp(SCRIPT_JMP_BUF, 2);
-		case 0x36:
+		case SCRIPT_BUILTIN_GAME_CLEAR_SAVE:
 			gameClearSave();
 			ACTIVE_INSTRUCTION = SCRIPT_OP_BUILTIN;
 			SCRIPT_STATE_3 = 0;

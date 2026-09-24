@@ -252,6 +252,8 @@ def read_opcodes(path):
             opcodes[op] = (names[op], None)
             continue
         args = parse(op)
+        if args is None:
+            sys.exit(f"{path}: can't read the arguments of SCRIPT_OP_{names[op]}")
         size = 1 + sum(ARG_SIZES[kind] for kind, _ in args)
         if SIZES.get(op) != size:
             sys.exit(f"{path}: SCRIPT_OP_{names[op]} takes {size} bytes, "
@@ -477,6 +479,8 @@ def format_arg(script, kind, name, value, names):
             return f"{label}={names[table][value]}"
     if label == "trigger":
         return "trigger=" + LABELS["trigger"].label(value, names)
+    if label == "builtin":
+        return LABELS["builtin"].label(value, names)
     if label in ("offset", "offsets", "section", "script", "map"):
         return f"{label}={value:#x}"
     return f"{label}={value}"
@@ -631,6 +635,7 @@ def main():
     if args.actions:
         LABELS["trigger"] = Labels(args.triggers, "TRIGGER")
         LABELS["pstat"] = Labels(args.pstats, "PSTAT")
+        LABELS["builtin"] = Labels(args.header, "SCRIPT_BUILTIN")
 
     for index in args.scripts or sorted(scripts):
         if index not in scripts:

@@ -243,7 +243,7 @@ static void *script_common_text_order[] = {
 	releaseTextboxRows,
 	drawTextboxRows,
 	checkArenaMap,
-	MAIN_func_800FF9AC,
+	loadShopLibrary,
 	checkShopMap,
 	MAIN_func_800FF900,
 	createMonochromonMoodBubble,
@@ -3368,7 +3368,7 @@ void checkShopMap(int32_t mapId)
 	}
 }
 
-void MAIN_func_800FF9AC(void)
+void loadShopLibrary(void)
 {
 	loadDynamicLibrary(SHOP_REL, (uint8_t *)&TRN_LOADING_COMPLETE, 1, 0, 0);
 }
