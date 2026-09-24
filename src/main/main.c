@@ -144,7 +144,7 @@ extern int32_t buffModelFrame;
 extern TMDModel *BUFF_MODEL[];
 
 void resetInventoryFlags(void);
-void MAIN_func_800DF804(void);
+void initEntityText(void);
 void initializeInventoryModules(void);
 
 void initializeEFE(void);
@@ -4035,7 +4035,7 @@ void initializeInventoryModules(void)
 	initializeDroppedItems();
 	resetInventoryFlags();
 	initializeInventory();
-	MAIN_func_800DF804();
+	initEntityText();
 }
 
 void addThrownItem(int32_t type)
