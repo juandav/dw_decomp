@@ -113,8 +113,8 @@ void handlePause(void);
 int32_t tickScript(void);
 void updateTournamentRegistration(void);
 void initializeNamingBuffer(uint8_t flags);
-void MAIN_func_8010020C(void);
-void MAIN_func_80100258(int32_t flag);
+void resetTextboxes(void);
+void tickTextboxes(int32_t flag);
 int32_t newGameStateMachine(void);
 void processInput(void);
 void loadNewgameScene(void);
@@ -368,25 +368,25 @@ int32_t MAP_LIGHT_UPDATE_DATA[2] = {
 	0x003101b7, 0xffff0002,
 };
 
-char MAIN_D_801345CC[] = "Sign";
+char SPEAKER_NAME_SIGN[] = "Sign";
 
-char MAIN_D_801345D4[4] = "Box";
+char SPEAKER_NAME_BOX[4] = "Box";
 
-char MAIN_D_801345D8[8] = "Betamon";
+char SPEAKER_NAME_BETAMON[8] = "Betamon";
 
-char MAIN_D_801345E0[8] = "Tanemon";
+char SPEAKER_NAME_TANEMON[8] = "Tanemon";
 
-char MAIN_D_801345E8[] = "Palmon";
+char SPEAKER_NAME_PALMON[] = "Palmon";
 
 char MAIN_D_801345F0[] = ";1";
 
-char MAIN_D_801345F4[4] = {
+char NAMING_PREVIEW_PREFIX[4] = {
 	0x00, 0x00, 0x00, 0x00,
 };
 
-char MAIN_D_801345F8[] = "Name";
+char NAMING_TITLE[] = "Name";
 
-char MAIN_D_80134600[8] = "BackOK";
+char NAMING_BUTTON_LABELS[8] = "BackOK";
 
 uint16_t MAIN_D_80134608[2] = {
 	0x0019, 0x0019,
@@ -3600,7 +3600,7 @@ void newGameScene(void)
 	done = 0;
 	checkShopMap(0xda);
 	initializeNamingBuffer(0);
-	MAIN_func_8010020C();
+	resetTextboxes();
 	fadeFromBlack(0x14);
 	writePStat(0xfe, 0);
 	writePStat(0xf3, 0xff);
@@ -3613,7 +3613,7 @@ void newGameScene(void)
 		GsSetWorkBase(&GS_WORK_BASES[ACTIVE_FRAMEBUFFER * 0x14000]);
 		GsClearOt(0, 0, ACTIVE_ORDERING_TABLE);
 		processInput();
-		MAIN_func_80100258(1);
+		tickTextboxes(1);
 
 		if (readPStat(0xf3) == 0) {
 			done = newGameStateMachine();

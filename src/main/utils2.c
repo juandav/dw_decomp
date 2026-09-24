@@ -574,14 +574,14 @@ void startTournament(void)
 		expected = 2;
 	}
 	if (result == expected) {
-		MAIN_D_80134FCC++;
-		MAIN_D_80134FCC = enforceStatsLimits(0x11, MAIN_D_80134FCC);
+		TOURNAMENT_TITLES++;
+		TOURNAMENT_TITLES = enforceStatsLimits(0x11, TOURNAMENT_TITLES);
 		setTrigger(id + 15);
 	} else {
-		MAIN_D_80134FD0++;
+		TOURNAMENT_LOSSES++;
 	}
-	TOURNAMENTS_LOST += result;
-	TOURNAMENTS_LOST = enforceStatsLimits(0x12, TOURNAMENTS_LOST);
-	MAIN_D_80134FD0 = enforceStatsLimits(0x13, MAIN_D_80134FD0);
+	TOURNAMENT_WINS += result;
+	TOURNAMENT_WINS = enforceStatsLimits(0x12, TOURNAMENT_WINS);
+	TOURNAMENT_LOSSES = enforceStatsLimits(0x13, TOURNAMENT_LOSSES);
 	writePStat(0xff, result);
 }

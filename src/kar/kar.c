@@ -56,7 +56,7 @@ extern char MAIN_D_80134A3C[];
 
 void renderSelectionCursor(int32_t a, int32_t b, int32_t c, int32_t d, int32_t e);
 void renderString(int32_t a, int32_t b, int32_t c, int32_t d, int32_t e, int32_t f, int32_t g, int32_t h, int32_t i);
-void renderUIBox(int32_t id);
+void renderTextboxNextArrow(int32_t id);
 
 void KAR_tickMatchState(void);
 void KAR_renderAimArrow(void);
@@ -2064,7 +2064,7 @@ int32_t KAR_tickHintBox(int32_t n)
 		if (MAIN_D_80135250 != -1) {
 			renderString(0, UI_BOX_DATA[0].finalPos.x + 4, UI_BOX_DATA[0].finalPos.y + 2, 0xfc, 0x34, 0,
 			             (MAIN_D_80135250 - 1) * 52, 6, 1);
-			renderUIBox(0);
+			renderTextboxNextArrow(0);
 		}
 	}
 

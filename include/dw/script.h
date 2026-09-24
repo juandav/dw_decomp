@@ -9,6 +9,14 @@
 #include <dw/font.h>
 #include <dw/types.h>
 
+/*
+ * Opcodes that the textbox code checks in ACTIVE_INSTRUCTION, the instruction
+ * the script is waiting on.
+ */
+#define SCRIPT_OP_CHOICE	0x10
+#define SCRIPT_OP_TEXT		0x1A
+#define SCRIPT_OP_BUILTIN	0x64	/* a shop, the jukebox, the naming screen... */
+
 typedef struct {
 	uint8_t *scriptPtr;
 	uint16_t scriptId;
@@ -66,25 +74,25 @@ typedef struct {
 	int16_t targetY;
 } ScriptCameraMovement;
 
-extern uint16_t MAIN_D_80134FFC;
-extern uint8_t MAIN_D_80135010;
+extern uint16_t SCRIPT_WAIT_TIMER;
+extern uint8_t TEXT_AUTO_ADVANCE_TIMER;
 extern ScriptState *SCRIPT_STATE_PTR;
 extern uint8_t ACTIVE_BGM_FONT;
 extern uint8_t *TEXT_BUFFERS_PTR;
-extern uint8_t *MAIN_D_80134FDC;
+extern uint8_t *SCRIPT_PC;
 extern uint8_t *MAPHEAD_DATA_PTR;
 extern int32_t LOADED_DIGIMON_MODELS[];
 extern ItemMenuBox *MAIN_D_80134F68;
 extern ItemMenuBox *MAIN_D_80134F6C;
 extern int8_t TRN_LOADING_COMPLETE;
-extern uint8_t MAIN_D_80134FE6;
+extern uint8_t DIALOGUE_SPEAKER;
 extern uint16_t MAIN_D_80134FC6;
 extern int16_t MAIN_D_8013027C[];
 extern uint16_t CURRENT_SCRIPT_ID;
 extern uint16_t CURRENT_MAP_ID;
 extern int32_t MAIN_D_80134FEC;
 extern jmp_buf SCRIPT_JMP_BUF;
-extern uint8_t MAIN_D_80134FE5;
+extern uint8_t TEXT_ADVANCE_MODE;
 extern uint8_t MAIN_D_80134FE7;
 extern int32_t SOME_SCRIPT_SYNC_BIT;
 extern int32_t IS_SCRIPT_PAUSED;
@@ -93,40 +101,42 @@ extern uint16_t ACTIVE_MAP_SCRIPT;
 extern int16_t MERIT;
 extern int16_t MAIN_D_80134FC8;
 extern int16_t MAIN_D_80134FCA;
-extern int16_t MAIN_D_80134FCC;
-extern int16_t TOURNAMENTS_LOST;
-extern int16_t MAIN_D_80134FD0;
+extern int16_t TOURNAMENT_TITLES;
+extern int16_t TOURNAMENT_WINS;
+extern int16_t TOURNAMENT_LOSSES;
 extern int16_t MAIN_D_80134FD2;
 extern int16_t MAIN_D_80134FD4;
 extern int16_t MAIN_D_80134FD6;
-extern uint16_t MAIN_D_80134F8C;
+extern uint16_t NAMING_CURSOR;
 extern uint8_t MAIN_D_80134F78;
 extern int16_t MAIN_D_80135002;
 extern int16_t MAIN_D_80135004;
 extern int32_t MAIN_D_80134F70;
 extern int32_t MAIN_D_80134F74;
 extern uint8_t MAIN_D_8012FE78[];
-extern int32_t MAIN_D_8013500C;
+extern int32_t SCRIPT_PRICE;
 extern uint16_t SELECTION_MENU_STATE;
 extern uint16_t SCRIPT_STATE_4;
 extern uint8_t SCRIPT_STATE_3;
 extern int32_t MAIN_D_80134FA0;
 extern int32_t MAIN_D_80134FE0;
 extern int32_t MONEY;
-extern char MAIN_D_801B1D1C[];
+extern char NAMING_BUFFER[];
 extern int32_t MAIN_D_80134F84;
 extern uint8_t ACTIVE_INSTRUCTION;
 extern uint8_t MAIN_D_80135011;
-extern uint8_t MAIN_D_80135000;
+extern uint8_t DIALOGUE_BOX_MODE;
 extern uint8_t MAIN_D_80134FA4;
 extern uint16_t MAIN_D_80134FF8;
 extern ScriptCameraMovement MAIN_D_801BE72C;
-extern uint8_t MAIN_D_80134F8E;
-extern int8_t MAIN_D_80134F98;
+extern uint8_t NAMING_FLAGS;
+#define NAMING_PARTNER		1	/* name the partner, not the player */
+#define NAMING_FROM_SCRIPT	2	/* a rename, not the new game questions */
+extern int8_t TEXT_MONOSPACE;
 int32_t scriptIdToEntityId(int32_t scriptId);
 uint32_t showTextbox(int32_t boxId, uint32_t speakerId);
 void closeBox(int32_t boxId);
-void MAIN_func_801062F8(int32_t owner);
+void beginScriptEvent(int32_t owner);
 void MAIN_func_800FCCFC(ItemMenuBox *box, int32_t startRow, int32_t style);
 void startAnimationTamer(int32_t animId);
 void tickScriptDialogueBox(void);
@@ -171,8 +181,8 @@ void showMapHeadTextbox(int32_t idx, int32_t owner, int32_t boxId,
 void setDialogueOwner(int32_t owner);
 void createMonochromonMoodBubble(void);
 void MAIN_func_800FF9AC(void);
-void MAIN_func_8010020C(void);
-void MAIN_func_8010064C(void);
+void resetTextboxes(void);
+void closeAllTextboxes(void);
 void createTextbox(int32_t boxId, int32_t flags, RECT *rect, RECT *origin,
 		   void *tick, void *render);
 void triggerBoxCloseFlag(int32_t boxId);
@@ -270,7 +280,7 @@ int32_t newGameStateMachine(void);
 int16_t *getStatsPointer(int32_t stat);
 uint8_t *getScript(int32_t mapId);
 uint8_t *getScriptSection(uint8_t *script, int32_t section);
-extern void MAIN_func_80100258(int32_t a0);
+extern void tickTextboxes(int32_t a0);
 extern void lostAllLives(void);
 
 #endif

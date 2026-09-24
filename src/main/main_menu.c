@@ -4180,9 +4180,9 @@ void loadSavegame(uint8_t *sv)
 	MERIT = savegame->meritData[0];
 	MAIN_D_80134FC8 = savegame->meritData[1];
 	MAIN_D_80134FCA = savegame->meritData[2];
-	MAIN_D_80134FCC = savegame->meritData[3];
-	TOURNAMENTS_LOST = savegame->meritData[4];
-	MAIN_D_80134FD0 = savegame->meritData[5];
+	TOURNAMENT_TITLES = savegame->meritData[3];
+	TOURNAMENT_WINS = savegame->meritData[4];
+	TOURNAMENT_LOSSES = savegame->meritData[5];
 	memcpy(SCRIPT_STATE_PTR, savegame->scriptState, 0x17C);
 	MAIN_STATE = savegame->mainState;
 	memcpy(SAVE_TAMER_WAYPOINT_X, savegame->tamerWaypointX, 0x1E);
@@ -4242,9 +4242,9 @@ void writeSavegame(uint8_t *sv)
 	savegame->meritData[0] = MERIT;
 	savegame->meritData[1] = MAIN_D_80134FC8;
 	savegame->meritData[2] = MAIN_D_80134FCA;
-	savegame->meritData[3] = MAIN_D_80134FCC;
-	savegame->meritData[4] = TOURNAMENTS_LOST;
-	savegame->meritData[5] = MAIN_D_80134FD0;
+	savegame->meritData[3] = TOURNAMENT_TITLES;
+	savegame->meritData[4] = TOURNAMENT_WINS;
+	savegame->meritData[5] = TOURNAMENT_LOSSES;
 	memcpy(savegame->scriptState, SCRIPT_STATE_PTR, 0x17C);
 	memcpy(savegame->tamerWaypointX, TAMER_WAYPOINT_X, 0x1E);
 	memcpy(savegame->tamerWaypointY, TAMER_WAYPOINT_Y, 0x1E);

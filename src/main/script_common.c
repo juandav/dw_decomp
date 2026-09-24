@@ -1,5 +1,6 @@
 #include <string.h>
 
+#include <libetc.h>
 #include <libgs.h>
 
 #include <dw/file_queue.h>
@@ -12,6 +13,7 @@
 #include <dw/sjis.h>
 #include <dw/sound.h>
 #include <dw/tamer.h>
+#include <dw/text.h>
 #include <dw/ui.h>
 #include <dw/utils.h>
 
@@ -41,7 +43,7 @@ typedef struct {
 } Pow10Table;
 
 extern ScriptCameraMovement MAIN_D_801BE6B4[];
-extern TextBoxTable MAIN_D_801BE80C;
+extern TextBoxTable TEXT_BOX_TABLE;
 extern uint8_t TEXTBOX_OPEN_TIMER;
 extern uint32_t MAIN_D_8013501C;
 extern int32_t MAIN_D_80135028;
@@ -55,17 +57,17 @@ extern int32_t MAIN_D_80135020;
 extern uint16_t MAIN_D_80135016;
 extern int32_t MAIN_D_80135018;
 extern uint32_t POLLED_INPUT;
-extern int32_t MAIN_D_80134F94;
-extern uint16_t MAIN_D_801BE952[];
-extern uint16_t MAIN_D_801BE954[];
-extern uint16_t MAIN_D_801BE956[];
+extern int32_t TEXTBOX_SHOW_NEXT_ARROW;
+extern uint16_t CHOICE_CURSOR[];
+extern uint16_t CHOICE_CURSOR_Y[];
+extern uint16_t CHOICE_CURSOR_WIDTH[];
 extern BabyTypeTable MAIN_D_801345B4;
 extern int32_t MAIN_D_80134F88;
 extern int16_t MAIN_D_801345BC[2];
 extern uint32_t POLLED_INPUT_PREVIOUS;
-extern uint16_t MAIN_D_801BE950[];
-extern int32_t MAIN_D_801BE948[];
-extern int32_t MAIN_D_801BE94C[];
+extern uint16_t CHOICE_COUNT[];
+extern int32_t CHOICE_TARGETS[];
+extern int32_t CHOICE_CANCEL_PC[];
 extern uint8_t MAIN_D_80134F81;
 extern uint8_t MAIN_D_80134F82;
 extern uint8_t MAIN_D_80134F80;
@@ -74,7 +76,7 @@ extern GsOT *ACTIVE_ORDERING_TABLE;
 extern char *MOVE_NAMES[];
 extern char *MAP_NAME_PTR[];
 extern char *ITEM_DESC_PTR[];
-extern int8_t MAIN_D_80134F98;
+extern int8_t TEXT_MONOSPACE;
 extern int32_t MAIN_D_80134FA8;
 extern char MAIN_D_801345F0[3];
 extern char MAIN_D_80134554[];
@@ -94,11 +96,11 @@ extern char MAIN_D_801345A0[2][2];
 extern char MAIN_D_801345A4[2][2];
 extern char MAIN_D_801345A8[2][2];
 extern char MAIN_D_801345AC[2][2];
-extern char MAIN_D_801345CC[];
-extern char MAIN_D_801345D4[];
-extern char MAIN_D_801345D8[];
-extern char MAIN_D_801345E0[];
-extern char MAIN_D_801345E8[];
+extern char SPEAKER_NAME_SIGN[];
+extern char SPEAKER_NAME_BOX[];
+extern char SPEAKER_NAME_BETAMON[];
+extern char SPEAKER_NAME_TANEMON[];
+extern char SPEAKER_NAME_PALMON[];
 extern int32_t CURRENT_SCRIPT_PTR;
 
 void renderSelectionCursor(int32_t a0, int32_t a1, int32_t a2, int32_t a3, int32_t a4);
@@ -107,7 +109,7 @@ void renderItemSprite(int32_t itemId, int32_t x, int32_t y, int32_t depth);
 void setPosDataPolyFT4(POLY_FT4 *prim, int32_t posX, int32_t posY, int32_t width, int32_t height);
 void setUVDataPolyFT4(POLY_FT4 *prim, int32_t xPos, int32_t yPos, int32_t width, int32_t height);
 void renderString(int32_t a0, int32_t a1, int32_t a2, int32_t a3, int32_t a4, int32_t a5, int32_t a6, int32_t a7, int32_t a8);
-int32_t MAIN_func_80100E40(int32_t boxId);
+int32_t tickTextboxPageFlip(int32_t boxId);
 int32_t hasMove(int32_t moveId);
 void unlearnMove(int32_t moveId);
 void loadMap(uint16_t mapId);
@@ -121,15 +123,15 @@ void MAIN_func_800FAB30(void);
 void MAIN_func_800FADE0(void);
 void MAIN_func_800FD534(ItemMenuBox *box, int32_t style);
 int32_t MAIN_func_800FD61C(ItemMenuBox *box, RECT *origin, int32_t uiBoxId);
-void MAIN_func_801000E4(void);
+void renderSizedTextbox(void);
 int32_t shopFillBuyItemList(void);
 int32_t MAIN_func_800FAA68(void);
 int32_t MAIN_func_800FAFB0(void);
 void MAIN_func_800FB070(void);
 void MAIN_func_800FB0CC(void);
 void MAIN_func_800FBC00(void);
-uint8_t *doShopkeeperLine(int32_t idx);
-uint8_t *resolveMapHeadEntry(int32_t section, int32_t idx);
+uint8_t *getShopText(int32_t idx);
+uint8_t *getMapHeadText(int32_t section, int32_t idx);
 void processInput(void);
 int32_t isKeyDown(uint32_t key);
 void MAIN_func_800FC08C(void);
@@ -145,7 +147,7 @@ void MAIN_func_800FDF84(void);
 int32_t MAIN_func_800FE650(uint8_t a);
 void MAIN_func_800FF2A8(ItemMenuBox *box);
 void MAIN_func_800FF310(ItemMenuBox *box);
-uint8_t *MAIN_func_800FF444(uint8_t *data, int32_t index);
+uint8_t *getItemMenuRowBuffer(ItemMenuBox *box, int32_t index);
 void terminateString(uint8_t *str, int32_t flag);
 uint8_t *padWithSpaces(uint8_t *str, int32_t width, int32_t used);
 void setDigimonRaised(int32_t digimonId);
@@ -155,14 +157,14 @@ int32_t hasMedal(uint16_t medal);
 void MAIN_func_800FF900(void);
 void checkShopMap(int32_t mapId);
 void checkArenaMap(int32_t mapId);
-void MAIN_func_800FFBB8(int32_t boxId);
-int32_t MAIN_func_800FFDF4(void);
-void MAIN_func_800FFF80(int32_t x, int32_t y);
-void MAIN_func_800FFFF0(void);
+void releaseTextboxRows(int32_t boxId);
+int32_t tickDialogueAdvance(void);
+void renderDialogueChoiceCursor(int32_t x, int32_t y);
+void tickSizedTextbox(void);
 void getVRAMModeCoords(int32_t mode, int32_t *outX, int32_t *outClut);
 int32_t advanceTextbox(int32_t boxId);
 void setupDialogueBox(uint8_t owner);
-int32_t MAIN_func_80101EF8(int32_t boxId, int32_t speakerId);
+int32_t showTextboxFinalPage(int32_t boxId, int32_t speakerId);
 void MAIN_func_800FB700(void);
 void MAIN_func_800FB8D4(void);
 void MAIN_func_800FBAA0(void);
@@ -180,16 +182,16 @@ void MAIN_func_800FEC30(ItemMenuBox *box, uint8_t row, int32_t isLast);
 void MAIN_func_800FED64(ItemMenuBox *box, uint8_t row, int32_t isLast);
 void MAIN_func_800FEEF0(ItemMenuBox *box, uint8_t row, int32_t isLast);
 void MAIN_func_800FF338(uint8_t boxId, int16_t x, int16_t y, int32_t w, int16_t h);
-int32_t MAIN_func_800FFA4C(int32_t boxId, int32_t flag);
-int32_t MAIN_func_800FFC1C(void);
-int32_t MAIN_func_800FFF24(void);
-int32_t drawString2(uint8_t *str, int16_t x, int16_t y, int32_t flag);
+int32_t drawTextboxRows(int32_t boxId, int32_t flag);
+int32_t tickDialogueChoice(void);
+int32_t isDialogueFinished(void);
+int32_t drawTextRow(uint8_t *str, int16_t x, int16_t y, int32_t flag);
 int32_t getSpeakerName(int32_t speakerId, uint8_t *buf);
 uint8_t *intToStringSJIS(uint8_t *buf, int32_t value, uint8_t digits, int32_t flag);
 void renderHorizontalLine(uint8_t boxId, int16_t x, int16_t y, int32_t w);
 void renderLinePrimitive(uint32_t color, int32_t x0, int32_t y0, int32_t x1, int32_t y1, int32_t order, uint32_t mode);
 void renderSellItemBox(void);
-void renderUIBox(int32_t boxId);
+void renderTextboxNextArrow(int32_t boxId);
 void renderVerticalLine(int32_t boxId, int16_t x, int16_t y, int32_t h);
 void tickSellItemBox(void);
 
@@ -209,35 +211,35 @@ static void *script_common_text_order[] = {
 	scriptIdToEntityId,
 	intToStringSJIS,
 	getSpeakerName,
-	MAIN_func_80101EF8,
+	showTextboxFinalPage,
 	scriptSetTextboxSize,
 	showTextbox,
 	scriptShowSelection,
-	renderUIBox,
+	renderTextboxNextArrow,
 	renderScriptDialogueBox,
 	tickScriptDialogueBox,
 	setupBoxOrigin,
 	setupDialogueBox,
 	advanceTextbox,
-	MAIN_func_80100E40,
-	drawString2,
+	tickTextboxPageFlip,
+	drawTextRow,
 	registerTextbox,
 	triggerBoxCloseFlag,
 	createTextbox,
 	closeBox,
-	MAIN_func_8010064C,
+	closeAllTextboxes,
 	closeTextbox,
 	getVRAMModeCoords,
-	MAIN_func_80100258,
-	MAIN_func_8010020C,
-	MAIN_func_801000E4,
-	MAIN_func_800FFFF0,
-	MAIN_func_800FFF80,
-	MAIN_func_800FFF24,
-	MAIN_func_800FFDF4,
-	MAIN_func_800FFC1C,
-	MAIN_func_800FFBB8,
-	MAIN_func_800FFA4C,
+	tickTextboxes,
+	resetTextboxes,
+	renderSizedTextbox,
+	tickSizedTextbox,
+	renderDialogueChoiceCursor,
+	isDialogueFinished,
+	tickDialogueAdvance,
+	tickDialogueChoice,
+	releaseTextboxRows,
+	drawTextboxRows,
 	checkArenaMap,
 	MAIN_func_800FF9AC,
 	checkShopMap,
@@ -252,7 +254,7 @@ static void *script_common_text_order[] = {
 	renderVerticalLine,
 	padWithSpaces,
 	terminateString,
-	MAIN_func_800FF444,
+	getItemMenuRowBuffer,
 	MAIN_func_800FF338,
 	MAIN_func_800FF310,
 	MAIN_func_800FF2A8,
@@ -305,8 +307,8 @@ static void *script_common_text_order[] = {
 	processInput,
 	initialKeyInputs,
 	renderMonochromonMoodBubble,
-	resolveMapHeadEntry,
-	doShopkeeperLine,
+	getMapHeadText,
+	getShopText,
 	MAIN_func_800FBC58,
 	MAIN_func_800FBC00,
 	MAIN_func_800FBAA0,
@@ -455,7 +457,7 @@ BoxUVTable MAIN_D_8012FE24 = {
 	},
 };
 
-ShopkeeperIdTable MAIN_D_8012FE5C = {
+ShopkeeperIdTable SHOPKEEPER_DIGIMON = {
 	{ 0x97, 0x99, 0xa3, 0xa5, 0x82, 0x89, 0x87, 0xaa, 0x76, 0x80, 0xff },
 };
 
@@ -476,7 +478,7 @@ uint8_t MAIN_D_8012FE78[78] = {
 	0x77, 0x78, 0x79, 0x7a, 0x7b, 0x7c,
 };
 
-char *MAIN_D_8012FEC8[63] = {
+char *BGM_TRACK_NAMES[63] = {
 	MAIN_D_8012F6D0,
 	MAIN_D_8012F6F0,
 	MAIN_D_8012F714,
@@ -616,7 +618,7 @@ CardData CARD_DATA[66] = {
 	{ 0x00, 0x05, 0x00, 0x00 },
 };
 
-char *MAIN_D_801300E0[23] = {
+char *TOURNAMENT_CUP_NAMES[23] = {
 	MAIN_D_80134554,
 	MAIN_D_8013455C,
 	MAIN_D_80134564,
@@ -725,7 +727,7 @@ int16_t MAIN_D_801302FC[8] = {
 	0x00aa, 0x00ca, 0x00ca, 0x00aa, 0x00ca, 0x0092, 0x0092, 0x00aa,
 };
 
-char MAIN_D_8013030C[] = "Coelamon";
+char SPEAKER_NAME_COELAMON[] = "Coelamon";
 
 int16_t MAIN_D_80130318[22] = {
 	0x03e7, 0x03e7, 0x03e7, 0x03e7, 0x270f, 0x270f, 0x270f, 0x270f,
@@ -733,24 +735,24 @@ int16_t MAIN_D_80130318[22] = {
 	0x270f, 0x03e7, 0x03e7, 0x03e7, 0x0063, 0x000a,
 };
 
-Pow10Table MAIN_D_80130344 = {
+Pow10Table POWERS_OF_TEN = {
 	{
 		0x00000001, 0x0000000a, 0x00000064, 0x000003e8,
 		0x00002710, 0x000186a0,
 	},
 };
 
-char *MAIN_D_8013035C[6] = {
-	MAIN_D_801345CC,
-	MAIN_D_801345D4,
-	MAIN_D_801345D8,
-	MAIN_D_8013030C,
-	MAIN_D_801345E0,
-	MAIN_D_801345E8,
+char *SPECIAL_SPEAKER_NAMES[6] = {
+	SPEAKER_NAME_SIGN,
+	SPEAKER_NAME_BOX,
+	SPEAKER_NAME_BETAMON,
+	SPEAKER_NAME_COELAMON,
+	SPEAKER_NAME_TANEMON,
+	SPEAKER_NAME_PALMON,
 };
 
-char MAIN_D_80130374[] = "\\SCN\\MAPHEAD.SCN";
-char MAIN_D_80130388[12] = "\\SCN\\DG.SCN";
+char MAPHEAD_FILE_PATH[] = "\\SCN\\MAPHEAD.SCN";
+char SCRIPT_FILE_PATH[12] = "\\SCN\\DG.SCN";
 char MAIN_D_80130394[20] = "\\ETCHI\\BOSS_EFE.TMD";
 char MAIN_D_801303A8[] = "\\ETCHI\\OP.TIM";
 
@@ -963,7 +965,7 @@ char **NAMING_CHAR_PAGES[6] = {
 	NAMING_PAGE_HIRAGANA_2,
 };
 
-int16_t MAIN_D_8013078C[10] = {
+int16_t NAMING_LABEL_LAYOUT[10] = {
 	0x000e, 0x0006, 0x0030, 0x000e, 0x005a, 0x0030, 0x000e, 0x0076,
 	0x0018, 0x0000,
 };
@@ -1106,7 +1108,7 @@ void MAIN_func_800FAB30(void)
 		return;
 	}
 
-	if (MAIN_D_8013500C != 0) {
+	if (SCRIPT_PRICE != 0) {
 		return;
 	}
 
@@ -1173,7 +1175,7 @@ int32_t MAIN_func_800FAFB0(void)
 	MAIN_D_80134F78 = box->buf[idx];
 
 	if (MAIN_D_80134F78 != 0xff && box->buf[idx + 1] != 0) {
-		MAIN_D_8013500C = ITEM_PARA[MAIN_D_80134F78].meritValue;
+		SCRIPT_PRICE = ITEM_PARA[MAIN_D_80134F78].meritValue;
 		SELECTION_MENU_STATE = 0xb;
 		SCRIPT_STATE_3 = 0;
 		playSound(0, 3);
@@ -1423,7 +1425,8 @@ void MAIN_func_800FBC00(void)
 	}
 }
 
-uint8_t *doShopkeeperLine(int32_t idx)
+/* Returns message idx of the shop run by the NPC in pstat 254. */
+uint8_t *getShopText(int32_t idx)
 {
 	ShopkeeperIdTable shopkeeperIds;
 	int32_t section;
@@ -1431,11 +1434,11 @@ uint8_t *doShopkeeperLine(int32_t idx)
 	int32_t i;
 	int32_t npcType;
 
-	shopkeeperIds = MAIN_D_8012FE5C;
+	shopkeeperIds = SHOPKEEPER_DIGIMON;
 	pstat = readPStat(0xfe) & 0xff;
 
 	if (pstat == 0xff) {
-		section = 0x4ce;
+		section = MAPHEAD_TEXT_COELAMON_SHOP;
 	} else {
 		pstat = scriptIdToEntityId(pstat) & 0xff;
 		if (pstat != 0xff) {
@@ -1443,18 +1446,22 @@ uint8_t *doShopkeeperLine(int32_t idx)
 				*(int32_t *)(&NPC_ENTITIES[pstat - 2]) & 0xff;
 			for (i = 0; (uint32_t)i < 0xb; i++) {
 				if (npcType == shopkeeperIds.b[i]) {
-					section = (i + 0x4c4) & 0xffff;
+					section = (i + MAPHEAD_TEXT_SHOP) & 0xffff;
 					goto done;
 				}
 			}
 		}
-		section = 0x4c4;
+		section = MAPHEAD_TEXT_SHOP;
 	}
 done:
-	return resolveMapHeadEntry(section, idx);
+	return getMapHeadText(section, idx);
 }
 
-uint8_t *resolveMapHeadEntry(int32_t section, int32_t idx)
+/*
+ * Returns message idx of a MAPHEAD_TEXT_* table. The table is a list of jumps
+ * to the text instructions, and this returns the text after the opcode.
+ */
+uint8_t *getMapHeadText(int32_t section, int32_t idx)
 {
 	uint8_t *script;
 	uint8_t *sectionPtr;
@@ -1774,7 +1781,7 @@ void tickSellItemBox(void)
 					unitPrice = unitPrice * 90 / 100;
 					savings = MAIN_D_80134F7C;
 					savings -= unitPrice;
-					MAIN_D_8013500C =
+					SCRIPT_PRICE =
 						MAIN_D_80134F81 * savings;
 				}
 
@@ -1822,7 +1829,7 @@ void MAIN_func_800FEEF0(ItemMenuBox *box, uint8_t row, int32_t isLast)
 	int32_t item;
 	int32_t len;
 
-	out = MAIN_func_800FF444((uint8_t *)box, row);
+	out = getItemMenuRowBuffer(box, row);
 	*out++ = 1;
 	*out++ = 7;
 
@@ -1991,7 +1998,7 @@ void initializeItemMenuBox(ItemMenuBox **box, int32_t bufSize, int32_t rows,
 
 void showShopkeeperTextbox(int32_t idx, int32_t owner, int32_t boxId)
 {
-	showMapHeadTextbox(idx, owner, boxId, 0xff);
+	showMapHeadTextbox(idx, owner, boxId, MAPHEAD_TEXT_CURRENT_SHOP);
 }
 
 void destroyItemMenuBox(ItemMenuBox **box)
@@ -2023,7 +2030,7 @@ void MAIN_func_800FC968(int32_t showBits)
 void MAIN_func_800FCA14(int32_t idx, int32_t owner, int32_t boxId,
                         int32_t *outSelection)
 {
-	showMapheadSelection(idx, owner, boxId, outSelection, 0xff);
+	showMapheadSelection(idx, owner, boxId, outSelection, MAPHEAD_TEXT_CURRENT_SHOP);
 }
 
 void MAIN_func_800FCA3C(void)
@@ -2049,7 +2056,7 @@ void MAIN_func_800FCA3C(void)
 	registerTextbox(1, 9, 6, 1, 0);
 	MAIN_func_800FCC98(result, 1, 9);
 	MAIN_func_800FCCFC(result, 9, 0);
-	MAIN_D_8013500C = 0;
+	SCRIPT_PRICE = 0;
 }
 
 void MAIN_func_800FCB3C(void)
@@ -2133,7 +2140,7 @@ void MAIN_func_800FCCFC(ItemMenuBox *box, int32_t startRow, int32_t style)
 	int32_t last;
 	int32_t i;
 
-	entry = &MAIN_D_801BE80C.box[box->boxId];
+	entry = &TEXT_BOX_TABLE.box[box->boxId];
 	rows = box->itemCount - box->topRow;
 	if (box->visibleRows < rows) {
 		rows = box->visibleRows;
@@ -2310,7 +2317,8 @@ int32_t MAIN_func_800FD244(RECT *origin)
 	createTextbox(3, 0xc1, &rect, origin, MAIN_func_800FB8D4,
 	              MAIN_func_800FBAA0);
 	registerTextbox(3, MAIN_D_80135018, 2, 0, 0);
-	showMapHeadTextbox(0, 0xff, 3, 0x4d8);
+	/* "Is it OK? / Yes No" */
+	showMapHeadTextbox(0, SPEAKER_NONE, 3, MAPHEAD_TEXT_SYSTEM);
 	MAIN_D_80134F81 = 0;
 	playSound(0, 3);
 
@@ -2527,7 +2535,7 @@ void MAIN_func_800FDC5C(ItemMenuBox *box, int16_t x1, int16_t y1, int16_t x2,
 	uint8_t row;
 
 	boxId = box->boxId;
-	tbox = &MAIN_D_801BE80C.box[boxId];
+	tbox = &TEXT_BOX_TABLE.box[boxId];
 	if (mode != 2) {
 		if (MAIN_func_800FCF88(box) != 0) {
 			top = box->prevTopRow;
@@ -2685,30 +2693,34 @@ void MAIN_func_800FE258(int32_t spriteId, int16_t x, int16_t y, int32_t depth)
 	GsSetWorkBase((PACKET *)prim);
 }
 
+/*
+ * Shows message idx of the MAPHEAD_TEXT_* table section in boxId, said by
+ * owner, in the middle of whatever the script is doing.
+ */
 void showMapHeadTextbox(int32_t idx, int32_t owner, int32_t boxId,
                         int32_t section)
 {
 	uint8_t *savedCursor;
 
-	if (boxId == 0 && owner != 0xfe) {
+	if (boxId == 0 && owner != SPEAKER_NARRATOR) {
 		setDialogueOwner(owner);
 	}
 
-	savedCursor = MAIN_D_80134FDC;
+	savedCursor = SCRIPT_PC;
 
-	if (section == 0xff) {
-		MAIN_D_80134FDC = doShopkeeperLine(idx);
+	if (section == MAPHEAD_TEXT_CURRENT_SHOP) {
+		SCRIPT_PC = getShopText(idx);
 	} else {
-		MAIN_D_80134FDC = resolveMapHeadEntry(section, idx);
+		SCRIPT_PC = getMapHeadText(section, idx);
 	}
 
-	if (owner == 0xfe) {
-		owner = 0xff;
+	if (owner == SPEAKER_NARRATOR) {
+		owner = SPEAKER_NONE;
 	}
 
-	MAIN_func_80101EF8(boxId, owner);
-	ACTIVE_INSTRUCTION = 0x64;
-	MAIN_D_80134FDC = savedCursor;
+	showTextboxFinalPage(boxId, owner);
+	ACTIVE_INSTRUCTION = SCRIPT_OP_BUILTIN;
+	SCRIPT_PC = savedCursor;
 }
 
 void lostAllLives(void)
@@ -2773,7 +2785,8 @@ state2:
 	unlearnMove(pick);
 	writePStat(0xf3, pick);
 	freeArray((uint32_t *)pool);
-	showMapHeadTextbox(7, 0xff, 0, 0x4d8);
+	/* "<move>was not passed on." */
+	showMapHeadTextbox(7, SPEAKER_NONE, 0, MAPHEAD_TEXT_SYSTEM);
 	SELECTION_MENU_STATE = 1;
 	SCRIPT_STATE_4 = 3;
 	SCRIPT_STATE_3 = 1;
@@ -2796,7 +2809,7 @@ int32_t MAIN_func_800FE650(uint8_t a)
 {
 	TextBoxData *entry;
 
-	entry = &MAIN_D_801BE80C.box[a];
+	entry = &TEXT_BOX_TABLE.box[a];
 
 	if (entry->doubleBuffered == 0) {
 		return 0;
@@ -2830,7 +2843,7 @@ void MAIN_func_800FE704(ItemMenuBox *box, uint8_t row, int32_t isLast)
 	int32_t idx;
 	int32_t i;
 
-	out = MAIN_func_800FF444((uint8_t *)box, row);
+	out = getItemMenuRowBuffer(box, row);
 	sum = box->topRow + row;
 	i = sum * 2;
 	idx = i;
@@ -2908,7 +2921,7 @@ void MAIN_func_800FE9F0(ItemMenuBox *box, uint8_t row, int32_t isLast)
 	int32_t idx;
 	int32_t value;
 
-	out = MAIN_func_800FF444((uint8_t *)box, row);
+	out = getItemMenuRowBuffer(box, row);
 	idx = (box->topRow + row) * 2;
 	type = box->buf[idx];
 	amount = box->buf[idx + 1];
@@ -2958,7 +2971,7 @@ void MAIN_func_800FEC30(ItemMenuBox *box, uint8_t row, int32_t isLast)
 	uint8_t type;
 	int32_t len;
 
-	out = MAIN_func_800FF444((uint8_t *)box, row);
+	out = getItemMenuRowBuffer(box, row);
 	type = box->buf[(box->topRow + row) * 2];
 	*out++ = 1;
 
@@ -2971,8 +2984,8 @@ void MAIN_func_800FEC30(ItemMenuBox *box, uint8_t row, int32_t isLast)
 	out = intToStringSJIS(out, type + 1, 2, 0);
 	*out++ = 0xf;
 	*out++ = 0;
-	strcpy(out, MAIN_D_8012FEC8[type]);
-	len = strlen(MAIN_D_8012FEC8[type]);
+	strcpy(out, BGM_TRACK_NAMES[type]);
+	len = strlen(BGM_TRACK_NAMES[type]);
 	out += len;
 	out = padWithSpaces(out, 0xc, len);
 	terminateString(out, isLast);
@@ -2985,7 +2998,7 @@ void MAIN_func_800FED64(ItemMenuBox *box, uint8_t row, int32_t isLast)
 	uint8_t nameId;
 	int32_t len;
 
-	out = MAIN_func_800FF444((uint8_t *)box, row);
+	out = getItemMenuRowBuffer(box, row);
 	raw = box->buf[(box->topRow + row) * 2];
 	*out++ = 1;
 
@@ -3017,7 +3030,7 @@ void MAIN_func_800FF0FC(ItemMenuBox *box, int32_t style)
 	int32_t outX;
 	int32_t outClut;
 
-	entry = &MAIN_D_801BE80C.box[box->boxId];
+	entry = &TEXT_BOX_TABLE.box[box->boxId];
 	((int32_t *)entry)[6] ^= 1;
 
 	row = box->cursor;
@@ -3049,7 +3062,7 @@ void MAIN_func_800FF0FC(ItemMenuBox *box, int32_t style)
 		p += 0x20;
 	}
 
-	drawString2(p, outX, row * 12, 1);
+	drawTextRow(p, outX, row * 12, 1);
 }
 
 void MAIN_func_800FF338(uint8_t boxId, int16_t x, int16_t y, int32_t w, int16_t h)
@@ -3089,42 +3102,42 @@ void MAIN_func_800FF310(ItemMenuBox *data)
 	playSound(0, 2);
 }
 
-uint8_t *MAIN_func_800FF444(uint8_t *data, int32_t index)
+/* Returns the row of the text buffer that holds row index of the menu. */
+uint8_t *getItemMenuRowBuffer(ItemMenuBox *box, int32_t index)
 {
 	TextBoxData *entry;
 	uint8_t *row;
 
-	entry = &MAIN_D_801BE80C.box[data[0xc]];
-	row = TEXT_BUFFERS_PTR + (data + index)[0x18] * 0x40;
+	entry = &TEXT_BOX_TABLE.box[box->boxId];
+	row = TEXT_BUFFERS_PTR + box->itemRow[index] * TEXT_ROW_SIZE;
 
-	if (((int32_t *)entry)[7] == 2) {
-		row += 0x20;
+	if (entry->vramMode == 2) {
+		row += TEXT_ROW_SIZE / 2;
 	}
 
 	if (entry->doubleBuffered == 1) {
-		row = (uint8_t *)(row +
-		                  (((((int32_t *)entry)[6] ^ 1) *
-		                    ((int32_t *)entry)[9])
-		                   << 6));
+		row = (uint8_t *)(row + (((entry->backPage ^ 1) * entry->vramRows) << 6));
 	}
 
 	return row;
 }
 
+/* Resets the color and ends the text, or only the row if flag is 0. */
 void terminateString(uint8_t *str, int32_t flag)
 {
-	*str++ = 1;
-	*str++ = 1;
+	*str++ = TEXT_COLOR;
+	*str++ = TEXT_COLOR_WHITE;
 
 	if (flag != 0) {
-		*str++ = 0;
+		*str++ = TEXT_END;
 		*str = 0;
 	} else {
-		*str++ = 0xd;
+		*str++ = TEXT_NEWLINE;
 		*str = 0;
 	}
 }
 
+/* Pads text that is used bytes long to width full-width characters. */
 uint8_t *padWithSpaces(uint8_t *str, int32_t width, int32_t used)
 {
 	used = width - (used >> 1);
@@ -3154,12 +3167,13 @@ void renderVerticalLine(int32_t boxId, int16_t x, int16_t y, int32_t h)
 	renderLinePrimitive(0x20202, x, y, x, (y + h) - 1, order, 0);
 }
 
+/* Changes who is talking, reopening the box next to them. */
 void setDialogueOwner(int32_t owner)
 {
-	if (MAIN_D_80134FE6 != owner) {
-		MAIN_D_80134FE6 = owner;
-		MAIN_func_801062F8(owner);
-		setupDialogueBox(MAIN_D_80134FE6);
+	if (DIALOGUE_SPEAKER != owner) {
+		DIALOGUE_SPEAKER = owner;
+		beginScriptEvent(owner);
+		setupDialogueBox(DIALOGUE_SPEAKER);
 	}
 }
 
@@ -3169,39 +3183,40 @@ void showMapheadSelection(int32_t idx, int32_t owner, int32_t x,
 	uint8_t *saved;
 	uint16_t rows;
 
-	if (owner != 0xfe) {
+	if (owner != SPEAKER_NARRATOR) {
 		setDialogueOwner(owner);
 	} else {
-		MAIN_D_80134FE6 = 0xff;
-		owner = 0xfd;
+		DIALOGUE_SPEAKER = SPEAKER_NONE;
+		owner = SPEAKER_PLAYER;
 	}
 
-	saved = MAIN_D_80134FDC;
+	saved = SCRIPT_PC;
 
-	if (section == 0xff) {
-		MAIN_D_80134FDC = doShopkeeperLine(idx);
+	if (section == MAPHEAD_TEXT_CURRENT_SHOP) {
+		SCRIPT_PC = getShopText(idx);
 	} else {
-		MAIN_D_80134FDC = resolveMapHeadEntry(section, idx);
+		SCRIPT_PC = getMapHeadText(section, idx);
 	}
 
-	MAIN_D_801BE950[0] = x;
+	CHOICE_COUNT[0] = x;
 
 	if (*outSel == 0) {
 		*outSel = 1;
-		MAIN_D_801BE952[0] = 0;
+		CHOICE_CURSOR[0] = 0;
 	}
 
-	MAIN_D_801BE956[0] = MAIN_func_80101EF8(0, MAIN_D_80134FE6);
-	MAIN_D_801BE956[0] = MAIN_D_801BE956[0] * 12 + 2;
+	CHOICE_CURSOR_WIDTH[0] = showTextboxFinalPage(0, DIALOGUE_SPEAKER);
+	CHOICE_CURSOR_WIDTH[0] = CHOICE_CURSOR_WIDTH[0] * TEXT_GLYPH_WIDTH + 2;
 
-	if (owner != 0xff) {
-		MAIN_D_801BE954[0] = 0xd;
+	/* Skip the row with the name of the speaker. */
+	if (owner != SPEAKER_NONE) {
+		CHOICE_CURSOR_Y[0] = 0xd;
 	} else {
-		MAIN_D_801BE954[0] = 0;
+		CHOICE_CURSOR_Y[0] = 0;
 	}
 
-	ACTIVE_INSTRUCTION = 0x64;
-	MAIN_D_80134FDC = saved;
+	ACTIVE_INSTRUCTION = SCRIPT_OP_BUILTIN;
+	SCRIPT_PC = saved;
 }
 
 void renderScriptDialogueBox(void)
@@ -3226,14 +3241,14 @@ void renderScriptDialogueBox(void)
 		y += 0xd;
 	}
 
-	if (ACTIVE_INSTRUCTION == 0x10) {
-		MAIN_func_800FFF80(x, ySave);
-	} else if (ACTIVE_INSTRUCTION == 0x64 && SCRIPT_STATE_3 == 2) {
-		MAIN_func_800FFF80(x, ySave);
+	if (ACTIVE_INSTRUCTION == SCRIPT_OP_CHOICE) {
+		renderDialogueChoiceCursor(x, ySave);
+	} else if (ACTIVE_INSTRUCTION == SCRIPT_OP_BUILTIN && SCRIPT_STATE_3 == 2) {
+		renderDialogueChoiceCursor(x, ySave);
 	}
 
-	if (MAIN_D_80134F94 != 0) {
-		renderUIBox(0);
+	if (TEXTBOX_SHOW_NEXT_ARROW != 0) {
+		renderTextboxNextArrow(0);
 	}
 }
 
@@ -3320,7 +3335,12 @@ void checkArenaMap(int32_t mapId)
 	}
 }
 
-int32_t MAIN_func_800FFA4C(int32_t boxId, int32_t flag)
+/*
+ * Draws the rows laid out by showTextbox() into VRAM, one row per frame for a
+ * full-width box and two for a half-width one. Returns 0 if there was nothing
+ * left to draw.
+ */
+int32_t drawTextboxRows(int32_t boxId, int32_t flag)
 {
 	TextBoxData *box;
 	uint32_t x;
@@ -3330,7 +3350,7 @@ int32_t MAIN_func_800FFA4C(int32_t boxId, int32_t flag)
 	uint8_t *buf;
 	int32_t done;
 
-	box = &MAIN_D_801BE80C.box[boxId];
+	box = &TEXT_BOX_TABLE.box[boxId];
 	if (box->writeCount == box->renderCount) {
 		return 0;
 	}
@@ -3350,7 +3370,7 @@ int32_t MAIN_func_800FFA4C(int32_t boxId, int32_t flag)
 	}
 
 	while (x != 0) {
-		done = drawString2(buf, px, row, flag);
+		done = drawTextRow(buf, px, row, flag);
 		box->writeRow++;
 		if (done != 0) {
 			box->writeCount = 1;
@@ -3367,26 +3387,32 @@ int32_t MAIN_func_800FFA4C(int32_t boxId, int32_t flag)
 	return 1;
 }
 
-void MAIN_func_800FFBB8(int32_t boxId)
+/* Gives the rows of the text buffer used by the box back. */
+void releaseTextboxRows(int32_t boxId)
 {
 	TextBoxData *entry;
 	int32_t rows;
 
-	entry = &MAIN_D_801BE80C.box[boxId];
+	entry = &TEXT_BOX_TABLE.box[boxId];
 
-	rows = ((int32_t *)entry)[9];
+	rows = entry->vramRows;
 	if (entry->doubleBuffered == 1) {
 		rows <<= 1;
 	}
 
-	((int32_t *)entry)[9] = 0;
+	entry->vramRows = 0;
 	entry->registered = 1;
-	MAIN_D_801BE80C.usedRows -= rows;
+	TEXT_BOX_TABLE.usedRows -= rows;
 }
 
-int32_t MAIN_func_800FFC1C(void)
+/*
+ * Moves the cursor of a choice and returns the option picked, or 0xffff while
+ * the player has not picked one. Triangle picks the last option, or leaves the
+ * choice if it is part of the script (CHOICE_CANCEL_PC).
+ */
+int32_t tickDialogueChoice(void)
 {
-	if (MAIN_func_80100E40(0) != 0) {
+	if (tickTextboxPageFlip(0) != 0) {
 		return 0xffff;
 	}
 
@@ -3394,29 +3420,29 @@ int32_t MAIN_func_800FFC1C(void)
 		return 0xffff;
 	}
 
-	if (isKeyDown(0x40)) {
+	if (isKeyDown(PADRdown)) {
 		advanceTextbox(0);
 		playSound(0, 3);
 
-		return MAIN_D_801BE952[0];
+		return CHOICE_CURSOR[0];
 	}
 
-	if (isKeyDown(0x10)) {
+	if (isKeyDown(PADRup)) {
 		if (isTriggerSet(0x31) == 0) {
-			if (ACTIVE_INSTRUCTION != 0x64) {
+			if (ACTIVE_INSTRUCTION != SCRIPT_OP_BUILTIN) {
 				advanceTextbox(0);
-				MAIN_D_80134FDC =
-					(uint8_t *)MAIN_D_801BE94C[0];
+				SCRIPT_PC =
+					(uint8_t *)CHOICE_CANCEL_PC[0];
 				playSound(0, 4);
 
 				return 0xffff;
 			}
 
 			advanceTextbox(0);
-			MAIN_D_801BE952[0] = MAIN_D_801BE950[0] - 1;
+			CHOICE_CURSOR[0] = CHOICE_COUNT[0] - 1;
 			playSound(0, 4);
 
-			return MAIN_D_801BE952[0];
+			return CHOICE_CURSOR[0];
 		}
 
 		playSound(0, 0xb);
@@ -3424,11 +3450,11 @@ int32_t MAIN_func_800FFC1C(void)
 		return 0xffff;
 	}
 
-	if (isKeyDown(0x1000)) {
-		if (MAIN_D_801BE952[0] == 0) {
-			MAIN_D_801BE952[0] = MAIN_D_801BE950[0] - 1;
+	if (isKeyDown(PADLup)) {
+		if (CHOICE_CURSOR[0] == 0) {
+			CHOICE_CURSOR[0] = CHOICE_COUNT[0] - 1;
 		} else {
-			MAIN_D_801BE952[0] -= 1;
+			CHOICE_CURSOR[0] -= 1;
 		}
 
 		playSound(0, 2);
@@ -3436,10 +3462,10 @@ int32_t MAIN_func_800FFC1C(void)
 		return 0xffff;
 	}
 
-	if (isKeyDown(0x4000)) {
-		MAIN_D_801BE952[0] += 1;
-		if (MAIN_D_801BE952[0] == MAIN_D_801BE950[0]) {
-			MAIN_D_801BE952[0] = 0;
+	if (isKeyDown(PADLdown)) {
+		CHOICE_CURSOR[0] += 1;
+		if (CHOICE_CURSOR[0] == CHOICE_COUNT[0]) {
+			CHOICE_CURSOR[0] = 0;
 		}
 
 		playSound(0, 2);
@@ -3447,23 +3473,28 @@ int32_t MAIN_func_800FFC1C(void)
 	return 0xffff;
 }
 
-int32_t MAIN_func_800FFDF4(void)
+/*
+ * Waits for the player to read the page, depending on TEXT_ADVANCE_MODE: 0
+ * waits for cross, 1 goes on at once and 2 after TEXT_AUTO_ADVANCE_TIMER.
+ * Returns 1 when the page is done.
+ */
+int32_t tickDialogueAdvance(void)
 {
-	if (MAIN_func_80100E40(0) != 0) {
+	if (tickTextboxPageFlip(0) != 0) {
 		return 0;
 	}
 
-	if (MAIN_D_80134FE5 == 0) {
-		MAIN_D_80134F94 = 1;
+	if (TEXT_ADVANCE_MODE == 0) {
+		TEXTBOX_SHOW_NEXT_ARROW = 1;
 	}
 
 	if (isXPressedAfterDialogue() == 0) {
 		return 0;
 	}
 
-	switch (MAIN_D_80134FE5) {
+	switch (TEXT_ADVANCE_MODE) {
 	case 0:
-		if (isKeyDown(0x40) == 0) {
+		if (isKeyDown(PADRdown) == 0) {
 			goto ret0;
 		}
 
@@ -3481,7 +3512,7 @@ int32_t MAIN_func_800FFDF4(void)
 			return 1;
 		}
 	case 2:
-		if (MAIN_D_80135010 != 0) {
+		if (TEXT_AUTO_ADVANCE_TIMER != 0) {
 			goto ret0;
 		}
 		/* fall through */
@@ -3498,20 +3529,21 @@ ret0:
 	return 0;
 }
 
-void MAIN_func_800FFF80(int32_t x, int32_t y)
+/* Draws the cursor over the selected option of a choice. */
+void renderDialogueChoiceCursor(int32_t x, int32_t y)
 {
 	if (TEXT_BOX_DATA[0].idle == 1) {
 		return;
 	}
 
 	renderSelectionCursor(x - 1,
-	                      y + MAIN_D_801BE954[0] + MAIN_D_801BE952[0] * 13 - 2,
-	                      MAIN_D_801BE956[0], 0xd, 6);
+	                      y + CHOICE_CURSOR_Y[0] + CHOICE_CURSOR[0] * 13 - 2,
+	                      CHOICE_CURSOR_WIDTH[0], 0xd, 6);
 }
 
-void MAIN_func_800FFFF0(void)
+void tickSizedTextbox(void)
 {
-	if (MAIN_func_80100E40(0) != 0) {
+	if (tickTextboxPageFlip(0) != 0) {
 		return;
 	}
 
@@ -3519,7 +3551,7 @@ void MAIN_func_800FFFF0(void)
 		return;
 	}
 
-	if (isKeyDown(0x40)) {
+	if (isKeyDown(PADRdown)) {
 		if (UI_BOX_DATA[0].state != 1) {
 			return;
 		}
@@ -3533,13 +3565,14 @@ void MAIN_func_800FFFF0(void)
 		return;
 	}
 
-	if (!isKeyDown(0x10)) {
+	if (!isKeyDown(PADRup)) {
 		return;
 	}
 
+	/* Triangle skips the rest of the message. */
 	if (UI_BOX_DATA[0].state == 1) {
 		while (TEXT_BOX_DATA[0].pageReady == 0) {
-			showTextbox(0, 0xff);
+			showTextbox(0, SPEAKER_NONE);
 		}
 
 		ACTIVE_INSTRUCTION = 0;
@@ -3549,7 +3582,7 @@ void MAIN_func_800FFFF0(void)
 	}
 }
 
-void MAIN_func_801000E4(void)
+void renderSizedTextbox(void)
 {
 	TextBoxData *box;
 	int16_t rowPx;
@@ -3558,7 +3591,7 @@ void MAIN_func_801000E4(void)
 	int16_t y;
 	int32_t i;
 
-	box = MAIN_D_801BE80C.box;
+	box = TEXT_BOX_TABLE.box;
 	rowPx = box->vramRow * 12;
 	pagePx = box->vramRows * 12;
 	rowPx = rowPx + (int16_t)(box->backPage * pagePx);
@@ -3570,7 +3603,8 @@ void MAIN_func_801000E4(void)
 	}
 }
 
-void MAIN_func_8010020C(void)
+/* Frees every textbox and the rows of the text buffer. */
+void resetTextboxes(void)
 {
 	TextBoxData *box;
 	int32_t i;
@@ -3581,13 +3615,17 @@ void MAIN_func_8010020C(void)
 		box->registered = 1;
 	}
 
-	MAIN_D_801BE80C.usedRows = 0;
-	MAIN_D_80134FFC = 0;
-	MAIN_D_80135010 = 0;
+	TEXT_BOX_TABLE.usedRows = 0;
+	SCRIPT_WAIT_TIMER = 0;
+	TEXT_AUTO_ADVANCE_TIMER = 0;
 	TEXTBOX_OPEN_TIMER = 0;
 }
 
-void MAIN_func_80100258(int32_t flag)
+/*
+ * Runs once per frame from tickScript(): clears the back page of the boxes
+ * with a new page, draws their text and opens or closes their UI boxes.
+ */
+void tickTextboxes(int32_t flag)
 {
 	RECT area;
 	int32_t x;
@@ -3620,7 +3658,7 @@ void MAIN_func_80100258(int32_t flag)
 					box->registered = 0;
 				}
 				if (drew == 0 && box->registered == 0) {
-					drew = MAIN_func_800FFA4C(i & 0xff, flag);
+					drew = drawTextboxRows(i & 0xff, flag);
 				}
 				flags = box->flags;
 				mode = flags & 0xf;
@@ -3645,13 +3683,13 @@ void MAIN_func_80100258(int32_t flag)
 				}
 			}
 		}
-		if (MAIN_D_80134FFC != 0) {
-			MAIN_D_80134FFC--;
+		if (SCRIPT_WAIT_TIMER != 0) {
+			SCRIPT_WAIT_TIMER--;
 		}
-		if (MAIN_D_80135010 != 0) {
-			MAIN_D_80135010--;
+		if (TEXT_AUTO_ADVANCE_TIMER != 0) {
+			TEXT_AUTO_ADVANCE_TIMER--;
 		}
-		MAIN_D_80134F94 = 0;
+		TEXTBOX_SHOW_NEXT_ARROW = 0;
 		TEXTBOX_OPEN_TIMER++;
 		return;
 	}
@@ -3664,6 +3702,10 @@ void MAIN_func_80100258(int32_t flag)
 	}
 }
 
+/*
+ * Mode 0 uses the whole width of the text area, 1 its left half and 2 its
+ * right half. outClut is really the width in pixels.
+ */
 void getVRAMModeCoords(int32_t mode, int32_t *outX, int32_t *outClut)
 {
 	if (mode == 0) {
@@ -3690,11 +3732,15 @@ void closeTextbox(int32_t boxId, RECT *target)
 			removeAnimatedUIBox(boxId, target);
 		}
 
-		MAIN_func_800FFBB8(boxId);
+		releaseTextboxRows(boxId);
 	}
 }
 
-void MAIN_func_8010064C(void)
+/*
+ * Closes every open textbox. If one closes with an animation (flag 0x40), the
+ * script ends once the animation is over, see tickTextboxes().
+ */
+void closeAllTextboxes(void)
 {
 	int32_t i;
 	uint8_t flags;
@@ -3717,7 +3763,7 @@ void createTextbox(int32_t boxId, int32_t flags, RECT *rect, RECT *origin,
 {
 	TextBoxData *entry;
 
-	entry = &MAIN_D_801BE80C.box[boxId];
+	entry = &TEXT_BOX_TABLE.box[boxId];
 
 	if ((entry->flags & 0xf) == 1) {
 		closeTextbox(boxId, 0);
@@ -3734,7 +3780,7 @@ void createTextbox(int32_t boxId, int32_t flags, RECT *rect, RECT *origin,
 
 void triggerBoxCloseFlag(int32_t boxId)
 {
-	TextBoxData *e = &MAIN_D_801BE80C.box[boxId];
+	TextBoxData *e = &TEXT_BOX_TABLE.box[boxId];
 	uint8_t val = e->flags;
 	uint32_t v;
 
@@ -3745,6 +3791,11 @@ void triggerBoxCloseFlag(int32_t boxId)
 	}
 }
 
+/*
+ * Reserves rows of the text buffer for the box, twice as many if it is double
+ * buffered, and clears their area of VRAM. mode picks which part of the text
+ * area the rows use, see getVRAMModeCoords().
+ */
 void registerTextbox(int32_t boxId, int32_t row, int32_t rows,
                      int32_t doubleBuffer, int32_t mode)
 {
@@ -3754,7 +3805,7 @@ void registerTextbox(int32_t boxId, int32_t row, int32_t rows,
 	int32_t vramX;
 	int32_t vramW;
 
-	entry = &MAIN_D_801BE80C.box[boxId];
+	entry = &TEXT_BOX_TABLE.box[boxId];
 	entry->vramRow = row;
 	entry->vramRows = rows;
 	entry->writeRow = 0;
@@ -3773,14 +3824,18 @@ void registerTextbox(int32_t boxId, int32_t row, int32_t rows,
 		usedRows = usedRows << 1;
 	}
 
-	MAIN_D_801BE80C.usedRows += usedRows;
+	TEXT_BOX_TABLE.usedRows += usedRows;
 	setTextColor(1);
 	getVRAMModeCoords(entry->vramMode, &vramX, &vramW);
 	setRECT(&rect, vramX, entry->vramRow * 12, vramW, usedRows * 12);
 	clearTextSubArea(&rect);
 }
 
-int32_t drawString2(uint8_t *str, int16_t x, int16_t y, int32_t flag)
+/*
+ * Draws one row of laid out text into the text area of VRAM. Returns 1 at the
+ * end of the message and 0 at the end of the row.
+ */
+int32_t drawTextRow(uint8_t *str, int16_t x, int16_t y, int32_t flag)
 {
 	int32_t y2;
 	RECT rect;
@@ -3795,19 +3850,19 @@ int32_t drawString2(uint8_t *str, int16_t x, int16_t y, int32_t flag)
 	for (;;) {
 		ch = *str++;
 		switch (ch) {
-		case 0:
+		case TEXT_END:
 			return 1;
-		case 3:
+		case TEXT_SKIP_3:
 			str += 3;
 			break;
-		case 2:
+		case TEXT_SKIP_1:
 			str++;
 			break;
-		case 1:
+		case TEXT_COLOR:
 			ch = *str++;
 			setTextColor(ch);
 			break;
-		case 0xc:
+		case TEXT_TAB_8:
 			str++;
 			rem = pos / 12 % 8;
 			save = pos;
@@ -3818,81 +3873,83 @@ int32_t drawString2(uint8_t *str, int16_t x, int16_t y, int32_t flag)
 				pos = save + rem;
 			}
 			break;
-		case 0x16:
+		case TEXT_COLUMN_105_ALT:
 			str++;
-			setRECT(&rect, x + pos - 6, y, 0x69, 0xc);
+			setRECT(&rect, x + pos - 6, y, 105, 0xc);
 			clearTextSubArea(&rect);
-			pos = 0x69;
+			pos = 105;
 			break;
-		case 0x17:
+		case TEXT_COLUMN_105:
 			str++;
-			setRECT(&rect, x + pos, y, 0x69, 0xc);
+			setRECT(&rect, x + pos, y, 105, 0xc);
 			clearTextSubArea(&rect);
-			pos = 0x69;
+			pos = 105;
 			break;
-		case 0x1b:
+		case TEXT_COLUMN_160:
 			str++;
-			setRECT(&rect, x + pos, y, 0xa0, 0xc);
+			setRECT(&rect, x + pos, y, 160, 0xc);
 			clearTextSubArea(&rect);
-			pos = 0xa0;
+			pos = 160;
 			break;
-		case 0x1c:
+		case TEXT_COLUMN_100:
 			str++;
-			setRECT(&rect, x + pos, y, 0x64, 0xc);
+			setRECT(&rect, x + pos, y, 100, 0xc);
 			clearTextSubArea(&rect);
-			pos = 0x64;
+			pos = 100;
 			break;
-		case 0x18:
+		case TEXT_COLUMN_96:
 			str++;
-			setRECT(&rect, x + pos, y, 0x60, 0xc);
+			setRECT(&rect, x + pos, y, 96, 0xc);
 			clearTextSubArea(&rect);
-			pos = 0x60;
+			pos = 96;
 			break;
-		case 0x19:
+		case TEXT_COLUMN_156:
 			str++;
-			setRECT(&rect, x + pos, y, 0x9c, 0xc);
+			setRECT(&rect, x + pos, y, 156, 0xc);
 			clearTextSubArea(&rect);
-			pos = 0x9c;
+			pos = 156;
 			break;
-		case 0x1a:
+		case TEXT_COLUMN_180:
 			str++;
-			setRECT(&rect, x + pos, y, 0xb4, 0xc);
+			setRECT(&rect, x + pos, y, 180, 0xc);
 			clearTextSubArea(&rect);
-			pos = 0xb4;
+			pos = 180;
 			break;
-		case 0xe:
+		case TEXT_TAB_11:
 			str++;
-			rem = pos / 12 % 0xb;
+			rem = pos / 12 % 11;
 			save = pos;
 			if (rem != 0) {
-				rem = (0xb - rem) * 12;
+				rem = (11 - rem) * 12;
 				setRECT(&rect, x + save, y, rem, 0xc);
 				clearTextSubArea(&rect);
 				pos = save + rem;
 			}
 			break;
-		case 0xf:
+		case TEXT_HALF_SPACE:
 			str++;
 			setRECT(&rect, x + pos, y, 6, 0xc);
 			clearTextSubArea(&rect);
 			pos += 6;
 			break;
-		case 0xd:
+		case TEXT_NEWLINE:
 			return 0;
 		default:
+			/* Half-width ASCII is drawn with the full-width glyphs. */
 			if (isAsciiEncoded((char *)&ch) != 0) {
 				glyph = swapShortBytes(convertAsciiToJis(ch));
 			} else {
 				glyph = ch + (*str++ << 8);
 			}
 
+			/* "　", read little-endian. */
 			if (glyph == 0x4081) {
 				setRECT(&rect, x + pos, y, 0xc, 0xc);
 				clearTextSubArea(&rect);
 			} else {
 				y2 = y;
 				adv = drawGlyph(glyph, x + pos, y2);
-				if (MAIN_D_80134F98 != 0) {
+				if (TEXT_MONOSPACE != 0) {
 					adv = 0xc;
 				}
 			}
@@ -3903,11 +3960,16 @@ int32_t drawString2(uint8_t *str, int16_t x, int16_t y, int32_t flag)
 	}
 }
 
-int32_t MAIN_func_80100E40(int32_t boxId)
+/*
+ * Shows the back page of a double buffered box once it has been drawn, and
+ * lets the script lay out the page after it. Returns 1 while the box is busy
+ * and the player cannot advance yet.
+ */
+int32_t tickTextboxPageFlip(int32_t boxId)
 {
 	TextBoxData *entry;
 
-	entry = &MAIN_D_801BE80C.box[boxId];
+	entry = &TEXT_BOX_TABLE.box[boxId];
 
 	if (entry->doubleBuffered == 0) {
 		return 0;
@@ -3948,13 +4010,14 @@ void closeBox(int32_t boxId)
 	closeTextbox(boxId, 0);
 }
 
-int32_t MAIN_func_800FFF24(void)
+/* Returns 1 once the last page of the dialogue has been shown. */
+int32_t isDialogueFinished(void)
 {
 	TextBoxData *entry;
 
 	entry = TEXT_BOX_DATA;
 
-	if (MAIN_func_80100E40(0) != 0) {
+	if (tickTextboxPageFlip(0) != 0) {
 		return 0;
 	}
 
@@ -3966,11 +4029,15 @@ int32_t MAIN_func_800FFF24(void)
 
 	return 0;
 }
+/*
+ * Goes to the next page of the box. Returns 1 if the page shown was the last
+ * one (pageReady marks the last page of a message).
+ */
 int32_t advanceTextbox(int32_t boxId)
 {
 	TextBoxData *entry;
 
-	entry = &MAIN_D_801BE80C.box[boxId];
+	entry = &TEXT_BOX_TABLE.box[boxId];
 	if (entry->registered == 0) {
 		return 0;
 	}
@@ -3995,6 +4062,7 @@ int32_t advanceTextbox(int32_t boxId)
 	return 0;
 }
 
+/* Opens the dialogue box, growing out of owner if it is on screen. */
 void setupDialogueBox(uint8_t owner)
 {
 	RECT rect;
@@ -4012,11 +4080,15 @@ void setupDialogueBox(uint8_t owner)
 	registerTextbox(0, 0, 4, 1, 0);
 }
 
+/*
+ * Gets the point on screen that the box of ownerId grows out of. Returns 0 if
+ * the box has no owner on screen.
+ */
 int32_t setupBoxOrigin(int32_t ownerId, RECT *origin)
 {
 	int16_t pos[2];
 
-	if (ownerId == 0xff) {
+	if (ownerId == SPEAKER_NONE) {
 		return 0;
 	}
 
@@ -4040,46 +4112,47 @@ int32_t setupBoxOrigin(int32_t ownerId, RECT *origin)
 	return 1;
 }
 
+/* Waits for the player to read or pick an option in the dialogue box. */
 void tickScriptDialogueBox(void)
 {
 	int32_t sel;
 
-	if (ACTIVE_INSTRUCTION == 0x10) {
-		sel = MAIN_func_800FFC1C();
+	if (ACTIVE_INSTRUCTION == SCRIPT_OP_CHOICE) {
+		sel = tickDialogueChoice();
 		if (sel != 0xffff) {
-			MAIN_D_80134FDC =
-				(uint8_t *)((uint32_t)MAIN_D_801BE948[0] +
-			                    MAIN_D_801BE952[0] * 2);
-			MAIN_D_80134FDC =
+			SCRIPT_PC =
+				(uint8_t *)((uint32_t)CHOICE_TARGETS[0] +
+			                    CHOICE_CURSOR[0] * 2);
+			SCRIPT_PC =
 				(uint8_t *)((uint32_t)CURRENT_SCRIPT_PTR +
-			                    *(uint16_t *)MAIN_D_80134FDC);
+			                    *(uint16_t *)SCRIPT_PC);
 		}
-	} else if (ACTIVE_INSTRUCTION == 0x1a) {
-		MAIN_func_800FFDF4();
-	} else if (ACTIVE_INSTRUCTION == 0x64) {
+	} else if (ACTIVE_INSTRUCTION == SCRIPT_OP_TEXT) {
+		tickDialogueAdvance();
+	} else if (ACTIVE_INSTRUCTION == SCRIPT_OP_BUILTIN) {
 		switch (SCRIPT_STATE_3) {
 		case 0:
 			break;
 		case 1:
-			if (MAIN_func_800FFDF4() == 1) {
+			if (tickDialogueAdvance() == 1) {
 				SCRIPT_STATE_3 = 0;
 				SELECTION_MENU_STATE = SCRIPT_STATE_4;
-				ACTIVE_INSTRUCTION = 0x64;
+				ACTIVE_INSTRUCTION = SCRIPT_OP_BUILTIN;
 			}
 			break;
 		case 2:
-			sel = MAIN_func_800FFC1C();
+			sel = tickDialogueChoice();
 			if (sel != 0xffff) {
 				SCRIPT_STATE_3 = 0;
-				sel = MAIN_D_801BE952[0];
+				sel = CHOICE_CURSOR[0];
 				SELECTION_MENU_STATE =
 					SCRIPT_STATE_4 + (uint16_t)sel;
-				ACTIVE_INSTRUCTION = 0x64;
+				ACTIVE_INSTRUCTION = SCRIPT_OP_BUILTIN;
 			}
 			break;
 		case 3:
-			if (MAIN_func_800FFF24() == 1) {
-				ACTIVE_INSTRUCTION = 0x64;
+			if (isDialogueFinished() == 1) {
+				ACTIVE_INSTRUCTION = SCRIPT_OP_BUILTIN;
 				SCRIPT_STATE_3 = 0;
 			}
 			break;
@@ -4087,7 +4160,8 @@ void tickScriptDialogueBox(void)
 	}
 }
 
-void renderUIBox(int32_t boxId)
+/* Draws the blinking arrow in the corner of a box that waits for cross. */
+void renderTextboxNextArrow(int32_t boxId)
 {
 	POLY_FT4 poly;
 	int16_t x;
@@ -4108,6 +4182,11 @@ void renderUIBox(int32_t boxId)
 	GsSortPoly(&poly, ACTIVE_ORDERING_TABLE, (6 - boxId));
 }
 
+/*
+ * Script instruction 0x10: a choice. It is followed by the number of options,
+ * the offsets to jump to for each option, the text with one option per row and
+ * the code that runs if the player cancels.
+ */
 void scriptShowSelection(void)
 {
 	uint8_t optionCount;
@@ -4115,28 +4194,28 @@ void scriptShowSelection(void)
 
 	pollNextScriptUByte(&optionCount);
 
-	MAIN_D_801BE950[0] = optionCount;
-	MAIN_D_801BE952[0] = 0;
-	MAIN_D_801BE948[0] = (int32_t)MAIN_D_80134FDC;
-	MAIN_D_80134FDC += (optionCount + 1) * 2;
-	MAIN_D_801BE956[0] = showTextbox(0, MAIN_D_80134FE6);
-	MAIN_D_801BE956[0] = MAIN_D_801BE956[0] * 12 + 2;
-	height = MAIN_D_801BE956[0];
+	CHOICE_COUNT[0] = optionCount;
+	CHOICE_CURSOR[0] = 0;
+	CHOICE_TARGETS[0] = (int32_t)SCRIPT_PC;
+	SCRIPT_PC += (optionCount + 1) * 2;
+	CHOICE_CURSOR_WIDTH[0] = showTextbox(0, DIALOGUE_SPEAKER);
+	CHOICE_CURSOR_WIDTH[0] = CHOICE_CURSOR_WIDTH[0] * TEXT_GLYPH_WIDTH + 2;
+	height = CHOICE_CURSOR_WIDTH[0];
 
 	if (height > 0xf0) {
-		MAIN_D_801BE956[0] = 0xf0;
+		CHOICE_CURSOR_WIDTH[0] = 0xf0;
 	}
 
-	MAIN_D_80134FDC += 2;
-	MAIN_D_801BE94C[0] = (int32_t)MAIN_D_80134FDC;
+	SCRIPT_PC += 2;
+	CHOICE_CANCEL_PC[0] = (int32_t)SCRIPT_PC;
 
-	if (MAIN_D_80134FE6 != 0xff) {
-		MAIN_D_801BE954[0] = 0xd;
+	if (DIALOGUE_SPEAKER != SPEAKER_NONE) {
+		CHOICE_CURSOR_Y[0] = 0xd;
 	} else {
-		MAIN_D_801BE954[0] = 0;
+		CHOICE_CURSOR_Y[0] = 0;
 	}
 
-	ACTIVE_INSTRUCTION = 0x10;
+	ACTIVE_INSTRUCTION = SCRIPT_OP_CHOICE;
 }
 
 static void showTextbox__garbage__(void)
@@ -4150,7 +4229,7 @@ static void showTextbox__garbage__(void)
 	int16_t posY;
 	ScriptCameraMovement *slot;
 
-	MAIN_func_801062F8(0xff);
+	beginScriptEvent(SPEAKER_NONE);
 	pollNextScriptUByte(&moveSlot);
 	pollNextTwoScriptBytes(&objectId, &speed);
 	pollNextTwoScriptBytes(&targetId, &pad);
@@ -4165,6 +4244,12 @@ static void showTextbox__garbage__(void)
 	slot->targetY = posY;
 }
 
+/*
+ * Lays out the next page of the message at SCRIPT_PC into the back page of
+ * the textbox, with the name of the speaker on the first row, and returns the
+ * width of the longest row in glyphs. The page ends at the end of the message
+ * or at an empty row.
+ */
 uint32_t showTextbox(int32_t boxId, uint32_t speakerId)
 {
 	TextBoxData *entry;
@@ -4174,13 +4259,13 @@ uint32_t showTextbox(int32_t boxId, uint32_t speakerId)
 	uint16_t maxCol;
 	uint32_t row;
 	uint32_t rowOffset;
-	int32_t lines;
+	int32_t len;
 	uint8_t ctrl;
 
-	entry = &MAIN_D_801BE80C.box[boxId];
+	entry = &TEXT_BOX_TABLE.box[boxId];
 	base = TEXT_BUFFERS_PTR + (entry->vramRow << 6);
 	if (entry->vramMode == 2) {
-		base += 0x20;
+		base += TEXT_ROW_SIZE / 2;
 	}
 	if (entry->doubleBuffered == 1) {
 		base = (uint8_t *)(base + (((entry->backPage ^ 1) * entry->vramRows) << 6));
@@ -4188,184 +4273,187 @@ uint32_t showTextbox(int32_t boxId, uint32_t speakerId)
 	out = base;
 	col = maxCol = 0;
 	row = 0;
-	if (speakerId != 0xff) {
-		*out++ = 1;
-		if (speakerId == 0xfd) {
-			*out++ = 6;
-		} else if (speakerId == 0xfc) {
-			*out++ = 0xa;
-		} else if (speakerId >= 0xc8) {
-			*out++ = 5;
+	if (speakerId != SPEAKER_NONE) {
+		*out++ = TEXT_COLOR;
+		if (speakerId == SPEAKER_PLAYER) {
+			*out++ = TEXT_COLOR_LIGHT_BLUE;
+		} else if (speakerId == SPEAKER_PARTNER) {
+			*out++ = TEXT_COLOR_ORANGE;
+		} else if (speakerId >= SPEAKER_SPECIAL) {
+			*out++ = TEXT_COLOR_GREEN;
 		} else {
-			*out++ = 7;
+			*out++ = TEXT_COLOR_YELLOW;
 		}
 		out += getSpeakerName(speakerId, out);
-		*out++ = 1;
-		*out++ = 1;
-		*out++ = 0xd;
-		*out = 0;
+		*out++ = TEXT_COLOR;
+		*out++ = TEXT_COLOR_WHITE;
+		*out++ = TEXT_NEWLINE;
+		*out = TEXT_END;
 		row++;
 		out = base + (row << 6);
 	}
 	rowOffset = row << 6;
 top: {
-	ctrl = *MAIN_D_80134FDC++;
+	ctrl = *SCRIPT_PC++;
 	{
 		switch (ctrl) {
-		case 3:
+		case TEXT_SKIP_3:
 			*out++ = ctrl;
-			*out++ = *MAIN_D_80134FDC++;
-			*out++ = *MAIN_D_80134FDC++;
-			*out++ = *MAIN_D_80134FDC++;
+			*out++ = *SCRIPT_PC++;
+			*out++ = *SCRIPT_PC++;
+			*out++ = *SCRIPT_PC++;
 			goto top;
-		case 4:
-			ctrl = *MAIN_D_80134FDC++;
+		case TEXT_PSTAT_NUMBER:
+			ctrl = *SCRIPT_PC++;
 			ctrl = readPStat(ctrl);
 			out = intToStringSJIS(out, ctrl, 3, 1);
 			goto top;
-		case 5:
-			MAIN_D_80134FDC++;
-			lines = getSpeakerName(0xfd, out);
-			out += lines;
-			col = (col + ((lines >> 1) &
+		case TEXT_PLAYER_NAME:
+			SCRIPT_PC++;
+			len = getSpeakerName(SPEAKER_PLAYER, out);
+			out += len;
+			col = (col + ((len >> 1) &
 			              0xffff)) &
 			      0xffff;
 			goto top;
-		case 6:
-			MAIN_D_80134FDC++;
-			lines = getSpeakerName(0xfc, out);
-			out += lines;
-			col = (col + ((lines >> 1) &
+		case TEXT_PARTNER_NAME:
+			SCRIPT_PC++;
+			len = getSpeakerName(SPEAKER_PARTNER, out);
+			out += len;
+			col = (col + ((len >> 1) &
 			              0xffff)) &
 			      0xffff;
 			goto top;
-		case 7:
-			ctrl = *MAIN_D_80134FDC++;
+		case TEXT_DIGIMON_NAME:
+			ctrl = *SCRIPT_PC++;
 			{
 				ctrl = readPStat(ctrl);
 				strcpy(out,
 				       (const char *)&DIGIMON_DATA[ctrl]);
-				lines = strlen(
+				len = strlen(
 					(const char *)&DIGIMON_DATA[ctrl]);
-				out += lines;
-				col = (col + ((lines >> 1) &
+				out += len;
+				col = (col + ((len >> 1) &
 				              0xffff)) &
 				      0xffff;
 			}
 			goto top;
-		case 8:
-			ctrl = *MAIN_D_80134FDC++;
+		case TEXT_MOVE_NAME:
+			ctrl = *SCRIPT_PC++;
 			{
 				ctrl = readPStat(ctrl);
 				strcpy(out, MOVE_NAMES[ctrl]);
-				lines = strlen(MOVE_NAMES[ctrl]);
-				out += lines;
-				col = (col + ((lines >> 1) &
+				len = strlen(MOVE_NAMES[ctrl]);
+				out += len;
+				col = (col + ((len >> 1) &
 				              0xffff)) &
 				      0xffff;
 			}
 			goto top;
-		case 9:
-			ctrl = *MAIN_D_80134FDC++;
+		case TEXT_ITEM_NAME:
+			ctrl = *SCRIPT_PC++;
 			{
 				ctrl = readPStat(ctrl);
 				strcpy(out,
 				       (const char *)&ITEM_PARA[ctrl]);
-				lines = strlen(
+				len = strlen(
 					(const char *)&ITEM_PARA[ctrl]);
-				out += lines;
-				col = (col + ((lines >> 1) &
+				out += len;
+				col = (col + ((len >> 1) &
 				              0xffff)) &
 				      0xffff;
 			}
 			goto top;
-		case 10:
-			MAIN_D_80134FDC++;
+		case TEXT_MONEY:
+			SCRIPT_PC++;
 			out = intToStringSJIS(out, MONEY, 6, 0);
 			goto top;
-		case 11:
-			MAIN_D_80134FDC++;
+		case TEXT_MERIT:
+			SCRIPT_PC++;
 			out = intToStringSJIS(out, MERIT, 4, 0);
 			goto top;
-		case 16:
-			MAIN_D_80134FDC++;
-			out = intToStringSJIS(out, MAIN_D_8013500C, 5, 1);
+		case TEXT_PRICE:
+			SCRIPT_PC++;
+			out = intToStringSJIS(out, SCRIPT_PRICE, 5, 1);
 			goto top;
-		case 19:
-			MAIN_D_80134FDC++;
-			out = intToStringSJIS(out, MAIN_D_80134FCC, 3, 1);
+		case TEXT_TOURNAMENT_TITLES:
+			SCRIPT_PC++;
+			out = intToStringSJIS(out, TOURNAMENT_TITLES, 3, 1);
 			goto top;
-		case 20:
-			MAIN_D_80134FDC++;
-			out = intToStringSJIS(out, TOURNAMENTS_LOST, 3, 1);
+		case TEXT_TOURNAMENT_WINS:
+			SCRIPT_PC++;
+			out = intToStringSJIS(out, TOURNAMENT_WINS, 3, 1);
 			goto top;
-		case 21:
-			MAIN_D_80134FDC++;
-			out = intToStringSJIS(out, MAIN_D_80134FD0, 3, 1);
+		case TEXT_TOURNAMENT_LOSSES:
+			SCRIPT_PC++;
+			out = intToStringSJIS(out, TOURNAMENT_LOSSES, 3, 1);
 			goto top;
-		case 17:
-			ctrl = *MAIN_D_80134FDC++;
+		case TEXT_BGM_NAME:
+			ctrl = *SCRIPT_PC++;
 			{
 				ctrl = readPStat(ctrl);
 				strcpy(out,
-				       MAIN_D_8012FEC8[ctrl]);
-				lines = strlen(MAIN_D_8012FEC8[ctrl]);
-				out += lines;
-				col = (col + ((lines >> 1) & 0xffff)) & 0xffff;
+				       BGM_TRACK_NAMES[ctrl]);
+				len = strlen(BGM_TRACK_NAMES[ctrl]);
+				out += len;
+				col = (col + ((len >> 1) & 0xffff)) & 0xffff;
 			}
 			goto top;
-		case 18:
-			ctrl = *MAIN_D_80134FDC++;
+		case TEXT_CUP_NAME:
+			ctrl = *SCRIPT_PC++;
 			{
 				ctrl = readPStat(ctrl);
 				strcpy(out,
-				       MAIN_D_801300E0[ctrl]);
-				lines = strlen(MAIN_D_801300E0[ctrl]);
-				out += lines;
-				col = (col + ((lines >> 1) & 0xffff)) & 0xffff;
+				       TOURNAMENT_CUP_NAMES[ctrl]);
+				len = strlen(TOURNAMENT_CUP_NAMES[ctrl]);
+				out += len;
+				col = (col + ((len >> 1) & 0xffff)) & 0xffff;
 			}
 			goto top;
-		case 12:
+		case TEXT_TAB_8:
 			*out++ = ctrl;
-			*out++ = *MAIN_D_80134FDC++;
+			*out++ = *SCRIPT_PC++;
 			goto top;
-		case 14:
+		case TEXT_TAB_11:
 			*out++ = ctrl;
-			*out++ = *MAIN_D_80134FDC++;
+			*out++ = *SCRIPT_PC++;
 			goto top;
-		case 13:
+		case TEXT_NEWLINE:
 			*out++ = ctrl;
-			*out++ = *MAIN_D_80134FDC++;
+			*out++ = *SCRIPT_PC++;
 			if (maxCol < col) {
 				maxCol = col;
 			}
 			col = 0;
-			ctrl = *MAIN_D_80134FDC;
-			if (ctrl == 0) {
-				MAIN_D_80134FDC += 2;
+			ctrl = *SCRIPT_PC;
+			if (ctrl == TEXT_END) {
+				/* End of the message: drop the newline. */
+				SCRIPT_PC += 2;
 				out -= 2;
 				*out = ctrl;
-				ctrl = *MAIN_D_80134FDC;
-				if (ctrl == 0x1a) {
+				/* Another text instruction continues the dialogue. */
+				ctrl = *SCRIPT_PC;
+				if (ctrl == SCRIPT_OP_TEXT) {
 					goto done;
 				}
 				entry->pageReady = 1;
 				goto done;
 			}
-			rowOffset += 0x40;
+			rowOffset += TEXT_ROW_SIZE;
 			row++;
-			lines = rowOffset;
-			out = base + lines;
+			len = rowOffset;
+			out = base + len;
 			goto top;
-		case 1:
-		case 2:
+		case TEXT_COLOR:
+		case TEXT_SKIP_1:
 			*out++ = ctrl;
-			*out++ = *MAIN_D_80134FDC++;
+			*out++ = *SCRIPT_PC++;
 			goto top;
-		case 15:
+		case TEXT_HALF_SPACE:
 		default:
+			/* A Shift JIS character. */
 			*out++ = ctrl;
-			*out++ = *MAIN_D_80134FDC++;
+			*out++ = *SCRIPT_PC++;
 			col = (col + 1) & 0xffff;
 			goto top;
 		}
@@ -4373,11 +4461,15 @@ top: {
 }
 done:
 	entry->writeCount++;
-	ACTIVE_INSTRUCTION = 0x1a;
+	ACTIVE_INSTRUCTION = SCRIPT_OP_TEXT;
 
 	return maxCol;
 }
 
+/*
+ * Script instruction 0x26: opens a centered box that is cols glyphs wide and
+ * rows lines high, for text without a speaker.
+ */
 void scriptSetTextboxSize(void)
 {
 	uint8_t originId;
@@ -4400,45 +4492,48 @@ void scriptSetTextboxSize(void)
 	width = cols * 12 + 10;
 	height = rows * 13 + 7;
 	setRECT(&rect1, (0x140 - width) / 2 - 0xa0, (0xf0 - height) / 2 - 0x78, width, height);
-	createTextbox(0, boxFlags, &rect1, &origin, MAIN_func_800FFFF0,
-	              MAIN_func_801000E4);
+	createTextbox(0, boxFlags, &rect1, &origin, tickSizedTextbox,
+	              renderSizedTextbox);
 	registerTextbox(0, 0, rows, 1, 0);
 }
 
-int32_t MAIN_func_80101EF8(int32_t boxId, int32_t speakerId)
+/* Lays out text that is not followed by more text, as MAPHEAD text is. */
+int32_t showTextboxFinalPage(int32_t boxId, int32_t speakerId)
 {
 	TEXT_BOX_DATA[boxId].pageReady = 1;
 
 	return showTextbox(boxId, speakerId);
 }
 
+/* Copies the name of the speaker into buf and returns its length. */
 int32_t getSpeakerName(int32_t speakerId, uint8_t *buf)
 {
-	if (speakerId == 0xff) {
+	if (speakerId == SPEAKER_NONE) {
 		return 0;
 	}
 
-	if (speakerId == 0xfd) {
+	/* The name of the player is kept as the name of Digimon 0. */
+	if (speakerId == SPEAKER_PLAYER) {
 		speakerId = 0;
 		goto digimon;
 	}
 
-	if (speakerId == 0xfc) {
+	if (speakerId == SPEAKER_PARTNER) {
 		strcpy((char *)buf, PARTNER_ENTITY.name);
 
 		return strlen(PARTNER_ENTITY.name);
 	}
 
-	if ((uint32_t)speakerId < 0xc8) {
+	if ((uint32_t)speakerId < SPEAKER_SPECIAL) {
 		speakerId = scriptIdToEntityId(speakerId) & 0xff;
 		speakerId = ENTITY_TABLE[speakerId]->type & 0xff;
 		goto digimon;
 	}
 
-	speakerId = (speakerId - 0xc8) & 0xff;
-	strcpy((char *)buf, MAIN_D_8013035C[speakerId]);
+	speakerId = (speakerId - SPEAKER_SPECIAL) & 0xff;
+	strcpy((char *)buf, SPECIAL_SPEAKER_NAMES[speakerId]);
 
-	return strlen(MAIN_D_8013035C[speakerId]);
+	return strlen(SPECIAL_SPEAKER_NAMES[speakerId]);
 
 digimon:
 	strcpy((char *)buf, DIGIMON_DATA[speakerId].name);
@@ -4446,6 +4541,10 @@ digimon:
 	return strlen(DIGIMON_DATA[speakerId].name);
 }
 
+/*
+ * Writes value with full-width digits. Leading zeros become spaces, or are
+ * left out if flag is set.
+ */
 uint8_t *intToStringSJIS(uint8_t *buf, int32_t value, uint8_t digits, int32_t flag)
 {
 	Pow10Table divs;
@@ -4455,20 +4554,20 @@ uint8_t *intToStringSJIS(uint8_t *buf, int32_t value, uint8_t digits, int32_t fl
 	int32_t hi;
 	int32_t lo;
 
-	divs = MAIN_D_80130344;
-	base = 0x824f;
+	divs = POWERS_OF_TEN;
+	base = SJIS_DIGIT_ZERO;
 	started = 0;
 	while (digits != 0) {
 		c = value / divs.v[digits - 1];
 		c = base + c;
 		value = value % divs.v[digits - 1];
 		if (digits != 1) {
-			if (c == 0x824f) {
+			if (c == SJIS_DIGIT_ZERO) {
 				if (started == 0) {
 					if (flag != 0) {
 						goto skip;
 					}
-					c = 0x8140;
+					c = SJIS_SPACE;
 				}
 			} else {
 				started = 1;
@@ -4489,11 +4588,11 @@ int32_t scriptIdToEntityId(int32_t scriptId)
 {
 	uint8_t i;
 
-	if (scriptId == 0xfd) {
+	if (scriptId == SPEAKER_PLAYER) {
 		return 0;
 	}
 
-	if (scriptId == 0xfc) {
+	if (scriptId == SPEAKER_PARTNER) {
 		return 1;
 	}
 
@@ -4526,7 +4625,7 @@ void scriptCompareDate(void)
 	pollNextTwoScriptBytes(&days, &hours);
 	pollNextScriptUByte(&minutes);
 
-	MAIN_D_80134FDC = (uint8_t *)(MAIN_D_80134FDC + 1);
+	SCRIPT_PC = (uint8_t *)(SCRIPT_PC + 1);
 	v1 = readPStat(statIdx);
 	v2 = readPStat((uint8_t)(statIdx + 1));
 	v3 = readPStat((uint8_t)(statIdx + 2));
@@ -4601,11 +4700,11 @@ int16_t *getStatsPointer(int32_t stat)
 	case 0x10:
 		return &MAIN_D_80134FCA;
 	case 0x11:
-		return &MAIN_D_80134FCC;
+		return &TOURNAMENT_TITLES;
 	case 0x12:
-		return &TOURNAMENTS_LOST;
+		return &TOURNAMENT_WINS;
 	case 0x13:
-		return &MAIN_D_80134FD0;
+		return &TOURNAMENT_LOSSES;
 	case 0x14:
 		return &PARTNER_PARA.weight;
 	case 0x15:
@@ -4803,7 +4902,7 @@ int32_t MAIN_func_80102630(void)
 	int32_t value;
 	uint8_t op;
 
-	MAIN_D_80134FDC = (uint8_t *)(MAIN_D_80134FDC + 1);
+	SCRIPT_PC = (uint8_t *)(SCRIPT_PC + 1);
 
 	pollNextScriptUByte(&op);
 	pollNextInt(&value);

@@ -60,6 +60,11 @@ characters in string and character literals as CP932 escapes before mwcc
 compiles them. Write Japanese text and symbols such as `△` directly in
 literals.
 
+The format of dialogue text (control codes, speakers, colors) is described in
+`include/dw/text.h`. `tools/maphead_text.py` prints the messages that the
+engine shows from `SCN/MAPHEAD.SCN` (shops, the new game questions...), for
+example `tools/maphead_text.py 0x4d6 16`.
+
 ## Links
 
 Symbols and reverse engineering is based on work by SydMontague:  

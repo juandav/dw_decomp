@@ -142,7 +142,7 @@ void changeMap(uint8_t mapId, uint8_t exitId);
 void addMapNameObject(uint8_t mapId);
 void renderString(int32_t, int32_t, int32_t, int32_t, int32_t, int32_t,
                   int32_t, int32_t, int32_t);
-void renderUIBox(int32_t id);
+void renderTextboxNextArrow(int32_t id);
 void setMapLayerEnabled(int32_t enabled);
 int32_t isSoundLoaded(int32_t isAsync, int32_t soundId);
 void playSound(int32_t vabId, uint32_t note);
@@ -761,7 +761,7 @@ void renderItemPickupTextbox(int32_t instanceId)
 		renderString(0, 0xffffff83, 0x39, 0x90, 0xc, 0, 0x18, 5, 0);
 	}
 
-	renderUIBox(1);
+	renderTextboxNextArrow(1);
 	++TEXTBOX_OPEN_TIMER;
 }
 
@@ -1272,7 +1272,7 @@ int32_t isTrainingComplete(void)
 void renderAwardSomethingTextbox(int32_t instanceId)
 {
 	renderString(0, 0xffffff83, 0x2d, 0xf0, 0x24, 0, 0x78, 5, 0);
-	renderUIBox(1);
+	renderTextboxNextArrow(1);
 	++TEXTBOX_OPEN_TIMER;
 }
 
