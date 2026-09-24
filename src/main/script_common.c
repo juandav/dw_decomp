@@ -81,12 +81,12 @@ extern char *ITEM_DESC_PTR[];
 extern int8_t TEXT_MONOSPACE;
 extern int32_t SCRIPT_FILE_POSITION;
 extern char MAIN_D_801345F0[3];
-extern char MAIN_D_80134554[];
-extern char MAIN_D_8013455C[];
-extern char MAIN_D_80134564[];
-extern char MAIN_D_8013456C[];
-extern char MAIN_D_80134574[];
-extern char MAIN_D_8013457C[];
+extern char CUP_NAME_GRADE_D[];
+extern char CUP_NAME_GRADE_C[];
+extern char CUP_NAME_GRADE_B[];
+extern char CUP_NAME_GRADE_A[];
+extern char CUP_NAME_GRADE_S[];
+extern char CUP_NAME_GRADE_R[];
 extern char MAIN_D_80134584[2][2];
 extern char MAIN_D_80134588[2][2];
 extern char MAIN_D_8013458C[2][2];
@@ -328,85 +328,85 @@ static void *script_common_text_order[] = {
 };
 
 // clang-format off
-char MAIN_D_8012F6D0[] = "Non Bewildering Forest Theme";
-char MAIN_D_8012F6F0[] = "Non Bewildering Forest Night Theme";
-char MAIN_D_8012F714[] = "Tropical Theme";
-char MAIN_D_8012F724[] = "Tropical Night Theme";
-char MAIN_D_8012F73C[] = "Mt. Panorama Theme";
-char MAIN_D_8012F750[] = "Mt. Panorama Night Theme";
-char MAIN_D_8012F76C[] = "Drill Tunnel Theme";
-char MAIN_D_8012F780[20] = "Ogre Fortress Theme";
-char MAIN_D_8012F794[24] = "Overdell Cemetary Theme";
-char MAIN_D_8012F7AC[] = "Canyon Theme";
-char MAIN_D_8012F7BC[20] = "Ogremon Theme No. 2";
-char MAIN_D_8012F7D0[] = "Everything Shop Theme";
-char MAIN_D_8012F7E8[] = "Ogremon ThemeNo. 3";
-char MAIN_D_8012F7FC[16] = "Lava Cave Theme";
-char MAIN_D_8012F80C[] = "Dark Aristcrat's Mansion Theme";
-char MAIN_D_8012F82C[] = "Underground Lab Theme";
-char MAIN_D_8012F844[] = "Gear Savanna Theme";
-char MAIN_D_8012F858[] = "Gear Savanna Night Theme";
-char MAIN_D_8012F874[] = "Leomon Theme";
-char MAIN_D_8012F884[] = "Amida Forest Theme";
-char MAIN_D_8012F898[] = "Amida Forest Night Theme";
-char MAIN_D_8012F8B4[] = "The Ancient Region of Dino Speedy Time Zone Theme";
-char MAIN_D_8012F8E8[56] = "The Ancient Region of Dino Speedy Time Zone Night Theme";
-char MAIN_D_8012F920[] = "The Ancient Region of Dino Glacial Time Zone Theme";
-char MAIN_D_8012F954[] = "The Ancient Region of Dino Glacial Time Zone Night Theme";
-char MAIN_D_8012F990[] = "Freezeland Theme";
-char MAIN_D_8012F9A4[] = "Freezeland Night Theme";
-char MAIN_D_8012F9BC[12] = "Igloo Theme";
-char MAIN_D_8012F9C8[] = "Curling Theme";
-char MAIN_D_8012F9D8[16] = "Sanctuary Theme";
-char MAIN_D_8012F9E8[] = "Sanctuary Below Theme";
-char MAIN_D_8012FA00[] = "Gecko Swamp Theme";
-char MAIN_D_8012FA14[24] = "Gecko Swamp Night Theme";
-char MAIN_D_8012FA2C[] = "Misty Trees Theme";
-char MAIN_D_8012FA40[24] = "Misty Trees Night Theme";
-char MAIN_D_8012FA58[20] = "WaruMonzaemon Theme";
-char MAIN_D_8012FA6C[] = "Toy Town Theme";
-char MAIN_D_8012FA7C[] = "Theme of Factorial";
-char MAIN_D_8012FA90[] = "Factorial Night Theme";
-char MAIN_D_8012FAA8[12] = "Sewer Theme";
-char MAIN_D_8012FAB4[] = "Trash Mountain Theme";
-char MAIN_D_8012FACC[] = "Trash Mountain Night Theme";
-char MAIN_D_8012FAE8[] = "Beatland Theme";
-char MAIN_D_8012FAF8[] = "Beatland Night Theme";
-char MAIN_D_8012FB10[24] = "Secret Beach Cave Theme";
-char MAIN_D_8012FB28[16] = "Last Room Theme";
-char MAIN_D_8012FB38[16] = "File City Theme";
-char MAIN_D_8012FB48[] = "File City Night Theme";
-char MAIN_D_8012FB60[24] = "Tornament Opening Theme";
-char MAIN_D_8012FB78[] = "Tornament Progress Theme";
-char MAIN_D_8012FB94[] = "Tornament Championship Theme";
-char MAIN_D_8012FBB4[] = "Partner's Entrance Theme";
-char MAIN_D_8012FBD0[] = "Competition Battle Opponent's Entrance Theme";
-char MAIN_D_8012FC00[] = "Arena Battle Theme No. 1";
-char MAIN_D_8012FC1C[20] = "Partner's Win Theme";
-char MAIN_D_8012FC30[] = "Partner's Loss Theme";
-char MAIN_D_8012FC48[] = "Arena Battle Theme No. 2";
-char MAIN_D_8012FC64[] = "Arena Battle Theme No. 3";
-char MAIN_D_8012FC80[] = "Event Battle Theme";
-char MAIN_D_8012FC94[20] = "Normal Battle Theme";
-char MAIN_D_8012FCA8[] = "Normal Battle  Theme No.2";
-char MAIN_D_8012FCC4[] = "Last Battle Theme";
-char MAIN_D_8012FCD8[] = "Version 1 Cup";
-char MAIN_D_8012FCE8[] = "Version 2 Cup";
-char MAIN_D_8012FCF8[] = "Version 3 Cup";
-char MAIN_D_8012FD08[] = "Version 4 Cup";
-char MAIN_D_8012FD18[] = "Version 0 Cup";
-char MAIN_D_8012FD28[] = "Fire Cup";
-char MAIN_D_8012FD34[12] = "Grapple Cup";
-char MAIN_D_8012FD40[] = "Thunder Wind Cup";
-char MAIN_D_8012FD54[] = "Cool Cup";
-char MAIN_D_8012FD60[] = "Nature Cup";
-char MAIN_D_8012FD6C[12] = "Metalic Cup";
-char MAIN_D_8012FD78[] = "Filth Cup";
-char MAIN_D_8012FD84[] = "Dino Cup";
-char MAIN_D_8012FD90[] = "Wing Cup";
-char MAIN_D_8012FD9C[] = "Animal Cup";
-char MAIN_D_8012FDA8[] = "Human Cup";
-char MAIN_D_8012FDB4[] = "Beetle Cup";
+char BGM_NAME_NON_BEWILDERING_FOREST[] = "Non Bewildering Forest Theme";
+char BGM_NAME_NON_BEWILDERING_FOREST_NIGHT[] = "Non Bewildering Forest Night Theme";
+char BGM_NAME_TROPICAL[] = "Tropical Theme";
+char BGM_NAME_TROPICAL_NIGHT[] = "Tropical Night Theme";
+char BGM_NAME_MT_PANORAMA[] = "Mt. Panorama Theme";
+char BGM_NAME_MT_PANORAMA_NIGHT[] = "Mt. Panorama Night Theme";
+char BGM_NAME_DRILL_TUNNEL[] = "Drill Tunnel Theme";
+char BGM_NAME_OGRE_FORTRESS[20] = "Ogre Fortress Theme";
+char BGM_NAME_OVERDELL_CEMETERY[24] = "Overdell Cemetary Theme";
+char BGM_NAME_CANYON[] = "Canyon Theme";
+char BGM_NAME_OGREMON_2[20] = "Ogremon Theme No. 2";
+char BGM_NAME_EVERYTHING_SHOP[] = "Everything Shop Theme";
+char BGM_NAME_OGREMON_3[] = "Ogremon ThemeNo. 3";
+char BGM_NAME_LAVA_CAVE[16] = "Lava Cave Theme";
+char BGM_NAME_DARK_ARISTOCRATS_MANSION[] = "Dark Aristcrat's Mansion Theme";
+char BGM_NAME_UNDERGROUND_LAB[] = "Underground Lab Theme";
+char BGM_NAME_GEAR_SAVANNA[] = "Gear Savanna Theme";
+char BGM_NAME_GEAR_SAVANNA_NIGHT[] = "Gear Savanna Night Theme";
+char BGM_NAME_LEOMON[] = "Leomon Theme";
+char BGM_NAME_AMIDA_FOREST[] = "Amida Forest Theme";
+char BGM_NAME_AMIDA_FOREST_NIGHT[] = "Amida Forest Night Theme";
+char BGM_NAME_DINO_SPEEDY_TIME_ZONE[] = "The Ancient Region of Dino Speedy Time Zone Theme";
+char BGM_NAME_DINO_SPEEDY_TIME_ZONE_NIGHT[56] = "The Ancient Region of Dino Speedy Time Zone Night Theme";
+char BGM_NAME_DINO_GLACIAL_TIME_ZONE[] = "The Ancient Region of Dino Glacial Time Zone Theme";
+char BGM_NAME_DINO_GLACIAL_TIME_ZONE_NIGHT[] = "The Ancient Region of Dino Glacial Time Zone Night Theme";
+char BGM_NAME_FREEZELAND[] = "Freezeland Theme";
+char BGM_NAME_FREEZELAND_NIGHT[] = "Freezeland Night Theme";
+char BGM_NAME_IGLOO[12] = "Igloo Theme";
+char BGM_NAME_CURLING[] = "Curling Theme";
+char BGM_NAME_SANCTUARY[16] = "Sanctuary Theme";
+char BGM_NAME_SANCTUARY_BELOW[] = "Sanctuary Below Theme";
+char BGM_NAME_GECKO_SWAMP[] = "Gecko Swamp Theme";
+char BGM_NAME_GECKO_SWAMP_NIGHT[24] = "Gecko Swamp Night Theme";
+char BGM_NAME_MISTY_TREES[] = "Misty Trees Theme";
+char BGM_NAME_MISTY_TREES_NIGHT[24] = "Misty Trees Night Theme";
+char BGM_NAME_WARUMONZAEMON[20] = "WaruMonzaemon Theme";
+char BGM_NAME_TOY_TOWN[] = "Toy Town Theme";
+char BGM_NAME_FACTORIAL[] = "Theme of Factorial";
+char BGM_NAME_FACTORIAL_NIGHT[] = "Factorial Night Theme";
+char BGM_NAME_SEWER[12] = "Sewer Theme";
+char BGM_NAME_TRASH_MOUNTAIN[] = "Trash Mountain Theme";
+char BGM_NAME_TRASH_MOUNTAIN_NIGHT[] = "Trash Mountain Night Theme";
+char BGM_NAME_BEATLAND[] = "Beatland Theme";
+char BGM_NAME_BEATLAND_NIGHT[] = "Beatland Night Theme";
+char BGM_NAME_SECRET_BEACH_CAVE[24] = "Secret Beach Cave Theme";
+char BGM_NAME_LAST_ROOM[16] = "Last Room Theme";
+char BGM_NAME_FILE_CITY[16] = "File City Theme";
+char BGM_NAME_FILE_CITY_NIGHT[] = "File City Night Theme";
+char BGM_NAME_TOURNAMENT_OPENING[24] = "Tornament Opening Theme";
+char BGM_NAME_TOURNAMENT_PROGRESS[] = "Tornament Progress Theme";
+char BGM_NAME_TOURNAMENT_CHAMPIONSHIP[] = "Tornament Championship Theme";
+char BGM_NAME_PARTNERS_ENTRANCE[] = "Partner's Entrance Theme";
+char BGM_NAME_COMPETITION_BATTLE_OPPONENTS_ENTRANCE[] = "Competition Battle Opponent's Entrance Theme";
+char BGM_NAME_ARENA_BATTLE_1[] = "Arena Battle Theme No. 1";
+char BGM_NAME_PARTNERS_WIN[20] = "Partner's Win Theme";
+char BGM_NAME_PARTNERS_LOSS[] = "Partner's Loss Theme";
+char BGM_NAME_ARENA_BATTLE_2[] = "Arena Battle Theme No. 2";
+char BGM_NAME_ARENA_BATTLE_3[] = "Arena Battle Theme No. 3";
+char BGM_NAME_EVENT_BATTLE[] = "Event Battle Theme";
+char BGM_NAME_NORMAL_BATTLE[20] = "Normal Battle Theme";
+char BGM_NAME_NORMAL_BATTLE_2[] = "Normal Battle  Theme No.2";
+char BGM_NAME_LAST_BATTLE[] = "Last Battle Theme";
+char CUP_NAME_VERSION_1[] = "Version 1 Cup";
+char CUP_NAME_VERSION_2[] = "Version 2 Cup";
+char CUP_NAME_VERSION_3[] = "Version 3 Cup";
+char CUP_NAME_VERSION_4[] = "Version 4 Cup";
+char CUP_NAME_VERSION_0[] = "Version 0 Cup";
+char CUP_NAME_FIRE[] = "Fire Cup";
+char CUP_NAME_GRAPPLE[12] = "Grapple Cup";
+char CUP_NAME_THUNDER_WIND[] = "Thunder Wind Cup";
+char CUP_NAME_COOL[] = "Cool Cup";
+char CUP_NAME_NATURE[] = "Nature Cup";
+char CUP_NAME_METALLIC[12] = "Metalic Cup";
+char CUP_NAME_FILTH[] = "Filth Cup";
+char CUP_NAME_DINO[] = "Dino Cup";
+char CUP_NAME_WING[] = "Wing Cup";
+char CUP_NAME_ANIMAL[] = "Animal Cup";
+char CUP_NAME_HUMAN[] = "Human Cup";
+char CUP_NAME_BEETLE[] = "Beetle Cup";
 
 GsSPRITE MOOD_BUBBLE_SPRITE = {
 	0x50000000,			/* attribute */
@@ -481,69 +481,69 @@ uint8_t LOST_ITEM_IDS[78] = {
 };
 
 char *BGM_TRACK_NAMES[63] = {
-	MAIN_D_8012F6D0,
-	MAIN_D_8012F6F0,
-	MAIN_D_8012F714,
-	MAIN_D_8012F724,
-	MAIN_D_8012F73C,
-	MAIN_D_8012F750,
-	MAIN_D_8012F76C,
-	MAIN_D_8012F780,
-	MAIN_D_8012F794,
-	MAIN_D_8012F7AC,
-	MAIN_D_8012F7BC,
-	MAIN_D_8012F7D0,
-	MAIN_D_8012F7E8,
-	MAIN_D_8012F7FC,
-	MAIN_D_8012F80C,
-	MAIN_D_8012F82C,
-	MAIN_D_8012F844,
-	MAIN_D_8012F858,
-	MAIN_D_8012F874,
-	MAIN_D_8012F884,
-	MAIN_D_8012F898,
-	MAIN_D_8012F8B4,
-	MAIN_D_8012F8E8,
-	MAIN_D_8012F920,
-	MAIN_D_8012F954,
-	MAIN_D_8012F990,
-	MAIN_D_8012F9A4,
-	MAIN_D_8012F9BC,
-	MAIN_D_8012F9C8,
-	MAIN_D_8012F9D8,
-	MAIN_D_8012F9E8,
-	MAIN_D_8012FA00,
-	MAIN_D_8012FA14,
-	MAIN_D_8012FA2C,
-	MAIN_D_8012FA40,
-	MAIN_D_8012FA58,
-	MAIN_D_8012FA6C,
-	MAIN_D_8012FA7C,
-	MAIN_D_8012FA90,
-	MAIN_D_8012FAA8,
-	MAIN_D_8012FAB4,
-	MAIN_D_8012FACC,
-	MAIN_D_8012FAE8,
-	MAIN_D_8012FAF8,
-	MAIN_D_8012FB10,
-	MAIN_D_8012F73C,
-	MAIN_D_8012FB28,
-	MAIN_D_8012FB38,
-	MAIN_D_8012FB48,
-	MAIN_D_8012FB60,
-	MAIN_D_8012FB78,
-	MAIN_D_8012FB94,
-	MAIN_D_8012FBB4,
-	MAIN_D_8012FBD0,
-	MAIN_D_8012FC00,
-	MAIN_D_8012FC1C,
-	MAIN_D_8012FC30,
-	MAIN_D_8012FC48,
-	MAIN_D_8012FC64,
-	MAIN_D_8012FC80,
-	MAIN_D_8012FC94,
-	MAIN_D_8012FCA8,
-	MAIN_D_8012FCC4,
+	BGM_NAME_NON_BEWILDERING_FOREST,
+	BGM_NAME_NON_BEWILDERING_FOREST_NIGHT,
+	BGM_NAME_TROPICAL,
+	BGM_NAME_TROPICAL_NIGHT,
+	BGM_NAME_MT_PANORAMA,
+	BGM_NAME_MT_PANORAMA_NIGHT,
+	BGM_NAME_DRILL_TUNNEL,
+	BGM_NAME_OGRE_FORTRESS,
+	BGM_NAME_OVERDELL_CEMETERY,
+	BGM_NAME_CANYON,
+	BGM_NAME_OGREMON_2,
+	BGM_NAME_EVERYTHING_SHOP,
+	BGM_NAME_OGREMON_3,
+	BGM_NAME_LAVA_CAVE,
+	BGM_NAME_DARK_ARISTOCRATS_MANSION,
+	BGM_NAME_UNDERGROUND_LAB,
+	BGM_NAME_GEAR_SAVANNA,
+	BGM_NAME_GEAR_SAVANNA_NIGHT,
+	BGM_NAME_LEOMON,
+	BGM_NAME_AMIDA_FOREST,
+	BGM_NAME_AMIDA_FOREST_NIGHT,
+	BGM_NAME_DINO_SPEEDY_TIME_ZONE,
+	BGM_NAME_DINO_SPEEDY_TIME_ZONE_NIGHT,
+	BGM_NAME_DINO_GLACIAL_TIME_ZONE,
+	BGM_NAME_DINO_GLACIAL_TIME_ZONE_NIGHT,
+	BGM_NAME_FREEZELAND,
+	BGM_NAME_FREEZELAND_NIGHT,
+	BGM_NAME_IGLOO,
+	BGM_NAME_CURLING,
+	BGM_NAME_SANCTUARY,
+	BGM_NAME_SANCTUARY_BELOW,
+	BGM_NAME_GECKO_SWAMP,
+	BGM_NAME_GECKO_SWAMP_NIGHT,
+	BGM_NAME_MISTY_TREES,
+	BGM_NAME_MISTY_TREES_NIGHT,
+	BGM_NAME_WARUMONZAEMON,
+	BGM_NAME_TOY_TOWN,
+	BGM_NAME_FACTORIAL,
+	BGM_NAME_FACTORIAL_NIGHT,
+	BGM_NAME_SEWER,
+	BGM_NAME_TRASH_MOUNTAIN,
+	BGM_NAME_TRASH_MOUNTAIN_NIGHT,
+	BGM_NAME_BEATLAND,
+	BGM_NAME_BEATLAND_NIGHT,
+	BGM_NAME_SECRET_BEACH_CAVE,
+	BGM_NAME_MT_PANORAMA,
+	BGM_NAME_LAST_ROOM,
+	BGM_NAME_FILE_CITY,
+	BGM_NAME_FILE_CITY_NIGHT,
+	BGM_NAME_TOURNAMENT_OPENING,
+	BGM_NAME_TOURNAMENT_PROGRESS,
+	BGM_NAME_TOURNAMENT_CHAMPIONSHIP,
+	BGM_NAME_PARTNERS_ENTRANCE,
+	BGM_NAME_COMPETITION_BATTLE_OPPONENTS_ENTRANCE,
+	BGM_NAME_ARENA_BATTLE_1,
+	BGM_NAME_PARTNERS_WIN,
+	BGM_NAME_PARTNERS_LOSS,
+	BGM_NAME_ARENA_BATTLE_2,
+	BGM_NAME_ARENA_BATTLE_3,
+	BGM_NAME_EVENT_BATTLE,
+	BGM_NAME_NORMAL_BATTLE,
+	BGM_NAME_NORMAL_BATTLE_2,
+	BGM_NAME_LAST_BATTLE,
 };
 
 int32_t CARD_PRICES[5] = {
@@ -621,29 +621,29 @@ CardData CARD_DATA[66] = {
 };
 
 char *TOURNAMENT_CUP_NAMES[23] = {
-	MAIN_D_80134554,
-	MAIN_D_8013455C,
-	MAIN_D_80134564,
-	MAIN_D_8013456C,
-	MAIN_D_80134574,
-	MAIN_D_8013457C,
-	MAIN_D_8012FCD8,
-	MAIN_D_8012FCE8,
-	MAIN_D_8012FCF8,
-	MAIN_D_8012FD08,
-	MAIN_D_8012FD18,
-	MAIN_D_8012FD28,
-	MAIN_D_8012FD34,
-	MAIN_D_8012FD40,
-	MAIN_D_8012FD54,
-	MAIN_D_8012FD60,
-	MAIN_D_8012FD6C,
-	MAIN_D_8012FD78,
-	MAIN_D_8012FD84,
-	MAIN_D_8012FD90,
-	MAIN_D_8012FD9C,
-	MAIN_D_8012FDA8,
-	MAIN_D_8012FDB4,
+	CUP_NAME_GRADE_D,
+	CUP_NAME_GRADE_C,
+	CUP_NAME_GRADE_B,
+	CUP_NAME_GRADE_A,
+	CUP_NAME_GRADE_S,
+	CUP_NAME_GRADE_R,
+	CUP_NAME_VERSION_1,
+	CUP_NAME_VERSION_2,
+	CUP_NAME_VERSION_3,
+	CUP_NAME_VERSION_4,
+	CUP_NAME_VERSION_0,
+	CUP_NAME_FIRE,
+	CUP_NAME_GRAPPLE,
+	CUP_NAME_THUNDER_WIND,
+	CUP_NAME_COOL,
+	CUP_NAME_NATURE,
+	CUP_NAME_METALLIC,
+	CUP_NAME_FILTH,
+	CUP_NAME_DINO,
+	CUP_NAME_WING,
+	CUP_NAME_ANIMAL,
+	CUP_NAME_HUMAN,
+	CUP_NAME_BEETLE,
 };
 
 char *TOURNAMENT_GRADES[23] = {
@@ -787,174 +787,174 @@ uint8_t TRADE_GIVEN_ITEMS[12] = {
 	0x15, 0x00, 0x00, 0x00,
 };
 
-char MAIN_D_80130450[] = "あいうえお";
+char NAMING_ROW_HIRAGANA_A[] = "あいうえお";
 
 /* sic: と instead of こ in the original */
-char MAIN_D_8013045C[] = "かきくけと";
+char NAMING_ROW_HIRAGANA_KA[] = "かきくけと";
 
-char MAIN_D_80130468[] = "さしすせそ";
+char NAMING_ROW_HIRAGANA_SA[] = "さしすせそ";
 
-char MAIN_D_80130474[] = "たちつてと";
+char NAMING_ROW_HIRAGANA_TA[] = "たちつてと";
 
-char MAIN_D_80130480[] = "なにぬねの";
+char NAMING_ROW_HIRAGANA_NA[] = "なにぬねの";
 
-char MAIN_D_8013048C[] = "はひふへほ";
+char NAMING_ROW_HIRAGANA_HA[] = "はひふへほ";
 
-char MAIN_D_80130498[] = "まみむめも";
+char NAMING_ROW_HIRAGANA_MA[] = "まみむめも";
 
-char MAIN_D_801304A4[] = "や　ゆ　よ";
+char NAMING_ROW_HIRAGANA_YA[] = "や　ゆ　よ";
 
-char MAIN_D_801304B0[] = "らりるれろ";
+char NAMING_ROW_HIRAGANA_RA[] = "らりるれろ";
 
 char *NAMING_PAGE_HIRAGANA[9] = {
-	MAIN_D_80130450,
-	MAIN_D_8013045C,
-	MAIN_D_80130468,
-	MAIN_D_80130474,
-	MAIN_D_80130480,
-	MAIN_D_8013048C,
-	MAIN_D_80130498,
-	MAIN_D_801304A4,
-	MAIN_D_801304B0,
+	NAMING_ROW_HIRAGANA_A,
+	NAMING_ROW_HIRAGANA_KA,
+	NAMING_ROW_HIRAGANA_SA,
+	NAMING_ROW_HIRAGANA_TA,
+	NAMING_ROW_HIRAGANA_NA,
+	NAMING_ROW_HIRAGANA_HA,
+	NAMING_ROW_HIRAGANA_MA,
+	NAMING_ROW_HIRAGANA_YA,
+	NAMING_ROW_HIRAGANA_RA,
 };
 
-char MAIN_D_801304E0[] = "わ　を　ん";
+char NAMING_ROW_HIRAGANA_WA[] = "わ　を　ん";
 
-char MAIN_D_801304EC[] = "がぎぐげご";
+char NAMING_ROW_HIRAGANA_GA[] = "がぎぐげご";
 
-char MAIN_D_801304F8[] = "ざじずぜぞ";
+char NAMING_ROW_HIRAGANA_ZA[] = "ざじずぜぞ";
 
-char MAIN_D_80130504[] = "だぢづでど";
+char NAMING_ROW_HIRAGANA_DA[] = "だぢづでど";
 
-char MAIN_D_80130510[] = "ばびぶべぼ";
+char NAMING_ROW_HIRAGANA_BA[] = "ばびぶべぼ";
 
-char MAIN_D_8013051C[] = "ぱぴぷぺぽ";
+char NAMING_ROW_HIRAGANA_PA[] = "ぱぴぷぺぽ";
 
-char MAIN_D_80130528[] = "ぁぃぅぇぉ";
+char NAMING_ROW_HIRAGANA_SMALL_A[] = "ぁぃぅぇぉ";
 
-char MAIN_D_80130534[] = "っゃゅょー";
+char NAMING_ROW_HIRAGANA_SMALL_TU[] = "っゃゅょー";
 
 char NAMING_BLANK_ROW[] = "　　　　　";
 
 char *NAMING_PAGE_HIRAGANA_2[9] = {
-	MAIN_D_801304E0,
-	MAIN_D_801304EC,
-	MAIN_D_801304F8,
-	MAIN_D_80130504,
-	MAIN_D_80130510,
-	MAIN_D_8013051C,
-	MAIN_D_80130528,
-	MAIN_D_80130534,
+	NAMING_ROW_HIRAGANA_WA,
+	NAMING_ROW_HIRAGANA_GA,
+	NAMING_ROW_HIRAGANA_ZA,
+	NAMING_ROW_HIRAGANA_DA,
+	NAMING_ROW_HIRAGANA_BA,
+	NAMING_ROW_HIRAGANA_PA,
+	NAMING_ROW_HIRAGANA_SMALL_A,
+	NAMING_ROW_HIRAGANA_SMALL_TU,
 	NAMING_BLANK_ROW,
 };
 
-char MAIN_D_80130570[] = "アイウエオ";
+char NAMING_ROW_KATAKANA_A[] = "アイウエオ";
 
-char MAIN_D_8013057C[] = "カキクケコ";
+char NAMING_ROW_KATAKANA_KA[] = "カキクケコ";
 
-char MAIN_D_80130588[] = "サシスセソ";
+char NAMING_ROW_KATAKANA_SA[] = "サシスセソ";
 
-char MAIN_D_80130594[] = "タチツテト";
+char NAMING_ROW_KATAKANA_TA[] = "タチツテト";
 
-char MAIN_D_801305A0[] = "ナニヌネノ";
+char NAMING_ROW_KATAKANA_NA[] = "ナニヌネノ";
 
-char MAIN_D_801305AC[] = "ハヒフヘホ";
+char NAMING_ROW_KATAKANA_HA[] = "ハヒフヘホ";
 
-char MAIN_D_801305B8[] = "マミムメモ";
+char NAMING_ROW_KATAKANA_MA[] = "マミムメモ";
 
-char MAIN_D_801305C4[] = "ヤ　ユ　ヨ";
+char NAMING_ROW_KATAKANA_YA[] = "ヤ　ユ　ヨ";
 
-char MAIN_D_801305D0[] = "ラリルレロ";
+char NAMING_ROW_KATAKANA_RA[] = "ラリルレロ";
 
 char *NAMING_PAGE_KATAKANA[9] = {
-	MAIN_D_80130570,
-	MAIN_D_8013057C,
-	MAIN_D_80130588,
-	MAIN_D_80130594,
-	MAIN_D_801305A0,
-	MAIN_D_801305AC,
-	MAIN_D_801305B8,
-	MAIN_D_801305C4,
-	MAIN_D_801305D0,
+	NAMING_ROW_KATAKANA_A,
+	NAMING_ROW_KATAKANA_KA,
+	NAMING_ROW_KATAKANA_SA,
+	NAMING_ROW_KATAKANA_TA,
+	NAMING_ROW_KATAKANA_NA,
+	NAMING_ROW_KATAKANA_HA,
+	NAMING_ROW_KATAKANA_MA,
+	NAMING_ROW_KATAKANA_YA,
+	NAMING_ROW_KATAKANA_RA,
 };
 
-char MAIN_D_80130600[] = "ワ　ヲ　ン";
+char NAMING_ROW_KATAKANA_WA[] = "ワ　ヲ　ン";
 
-char MAIN_D_8013060C[] = "ガギグゲゴ";
+char NAMING_ROW_KATAKANA_GA[] = "ガギグゲゴ";
 
-char MAIN_D_80130618[] = "ザジズゼゾ";
+char NAMING_ROW_KATAKANA_ZA[] = "ザジズゼゾ";
 
-char MAIN_D_80130624[] = "ダヂヅデド";
+char NAMING_ROW_KATAKANA_DA[] = "ダヂヅデド";
 
-char MAIN_D_80130630[] = "バビブベボ";
+char NAMING_ROW_KATAKANA_BA[] = "バビブベボ";
 
-char MAIN_D_8013063C[] = "パピプペポ";
+char NAMING_ROW_KATAKANA_PA[] = "パピプペポ";
 
-char MAIN_D_80130648[] = "ァィゥェォ";
+char NAMING_ROW_KATAKANA_SMALL_A[] = "ァィゥェォ";
 
-char MAIN_D_80130654[] = "ッャュョー";
+char NAMING_ROW_KATAKANA_SMALL_TU[] = "ッャュョー";
 
 char *NAMING_PAGE_KATAKANA_2[9] = {
-	MAIN_D_80130600,
-	MAIN_D_8013060C,
-	MAIN_D_80130618,
-	MAIN_D_80130624,
-	MAIN_D_80130630,
-	MAIN_D_8013063C,
-	MAIN_D_80130648,
-	MAIN_D_80130654,
+	NAMING_ROW_KATAKANA_WA,
+	NAMING_ROW_KATAKANA_GA,
+	NAMING_ROW_KATAKANA_ZA,
+	NAMING_ROW_KATAKANA_DA,
+	NAMING_ROW_KATAKANA_BA,
+	NAMING_ROW_KATAKANA_PA,
+	NAMING_ROW_KATAKANA_SMALL_A,
+	NAMING_ROW_KATAKANA_SMALL_TU,
 	NAMING_BLANK_ROW,
 };
 
-char MAIN_D_80130684[] = "ＡＢＣＤＥ";
+char NAMING_ROW_UPPER_A[] = "ＡＢＣＤＥ";
 
-char MAIN_D_80130690[] = "ＦＧＨＩＪ";
+char NAMING_ROW_UPPER_F[] = "ＦＧＨＩＪ";
 
-char MAIN_D_8013069C[] = "ＫＬＭＮＯ";
+char NAMING_ROW_UPPER_K[] = "ＫＬＭＮＯ";
 
-char MAIN_D_801306A8[] = "ＰＱＲＳＴ";
+char NAMING_ROW_UPPER_P[] = "ＰＱＲＳＴ";
 
-char MAIN_D_801306B4[] = "ＵＶＷＸＹ";
+char NAMING_ROW_UPPER_U[] = "ＵＶＷＸＹ";
 
-char MAIN_D_801306C0[] = "Ｚ　　　　";
+char NAMING_ROW_UPPER_Z[] = "Ｚ　　　　";
 
 char *NAMING_PAGE_UPPERCASE[9] = {
-	MAIN_D_80130684,
-	MAIN_D_80130690,
-	MAIN_D_8013069C,
-	MAIN_D_801306A8,
-	MAIN_D_801306B4,
-	MAIN_D_801306C0,
+	NAMING_ROW_UPPER_A,
+	NAMING_ROW_UPPER_F,
+	NAMING_ROW_UPPER_K,
+	NAMING_ROW_UPPER_P,
+	NAMING_ROW_UPPER_U,
+	NAMING_ROW_UPPER_Z,
 	NAMING_BLANK_ROW,
 	NAMING_BLANK_ROW,
 	NAMING_BLANK_ROW,
 };
 
-char MAIN_D_801306F0[] = "ａｂｃｄｅ";
+char NAMING_ROW_LOWER_a[] = "ａｂｃｄｅ";
 
-char MAIN_D_801306FC[] = "ｆｇｈｉｊ";
+char NAMING_ROW_LOWER_f[] = "ｆｇｈｉｊ";
 
-char MAIN_D_80130708[] = "ｋｌｍｎｏ";
+char NAMING_ROW_LOWER_k[] = "ｋｌｍｎｏ";
 
-char MAIN_D_80130714[] = "ｐｑｒｓｔ";
+char NAMING_ROW_LOWER_p[] = "ｐｑｒｓｔ";
 
-char MAIN_D_80130720[] = "ｕｖｗｘｙ";
+char NAMING_ROW_LOWER_u[] = "ｕｖｗｘｙ";
 
-char MAIN_D_8013072C[] = "ｚ　　　　";
+char NAMING_ROW_LOWER_z[] = "ｚ　　　　";
 
-char MAIN_D_80130738[] = "０１２３４";
+char NAMING_ROW_DIGITS_0[] = "０１２３４";
 
-char MAIN_D_80130744[] = "５６７８９";
+char NAMING_ROW_DIGITS_5[] = "５６７８９";
 
 char *NAMING_PAGE_LOWERCASE[9] = {
-	MAIN_D_801306F0,
-	MAIN_D_801306FC,
-	MAIN_D_80130708,
-	MAIN_D_80130714,
-	MAIN_D_80130720,
-	MAIN_D_8013072C,
-	MAIN_D_80130738,
-	MAIN_D_80130744,
+	NAMING_ROW_LOWER_a,
+	NAMING_ROW_LOWER_f,
+	NAMING_ROW_LOWER_k,
+	NAMING_ROW_LOWER_p,
+	NAMING_ROW_LOWER_u,
+	NAMING_ROW_LOWER_z,
+	NAMING_ROW_DIGITS_0,
+	NAMING_ROW_DIGITS_5,
 	NAMING_BLANK_ROW,
 };
 

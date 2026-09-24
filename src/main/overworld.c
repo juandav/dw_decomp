@@ -428,9 +428,9 @@ uint8_t MAIN_D_80134237 = 0xff;
 
 SVECTOR MAIN_D_80134238 = { 0x0000, 0x0000, 0x0000, 0x0000 };
 
-char MAIN_D_80134240[8] = "Current";
+char LABELS_CURRENT[8] = "Current";
 
-char MAIN_D_80134248[8] = "Ending";
+char MEDAL_NAME_ENDING[8] = "Ending";
 
 TriangleCursorUVData MAIN_D_80134250 = { { 0x00, 0x04, 0x00, 0x04, 0x04, 0x04, 0x08, 0x08 } };
 
@@ -458,19 +458,19 @@ uint8_t MAIN_D_801342A0[4] = {
 
 PlayerTabs MAIN_D_801342A4 = { { 0x01, 0x01, 0x01, 0x01 } };
 
-char MAIN_D_801342A8[8] = "Amateur";
+char TAMER_LEVEL_AMATEUR[8] = "Amateur";
 
-char MAIN_D_801342B0[] = "Novice";
+char TAMER_LEVEL_NOVICE[] = "Novice";
 
-char MAIN_D_801342B8[8] = "Veteran";
+char TAMER_LEVEL_VETERAN[8] = "Veteran";
 
-char MAIN_D_801342C0[] = "Super";
+char TAMER_LEVEL_SUPER[] = "Super";
 
-char MAIN_D_801342C8[] = "Master";
+char TAMER_LEVEL_MASTER[] = "Master";
 
-char MAIN_D_801342D0[] = "Genius";
+char TAMER_LEVEL_GENIUS[] = "Genius";
 
-char MAIN_D_801342D8[] = "Legend";
+char TAMER_LEVEL_LEGEND[] = "Legend";
 
 RECT MAIN_D_801342E0 = { 0, 24, 256, 200 };
 
@@ -500,125 +500,125 @@ GsRVIEW2 MAIN_D_80123880 = {
 	-1050, 220, -10000, -1050, 220, 0, 0, NULL,
 };
 
-char MAIN_D_801238A0[] = "Status  Tech";
+char LABELS_STATUS_TECH[] = "Status  Tech";
 
-char MAIN_D_801238B0[] = "      Disc.      Life  Vir. HPMPnight";
+char LABELS_DISC_LIFE_VIR_HPMPNIGHT[] = "      Disc.      Life  Vir. HPMPnight";
 
-char MAIN_D_801238D8[] = "sunup  day      groggysleepy sunset ";
+char LABELS_SUNUP_DAY_GROGGYSLEEPY_SUNSET[] = "sunup  day      groggysleepy sunset ";
 
-char MAIN_D_80123900[20] = "TechsetFinal  Techs";
+char LABELS_TECHSETFINAL_TECHS[20] = "TechsetFinal  Techs";
 
-char MAIN_D_80123914[12] = "help     □";
+char LABELS_HELP[12] = "help     □";
 
-char MAIN_D_80123920[] = "△ Change Techniques";
+char LABELS_CHANGE_TECHNIQUES[] = "△ Change Techniques";
 
-char MAIN_D_80123938[] = "poisconfstunflat";
+char LABELS_POISCONFSTUNFLAT[] = "poisconfstunflat";
 
-char MAIN_D_8012394C[] = "× Cancel";
+char LABELS_CANCEL[] = "× Cancel";
 
-char MAIN_D_80123958[] = "S      L      W      A";
+char LABELS_S_L_W_A[] = "S      L      W      A";
 
-char MAIN_D_80123970[] = "Select - choose to select tech";
+char LABELS_SELECT_CHOOSE_TO_SELECT_TECH[] = "Select - choose to select tech";
 
-char MAIN_D_80123990[] = "Cancel - △ deselects tech";
+char LABELS_CANCEL_DESELECTS_TECH[] = "Cancel - △ deselects tech";
 
-char MAIN_D_801239AC[] = "Technique Select Help";
+char LABELS_TECHNIQUE_SELECT_HELP[] = "Technique Select Help";
 
-char MAIN_D_801239C4[] = "Mastered";
+char LABELS_MASTERED[] = "Mastered";
 
-char MAIN_D_801239D0[] = "Unmastered";
+char LABELS_UNMASTERED[] = "Unmastered";
 
-char MAIN_D_801239DC[] = "Unusable";
+char LABELS_UNUSABLE[] = "Unusable";
 
-char MAIN_D_801239E8[] = "Selected";
+char LABELS_SELECTED[] = "Selected";
 
-char MAIN_D_801239F4[36] = "BattleRecord Wins Losses Percentage";
+char LABELS_BATTLERECORD_WINS_LOSSES_PERCENTAGE[36] = "BattleRecord Wins Losses Percentage";
 
-char MAIN_D_80123A18[] = "Player   Chart    Med. Card Fish";
+char LABELS_PLAYER_CHART_MED_CARD_FISH[] = "Player   Chart    Med. Card Fish";
 
-char MAIN_D_80123A3C[] = "Medals Chart   △× Select  Cancel";
+char LABELS_MEDALS_CHART_SELECT_CANCEL[] = "Medals Chart   △× Select  Cancel";
 
-char MAIN_D_80123A60[] = "NameLevel           Raised";
+char LABELS_NAMELEVEL_RAISED[] = "NameLevel           Raised";
 
-char MAIN_D_80123A7C[] = "Bits                Time";
+char LABELS_BITS_TIME[] = "Bits                Time";
 
-char MAIN_D_80123A98[] = "Items          Medals";
+char LABELS_ITEMS_MEDALS[] = "Items          Medals";
 
-char MAIN_D_80123AB0[] = "Card List△Select   ×Cancel";
+char LABELS_CARD_LIST_SELECT_CANCEL[] = "Card List△Select   ×Cancel";
 
-char MAIN_D_80123AD0[20] = "△Select   ×Cancel";
+char LABELS_SELECT_CANCEL[20] = "△Select   ×Cancel";
 
-char MAIN_D_80123AE4[] = "Tree FreshTraining               △Select";
+char LABELS_TREE_FRESHTRAINING_SELECT[] = "Tree FreshTraining               △Select";
 
-char MAIN_D_80123B10[] = "RookieChampion";
+char LABELS_ROOKIECHAMPION[] = "RookieChampion";
 
-char MAIN_D_80123B20[] = "Ultimate";
+char LABELS_ULTIMATE[] = "Ultimate";
 
-char MAIN_D_80123B2C[] = "Grade Cup";
+char MEDAL_NAME_GRADE_CUP[] = "Grade Cup";
 
-char MAIN_D_80123B38[12] = "Version Cup";
+char MEDAL_NAME_VERSION_CUP[12] = "Version Cup";
 
-char MAIN_D_80123B44[] = "Type Cup";
+char MEDAL_NAME_TYPE_CUP[] = "Type Cup";
 
-char MAIN_D_80123B50[12] = "Special Cup";
+char MEDAL_NAME_SPECIAL_CUP[12] = "Special Cup";
 
-char MAIN_D_80123B5C[] = "100 Times";
+char MEDAL_NAME_100_TIMES[] = "100 Times";
 
-char MAIN_D_80123B68[] = "Technique Master";
+char MEDAL_NAME_TECHNIQUE_MASTER[] = "Technique Master";
 
-char MAIN_D_80123B7C[] = "Digimon Master";
+char MEDAL_NAME_DIGIMON_MASTER[] = "Digimon Master";
 
-char MAIN_D_80123B8C[] = "Max Abilities";
+char MEDAL_NAME_MAX_ABILITIES[] = "Max Abilities";
 
-char MAIN_D_80123B9C[16] = "Perfect Curling";
+char MEDAL_NAME_PERFECT_CURLING[16] = "Perfect Curling";
 
-char MAIN_D_80123BAC[] = "100 Fish";
+char MEDAL_NAME_100_FISH[] = "100 Fish";
 
-char MAIN_D_80123BB8[] = "Town Flourishing";
+char MEDAL_NAME_TOWN_FLOURISHING[] = "Town Flourishing";
 
-char MAIN_D_80123BCC[] = "Card Complete";
+char MEDAL_NAME_CARD_COMPLETE[] = "Card Complete";
 
-char MAIN_D_80123BDC[] = "Bits Maxed";
+char MEDAL_NAME_BITS_MAXED[] = "Bits Maxed";
 
-char MAIN_D_80123BE8[] = "10 Years";
+char MEDAL_NAME_10_YEARS[] = "10 Years";
 
-char MAIN_D_80123BF4[] = "Cup D C B A S";
+char MEDAL_TEXT_CUP_D_C_B_A[] = "Cup D C B A S";
 
-char MAIN_D_80123C04[] = "Win in all";
+char MEDAL_TEXT_WIN_IN_ALL[] = "Win in all";
 
-char MAIN_D_80123C10[] = "Win in all VER 1 2 3 4 0";
+char MEDAL_TEXT_WIN_IN_ALL_VER_1[] = "Win in all VER 1 2 3 4 0";
 
-char MAIN_D_80123C2C[] = "Fire Grapple Thunder Wind";
+char MEDAL_TEXT_FIRE_GRAPPLE_THUNDER_WIND[] = "Fire Grapple Thunder Wind";
 
-char MAIN_D_80123C48[] = "Nature Cool Metallic Filth Cup";
+char MEDAL_TEXT_NATURE_COOL_METALLIC_FILTH_CUP[] = "Nature Cool Metallic Filth Cup";
 
-char MAIN_D_80123C68[] = "Dino Wing Animal Human Cup";
+char MEDAL_TEXT_DINO_WING_ANIMAL_HUMAN_CUP[] = "Dino Wing Animal Human Cup";
 
-char MAIN_D_80123C84[] = "Won Championship 100 times";
+char MEDAL_TEXT_WON_CHAMPIONSHIP_100_TIMES[] = "Won Championship 100 times";
 
-char MAIN_D_80123CA0[] = "Mastered 56 switch techniques";
+char MEDAL_TEXT_MASTERED_56_SWITCH_TECHNIQUES[] = "Mastered 56 switch techniques";
 
-char MAIN_D_80123CC0[] = "Raised all 61 Digimon";
+char MEDAL_TEXT_RAISED_ALL_61_DIGIMON[] = "Raised all 61 Digimon";
 
-char MAIN_D_80123CD8[] = "Maxed all of the Digimons";
+char MEDAL_TEXT_MAXED_ALL_OF_THE_DIGIMONS[] = "Maxed all of the Digimons";
 
-char MAIN_D_80123CF4[] = "parameters";
+char MEDAL_TEXT_PARAMETERS[] = "parameters";
 
-char MAIN_D_80123D00[] = "Got a perfect score in curling";
+char MEDAL_TEXT_GOT_A_PERFECT_SCORE_IN[] = "Got a perfect score in curling";
 
-char MAIN_D_80123D20[16] = "100 fish caught";
+char MEDAL_TEXT_100_FISH_CAUGHT[16] = "100 fish caught";
 
-char MAIN_D_80123D30[] = "Finished the game";
+char MEDAL_TEXT_FINISHED_THE_GAME[] = "Finished the game";
 
-char MAIN_D_80123D44[] = "Jijimon said the town";
+char MEDAL_TEXT_JIJIMON_SAID_THE_TOWN[] = "Jijimon said the town";
 
-char MAIN_D_80123D5C[] = "is flourishing";
+char MEDAL_TEXT_IS_FLOURISHING[] = "is flourishing";
 
-char MAIN_D_80123D6C[28] = "Collected all Digimon Cards";
+char MEDAL_TEXT_COLLECTED_ALL_DIGIMON_CARDS[28] = "Collected all Digimon Cards";
 
-char MAIN_D_80123D88[] = "Collected 999999 bits";
+char MEDAL_TEXT_COLLECTED_999999_BITS[] = "Collected 999999 bits";
 
-char MAIN_D_80123DA0[] = "Survived for 300 days!";
+char MEDAL_TEXT_SURVIVED_FOR_300_DAYS[] = "Survived for 300 days!";
 
 uint8_t MAIN_D_80123DB8[24] = {
 	0x08, 0x08, 0x08, 0x09, 0x09, 0x09, 0x09, 0x09,
@@ -631,13 +631,13 @@ int32_t MAIN_D_80123DD0[6] = {
 	0x00000010, 0x00000002,
 };
 
-char MAIN_D_80123DE8[] = "Beginner";
+char TAMER_LEVEL_BEGINNER[] = "Beginner";
 
-char MAIN_D_80123DF4[] = "Intermediate";
+char TAMER_LEVEL_INTERMEDIATE[] = "Intermediate";
 
-char MAIN_D_80123E04[] = "Advanced";
+char TAMER_LEVEL_ADVANCED[] = "Advanced";
 
-char MAIN_D_80123E10[] = "Top rate";
+char TAMER_LEVEL_TOP_RATE[] = "Top rate";
 
 int16_t MAIN_D_80123E1C[6] = {
 	0x7a07, 0x7a47, 0x7a87, 0x7ac7, 0x7b07, 0x0000,
@@ -939,123 +939,124 @@ int16_t MAIN_D_8012472C[70] = {
  * them run several labels together or pad them with spaces.
  */
 char *STATUS_VIEW_LABELS[8] = {
-	MAIN_D_801238A0,
-	MAIN_D_801238B0,
-	MAIN_D_801238D8,
-	MAIN_D_80123900,
-	MAIN_D_80123914,
-	MAIN_D_80123920,
-	MAIN_D_80123938,
-	MAIN_D_8012394C,
+	LABELS_STATUS_TECH,
+	LABELS_DISC_LIFE_VIR_HPMPNIGHT,
+	LABELS_SUNUP_DAY_GROGGYSLEEPY_SUNSET,
+	LABELS_TECHSETFINAL_TECHS,
+	LABELS_HELP,
+	LABELS_CHANGE_TECHNIQUES,
+	LABELS_POISCONFSTUNFLAT,
+	LABELS_CANCEL,
 };
 
 char *TECH_VIEW_LABELS[10] = {
-	MAIN_D_80123958,
-	MAIN_D_80123970,
-	MAIN_D_80123990,
-	MAIN_D_801239AC,
-	MAIN_D_80134240,
-	MAIN_D_801239C4,
-	MAIN_D_801239D0,
-	MAIN_D_801239DC,
-	MAIN_D_801239E8,
-	MAIN_D_801239F4,
+	LABELS_S_L_W_A,
+	LABELS_SELECT_CHOOSE_TO_SELECT_TECH,
+	LABELS_CANCEL_DESELECTS_TECH,
+	LABELS_TECHNIQUE_SELECT_HELP,
+	LABELS_CURRENT,
+	LABELS_MASTERED,
+	LABELS_UNMASTERED,
+	LABELS_UNUSABLE,
+	LABELS_SELECTED,
+	LABELS_BATTLERECORD_WINS_LOSSES_PERCENTAGE,
 };
 
 char *PLAYER_VIEW_LABELS[5] = {
-	MAIN_D_80123A18,
-	MAIN_D_80123A3C,
-	MAIN_D_80123A60,
-	MAIN_D_80123A7C,
-	MAIN_D_80123A98,
+	LABELS_PLAYER_CHART_MED_CARD_FISH,
+	LABELS_MEDALS_CHART_SELECT_CANCEL,
+	LABELS_NAMELEVEL_RAISED,
+	LABELS_BITS_TIME,
+	LABELS_ITEMS_MEDALS,
 };
 
 char *CARD_CHART_LABELS[5] = {
-	MAIN_D_80123AB0,
-	MAIN_D_80123AD0,
-	MAIN_D_80123AE4,
-	MAIN_D_80123B10,
-	MAIN_D_80123B20,
+	LABELS_CARD_LIST_SELECT_CANCEL,
+	LABELS_SELECT_CANCEL,
+	LABELS_TREE_FRESHTRAINING_SELECT,
+	LABELS_ROOKIECHAMPION,
+	LABELS_ULTIMATE,
 };
 
 char *MEDAL_NAMES[15] = {
-	MAIN_D_80123B2C,
-	MAIN_D_80123B38,
-	MAIN_D_80123B44,
-	MAIN_D_80123B50,
-	MAIN_D_80123B5C,
-	MAIN_D_80123B68,
-	MAIN_D_80123B7C,
-	MAIN_D_80123B8C,
-	MAIN_D_80123B9C,
-	MAIN_D_80123BAC,
-	MAIN_D_80134248,
-	MAIN_D_80123BB8,
-	MAIN_D_80123BCC,
-	MAIN_D_80123BDC,
-	MAIN_D_80123BE8,
+	MEDAL_NAME_GRADE_CUP,
+	MEDAL_NAME_VERSION_CUP,
+	MEDAL_NAME_TYPE_CUP,
+	MEDAL_NAME_SPECIAL_CUP,
+	MEDAL_NAME_100_TIMES,
+	MEDAL_NAME_TECHNIQUE_MASTER,
+	MEDAL_NAME_DIGIMON_MASTER,
+	MEDAL_NAME_MAX_ABILITIES,
+	MEDAL_NAME_PERFECT_CURLING,
+	MEDAL_NAME_100_FISH,
+	MEDAL_NAME_ENDING,
+	MEDAL_NAME_TOWN_FLOURISHING,
+	MEDAL_NAME_CARD_COMPLETE,
+	MEDAL_NAME_BITS_MAXED,
+	MEDAL_NAME_10_YEARS,
 };
 
+/* Three rows per medal; &MEDAL_NAME_ENDING[7], the padding after "Ending", is an empty row. */
 char *MEDAL_DESCRIPTIONS[45] = {
-	MAIN_D_80123BF4,
-	MAIN_D_80123C04,
-	&MAIN_D_80134248[7],
-	MAIN_D_80123C10,
-	&MAIN_D_80134248[7],
-	&MAIN_D_80134248[7],
-	MAIN_D_80123C2C,
-	MAIN_D_80123C48,
-	MAIN_D_80123C04,
-	&MAIN_D_80134248[7],
-	MAIN_D_80123C68,
-	MAIN_D_80123C04,
-	&MAIN_D_80134248[7],
-	MAIN_D_80123C84,
-	&MAIN_D_80134248[7],
-	&MAIN_D_80134248[7],
-	MAIN_D_80123CA0,
-	&MAIN_D_80134248[7],
-	&MAIN_D_80134248[7],
-	MAIN_D_80123CC0,
-	&MAIN_D_80134248[7],
-	&MAIN_D_80134248[7],
-	MAIN_D_80123CD8,
-	MAIN_D_80123CF4,
-	&MAIN_D_80134248[7],
-	MAIN_D_80123D00,
-	&MAIN_D_80134248[7],
-	&MAIN_D_80134248[7],
-	MAIN_D_80123D20,
-	&MAIN_D_80134248[7],
-	&MAIN_D_80134248[7],
-	MAIN_D_80123D30,
-	&MAIN_D_80134248[7],
-	&MAIN_D_80134248[7],
-	MAIN_D_80123D44,
-	MAIN_D_80123D5C,
-	&MAIN_D_80134248[7],
-	MAIN_D_80123D6C,
-	&MAIN_D_80134248[7],
-	&MAIN_D_80134248[7],
-	MAIN_D_80123D88,
-	&MAIN_D_80134248[7],
-	&MAIN_D_80134248[7],
-	MAIN_D_80123DA0,
-	&MAIN_D_80134248[7],
+	MEDAL_TEXT_CUP_D_C_B_A,
+	MEDAL_TEXT_WIN_IN_ALL,
+	&MEDAL_NAME_ENDING[7],
+	MEDAL_TEXT_WIN_IN_ALL_VER_1,
+	&MEDAL_NAME_ENDING[7],
+	&MEDAL_NAME_ENDING[7],
+	MEDAL_TEXT_FIRE_GRAPPLE_THUNDER_WIND,
+	MEDAL_TEXT_NATURE_COOL_METALLIC_FILTH_CUP,
+	MEDAL_TEXT_WIN_IN_ALL,
+	&MEDAL_NAME_ENDING[7],
+	MEDAL_TEXT_DINO_WING_ANIMAL_HUMAN_CUP,
+	MEDAL_TEXT_WIN_IN_ALL,
+	&MEDAL_NAME_ENDING[7],
+	MEDAL_TEXT_WON_CHAMPIONSHIP_100_TIMES,
+	&MEDAL_NAME_ENDING[7],
+	&MEDAL_NAME_ENDING[7],
+	MEDAL_TEXT_MASTERED_56_SWITCH_TECHNIQUES,
+	&MEDAL_NAME_ENDING[7],
+	&MEDAL_NAME_ENDING[7],
+	MEDAL_TEXT_RAISED_ALL_61_DIGIMON,
+	&MEDAL_NAME_ENDING[7],
+	&MEDAL_NAME_ENDING[7],
+	MEDAL_TEXT_MAXED_ALL_OF_THE_DIGIMONS,
+	MEDAL_TEXT_PARAMETERS,
+	&MEDAL_NAME_ENDING[7],
+	MEDAL_TEXT_GOT_A_PERFECT_SCORE_IN,
+	&MEDAL_NAME_ENDING[7],
+	&MEDAL_NAME_ENDING[7],
+	MEDAL_TEXT_100_FISH_CAUGHT,
+	&MEDAL_NAME_ENDING[7],
+	&MEDAL_NAME_ENDING[7],
+	MEDAL_TEXT_FINISHED_THE_GAME,
+	&MEDAL_NAME_ENDING[7],
+	&MEDAL_NAME_ENDING[7],
+	MEDAL_TEXT_JIJIMON_SAID_THE_TOWN,
+	MEDAL_TEXT_IS_FLOURISHING,
+	&MEDAL_NAME_ENDING[7],
+	MEDAL_TEXT_COLLECTED_ALL_DIGIMON_CARDS,
+	&MEDAL_NAME_ENDING[7],
+	&MEDAL_NAME_ENDING[7],
+	MEDAL_TEXT_COLLECTED_999999_BITS,
+	&MEDAL_NAME_ENDING[7],
+	&MEDAL_NAME_ENDING[7],
+	MEDAL_TEXT_SURVIVED_FOR_300_DAYS,
+	&MEDAL_NAME_ENDING[7],
 };
 
 char *TAMER_LEVEL_NAMES[11] = {
-	MAIN_D_801342A8,
-	MAIN_D_801342B0,
-	MAIN_D_80123DE8,
-	MAIN_D_80123DF4,
-	MAIN_D_80123E04,
-	MAIN_D_801342B8,
-	MAIN_D_80123E10,
-	MAIN_D_801342C0,
-	MAIN_D_801342C8,
-	MAIN_D_801342D0,
-	MAIN_D_801342D8,
+	TAMER_LEVEL_AMATEUR,
+	TAMER_LEVEL_NOVICE,
+	TAMER_LEVEL_BEGINNER,
+	TAMER_LEVEL_INTERMEDIATE,
+	TAMER_LEVEL_ADVANCED,
+	TAMER_LEVEL_VETERAN,
+	TAMER_LEVEL_TOP_RATE,
+	TAMER_LEVEL_SUPER,
+	TAMER_LEVEL_MASTER,
+	TAMER_LEVEL_GENIUS,
+	TAMER_LEVEL_LEGEND,
 };
 
 int32_t MAIN_D_80124944[16] = {

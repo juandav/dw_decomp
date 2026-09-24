@@ -316,17 +316,17 @@ uint8_t MAIN_D_80134550[4] = {
 	0x01, 0x03, 0x05, 0x00,
 };
 
-char MAIN_D_80134554[8] = "Grade D";
+char CUP_NAME_GRADE_D[8] = "Grade D";
 
-char MAIN_D_8013455C[8] = "Grade C";
+char CUP_NAME_GRADE_C[8] = "Grade C";
 
-char MAIN_D_80134564[8] = "Grade B";
+char CUP_NAME_GRADE_B[8] = "Grade B";
 
-char MAIN_D_8013456C[8] = "Grade A";
+char CUP_NAME_GRADE_A[8] = "Grade A";
 
-char MAIN_D_80134574[8] = "Grade S";
+char CUP_NAME_GRADE_S[8] = "Grade S";
 
-char MAIN_D_8013457C[8] = "Grade R";
+char CUP_NAME_GRADE_R[8] = "Grade R";
 
 char MAIN_D_80134584[2][2] = { "D", "C" };
 
