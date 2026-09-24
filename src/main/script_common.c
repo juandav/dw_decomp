@@ -4920,7 +4920,7 @@ void scriptInstructionFBtoFF(int32_t op)
 	entry.smth[0] = 3;
 	pushScriptStack(&entry);
 
-	MAIN_D_80134FEC = 1;
+	SCRIPT_WARPING = 1;
 
 	resetBGM();
 	loadMap(CURRENT_MAP_ID);

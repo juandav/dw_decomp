@@ -10,12 +10,115 @@
 #include <dw/types.h>
 
 /*
- * Opcodes that the textbox code checks in ACTIVE_INSTRUCTION, the instruction
- * the script is waiting on.
+ * Script opcodes. Arguments follow the opcode byte; "_" is a padding byte,
+ * u8/u16/s16/s32 are little-endian values, "id" is a script id (an NPC, or a
+ * SPEAKER_* value) and "pstat" the index of a pstat. Offsets are from the
+ * start of the script. ACTIVE_INSTRUCTION holds the opcode the script waits
+ * on, such as SCRIPT_OP_TEXT while a textbox is shown.
  */
-#define SCRIPT_OP_CHOICE	0x10
-#define SCRIPT_OP_TEXT		0x1A
-#define SCRIPT_OP_BUILTIN	0x64	/* a shop, the jukebox, the naming screen... */
+#define SCRIPT_OP_CHOICE		0x10	/* u8 count, u16 targets[count], text */
+#define SCRIPT_OP_CALL			0x13	/* _, u16 offset */
+#define SCRIPT_OP_CALL_SCRIPT		0x14	/* _, u16 script, u16 section */
+#define SCRIPT_OP_RETURN		0x15	/* _ */
+#define SCRIPT_OP_JUMP			0x16	/* _, u16 offset */
+#define SCRIPT_OP_JUMP_SCRIPT		0x17	/* _, u16 script, u16 section */
+#define SCRIPT_OP_SWITCH		0x18	/* pstat, u16 count, u16 offsets[count] */
+#define SCRIPT_OP_CONDITION		0x19	/* _, entries, 0x19, _ */
+#define SCRIPT_OP_TEXT			0x1A	/* _, text */
+#define SCRIPT_OP_SPEAKER		0x1B	/* id */
+#define SCRIPT_OP_SET_TRIGGER		0x1C	/* _, u16 trigger */
+#define SCRIPT_OP_UNSET_TRIGGER		0x1D	/* _, u16 trigger */
+#define SCRIPT_OP_SET_PSTAT		0x1E	/* _, pstat, u8 value */
+#define SCRIPT_OP_ADD_PSTAT		0x1F	/* _, pstat, u8 value */
+#define SCRIPT_OP_SUB_PSTAT		0x20	/* _, pstat, u8 value */
+#define SCRIPT_OP_GET_MAP		0x21	/* pstat */
+#define SCRIPT_OP_GET_PARTNER_TYPE	0x22	/* pstat */
+#define SCRIPT_OP_SET_INVENTORY_SIZE	0x23	/* u8 size */
+#define SCRIPT_OP_RANDOM		0x24	/* _, pstat, u8 max */
+#define SCRIPT_OP_GET_DATE		0x25	/* pstat: year, day, hour, minute */
+#define SCRIPT_OP_SIZED_TEXTBOX		0x26	/* id origin, u8 cols, u8 rows */
+#define SCRIPT_OP_CLOSE_TEXTBOX		0x27	/* u8 box */
+#define SCRIPT_OP_GIVE_ITEM		0x28	/* _, u8 item, u8 amount */
+#define SCRIPT_OP_TAKE_ITEM		0x29	/* _, u8 item, u8 amount */
+#define SCRIPT_OP_ADD_MONEY		0x2A	/* _, s32 amount */
+#define SCRIPT_OP_SUB_MONEY		0x2B	/* _, s32 amount */
+#define SCRIPT_OP_COMPARE_DATE		0x2C	/* pstat date, u16 trigger, u8 compare, u8 year, u8 day, u8 hour, u8 minute, _ */
+#define SCRIPT_OP_LEARN_MOVE		0x2D	/* u8 move */
+#define SCRIPT_OP_NOP_2E		0x2E	/* u8 */
+#define SCRIPT_OP_GIVE_CARD		0x2F	/* u8 card */
+#define SCRIPT_OP_TAKE_CARD		0x30	/* u8 card */
+#define SCRIPT_OP_SET_MERIT		0x31	/* _, u16 value */
+#define SCRIPT_OP_ADD_MERIT		0x32	/* _, u16 value */
+#define SCRIPT_OP_SUB_MERIT		0x33	/* _, u16 value; sets MERIT to -value */
+#define SCRIPT_OP_SET_STAT		0x34	/* u8 stat, u16 value, see getStatsPointer() */
+#define SCRIPT_OP_ADD_STAT		0x35	/* u8 stat, u16 value */
+#define SCRIPT_OP_SUB_STAT		0x36	/* u8 stat, u16 value */
+#define SCRIPT_OP_WAIT_UNTIL_DATE	0x37	/* pstat: year, day, hour, minute */
+#define SCRIPT_OP_ADD_TO_DATE		0x38	/* pstat, s32 minutes */
+#define SCRIPT_OP_SUB_FROM_DATE		0x39	/* pstat, s32 minutes */
+#define SCRIPT_OP_NOP_3A		0x3A	/* _, u8, u8 */
+#define SCRIPT_OP_NOP_3B		0x3B	/* _, u8, u8 */
+#define SCRIPT_OP_NOP_3C		0x3C	/* _, u8, u8 */
+#define SCRIPT_OP_NOP_3D		0x3D	/* u8 */
+#define SCRIPT_OP_NOP_3E		0x3E	/* u8 */
+#define SCRIPT_OP_GET_DIGIMON_TYPE	0x3F	/* _, pstat digimon, pstat out */
+#define SCRIPT_OP_LOAD_MODEL		0x46	/* u8 digimon */
+#define SCRIPT_OP_SPAWN_DIGIMON		0x47	/* u8 digimon, u8 slot, u8 autotalk */
+#define SCRIPT_OP_REMOVE_DIGIMON	0x48	/* id */
+#define SCRIPT_OP_DIGIMON_ROUTINE	0x49	/* u8 routine, see callDigimonRoutine() */
+#define SCRIPT_OP_WAIT_MOVEMENT		0x4A	/* id, or 0xFF for all */
+#define SCRIPT_OP_CHANGE_SCREEN		0x4B	/* u8 screen, u8 exit, u8 section */
+#define SCRIPT_OP_LOOK_AT		0x4C	/* _, id, id target */
+#define SCRIPT_OP_SET_ROTATION		0x4D	/* id, s16 rotation */
+#define SCRIPT_OP_WALK_TO		0x4E	/* id, s16 x, s16 z, u8 anim, u8 */
+#define SCRIPT_OP_CAMERA_TO		0x4F	/* u8 speed, s16 x, s16 z */
+#define SCRIPT_OP_CAMERA_TO_ENTITY	0x50	/* _, id, u8 speed */
+#define SCRIPT_OP_WALK_TO_ENTITY	0x51	/* id, u8 anim, id target */
+#define SCRIPT_OP_WALK_TO_CAMERA	0x52	/* as WALK_TO, the camera follows */
+#define SCRIPT_OP_WALK_TO_ENTITY_CAMERA	0x53	/* as WALK_TO_ENTITY, the camera follows */
+#define SCRIPT_OP_RESET_ORIGIN		0x54	/* id */
+#define SCRIPT_OP_TEXTBOX_ORIGIN	0x55	/* _, s16 x, s16 y, s16 z */
+#define SCRIPT_OP_ANIMATE		0x56	/* _, id, u8 anim */
+#define SCRIPT_OP_SET_MAP_OBJECT	0x57	/* _, u8 object, u8 flag */
+#define SCRIPT_OP_CHANGE_SCREEN_PSTAT	0x58	/* pstat: screen, exit */
+#define SCRIPT_OP_PLAY_SOUND		0x5A	/* _, u8 bank, u8 sound */
+#define SCRIPT_OP_NOP_5B		0x5B	/* u8 */
+#define SCRIPT_OP_NOP_5C		0x5C	/* u8 */
+#define SCRIPT_OP_PLAY_BGM		0x5D	/* u8 bgm */
+#define SCRIPT_OP_STOP_BGM		0x5E	/* u8 */
+#define SCRIPT_OP_NOP_5F		0x5F	/* u8 */
+#define SCRIPT_OP_BUILTIN		0x64	/* u8: a shop, the jukebox, the naming screen... */
+#define SCRIPT_OP_CURE_CONDITION	0x65	/* u8 mask of CONDITION_* */
+#define SCRIPT_OP_BATTLE		0x66	/* u8 */
+#define SCRIPT_OP_WAIT			0x67	/* _, u16 frames */
+#define SCRIPT_OP_TEXT_ADVANCE		0x68	/* _, u8 mode, u8 frames */
+#define SCRIPT_OP_HURT_PARTNER		0x69	/* pstat percent of max HP */
+#define SCRIPT_OP_SET_AUTOTALK		0x6A	/* _, id, u8 autotalk */
+#define SCRIPT_OP_NOP_6B		0x6B
+#define SCRIPT_OP_MOVE_TO		0x6C	/* id, s16 x, s16 z, u8 speed, u8 */
+#define SCRIPT_OP_MOVE_TO_ENTITY	0x6D	/* id, id target, u8 speed */
+#define SCRIPT_OP_MOVE_TO_CAMERA	0x6E	/* as MOVE_TO, but uses MOVE_TO_ENTITY_CAMERA's movement */
+#define SCRIPT_OP_MOVE_TO_ENTITY_CAMERA	0x6F	/* as MOVE_TO_ENTITY, the camera follows */
+#define SCRIPT_OP_ROTATE_DOOR		0x70	/* u8 door, u8, u8 target */
+#define SCRIPT_OP_MOVE_OBJECT		0x71	/* u8 slot, id, u8 speed, s8 angle, _, s16 x, s16 z */
+#define SCRIPT_OP_MOVE_ALONG_AXIS	0x72	/* id, s16 target, u8 axis, u8 speed */
+#define SCRIPT_OP_MOVE_ALONG_AXIS_CAMERA 0x73	/* as MOVE_ALONG_AXIS, the camera follows */
+#define SCRIPT_OP_SPAWN_ITEM		0x74	/* u8 item, s16 x, s16 z */
+#define SCRIPT_OP_SPAWN_CHEST		0x75	/* u8 item, s16 x, y, z, w, u16 trigger */
+#define SCRIPT_OP_SPAWN_BOULDER		0x76	/* u8 */
+#define SCRIPT_OP_MOVE_BOULDER		0x77	/* u8, s16 x, s16 z */
+#define SCRIPT_OP_REMOVE_BOULDER	0x78	/* u8 */
+#define SCRIPT_OP_UNLOAD_MODEL		0x79	/* u8 digimon */
+#define SCRIPT_OP_COPY_PSTAT		0x7A	/* _, pstat from, pstat to */
+#define SCRIPT_OP_RETURN_SECTION	0x7B	/* u8 section to run after a screen change */
+#define SCRIPT_OP_SET_IMPASSABLE	0x7C	/* u8, s16 x, s16 z, u8 w, u8 h */
+#define SCRIPT_OP_SPAWN_SPRITE		0x7D	/* u8 sprite, s16 x, y, z, w */
+#define SCRIPT_OP_SPAWN_SPRITE_AT	0x7E	/* id, u8 node, u8 sprite */
+#define SCRIPT_OP_WARP			0xFB	/* _, u16 script, u16 map */
+#define SCRIPT_OP_NOP_FC		0xFC
+#define SCRIPT_OP_NOP_FD		0xFD
+#define SCRIPT_OP_END			0xFE
+#define SCRIPT_OP_END_FF		0xFF
 
 typedef struct {
 	uint8_t *scriptPtr;
@@ -106,13 +209,13 @@ extern uint16_t MAIN_D_80134FC6;
 extern int16_t ITEM_MENU_RECTS[];
 extern uint16_t CURRENT_SCRIPT_ID;
 extern uint16_t CURRENT_MAP_ID;
-extern int32_t MAIN_D_80134FEC;
+extern int32_t SCRIPT_WARPING;
 extern jmp_buf SCRIPT_JMP_BUF;
 extern uint8_t TEXT_ADVANCE_MODE;
-extern uint8_t MAIN_D_80134FE7;
+extern uint8_t SCRIPT_SAVED_PSTAT_0;
 extern int32_t SOME_SCRIPT_SYNC_BIT;
 extern int32_t IS_SCRIPT_PAUSED;
-extern int16_t MAIN_D_80134F9C;
+extern int16_t SCRIPT_TALKED_ENTITY;
 extern uint16_t ACTIVE_MAP_SCRIPT;
 extern int16_t MERIT;
 extern int16_t MAIN_D_80134FC8;
@@ -135,7 +238,7 @@ extern uint16_t SELECTION_MENU_STATE;
 extern uint16_t SCRIPT_STATE_4;
 extern uint8_t SCRIPT_STATE_3;
 extern int32_t MAIN_D_80134FA0;
-extern int32_t MAIN_D_80134FE0;
+extern int32_t SCRIPT_FROM_TALK;
 extern int32_t MONEY;
 extern char NAMING_BUFFER[];
 extern int32_t MONEY_BOX_DIRTY;
@@ -224,7 +327,7 @@ void scriptInstruction5Ato5F(int32_t op);
 void scriptInstruction64to7E(int32_t op);
 void scriptUpdateEnergyBoundaries(int32_t a0, int32_t a1);
 void MAIN_func_801053EC(void);
-void MAIN_func_80105464(uint8_t actorId, int32_t animationId);
+void scriptStartWalkAnimation(uint8_t actorId, int32_t animationId);
 void scriptStartAnimation(uint8_t actorId, int32_t animationId);
 void handleMusicOverride(uint8_t *outFont, uint8_t *outVariant);
 void tickScriptedMovement(int32_t slot);

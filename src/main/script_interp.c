@@ -46,9 +46,9 @@ typedef struct {
 	TextBoxData box[6];
 } TextBoxTable;
 
-extern uint8_t MAIN_D_80134FE4;
-extern uint8_t MAIN_D_80134FE9;
-extern int32_t MAIN_D_80134FF0;
+extern uint8_t SCRIPT_SECTION;
+extern uint8_t SCRIPT_MAP_CHANGE;
+extern int32_t SCRIPT_HAS_CONTROL;
 extern uint8_t MAIN_D_801BE6B5[];
 extern uint8_t MAIN_D_801BE6B6[];
 extern uint8_t *SCRIPT_HEADER_PTR;
@@ -323,7 +323,7 @@ static void *script_interp_text_order[] = {
 	tickScriptedMovement,
 	handleMusicOverride,
 	scriptStartAnimation,
-	MAIN_func_80105464,
+	scriptStartWalkAnimation,
 	MAIN_func_801053EC,
 	scriptUpdateEnergyBoundaries,
 	scriptConditionBlock,
@@ -351,18 +351,18 @@ int32_t tickScript(void)
 
 	tickTextboxes(0);
 	tickScriptedMovements();
-	if (MAIN_D_80134FE9 == 0x4b) {
+	if (SCRIPT_MAP_CHANGE == 0x4b) {
 		if (MAIN_func_800D8E64((int16_t)MAIN_D_80134FF8,
 		                       (int16_t)SELECTION_MENU_STATE,
 		                       MAIN_D_80134FA0)) {
-			MAIN_D_80134FF0 = 0;
+			SCRIPT_HAS_CONTROL = 0;
 			beginScriptEvent(SPEAKER_NONE);
-			MAIN_D_80134FE9 = 0;
+			SCRIPT_MAP_CHANGE = 0;
 		}
 	}
 
 	switch (ACTIVE_INSTRUCTION) {
-	case 0x67:
+	case SCRIPT_OP_WAIT:
 		if (SCRIPT_WAIT_TIMER == 0) {
 			ACTIVE_INSTRUCTION = 0;
 		}
@@ -511,7 +511,7 @@ done:
 			break;
 		}
 		break;
-	case 0x4a:
+	case SCRIPT_OP_WAIT_MOVEMENT:
 		if ((entityId = MAIN_D_80134FA4) == 0x19) {
 			if (MAIN_func_800DF7F8()) {
 				ACTIVE_INSTRUCTION = 0;
@@ -544,7 +544,7 @@ found:;
 		break;
 	}
 
-	if (MAIN_D_80134FE9) {
+	if (SCRIPT_MAP_CHANGE) {
 		return IS_SCRIPT_PAUSED;
 	}
 
@@ -578,8 +578,8 @@ setjmp_retry:
 
 		if (ret == 3) {
 			closeAllTextboxes();
-			writePStat(0, MAIN_D_80134FE7);
-			MAIN_D_80134FE9 = 0x4b;
+			writePStat(0, SCRIPT_SAVED_PSTAT_0);
+			SCRIPT_MAP_CHANGE = 0x4b;
 			SCRIPT_MAP_CHANGE_STATE = 0;
 			return IS_SCRIPT_PAUSED;
 		}
@@ -587,8 +587,8 @@ setjmp_retry:
 
 	if (IS_SCRIPT_PAUSED) {
 		closeAllTextboxes();
-		writePStat(0, MAIN_D_80134FE7);
-		if (MAIN_D_80134FF0 == 1) {
+		writePStat(0, SCRIPT_SAVED_PSTAT_0);
+		if (SCRIPT_HAS_CONTROL == 1) {
 			setMovementEnabled(-1, 0);
 			setCameraFollowPlayer();
 			startGameTime();
@@ -646,12 +646,12 @@ void scriptInstruction10to27(int32_t op)
 	int32_t newValue;
 
 	switch (op) {
-	case 0x10: /* choice */
+	case SCRIPT_OP_CHOICE:
 		DIALOGUE_BOX_MODE = 1;
 		scriptShowSelection();
 		longjmp(SCRIPT_JMP_BUF, 2);
 		break;
-	case 0x13:
+	case SCRIPT_OP_CALL:
 		skipOneReadOneUShort(&shortArg);
 		entry.scriptPtr = SCRIPT_PC;
 		entry.scriptId = ACTIVE_MAP_SCRIPT;
@@ -660,7 +660,7 @@ void scriptInstruction10to27(int32_t op)
 		SCRIPT_PC =
 			(uint8_t *)((uint32_t)CURRENT_SCRIPT_PTR + shortArg);
 		break;
-	case 0x14:
+	case SCRIPT_OP_CALL_SCRIPT:
 		skipOneReadTwoShort(&shortArg, &offset);
 		entry.scriptPtr = SCRIPT_PC;
 		entry.scriptId = ACTIVE_MAP_SCRIPT;
@@ -670,24 +670,24 @@ void scriptInstruction10to27(int32_t op)
 		SCRIPT_PC = getScriptSection(
 			(uint8_t *)(int32_t)CURRENT_SCRIPT_PTR, offset);
 		break;
-	case 0x15:
+	case SCRIPT_OP_RETURN:
 		SCRIPT_PC++;
 		popScriptStack(&entry);
 		CURRENT_SCRIPT_PTR = getScript(entry.scriptId);
 		SCRIPT_PC = (uint8_t *)entry.scriptPtr;
 		break;
-	case 0x16:
+	case SCRIPT_OP_JUMP:
 		skipOneReadOneUShort(&shortArg);
 		SCRIPT_PC =
 			(uint8_t *)((uint32_t)CURRENT_SCRIPT_PTR + shortArg);
 		break;
-	case 0x17:
+	case SCRIPT_OP_JUMP_SCRIPT:
 		skipOneReadTwoShort(&shortArg, &offset);
 		CURRENT_SCRIPT_PTR = getScript(shortArg);
 		SCRIPT_PC = getScriptSection(
 			(uint8_t *)(int32_t)CURRENT_SCRIPT_PTR, offset);
 		break;
-	case 0x18:
+	case SCRIPT_OP_SWITCH:
 		pollOneUByteOneUShort(&pstat, &shortArg);
 		value = readPStat(pstat);
 		if (value >= shortArg) {
@@ -697,11 +697,11 @@ void scriptInstruction10to27(int32_t op)
 		SCRIPT_PC =
 			(uint8_t *)((uint32_t)CURRENT_SCRIPT_PTR + shortArg);
 		break;
-	case 0x19:
+	case SCRIPT_OP_CONDITION:
 		SCRIPT_PC++;
 		scriptConditionBlock();
 		break;
-	case 0x1a: /* text */
+	case SCRIPT_OP_TEXT:
 		SCRIPT_PC++;
 		if (DIALOGUE_BOX_MODE == 2) {
 			showTextbox(0, SPEAKER_NONE);
@@ -709,7 +709,7 @@ void scriptInstruction10to27(int32_t op)
 			showTextbox(0, DIALOGUE_SPEAKER);
 		}
 		longjmp(SCRIPT_JMP_BUF, 2);
-	case 0x1b: /* speaker */
+	case SCRIPT_OP_SPEAKER:
 		pollNextScriptUByte(&pstat);
 		DIALOGUE_BOX_MODE = 0;
 		/* Reopen the box even if the speaker is the same. */
@@ -718,19 +718,19 @@ void scriptInstruction10to27(int32_t op)
 		}
 		setDialogueOwner(pstat);
 		break;
-	case 0x1c:
+	case SCRIPT_OP_SET_TRIGGER:
 		skipOneReadOneUShort(&shortArg);
 		setTrigger(shortArg);
 		break;
-	case 0x1d:
+	case SCRIPT_OP_UNSET_TRIGGER:
 		skipOneReadOneUShort(&shortArg);
 		unsetTrigger(shortArg);
 		break;
-	case 0x1e:
+	case SCRIPT_OP_SET_PSTAT:
 		skipOnePollTwoScriptBytes(&pstat, &value);
 		writePStat(pstat, value);
 		break;
-	case 0x1f:
+	case SCRIPT_OP_ADD_PSTAT:
 		skipOnePollTwoScriptBytes(&pstat, &value);
 		newValue = readPStat(pstat) + value;
 		if (newValue >= 0x100) {
@@ -738,7 +738,7 @@ void scriptInstruction10to27(int32_t op)
 		}
 		writePStat(pstat, newValue);
 		break;
-	case 0x20:
+	case SCRIPT_OP_SUB_PSTAT:
 		skipOnePollTwoScriptBytes(&pstat, &value);
 		newValue = readPStat(pstat) - value;
 		if (newValue < 0) {
@@ -746,36 +746,36 @@ void scriptInstruction10to27(int32_t op)
 		}
 		writePStat(pstat, newValue);
 		break;
-	case 0x21:
+	case SCRIPT_OP_GET_MAP:
 		pollNextScriptUByte(&pstat);
 		writePStat(pstat, CURRENT_MAP_ID);
 		break;
-	case 0x22:
+	case SCRIPT_OP_GET_PARTNER_TYPE:
 		pollNextScriptUByte(&pstat);
 		value = PARTNER_ENTITY.digimonEntity.entity.type;
 		writePStat(pstat, value);
 		break;
-	case 0x23:
+	case SCRIPT_OP_SET_INVENTORY_SIZE:
 		pollNextScriptUByte(&pstat);
 		setInventorySize(pstat);
 		break;
-	case 0x24:
+	case SCRIPT_OP_RANDOM:
 		skipOnePollTwoScriptBytes(&pstat, &value);
 		writePStat(pstat, random(value + 1));
 		break;
-	case 0x25:
+	case SCRIPT_OP_GET_DATE:
 		pollNextScriptUByte(&pstat);
 		writePStat(pstat, YEAR);
 		writePStat((pstat + 1) & 0xff, DAY);
 		writePStat((pstat + 2) & 0xff, HOUR);
 		writePStat((pstat + 3) & 0xff, MINUTE);
 		break;
-	case 0x26: /* sized textbox */
+	case SCRIPT_OP_SIZED_TEXTBOX:
 		beginScriptEvent(SPEAKER_NONE);
 		DIALOGUE_BOX_MODE = 2;
 		scriptSetTextboxSize();
 		break;
-	case 0x27: /* close textbox */
+	case SCRIPT_OP_CLOSE_TEXTBOX:
 		pollNextScriptUByte(&pstat);
 		closeBox(pstat);
 		longjmp(SCRIPT_JMP_BUF, 2);
@@ -804,7 +804,7 @@ void MAIN_func_801053EC(void)
 
 	switch (state) {
 	case 0:
-		MAIN_D_80134FA0 = (MAIN_D_80134FE0 != 0) ^ 1;
+		MAIN_D_80134FA0 = (SCRIPT_FROM_TALK != 0) ^ 1;
 		break;
 	case 1:
 		MAIN_D_80134FA0 = 1;
@@ -817,7 +817,7 @@ void MAIN_func_801053EC(void)
 	writePStat(6, 0);
 }
 
-void MAIN_func_80105464(uint8_t actorId, int32_t animationId)
+void scriptStartWalkAnimation(uint8_t actorId, int32_t animationId)
 {
 	if (actorId == 0xfd) {
 		startAnimationTamer((int16_t)(animationId + 2));
@@ -999,12 +999,12 @@ static void scriptInstruction28to3F__garbage__(int32_t op)
 	int32_t newValue;
 
 	switch (op) {
-	case 0x10:
+	case SCRIPT_OP_CHOICE:
 		DIALOGUE_BOX_MODE = 1;
 		scriptShowSelection();
 		longjmp(SCRIPT_JMP_BUF, 2);
 		break;
-	case 0x13:
+	case SCRIPT_OP_CALL:
 		skipOneReadOneUShort(&shortArg);
 		entry.scriptPtr = SCRIPT_PC;
 		entry.scriptId = ACTIVE_MAP_SCRIPT;
@@ -1029,7 +1029,7 @@ void scriptInstruction28to3F(int32_t op)
 	uint32_t sec;
 
 	switch (op) {
-	case 0x28:
+	case SCRIPT_OP_GIVE_ITEM:
 		skipOnePollTwoScriptBytes(&byteArg1, &byteArg2);
 		if (giveItem(byteArg1, byteArg2) != 0) {
 			unsetTrigger(0);
@@ -1037,35 +1037,35 @@ void scriptInstruction28to3F(int32_t op)
 			setTrigger(0);
 		}
 		break;
-	case 0x29:
+	case SCRIPT_OP_TAKE_ITEM:
 		skipOnePollTwoScriptBytes(&byteArg1, &byteArg2);
 		removeItem(byteArg1, byteArg2);
 		break;
-	case 0x2a:
+	case SCRIPT_OP_ADD_MONEY:
 		skipOneReadInteger(&intArg);
 		MONEY += intArg;
 		if (MONEY >= 0xf4240) {
 			MONEY = 0xf423f;
 		}
 		break;
-	case 0x2b:
+	case SCRIPT_OP_SUB_MONEY:
 		skipOneReadInteger(&intArg);
 		MONEY -= intArg;
 		if (MONEY < 0) {
 			MONEY = 0;
 		}
 		break;
-	case 0x2c:
+	case SCRIPT_OP_COMPARE_DATE:
 		scriptCompareDate();
 		break;
-	case 0x2d:
+	case SCRIPT_OP_LEARN_MOVE:
 		pollNextScriptUByte(&byteArg1);
 		scriptLearnMove(byteArg1);
 		break;
-	case 0x2e:
+	case SCRIPT_OP_NOP_2E:
 		pollNextScriptUByte(&byteArg1);
 		break;
-	case 0x2f:
+	case SCRIPT_OP_GIVE_CARD:
 		pollNextScriptUByte(&byteArg1);
 		byteArg2 = getCardAmount(byteArg1);
 		if (byteArg2 < 9) {
@@ -1073,7 +1073,7 @@ void scriptInstruction28to3F(int32_t op)
 			setCardAmount(byteArg1, byteArg2);
 		}
 		break;
-	case 0x30:
+	case SCRIPT_OP_TAKE_CARD:
 		pollNextScriptUByte(&byteArg1);
 		byteArg2 = getCardAmount(byteArg1);
 		if (byteArg2 != 0) {
@@ -1081,28 +1081,28 @@ void scriptInstruction28to3F(int32_t op)
 			setCardAmount(byteArg1, byteArg2);
 		}
 		break;
-	case 0x31:
+	case SCRIPT_OP_SET_MERIT:
 		skipOneReadOneUShort(&value);
 		MERIT = value;
 		if (MERIT >= 0x2710) {
 			MERIT = 0x270f;
 		}
 		break;
-	case 0x32:
+	case SCRIPT_OP_ADD_MERIT:
 		skipOneReadOneUShort(&value);
 		MERIT += value;
 		if (MERIT >= 0x2710) {
 			MERIT = 0x270f;
 		}
 		break;
-	case 0x33:
+	case SCRIPT_OP_SUB_MERIT:
 		skipOneReadOneUShort(&value);
 		MERIT = -value;
 		if (MERIT < 0) {
 			MERIT = 0;
 		}
 		break;
-	case 0x34:
+	case SCRIPT_OP_SET_STAT:
 		pollOneUByteOneUShort(&byteArg1, &value);
 		statPtr = getStatsPointer(byteArg1);
 		value32 = value;
@@ -1115,7 +1115,7 @@ void scriptInstruction28to3F(int32_t op)
 			PARTNER_ENTITY.lives = MAIN_D_80135004;
 		}
 		break;
-	case 0x35:
+	case SCRIPT_OP_ADD_STAT:
 		pollOneUByteOneUShort(&byteArg1, &value);
 		statPtr = getStatsPointer(byteArg1);
 		value32 = value;
@@ -1129,7 +1129,7 @@ void scriptInstruction28to3F(int32_t op)
 			PARTNER_ENTITY.lives = MAIN_D_80135004;
 		}
 		break;
-	case 0x36:
+	case SCRIPT_OP_SUB_STAT:
 		pollOneUByteOneUShort(&byteArg1, &value);
 		statPtr = getStatsPointer(byteArg1);
 		intArg = *statPtr - (int16_t)value;
@@ -1151,7 +1151,7 @@ void scriptInstruction28to3F(int32_t op)
 			PARTNER_ENTITY.lives = MAIN_D_80135004;
 		}
 		break;
-	case 0x37:
+	case SCRIPT_OP_WAIT_UNTIL_DATE:
 		pollNextScriptUByte(&byteArg1);
 		byteArg2 = readPStat(byteArg1);
 		day = readPStat((byteArg1 + 1) & 0xff);
@@ -1177,8 +1177,8 @@ void scriptInstruction28to3F(int32_t op)
 			}
 		}
 		break;
-	case 0x38:
-	case 0x39:
+	case SCRIPT_OP_ADD_TO_DATE:
+	case SCRIPT_OP_SUB_FROM_DATE:
 		pollNextScriptUByte(&byteArg1);
 		pollNextInt(&intArg);
 		byteArg2 = readPStat(byteArg1);
@@ -1200,16 +1200,16 @@ void scriptInstruction28to3F(int32_t op)
 		writePStat((byteArg1 + 2) & 0xff, hour);
 		writePStat((byteArg1 + 3) & 0xff, minute);
 		break;
-	case 0x3a:
-	case 0x3b:
-	case 0x3c:
+	case SCRIPT_OP_NOP_3A:
+	case SCRIPT_OP_NOP_3B:
+	case SCRIPT_OP_NOP_3C:
 		skipOnePollTwoScriptBytes(&byteArg1, &byteArg2);
 		break;
-	case 0x3d:
-	case 0x3e:
+	case SCRIPT_OP_NOP_3D:
+	case SCRIPT_OP_NOP_3E:
 		pollNextScriptUByte(&byteArg1);
 		break;
-	case 0x3f:
+	case SCRIPT_OP_GET_DIGIMON_TYPE:
 		skipOnePollTwoScriptBytes(&byteArg1, &byteArg2);
 		byteArg1 = readPStat(byteArg1);
 		byteArg1 = DIGIMON_DATA[byteArg1].type;
@@ -1232,29 +1232,29 @@ void scriptInstruction46to58(int32_t op)
 	uint8_t *b;
 
 	switch (op) {
-	case 0x46:
+	case SCRIPT_OP_LOAD_MODEL:
 		pollNextScriptUByte(&byteArg1);
 		scriptLoadModel(byteArg1);
 		break;
-	case 0x47:
+	case SCRIPT_OP_SPAWN_DIGIMON:
 		beginScriptEvent(SPEAKER_NONE);
 		pollNextScriptUByte(&byteArg1);
 		pollNextTwoScriptBytes(&byteArg2, &byteArg3);
 		scriptSetDigimon(byteArg1, byteArg2, byteArg3);
 		break;
-	case 0x48:
+	case SCRIPT_OP_REMOVE_DIGIMON:
 		beginScriptEvent(SPEAKER_NONE);
 		pollNextScriptUByte(&byteArg1);
 		scriptUnloadEntity(byteArg1);
 		break;
-	case 0x49:
+	case SCRIPT_OP_DIGIMON_ROUTINE:
 		beginScriptEvent(SPEAKER_NONE);
 		pollNextScriptUByte(&byteArg1);
 		callDigimonRoutine(byteArg1);
 		break;
-	case 0x4a:
+	case SCRIPT_OP_WAIT_MOVEMENT:
 		pollNextScriptUByte(&byteArg1);
-		ACTIVE_INSTRUCTION = 0x4a;
+		ACTIVE_INSTRUCTION = SCRIPT_OP_WAIT_MOVEMENT;
 		if (byteArg1 == 0xff) {
 			goto wait_for_entity_end;
 		}
@@ -1323,7 +1323,7 @@ void scriptInstruction46to58(int32_t op)
 wait_for_entity_end:
 		MAIN_D_80134FA4 = byteArg1;
 		longjmp(SCRIPT_JMP_BUF, 2);
-	case 0x4b:
+	case SCRIPT_OP_CHANGE_SCREEN:
 		beginScriptEvent(SPEAKER_NONE);
 		pollNextScriptUByte(&byteArg1);
 		pollNextTwoScriptBytes(&byteArg2, &byteArg3);
@@ -1334,7 +1334,7 @@ wait_for_entity_end:
 		entry.smth[1] = byteArg3;
 		pushScriptStack(&entry);
 		longjmp(SCRIPT_JMP_BUF, 3);
-	case 0x4c:
+	case SCRIPT_OP_LOOK_AT:
 		beginScriptEvent(SPEAKER_NONE);
 		skipOnePollTwoScriptBytes(&byteArg1, &byteArg2);
 		entityId = scriptIdToEntityId(byteArg1);
@@ -1346,7 +1346,7 @@ wait_for_entity_end:
 		b[1] = byteArg1;
 		b[2] = byteArg2;
 		break;
-	case 0x4d:
+	case SCRIPT_OP_SET_ROTATION:
 		beginScriptEvent(SPEAKER_NONE);
 		pollNextScriptUByte(&byteArg1);
 		pollNextScriptShort(&posX);
@@ -1359,12 +1359,12 @@ wait_for_entity_end:
 		b[1] = byteArg1;
 		*(int16_t *)(b + 4) = posX;
 		break;
-	case 0x4e:
+	case SCRIPT_OP_WALK_TO:
 		beginScriptEvent(SPEAKER_NONE);
 		pollNextScriptUByte(&byteArg1);
 		pollNextTwoScriptShorts(&posX, &posY);
 		pollNextTwoScriptBytes(&byteArg2, &byteArg3);
-		MAIN_func_80105464(byteArg1, byteArg2);
+		scriptStartWalkAnimation(byteArg1, byteArg2);
 		entityId = scriptIdToEntityId(byteArg1);
 		if (entityId == 0xff) {
 			break;
@@ -1375,7 +1375,7 @@ wait_for_entity_end:
 		*(int16_t *)(b + 4) = posX;
 		*(int16_t *)(b + 6) = posY;
 		break;
-	case 0x4f:
+	case SCRIPT_OP_CAMERA_TO:
 		beginScriptEvent(SPEAKER_NONE);
 		pollNextScriptUByte(&byteArg1);
 		pollNextTwoScriptShorts(&posX, &posY);
@@ -1385,7 +1385,7 @@ wait_for_entity_end:
 		*(int16_t *)(b + 6) = posY;
 		b[3] = byteArg1;
 		break;
-	case 0x50:
+	case SCRIPT_OP_CAMERA_TO_ENTITY:
 		beginScriptEvent(SPEAKER_NONE);
 		skipOnePollTwoScriptBytes(&byteArg1, &byteArg2);
 		b = (uint8_t *)&MAIN_D_801BE72C;
@@ -1393,11 +1393,11 @@ wait_for_entity_end:
 		b[1] = byteArg1;
 		b[3] = byteArg2;
 		break;
-	case 0x51:
+	case SCRIPT_OP_WALK_TO_ENTITY:
 		beginScriptEvent(SPEAKER_NONE);
 		pollNextScriptUByte(&byteArg1);
 		pollNextTwoScriptBytes(&byteArg2, &byteArg3);
-		MAIN_func_80105464(byteArg1, byteArg2);
+		scriptStartWalkAnimation(byteArg1, byteArg2);
 		entityId = scriptIdToEntityId(byteArg1);
 		if (entityId == 0xff) {
 			break;
@@ -1407,12 +1407,12 @@ wait_for_entity_end:
 		b[1] = byteArg1;
 		b[2] = byteArg3;
 		break;
-	case 0x52:
+	case SCRIPT_OP_WALK_TO_CAMERA:
 		beginScriptEvent(SPEAKER_NONE);
 		pollNextScriptUByte(&byteArg1);
 		pollNextTwoScriptShorts(&posX, &posY);
 		pollNextTwoScriptBytes(&byteArg2, &byteArg3);
-		MAIN_func_80105464(byteArg1, byteArg2);
+		scriptStartWalkAnimation(byteArg1, byteArg2);
 		entityId = scriptIdToEntityId(byteArg1);
 		if (entityId == 0xff) {
 			break;
@@ -1423,11 +1423,11 @@ wait_for_entity_end:
 		*(int16_t *)(b + 4) = posX;
 		*(int16_t *)(b + 6) = posY;
 		break;
-	case 0x53:
+	case SCRIPT_OP_WALK_TO_ENTITY_CAMERA:
 		beginScriptEvent(SPEAKER_NONE);
 		pollNextScriptUByte(&byteArg1);
 		pollNextTwoScriptBytes(&byteArg2, &byteArg3);
-		MAIN_func_80105464(byteArg1, byteArg2);
+		scriptStartWalkAnimation(byteArg1, byteArg2);
 		entityId = scriptIdToEntityId(byteArg1);
 		if (entityId == 0xff) {
 			break;
@@ -1437,25 +1437,25 @@ wait_for_entity_end:
 		b[1] = byteArg1;
 		b[2] = byteArg3;
 		break;
-	case 0x54:
+	case SCRIPT_OP_RESET_ORIGIN:
 		beginScriptEvent(SPEAKER_NONE);
 		pollNextScriptUByte(&byteArg1);
 		resetEntityOrigin(byteArg1);
 		break;
-	case 0x55:
+	case SCRIPT_OP_TEXTBOX_ORIGIN:
 		SCRIPT_PC++;
 		pollNextTwoScriptShorts(&MAIN_D_80134FD2, &MAIN_D_80134FD4);
 		pollNextScriptShort(&MAIN_D_80134FD6);
 		break;
-	case 0x56:
+	case SCRIPT_OP_ANIMATE:
 		skipOnePollTwoScriptBytes(&byteArg1, &byteArg2);
 		scriptStartAnimation(byteArg1, byteArg2);
 		break;
-	case 0x57:
+	case SCRIPT_OP_SET_MAP_OBJECT:
 		skipOnePollTwoScriptBytes(&byteArg1, &byteArg2);
 		setMapObjectsFlag(byteArg1, 1, byteArg2);
 		break;
-	case 0x58:
+	case SCRIPT_OP_CHANGE_SCREEN_PSTAT:
 		beginScriptEvent(SPEAKER_NONE);
 		pollNextScriptUByte(&byteArg1);
 		MAIN_D_80134FF8 = readPStat(byteArg1);
@@ -1476,25 +1476,25 @@ void scriptInstruction5Ato5F(int32_t op)
 	uint8_t byteArg2;
 
 	switch (op) {
-	case 0x5a:
+	case SCRIPT_OP_PLAY_SOUND:
 		skipOnePollTwoScriptBytes(&byteArg1, &byteArg2);
 		playSound(byteArg1, byteArg2);
 		break;
-	case 0x5b:
+	case SCRIPT_OP_NOP_5B:
 		pollNextScriptUByte(&byteArg1);
 		break;
-	case 0x5c:
+	case SCRIPT_OP_NOP_5C:
 		pollNextScriptUByte(&byteArg1);
 		break;
-	case 0x5d:
+	case SCRIPT_OP_PLAY_BGM:
 		pollNextScriptUByte(&byteArg1);
 		playBGM(byteArg1);
 		break;
-	case 0x5e:
+	case SCRIPT_OP_STOP_BGM:
 		pollNextScriptUByte(&byteArg1);
 		resetBGM();
 		break;
-	case 0x5f:
+	case SCRIPT_OP_NOP_5F:
 		pollNextScriptUByte(&byteArg1);
 		break;
 	}
@@ -1570,7 +1570,7 @@ void scriptInstruction64to7E(int32_t op)
 	uint8_t *b;
 
 	switch (op) {
-	case 0x64:
+	case SCRIPT_OP_BUILTIN:
 		pollNextScriptUByte(&byteArg1);
 		MAIN_D_80134FF8 = byteArg1;
 		switch (byteArg1) {
@@ -1590,7 +1590,7 @@ void scriptInstruction64to7E(int32_t op)
 		case 0x0e:
 		case 0x12:
 		case 0x2f:
-			ACTIVE_INSTRUCTION = 0x64;
+			ACTIVE_INSTRUCTION = SCRIPT_OP_BUILTIN;
 			SELECTION_MENU_STATE = 0;
 			SCRIPT_STATE_3 = 0;
 			longjmp(SCRIPT_JMP_BUF, 2);
@@ -1639,7 +1639,7 @@ void scriptInstruction64to7E(int32_t op)
 					break;
 				}
 			}
-			ACTIVE_INSTRUCTION = 0x64;
+			ACTIVE_INSTRUCTION = SCRIPT_OP_BUILTIN;
 			SCRIPT_STATE_3 = 0;
 			longjmp(SCRIPT_JMP_BUF, 2);
 			break;
@@ -1679,11 +1679,11 @@ void scriptInstruction64to7E(int32_t op)
 		case 0x17:
 		case 0x18:
 		case 0x32:
-			ACTIVE_INSTRUCTION = 0x64;
+			ACTIVE_INSTRUCTION = SCRIPT_OP_BUILTIN;
 			SCRIPT_STATE_3 = 0;
 			longjmp(SCRIPT_JMP_BUF, 2);
 		case 0x19:
-			MAIN_D_80134FE7 = readPStat(0xfe);
+			SCRIPT_SAVED_PSTAT_0 = readPStat(0xfe);
 			break;
 		case 0x1a:
 			loadDirtCartModel();
@@ -1740,12 +1740,12 @@ void scriptInstruction64to7E(int32_t op)
 			openSaveMachine();
 			/* fall through */
 		case 0x25:
-			ACTIVE_INSTRUCTION = 0x64;
+			ACTIVE_INSTRUCTION = SCRIPT_OP_BUILTIN;
 			SCRIPT_STATE_3 = 0;
 			longjmp(SCRIPT_JMP_BUF, 2);
 		case 0x36:
 			gameClearSave();
-			ACTIVE_INSTRUCTION = 0x64;
+			ACTIVE_INSTRUCTION = SCRIPT_OP_BUILTIN;
 			SCRIPT_STATE_3 = 0;
 			longjmp(SCRIPT_JMP_BUF, 2);
 		case 0x26:
@@ -1773,7 +1773,7 @@ void scriptInstruction64to7E(int32_t op)
 			isSoundLoaded(0, 8);
 			setTamerState(0x10);
 			SOME_SCRIPT_SYNC_BIT = 0;
-			ACTIVE_INSTRUCTION = 0x64;
+			ACTIVE_INSTRUCTION = SCRIPT_OP_BUILTIN;
 			SCRIPT_STATE_3 = 0;
 			longjmp(SCRIPT_JMP_BUF, 2);
 			break;
@@ -1813,11 +1813,11 @@ void scriptInstruction64to7E(int32_t op)
 			goto script_end;
 		}
 		break;
-	case 0x65:
+	case SCRIPT_OP_CURE_CONDITION:
 		pollNextScriptUByte(&byteArg1);
 		PARTNER_PARA.condition &= ~byteArg1;
 		break;
-	case 0x66:
+	case SCRIPT_OP_BATTLE:
 		pollNextScriptUByte(&byteArg1);
 		if (MAIN_D_80134FC8 < 0x270f) {
 			MAIN_D_80134FC8++;
@@ -1837,7 +1837,7 @@ void scriptInstruction64to7E(int32_t op)
 		{
 			int16_t outcome;
 
-			outcome = startBattle(MAIN_D_80134F9C);
+			outcome = startBattle(SCRIPT_TALKED_ENTITY);
 			writePStat(0xff, outcome);
 			if (outcome == -1) {
 				handleItemLoss();
@@ -1874,15 +1874,15 @@ void scriptInstruction64to7E(int32_t op)
 		b[1] = 0xfd;
 		b[3] = 0xa;
 
-		ACTIVE_INSTRUCTION = 0x4a;
+		ACTIVE_INSTRUCTION = SCRIPT_OP_WAIT_MOVEMENT;
 		MAIN_D_80134FA4 = 0xa;
 		resetTextboxes();
 		longjmp(SCRIPT_JMP_BUF, 2);
-	case 0x67: /* wait frames */
+	case SCRIPT_OP_WAIT:
 		skipOneReadOneUShort(&SCRIPT_WAIT_TIMER);
-		ACTIVE_INSTRUCTION = 0x67;
+		ACTIVE_INSTRUCTION = SCRIPT_OP_WAIT;
 		longjmp(SCRIPT_JMP_BUF, 2);
-	case 0x68: /* text advance mode */
+	case SCRIPT_OP_TEXT_ADVANCE:
 		skipOnePollTwoScriptBytes(&byteArg1, &byteArg2);
 		TEXT_ADVANCE_MODE = byteArg1;
 		if (byteArg1 != 2) {
@@ -1890,7 +1890,7 @@ void scriptInstruction64to7E(int32_t op)
 		}
 		TEXT_AUTO_ADVANCE_TIMER = byteArg2;
 		break;
-	case 0x69:
+	case SCRIPT_OP_HURT_PARTNER:
 		beginScriptEvent(SPEAKER_NONE);
 		pollNextScriptUByte(&byteArg1);
 		{
@@ -1912,7 +1912,7 @@ void scriptInstruction64to7E(int32_t op)
 			              0);
 		}
 		break;
-	case 0x6a:
+	case SCRIPT_OP_SET_AUTOTALK:
 		skipOnePollTwoScriptBytes(&byteArg1, &byteArg2);
 		byteArg1 = scriptIdToEntityId(byteArg1);
 		if (byteArg1 == 0xff || byteArg1 < 2) {
@@ -1920,9 +1920,9 @@ void scriptInstruction64to7E(int32_t op)
 		}
 		NPC_ENTITIES[byteArg1 - 2].autotalk = byteArg2;
 		break;
-	case 0x6b:
+	case SCRIPT_OP_NOP_6B:
 		break;
-	case 0x6c:
+	case SCRIPT_OP_MOVE_TO:
 		beginScriptEvent(SPEAKER_NONE);
 		pollNextScriptUByte(&byteArg1);
 		pollNextTwoScriptShorts(&posX, &posY);
@@ -1938,7 +1938,7 @@ void scriptInstruction64to7E(int32_t op)
 			*(int16_t *)(b + 6) = posY;
 		}
 		break;
-	case 0x6d:
+	case SCRIPT_OP_MOVE_TO_ENTITY:
 		beginScriptEvent(SPEAKER_NONE);
 		pollNextScriptUByte(&byteArg1);
 		pollNextTwoScriptBytes(&byteArg2, &byteArg3);
@@ -1952,7 +1952,7 @@ void scriptInstruction64to7E(int32_t op)
 			b[3] = byteArg3;
 		}
 		break;
-	case 0x6e:
+	case SCRIPT_OP_MOVE_TO_CAMERA:
 		beginScriptEvent(SPEAKER_NONE);
 		pollNextScriptUByte(&byteArg1);
 		pollNextTwoScriptShorts(&posX, &posY);
@@ -1968,7 +1968,7 @@ void scriptInstruction64to7E(int32_t op)
 			*(int16_t *)(b + 6) = posY;
 		}
 		break;
-	case 0x6f:
+	case SCRIPT_OP_MOVE_TO_ENTITY_CAMERA:
 		beginScriptEvent(SPEAKER_NONE);
 		pollNextScriptUByte(&byteArg1);
 		pollNextTwoScriptBytes(&byteArg2, &byteArg3);
@@ -1982,7 +1982,7 @@ void scriptInstruction64to7E(int32_t op)
 			b[3] = byteArg3;
 		}
 		break;
-	case 0x70:
+	case SCRIPT_OP_ROTATE_DOOR:
 		beginScriptEvent(SPEAKER_NONE);
 		pollNextScriptUByte(&byteArg1);
 		pollNextTwoScriptBytes(&byteArg2, &byteArg3);
@@ -1990,7 +1990,7 @@ void scriptInstruction64to7E(int32_t op)
 		MAIN_D_801BE738[1] = byteArg1;
 		MAIN_D_801BE738[2] = byteArg3;
 		break;
-	case 0x71:
+	case SCRIPT_OP_MOVE_OBJECT:
 		beginScriptEvent(SPEAKER_NONE);
 		pollNextScriptUByte(&byteArg1);
 		pollNextTwoScriptBytes(&byteArg2, &byteArg3);
@@ -2005,7 +2005,7 @@ void scriptInstruction64to7E(int32_t op)
 		*(int16_t *)(b + 8) = posX;
 		*(int16_t *)(b + 0xa) = posY;
 		break;
-	case 0x72:
+	case SCRIPT_OP_MOVE_ALONG_AXIS:
 		beginScriptEvent(SPEAKER_NONE);
 		pollNextScriptUByte(&byteArg1);
 		pollNextScriptShort(&posX);
@@ -2021,7 +2021,7 @@ void scriptInstruction64to7E(int32_t op)
 			b[3] = byteArg3;
 		}
 		break;
-	case 0x73:
+	case SCRIPT_OP_MOVE_ALONG_AXIS_CAMERA:
 		beginScriptEvent(SPEAKER_NONE);
 		pollNextScriptUByte(&byteArg1);
 		pollNextScriptShort(&posX);
@@ -2037,61 +2037,61 @@ void scriptInstruction64to7E(int32_t op)
 			b[3] = byteArg3;
 		}
 		break;
-	case 0x74:
+	case SCRIPT_OP_SPAWN_ITEM:
 		pollNextScriptUByte(&byteArg1);
 		pollNextTwoScriptShorts(&posX, &posY);
 		spawnItem(byteArg1, posX, posY);
 		break;
-	case 0x75:
+	case SCRIPT_OP_SPAWN_CHEST:
 		pollNextScriptUByte(&byteArg1);
 		pollNextTwoScriptShorts(&posX, &posY);
 		pollNextTwoScriptShorts(&posZ, &posW);
 		pollNextScriptUShort(&triggerId);
 		spawnChest(posX, posY, posZ, posW, byteArg1, triggerId);
 		break;
-	case 0x76:
+	case SCRIPT_OP_SPAWN_BOULDER:
 		pollNextScriptUByte(&byteArg1);
 		spawnBoulder();
 		break;
-	case 0x77:
+	case SCRIPT_OP_MOVE_BOULDER:
 		pollNextScriptUByte(&byteArg1);
 		pollNextTwoScriptShorts(&posX, &posY);
 		moveBoulder(posX, posY);
 		longjmp(SCRIPT_JMP_BUF, 2);
-	case 0x78:
+	case SCRIPT_OP_REMOVE_BOULDER:
 		pollNextScriptUByte(&byteArg1);
 		removeObject(0xfb6, 0);
 		break;
-	case 0x79:
+	case SCRIPT_OP_UNLOAD_MODEL:
 		pollNextScriptUByte(&byteArg1);
 		scriptUnloadModel(byteArg1);
 		break;
-	case 0x7a:
+	case SCRIPT_OP_COPY_PSTAT:
 		skipOnePollTwoScriptBytes(&byteArg1, &byteArg2);
 		byteArg1 = readPStat(byteArg1);
 		writePStat(byteArg2, byteArg1);
 		break;
-	case 0x7b:
+	case SCRIPT_OP_RETURN_SECTION:
 		pollNextScriptUByte(&byteArg1);
 		entry.smth[0] = 4;
 		entry.smth[1] = byteArg1;
 		pushScriptStack(&entry);
-		writePStat(0, MAIN_D_80134FE7);
+		writePStat(0, SCRIPT_SAVED_PSTAT_0);
 		break;
-	case 0x7c:
+	case SCRIPT_OP_SET_IMPASSABLE:
 		pollNextScriptUByte(&byteArg1);
 		pollNextTwoScriptShorts(&posX, &posY);
 		pollNextTwoScriptBytes(&byteArg2, &byteArg3);
 		setRectImpassible(posX, posY, byteArg2,
 		                  byteArg3);
 		break;
-	case 0x7d:
+	case SCRIPT_OP_SPAWN_SPRITE:
 		pollNextScriptUByte(&byteArg1);
 		pollNextTwoScriptShorts(&posX, &posY);
 		pollNextTwoScriptShorts(&posZ, &posW);
 		spawnSpriteAtLocation(posX, posY, posZ, posW, byteArg1);
 		break;
-	case 0x7e:
+	case SCRIPT_OP_SPAWN_SPRITE_AT:
 		pollNextScriptUByte(&byteArg1);
 		pollNextTwoScriptBytes(&byteArg2, &byteArg3);
 		spawnSpriteAtEntity(byteArg1, byteArg2, byteArg3);
@@ -2157,6 +2157,10 @@ void runMapHeadScript(int32_t section)
 	tickScript();
 }
 
+/*
+ * Starts section of script scriptId: the section of an NPC's script id when
+ * the player talks to it (param 1), or of a trigger tile or event (param 0).
+ */
 void callScriptSection(int32_t scriptId, int32_t section, int32_t param)
 {
 	int32_t i;
@@ -2165,18 +2169,18 @@ void callScriptSection(int32_t scriptId, int32_t section, int32_t param)
 	SCRIPT_PC =
 		getScriptSection((uint8_t *)(int32_t)CURRENT_SCRIPT_PTR,
 	                         section);
-	MAIN_D_80134FE0 = param;
-	MAIN_D_80134FE4 = section;
+	SCRIPT_FROM_TALK = param;
+	SCRIPT_SECTION = section;
 	TEXT_ADVANCE_MODE = 0;
 	DIALOGUE_SPEAKER = SPEAKER_PLAYER;
-	MAIN_D_80134FE7 = readPStat(0);
+	SCRIPT_SAVED_PSTAT_0 = readPStat(0);
 	SOME_SCRIPT_SYNC_BIT = 1;
 	ACTIVE_INSTRUCTION = 0;
-	MAIN_D_80134FE9 = 0;
-	MAIN_D_80134FEC = 0;
-	MAIN_D_80134FF0 = 0;
+	SCRIPT_MAP_CHANGE = 0;
+	SCRIPT_WARPING = 0;
+	SCRIPT_HAS_CONTROL = 0;
 	IS_SCRIPT_PAUSED = 0;
-	MAIN_D_80134F9C = TALKED_TO_ENTITY;
+	SCRIPT_TALKED_ENTITY = TALKED_TO_ENTITY;
 	for (i = 0; i < 0x16; i++) {
 		((ScriptCameraMovement *)MAIN_D_801BE6B4)[i].type = 0xff;
 	}
@@ -4638,7 +4642,7 @@ void returnFromScriptFile(void)
 		if (type == 3) {
 			readMapTFS(CURRENT_MAP_ID);
 			MAIN_func_800D634C(CURRENT_MAP_ID, 0);
-			MAIN_D_80134FEC = 0;
+			SCRIPT_WARPING = 0;
 			script = getScript(CURRENT_SCRIPT_ID);
 			section = getScriptSection(script, 0xfe);
 			if (section != 0) {
@@ -4676,8 +4680,8 @@ void beginScriptEvent(int32_t owner)
 	uint8_t speaker;
 	int32_t idx;
 
-	if (MAIN_D_80134FF0 == 0) {
-		MAIN_D_80134FF0 = 1;
+	if (SCRIPT_HAS_CONTROL == 0) {
+		SCRIPT_HAS_CONTROL = 1;
 		setMovementEnabled(0, 1);
 		setMovementEnabled(1, 1);
 		unsetCameraFollowPlayer();
@@ -4685,12 +4689,12 @@ void beginScriptEvent(int32_t owner)
 		clearTextArea();
 		stopGameTime();
 
-		if (MAIN_D_80134FE0 != 0 && isTriggerSet(TRIGGER_44) == 0) {
-			entityId = scriptIdToEntityId(MAIN_D_80134FE4) & 0xff;
+		if (SCRIPT_FROM_TALK != 0 && isTriggerSet(TRIGGER_44) == 0) {
+			entityId = scriptIdToEntityId(SCRIPT_SECTION) & 0xff;
 			if (entityId != 0xff) {
 				MAIN_D_801BE6B4[entityId * 0xc] = 0;
 				idx = entityId * 0xc;
-				speaker = MAIN_D_80134FE4;
+				speaker = SCRIPT_SECTION;
 				MAIN_D_801BE6B5[idx] = speaker;
 				MAIN_D_801BE6B6[idx] = 0xfd;
 				MAIN_D_801BE6B4[0] = 0;
