@@ -4,7 +4,7 @@
 #include <dw/ui.h>
 
 extern int8_t MENU_SUB_STATE;
-extern char MAIN_D_80124C54[];
+extern char FULLWIDTH_DIGITS[];
 extern int16_t MAIN_D_80134D42;
 extern int16_t MAIN_D_80134D44;
 extern RECT MAIN_D_80134308;
@@ -24,7 +24,7 @@ int32_t drawEvoChartStrings(int32_t arg)
 	switch (MENU_SUB_STATE) {
 	case 0:
 		clearTextSubArea(&rect1);
-		drawString(MAIN_D_80124C54, 0, 0xf0);
+		drawString(FULLWIDTH_DIGITS, 0, 0xf0);
 		drawString(MAIN_D_80124814[1], 0, 0xc);
 		MAIN_D_80134D44 = 0;
 		MAIN_D_80134D42 = 0;

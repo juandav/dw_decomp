@@ -65,12 +65,8 @@ RGB8 TEXT_COLORS[17] = {
 	{ 0x7c, 0x4c, 0x68 },
 };
 
-char MAIN_D_8012B94C[32] = {
-	0x25, 0x30, 0x31, 0x64, 0x00, 0x25, 0x30, 0x32,
-	0x64, 0x00, 0x25, 0x30, 0x33, 0x64, 0x00, 0x25,
-	0x30, 0x34, 0x64, 0x00, 0x25, 0x30, 0x35, 0x64,
-	0x00, 0x25, 0x30, 0x36, 0x64, 0x00, 0x00, 0x00,
-};
+/* six 5-byte formats: "%01d" to "%06d" */
+char ZERO_PAD_FORMATS[32] = "%01d\0%02d\0%03d\0%04d\0%05d\0%06d";
 
 void *MAIN_D_8012B96C[16] = {
 	btl_START,
@@ -338,7 +334,7 @@ void convertValueToDigits(int32_t n, int32_t value, int32_t *outCount,
 	char *base;
 	int32_t cnt;
 
-	sprintf(buf, &MAIN_D_8012B94C[(j = n - 1) * 5], value);
+	sprintf(buf, &ZERO_PAD_FORMATS[(j = n - 1) * 5], value);
 	i = 0;
 	off = 0;
 	n = cnt = n;

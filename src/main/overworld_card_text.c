@@ -5,7 +5,7 @@
 
 extern RECT MAIN_D_80134328;
 extern char *MAIN_D_80124814[];
-extern char MAIN_D_80124C54[];
+extern char FULLWIDTH_DIGITS[];
 extern int8_t MENU_SUB_STATE;
 extern int8_t SELECTED_CARD;
 
@@ -23,7 +23,7 @@ int32_t drawCardViewStrings(void)
 			goto ret0;
 		}
 		clearTextSubArea(&rect);
-		drawString(MAIN_D_80124C54, 0, 0xF0);
+		drawString(FULLWIDTH_DIGITS, 0, 0xF0);
 		MENU_SUB_STATE = 1;
 		goto ret0;
 	}

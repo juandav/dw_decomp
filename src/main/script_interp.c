@@ -98,7 +98,7 @@ extern BoxLabel MAIN_D_801307B4;
 extern BoxLabel MAIN_D_801307C0;
 extern TextBoxTable MAIN_D_801BE80C;
 extern char MAIN_D_801307CC[];
-extern char **MAIN_D_80130774[];
+extern char **NAMING_CHAR_PAGES[];
 extern char MAIN_D_801B1D26[];
 extern char MAIN_D_801345F8[5];
 extern char MAIN_D_80134600[8];
@@ -4097,10 +4097,10 @@ void tickNamingBox(void)
 	if (isKeyDown(0x40)) {
 		if ((MAIN_D_80134F8C & 0x8000) == 0) {
 			if (row < 9) {
-				rows = MAIN_D_80130774[MAIN_D_80134F81 * 2];
+				rows = NAMING_CHAR_PAGES[MAIN_D_80134F81 * 2];
 			} else {
 				row -= 9;
-				rows = MAIN_D_80130774[MAIN_D_80134F81 * 2 + 1];
+				rows = NAMING_CHAR_PAGES[MAIN_D_80134F81 * 2 + 1];
 			}
 			str = rows[row];
 			col *= 2;
@@ -4241,7 +4241,7 @@ void MAIN_func_8010A79C(void)
 	line += 0x40;
 	page = MAIN_D_80134F81 * 2;
 	for (row = 0; row < 2; row++) {
-		table = MAIN_D_80130774[page + row];
+		table = NAMING_CHAR_PAGES[page + row];
 		for (j = 0; j < 9; j += 3) {
 			buf = line + row * 0xc0 + (j / 3) * 64;
 			strcpy(buf, table[j]);

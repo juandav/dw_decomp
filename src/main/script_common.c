@@ -83,17 +83,17 @@ extern char MAIN_D_80134564[];
 extern char MAIN_D_8013456C[];
 extern char MAIN_D_80134574[];
 extern char MAIN_D_8013457C[];
-extern char MAIN_D_80134584[];
-extern char MAIN_D_80134588[];
-extern char MAIN_D_8013458C[];
-extern char MAIN_D_80134590[];
-extern char MAIN_D_80134594[];
-extern char MAIN_D_80134598[];
-extern char MAIN_D_8013459C[];
-extern char MAIN_D_801345A0[];
-extern char MAIN_D_801345A4[];
-extern char MAIN_D_801345A8[];
-extern char MAIN_D_801345AC[];
+extern char MAIN_D_80134584[2][2];
+extern char MAIN_D_80134588[2][2];
+extern char MAIN_D_8013458C[2][2];
+extern char MAIN_D_80134590[2][2];
+extern char MAIN_D_80134594[2][2];
+extern char MAIN_D_80134598[2][2];
+extern char MAIN_D_8013459C[2][2];
+extern char MAIN_D_801345A0[2][2];
+extern char MAIN_D_801345A4[2][2];
+extern char MAIN_D_801345A8[2][2];
+extern char MAIN_D_801345AC[2][2];
 extern char MAIN_D_801345CC[];
 extern char MAIN_D_801345D4[];
 extern char MAIN_D_801345D8[];
@@ -643,29 +643,29 @@ char *MAIN_D_801300E0[23] = {
 };
 
 char *TOURNAMENT_GRADES[23] = {
-	MAIN_D_80134584,
-	&MAIN_D_80134584[2],
-	MAIN_D_80134588,
-	&MAIN_D_80134588[2],
-	MAIN_D_8013458C,
-	&MAIN_D_8013458C[2],
-	MAIN_D_80134590,
-	&MAIN_D_80134590[2],
-	MAIN_D_80134594,
-	&MAIN_D_80134594[2],
-	MAIN_D_80134598,
-	&MAIN_D_80134598[2],
-	MAIN_D_8013459C,
-	&MAIN_D_8013459C[2],
-	MAIN_D_801345A0,
-	&MAIN_D_801345A0[2],
-	MAIN_D_801345A4,
-	&MAIN_D_801345A4[2],
-	MAIN_D_801345A8,
-	&MAIN_D_8013459C[2],
-	&MAIN_D_801345A8[2],
-	MAIN_D_801345AC,
-	&MAIN_D_801345AC[2],
+	MAIN_D_80134584[0],
+	MAIN_D_80134584[1],
+	MAIN_D_80134588[0],
+	MAIN_D_80134588[1],
+	MAIN_D_8013458C[0],
+	MAIN_D_8013458C[1],
+	MAIN_D_80134590[0],
+	MAIN_D_80134590[1],
+	MAIN_D_80134594[0],
+	MAIN_D_80134594[1],
+	MAIN_D_80134598[0],
+	MAIN_D_80134598[1],
+	MAIN_D_8013459C[0],
+	MAIN_D_8013459C[1],
+	MAIN_D_801345A0[0],
+	MAIN_D_801345A0[1],
+	MAIN_D_801345A4[0],
+	MAIN_D_801345A4[1],
+	MAIN_D_801345A8[0],
+	MAIN_D_8013459C[1],
+	MAIN_D_801345A8[1],
+	MAIN_D_801345AC[0],
+	MAIN_D_801345AC[1],
 };
 
 uint8_t TOURNAMENT_DATA[180] = {
@@ -783,52 +783,26 @@ uint8_t MAIN_D_80130444[12] = {
 	0x15, 0x00, 0x00, 0x00,
 };
 
-char MAIN_D_80130450[] = {
-	0x82, 0xa0, 0x82, 0xa2, 0x82, 0xa4, 0x82, 0xa6,
-	0x82, 0xa8, 0x00,
-};
+char MAIN_D_80130450[] = "あいうえお";
 
-char MAIN_D_8013045C[] = {
-	0x82, 0xa9, 0x82, 0xab, 0x82, 0xad, 0x82, 0xaf,
-	0x82, 0xc6, 0x00,
-};
+/* sic: と instead of こ in the original */
+char MAIN_D_8013045C[] = "かきくけと";
 
-char MAIN_D_80130468[] = {
-	0x82, 0xb3, 0x82, 0xb5, 0x82, 0xb7, 0x82, 0xb9,
-	0x82, 0xbb, 0x00,
-};
+char MAIN_D_80130468[] = "さしすせそ";
 
-char MAIN_D_80130474[] = {
-	0x82, 0xbd, 0x82, 0xbf, 0x82, 0xc2, 0x82, 0xc4,
-	0x82, 0xc6, 0x00,
-};
+char MAIN_D_80130474[] = "たちつてと";
 
-char MAIN_D_80130480[] = {
-	0x82, 0xc8, 0x82, 0xc9, 0x82, 0xca, 0x82, 0xcb,
-	0x82, 0xcc, 0x00,
-};
+char MAIN_D_80130480[] = "なにぬねの";
 
-char MAIN_D_8013048C[] = {
-	0x82, 0xcd, 0x82, 0xd0, 0x82, 0xd3, 0x82, 0xd6,
-	0x82, 0xd9, 0x00,
-};
+char MAIN_D_8013048C[] = "はひふへほ";
 
-char MAIN_D_80130498[] = {
-	0x82, 0xdc, 0x82, 0xdd, 0x82, 0xde, 0x82, 0xdf,
-	0x82, 0xe0, 0x00,
-};
+char MAIN_D_80130498[] = "まみむめも";
 
-char MAIN_D_801304A4[] = {
-	0x82, 0xe2, 0x81, 0x40, 0x82, 0xe4, 0x81, 0x40,
-	0x82, 0xe6, 0x00,
-};
+char MAIN_D_801304A4[] = "や　ゆ　よ";
 
-char MAIN_D_801304B0[] = {
-	0x82, 0xe7, 0x82, 0xe8, 0x82, 0xe9, 0x82, 0xea,
-	0x82, 0xeb, 0x00,
-};
+char MAIN_D_801304B0[] = "らりるれろ";
 
-char *MAIN_D_801304BC[9] = {
+char *NAMING_PAGE_HIRAGANA[9] = {
 	MAIN_D_80130450,
 	MAIN_D_8013045C,
 	MAIN_D_80130468,
@@ -840,52 +814,25 @@ char *MAIN_D_801304BC[9] = {
 	MAIN_D_801304B0,
 };
 
-char MAIN_D_801304E0[] = {
-	0x82, 0xed, 0x81, 0x40, 0x82, 0xf0, 0x81, 0x40,
-	0x82, 0xf1, 0x00,
-};
+char MAIN_D_801304E0[] = "わ　を　ん";
 
-char MAIN_D_801304EC[] = {
-	0x82, 0xaa, 0x82, 0xac, 0x82, 0xae, 0x82, 0xb0,
-	0x82, 0xb2, 0x00,
-};
+char MAIN_D_801304EC[] = "がぎぐげご";
 
-char MAIN_D_801304F8[] = {
-	0x82, 0xb4, 0x82, 0xb6, 0x82, 0xb8, 0x82, 0xba,
-	0x82, 0xbc, 0x00,
-};
+char MAIN_D_801304F8[] = "ざじずぜぞ";
 
-char MAIN_D_80130504[] = {
-	0x82, 0xbe, 0x82, 0xc0, 0x82, 0xc3, 0x82, 0xc5,
-	0x82, 0xc7, 0x00,
-};
+char MAIN_D_80130504[] = "だぢづでど";
 
-char MAIN_D_80130510[] = {
-	0x82, 0xce, 0x82, 0xd1, 0x82, 0xd4, 0x82, 0xd7,
-	0x82, 0xda, 0x00,
-};
+char MAIN_D_80130510[] = "ばびぶべぼ";
 
-char MAIN_D_8013051C[] = {
-	0x82, 0xcf, 0x82, 0xd2, 0x82, 0xd5, 0x82, 0xd8,
-	0x82, 0xdb, 0x00,
-};
+char MAIN_D_8013051C[] = "ぱぴぷぺぽ";
 
-char MAIN_D_80130528[] = {
-	0x82, 0x9f, 0x82, 0xa1, 0x82, 0xa3, 0x82, 0xa5,
-	0x82, 0xa7, 0x00,
-};
+char MAIN_D_80130528[] = "ぁぃぅぇぉ";
 
-char MAIN_D_80130534[] = {
-	0x82, 0xc1, 0x82, 0xe1, 0x82, 0xe3, 0x82, 0xe5,
-	0x81, 0x5b, 0x00,
-};
+char MAIN_D_80130534[] = "っゃゅょー";
 
-char MAIN_D_80130540[] = {
-	0x81, 0x40, 0x81, 0x40, 0x81, 0x40, 0x81, 0x40,
-	0x81, 0x40, 0x00,
-};
+char NAMING_BLANK_ROW[] = "　　　　　";
 
-char *MAIN_D_8013054C[9] = {
+char *NAMING_PAGE_HIRAGANA_2[9] = {
 	MAIN_D_801304E0,
 	MAIN_D_801304EC,
 	MAIN_D_801304F8,
@@ -894,55 +841,28 @@ char *MAIN_D_8013054C[9] = {
 	MAIN_D_8013051C,
 	MAIN_D_80130528,
 	MAIN_D_80130534,
-	MAIN_D_80130540,
+	NAMING_BLANK_ROW,
 };
 
-char MAIN_D_80130570[] = {
-	0x83, 0x41, 0x83, 0x43, 0x83, 0x45, 0x83, 0x47,
-	0x83, 0x49, 0x00,
-};
+char MAIN_D_80130570[] = "アイウエオ";
 
-char MAIN_D_8013057C[] = {
-	0x83, 0x4a, 0x83, 0x4c, 0x83, 0x4e, 0x83, 0x50,
-	0x83, 0x52, 0x00,
-};
+char MAIN_D_8013057C[] = "カキクケコ";
 
-char MAIN_D_80130588[] = {
-	0x83, 0x54, 0x83, 0x56, 0x83, 0x58, 0x83, 0x5a,
-	0x83, 0x5c, 0x00,
-};
+char MAIN_D_80130588[] = "サシスセソ";
 
-char MAIN_D_80130594[] = {
-	0x83, 0x5e, 0x83, 0x60, 0x83, 0x63, 0x83, 0x65,
-	0x83, 0x67, 0x00,
-};
+char MAIN_D_80130594[] = "タチツテト";
 
-char MAIN_D_801305A0[] = {
-	0x83, 0x69, 0x83, 0x6a, 0x83, 0x6b, 0x83, 0x6c,
-	0x83, 0x6d, 0x00,
-};
+char MAIN_D_801305A0[] = "ナニヌネノ";
 
-char MAIN_D_801305AC[] = {
-	0x83, 0x6e, 0x83, 0x71, 0x83, 0x74, 0x83, 0x77,
-	0x83, 0x7a, 0x00,
-};
+char MAIN_D_801305AC[] = "ハヒフヘホ";
 
-char MAIN_D_801305B8[] = {
-	0x83, 0x7d, 0x83, 0x7e, 0x83, 0x80, 0x83, 0x81,
-	0x83, 0x82, 0x00,
-};
+char MAIN_D_801305B8[] = "マミムメモ";
 
-char MAIN_D_801305C4[] = {
-	0x83, 0x84, 0x81, 0x40, 0x83, 0x86, 0x81, 0x40,
-	0x83, 0x88, 0x00,
-};
+char MAIN_D_801305C4[] = "ヤ　ユ　ヨ";
 
-char MAIN_D_801305D0[] = {
-	0x83, 0x89, 0x83, 0x8a, 0x83, 0x8b, 0x83, 0x8c,
-	0x83, 0x8d, 0x00,
-};
+char MAIN_D_801305D0[] = "ラリルレロ";
 
-char *MAIN_D_801305DC[9] = {
+char *NAMING_PAGE_KATAKANA[9] = {
 	MAIN_D_80130570,
 	MAIN_D_8013057C,
 	MAIN_D_80130588,
@@ -954,47 +874,23 @@ char *MAIN_D_801305DC[9] = {
 	MAIN_D_801305D0,
 };
 
-char MAIN_D_80130600[] = {
-	0x83, 0x8f, 0x81, 0x40, 0x83, 0x92, 0x81, 0x40,
-	0x83, 0x93, 0x00,
-};
+char MAIN_D_80130600[] = "ワ　ヲ　ン";
 
-char MAIN_D_8013060C[] = {
-	0x83, 0x4b, 0x83, 0x4d, 0x83, 0x4f, 0x83, 0x51,
-	0x83, 0x53, 0x00,
-};
+char MAIN_D_8013060C[] = "ガギグゲゴ";
 
-char MAIN_D_80130618[] = {
-	0x83, 0x55, 0x83, 0x57, 0x83, 0x59, 0x83, 0x5b,
-	0x83, 0x5d, 0x00,
-};
+char MAIN_D_80130618[] = "ザジズゼゾ";
 
-char MAIN_D_80130624[] = {
-	0x83, 0x5f, 0x83, 0x61, 0x83, 0x64, 0x83, 0x66,
-	0x83, 0x68, 0x00,
-};
+char MAIN_D_80130624[] = "ダヂヅデド";
 
-char MAIN_D_80130630[] = {
-	0x83, 0x6f, 0x83, 0x72, 0x83, 0x75, 0x83, 0x78,
-	0x83, 0x7b, 0x00,
-};
+char MAIN_D_80130630[] = "バビブベボ";
 
-char MAIN_D_8013063C[] = {
-	0x83, 0x70, 0x83, 0x73, 0x83, 0x76, 0x83, 0x79,
-	0x83, 0x7c, 0x00,
-};
+char MAIN_D_8013063C[] = "パピプペポ";
 
-char MAIN_D_80130648[] = {
-	0x83, 0x40, 0x83, 0x42, 0x83, 0x44, 0x83, 0x46,
-	0x83, 0x48, 0x00,
-};
+char MAIN_D_80130648[] = "ァィゥェォ";
 
-char MAIN_D_80130654[] = {
-	0x83, 0x62, 0x83, 0x83, 0x83, 0x85, 0x83, 0x87,
-	0x81, 0x5b, 0x00,
-};
+char MAIN_D_80130654[] = "ッャュョー";
 
-char *MAIN_D_80130660[9] = {
+char *NAMING_PAGE_KATAKANA_2[9] = {
 	MAIN_D_80130600,
 	MAIN_D_8013060C,
 	MAIN_D_80130618,
@@ -1003,92 +899,50 @@ char *MAIN_D_80130660[9] = {
 	MAIN_D_8013063C,
 	MAIN_D_80130648,
 	MAIN_D_80130654,
-	MAIN_D_80130540,
+	NAMING_BLANK_ROW,
 };
 
-char MAIN_D_80130684[] = {
-	0x82, 0x60, 0x82, 0x61, 0x82, 0x62, 0x82, 0x63,
-	0x82, 0x64, 0x00,
-};
+char MAIN_D_80130684[] = "ＡＢＣＤＥ";
 
-char MAIN_D_80130690[] = {
-	0x82, 0x65, 0x82, 0x66, 0x82, 0x67, 0x82, 0x68,
-	0x82, 0x69, 0x00,
-};
+char MAIN_D_80130690[] = "ＦＧＨＩＪ";
 
-char MAIN_D_8013069C[] = {
-	0x82, 0x6a, 0x82, 0x6b, 0x82, 0x6c, 0x82, 0x6d,
-	0x82, 0x6e, 0x00,
-};
+char MAIN_D_8013069C[] = "ＫＬＭＮＯ";
 
-char MAIN_D_801306A8[] = {
-	0x82, 0x6f, 0x82, 0x70, 0x82, 0x71, 0x82, 0x72,
-	0x82, 0x73, 0x00,
-};
+char MAIN_D_801306A8[] = "ＰＱＲＳＴ";
 
-char MAIN_D_801306B4[] = {
-	0x82, 0x74, 0x82, 0x75, 0x82, 0x76, 0x82, 0x77,
-	0x82, 0x78, 0x00,
-};
+char MAIN_D_801306B4[] = "ＵＶＷＸＹ";
 
-char MAIN_D_801306C0[] = {
-	0x82, 0x79, 0x81, 0x40, 0x81, 0x40, 0x81, 0x40,
-	0x81, 0x40, 0x00,
-};
+char MAIN_D_801306C0[] = "Ｚ　　　　";
 
-char *MAIN_D_801306CC[9] = {
+char *NAMING_PAGE_UPPERCASE[9] = {
 	MAIN_D_80130684,
 	MAIN_D_80130690,
 	MAIN_D_8013069C,
 	MAIN_D_801306A8,
 	MAIN_D_801306B4,
 	MAIN_D_801306C0,
-	MAIN_D_80130540,
-	MAIN_D_80130540,
-	MAIN_D_80130540,
+	NAMING_BLANK_ROW,
+	NAMING_BLANK_ROW,
+	NAMING_BLANK_ROW,
 };
 
-char MAIN_D_801306F0[] = {
-	0x82, 0x81, 0x82, 0x82, 0x82, 0x83, 0x82, 0x84,
-	0x82, 0x85, 0x00,
-};
+char MAIN_D_801306F0[] = "ａｂｃｄｅ";
 
-char MAIN_D_801306FC[] = {
-	0x82, 0x86, 0x82, 0x87, 0x82, 0x88, 0x82, 0x89,
-	0x82, 0x8a, 0x00,
-};
+char MAIN_D_801306FC[] = "ｆｇｈｉｊ";
 
-char MAIN_D_80130708[] = {
-	0x82, 0x8b, 0x82, 0x8c, 0x82, 0x8d, 0x82, 0x8e,
-	0x82, 0x8f, 0x00,
-};
+char MAIN_D_80130708[] = "ｋｌｍｎｏ";
 
-char MAIN_D_80130714[] = {
-	0x82, 0x90, 0x82, 0x91, 0x82, 0x92, 0x82, 0x93,
-	0x82, 0x94, 0x00,
-};
+char MAIN_D_80130714[] = "ｐｑｒｓｔ";
 
-char MAIN_D_80130720[] = {
-	0x82, 0x95, 0x82, 0x96, 0x82, 0x97, 0x82, 0x98,
-	0x82, 0x99, 0x00,
-};
+char MAIN_D_80130720[] = "ｕｖｗｘｙ";
 
-char MAIN_D_8013072C[] = {
-	0x82, 0x9a, 0x81, 0x40, 0x81, 0x40, 0x81, 0x40,
-	0x81, 0x40, 0x00,
-};
+char MAIN_D_8013072C[] = "ｚ　　　　";
 
-char MAIN_D_80130738[] = {
-	0x82, 0x4f, 0x82, 0x50, 0x82, 0x51, 0x82, 0x52,
-	0x82, 0x53, 0x00,
-};
+char MAIN_D_80130738[] = "０１２３４";
 
-char MAIN_D_80130744[] = {
-	0x82, 0x54, 0x82, 0x55, 0x82, 0x56, 0x82, 0x57,
-	0x82, 0x58, 0x00,
-};
+char MAIN_D_80130744[] = "５６７８９";
 
-char *MAIN_D_80130750[9] = {
+char *NAMING_PAGE_LOWERCASE[9] = {
 	MAIN_D_801306F0,
 	MAIN_D_801306FC,
 	MAIN_D_80130708,
@@ -1097,16 +951,16 @@ char *MAIN_D_80130750[9] = {
 	MAIN_D_8013072C,
 	MAIN_D_80130738,
 	MAIN_D_80130744,
-	MAIN_D_80130540,
+	NAMING_BLANK_ROW,
 };
 
-char **MAIN_D_80130774[6] = {
-	MAIN_D_801306CC,
-	MAIN_D_80130750,
-	MAIN_D_801305DC,
-	MAIN_D_80130660,
-	MAIN_D_801304BC,
-	MAIN_D_8013054C,
+char **NAMING_CHAR_PAGES[6] = {
+	NAMING_PAGE_UPPERCASE,
+	NAMING_PAGE_LOWERCASE,
+	NAMING_PAGE_KATAKANA,
+	NAMING_PAGE_KATAKANA_2,
+	NAMING_PAGE_HIRAGANA,
+	NAMING_PAGE_HIRAGANA_2,
 };
 
 int16_t MAIN_D_8013078C[10] = {
@@ -1119,15 +973,9 @@ uint16_t MAIN_D_801307A0[10] = {
 	0x8000, 0x0000,
 };
 
-uint8_t MAIN_D_801307B4[12] = {
-	0x49, 0x6e, 0x20, 0x68, 0x61, 0x6e, 0x64, 0x00,
-	0x00, 0x00, 0x00, 0x00,
-};
+uint8_t MAIN_D_801307B4[12] = "In hand";
 
-uint8_t MAIN_D_801307C0[12] = {
-	0x4b, 0x65, 0x65, 0x70, 0x69, 0x6e, 0x67, 0x00,
-	0x00, 0x00, 0x00, 0x00,
-};
+uint8_t MAIN_D_801307C0[12] = "Keeping";
 
 char MAIN_D_801307CC[20] = "You have Will trade";
 // clang-format on

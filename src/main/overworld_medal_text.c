@@ -6,7 +6,7 @@ extern int8_t MENU_SUB_STATE;
 extern int8_t MEDAL_SELECTOR_INDEX;
 extern RECT MAIN_D_80134318;
 extern RECT MAIN_D_80134320;
-extern char MAIN_D_80124C54[];
+extern char FULLWIDTH_DIGITS[];
 extern char *MAIN_D_80124800[];
 extern char *MAIN_D_80124828[];
 extern char *MAIN_D_80124864[];
@@ -24,7 +24,7 @@ int32_t drawMedalViewStrings(void)
 	switch (MENU_SUB_STATE) {
 	case 0:
 		clearTextSubArea(&rect1);
-		drawString(MAIN_D_80124C54, 0, 0xf0);
+		drawString(FULLWIDTH_DIGITS, 0, 0xf0);
 		MENU_SUB_STATE = 1;
 		break;
 	case 1:

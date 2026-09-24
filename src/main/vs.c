@@ -54,7 +54,7 @@ extern int16_t MAIN_D_8013527C[2];
 extern char MAIN_D_80134500[5];
 extern char MAIN_D_80134508[5];
 extern char MAIN_D_80124C24[];
-extern char MAIN_D_80124C54[];
+extern char FULLWIDTH_DIGITS[];
 extern int16_t MAIN_D_80134F24;
 extern int16_t MAIN_D_80134F26;
 extern uint8_t MAIN_D_80134F28;
@@ -392,10 +392,7 @@ RGB8 MAIN_D_8012F438[10] = {
 	{ 0x00, 0x00, 0x00 },
 };
 
-char MAIN_D_8012F458[] = {
-	0x83, 0x5f, 0x83, 0x81, 0x81, 0x5b, 0x83, 0x57,
-	0x00,
-};
+char MAIN_D_8012F458[] = "ダメージ";
 
 char MAIN_D_8012F464[] = "\\ETCDAT\\ETCTIM.BIN";
 
@@ -438,8 +435,8 @@ uint8_t MAIN_D_8012F578[12] = {
 	0x62, 0x6c, 0x7a, 0x84,
 };
 
-/* "ソウビナシ" (not equipped) */
-char MAIN_D_8012F584[] = "\x83\x5c\x83\x45\x83\x72\x83\x69\x83\x56";
+/* not equipped */
+char MAIN_D_8012F584[] = "ソウビナシ";
 
 VsListPanel MAIN_D_8012F590[12] = {
 	{ 0x0000, 0x01e8, 0x00, 0x00, 0x96, 0xd7, 0x06, 0x00, 0x00 },
@@ -533,7 +530,7 @@ void VS__drawStatLabelText(void)
 		DrawSync(0);
 	}
 
-	drawString(MAIN_D_80124C54, 0, 0xf0);
+	drawString(FULLWIDTH_DIGITS, 0, 0xf0);
 }
 
 void VS__addIntroText(Entity *entity, int32_t id)

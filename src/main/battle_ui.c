@@ -73,7 +73,7 @@ extern int16_t MAIN_D_80134EA0;
 extern int8_t BTL_END_BOX_TEXTBUFFER[];
 extern int8_t HAS_STAT_GAIN[6];
 extern char MAIN_D_80124C0C[];
-extern char MAIN_D_80124C54[];
+extern char FULLWIDTH_DIGITS[];
 extern uint8_t GAME_STATE;
 extern uint8_t CURRENT_SCREEN;
 
@@ -503,7 +503,7 @@ void createPostBattleStatsBox(void)
 		}
 
 		if (i == 3) {
-			drawString(MAIN_D_80124C54, 0, 240);
+			drawString(FULLWIDTH_DIGITS, 0, 240);
 		}
 
 		DrawSync(0);

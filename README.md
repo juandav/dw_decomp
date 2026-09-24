@@ -52,6 +52,14 @@ make compare
 make objdiff
 ```
 
+## Text encoding
+
+Source files are UTF-8. The game stores text as Shift JIS, so the build runs
+every C file through `tools/sjis_escape.py`, which rewrites the non-ASCII
+characters in string and character literals as CP932 escapes before mwcc
+compiles them. Write Japanese text and symbols such as `△` directly in
+literals.
+
 ## Links
 
 Symbols and reverse engineering is based on work by SydMontague:  

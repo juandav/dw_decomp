@@ -19,7 +19,7 @@ extern int16_t INITIAL_COMBAT_STATS[][6];
 extern uint32_t POLLED_INPUT;
 extern uint32_t POLLED_INPUT_PREVIOUS;
 extern char MAIN_D_80124C0C[];
-extern char MAIN_D_80124C54[];
+extern char FULLWIDTH_DIGITS[];
 extern GsOT *ACTIVE_ORDERING_TABLE;
 
 void worldPosToScreenPos(TrainingSpot *item, SVECTOR *out);
@@ -333,7 +333,7 @@ void TRN2_createPostTrainingStatsBox(void)
 		}
 		if (i == 3) {
 			drawString(MAIN_D_80134BE0, 0, 84);
-			drawString(MAIN_D_80124C54, 0, 240);
+			drawString(FULLWIDTH_DIGITS, 0, 240);
 		}
 		DrawSync(0);
 	}

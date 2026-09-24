@@ -91,7 +91,7 @@ extern int16_t MAIN_D_80135264;
 extern int32_t DRAWING_OFFSET_X;
 extern int32_t DRAWING_OFFSET_Y;
 extern uint8_t MAIN_D_80135274;
-extern char MAIN_D_80124C54[];
+extern char FULLWIDTH_DIGITS[];
 extern char TAMER_MODEL_BUFFER[];
 extern void *MAIN_D_801352A0;
 extern int8_t MAP_COLLISION_DATA[];
@@ -1677,7 +1677,7 @@ void VS_playVersusIntroSequence(void)
 	clearTextArea();
 	drawString(MAIN_D_80134A50, 0, 0);
 	drawString(MAIN_D_80134A54, 0, 0xc);
-	drawString(MAIN_D_80124C54, 0, 0xf0);
+	drawString(FULLWIDTH_DIGITS, 0, 0xf0);
 	fadeFromBlack(3);
 	i = 3;
 	if (MAIN_D_80135264 == VS_D_800716A8[11] - 1) {

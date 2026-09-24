@@ -89,7 +89,7 @@ extern Entity *MAIN_D_801350E8;
 extern uint8_t CURRENT_SCREEN;
 extern uint8_t MAIN_D_8013514C;
 extern char MAIN_D_80124C24[];
-extern char MAIN_D_80124C54[];
+extern char FULLWIDTH_DIGITS[];
 extern int16_t MAIN_D_80135144;
 extern int32_t MAIN_D_80135114;
 extern int32_t COMBAT_AREA_CENTER_X;
@@ -1243,10 +1243,7 @@ StdSrcA598 STD_D_8007A598[8] = {
 	},
 };
 
-char STD_D_8007A658[] = {
-	0x83, 0x5f, 0x83, 0x81, 0x81, 0x5b, 0x83, 0x57,
-	0x00,
-};
+char STD_D_8007A658[] = "ダメージ";
 
 char STD_D_8007A664[] = "Moderate";
 
@@ -1365,7 +1362,7 @@ void STD_func_8005858C(void)
 		DrawSync(0);
 	}
 
-	drawString(MAIN_D_80124C54, 0, 0xf0);
+	drawString(FULLWIDTH_DIGITS, 0, 0xf0);
 }
 
 void STD_func_80058684(Entity *entity, int32_t id)

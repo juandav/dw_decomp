@@ -2,7 +2,7 @@
 #include <dw/font.h>
 
 extern int8_t MENU_SUB_STATE;
-extern char MAIN_D_80124C54[];
+extern char FULLWIDTH_DIGITS[];
 extern RECT MAIN_D_801342E8;
 extern uint8_t MAIN_D_80134234[4];
 extern int16_t MAIN_D_80134D38;
@@ -22,7 +22,7 @@ int32_t drawDigimonMovesText(void)
 	switch (MENU_SUB_STATE) {
 	case 0:
 		clearTextSubArea(&rect);
-		drawString(MAIN_D_80124C54, 0, 0xf0);
+		drawString(FULLWIDTH_DIGITS, 0, 0xf0);
 		if (PARTNER_ENTITY.digimonEntity.stats.base.moves[0] != 0xff) {
 			MAIN_D_80134234[0] = entityGetTechFromAnim(ENTITY_TABLE[1],
 				PARTNER_ENTITY.digimonEntity.stats.base.moves[0]);

@@ -31,7 +31,7 @@ void tickAnimation(Entity *entity);
 extern char *MAIN_D_801247B8[];
 extern char MAIN_D_80124C24[];
 extern char MAIN_D_80124C30[];
-extern char MAIN_D_80124C54[];
+extern char FULLWIDTH_DIGITS[];
 extern RECT MAIN_D_801342E0;
 extern int8_t MENU_SUB_STATE;
 
@@ -350,7 +350,7 @@ int32_t drawDigimonStatsStrings(void)
 	switch (MENU_SUB_STATE) {
 	case 0:
 		clearTextSubArea(&rect);
-		drawString(MAIN_D_80124C54, 0, 0xf0);
+		drawString(FULLWIDTH_DIGITS, 0, 0xf0);
 		drawString(MAIN_D_80124C24, 0, 0x24);
 		drawString(MAIN_D_80124C30, 0x24, 0x24);
 		MENU_SUB_STATE = 1;

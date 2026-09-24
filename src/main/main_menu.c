@@ -300,9 +300,7 @@ void *main_menu_order_anchor[] = {
 };
 
 // clang-format off
-char MAIN_D_80134660[2] = {
-	0x00, 0x00,
-};
+char MAIN_D_80134660[2] = "";
 
 uint16_t MAIN_D_80134662 = 0x0032;
 
@@ -310,21 +308,13 @@ char MAIN_D_80134664[] = "YesNo";
 
 char MAIN_D_8013466C[] = "Yes No";
 
-char MAIN_D_80134674[] = {
-	0x82, 0x51, 0x00,
-};
+char MAIN_D_80134674[] = "２";
 
-char MAIN_D_80134678[] = {
-	0x82, 0xc9, 0x00,
-};
+char MAIN_D_80134678[] = "に";
 
-char MAIN_D_8013467C[] = {
-	0x82, 0xaa, 0x00,
-};
+char MAIN_D_8013467C[] = "が";
 
-char MAIN_D_80134680[] = {
-	0x82, 0xf0, 0x00,
-};
+char MAIN_D_80134680[] = "を";
 
 char MAIN_D_80134684[] = "Name";
 
@@ -346,9 +336,7 @@ char MAIN_D_801346B4[] = " ";
 
 char MAIN_D_801346B8[] = " is in";
 
-char MAIN_D_801346C0[4] = {
-	0x2e, 0x00, 0x2a, 0x00,
-};
+char MAIN_D_801346C0[2][2] = { ".", "*" };
 
 char MAIN_D_801346C4[] = "Player";
 
@@ -448,12 +436,7 @@ char MAIN_D_80131328[] = "Do you want to format?";
 
 char MAIN_D_80131340[] = "Not used";
 
-char MAIN_D_8013134C[] = {
-	0x83, 0x58, 0x83, 0x8d, 0x83, 0x62, 0x83, 0x67,
-	0x82, 0x50, 0x82, 0xcc, 0x83, 0x81, 0x83, 0x82,
-	0x83, 0x8a, 0x81, 0x5b, 0x83, 0x4a, 0x81, 0x5b,
-	0x83, 0x68, 0x82, 0xc9, 0x00,
-};
+char MAIN_D_8013134C[] = "スロット１のメモリーカードに";
 
 char MAIN_D_8013136C[12] = "Go to sleep";
 
@@ -534,24 +517,25 @@ CVECTOR MAIN_D_80131638[4] = {
 	{ 0xc0, 0x40, 0x40, 0x00 },
 };
 
-int8_t MAIN_D_80131648[16] = {
-	0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37,
-	0x38, 0x39, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46,
-};
+int8_t HEX_DIGITS[16] = "0123456789ABCDEF";
 
-char MAIN_D_80131658[96] = {
-	0x20, 0x30, 0x00, 0x00, 0x00, 0x00, 0x20, 0x31,
-	0x00, 0x00, 0x00, 0x00, 0x20, 0x32, 0x00, 0x00,
-	0x00, 0x00, 0x20, 0x33, 0x00, 0x00, 0x00, 0x00,
-	0x20, 0x34, 0x00, 0x00, 0x00, 0x00, 0x20, 0x35,
-	0x00, 0x00, 0x00, 0x00, 0x20, 0x36, 0x00, 0x00,
-	0x00, 0x00, 0x20, 0x37, 0x20, 0x00, 0x00, 0x00,
-	0x20, 0x38, 0x20, 0x00, 0x00, 0x00, 0x20, 0x39,
-	0x00, 0x00, 0x00, 0x00, 0x31, 0x30, 0x00, 0x00,
-	0x00, 0x00, 0x31, 0x31, 0x00, 0x00, 0x00, 0x00,
-	0x31, 0x32, 0x00, 0x00, 0x00, 0x00, 0x31, 0x33,
-	0x00, 0x00, 0x00, 0x00, 0x31, 0x34, 0x00, 0x00,
-	0x00, 0x00, 0x31, 0x35, 0x00, 0x00, 0x00, 0x00,
+char SLOT_NUMBER_STRINGS[16][6] = {
+	" 0",
+	" 1",
+	" 2",
+	" 3",
+	" 4",
+	" 5",
+	" 6",
+	" 7 ",
+	" 8 ",
+	" 9",
+	"10",
+	"11",
+	"12",
+	"13",
+	"14",
+	"15",
 };
 
 MenuHighlight MAIN_D_801316B8[22] = {
@@ -827,12 +811,7 @@ char *MAIN_D_801318FC[4] = {
 	MAIN_D_80131264,
 };
 
-char MAIN_D_8013190C[32] = {
-	0x42, 0x41, 0x53, 0x4c, 0x55, 0x53, 0x2d, 0x30,
-	0x31, 0x30, 0x33, 0x32, 0x44, 0x4d, 0x52, 0x2a,
-	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
+char MEMCARD_FILENAME[32] = "BASLUS-01032DMR*";
 
 uint8_t MAIN_D_8013192C[32] = {
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -2464,7 +2443,7 @@ void drawMainMenuStrings(int32_t menu)
 		DrawSync(0);
 		drawString(MAIN_D_80131340, 0x90, 0);
 		DrawSync(0);
-		drawString(&MAIN_D_80131658[(MEMORY_CARD_SLOT + 1) * 6], 0, 0xC);
+		drawString(SLOT_NUMBER_STRINGS[MEMORY_CARD_SLOT + 1], 0, 0xC);
 		DrawSync(0);
 		drawString(&MAIN_D_801BF768[MEMORY_CARD_SLOT * 0x44] + 4, 0x18, 0xC);
 		DrawSync(0);
@@ -2472,7 +2451,7 @@ void drawMainMenuStrings(int32_t menu)
 		DrawSync(0);
 		drawString(&MAIN_D_801BF768[MEMORY_CARD_SLOT * 0x44] + 0x2C, 0, 0x18);
 		DrawSync(0);
-		drawString(&MAIN_D_80131658[(MEMORY_CARD_SLOT + 1) * 6], 0, 0x30);
+		drawString(SLOT_NUMBER_STRINGS[MEMORY_CARD_SLOT + 1], 0, 0x30);
 		DrawSync(0);
 		drawString(MAIN_D_801318DC[MAIN_MENU_ACTION], 0x18, 0x30);
 		DrawSync(0);
@@ -2593,9 +2572,9 @@ void drawMainMenuStrings(int32_t menu)
 		strcpy(buf, PARTNER_ENTITY.name);
 		drawString(buf, 0, 0x18);
 		DrawSync(0);
-		drawString(&MAIN_D_80131658[((BATTLE_REGISTRATION_SLOT + 1) / 10) * 6] + 2, 0, 0xC);
+		drawString(&SLOT_NUMBER_STRINGS[(BATTLE_REGISTRATION_SLOT + 1) / 10][2], 0, 0xC);
 		DrawSync(0);
-		drawString(&MAIN_D_80131658[((BATTLE_REGISTRATION_SLOT + 1) % 10) * 6] + 2, 0xC, 0xC);
+		drawString(&SLOT_NUMBER_STRINGS[(BATTLE_REGISTRATION_SLOT + 1) % 10][2], 0xC, 0xC);
 		DrawSync(0);
 		drawString(MAIN_D_801346AC, 0, 0x24);
 		DrawSync(0);
@@ -2658,7 +2637,7 @@ void drawSaveSlotText(int32_t slot, int32_t row)
 		row *= 0x18;
 		setRECT(&area, 0, row + 0xC, 0xE0, 0x18);
 		clearTextSubArea(&area);
-		drawString(&MAIN_D_80131658[(slot + 1) * 6], 0, row + 0xC);
+		drawString(SLOT_NUMBER_STRINGS[slot + 1], 0, row + 0xC);
 		drawString(&MAIN_D_801BF768[slot * 0x44] + 4, 0x18, row + 0xC);
 		DrawSync(0);
 		drawString(&MAIN_D_801BF768[slot * 0x44] + 0x18, 0x6C, row + 0xC);
@@ -2701,14 +2680,14 @@ void drawRegisteredBattleSlots(int32_t slot)
 	currentSlot = slot + (i = 0);
 	y = 0xC;
 	while (i < 10) {
-		drawString(&MAIN_D_80131658[((currentSlot + 1) / 10) * 6] + 2, 0, y);
-		drawString(&MAIN_D_80131658[((currentSlot + 1) % 10) * 6] + 2, 0xC, y);
+		drawString(&SLOT_NUMBER_STRINGS[(currentSlot + 1) / 10][2], 0, y);
+		drawString(&SLOT_NUMBER_STRINGS[(currentSlot + 1) % 10][2], 0xC, y);
 		if ((type = (&MAIN_D_80131B2C[0x51C])[currentSlot * 0x40]) != 0) {
 			drawString((char *)&MAIN_D_8013192C[currentSlot * 0x40] + 0x70E, 0x1E, y);
 			drawString(DIGIMON_DATA[type].name, 0x6C, y);
 		} else {
 			setTextColor(9);
-			drawString(MAIN_D_801346C0, 0x1E, y);
+			drawString(MAIN_D_801346C0[0], 0x1E, y);
 			setTextColor(1);
 		}
 		DrawSync(0);
@@ -2945,8 +2924,8 @@ void tickMainMenu(void)
 			if (MEMORY_CARD_USED_BLOCKS >= 0xF) {
 				setMemoryCardReadError(7, 0);
 			} else {
-				MAIN_D_8013190C[0xF] = 0x3F;
-				loadSaveSlotData(MEMORY_CARD_ID, MAIN_D_8013190C,
+				MEMCARD_FILENAME[0xF] = 0x3F;
+				loadSaveSlotData(MEMORY_CARD_ID, MEMCARD_FILENAME,
 						 (SaveSlotPreview *)MAIN_D_801BF768, 0);
 			}
 		}
@@ -2990,8 +2969,8 @@ void tickMainMenu(void)
 
 	case 0x10:
 		if ((MAIN_MENU_TICKS >= 3) && MemCardSync(1, (unsigned long *)&command, (unsigned long *)&result)) {
-			MAIN_D_8013190C[0xF] = MAIN_D_80131648[MEMORY_CARD_SLOT];
-			input = MemCardCreateFile(MEMORY_CARD_ID, MAIN_D_8013190C, 1);
+			MEMCARD_FILENAME[0xF] = HEX_DIGITS[MEMORY_CARD_SLOT];
+			input = MemCardCreateFile(MEMORY_CARD_ID, MEMCARD_FILENAME, 1);
 			switch (input) {
 			case 0:
 				TARGET_MENU = 0x11;
@@ -3024,7 +3003,7 @@ void tickMainMenu(void)
 		asciiToShiftJIS((uint8_t *)MAIN_D_8013392C,
 				(uint16_t *)(MAIN_D_8013192C + 4));
 		_strncpy((char *)MAIN_D_8013192C + 0xC,
-			 MAIN_D_80131658 + (MEMORY_CARD_SLOT + 1) * 6, 4);
+			 SLOT_NUMBER_STRINGS[MEMORY_CARD_SLOT + 1], 4);
 		_strncpy((char *)MAIN_D_8013192C + 0x12,
 			 (char *)MAIN_D_80131B2C + 0x467, 0xD);
 		_strncpy(MAIN_D_8013194C,
@@ -3034,7 +3013,7 @@ void tickMainMenu(void)
 		((SavegamePayload *)MAIN_D_80131B2C)->checksum = createSavegameChecksum(0);
 		*(SavegamePayload *)MAIN_D_80132A2C =
 			*(SavegamePayload *)MAIN_D_80131B2C;
-		input = MemCardWriteFile(MEMORY_CARD_ID, MAIN_D_8013190C,
+		input = MemCardWriteFile(MEMORY_CARD_ID, MEMCARD_FILENAME,
 					 (long *)MAIN_D_8013192C, 0, 0x2000);
 		if (input != 1) {
 			setMemoryCardReadError(0, 0);
@@ -3116,8 +3095,8 @@ void tickMainMenu(void)
 
 	case 0x16:
 		TARGET_MENU = 0x17;
-		MAIN_D_8013190C[0xF] = 0x3F;
-		loadSaveSlotData(MEMORY_CARD_ID, MAIN_D_8013190C,
+		MEMCARD_FILENAME[0xF] = 0x3F;
+		loadSaveSlotData(MEMORY_CARD_ID, MEMCARD_FILENAME,
 				 (SaveSlotPreview *)MAIN_D_801BF768, 0);
 		break;
 
@@ -3160,8 +3139,8 @@ void tickMainMenu(void)
 	case 0x19:
 		if (MAIN_MENU_TICKS >= 3) {
 			MemCardSync(0, (unsigned long *)&command, (unsigned long *)&result);
-			MAIN_D_8013190C[0xF] = MAIN_D_80131648[MEMORY_CARD_SLOT];
-			input = MemCardReadFile(MEMORY_CARD_ID, MAIN_D_8013190C,
+			MEMCARD_FILENAME[0xF] = HEX_DIGITS[MEMORY_CARD_SLOT];
+			input = MemCardReadFile(MEMORY_CARD_ID, MEMCARD_FILENAME,
 					    (long *)MAIN_D_8013192C, 0, 0x2000);
 			if (input != 1) {
 				setMemoryCardReadError(0, 0);
@@ -3237,8 +3216,8 @@ void tickMainMenu(void)
 
 	case 0x20:
 		TARGET_MENU = 0x21;
-		MAIN_D_8013190C[0xF] = 0x3F;
-		loadSaveSlotData(MEMORY_CARD_ID, MAIN_D_8013190C,
+		MEMCARD_FILENAME[0xF] = 0x3F;
+		loadSaveSlotData(MEMORY_CARD_ID, MEMCARD_FILENAME,
 				 (SaveSlotPreview *)MAIN_D_801BF768, 0);
 		break;
 
@@ -3280,8 +3259,8 @@ void tickMainMenu(void)
 
 	case 0x23:
 		if ((MAIN_MENU_TICKS >= 3) && MemCardSync(1, (unsigned long *)&command, (unsigned long *)&result)) {
-			MAIN_D_8013190C[0xF] = MAIN_D_80131648[MEMORY_CARD_SLOT];
-			input = MemCardDeleteFile(MEMORY_CARD_ID, MAIN_D_8013190C);
+			MEMCARD_FILENAME[0xF] = HEX_DIGITS[MEMORY_CARD_SLOT];
+			input = MemCardDeleteFile(MEMORY_CARD_ID, MEMCARD_FILENAME);
 			if (input == 0) {
 				TARGET_MENU = 0x1F;
 				MEMORY_CARD_OPERATION = 0;
@@ -3341,8 +3320,8 @@ void tickMainMenu(void)
 
 	case 0x2A:
 		MemCardSync(0, (unsigned long *)&command, (unsigned long *)&result);
-		MAIN_D_8013190C[0xF] = MAIN_D_80131648[MEMORY_CARD_SLOT];
-		input = MemCardGetDirentry(MEMORY_CARD_ID, MAIN_D_8013190C,
+		MEMCARD_FILENAME[0xF] = HEX_DIGITS[MEMORY_CARD_SLOT];
+		input = MemCardGetDirentry(MEMORY_CARD_ID, MEMCARD_FILENAME,
 					MEMCARD_DIRENTRIES, (long *)&count, 0, 1);
 		MEMORY_CARD_ERROR = -1;
 		switch (input) {
@@ -3380,7 +3359,7 @@ void tickMainMenu(void)
 			asciiToShiftJIS((uint8_t *)MAIN_D_8013392C,
 				(uint16_t *)(MAIN_D_8013192C + 4));
 			_strncpy((char *)MAIN_D_8013192C + 0xC,
-				 MAIN_D_80131658 + (MEMORY_CARD_SLOT + 1) * 6, 4);
+				 SLOT_NUMBER_STRINGS[MEMORY_CARD_SLOT + 1], 4);
 			_strncpy((char *)MAIN_D_8013192C + 0x12,
 				 (char *)MAIN_D_80131B2C + 0x467, 0xD);
 			_strncpy(MAIN_D_8013194C,
@@ -3390,7 +3369,7 @@ void tickMainMenu(void)
 			((SavegamePayload *)MAIN_D_80131B2C)->checksum = createSavegameChecksum(0);
 			*(SavegamePayload *)MAIN_D_80132A2C =
 				*(SavegamePayload *)MAIN_D_80131B2C;
-			input = MemCardWriteFile(MEMORY_CARD_ID, MAIN_D_8013190C,
+			input = MemCardWriteFile(MEMORY_CARD_ID, MEMCARD_FILENAME,
 						 (long *)MAIN_D_8013192C, 0, 0x2000);
 			if (input != 1) {
 				setMemoryCardReadError(0, 0x28);
@@ -3495,8 +3474,8 @@ void tickMainMenu(void)
 				setMemoryCardReadError(result, 0x32);
 				break;
 			}
-			MAIN_D_8013190C[0xF] = 0x3F;
-			if (loadSaveSlotData(MEMORY_CARD_ID, MAIN_D_8013190C,
+			MEMCARD_FILENAME[0xF] = 0x3F;
+			if (loadSaveSlotData(MEMORY_CARD_ID, MEMCARD_FILENAME,
 					     (SaveSlotPreview *)MAIN_D_801BF768,
 					     0x32) != 0) {
 				TARGET_MENU = 0x34;
@@ -3545,8 +3524,8 @@ void tickMainMenu(void)
 	case 0x36:
 		if (MAIN_MENU_TICKS >= 3) {
 			MemCardSync(0, (unsigned long *)&command, (unsigned long *)&result);
-			MAIN_D_8013190C[0xF] = MAIN_D_80131648[MEMORY_CARD_SLOT];
-			input = MemCardReadFile(MEMORY_CARD_ID, MAIN_D_8013190C,
+			MEMCARD_FILENAME[0xF] = HEX_DIGITS[MEMORY_CARD_SLOT];
+			input = MemCardReadFile(MEMORY_CARD_ID, MEMCARD_FILENAME,
 					    (long *)MAIN_D_8013192C, 0, 0x2000);
 			if (input != 1) {
 				setMemoryCardReadError(0, 0x32);
@@ -3686,8 +3665,8 @@ void tickMainMenu(void)
 
 	case 0x40:
 		MemCardSync(0, (unsigned long *)&command, (unsigned long *)&result);
-		MAIN_D_8013190C[0xF] = MAIN_D_80131648[MEMORY_CARD_SLOT];
-		input = MemCardGetDirentry(MEMORY_CARD_ID, MAIN_D_8013190C,
+		MEMCARD_FILENAME[0xF] = HEX_DIGITS[MEMORY_CARD_SLOT];
+		input = MemCardGetDirentry(MEMORY_CARD_ID, MEMCARD_FILENAME,
 					MEMCARD_DIRENTRIES, (long *)&count, 0, 1);
 		MEMORY_CARD_ERROR = -1;
 		switch (input) {
@@ -3725,7 +3704,7 @@ void tickMainMenu(void)
 			asciiToShiftJIS((uint8_t *)MAIN_D_8013392C,
 				(uint16_t *)(MAIN_D_8013192C + 4));
 			_strncpy((char *)MAIN_D_8013192C + 0xC,
-				 MAIN_D_80131658 + (MEMORY_CARD_SLOT + 1) * 6, 4);
+				 SLOT_NUMBER_STRINGS[MEMORY_CARD_SLOT + 1], 4);
 			_strncpy((char *)MAIN_D_8013192C + 0x12,
 				 (char *)MAIN_D_80131B2C + 0x467, 0xD);
 			_strncpy(MAIN_D_8013194C,
@@ -3735,7 +3714,7 @@ void tickMainMenu(void)
 			((SavegamePayload *)MAIN_D_80131B2C)->checksum = createSavegameChecksum(0);
 			*(SavegamePayload *)MAIN_D_80132A2C =
 				*(SavegamePayload *)MAIN_D_80131B2C;
-			input = MemCardWriteFile(MEMORY_CARD_ID, MAIN_D_8013190C,
+			input = MemCardWriteFile(MEMORY_CARD_ID, MEMCARD_FILENAME,
 						 (long *)MAIN_D_8013192C, 0, 0x2000);
 			if (input != 1) {
 				setMemoryCardReadError(0, SAVE_RETRY_RETURN_MENU);
@@ -3938,7 +3917,7 @@ int32_t countUsedMemoryCardBlocks(int32_t channel, int32_t returnMenu)
 	int32_t status;
 
 	MemCardSync(0, &cmd, &result);
-	status = MemCardGetDirentry(channel, MAIN_D_801346C0 + 2, MEMCARD_DIRENTRIES,
+	status = MemCardGetDirentry(channel, MAIN_D_801346C0[1], MEMCARD_DIRENTRIES,
 			&fileCount, 0, 15);
 	/* Keep the success block after both errors for the retail branch layout. */
 	if (status == -1)
