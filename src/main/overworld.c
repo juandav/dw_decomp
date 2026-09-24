@@ -1188,14 +1188,15 @@ RGB8 UI_BOX_COLORS[5] = {
 	{ 0x00, 0x00, 0x00 },
 };
 
-char MAIN_D_80124C0C[2][12] = {
+/* The six stat names, read as one [6][12] table from STAT_LABELS on. */
+char STAT_LABELS[2][12] = {
 	"HP",
 	"MP",
 };
 
-char MAIN_D_80124C24[12] = "Off";
+char STAT_LABEL_OFF[12] = "Off";
 
-char MAIN_D_80124C30[3][12] = {
+char STAT_LABELS_DEF[3][12] = {
 	"Def",
 	"Speed",
 	"Brain",

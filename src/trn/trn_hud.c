@@ -15,7 +15,7 @@ extern uint32_t POLLED_INPUT;
 extern uint32_t POLLED_INPUT_PREVIOUS;
 extern int16_t STATS_GAINS[6];
 extern GsOT *ACTIVE_ORDERING_TABLE;
-extern char MAIN_D_80124C0C[];
+extern char STAT_LABELS[];
 extern char FULLWIDTH_DIGITS[];
 
 void renderString(int32_t a, int32_t b, int32_t c, int32_t d, int32_t e, int32_t f, int32_t g, int32_t h, int32_t i);
@@ -150,8 +150,8 @@ void TRN_createPostTrainingStatsBox(void)
 		row = i * 2;
 
 		if (i < 3) {
-			drawString(&MAIN_D_80124C0C[row * 12], 0, y * 2);
-			drawString(&MAIN_D_80124C0C[(row + 1) * 12], 0, (row + 1) * 12);
+			drawString(&STAT_LABELS[row * 12], 0, y * 2);
+			drawString(&STAT_LABELS[(row + 1) * 12], 0, (row + 1) * 12);
 		}
 		if (i == 3) {
 			drawString(MAIN_D_80134BC0, 0, 84);

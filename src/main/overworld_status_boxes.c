@@ -29,8 +29,8 @@ extern GsF_LIGHT LIGHT_DATA[3];
 void startAnimation(Entity *entity, int32_t animId);
 void tickAnimation(Entity *entity);
 extern char *MAIN_D_801247B8[];
-extern char MAIN_D_80124C24[];
-extern char MAIN_D_80124C30[];
+extern char STAT_LABEL_OFF[];
+extern char STAT_LABELS_DEF[];
 extern char FULLWIDTH_DIGITS[];
 extern RECT MAIN_D_801342E0;
 extern int8_t MENU_SUB_STATE;
@@ -351,8 +351,8 @@ int32_t drawDigimonStatsStrings(void)
 	case 0:
 		clearTextSubArea(&rect);
 		drawString(FULLWIDTH_DIGITS, 0, 0xf0);
-		drawString(MAIN_D_80124C24, 0, 0x24);
-		drawString(MAIN_D_80124C30, 0x24, 0x24);
+		drawString(STAT_LABEL_OFF, 0, 0x24);
+		drawString(STAT_LABELS_DEF, 0x24, 0x24);
 		MENU_SUB_STATE = 1;
 		break;
 	case 1:

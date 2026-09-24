@@ -53,7 +53,7 @@ extern char VS_D_80070B1C[];
 extern int16_t MAIN_D_8013527C[2];
 extern char MAIN_D_80134500[5];
 extern char MAIN_D_80134508[5];
-extern char MAIN_D_80124C24[];
+extern char STAT_LABEL_OFF[];
 extern char FULLWIDTH_DIGITS[];
 extern int16_t MAIN_D_80134F24;
 extern int16_t MAIN_D_80134F26;
@@ -523,7 +523,7 @@ void VS__drawStatLabelText(void)
 	drawString(MAIN_D_80134500, 0, 0);
 	drawString(MAIN_D_80134508, 0, 12);
 
-	for (i = 2, y = 24, text = MAIN_D_80124C24;
+	for (i = 2, y = 24, text = STAT_LABEL_OFF;
 	     i < 6;
 	     ++i, text += 12, y += 12) {
 		drawString(text, 0, y);

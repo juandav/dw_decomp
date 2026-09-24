@@ -88,7 +88,7 @@ extern uint8_t MAIN_D_80135167;
 extern Entity *MAIN_D_801350E8;
 extern uint8_t CURRENT_SCREEN;
 extern uint8_t MAIN_D_8013514C;
-extern char MAIN_D_80124C24[];
+extern char STAT_LABEL_OFF[];
 extern char FULLWIDTH_DIGITS[];
 extern int16_t MAIN_D_80135144;
 extern int32_t MAIN_D_80135114;
@@ -1357,7 +1357,7 @@ void STD_func_8005858C(void)
 	drawString(MAIN_D_80134808, 0, 0);
 	drawString(MAIN_D_80134810, 0, 12);
 
-	for (i = 2, y = 24, text = MAIN_D_80124C24; i < 6; ++i, text += 12, y += 12) {
+	for (i = 2, y = 24, text = STAT_LABEL_OFF; i < 6; ++i, text += 12, y += 12) {
 		drawString(text, 0, y);
 		DrawSync(0);
 	}
