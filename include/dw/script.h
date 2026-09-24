@@ -38,7 +38,7 @@
 #define SCRIPT_OP_GET_DATE		0x25	/* pstat: year, day, hour, minute */
 #define SCRIPT_OP_SIZED_TEXTBOX		0x26	/* id origin, u8 cols, u8 rows */
 #define SCRIPT_OP_CLOSE_TEXTBOX		0x27	/* u8 box */
-#define SCRIPT_OP_GIVE_ITEM		0x28	/* _, u8 item, u8 amount */
+#define SCRIPT_OP_GIVE_ITEM		0x28	/* _, u8 item, u8 amount; see TRIGGER_GIVE_ITEM_FAILED */
 #define SCRIPT_OP_TAKE_ITEM		0x29	/* _, u8 item, u8 amount */
 #define SCRIPT_OP_ADD_MONEY		0x2A	/* _, s32 amount */
 #define SCRIPT_OP_SUB_MONEY		0x2B	/* _, s32 amount */
@@ -212,7 +212,7 @@ extern uint16_t CURRENT_MAP_ID;
 extern int32_t SCRIPT_WARPING;
 extern jmp_buf SCRIPT_JMP_BUF;
 extern uint8_t TEXT_ADVANCE_MODE;
-extern uint8_t SCRIPT_SAVED_PSTAT_0;
+extern uint8_t SCRIPT_SAVED_TIME_SPEED;
 extern int32_t SOME_SCRIPT_SYNC_BIT;
 extern int32_t IS_SCRIPT_PAUSED;
 extern int16_t SCRIPT_TALKED_ENTITY;

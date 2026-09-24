@@ -11,6 +11,7 @@
 #include <dw/main.h>
 #include <dw/math.h>
 #include <dw/params.h>
+#include <dw/pstat.h>
 #include <dw/script.h>
 #include <dw/sound.h>
 #include <dw/sound_async.h>
@@ -255,7 +256,7 @@ int32_t handleBattleStart(int32_t id)
 	COMBAT_DATA_PTR->player.unk4 = 0;
 	count = 0;
 	MAIN_D_80134D7C[0] = isTriggerSet(1);
-	IS_PREDEFINED_BATTLE = readPStat(0xfa);
+	IS_PREDEFINED_BATTLE = readPStat(PSTAT_BATTLE_SET_ENEMIES);
 	if (IS_PREDEFINED_BATTLE == 1) {
 		for (i = 0; i < 3; i++) {
 			slots[i] = readPStat((i + 0xfb) & 0xff);

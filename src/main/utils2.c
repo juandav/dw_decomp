@@ -8,9 +8,11 @@
 #include <dw/main.h>
 #include <dw/mov.h>
 #include <dw/params.h>
+#include <dw/pstat.h>
 #include <dw/sound.h>
 #include <dw/std.h>
 #include <dw/tournament.h>
+#include <dw/trigger.h>
 #include <dw/ui.h>
 #include <dw/utils.h>
 
@@ -493,7 +495,7 @@ void startTournament(void)
 	int16_t expected;
 	int32_t trig;
 
-	id = readPStat(3);
+	id = readPStat(PSTAT_TOURNAMENT_ID);
 	t.cup = id;
 	pool = (uint8_t *)allocateArray(0x70);
 	w = pool;
@@ -503,7 +505,7 @@ void startTournament(void)
 	if (c < 0xfe) {
 		if (id != 0x16) {
 			while ((c = *p++) < 0xfe) {
-				if (isTriggerSet(c + 200) != 0) {
+				if (isTriggerSet(c + TRIGGER_DIGIMON_MET) != 0) {
 					*w++ = c;
 					count++;
 				}
@@ -566,8 +568,8 @@ void startTournament(void)
 	loadDynamicLibrary(STD_REL, &t.isComplete, 0, NULL, NULL);
 	result = STD_func_800579D8(&t.cup);
 	MAIN_thunk_func_800D92EC();
-	unsetTrigger(0x25);
-	id = readPStat(3);
+	unsetTrigger(TRIGGER_TOURNAMENT_REGISTERED);
+	id = readPStat(PSTAT_TOURNAMENT_ID);
 	if (id != 5) {
 		expected = 3;
 	} else {
@@ -576,12 +578,12 @@ void startTournament(void)
 	if (result == expected) {
 		TOURNAMENT_TITLES++;
 		TOURNAMENT_TITLES = enforceStatsLimits(0x11, TOURNAMENT_TITLES);
-		setTrigger(id + 15);
+		setTrigger(id + TRIGGER_CUP_WON);
 	} else {
 		TOURNAMENT_LOSSES++;
 	}
 	TOURNAMENT_WINS += result;
 	TOURNAMENT_WINS = enforceStatsLimits(0x12, TOURNAMENT_WINS);
 	TOURNAMENT_LOSSES = enforceStatsLimits(0x13, TOURNAMENT_LOSSES);
-	writePStat(0xff, result);
+	writePStat(PSTAT_RESULT, result);
 }

@@ -18,7 +18,9 @@
 #include <dw/fade.h>
 #include <dw/model.h>
 #include <dw/params.h>
+#include <dw/pstat.h>
 #include <dw/tamer.h>
+#include <dw/trigger.h>
 #include <dw/ui.h>
 #include <dw/types.h>
 #include <dw/world_object.h>
@@ -3397,7 +3399,7 @@ int32_t main(void)
 			initializeMusic();
 			loadStackedTIMFile(MAIN_D_8012CE8C);
 			initializeTamer(0, 0, 0, 0, 0, 0, 0);
-			if (readPStat(0xfe) == 0) {
+			if (readPStat(PSTAT_BUILTIN_ARG) == 0) {
 				partnerId = 0x3;
 			} else {
 				partnerId = 0x11;
@@ -3602,8 +3604,8 @@ void newGameScene(void)
 	initializeNamingBuffer(0);
 	resetTextboxes();
 	fadeFromBlack(0x14);
-	writePStat(0xfe, 0);
-	writePStat(0xf3, 0xff);
+	writePStat(PSTAT_BUILTIN_ARG, 0);
+	writePStat(PSTAT_TEXT_ARG_1, 0xff);
 	loadNewgameScene();
 
 	do {
@@ -3615,7 +3617,7 @@ void newGameScene(void)
 		processInput();
 		tickTextboxes(1);
 
-		if (readPStat(0xf3) == 0) {
+		if (readPStat(PSTAT_TEXT_ARG_1) == 0) {
 			done = newGameStateMachine();
 		}
 
@@ -3808,7 +3810,7 @@ void recalculatePPandArena(void)
 
 	pp = 0;
 	for (i = 3; i < 0x3b; i++) {
-		if ((DIGIMON_DATA[i].level >= 3) && (isTriggerSet((uint16_t)(0xc8 + i)) != 0)) {
+		if ((DIGIMON_DATA[i].level >= 3) && (isTriggerSet((uint16_t)(TRIGGER_DIGIMON_MET + i)) != 0)) {
 			if ((i == 0xb) || (i == 0x27) || (i == 0x35)) {
 				pp++;
 			} else {
@@ -3816,11 +3818,11 @@ void recalculatePPandArena(void)
 			}
 		}
 	}
-	writePStat(1, pp);
-	pp = readPStat(3);
+	writePStat(PSTAT_PROSPERITY_POINTS, pp);
+	pp = readPStat(PSTAT_TOURNAMENT_ID);
 	if (pp >= 0x17) {
 		if (isTriggerSet(0x25) != 0) {
-			unsetTrigger(0x25);
+			unsetTrigger(TRIGGER_TOURNAMENT_REGISTERED);
 		}
 		if (isTriggerSet(0x26) != 0) {
 			unsetTrigger(0x26);
@@ -4487,7 +4489,7 @@ void tickNewGameJijimon(int32_t instanceId)
 		setEntityRotation(2, 0, 0x71, 0);
 		setupEntityMatrix(2);
 		startAnimation(ENTITY_TABLE[2], 0);
-		writePStat(0xf3, 0);
+		writePStat(PSTAT_TEXT_ARG_1, 0);
 	}
 	tickAnimation(ENTITY_TABLE[2]);
 }

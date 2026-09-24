@@ -28,7 +28,7 @@ static void *script_menu_text_order[] = {
 
 void tickLostItemShop(void)
 {
-	uint8_t owner = readPStat(PSTAT_254);
+	uint8_t owner = readPStat(PSTAT_BUILTIN_ARG);
 
 	switch (SELECTION_MENU_STATE) {
 	case 0: {
@@ -125,7 +125,7 @@ void rollCardPack(void)
 {
 	switch (SELECTION_MENU_STATE) {
 	case 0:
-		writePStat(PSTAT_249, rollCard());
+		writePStat(PSTAT_SELECTED, rollCard());
 		showCardTextbox();
 		SELECTION_MENU_STATE = 1;
 		SCRIPT_STATE_4 = 2;
@@ -134,14 +134,14 @@ void rollCardPack(void)
 	case 1:
 		break;
 	case 2:
-		writePStat(PSTAT_249, rollCard());
+		writePStat(PSTAT_SELECTED, rollCard());
 		showCardTextbox();
 		SELECTION_MENU_STATE = 1;
 		SCRIPT_STATE_4 = 3;
 		SCRIPT_STATE_3 = 1;
 		break;
 	case 3:
-		writePStat(PSTAT_249, rollCard());
+		writePStat(PSTAT_SELECTED, rollCard());
 		showCardTextbox();
 		SELECTION_MENU_STATE = 1;
 		SCRIPT_STATE_4 = 4;
@@ -155,7 +155,7 @@ void rollCardPack(void)
 
 void tickCardShop(void)
 {
-	uint8_t owner = readPStat(PSTAT_254);
+	uint8_t owner = readPStat(PSTAT_BUILTIN_ARG);
 
 	switch (SELECTION_MENU_STATE) {
 	case 0:
@@ -197,7 +197,7 @@ void tickCardShop(void)
 
 void tickCardSellShop(void)
 {
-	uint8_t owner = readPStat(PSTAT_254);
+	uint8_t owner = readPStat(PSTAT_BUILTIN_ARG);
 
 	switch (SELECTION_MENU_STATE) {
 	case 0:
@@ -233,7 +233,7 @@ void tickCardSellShop(void)
 void tickMeritShop(void)
 {
 	int32_t selection = 0;
-	uint8_t owner = readPStat(PSTAT_254);
+	uint8_t owner = readPStat(PSTAT_BUILTIN_ARG);
 
 	switch (SELECTION_MENU_STATE) {
 	case 0:
@@ -343,7 +343,7 @@ void tickMeritShop(void)
 void tickItemKeeper(void)
 {
 	int32_t selection = 0;
-	uint8_t owner = readPStat(PSTAT_254);
+	uint8_t owner = readPStat(PSTAT_BUILTIN_ARG);
 
 	switch (SELECTION_MENU_STATE) {
 	case 0:
@@ -401,7 +401,7 @@ void tickItemKeeper(void)
 
 void openJukebox(void)
 {
-	uint8_t owner = readPStat(PSTAT_254);
+	uint8_t owner = readPStat(PSTAT_BUILTIN_ARG);
 
 	switch (SELECTION_MENU_STATE) {
 	case 0:
@@ -445,7 +445,7 @@ void openJukebox(void)
 void tickTransport(void)
 {
 	int32_t selection = 0;
-	uint8_t owner = readPStat(PSTAT_254);
+	uint8_t owner = readPStat(PSTAT_BUILTIN_ARG);
 
 	switch (SELECTION_MENU_STATE) {
 	case 0:
@@ -485,8 +485,8 @@ void tickTransport(void)
 		triggerBoxCloseFlag(1);
 
 		idx = MAIN_D_80134F68->buf[(MAIN_D_80134F68->topRow + MAIN_D_80134F68->cursor) * 2] & 0x7f;
-		writePStat(PSTAT_247, TRANSPORT_DESTINATIONS[idx].mapId);
-		writePStat(PSTAT_248, TRANSPORT_DESTINATIONS[idx].unk_0x1);
+		writePStat(PSTAT_TRANSPORT_MAP, TRANSPORT_DESTINATIONS[idx].mapId);
+		writePStat(PSTAT_TRANSPORT_EXIT, TRANSPORT_DESTINATIONS[idx].unk_0x1);
 		CURRENT_SCRIPT_PTR = (int32_t)getScript(0);
 		SCRIPT_PC = getScriptSection((uint8_t *)CURRENT_SCRIPT_PTR, 0x4e3);
 		MONEY -= SCRIPT_PRICE;
@@ -509,14 +509,14 @@ void tickTransport(void)
 void tickCollectorTrade(void)
 {
 	int32_t selection = 0;
-	uint8_t owner = readPStat(PSTAT_254);
+	uint8_t owner = readPStat(PSTAT_BUILTIN_ARG);
 
 	switch (SELECTION_MENU_STATE) {
 	case 0:
 		initializeItemMenuBox(&MAIN_D_80134F68, 6, 3, 0, 0, 0, 0);
 		initializeItemMenuBox(&MAIN_D_80134F6C, 6, 3, 0, 0, 0, 0);
 		fillTradeLists();
-		writePStat(PSTAT_249, 255);
+		writePStat(PSTAT_SELECTED, 255);
 		/* "I'm a collector. If you got / a thing I want, I'll trade." */
 		showMapHeadTextbox(8, owner, 0, MAPHEAD_TEXT_SERVICES);
 		SELECTION_MENU_STATE = 1;
@@ -556,7 +556,7 @@ void tickCollectorTrade(void)
 		                                           2],
 		                      1);
 		if (giveResult != 0) {
-			uint8_t itemId = readPStat(PSTAT_249);
+			uint8_t itemId = readPStat(PSTAT_SELECTED);
 			removeItem(itemId, 1);
 			markTradeDone();
 			/* "Thanks!" */
@@ -644,11 +644,11 @@ int32_t newGameStateMachine(void)
 		showNewgameSelection(0x15, 8);
 		return 0;
 	case 8:
-		writePStat(PSTAT_254, 0);
+		writePStat(PSTAT_BUILTIN_ARG, 0);
 		SELECTION_MENU_STATE = 0x11;
 		break;
 	case 9:
-		writePStat(PSTAT_254, 1);
+		writePStat(PSTAT_BUILTIN_ARG, 1);
 		SELECTION_MENU_STATE = 0x11;
 		break;
 	case 10:

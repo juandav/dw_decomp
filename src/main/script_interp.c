@@ -457,12 +457,12 @@ int32_t tickScript(void)
 			scriptCheckTournamentMedal();
 			break;
 		case 23:
-			if (tickOpenChestTray(readPStat(0xfe))) {
+			if (tickOpenChestTray(readPStat(PSTAT_BUILTIN_ARG))) {
 				ACTIVE_INSTRUCTION = 0;
 			}
 			break;
 		case 24:
-			if (tickCloseChestTray(readPStat(0xfe))) {
+			if (tickCloseChestTray(readPStat(PSTAT_BUILTIN_ARG))) {
 				ACTIVE_INSTRUCTION = 0;
 			}
 			break;
@@ -578,7 +578,7 @@ setjmp_retry:
 
 		if (ret == 3) {
 			closeAllTextboxes();
-			writePStat(0, SCRIPT_SAVED_PSTAT_0);
+			writePStat(0, SCRIPT_SAVED_TIME_SPEED);
 			SCRIPT_MAP_CHANGE = 0x4b;
 			SCRIPT_MAP_CHANGE_STATE = 0;
 			return IS_SCRIPT_PAUSED;
@@ -587,7 +587,7 @@ setjmp_retry:
 
 	if (IS_SCRIPT_PAUSED) {
 		closeAllTextboxes();
-		writePStat(0, SCRIPT_SAVED_PSTAT_0);
+		writePStat(0, SCRIPT_SAVED_TIME_SPEED);
 		if (SCRIPT_HAS_CONTROL == 1) {
 			setMovementEnabled(-1, 0);
 			setCameraFollowPlayer();
@@ -1595,7 +1595,7 @@ void scriptInstruction64to7E(int32_t op)
 			SCRIPT_STATE_3 = 0;
 			longjmp(SCRIPT_JMP_BUF, 2);
 		case 0x07:
-			byteArg1 = readPStat(0xfe);
+			byteArg1 = readPStat(PSTAT_BUILTIN_ARG);
 			if ((CURRENT_MAP_ID == 0x6b) ||
 			    (CURRENT_MAP_ID == 0x6c) ||
 			    (CURRENT_MAP_ID == 0xa5) ||
@@ -1644,13 +1644,13 @@ void scriptInstruction64to7E(int32_t op)
 			longjmp(SCRIPT_JMP_BUF, 2);
 			break;
 		case 0x0c:
-			byteArg1 = readPStat(0xfe);
+			byteArg1 = readPStat(PSTAT_BUILTIN_ARG);
 			if (byteArg1 != 0xff) {
 				removeItem(byteArg1, 1);
 			}
 			break;
 		case 0x0d:
-			byteArg1 = readPStat(0xfe);
+			byteArg1 = readPStat(PSTAT_BUILTIN_ARG);
 			if (byteArg1 != 0xff) {
 				removeItem(byteArg1, 0x63);
 			}
@@ -1662,7 +1662,7 @@ void scriptInstruction64to7E(int32_t op)
 			triggerBoxCloseFlag(2);
 			longjmp(SCRIPT_JMP_BUF, 2);
 		case 0x13:
-			byteArg1 = readPStat(0xfe);
+			byteArg1 = readPStat(PSTAT_BUILTIN_ARG);
 			setDirtCartModel(byteArg1);
 			longjmp(SCRIPT_JMP_BUF, 2);
 		case 0x14:
@@ -1683,7 +1683,7 @@ void scriptInstruction64to7E(int32_t op)
 			SCRIPT_STATE_3 = 0;
 			longjmp(SCRIPT_JMP_BUF, 2);
 		case 0x19:
-			SCRIPT_SAVED_PSTAT_0 = readPStat(0xfe);
+			SCRIPT_SAVED_TIME_SPEED = readPStat(PSTAT_BUILTIN_ARG);
 			break;
 		case 0x1a:
 			loadDirtCartModel();
@@ -1698,17 +1698,17 @@ void scriptInstruction64to7E(int32_t op)
 			SCRIPT_PRICE = 0;
 			break;
 		case 0x1f: {
-			int32_t hi = readPStat(0xf3) << 8;
-			int32_t lo = readPStat(0xf4);
+			int32_t hi = readPStat(PSTAT_TEXT_ARG_1) << 8;
+			int32_t lo = readPStat(PSTAT_TEXT_ARG_2);
 			posX = lo + hi;
 			SCRIPT_PRICE += posX;
 		} break;
 		case 0x38:
-			writePStat(0xf3, (SCRIPT_PRICE / 256) & 0xff);
-			writePStat(0xf4, SCRIPT_PRICE & 0xff);
+			writePStat(PSTAT_TEXT_ARG_1, (SCRIPT_PRICE / 256) & 0xff);
+			writePStat(PSTAT_TEXT_ARG_2, SCRIPT_PRICE & 0xff);
 			break;
 		case 0x20:
-			initializeNamingBuffer(readPStat(0xfe));
+			initializeNamingBuffer(readPStat(PSTAT_BUILTIN_ARG));
 			longjmp(SCRIPT_JMP_BUF, 2);
 		case 0x21:
 			setTrigger(0x25);
@@ -1778,29 +1778,29 @@ void scriptInstruction64to7E(int32_t op)
 			longjmp(SCRIPT_JMP_BUF, 2);
 			break;
 		case 0x37:
-			setLoopCountToOne(readPStat(0xfe));
+			setLoopCountToOne(readPStat(PSTAT_BUILTIN_ARG));
 			longjmp(SCRIPT_JMP_BUF, 2);
 			break;
 		case 0x29:
 			spawnGearbox();
 			break;
 		case 0x2a: {
-			int8_t pstat = readPStat(0xfe);
+			int8_t pstat = readPStat(PSTAT_BUILTIN_ARG);
 			somethingToyTown(pstat);
 		} break;
 		case 0x2b:
 			spawnToyTownBoxes();
 			break;
 		case 0x2c: {
-			int8_t value = readPStat(0xfe);
+			int8_t value = readPStat(PSTAT_BUILTIN_ARG);
 			openToyTownBox(value);
 		} break;
 		case 0x2d: {
-			int16_t value = readPStat(0xfe);
+			int16_t value = readPStat(PSTAT_BUILTIN_ARG);
 			fadeToWhite(value);
 		} break;
 		case 0x2e: {
-			int16_t value = readPStat(0xfe);
+			int16_t value = readPStat(PSTAT_BUILTIN_ARG);
 			fadeFromWhite(value);
 		} break;
 		case 0x31:
@@ -1822,9 +1822,9 @@ void scriptInstruction64to7E(int32_t op)
 		if (MAIN_D_80134FC8 < 0x270f) {
 			MAIN_D_80134FC8++;
 		}
-		byteArg1 = readPStat(0xfa);
+		byteArg1 = readPStat(PSTAT_BATTLE_SET_ENEMIES);
 		if (byteArg1 != 0) {
-			for (byteArg1 = 0xfb; byteArg1 < 0xfe; byteArg1++) {
+			for (byteArg1 = PSTAT_BATTLE_ENEMY_1; byteArg1 < PSTAT_BATTLE_ENEMY_3 + 1; byteArg1++) {
 				byteArg2 = readPStat(byteArg1);
 				if (byteArg2 != 0xff) {
 					byteArg2 =
@@ -1838,7 +1838,7 @@ void scriptInstruction64to7E(int32_t op)
 			int16_t outcome;
 
 			outcome = startBattle(SCRIPT_TALKED_ENTITY);
-			writePStat(0xff, outcome);
+			writePStat(PSTAT_RESULT, outcome);
 			if (outcome == -1) {
 				handleItemLoss();
 				PARTNER_ENTITY.lives -= 1;
@@ -2076,7 +2076,7 @@ void scriptInstruction64to7E(int32_t op)
 		entry.smth[0] = 4;
 		entry.smth[1] = byteArg1;
 		pushScriptStack(&entry);
-		writePStat(0, SCRIPT_SAVED_PSTAT_0);
+		writePStat(0, SCRIPT_SAVED_TIME_SPEED);
 		break;
 	case SCRIPT_OP_SET_IMPASSABLE:
 		pollNextScriptUByte(&byteArg1);
@@ -2173,7 +2173,7 @@ void callScriptSection(int32_t scriptId, int32_t section, int32_t param)
 	SCRIPT_SECTION = section;
 	TEXT_ADVANCE_MODE = 0;
 	DIALOGUE_SPEAKER = SPEAKER_PLAYER;
-	SCRIPT_SAVED_PSTAT_0 = readPStat(0);
+	SCRIPT_SAVED_TIME_SPEED = readPStat(0);
 	SOME_SCRIPT_SYNC_BIT = 1;
 	ACTIVE_INSTRUCTION = 0;
 	SCRIPT_MAP_CHANGE = 0;
@@ -2431,7 +2431,7 @@ void showCardTextbox(void)
 	int32_t cardId;
 	uint8_t amount;
 
-	cardId = readPStat(PSTAT_249) & 0xff;
+	cardId = readPStat(PSTAT_SELECTED) & 0xff;
 	amount = getCardAmount(cardId);
 	if (amount == 0) {
 		if (CARD_DATA[cardId].spriteId == 0) {
@@ -2452,7 +2452,7 @@ void showCardTextbox(void)
 		setCardAmount(cardId, amount);
 	}
 
-	writePStat(PSTAT_249, CARD_DATA[cardId].digimonId);
+	writePStat(PSTAT_SELECTED, CARD_DATA[cardId].digimonId);
 	showMapHeadTextbox(line, SPEAKER_PLAYER, 0, MAPHEAD_TEXT_CARD_SHOP);
 }
 
@@ -2747,7 +2747,7 @@ void openCardMenuBox(void)
 	if (ITEM_MENU_MODE == ITEM_MENU_SELL_CARD) {
 		boxId = 0xfd;
 	} else {
-		boxId = readPStat(PSTAT_254) & 0xff;
+		boxId = readPStat(PSTAT_BUILTIN_ARG) & 0xff;
 	}
 
 	setupBoxOrigin(boxId, &origin);
@@ -2897,7 +2897,7 @@ void openItemKeeperBoxes(void)
 	RECT origin;
 	int32_t boxId;
 
-	boxId = readPStat(PSTAT_254);
+	boxId = readPStat(PSTAT_BUILTIN_ARG);
 	setupBoxOrigin(boxId, &origin);
 	setRECT(&rect, -152, -98, 148, 127);
 	createTextbox(1, 0xe1, &rect, &origin, tickItemKeeperMenu,
@@ -2946,14 +2946,14 @@ void fillJukeboxList(void)
 		if (b == ACTIVE_BGM_FONT) {
 			b = JUKEBOX_TRACKS[track * 2 + 1];
 			if (b == MAIN_D_80135007) {
-				writePStat(PSTAT_249, i);
+				writePStat(PSTAT_SELECTED, i);
 				JUKEBOX_PLAYING = i;
 				return;
 			}
 		}
 	}
 
-	writePStat(PSTAT_249, 0xff);
+	writePStat(PSTAT_SELECTED, 0xff);
 	JUKEBOX_PLAYING = 0xff;
 	stopBGM();
 }
@@ -2971,7 +2971,7 @@ void openJukeboxMenuBox(void)
 	int32_t count;
 	int32_t row;
 
-	setupBoxOrigin(readPStat(0xfe), &origin);
+	setupBoxOrigin(readPStat(PSTAT_BUILTIN_ARG), &origin);
 	setRECT(&rect, -0x47, -0x62, 0xde, 0x81);
 	createTextbox(1, 0xf1, &rect, &origin, tickJukeboxMenu, renderJukeboxMenuBox);
 	registerTextbox(1, 9, 6, 1, 0);
@@ -2980,7 +2980,7 @@ void openJukeboxMenuBox(void)
 		MAIN_D_80134F68->isOpen = 1;
 		MAIN_D_80134F68->boxId = 1;
 
-		item = readPStat(0xf9);
+		item = readPStat(PSTAT_SELECTED);
 		box = MAIN_D_80134F68;
 		menu = box;
 		count = menu->itemCount;
@@ -3042,7 +3042,7 @@ void openTransportMenuBox(void)
 	RECT origin;
 	int32_t boxId;
 
-	boxId = readPStat(PSTAT_254);
+	boxId = readPStat(PSTAT_BUILTIN_ARG);
 	setupBoxOrigin(boxId, &origin);
 	setRECT(&rect, -71, -100, 222, 129);
 	createTextbox(1, 0xf1, &rect, &origin, tickTransportMenu,
@@ -3066,7 +3066,7 @@ void fillTradeLists(void)
 	uint8_t idx;
 	int32_t item;
 
-	ITEM_MENU_MODE = readPStat(PSTAT_249) * 3;
+	ITEM_MENU_MODE = readPStat(PSTAT_SELECTED) * 3;
 	idx = ITEM_MENU_MODE;
 	buf = MAIN_D_80134F68->buf;
 	MAIN_D_80134F68->itemCount = 3;
@@ -3096,7 +3096,7 @@ void openTradeMenuBox(void)
 	RECT origin;
 	int32_t boxId;
 
-	boxId = readPStat(PSTAT_254);
+	boxId = readPStat(PSTAT_BUILTIN_ARG);
 	setupBoxOrigin(boxId, &origin);
 	setRECT(&rect, -88, -80, 223, 83);
 	createTextbox(1, 0xe1, &rect, &origin, tickTradeMenu,
@@ -3112,15 +3112,15 @@ void markTradeDone(void)
 	ItemMenuBox *box = MAIN_D_80134F68;
 	int32_t trigger;
 
-	trigger = box->topRow + box->cursor + ITEM_MENU_MODE + 5;
+	trigger = box->topRow + box->cursor + ITEM_MENU_MODE + TRIGGER_TRADE_DONE;
 	setTrigger(trigger);
-	for (trigger = 5; trigger < 0xe; trigger++) {
+	for (trigger = TRIGGER_TRADE_DONE; trigger < TRIGGER_ALL_TRADES_DONE; trigger++) {
 		if (isTriggerSet(trigger) == 0) {
 			return;
 		}
 	}
 
-	setTrigger(0xe);
+	setTrigger(TRIGGER_ALL_TRADES_DONE);
 }
 
 void tickCardMenu(void)
@@ -3226,7 +3226,7 @@ int32_t pickMeritCard(void)
 			idx = SELECTED_ITEM * 4;
 			SCRIPT_PRICE = *(int16_t *)((uint8_t *)&CARD_DATA[0].unk2 + idx);
 			kind = ((uint8_t *)&CARD_DATA[0].spriteId)[SELECTED_ITEM * 4] + 7;
-			showMapHeadTextbox(kind, readPStat(0xfe), 0, MAPHEAD_TEXT_MERIT_SHOP);
+			showMapHeadTextbox(kind, readPStat(PSTAT_BUILTIN_ARG), 0, MAPHEAD_TEXT_MERIT_SHOP);
 			SELECTION_MENU_STATE = 1;
 			SCRIPT_STATE_4 = 7;
 			SCRIPT_STATE_3 = 1;
@@ -3771,7 +3771,7 @@ void tickJukeboxMenu(void)
 		return;
 	}
 
-	cur = readPStat(PSTAT_249) & 0xff;
+	cur = readPStat(PSTAT_SELECTED) & 0xff;
 	if (cur != JUKEBOX_PLAYING) {
 		JUKEBOX_PLAYING = cur;
 		stopBGM();
@@ -3781,12 +3781,12 @@ void tickJukeboxMenu(void)
 	}
 
 	if (isKeyDown(PADRdown)) {
-		writePStat(PSTAT_249,
+		writePStat(PSTAT_SELECTED,
 		           MAIN_D_80134F68->buf[(MAIN_D_80134F68->topRow +
 		                                 MAIN_D_80134F68->cursor) *
 		                                2]);
 		/* "<bgm>, right?" */
-		showMapHeadTextbox(2, readPStat(PSTAT_254), 0, MAPHEAD_TEXT_SERVICES);
+		showMapHeadTextbox(2, readPStat(PSTAT_BUILTIN_ARG), 0, MAPHEAD_TEXT_SERVICES);
 		SELECTION_MENU_STATE = 1;
 		SCRIPT_STATE_3 = 3;
 		layoutItemMenu(MAIN_D_80134F68, 9, 2);
@@ -3856,7 +3856,7 @@ void tickTransportMenu(void)
 		                            2];
 		if ((item & 0x80) != 0) {
 			/* "Are you sure? Once you go, / I can't take you back." */
-			showMapHeadTextbox(6, readPStat(PSTAT_254), 0, MAPHEAD_TEXT_SERVICES);
+			showMapHeadTextbox(6, readPStat(PSTAT_BUILTIN_ARG), 0, MAPHEAD_TEXT_SERVICES);
 			SCRIPT_PRICE = TRANSPORT_DESTINATIONS[item & 0x7f].cost;
 			SELECTION_MENU_STATE = 1;
 			SCRIPT_STATE_4 = 4;
@@ -3920,7 +3920,7 @@ void tickTradeMenu(void)
 		return;
 	}
 
-	if (readPStat(PSTAT_249) != 0xff) {
+	if (readPStat(PSTAT_SELECTED) != 0xff) {
 		return;
 	}
 
@@ -3929,9 +3929,9 @@ void tickTradeMenu(void)
 		                             MAIN_D_80134F68->cursor) *
 		                            2];
 		if ((item & 0x80) != 0) {
-			writePStat(PSTAT_249, (item & 0x7f));
+			writePStat(PSTAT_SELECTED, (item & 0x7f));
 			/* "You'll really give me <item>?" */
-			showMapHeadTextbox(0xb, readPStat(PSTAT_254), 0, MAPHEAD_TEXT_SERVICES);
+			showMapHeadTextbox(0xb, readPStat(PSTAT_BUILTIN_ARG), 0, MAPHEAD_TEXT_SERVICES);
 			SELECTION_MENU_STATE = 1;
 			SCRIPT_STATE_4 = 4;
 			SCRIPT_STATE_3 = 1;

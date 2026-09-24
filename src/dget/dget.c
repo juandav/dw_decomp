@@ -145,7 +145,7 @@ void buildScheduleLabels(void)
 	RECT rect1;
 	RECT rect2;
 
-	stat = readPStat(PSTAT_254);
+	stat = readPStat(PSTAT_BUILTIN_ARG);
 	setupBoxOrigin(stat, &rect2);
 
 	setRECT(&rect1, -54, -98, 108, 20);
@@ -190,7 +190,7 @@ void buildScheduleEntries(void)
 	TOURNAMENT_SELECTED_ROW = 0;
 	TOURNAMENT_SELECTED_COLUMN = 0;
 
-	stat = readPStat(PSTAT_254);
+	stat = readPStat(PSTAT_BUILTIN_ARG);
 	setupBoxOrigin(stat, &rect2);
 
 	setRECT(&rect1, -0x82, -0x3e, 0x104, 0x7c);
@@ -295,7 +295,7 @@ void initTournamentInfo(int32_t arg)
 	MAIN_D_801353B0 = arg;
 	if (arg != 0) {
 		boxId = 0xe1;
-		stat = readPStat(PSTAT_254);
+		stat = readPStat(PSTAT_BUILTIN_ARG);
 		setupBoxOrigin(stat, &rect2);
 		yOff = -0x4f;
 		slot = 8;
@@ -376,13 +376,13 @@ int32_t isTournamentEnabled(uint8_t tournament)
 	trigger = *triggerPtr;
 	if (trigger < 0xfeu) {
 		while ((trigger = *triggerPtr++) < 0xfe) {
-			triggered = isTriggerSet(trigger + TRIGGER_OGRE_FORTRESS_OPENED);
+			triggered = isTriggerSet(trigger + TRIGGER_DIGIMON_MET);
 			if (triggered != 0) {
 				++triggerCount;
 			}
 		}
 	} else {
-		for (trigIdx = TRIGGER_OGRE_FORTRESS_OPENED;
+		for (trigIdx = TRIGGER_DIGIMON_MET;
 		     trigIdx < TRIGGER_WARUSEADRAMON_BEATEN;
 		     ++trigIdx) {
 			triggered = isTriggerSet(trigIdx);
@@ -406,7 +406,7 @@ int32_t isTournamentEnabled(uint8_t tournament)
 		triggerPtr = (uint8_t *)getScriptSection(scriptEntry, 0xb) + 2;
 		triggerCount = 0;
 		while ((trigger = *triggerPtr++) < 0xfe) {
-			triggered = isTriggerSet(trigger + TRIGGER_OGRE_FORTRESS_OPENED);
+			triggered = isTriggerSet(trigger + TRIGGER_DIGIMON_MET);
 			if (triggered != 0) {
 				++triggerCount;
 			}
@@ -419,7 +419,7 @@ int32_t isTournamentEnabled(uint8_t tournament)
 		triggerPtr = getCupDataJumpTableEntry(scriptEntry, 4) + 2;
 		triggerCount = 0;
 		while ((trigger = *triggerPtr++) <= reqType) {
-			triggered = isTriggerSet(trigger + TRIGGER_OGRE_FORTRESS_OPENED);
+			triggered = isTriggerSet(trigger + TRIGGER_DIGIMON_MET);
 			if (triggered != 0) {
 				++triggerCount;
 			}
@@ -683,12 +683,12 @@ void initTournamentSchedule(void)
 			initTournamentInfo(1);
 			triggered = tournamentCheckFair(value);
 			if (triggered != 0) {
-				stat = readPStat(PSTAT_254);
+				stat = readPStat(PSTAT_BUILTIN_ARG);
 				/* "<partner>is going to / enter - <cup>-? / Are you sure?" */
 				showMapHeadTextbox(3, stat, 0, MAPHEAD_TEXT_SYSTEM);
 				setTrigger(TRIGGER_TOURNAMENT_OVERLEVELED);
 			} else {
-				stat = readPStat(PSTAT_254);
+				stat = readPStat(PSTAT_BUILTIN_ARG);
 				/* "Do you want to enter? / - <cup>- ?" */
 				showMapHeadTextbox(2, stat, 0, MAPHEAD_TEXT_SYSTEM);
 				unsetTrigger(TRIGGER_TOURNAMENT_OVERLEVELED);

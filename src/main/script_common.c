@@ -9,11 +9,13 @@
 #include <dw/map.h>
 #include <dw/math.h>
 #include <dw/params.h>
+#include <dw/pstat.h>
 #include <dw/script.h>
 #include <dw/sjis.h>
 #include <dw/sound.h>
 #include <dw/tamer.h>
 #include <dw/text.h>
+#include <dw/trigger.h>
 #include <dw/ui.h>
 #include <dw/utils.h>
 
@@ -1005,7 +1007,7 @@ int32_t shopFillBuyItemList()
 	}
 
 	for (itemId = 0; itemId < 128; itemId++) {
-		if (!isTriggerSet(0x180 + itemId)) {
+		if (!isTriggerSet(TRIGGER_ITEM_IN_SHOPS + itemId)) {
 			continue;
 		}
 
@@ -1140,7 +1142,7 @@ void tickItemMenu(void)
 			SELECTION_MENU_STATE = 0xa;
 		} else if (ITEM_MENU_MODE == ITEM_MENU_PICK_ITEM) {
 			if (isTriggerSet(3) != 0) {
-				writePStat(0xfe, 0xff);
+				writePStat(PSTAT_BUILTIN_ARG, 0xff);
 				unsetTrigger(3);
 				SELECTION_MENU_STATE = 4;
 			}
@@ -1375,7 +1377,7 @@ void tickItemConfirmBox(void)
 				SELECTION_MENU_STATE = 4;
 				MAIN_func_800FDFB4();
 			} else {
-				writePStat(0xfe, SELECTED_ITEM);
+				writePStat(PSTAT_BUILTIN_ARG, SELECTED_ITEM);
 				unsetTrigger(3);
 				SELECTION_MENU_STATE = 4;
 				playSound(0, 3);
@@ -1441,7 +1443,7 @@ uint8_t *getShopText(int32_t idx)
 	int32_t npcType;
 
 	shopkeeperIds = SHOPKEEPER_DIGIMON;
-	pstat = readPStat(0xfe) & 0xff;
+	pstat = readPStat(PSTAT_BUILTIN_ARG) & 0xff;
 
 	if (pstat == 0xff) {
 		section = MAPHEAD_TEXT_COELAMON_SHOP;
@@ -1783,7 +1785,7 @@ void tickSellItemBox(void)
 				}
 
 				removeItem(SELECTED_ITEM, MAIN_D_80134F81);
-				owner = readPStat(0xfe);
+				owner = readPStat(PSTAT_BUILTIN_ARG);
 			} else {
 				unitPrice = SELECTED_ITEM_PRICE;
 				/* Babies get 10% off. */
@@ -1818,7 +1820,7 @@ void tickSellItemBox(void)
 			owner = getCardAmount(SELECTED_ITEM);
 			owner = (uint32_t)owner - MAIN_D_80134F81;
 			setCardAmount(SELECTED_ITEM, owner);
-			owner = readPStat(0xfe);
+			owner = readPStat(PSTAT_BUILTIN_ARG);
 			SELECTION_MENU_STATE = 4;
 		}
 
@@ -1894,7 +1896,7 @@ void tickItemShop(void)
 	int32_t trig;
 	int32_t found;
 
-	npcId = readPStat(0xfe) & 0xff;
+	npcId = readPStat(PSTAT_BUILTIN_ARG) & 0xff;
 
 	switch (SELECTION_MENU_STATE) {
 	case 0:
@@ -1906,7 +1908,7 @@ void tickItemShop(void)
 		MAIN_D_80134F70 = 0;
 
 		found = 0;
-		for (i = 0, trig = 0x180; i < 0x80; i++, trig++) {
+		for (i = 0, trig = TRIGGER_ITEM_IN_SHOPS; i < 0x80; i++, trig++) {
 			if (isTriggerSet(trig)) {
 				found = 1;
 				break;
@@ -2062,7 +2064,7 @@ void openItemMenuBox(void)
 	if (ITEM_MENU_MODE == ITEM_MENU_SELL || ITEM_MENU_MODE == ITEM_MENU_PICK_ITEM) {
 		boxId = 0xfd;
 	} else {
-		boxId = readPStat(0xfe) & 0xff;
+		boxId = readPStat(PSTAT_BUILTIN_ARG) & 0xff;
 	}
 
 	setupBoxOrigin(boxId, &origin);
@@ -2090,7 +2092,7 @@ void tickPickItemMenu(void)
 			SCRIPT_STATE_3 = 0;
 		} else {
 			setTrigger(3);
-			writePStat(0xfe, 0xff);
+			writePStat(PSTAT_BUILTIN_ARG, 0xff);
 			SELECTION_MENU_STATE = 2;
 			SCRIPT_STATE_3 = 0;
 		}
@@ -2802,7 +2804,7 @@ void lostAllLives(void)
 		return;
 	}
 
-	writePStat(0xf4, count);
+	writePStat(PSTAT_TEXT_ARG_2, count);
 	SELECTION_MENU_STATE = 2;
 
 	return;
@@ -2821,7 +2823,7 @@ state2:
 	pick = random(j);
 	pick = pool[pick];
 	unlearnMove(pick);
-	writePStat(0xf3, pick);
+	writePStat(PSTAT_TEXT_ARG_1, pick);
 	freeArray((uint32_t *)pool);
 	/* "<move>was not passed on." */
 	showMapHeadTextbox(7, SPEAKER_NONE, 0, MAPHEAD_TEXT_SYSTEM);
@@ -2831,7 +2833,7 @@ state2:
 
 	return;
 state3:
-	pick = readPStat(0xf4);
+	pick = readPStat(PSTAT_TEXT_ARG_2);
 	pick -= 1;
 	if (pick == 0) {
 		closeBox(0);
@@ -2839,7 +2841,7 @@ state3:
 		return;
 	}
 
-	writePStat(0xf4, pick);
+	writePStat(PSTAT_TEXT_ARG_2, pick);
 	SELECTION_MENU_STATE = 2;
 }
 
@@ -3022,7 +3024,7 @@ void layoutBgmTrackRow(ItemMenuBox *box, uint8_t row, int32_t isLast)
 	*out++ = TEXT_COLOR;
 
 	/* The track that is playing. */
-	if (type == readPStat(0xf9)) {
+	if (type == readPStat(PSTAT_SELECTED)) {
 		*out++ = TEXT_COLOR_LIGHT_BLUE;
 	} else {
 		*out++ = TEXT_COLOR_WHITE;
@@ -3304,25 +3306,25 @@ void renderScriptDialogueBox(void)
 void setDigimonRaised(int32_t digimonId)
 {
 	if ((uint32_t)digimonId < 0x3f) {
-		setTrigger(digimonId + 0x200);
+		setTrigger(digimonId + TRIGGER_DIGIMON_RAISED);
 	}
 }
 
 int32_t hasDigimonRaised(int32_t digimonId)
 {
-	return isTriggerSet(digimonId + 0x200);
+	return isTriggerSet(digimonId + TRIGGER_DIGIMON_RAISED);
 }
 
 void unlockMedal(uint16_t medal)
 {
 	if (medal < 0x13) {
-		setTrigger(medal + 0x16c);
+		setTrigger(medal + TRIGGER_MEDAL);
 	}
 }
 
 int32_t hasMedal(uint16_t medal)
 {
-	return isTriggerSet(medal + 0x16c);
+	return isTriggerSet(medal + TRIGGER_MEDAL);
 }
 
 void createMonochromonMoodBubble(void)
@@ -3477,7 +3479,7 @@ int32_t tickDialogueChoice(void)
 	}
 
 	if (isKeyDown(PADRup)) {
-		if (isTriggerSet(0x31) == 0) {
+		if (isTriggerSet(TRIGGER_CHOICE_CANT_CANCEL) == 0) {
 			if (ACTIVE_INSTRUCTION != SCRIPT_OP_BUILTIN) {
 				advanceTextbox(0);
 				SCRIPT_PC =
