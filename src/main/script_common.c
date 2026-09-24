@@ -104,7 +104,7 @@ extern char SPEAKER_NAME_PALMON[];
 extern int32_t CURRENT_SCRIPT_PTR;
 
 void renderSelectionCursor(int32_t a0, int32_t a1, int32_t a2, int32_t a3, int32_t a4);
-int32_t MAIN_func_80106730(uint8_t op, uint32_t lhs, uint32_t rhs);
+int32_t scriptCompareSigned(uint8_t op, uint32_t lhs, uint32_t rhs);
 void renderItemSprite(int32_t itemId, int32_t x, int32_t y, int32_t depth);
 void setPosDataPolyFT4(POLY_FT4 *prim, int32_t posX, int32_t posY, int32_t width, int32_t height);
 void setUVDataPolyFT4(POLY_FT4 *prim, int32_t xPos, int32_t yPos, int32_t width, int32_t height);
@@ -200,13 +200,13 @@ static void *script_common_text_order[] = {
 	tickScriptedMovements,
 	readFileSection,
 	enforceStatsLimits,
-	MAIN_func_80102630,
-	MAIN_func_801025E8,
-	MAIN_func_80102564,
-	MAIN_func_80102514,
-	MAIN_func_801024CC,
+	scriptTestMoney,
+	scriptTestItemCount,
+	scriptTestPartnerCondition,
+	scriptTestHasMove,
+	scriptTestCardAmount,
 	getStatsPointer,
-	MAIN_func_801022FC,
+	scriptTestStat,
 	scriptCompareDate,
 	scriptIdToEntityId,
 	intToStringSJIS,
@@ -4687,7 +4687,7 @@ void scriptCompareDate(void)
 	}
 }
 
-int32_t MAIN_func_801022FC(void)
+int32_t scriptTestStat(void)
 {
 	uint16_t u;
 	int16_t s;
@@ -4708,7 +4708,7 @@ int32_t MAIN_func_801022FC(void)
 	stat2 = *getStatsPointer(b1);
 	pollNextScriptShort(&s);
 
-	return MAIN_func_80106730(b2, stat2, s);
+	return scriptCompareSigned(b2, stat2, s);
 }
 
 int16_t *getStatsPointer(int32_t stat)
@@ -4796,7 +4796,7 @@ void renderMoneyBox(void)
 	renderString(0, x + 0x10, y + 0xd, 0x3c, 0xc, 0x30, rowPx, 4, 1);
 }
 
-int32_t MAIN_func_801024CC(void)
+int32_t scriptTestCardAmount(void)
 {
 	uint16_t value;
 	uint8_t cardId;
@@ -4808,14 +4808,14 @@ int32_t MAIN_func_801024CC(void)
 	return scriptCompareValues(op, (uint8_t)getCardAmount(cardId), value);
 }
 
-int32_t MAIN_func_80102514(void)
+int32_t scriptTestHasMove(void)
 {
 	uint8_t moveId;
 	uint8_t negate;
 	int32_t res;
 
 	pollNextTwoScriptBytes(&moveId, &negate);
-	res = MAIN_func_80106D1C(moveId);
+	res = scriptHasMove(moveId);
 	if (negate == 0) {
 		return res;
 	}
@@ -4823,7 +4823,7 @@ int32_t MAIN_func_80102514(void)
 	return (res != 0) ^ 1;
 }
 
-int32_t MAIN_func_80102564(void)
+int32_t scriptTestPartnerCondition(void)
 {
 	uint8_t mask;
 	uint8_t negate;
@@ -4845,7 +4845,7 @@ int32_t MAIN_func_80102564(void)
 	}
 }
 
-int32_t MAIN_func_801025E8(void)
+int32_t scriptTestItemCount(void)
 {
 	uint16_t value;
 	uint8_t itemId;
@@ -4946,7 +4946,7 @@ int32_t enforceStatsLimits(int32_t stat, int32_t value)
 	return value;
 }
 
-int32_t MAIN_func_80102630(void)
+int32_t scriptTestMoney(void)
 {
 	int32_t value;
 	uint8_t op;

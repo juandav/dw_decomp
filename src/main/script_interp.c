@@ -160,7 +160,7 @@ void renderJukeboxMenuBox(void);
 void tickNamingBox(void);
 void renderNamingBox(void);
 void layoutNamingBox(void);
-int32_t MAIN_func_80106730(int32_t op, int32_t lhs, int32_t rhs);
+int32_t scriptCompareSigned(int32_t op, int32_t lhs, int32_t rhs);
 void updateBGM(void);
 void forceUpdateBGM(void);
 void pollNextScriptTwoUShort(uint16_t *out1, uint16_t *out2);
@@ -278,7 +278,7 @@ static void *script_interp_text_order[] = {
 	showCardTextbox,
 	rollCard,
 	fillLostItemList,
-	MAIN_func_80106D1C,
+	scriptHasMove,
 	getTriggerOffset,
 	pollNextScriptTwoUShort,
 	scriptUnloadModel,
@@ -295,7 +295,7 @@ static void *script_interp_text_order[] = {
 	getCardAmount,
 	scriptLearnMove,
 	skipOneReadInteger,
-	MAIN_func_80106730,
+	scriptCompareSigned,
 	scriptCompareValues,
 	pollNextTwoScriptBytes,
 	pollNextScriptUShort,
@@ -326,7 +326,7 @@ static void *script_interp_text_order[] = {
 	MAIN_func_80105464,
 	MAIN_func_801053EC,
 	scriptUpdateEnergyBoundaries,
-	MAIN_func_801050C0,
+	scriptConditionBlock,
 	returnFromScriptFile,
 	returnFromScriptFile,
 	setMapHeadActive,
@@ -699,7 +699,7 @@ void scriptInstruction10to27(int32_t op)
 		break;
 	case 0x19:
 		SCRIPT_PC++;
-		MAIN_func_801050C0();
+		scriptConditionBlock();
 		break;
 	case 0x1a: /* text */
 		SCRIPT_PC++;
@@ -845,7 +845,18 @@ void scriptStartAnimation(uint8_t actorId, int32_t animationId)
 	}
 }
 
-void MAIN_func_801050C0(void)
+/*
+ * Script instruction 0x19: a list of two-byte entries and their arguments,
+ * ended by another 0x19. Bits 3-5 of an entry pick what it does:
+ * 0: test trigger u16 (bit 0 clear: set, set: not set)
+ * 1: compare pstat u8 with u8 (bits 0-2: ==, !=, >=, <=, >, <)
+ * 2: jump to u16 if the result so far is true
+ * 3: jump to u16 if the result so far is false
+ * 4: one of the scriptTest*() functions, which read their own arguments
+ * Bit 7 ands the test with the result so far, bit 6 ors it. With no jump
+ * taken, the script goes on after the block.
+ */
+void scriptConditionBlock(void)
 {
 	uint8_t condOp;
 	uint32_t one;
@@ -902,22 +913,22 @@ void MAIN_func_801050C0(void)
 		case (4 << 3):
 			switch (condOp & 7) {
 			case 0:
-				cond = MAIN_func_801022FC();
+				cond = scriptTestStat();
 				break;
 			case 1:
-				cond = MAIN_func_801024CC();
+				cond = scriptTestCardAmount();
 				break;
 			case 2:
-				cond = MAIN_func_80102514();
+				cond = scriptTestHasMove();
 				break;
 			case 3:
-				cond = MAIN_func_80102564();
+				cond = scriptTestPartnerCondition();
 				break;
 			case 4:
-				cond = MAIN_func_801025E8();
+				cond = scriptTestItemCount();
 				break;
 			case 5:
-				cond = MAIN_func_80102630();
+				cond = scriptTestMoney();
 				break;
 			}
 			break;
@@ -959,7 +970,7 @@ int32_t scriptCompareValues(uint8_t op, uint32_t lhs, uint32_t rhs)
 	}
 }
 
-int32_t MAIN_func_80106730(int32_t op, int32_t lhs, int32_t rhs)
+int32_t scriptCompareSigned(int32_t op, int32_t lhs, int32_t rhs)
 {
 	switch (op & 7) {
 	case 0:
@@ -2647,7 +2658,7 @@ void getTriggerOffset(int32_t trigger, uint8_t **outPtr, uint8_t *outMask)
 	}
 }
 
-int32_t MAIN_func_80106D1C(int32_t moveId)
+int32_t scriptHasMove(int32_t moveId)
 {
 	return hasMove((int16_t)moveId);
 }

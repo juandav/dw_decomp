@@ -63,7 +63,9 @@ literals.
 The format of dialogue text (control codes, speakers, colors) is described in
 `include/dw/text.h`. `tools/maphead_text.py` prints the messages that the
 engine shows from `SCN/MAPHEAD.SCN` (shops, the new game questions...), for
-example `tools/maphead_text.py 0x4d6 16`.
+example `tools/maphead_text.py 0x4d6 16`. `tools/dump_dialogue.py` prints the
+dialogue of the map scripts in `SCN/DG.SCN`, following their code the way the
+script interpreter does, for example `tools/dump_dialogue.py 3`.
 
 ## Links
 
