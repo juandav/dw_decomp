@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Print the dialogue of the map scripts in SCN/DG.SCN.
 
-DG.SCN starts with a table of offsets, one script per map id. A script starts
+DG.SCN starts with a table of offsets, one per script id. A script starts
 with the offset of its code, then a table of (section, offset) pairs ended by
 0xFFFF: section 0xFE runs when the map loads, and the others run when the
 player talks to the NPC with that script id. This follows the code from every
@@ -13,6 +13,13 @@ Each script is padded to a multiple of 0x800 bytes, and the padding often
 holds an older copy of the script. --unreachable also prints the text found
 there, which the game never shows.
 
+NPCs are named after the Digimon that the maps using the script put in their
+slot. The warp instruction (0xFB) loads a map with a script, a script called
+from another one (0x14, 0x17) runs on the maps of the caller, and each map
+file lists its Digimon with their script ids. A slot that holds different
+Digimon on different maps shows them all, as in "Palmon/Tanemon". The names
+and the map table come from the executable.
+
 Script 0 is SCN/MAPHEAD.SCN, the script shared by every map, as getScript()
 loads it. Its message tables are left out; tools/maphead_text.py prints them.
 
@@ -21,6 +28,9 @@ loads it. Its message tables are left out; tools/maphead_text.py prints them.
 """
 
 import argparse
+import collections
+import os
+import re
 import struct
 import sys
 
@@ -28,6 +38,9 @@ from maphead_text import TABLES, decode_message, format_message
 
 DEFAULT_PATH = "disks/us/SCN/DG.SCN"
 MAPHEAD_PATH = "disks/us/SCN/MAPHEAD.SCN"
+EXE_PATH = "disks/us/SLUS_010.32"
+MAP_DIR = "disks/us/MAP"
+SYMBOLS_PATH = "config/symbols.txt"
 HEADER_ENTRIES = 0x800
 
 OP_CHOICE = 0x10
@@ -38,6 +51,9 @@ OP_CONDITION = 0x19
 OP_TEXT = 0x1A
 OP_SPEAKER = 0x1B
 OP_SIZED_TEXTBOX = 0x26
+OP_WARP = 0xFB
+OP_CALL_SCRIPT = 0x14
+OP_JUMP_SCRIPT = 0x17
 
 SPEAKER_PLAYER = 0xFD
 SPEAKER_NONE = 0xFF
@@ -94,8 +110,67 @@ SPEAKERS = {
 }
 
 
-def speaker_name(speaker):
+def speaker_name(speaker, npcs):
+    if speaker in npcs:
+        return "/".join(sorted(npcs[speaker]))
     return SPEAKERS.get(speaker, f"npc {speaker}")
+
+
+DIGIMON_PARA_SIZE = 52
+MAP_ENTRY_SIZE = 16
+MAP_WARPS_SIZE = 120
+# int16 fields of a Digimon in a map file, before its waypoints.
+MAP_DIGIMON_FIELDS = 42
+
+
+class Exe:
+    """Reads tables of the executable at the addresses in symbols.txt."""
+
+    def __init__(self, path, symbols_path):
+        with open(path, "rb") as f:
+            self.data = f.read()
+        self.load = struct.unpack_from("<I", self.data, 0x18)[0]
+        self.symbols = {}
+        with open(symbols_path) as f:
+            for line in f:
+                m = re.match(r"(\w+) = (0x[0-9A-Fa-f]+);", line)
+                if m:
+                    self.symbols[m.group(1)] = int(m.group(2), 16)
+
+    def table(self, symbol, size, count):
+        start = self.symbols[symbol] - self.load + 0x800
+        return [self.data[start + i * size:start + (i + 1) * size]
+                for i in range(count)]
+
+
+def read_map_npcs(exe, map_dir):
+    """Return, for each map id, the Digimon type of each NPC script id."""
+    names = [e[:20].split(b"\0")[0].decode()
+             for e in exe.table("DIGIMON_DATA", DIGIMON_PARA_SIZE, 180)]
+    maps = {}
+    for map_id, entry in enumerate(exe.table("MAP_ENTRIES", MAP_ENTRY_SIZE, 255)):
+        filename = entry[:10].split(b"\0")[0].decode()
+        images, flags = entry[10] + entry[11], entry[12]
+        # The path that buildMapPath() makes.
+        path = os.path.join(map_dir, f"MAP{map_id // 15 + 1}", filename + ".MAP")
+        if not filename or not os.path.exists(path) or not flags & 0x80:
+            continue
+        with open(path, "rb") as f:
+            data = f.read()
+        # The offsets that loadMap() reads: the setup, the images and
+        # objects if there are images, then the entities.
+        index = 1 + (images + 1 if images else 0)
+        pos = struct.unpack_from("<i", data, 4 * index)[0] + MAP_WARPS_SIZE
+        count = struct.unpack_from("<h", data, pos)[0]
+        pos += 2
+        npcs = {}
+        # The fields that loadMapDigimon() reads.
+        for _ in range(count):
+            fields = struct.unpack_from(f"<{MAP_DIGIMON_FIELDS}h", data, pos)
+            npcs[fields[10]] = names[fields[0]]
+            pos += 2 * MAP_DIGIMON_FIELDS + 6 * fields[33]
+        maps[map_id] = npcs
+    return maps
 
 
 def u16(data, pos):
@@ -134,6 +209,9 @@ class Script:
         self.code = {}
         self.texts = {}
         self.speakers = {}
+        # The names of the NPCs of the maps that use the script.
+        self.npcs = {}
+        self.section_texts = []
 
     def walk(self, offset):
         """Follow the code from offset; return the positions of new text."""
@@ -245,8 +323,39 @@ def format_text(script, pos):
         return "choice: " + " / ".join(rows)
     # Text that names its speaker, such as a narrator's line, keeps that name.
     if speaker is None:
-        speaker = speaker_name(script.speakers[pos])
+        speaker = speaker_name(script.speakers[pos], script.npcs)
     return format_message(speaker, rows)
+
+
+def name_npcs(scripts, maps):
+    """Name the NPCs of each script after the maps it runs on."""
+    uses = collections.defaultdict(set)
+    calls = collections.defaultdict(set)
+    for index, script in scripts.items():
+        for pos in script.code:
+            op = script.scn[pos]
+            if op == OP_WARP:
+                script_id, map_id = struct.unpack_from("<HH", script.scn, pos + 2)
+                uses[script_id].add(map_id)
+            elif op in (OP_CALL_SCRIPT, OP_JUMP_SCRIPT):
+                calls[index].add(u16(script.scn, pos + 2))
+    # A script called from another one runs on the maps of the caller.
+    changed = True
+    while changed:
+        changed = False
+        for caller, callees in calls.items():
+            for callee in callees:
+                if not uses[caller] <= uses[callee]:
+                    uses[callee] |= uses[caller]
+                    changed = True
+    for index, map_ids in uses.items():
+        if index not in scripts:
+            continue
+        npcs = collections.defaultdict(set)
+        for map_id in map_ids:
+            for npc, name in maps.get(map_id, {}).items():
+                npcs[npc].add(name)
+        scripts[index].npcs = npcs
 
 
 def read_scripts(scn):
@@ -265,6 +374,9 @@ def main():
     parser.add_argument("scripts", nargs="*", type=lambda x: int(x, 0))
     parser.add_argument("--scn", default=DEFAULT_PATH)
     parser.add_argument("--maphead", default=MAPHEAD_PATH)
+    parser.add_argument("--exe", default=EXE_PATH)
+    parser.add_argument("--maps", default=MAP_DIR)
+    parser.add_argument("--symbols", default=SYMBOLS_PATH)
     parser.add_argument("--unreachable", action="store_true",
                         help="also print text the game never reaches")
     args = parser.parse_args()
@@ -276,6 +388,16 @@ def main():
     with open(args.maphead, "rb") as f:
         maphead = f.read()
     scripts[0] = Script(maphead, 0, len(maphead))
+    for index, script in scripts.items():
+        for section, offset in script.sections:
+            # MAPHEAD's message tables are shown by tools/maphead_text.py.
+            if index == 0 and section in TABLES:
+                continue
+            # A section id can be listed twice, so keep a list.
+            script.section_texts.append((section, script.walk(offset)))
+
+    if os.path.exists(args.exe) and os.path.exists(args.maps):
+        name_npcs(scripts, read_map_npcs(Exe(args.exe, args.symbols), args.maps))
 
     for index in args.scripts or sorted(scripts):
         if index not in scripts:
@@ -284,10 +406,7 @@ def main():
         scn = script.scn
         name = "MAPHEAD.SCN" if index == 0 else f"{script.start:#x}"
         print(f"== script {index} ({name})")
-        for section, offset in script.sections:
-            if index == 0 and section in TABLES:
-                continue
-            found = script.walk(offset)
+        for section, found in script.section_texts:
             if not found:
                 continue
             print(f"-- section {section:#x}")
