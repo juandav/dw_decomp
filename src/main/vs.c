@@ -49,10 +49,10 @@ typedef struct {
 	uint8_t y;
 } VsUISprite;
 
-extern char VS_D_80070B1C[];
+extern char VS_PATH_STDDAT_DRAW_TMD[];
 extern int16_t MAIN_D_8013527C[2];
-extern char MAIN_D_80134500[5];
-extern char MAIN_D_80134508[5];
+extern char TEXT_HP_FULLWIDTH[5];
+extern char TEXT_MP_FULLWIDTH[5];
 extern char STAT_LABEL_OFF[];
 extern char FULLWIDTH_DIGITS[];
 extern int16_t MAIN_D_80134F24;
@@ -96,7 +96,7 @@ extern uint8_t MAIN_D_80134F44;
 extern int16_t MAIN_D_80135264;
 extern char *MAIN_D_8013526C;
 extern char *MAIN_D_80135270;
-extern char MAIN_D_80134518[7];
+extern char TEXT_DEALT_JP[7];
 extern int32_t MAIN_D_80134F48;
 extern int16_t MAIN_D_80134510[4];
 extern int32_t COMBAT_AREA_CENTER_Y;
@@ -354,9 +354,9 @@ uint8_t MAIN_D_80134AF0[5] = { 11, 14, 14, 11, 11 };
 uint8_t MAIN_D_80134AF8[8] = { 0, 6, 10, 18, 22, 30, 38, 43 };
 uint8_t MAIN_D_80134B00[8] = { 6, 4, 8, 4, 8, 8, 5, 5 };
 uint8_t MAIN_D_80134B08[8] = { 0, 6, 10, 18, 22, 30, 38, 43 };
-char *MAIN_D_80134B10 = VS_D_80070B1C;
+char *MAIN_D_80134B10 = VS_PATH_STDDAT_DRAW_TMD;
 int16_t MAIN_D_80134B14[4] = { -273, -86, 94, 272 };
-char MAIN_D_80134B1C[] = "%d\n";
+char VS_NUMBER_FORMAT[] = "%d\n";
 int8_t MAIN_D_80134B20[4] = { 1, 0, -1, 0 };
 int8_t MAIN_D_80134B24[4] = { 0, 1, 0, -1 };
 int8_t MAIN_D_80134B28[8] = { -1, 1, 1, -1, -1, 1, 1, -1 };
@@ -392,7 +392,7 @@ RGB8 MAIN_D_8012F438[10] = {
 	{ 0x00, 0x00, 0x00 },
 };
 
-char MAIN_D_8012F458[] = "ダメージ";
+char VS_TEXT_DAMAGE_JP[] = "ダメージ";
 
 char PATH_ETCDAT_ETCTIM_BIN_2[] = "\\ETCDAT\\ETCTIM.BIN";
 
@@ -436,7 +436,7 @@ uint8_t MAIN_D_8012F578[12] = {
 };
 
 /* not equipped */
-char MAIN_D_8012F584[] = "ソウビナシ";
+char VS_TEXT_NO_EQUIPMENT_JP[] = "ソウビナシ";
 
 VsListPanel MAIN_D_8012F590[12] = {
 	{ 0x0000, 0x01e8, 0x00, 0x00, 0x96, 0xd7, 0x06, 0x00, 0x00 },
@@ -520,8 +520,8 @@ void VS__drawStatLabelText(void)
 	char *text;
 
 	clearTextArea();
-	drawString(MAIN_D_80134500, 0, 0);
-	drawString(MAIN_D_80134508, 0, 12);
+	drawString(TEXT_HP_FULLWIDTH, 0, 0);
+	drawString(TEXT_MP_FULLWIDTH, 0, 12);
 
 	for (i = 2, y = 24, text = STAT_LABEL_OFF;
 	     i < 6;
@@ -1801,8 +1801,8 @@ void VS__func_800F4F9C(void)
 	name2 = MAIN_D_80135270 + (&VS_D_800716A8[5])[MAIN_D_80135264] * 64;
 
 	clearTextArea();
-	drawString(MAIN_D_80134518, 6, 0);
-	drawString(MAIN_D_8012F458, 0, 12);
+	drawString(TEXT_DEALT_JP, 6, 0);
+	drawString(VS_TEXT_DAMAGE_JP, 0, 12);
 	drawString(name1 + 14, (120 - strlen(name1 + 14) * 6) / 2, 24);
 	drawString(name2 + 14, (120 - strlen(name2 + 14) * 6) / 2, 36);
 	DrawSync(0);
@@ -3568,7 +3568,7 @@ void VS__func_800F87E0(id)
 		rec = (uint8_t *)(names + (st + baseIdx)[i] * 64);
 		for (j = 0; j < 3; j++) {
 			if ((rec + j)[0x1d] == 0xff) {
-				strcpy(buf, MAIN_D_8012F584);
+				strcpy(buf, VS_TEXT_NO_EQUIPMENT_JP);
 				text = (uint16_t *)buf;
 			} else {
 				text = (uint16_t *)MOVE_NAMES[DIGIMON_DATA[rec[0x1c]]

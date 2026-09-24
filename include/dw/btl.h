@@ -136,7 +136,7 @@ extern char MP_BONUS_SUFFIX[5];
 extern uint8_t MAIN_D_80134764[8];
 extern uint8_t MAIN_D_8013476C[8];
 extern uint8_t MAIN_D_80134774[8];
-extern char MAIN_D_8013477C[4];
+extern char BTL_NUMBER_FORMAT[4];
 extern int8_t MAIN_D_80134780[4];
 extern int8_t MAIN_D_80134784[4];
 extern int8_t MAIN_D_80134788[8];

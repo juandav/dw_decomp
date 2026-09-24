@@ -22,18 +22,18 @@ void BTL_drawCommandShout(uint32_t arg0);
 void BTL_removeCommandShout(void);
 void BTL_renderCommandShout(void);
 
-const char BTL_D_80072DB8[] = "Your Call!";
-const char BTL_D_80072DC4[] = "Moderate!";
-const char BTL_D_80072DD0[] = "Distance!";
-const char BTL_D_80072DDC[] = "Defense!";
+const char BTL_SHOUT_YOUR_CALL[] = "Your Call!";
+const char BTL_SHOUT_MODERATE[] = "Moderate!";
+const char BTL_SHOUT_DISTANCE[] = "Distance!";
+const char BTL_SHOUT_DEFENSE[] = "Defense!";
 
 const char *const BTL_D_80072DE8[7] = {
 	BTL_TEXT_RUN,
 	BTL_TEXT_ATTACK,
-	BTL_D_80072DB8,
-	BTL_D_80072DC4,
-	BTL_D_80072DD0,
-	BTL_D_80072DDC,
+	BTL_SHOUT_YOUR_CALL,
+	BTL_SHOUT_MODERATE,
+	BTL_SHOUT_DISTANCE,
+	BTL_SHOUT_DEFENSE,
 	BTL_TEXT_CHANGE,
 };
 

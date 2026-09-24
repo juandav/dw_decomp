@@ -278,15 +278,15 @@ uint8_t MAIN_D_801344FC[4] = {
 	0x10, 0x07, 0x03, 0x00,
 };
 
-char MAIN_D_80134500[] = "ＨＰ";
+char TEXT_HP_FULLWIDTH[] = "ＨＰ";
 
-char MAIN_D_80134508[] = "ＭＰ";
+char TEXT_MP_FULLWIDTH[] = "ＭＰ";
 
 int16_t MAIN_D_80134510[4] = {
 	0x0000, 0x0400, 0x0800, 0x0c00,
 };
 
-char MAIN_D_80134518[] = "与えた";
+char TEXT_DEALT_JP[] = "与えた";
 
 uint8_t MAIN_D_80134520[8] = {
 	0x02, 0x03, 0x04, 0x05, 0x06, 0x00, 0x00, 0x00,
@@ -328,27 +328,27 @@ char CUP_NAME_GRADE_S[8] = "Grade S";
 
 char CUP_NAME_GRADE_R[8] = "Grade R";
 
-char MAIN_D_80134584[2][2] = { "D", "C" };
+char CUP_LETTERS_D_C[2][2] = { "D", "C" };
 
-char MAIN_D_80134588[2][2] = { "B", "A" };
+char CUP_LETTERS_B_A[2][2] = { "B", "A" };
 
-char MAIN_D_8013458C[2][2] = { "S", "R" };
+char CUP_LETTERS_S_R[2][2] = { "S", "R" };
 
-char MAIN_D_80134590[2][2] = { "H", "I" };
+char CUP_LETTERS_H_I[2][2] = { "H", "I" };
 
-char MAIN_D_80134594[2][2] = { "J", "K" };
+char CUP_LETTERS_J_K[2][2] = { "J", "K" };
 
-char MAIN_D_80134598[2][2] = { "L", "F" };
+char CUP_LETTERS_L_F[2][2] = { "L", "F" };
 
-char MAIN_D_8013459C[2][2] = { "G", "W" };
+char CUP_LETTERS_G_W[2][2] = { "G", "W" };
 
-char MAIN_D_801345A0[2][2] = { "O", "N" };
+char CUP_LETTERS_O_N[2][2] = { "O", "N" };
 
-char MAIN_D_801345A4[2][2] = { "M", "T" };
+char CUP_LETTERS_M_T[2][2] = { "M", "T" };
 
-char MAIN_D_801345A8[2][2] = { "Y", "Z" };
+char CUP_LETTERS_Y_Z[2][2] = { "Y", "Z" };
 
-char MAIN_D_801345AC[2][2] = { "X", "Q" };
+char CUP_LETTERS_X_Q[2][2] = { "X", "Q" };
 
 uint8_t *MAIN_D_801345B0 = TEXTURE_BUFFER;
 
@@ -380,7 +380,7 @@ char SPEAKER_NAME_TANEMON[8] = "Tanemon";
 
 char SPEAKER_NAME_PALMON[] = "Palmon";
 
-char MAIN_D_801345F0[] = ";1";
+char FILE_VERSION_SUFFIX[] = ";1";
 
 char NAMING_PREVIEW_PREFIX[4] = {
 	0x00, 0x00, 0x00, 0x00,

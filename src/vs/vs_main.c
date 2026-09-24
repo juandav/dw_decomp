@@ -51,9 +51,9 @@ extern char VS_TEXT_RUN[];
 extern char VS_TEXT_ATTACK[];
 extern char VS_TEXT_AUTO[];
 extern char VS_TEXT_CHANGE[];
-extern char VS_D_80070720[];
-extern char VS_D_8007072C[];
-extern char VS_D_80070738[];
+extern char VS_TEXT_MODERATE[];
+extern char VS_TEXT_DISTANCE[];
+extern char VS_TEXT_DEFENSIVE[];
 void renderString(int32_t a, int32_t b, int32_t c, int32_t d, int32_t e,
                   int32_t f, int32_t g, int32_t h, int32_t i);
 void createParticleFX();
@@ -172,9 +172,9 @@ char *VS_D_80070744[8] = {
 	VS_TEXT_RUN,
 	VS_TEXT_ATTACK,
 	VS_TEXT_AUTO,
-	VS_D_80070720,
-	VS_D_8007072C,
-	VS_D_80070738,
+	VS_TEXT_MODERATE,
+	VS_TEXT_DISTANCE,
+	VS_TEXT_DEFENSIVE,
 	VS_TEXT_CHANGE,
 	(void *)0x00000000,
 };

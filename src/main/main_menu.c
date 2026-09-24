@@ -309,21 +309,21 @@ char YES_NO_LABEL[] = "YesNo";
 
 char YES_NO_LABEL_SPACED[] = "Yes No";
 
-char MAIN_D_80134674[] = "２";
+char MAIN_MENU_TEXT_2_FULLWIDTH[] = "２";
 
-char MAIN_D_80134678[] = "に";
+char MAIN_MENU_TEXT_PARTICLE_NI_JP[] = "に";
 
-char MAIN_D_8013467C[] = "が";
+char MAIN_MENU_TEXT_PARTICLE_GA_JP[] = "が";
 
-char MAIN_D_80134680[] = "を";
+char MAIN_MENU_TEXT_PARTICLE_WO_JP[] = "を";
 
 char MAIN_MENU_TEXT_NAME[] = "Name";
 
 char MAIN_MENU_TEXT_DIGIMON[8] = "Digimon";
 
-char MAIN_D_80134694[] = "HP";
+char MAIN_MENU_TEXT_HP[] = "HP";
 
-char MAIN_D_80134698[] = "MP";
+char MAIN_MENU_TEXT_MP[] = "MP";
 
 char MAIN_MENU_TEXT_OFFENSE[8] = "Offense";
 
@@ -331,13 +331,14 @@ char MAIN_MENU_TEXT_DEFENSE[8] = "Defense";
 
 char MAIN_MENU_TEXT_YES[4] = "Yes";
 
-char MAIN_D_801346B0[] = "No";
+char MAIN_MENU_TEXT_NO[] = "No";
 
-char MAIN_D_801346B4[] = " ";
+char MAIN_MENU_TEXT_SPACE[] = " ";
 
 char MAIN_MENU_TEXT_IS_IN[] = " is in";
 
-char MAIN_D_801346C0[2][2] = { ".", "*" };
+/* A dot drawn in the list of registered battles, and the Memory Card wildcard. */
+char MAIN_MENU_DOT_AND_WILDCARD[2][2] = { ".", "*" };
 
 char MAIN_MENU_TEXT_PLAYER[] = "Player";
 
@@ -437,7 +438,8 @@ char MAIN_MENU_TEXT_DO_YOU_WANT_TO_FORMAT[] = "Do you want to format?";
 
 char MAIN_MENU_TEXT_NOT_USED[] = "Not used";
 
-char MAIN_D_8013134C[] = "スロット１のメモリーカードに";
+/* "To the Memory Card in slot 1": the start of a Japanese error left in the game. */
+char MAIN_MENU_TEXT_SLOT_1_MEMORY_CARD_JP[] = "スロット１のメモリーカードに";
 
 char MAIN_MENU_TEXT_GO_TO_SLEEP[12] = "Go to sleep";
 
@@ -2463,19 +2465,19 @@ void drawMainMenuStrings(int32_t menu)
 		}
 		break;
 	case 10:
-		drawString(MAIN_D_8013134C, 0, 0);
+		drawString(MAIN_MENU_TEXT_SLOT_1_MEMORY_CARD_JP, 0, 0);
 		DrawSync(0);
 		if (MEMORY_CARD_ID != 0) {
-			drawString(MAIN_D_80134674, 0x30, 0);
+			drawString(MAIN_MENU_TEXT_2_FULLWIDTH, 0x30, 0);
 		}
 		if (MEMORY_CARD_ERROR == 1) {
-			drawString(MAIN_D_80134678, 0x3C, 0);
+			drawString(MAIN_MENU_TEXT_PARTICLE_NI_JP, 0x3C, 0);
 		}
 		if (MEMORY_CARD_ERROR == 1 || MEMORY_CARD_ERROR == 4) {
-			drawString(MAIN_D_8013467C, 0x9C, 0);
+			drawString(MAIN_MENU_TEXT_PARTICLE_GA_JP, 0x9C, 0);
 		}
 		if (MEMORY_CARD_ERROR == 3) {
-			drawString(MAIN_D_80134680, 0x9C, 0);
+			drawString(MAIN_MENU_TEXT_PARTICLE_WO_JP, 0x9C, 0);
 		}
 		DrawSync(0);
 		drawString(MEMCARD_ERROR_TEXT[MEMORY_CARD_ERROR], 0, 0xC);
@@ -2534,10 +2536,10 @@ void drawMainMenuStrings(int32_t menu)
 		drawString(MAIN_MENU_TEXT_DIGIMON, 0, 0x18);
 		drawString(DIGIMON_DATA[PARTNER_ENTITY.digimonEntity.entity.type].name, 0x64, 0x18);
 		DrawSync(0);
-		drawString(MAIN_D_80134694, 0, 0x24);
+		drawString(MAIN_MENU_TEXT_HP, 0, 0x24);
 		drawString(formatNumber(PARTNER_ENTITY.digimonEntity.stats.base.hp, buf, 4), 0x64, 0x24);
 		DrawSync(0);
-		drawString(MAIN_D_80134698, 0, 0x30);
+		drawString(MAIN_MENU_TEXT_MP, 0, 0x30);
 		drawString(formatNumber(PARTNER_ENTITY.digimonEntity.stats.base.mp, buf, 4), 0x64, 0x30);
 		DrawSync(0);
 		drawString(MAIN_MENU_TEXT_OFFENSE, 0, 0x3C);
@@ -2557,7 +2559,7 @@ void drawMainMenuStrings(int32_t menu)
 		DrawSync(0);
 		drawString(MAIN_MENU_TEXT_DO_YOU_WANT_TO_REGISTER, 0, 0x78);
 		drawString(MAIN_MENU_TEXT_YES, 0, 0x84);
-		drawString(MAIN_D_801346B0, 0, 0x90);
+		drawString(MAIN_MENU_TEXT_NO, 0, 0x90);
 		break;
 	case 15:
 		drawString(SLOT_ACTION_TITLES[6], 0, 0);
@@ -2580,7 +2582,7 @@ void drawMainMenuStrings(int32_t menu)
 		DrawSync(0);
 		drawString(MAIN_MENU_TEXT_YES, 0, 0x24);
 		DrawSync(0);
-		drawString(MAIN_D_801346B0, 0, 0x30);
+		drawString(MAIN_MENU_TEXT_NO, 0, 0x30);
 		DrawSync(0);
 		drawString(MAIN_MENU_TEXT_THE_COMPETITION_DIGIMON, 0, 0x3C);
 		DrawSync(0);
@@ -2602,7 +2604,7 @@ void drawMainMenuStrings(int32_t menu)
 		break;
 	case 19:
 		strcpy(buf, PARTNER_ENTITY.name);
-		strcat(buf, MAIN_D_801346B4);
+		strcat(buf, MAIN_MENU_TEXT_SPACE);
 		strcat(buf, DIGIMON_DATA[PARTNER_ENTITY.digimonEntity.entity.type].name);
 		strcat(buf, MAIN_MENU_TEXT_IS_IN);
 		drawString(buf, 0, 0);
@@ -2691,7 +2693,7 @@ void drawRegisteredBattleSlots(int32_t slot)
 			drawString(DIGIMON_DATA[type].name, 0x6C, y);
 		} else {
 			setTextColor(9);
-			drawString(MAIN_D_801346C0[0], 0x1E, y);
+			drawString(MAIN_MENU_DOT_AND_WILDCARD[0], 0x1E, y);
 			setTextColor(1);
 		}
 		DrawSync(0);
@@ -3925,7 +3927,7 @@ int32_t countUsedMemoryCardBlocks(int32_t channel, int32_t returnMenu)
 	int32_t status;
 
 	MemCardSync(0, &cmd, &result);
-	status = MemCardGetDirentry(channel, MAIN_D_801346C0[1], MEMCARD_DIRENTRIES,
+	status = MemCardGetDirentry(channel, MAIN_MENU_DOT_AND_WILDCARD[1], MEMCARD_DIRENTRIES,
 			&fileCount, 0, 15);
 	/* Keep the success block after both errors for the retail branch layout. */
 	if (status == -1)

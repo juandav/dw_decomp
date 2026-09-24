@@ -226,7 +226,7 @@ uint8_t MAIN_D_8013421C[4] = {
 	0x40, 0x00, 0x00, 0x00,
 };
 
-char MAIN_D_80134220[] = ";1";
+char EFE_FILE_VERSION_SUFFIX[] = ";1";
 // clang-format on
 
 static void createParticleFX__garbage__(void)
@@ -974,7 +974,7 @@ void findEFEDATFile(void)
 	mode = 0x80;
 	name[0] = 0x5C;
 	strcpy(&name[1], PATH_ETCHI_EFEDAT_EFE);
-	strcat(name, MAIN_D_80134220);
+	strcat(name, EFE_FILE_VERSION_SUFFIX);
 	while ((int32_t)CdSearchFile(&file, name) == -1) {
 	}
 	CdControl(0xE, &mode, 0);

@@ -139,18 +139,18 @@ static void *battle_hud_functions[] = {
 };
 
 // clang-format off
-const char BTL_D_80072E04[] = "Your Call";
-const char BTL_D_80072E10[] = "Moderate";
-const char BTL_D_80072E1C[] = "Distance";
-const char BTL_D_80072E28[] = "Defensive";
+const char BTL_TEXT_YOUR_CALL[] = "Your Call";
+const char BTL_TEXT_MODERATE[] = "Moderate";
+const char BTL_TEXT_DISTANCE[] = "Distance";
+const char BTL_TEXT_DEFENSIVE[] = "Defensive";
 
 const char *BTL_D_80072E34[8] = {
 	COMMAND_NAME_RUN,
 	COMMAND_NAME_ATTACK,
-	BTL_D_80072E04,
-	BTL_D_80072E10,
-	BTL_D_80072E1C,
-	BTL_D_80072E28,
+	BTL_TEXT_YOUR_CALL,
+	BTL_TEXT_MODERATE,
+	BTL_TEXT_DISTANCE,
+	BTL_TEXT_DEFENSIVE,
 	COMMAND_NAME_CHANGE,
 	NULL,
 };

@@ -80,24 +80,24 @@ extern char *MAP_NAME_PTR[];
 extern char *ITEM_DESC_PTR[];
 extern int8_t TEXT_MONOSPACE;
 extern int32_t SCRIPT_FILE_POSITION;
-extern char MAIN_D_801345F0[3];
+extern char FILE_VERSION_SUFFIX[3];
 extern char CUP_NAME_GRADE_D[];
 extern char CUP_NAME_GRADE_C[];
 extern char CUP_NAME_GRADE_B[];
 extern char CUP_NAME_GRADE_A[];
 extern char CUP_NAME_GRADE_S[];
 extern char CUP_NAME_GRADE_R[];
-extern char MAIN_D_80134584[2][2];
-extern char MAIN_D_80134588[2][2];
-extern char MAIN_D_8013458C[2][2];
-extern char MAIN_D_80134590[2][2];
-extern char MAIN_D_80134594[2][2];
-extern char MAIN_D_80134598[2][2];
-extern char MAIN_D_8013459C[2][2];
-extern char MAIN_D_801345A0[2][2];
-extern char MAIN_D_801345A4[2][2];
-extern char MAIN_D_801345A8[2][2];
-extern char MAIN_D_801345AC[2][2];
+extern char CUP_LETTERS_D_C[2][2];
+extern char CUP_LETTERS_B_A[2][2];
+extern char CUP_LETTERS_S_R[2][2];
+extern char CUP_LETTERS_H_I[2][2];
+extern char CUP_LETTERS_J_K[2][2];
+extern char CUP_LETTERS_L_F[2][2];
+extern char CUP_LETTERS_G_W[2][2];
+extern char CUP_LETTERS_O_N[2][2];
+extern char CUP_LETTERS_M_T[2][2];
+extern char CUP_LETTERS_Y_Z[2][2];
+extern char CUP_LETTERS_X_Q[2][2];
 extern char SPEAKER_NAME_SIGN[];
 extern char SPEAKER_NAME_BOX[];
 extern char SPEAKER_NAME_BETAMON[];
@@ -647,29 +647,29 @@ char *TOURNAMENT_CUP_NAMES[23] = {
 };
 
 char *TOURNAMENT_GRADES[23] = {
-	MAIN_D_80134584[0],
-	MAIN_D_80134584[1],
-	MAIN_D_80134588[0],
-	MAIN_D_80134588[1],
-	MAIN_D_8013458C[0],
-	MAIN_D_8013458C[1],
-	MAIN_D_80134590[0],
-	MAIN_D_80134590[1],
-	MAIN_D_80134594[0],
-	MAIN_D_80134594[1],
-	MAIN_D_80134598[0],
-	MAIN_D_80134598[1],
-	MAIN_D_8013459C[0],
-	MAIN_D_8013459C[1],
-	MAIN_D_801345A0[0],
-	MAIN_D_801345A0[1],
-	MAIN_D_801345A4[0],
-	MAIN_D_801345A4[1],
-	MAIN_D_801345A8[0],
-	MAIN_D_8013459C[1],
-	MAIN_D_801345A8[1],
-	MAIN_D_801345AC[0],
-	MAIN_D_801345AC[1],
+	CUP_LETTERS_D_C[0],
+	CUP_LETTERS_D_C[1],
+	CUP_LETTERS_B_A[0],
+	CUP_LETTERS_B_A[1],
+	CUP_LETTERS_S_R[0],
+	CUP_LETTERS_S_R[1],
+	CUP_LETTERS_H_I[0],
+	CUP_LETTERS_H_I[1],
+	CUP_LETTERS_J_K[0],
+	CUP_LETTERS_J_K[1],
+	CUP_LETTERS_L_F[0],
+	CUP_LETTERS_L_F[1],
+	CUP_LETTERS_G_W[0],
+	CUP_LETTERS_G_W[1],
+	CUP_LETTERS_O_N[0],
+	CUP_LETTERS_O_N[1],
+	CUP_LETTERS_M_T[0],
+	CUP_LETTERS_M_T[1],
+	CUP_LETTERS_Y_Z[0],
+	CUP_LETTERS_G_W[1],
+	CUP_LETTERS_Y_Z[1],
+	CUP_LETTERS_X_Q[0],
+	CUP_LETTERS_X_Q[1],
 };
 
 uint8_t TOURNAMENT_DATA[180] = {
@@ -4872,7 +4872,7 @@ void readFileSection(char *filename, void *dest, uint32_t offset,
 	if (SCRIPT_FILE_POSITION == 0) {
 		path[0] = '\\';
 		strcpy(&path[1], filename);
-		strcat(path, MAIN_D_801345F0);
+		strcat(path, FILE_VERSION_SUFFIX);
 		if (CdSearchFile(&file, path) == 0) {
 			return;
 		}

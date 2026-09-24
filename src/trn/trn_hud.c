@@ -154,7 +154,7 @@ void TRN_createPostTrainingStatsBox(void)
 			drawString(&STAT_LABELS[(row + 1) * 12], 0, (row + 1) * 12);
 		}
 		if (i == 3) {
-			drawString(MAIN_D_80134BC0, 0, 84);
+			drawString(TRN_TEXT_MONEY_JP, 0, 84);
 			drawString(FULLWIDTH_DIGITS, 0, 240);
 		}
 		DrawSync(0);

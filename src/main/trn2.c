@@ -4,7 +4,7 @@
 #include <dw/types.h>
 
 /* money held */
-char MAIN_D_80134BE0[] = "所持金";
+char TRN2_TEXT_MONEY_JP[] = "所持金";
 RECT MAIN_D_80134BE8 = { -82, -87, 164, 90 };
 RECT MAIN_D_80134BF0 = { -8, -8, 16, 16 };
 RECT MAIN_D_80134BF8 = { -8, -8, 16, 16 };

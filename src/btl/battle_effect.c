@@ -3391,7 +3391,7 @@ void BTL_getVectorEulerAngles(void)
 
 void BTL_printDebugValue(void)
 {
-	printf(MAIN_D_8013477C, EFE_POP1(int32_t));
+	printf(BTL_NUMBER_FORMAT, EFE_POP1(int32_t));
 }
 
 void BTL_getRandomInRange(void)
