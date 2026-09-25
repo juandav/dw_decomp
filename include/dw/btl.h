@@ -164,6 +164,8 @@ extern uint8_t MAIN_D_801347F0[4];
 extern uint8_t MAIN_D_801347F4[4];
 extern uint8_t MAIN_D_801347F8[4];
 
+extern const int8_t BTL_SHOUT_HOP_OFFSETS[20];
+extern const int8_t BTL_SHOUT_DROP_OFFSETS[20];
 extern GsSPRITE BTL_D_80073E54;
 extern BtlDeathCountdownRaw BTL_D_80073E78;
 extern char BTL_END_BOX_TEXTBUFFER[1024];
@@ -194,6 +196,7 @@ void BTL_initializeEnemyHPBarSprites(void);
 void BTL_addEnemyHPBars(void);
 void BTL_initializePartnerStatusBars(void);
 void BTL_initializeCommandMenu(void);
+void BTL_drawCommandShout(uint32_t command);
 void BTL_addDeathCountdown(Entity *entity);
 void entityLookAtLocation(Entity *entity, VECTOR *pos);
 int32_t entityCheckCollision(Entity *a, Entity *entity, int32_t c, int32_t d);
