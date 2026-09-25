@@ -124,7 +124,7 @@ int32_t createItemMenuDescriptionBox(ItemMenuBox *box, RECT *origin, int32_t uiB
 void MAIN_func_801000E4(void);
 int32_t shopFillBuyItemList(void);
 int32_t fillInventoryItemList(void);
-int32_t MAIN_func_800FAFB0(void);
+int32_t pickMeritItem(void);
 void tickItemDescriptionBox(void);
 void renderItemDescriptionBox(void);
 void tickShopBitBox(void);
@@ -286,12 +286,12 @@ static void *script_common_text_order[] = {
 	getItemMenuFromType,
 	tickPickItemMenu,
 	createItemMenuBox,
-	MAIN_func_800FCA14,
+	showShopkeeperSelection,
 	createShopBitBox,
 	destroyItemMenuBox,
 	showShopkeeperTextbox,
 	initializeItemMenuBox,
-	MAIN_func_800FC508,
+	tickItemShop,
 	isPartnerBaby,
 	dailyPStatTrigger,
 	getRecycleId,
@@ -316,7 +316,7 @@ static void *script_common_text_order[] = {
 	tickSellItemBox,
 	renderItemDescriptionBox,
 	tickItemDescriptionBox,
-	MAIN_func_800FAFB0,
+	pickMeritItem,
 	renderItemMenuBox,
 	tickItemMenu,
 	fillInventoryItemList,
@@ -463,7 +463,7 @@ int16_t MAIN_D_8012FE68[8] = {
 	0x0083, 0x0085, 0x0086, 0x008d, 0x00cf, 0x00d3, 0x00d7, 0x00da,
 };
 
-uint8_t MAIN_D_8012FE78[78] = {
+uint8_t RECYCLEABLE_ITEMS[78] = {
 	0x0b, 0x0c, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c,
 	0x1d, 0x1e, 0x1f, 0x21, 0x23, 0x24, 0x2e, 0x32,
 	0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d, 0x43, 0x46,
@@ -542,7 +542,7 @@ char *MAIN_D_8012FEC8[63] = {
 	MAIN_D_8012FCC4,
 };
 
-int32_t MAIN_D_8012FFC4[5] = {
+int32_t CARD_PRICES[5] = {
 	0x00001388, 0x000005dc, 0x000001f4, 0x00000064,
 	0x00000032,
 };
@@ -694,7 +694,7 @@ uint8_t TOURNAMENT_DATA[180] = {
 	0xff, 0xff, 0xff, 0xff,
 };
 
-BattleEntry MAIN_D_8013024C[6] = {
+BattleEntry BIRDRA_TRANSPORT_TARGETS[6] = {
 	{ 0x26, 0x09, 0x00dd, 0x000003e8 },
 	{ 0x46, 0x09, 0x00be, 0x000003e8 },
 	{ 0x4f, 0x09, 0x00bc, 0x000005dc },
@@ -754,7 +754,7 @@ char MAIN_D_80130388[12] = "\\SCN\\DG.SCN";
 char MAIN_D_80130394[20] = "\\ETCHI\\BOSS_EFE.TMD";
 char MAIN_D_801303A8[] = "\\ETCHI\\OP.TIM";
 
-uint8_t MAIN_D_801303B8[128] = {
+uint8_t JUKEBOX_TRACKS[128] = {
 	0x01, 0x00, 0x01, 0x01, 0x02, 0x00, 0x02, 0x01,
 	0x03, 0x00, 0x03, 0x01, 0x04, 0x00, 0x04, 0x01,
 	0x05, 0x00, 0x06, 0x00, 0x06, 0x01, 0x07, 0x00,
@@ -773,12 +773,12 @@ uint8_t MAIN_D_801303B8[128] = {
 	0x21, 0x01, 0x21, 0x02, 0x21, 0x03, 0x00, 0x00,
 };
 
-uint8_t MAIN_D_80130438[12] = {
+uint8_t MOJYAMON_ITEMS_GIVE[12] = {
 	0x2c, 0x29, 0x45, 0x27, 0x41, 0x11, 0x09, 0x01,
 	0x3e, 0x00, 0x00, 0x00,
 };
 
-uint8_t MAIN_D_80130444[12] = {
+uint8_t MOJYAMON_ITEMS_GET[12] = {
 	0x01, 0x09, 0x61, 0x16, 0x0b, 0x0e, 0x13, 0x14,
 	0x15, 0x00, 0x00, 0x00,
 };
@@ -1275,7 +1275,7 @@ void tickItemMenu(void)
 			createItemMenuAmountBox(&rect);
 			break;
 		case 7:
-			MAIN_func_800FAFB0();
+			pickMeritItem();
 			break;
 		case 5:
 			createSingleCardShopMenu(&rect);
@@ -1315,7 +1315,7 @@ void tickItemMenu(void)
 	}
 }
 
-int32_t MAIN_func_800FAFB0(void)
+int32_t pickMeritItem(void)
 {
 	ItemMenuBox *box;
 	int32_t idx;
@@ -1513,7 +1513,7 @@ void tickItemConfirmBox(void)
 				amount = getCardAmount(SHOP_ITEM_TYPE);
 				amount = amount + 1u;
 				setCardAmount(SHOP_ITEM_TYPE, amount);
-				MONEY -= MAIN_D_8012FFC4[CARD_DATA[SHOP_ITEM_TYPE].spriteId];
+				MONEY -= CARD_PRICES[CARD_DATA[SHOP_ITEM_TYPE].spriteId];
 				SCRIPT_STATE_PTR->smth[box->cursor] = 0xff;
 				UPDATE_SHOP_BIT_BOX = 1;
 				SELECTION_MENU_STATE = 4;
@@ -1787,7 +1787,7 @@ uint8_t getRecycleId(uint8_t value)
 	uint8_t i;
 
 	for (i = 0; i < 0x4e; i++) {
-		if (value == MAIN_D_8012FE78[i]) {
+		if (value == RECYCLEABLE_ITEMS[i]) {
 			return i;
 		}
 	}
@@ -2016,7 +2016,7 @@ void layoutTradeRow(ItemMenuBox *box, uint8_t row, int32_t isLast)
 	terminateString(out, isLast);
 }
 
-void MAIN_func_800FC508(void)
+void tickItemShop(void)
 {
 	int32_t npcId;
 	int32_t i;
@@ -2064,7 +2064,7 @@ void MAIN_func_800FC508(void)
 		break;
 	case 3:
 		createShopBitBox(1);
-		MAIN_func_800FCA14(2, 0xfd, 3, &MAIN_D_80134F70);
+		showShopkeeperSelection(2, 0xfd, 3, &MAIN_D_80134F70);
 		SELECTION_MENU_STATE = 1;
 		SCRIPT_STATE_4 = 4;
 		SCRIPT_STATE_3 = 2;
@@ -2172,8 +2172,8 @@ void createShopBitBox(int32_t showBits)
 	tickShopBitBox();
 }
 
-void MAIN_func_800FCA14(int32_t idx, int32_t owner, int32_t boxId,
-                        int32_t *outSelection)
+void showShopkeeperSelection(int32_t idx, int32_t owner, int32_t boxId,
+                             int32_t *outSelection)
 {
 	showMapheadSelection(idx, owner, boxId, outSelection, 0xff);
 }
@@ -2404,7 +2404,7 @@ int32_t createItemMenuAmountBox(RECT *origin)
 		}
 	} else {
 		SHOP_ITEM_PRICE =
-			MAIN_D_8012FFC4[CARD_DATA[id].spriteId] >> 1;
+			CARD_PRICES[CARD_DATA[id].spriteId] >> 1;
 		MAX_SHOP_AMOUNT = amount;
 	}
 
@@ -3087,7 +3087,7 @@ void layoutCardRow(ItemMenuBox *box, uint8_t row, int32_t isLast)
 		*out++ = 0;
 		*out++ = 0xf;
 		*out++ = 0;
-		value = MAIN_D_8012FFC4[CARD_DATA[type].spriteId];
+		value = CARD_PRICES[CARD_DATA[type].spriteId];
 
 		if (ITEM_MENU_TYPE == 3) {
 			out = intToStringSJIS(out, value, 4, 0);
@@ -3148,7 +3148,7 @@ void layoutDestinationRow(ItemMenuBox *box, uint8_t row, int32_t isLast)
 	}
 
 	raw &= 0x7f;
-	nameId = MAP_ENTRIES[MAIN_D_8013024C[raw].mapId].loadingName;
+	nameId = MAP_ENTRIES[BIRDRA_TRANSPORT_TARGETS[raw].mapId].loadingName;
 	strcpy(out, MAP_NAME_PTR[nameId]);
 	len = strlen(MAP_NAME_PTR[nameId]);
 	out += len;
@@ -3157,7 +3157,7 @@ void layoutDestinationRow(ItemMenuBox *box, uint8_t row, int32_t isLast)
 	*out++ = 0;
 	*out++ = 0x1b;
 	*out++ = 0;
-	out = intToStringSJIS(out, MAIN_D_8013024C[raw].cost, 4, 0);
+	out = intToStringSJIS(out, BIRDRA_TRANSPORT_TARGETS[raw].cost, 4, 0);
 	terminateString(out, isLast);
 }
 
