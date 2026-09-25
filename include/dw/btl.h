@@ -12,6 +12,13 @@
 #include <dw/types.h>
 
 typedef struct {
+	int32_t frame;
+	int16_t x;
+	int16_t y;
+	uint8_t width;
+} BtlCommandShout;
+
+typedef struct {
 	int32_t life;
 	SVECTOR p[4];
 } EfeTrail;

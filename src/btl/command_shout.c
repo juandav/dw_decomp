@@ -10,10 +10,7 @@
 extern char MAIN_D_801346FC[];
 extern char MAIN_D_80134704[];
 extern char MAIN_D_8013470C[];
-extern volatile int32_t BTL_D_80072DAC[];
-extern int16_t BTL_D_80072DB0[];
-extern int16_t BTL_D_80072DB2[];
-extern uint8_t BTL_D_80072DB4[];
+extern BtlCommandShout BTL_COMMAND_SHOUT;
 extern int8_t BTL_D_80072E54[];
 extern int8_t BTL_D_80072E68[];
 
@@ -44,11 +41,11 @@ void BTL_drawCommandShout(uint32_t arg0)
 	int16_t tech;
 	int32_t length;
 
-	if (BTL_D_80072DAC[0] != -1) {
+	if (BTL_COMMAND_SHOUT.frame != -1) {
 		BTL_removeCommandShout();
 	}
 
-	BTL_D_80072DAC[0] = 0;
+	BTL_COMMAND_SHOUT.frame = 0;
 	getEntityScreenPos(ENTITY_TABLE[0], 4, screenPos);
 	setRECT(&rect, 0, 0xcc, 0xa8, 0xc);
 	clearTextSubArea(&rect);
@@ -62,13 +59,13 @@ void BTL_drawCommandShout(uint32_t arg0)
 		length = strlen(BTL_D_80072DE8[(int32_t)arg0 - 1]);
 	}
 
-	BTL_D_80072DB4[0] = length * 12;
-	if ((screenPos[0] - (BTL_D_80072DB4[0] / 2)) < -0x8c) {
-		screenPos[0] = (BTL_D_80072DB4[0] / 2) - 0x8c;
+	BTL_COMMAND_SHOUT.width = length * 12;
+	if ((screenPos[0] - (BTL_COMMAND_SHOUT.width / 2)) < -0x8c) {
+		screenPos[0] = (BTL_COMMAND_SHOUT.width / 2) - 0x8c;
 	}
 
-	if ((screenPos[0] + (BTL_D_80072DB4[0] / 2)) >= 0x8d) {
-		screenPos[0] = 0x8c - (BTL_D_80072DB4[0] / 2);
+	if ((screenPos[0] + (BTL_COMMAND_SHOUT.width / 2)) >= 0x8d) {
+		screenPos[0] = 0x8c - (BTL_COMMAND_SHOUT.width / 2);
 	}
 
 	if (screenPos[1] < -0x64) {
@@ -79,16 +76,16 @@ void BTL_drawCommandShout(uint32_t arg0)
 		screenPos[1] = 0x64;
 	}
 
-	BTL_D_80072DB0[0] = screenPos[0];
-	BTL_D_80072DB2[0] = screenPos[1];
+	BTL_COMMAND_SHOUT.x = screenPos[0];
+	BTL_COMMAND_SHOUT.y = screenPos[1];
 	addObject(0x199, 0, NULL, (RenderFunction)BTL_renderCommandShout);
 }
 
 void BTL_removeCommandShout(void)
 {
-	if (BTL_D_80072DAC[0] != -1) {
+	if (BTL_COMMAND_SHOUT.frame != -1) {
 		removeObject(0x199, 0);
-		BTL_D_80072DAC[0] = -1;
+		BTL_COMMAND_SHOUT.frame = -1;
 	}
 }
 
@@ -102,24 +99,24 @@ void BTL_renderCommandShout(void)
 	sprite.cx = 0xd0;
 	sprite.cy = 0x1e8;
 	sprite.r = sprite.g = sprite.b = 0x80;
-	setWH(&sprite, BTL_D_80072DB4[0], 0xc);
+	setWH(&sprite, BTL_COMMAND_SHOUT.width, 0xc);
 	sprite.mx = sprite.w / 2;
 	sprite.my = 6;
 	sprite.u = 0;
 	sprite.v = 0xcc;
 
-	if (BTL_D_80072DAC[0] < 4) {
-		sprite.scaley = sprite.scalex = (((BTL_D_80072DAC[0] * 2) + 2) << 12) / 10;
+	if (BTL_COMMAND_SHOUT.frame < 4L) {
+		sprite.scaley = sprite.scalex = (((BTL_COMMAND_SHOUT.frame * 2) + 2) << 12) / 10;
 	} else {
 		sprite.scaley = sprite.scalex = 0x1000;
 	}
 
-	sprite.x = BTL_D_80072DB0[0];
-	y = BTL_D_80072DB2[0];
+	sprite.x = BTL_COMMAND_SHOUT.x;
+	y = BTL_COMMAND_SHOUT.y;
 	if (y < -0x28) {
-		sprite.y = y + BTL_D_80072E68[BTL_D_80072DAC[0]++];
+		sprite.y = y + BTL_D_80072E68[BTL_COMMAND_SHOUT.frame++];
 	} else {
-		sprite.y = y + BTL_D_80072E54[BTL_D_80072DAC[0]++];
+		sprite.y = y + BTL_D_80072E54[BTL_COMMAND_SHOUT.frame++];
 	}
 
 	sprite.rotate = 0;
@@ -132,7 +129,7 @@ void BTL_renderCommandShout(void)
 	sprite.y++;
 	GsSortSprite(&sprite, ACTIVE_ORDERING_TABLE, 7);
 
-	if (BTL_D_80072DAC[0] >= 0x14) {
+	if (BTL_COMMAND_SHOUT.frame >= 0x14) {
 		BTL_removeCommandShout();
 	}
 }
