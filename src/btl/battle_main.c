@@ -8,8 +8,10 @@
 #include <dw/btl.h>
 #include <dw/combat.h>
 #include <dw/item.h>
+#include <dw/math.h>
 #include <dw/move.h>
 #include <dw/params.h>
+#include <dw/script.h>
 #include <dw/sound.h>
 #include <dw/sound_async.h>
 #include <dw/swap.h>
@@ -48,7 +50,6 @@ extern DigimonEntity *MAIN_D_80134EF4;
 extern DigimonEntity *MAIN_D_80134EF8;
 extern uint8_t CURRENT_SCREEN;
 extern uint8_t MAIN_D_80134D64;
-extern uint8_t MAIN_D_80135094;
 extern int8_t PARTNER_WAYPOINT_COUNT;
 extern int8_t PARTNER_WAYPOINT_CURRENT;
 extern int8_t PARTNER_WAYPOINT_X[];
@@ -129,7 +130,6 @@ void BTL_removeFinisherAura(int32_t arg0);
 int32_t isFiveTileWidePathOpen(int32_t x1, int32_t y1, int32_t x2, int32_t y2);
 void BTL_addAuraProjectile(Entity *entity);
 void BTL_handleHitReaction(Entity *entity, FighterData *fighter, AttackObject *attack, int16_t index);
-void BTL_setCommandIconUV(DigimonEntity *digimon, POLY_FT4 *prim, int32_t index);
 void BTL_retargetAfterHit(DigimonEntity *digimon, FighterData *fighter, AttackObject attack);
 void BTL_applyFlattenScale(VECTOR *scale, int32_t t);
 void BTL_tickQueuedMove(DigimonEntity *digimon, DigimonEntity *target, FighterData *fighter, int32_t arg3);
@@ -3902,7 +3902,7 @@ void BTL_selectEnemyMove(DigimonEntity *digimon, FighterData *fighter, int16_t i
 	}
 }
 
-void BTL_setCommandIconUV(DigimonEntity *digimon, POLY_FT4 *prim, int32_t index)
+void BTL_setCommandIconUV(DigimonEntity *digimon, POLY_FT4 *prim, uint8_t index)
 {
 	int16_t c;
 	int16_t eff;

@@ -5,10 +5,13 @@
 #include <dw/fade.h>
 #include <dw/file.h>
 #include <dw/file_queue.h>
+#include <dw/font.h>
 #include <dw/main.h>
+#include <dw/math.h>
 #include <dw/mov.h>
 #include <dw/params.h>
 #include <dw/pstat.h>
+#include <dw/script.h>
 #include <dw/sound.h>
 #include <dw/std.h>
 #include <dw/tournament.h>
