@@ -10,16 +10,11 @@ extern int16_t MAIN_D_80135086;
 extern uint8_t MAIN_D_80135088;
 extern uint8_t MAIN_D_80135089;
 extern uint8_t MAIN_D_8013508C;
-extern int16_t BTL_D_80072EB8[];
-extern int16_t BTL_D_80072EC8[];
-extern uint8_t BTL_D_80072E7C[][10];
-extern int8_t MAIN_D_80135094;
 extern uint8_t MAIN_D_8013508A;
 extern uint8_t MAIN_D_8013508B;
 
 void setPosDataPolyFT4(POLY_FT4 *prim, int32_t posX, int32_t posY, int32_t width, int32_t height);
 void setUVDataPolyFT4(POLY_FT4 *prim, int32_t uPos, int32_t vPos, int32_t width, int32_t height);
-void BTL_setCommandIconUV(Entity *entity, POLY_FT4 *prim, uint8_t cmd);
 void BTL_tickCommandMenu(void);
 void BTL_renderCommandMenu(int32_t arg0);
 void BTL_removeCommandMenu(void);
@@ -28,10 +23,7 @@ void BTL_removeCommandMenu(void);
  * command_shout.c state is defined here because it's in .rodata section but
  * it gets modified.
  */
-const volatile int32_t BTL_D_80072DAC = -1;
-const int16_t BTL_D_80072DB0 = 0;
-const int16_t BTL_D_80072DB2 = 0;
-const uint8_t BTL_D_80072DB4[4] = { 0, 0, 0, 0 };
+const BtlCommandShout BTL_COMMAND_SHOUT = { -1, 0, 0, 0 };
 
 void BTL_initializeCommandMenu(void)
 {
@@ -67,7 +59,7 @@ void BTL_initializeCommandMenu(void)
 	}
 
 	MAIN_D_801346F8 = 0;
-	addObject(0x198, 0, (TickFunction)BTL_tickCommandMenu, (RenderFunction)BTL_renderCommandMenu);
+	addObject(0x198, 0, (TickFunction)BTL_tickCommandMenu, BTL_renderCommandMenu);
 }
 
 void BTL_tickCommandMenu(void)
@@ -122,7 +114,7 @@ void BTL_renderCommandMenu(int32_t arg0)
 		x = base - (COMBAT_DATA_PTR->player.hoveredCommand[0] * 0xe);
 		SetPolyFT4(prim);
 		prim->tpage = getTPage(0, 0, 960, 256);
-		prim->clut = GetClut(0x11a, 0x1f1);
+		setClut(prim, 282, 497);
 		setRGB0(prim, 0x80, 0x80, 0x80);
 		setUVDataPolyFT4(prim, 0x3d, 0xe0, 0x16, 0x16);
 		if ((count % 2) == 0) {
@@ -146,9 +138,9 @@ void BTL_renderCommandMenu(int32_t arg0)
 	for (i = 1, off = 0xe; i < COMBAT_DATA_PTR->player.numCommands[0]; i++, off += 0xe) {
 		SetPolyFT4(prim);
 		prim->tpage = getTPage(0, 0, 960, 256);
-		prim->clut = GetClut(0x110, 0x1f0);
+		setClut(prim, 272, 496);
 		setRGB0(prim, 0x80, 0x80, 0x80);
-		BTL_setCommandIconUV(ENTITY_TABLE[COMBAT_DATA_PTR->player.entityIds[arg0]], prim, COMBAT_DATA_PTR->player.availableCommands[0][i]);
+		BTL_setCommandIconUV((DigimonEntity *)ENTITY_TABLE[COMBAT_DATA_PTR->player.entityIds[arg0]], prim, COMBAT_DATA_PTR->player.availableCommands[0][i]);
 		x = base - off;
 		if ((count % 2) == 0) {
 			setXY4(prim, x, ((i % 2) == 0) ? MAIN_D_80135084 + 3 : MAIN_D_80135084 + 0xd, x + 0x10, ((i % 2) == 0) ? MAIN_D_80135084 + 3 : MAIN_D_80135084 + 0xd, x, ((i % 2) == 0) ? MAIN_D_80135086 - 0xd : MAIN_D_80135086 - 3, x + 0x10, ((i % 2) == 0) ? MAIN_D_80135086 - 0xd : MAIN_D_80135086 - 3);
@@ -167,8 +159,8 @@ void BTL_renderCommandMenu(int32_t arg0)
 	for (i = 0; i < COMBAT_DATA_PTR->player.numCommands[0]; i++) {
 		SetPolyFT4(prim);
 		setSemiTrans(prim, 1);
-		prim->tpage = GetTPage(0, 0, 0x3c0, 0x100);
-		prim->clut = GetClut(0x110, 0x1f1);
+		setTPage(prim, 0, 0, 960, 256);
+		setClut(prim, 272, 497);
 		setRGB0(prim, 0x80, 0x80, 0x80);
 		setUVWH(prim, MAIN_D_80134728[BTL_D_80072E7C[MAIN_D_8013508C][i]], 0xe0, MAIN_D_80134730[BTL_D_80072E7C[MAIN_D_8013508C][i]], 31);
 		if (i > 0) {

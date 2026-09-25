@@ -1,4 +1,3 @@
-#include <stdlib.h>
 #include <string.h>
 
 #include <libgpu.h>
@@ -6,19 +5,17 @@
 #include <libgte.h>
 #include <mwinline_n.h>
 
-#include <dw/aabb.h>
 #include <dw/battle.h>
 #include <dw/btl.h>
 #include <dw/combat.h>
 #include <dw/font.h>
-#include <dw/graphics.h>
 #include <dw/item.h>
+#include <dw/math.h>
 #include <dw/model.h>
 #include <dw/params.h>
+#include <dw/script.h>
 #include <dw/sjis.h>
-#include <dw/sound.h>
-
-#include "common.h"
+#include <dw/swap.h>
 
 extern char COMMAND_NAME_RUN[];
 extern char COMMAND_NAME_ATTACK[];
@@ -32,7 +29,6 @@ extern int16_t MAIN_D_80135090[2];
 extern int32_t MAIN_D_801350C0;
 extern GsRVIEW2 GS_VIEWPOINT;
 extern int32_t VIEWPORT_DISTANCE;
-extern int16_t BTL_D_80073014[155][2];
 extern uint8_t MAIN_D_801350BC;
 extern StatsGains STATS_GAINS;
 extern char BTL_COMMAND_LEARNED_TEXT[];
@@ -50,18 +46,14 @@ extern char BTL_INJURED_TEXT[];
 extern int16_t END_TEXT_RECT_Y;
 extern int16_t END_TEXT_RECT_W;
 extern int16_t END_TEXT_RECT_H;
-extern int8_t MAIN_D_80135094;
 extern uint8_t MAIN_D_801350C4;
 extern uint8_t MAIN_D_801350C5;
 extern uint8_t MAIN_D_801350C6;
 extern uint8_t MAIN_D_801350C7;
 extern uint8_t MAIN_D_801350C8;
 extern uint8_t MAIN_D_801350C9;
-extern int16_t BTL_D_80073280[];
-extern BarSprite BTL_D_800732C0[6];
 extern uint8_t MAIN_D_801350CA;
 extern uint8_t MAIN_D_801350CB;
-extern int32_t BTL_D_80073290[12];
 
 void renderString(int32_t a, int32_t b, int32_t c, int32_t d, int32_t e, int32_t f, int32_t g, int32_t h, int32_t i);
 int16_t entityGetTechFromAnim(Entity *entity, int32_t anim);
@@ -77,7 +69,6 @@ void setEntityTextDigit(POLY_FT4 *poly, int32_t x, int32_t y);
 void setUVDataPolyFT4(POLY_FT4 *prim, int32_t u, int32_t v, int32_t w, int32_t h);
 void setPosDataPolyFT4(POLY_FT4 *prim, int32_t x, int32_t y, int32_t w, int32_t h);
 void BTL_drawBattleEndText(int32_t a);
-void swapByte(uint8_t *a, uint8_t *b);
 void BTL_renderBattleStartTextBurst(void);
 void BTL_scrollBattleEndText(void);
 void BTL_appendItemDroppedText(Entity *entity);
@@ -90,7 +81,6 @@ void BTL_renderBattleEndText(int32_t n);
 int32_t BTL_isEndBoxTextFinished(void);
 void BTL_shuffleBattleStartTextPieces(void);
 void BTL_renderNumber(int32_t a, int32_t digits, int32_t x, int32_t y, int16_t value, int32_t layer);
-void GsSortBoxFill(GsBOXF *bp, GsOT *ot, unsigned short pri);
 void BTL_renderFinisherReadyIcon(void);
 void BTL_renderPartnerStatusBars(int16_t idx);
 void BTL_tickPartnerStatusBars(void);
@@ -155,16 +145,16 @@ const char *BTL_D_80072E34[8] = {
 	NULL,
 };
 
-const int8_t BTL_D_80072E54[20] = {
-	0x00, 0xf8, 0xf2, 0xec, 0xe7, 0xe2, 0xde, 0xdc,
-	0xda, 0xd9, 0xd8, 0xd9, 0xda, 0xdc, 0xde, 0xe2,
-	0xde, 0xdc, 0xda, 0xd9,
+const int8_t BTL_SHOUT_HOP_OFFSETS[20] = {
+	0, -8, -14, -20, -25, -30, -34, -36,
+	-38, -39, -40, -39, -38, -36, -34, -30,
+	-34, -36, -38, -39,
 };
 
-const int8_t BTL_D_80072E68[20] = {
-	0x00, 0x01, 0x02, 0x04, 0x06, 0x0a, 0x0f, 0x14,
-	0x1a, 0x20, 0x28, 0x24, 0x22, 0x20, 0x1f, 0x1e,
-	0x1f, 0x20, 0x22, 0x24,
+const int8_t BTL_SHOUT_DROP_OFFSETS[20] = {
+	0, 1, 2, 4, 6, 10, 15, 20,
+	26, 32, 40, 36, 34, 32, 31, 30,
+	31, 32, 34, 36,
 };
 
 const uint8_t BTL_D_80072E7C[6][10] = {
@@ -177,25 +167,11 @@ const uint8_t BTL_D_80072E7C[6][10] = {
 };
 
 const int16_t BTL_D_80072EB8[8] = {
-	0xff88,
-	0xff96,
-	0xffa2,
-	0xffac,
-	0xffb3,
-	0xffb8,
-	0xffbb,
-	0xffbc,
+	0xff88, 0xff96, 0xffa2, 0xffac, 0xffb3, 0xffb8, 0xffbb, 0xffbc,
 };
 
 const int16_t BTL_D_80072EC8[8] = {
-	0xff68,
-	0xff69,
-	0xff6c,
-	0xff71,
-	0xff78,
-	0xff82,
-	0xff8e,
-	0xff9c,
+	0xff68, 0xff69, 0xff6c, 0xff71, 0xff78, 0xff82, 0xff8e, 0xff9c,
 };
 
 const uint8_t BTL_D_80072ED8[8][2] = {
@@ -319,7 +295,7 @@ void BTL_renderFinisherChargeup(void)
 
 	SetPolyFT4(&prim);
 	prim.tpage = getTPage(0, 0, 960, 256);
-	prim.clut = GetClut(0x110, 0x1f2);
+	setClut(&prim, 272, 498);
 	setRGB0(&prim, 0x80, 0x80, 0x80);
 	setUVWH(&prim, 0x58, 0xe0, 46, 12);
 	setXYWH(&prim, MAIN_D_80135090[0], MAIN_D_80135090[1], 0x2e, 0xc);
@@ -831,10 +807,10 @@ void BTL_renderBattleStartText(void)
 
 	if (n == 0x9b) {
 		y = MAIN_D_801350BC++;
-		clut = GetClut(0x100, y % 6 / 2 + 0x1e8);
+		clut = GetClut(256, (y % 6 / 2) + 488);
 		MAIN_D_801350C0 = 1;
 	} else {
-		clut = GetClut(0x100, 0x1e8);
+		clut = GetClut(256, 488);
 	}
 
 	p = BTL_D_800742A0;
@@ -872,7 +848,7 @@ void BTL_renderBattleStartText(void)
 		p3.vz = 0;
 
 		ft = prim;
-		setEntityTextDigit(prim, 0x100, 0x1e8);
+		setEntityTextDigit(prim, 256, 488);
 		setRGB0(prim, 0x80, 0x80, 0x80);
 		prim->clut = clut;
 		gte_ldv3(&p0, &p1, &p2);
@@ -882,13 +858,13 @@ void BTL_renderBattleStartText(void)
 		gte_ldv0(&p3);
 		gte_rtps();
 		gte_stsxy(&prim->x3);
-		setUVWH(prim, ((uint8_t *)*p)[0x13] * 8 + 0x80, 0x80, 8, 8);
+		setUVWH(prim, (((uint8_t *)*p)[0x13] * 8) + 0x80, 0x80, 8, 8);
 		AddPrim(ot + 5, prim++);
 
 		if (n != 0x9b) {
 			SetPolyFT4(prim);
 			setRGB0(prim, 0x80, 0x80, 0x80);
-			prim->tpage = GetTPage(0, 0, 0x380, 0x180);
+			setTPage(prim, 0, 0, 896, 384);
 			prim->clut = clut;
 			SetSemiTrans(prim, 1);
 			if (((int8_t *)*p)[0x10] > 0) {
@@ -1017,9 +993,9 @@ void BTL_renderBattleStartTextBurst(void)
 		PopMatrix();
 
 		ft = prim;
-		setEntityTextDigit(prim, 0x100, 0x1e8);
+		setEntityTextDigit(prim, 256, 488);
 		setRGB0(prim, 0x80, 0x80, 0x80);
-		prim->clut = GetClut(0x100, 0x1e8);
+		setClut(prim, 256, 488);
 		gte_ldv3(&pts[0], &pts[1], &pts[2]);
 		gte_rtpt();
 		gte_stsxy3(&prim->x0, &prim->x1, &prim->x2);
@@ -1027,7 +1003,7 @@ void BTL_renderBattleStartTextBurst(void)
 		gte_ldv0(&pts[3]);
 		gte_rtps();
 		gte_stsxy(&prim->x3);
-		setUVWH(prim, ((uint8_t *)*p)[0x13] * 8 + 0x80, 0x80, 8, 8);
+		setUVWH(prim, (((uint8_t *)*p)[0x13] * 8) + 0x80, 0x80, 8, 8);
 		AddPrim(ot + 5, prim++);
 		shadow = (POLY_F4 *)prim;
 		SetPolyF4(shadow);
@@ -1245,7 +1221,7 @@ void BTL_tickPartnerStatusBars(void)
 void BTL_renderPartnerStatusBars(int16_t idx)
 {
 	POLY_FT4 *prim;
-	BarSprite *p;
+	const BarSprite *p;
 	FighterData *fighter;
 	int16_t *hpPtr;
 	int16_t *mpPtr;
@@ -1281,7 +1257,7 @@ void BTL_renderPartnerStatusBars(int16_t idx)
 	}
 
 	for (bar = 0; bar < 2; bar++) {
-		p = &BTL_D_800732C0[bar * 3 + 2];
+		p = &BTL_D_800732C0[(bar * 3) + 2];
 		if (bar == 0) {
 			x0 = BTL_D_80073280[MAIN_D_801350CB];
 			y0 = -0x64;
@@ -1299,7 +1275,7 @@ void BTL_renderPartnerStatusBars(int16_t idx)
 		prim = (POLY_FT4 *)GsGetWorkBase();
 		for (k = 0; k < 3; k++, p--) {
 			SetPolyFT4(prim);
-			prim->clut = GetClut(0x100, p->clut);
+			setClut(prim, 256, p->clut);
 			prim->tpage = getTPage(0, 0, 896, 256);
 			setRGB0(prim, 0x80, 0x80, 0x80);
 			setUVWH(prim, p->u, p->v, p->w, p->h);
