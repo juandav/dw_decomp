@@ -14,6 +14,7 @@
 #include <dw/btl.h>
 #include <dw/efe.h>
 #include <dw/graphics.h>
+#include <dw/math.h>
 #include <dw/model.h>
 #include <dw/params.h>
 #include <dw/sound.h>

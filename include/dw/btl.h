@@ -4,11 +4,9 @@
 #include <libgs.h>
 #include <libgte.h>
 
+#include <dw/battle.h>
 #include <dw/entity.h>
-#include <dw/font.h>
 #include <dw/graphics.h>
-#include <dw/math.h>
-#include <dw/script.h>
 #include <dw/types.h>
 
 typedef struct {
@@ -108,6 +106,7 @@ extern int32_t MAIN_D_80134D7C[2];
 extern uint8_t MAIN_D_80135078;
 extern int32_t MAIN_D_8013507C;
 extern int32_t MAIN_D_80135080;
+extern int8_t MAIN_D_80135094;
 extern StatsGains INITIAL_COMBAT_STATS[];
 extern int8_t GAME_STATE;
 extern int32_t DRAWING_OFFSET_X;
@@ -116,7 +115,6 @@ extern GsOT *ACTIVE_ORDERING_TABLE;
 extern uint32_t POLLED_INPUT;
 extern uint32_t POLLED_INPUT_PREVIOUS;
 extern char *MOVE_NAMES[];
-extern uint8_t MAIN_D_80134730[8];
 extern int32_t MAIN_D_80135098;
 extern int16_t MAIN_D_801350AE;
 extern int16_t MAIN_D_801350B0;
@@ -133,6 +131,7 @@ extern uint8_t MAIN_D_801346F0[4];
 extern uint8_t MAIN_D_801346F4[4];
 extern int8_t MAIN_D_801346F8;
 extern uint8_t MAIN_D_80134728[5];
+extern uint8_t MAIN_D_80134730[8];
 extern char MAIN_D_80134740[4];
 extern char MAIN_D_80134744[6];
 extern char MAIN_D_8013474C[3];
@@ -166,6 +165,13 @@ extern uint8_t MAIN_D_801347F8[4];
 
 extern const int8_t BTL_SHOUT_HOP_OFFSETS[20];
 extern const int8_t BTL_SHOUT_DROP_OFFSETS[20];
+extern const uint8_t BTL_D_80072E7C[6][10];
+extern const int16_t BTL_D_80072EB8[8];
+extern const int16_t BTL_D_80072EC8[8];
+extern const int16_t BTL_D_80073014[155][2];
+extern const int16_t BTL_D_80073280[8];
+extern const int32_t BTL_D_80073290[12];
+extern const BarSprite BTL_D_800732C0[6];
 extern GsSPRITE BTL_D_80073E54;
 extern BtlDeathCountdownRaw BTL_D_80073E78;
 extern char BTL_END_BOX_TEXTBUFFER[1024];
@@ -225,5 +231,6 @@ void BTL_removeAllAuraProjectiles(void);
 void BTL_unloadAllEFESlots(void);
 void BTL_removeEFEEngine(void);
 void BTL_drawHoveredCommandName(void);
+void BTL_setCommandIconUV(DigimonEntity *digimon, POLY_FT4 *prim, uint8_t index);
 
 #endif
