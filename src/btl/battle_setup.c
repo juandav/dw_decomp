@@ -5,6 +5,7 @@
 #include <dw/item.h>
 #include <dw/model.h>
 #include <dw/params.h>
+#include <dw/script.h>
 
 extern int8_t MAIN_D_80134D64;
 extern int16_t MAIN_D_80134D6A;

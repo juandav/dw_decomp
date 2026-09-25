@@ -6,6 +6,7 @@
 #include <dw/btl.h>
 #include <dw/combat.h>
 #include <dw/main.h>
+#include <dw/script.h>
 #include <dw/std.h>
 #include <dw/ui.h>
 #include <dw/utils.h>
