@@ -28,10 +28,7 @@ void BTL_removeCommandMenu(void);
  * command_shout.c state is defined here because it's in .rodata section but
  * it gets modified.
  */
-const volatile int32_t BTL_D_80072DAC = -1;
-const int16_t BTL_D_80072DB0 = 0;
-const int16_t BTL_D_80072DB2 = 0;
-const uint8_t BTL_D_80072DB4[4] = { 0, 0, 0, 0 };
+const BtlCommandShout BTL_COMMAND_SHOUT = { -1, 0, 0, 0 };
 
 void BTL_initializeCommandMenu(void)
 {
