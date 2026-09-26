@@ -31,7 +31,7 @@ void swapByte(uint8_t *a, uint8_t *b);
 void swapShort(int16_t *a, int16_t *b);
 void swapInt(int32_t *a, int32_t *b);
 
-void loadDynamicLibrary(Overlay lib, uint8_t *isComplete, dw_bool isAsync,
+void loadDynamicLibrary(Overlay lib, uint8_t *isComplete, int8_t isAsync,
 			FileCallback callback, void *param);
 
 #endif

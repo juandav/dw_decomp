@@ -166,7 +166,7 @@ void initializeScripts(void);
 void initializeStatusObjects(void);
 void initializeMusic(void);
 void finalizeMusic(void);
-void playMovie(int32_t movieId, dw_bool shouldPlay);
+void playMovie(int32_t movieId, int32_t shouldPlay);
 void loadStackedTIMFile(char *path);
 void runLandingScreen(void);
 void runMainMenu(void);

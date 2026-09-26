@@ -1424,7 +1424,7 @@ void tickTakeChest(void)
 				     &CHEST_ARRAY[INTERACTED_CHEST].location);
 		clearTextSubArea(&textRect);
 		drawString(DIGIMON_DATA[0].name, 0, 0xc);
-		if (CHEST_ARRAY[INTERACTED_CHEST].isTaken == DW_FALSE) {
+		if (CHEST_ARRAY[INTERACTED_CHEST].isTaken == 0) {
 			drawString(ITEM_PARA[CHEST_ARRAY[INTERACTED_CHEST].item].name,
 			           0, 0x18);
 			drawString(MAIN_D_801341FC, 0, 0x24);

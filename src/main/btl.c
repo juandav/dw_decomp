@@ -363,7 +363,7 @@ void loadBattleData(int32_t entityId, int32_t count)
 		music = -1;
 	}
 	LOAD_EFE_STATE = music;
-	loadDynamicLibrary(BTL_REL, (uint8_t *)&loadState, DW_TRUE, NULL, NULL);
+	loadDynamicLibrary(BTL_REL, (uint8_t *)&loadState, 1, NULL, NULL);
 	tickPartnerWaypoints();
 	PARTNER_ENTITY.digimonEntity.entity.isOnScreen = 1;
 	ENEMY_COUNT = count;

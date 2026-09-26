@@ -4,7 +4,7 @@ TOOLCHAIN ?= mwcc
 PLATFORM ?= psx
 
 CONFIG := $(PLATFORM)/$(TOOLCHAIN)
-CONFIGS := psx/mwcc
+CONFIGS := psx/mwcc psx/gcc
 MATCHING_CONFIG := psx/mwcc
 
 ifeq ($(filter $(CONFIG),$(CONFIGS)),)

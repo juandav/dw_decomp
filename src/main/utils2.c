@@ -36,7 +36,7 @@ void setMapLayerEnabled(uint8_t enabled);
 int32_t isInvisible(Entity* entity);
 int32_t isTamerOnScreen(void);
 void startMovie(int32_t movieId);
-void playMovie(int32_t movieId, dw_bool shouldPlay);
+void playMovie(int32_t movieId, int8_t shouldPlay);
 void initializeFramebuffer(void);
 void initStringFT4(POLY_FT4* poly);
 void convertValueToDigits(int32_t n, int32_t value, int32_t *outCount,
@@ -287,7 +287,7 @@ int32_t isInvisible(Entity* entity)
 	return 0;
 }
 
-void loadDynamicLibrary(Overlay lib, uint8_t *isComplete, dw_bool isAsync,
+void loadDynamicLibrary(Overlay lib, uint8_t *isComplete, int8_t isAsync,
 			FileCallback callback, void *param)
 {
 	uint8_t *nv;
@@ -414,7 +414,7 @@ void loadStackedTIMFile(char *path)
 	}
 }
 
-void playMovie(int32_t movieId, dw_bool shouldPlay)
+void playMovie(int32_t movieId, int8_t shouldPlay)
 {
 	if (shouldPlay) {
 		startMovie(movieId);

@@ -1,4 +1,5 @@
 # This file is used by clangd to add the include paths
+-Iinclude/gcc/
 -Iinclude/ 
 -Iexternal/psyq_headers/mw_lib41/include/
 -std=c99
