@@ -58,8 +58,23 @@ LDFLAGS := -g $(addprefix -T ,$(CPPLDSCRIPT)) -static \
 	   -Wl,--no-check-sections -Wl,-Map=% -Wl,--build-id=none \
 	   -Wl,--gc-sections -Wl,--print-gc-sections
 
-MAIN_ASM_SRC := $(shell find $(ASM_DIR)/main -path '*.s' \
-		-not -path '$(ASM_DIR)/main/*matchings*' 2> /dev/null)
+define unit
+$(1)_ASM_SRC := $$(shell find $$(ASM_DIR)/$(2) -path '*.s' \
+		-not -path '$$(ASM_DIR)/$(2)/*matchings*' 2> /dev/null)
+$(1)_SRC := $$($(1)_ASM_SRC) $$($(1)_GEN_SRC) $$($(1)_C_SRC)
+$(1)_OBJ := $$($(1)_SRC:%=$$(BUILD_DIR)/%.o)
+$(1)_DEP := $$($(1)_OBJ:%.o=%.d)
+OBJ += $$($(1)_OBJ)
+DEP += $$($(1)_DEP)
+endef
+
+define overlay
+$(call unit,$(1),$(2))
+OVERLAY += $(1)
+endef
+
+OBJ :=
+DEP :=
 
 MAIN_SBSS := \
 	$(BUILD_DIR)/generated/unk_0x80134C4C.sbss.s \
@@ -93,10 +108,9 @@ MAIN_BSS := \
 	$(BUILD_DIR)/generated/unk_0x801555D0.bss.s \
 	$(BUILD_DIR)/generated/unk_0x801BF768.bss.s
 
-MAIN_SRC := \
-	$(MAIN_ASM_SRC) \
-	$(MAIN_BSS) \
-	$(MAIN_SBSS) \
+MAIN_GEN_SRC := $(MAIN_BSS) $(MAIN_SBSS)
+
+MAIN_C_SRC := \
 	src/main/_psstart.c \
 	src/main/aabb.c \
 	src/main/anim.c \
@@ -158,19 +172,11 @@ MAIN_SRC := \
 	src/main/vs.c \
 	src/main/world_object.c
 
-MAIN_OBJ := $(MAIN_SRC:%=$(BUILD_DIR)/%.o)
-MAIN_DEP := $(MAIN_OBJ:%.o=%.d)
-
-OBJ += $(MAIN_OBJ)
-DEP += $(MAIN_DEP)
+$(eval $(call unit,MAIN,main))
 
 OVERLAY :=
 
-BTL_ASM_SRC := $(shell find $(ASM_DIR)/btl -path '*.s' \
-		-not -path '$(ASM_DIR)/btl/*matchings*' 2> /dev/null)
-
-BTL_SRC := \
-	$(BTL_ASM_SRC) \
+BTL_C_SRC := \
 	src/btl/battle_effect.c \
 	src/btl/battle_hud.c \
 	src/btl/battle_main.c \
@@ -179,199 +185,79 @@ BTL_SRC := \
 	src/btl/command_menu.c \
 	src/btl/command_shout.c
 
-BTL_OBJ := $(BTL_SRC:%=$(BUILD_DIR)/%.o)
-BTL_DEP := $(BTL_OBJ:%.o=%.d)
+$(eval $(call overlay,BTL,btl))
 
-OBJ += $(BTL_OBJ)
-DEP += $(BTL_DEP)
-
-OVERLAY += BTL
-
-DGET_ASM_SRC := $(shell find $(ASM_DIR)/dget -path '*.s' \
-		-not -path '$(ASM_DIR)/dget/*matchings*' 2> /dev/null)
-
-DGET_SRC := \
-	$(DGET_ASM_SRC) \
+DGET_C_SRC := \
 	src/dget/dget.c
 
-DGET_OBJ := $(DGET_SRC:%=$(BUILD_DIR)/%.o)
-DGET_DEP := $(DGET_OBJ:%.o=%.d)
+$(eval $(call overlay,DGET,dget))
 
-OBJ += $(DGET_OBJ)
-DEP += $(DGET_DEP)
-
-OVERLAY += DGET
-
-DOO2_ASM_SRC := $(shell find $(ASM_DIR)/doo2 -path '*.s' \
-		-not -path '$(ASM_DIR)/doo2/*matchings*' 2> /dev/null)
-
-DOO2_SRC := \
-	$(DOO2_ASM_SRC) \
+DOO2_C_SRC := \
 	src/doo2/doo2.c \
 	src/doo2/doo2_bss.c
 
-DOO2_OBJ := $(DOO2_SRC:%=$(BUILD_DIR)/%.o)
-DOO2_DEP := $(DOO2_OBJ:%.o=%.d)
+$(eval $(call overlay,DOO2,doo2))
 
-OBJ += $(DOO2_OBJ)
-DEP += $(DOO2_DEP)
-
-OVERLAY += DOO2
-
-DOOA_ASM_SRC := $(shell find $(ASM_DIR)/dooa -path '*.s' \
-		-not -path '$(ASM_DIR)/dooa/*matchings*' 2> /dev/null)
-
-DOOA_SRC := \
-	$(DOOA_ASM_SRC) \
+DOOA_C_SRC := \
 	src/dooa/dooa.c \
 	src/dooa/dooa_bss.c
 
-DOOA_OBJ := $(DOOA_SRC:%=$(BUILD_DIR)/%.o)
-DOOA_DEP := $(DOOA_OBJ:%.o=%.d)
+$(eval $(call overlay,DOOA,dooa))
 
-OBJ += $(DOOA_OBJ)
-DEP += $(DOOA_DEP)
-
-OVERLAY += DOOA
-
-EAB_ASM_SRC := $(shell find $(ASM_DIR)/eab -path '*.s' \
-		-not -path '$(ASM_DIR)/eab/*matchings*' 2> /dev/null)
-
-EAB_SRC := \
-	$(EAB_ASM_SRC) \
+EAB_C_SRC := \
 	src/eab/eab.c \
 	src/eab/eab_bss.c
 
-EAB_OBJ := $(EAB_SRC:%=$(BUILD_DIR)/%.o)
-EAB_DEP := $(EAB_OBJ:%.o=%.d)
+$(eval $(call overlay,EAB,eab))
 
-OBJ += $(EAB_OBJ)
-DEP += $(EAB_DEP)
-
-OVERLAY += EAB
-
-ENDI_ASM_SRC := $(shell find $(ASM_DIR)/endi -path '*.s' \
-		-not -path '$(ASM_DIR)/endi/*matchings*' 2> /dev/null)
-
-ENDI_SRC := \
-	$(ENDI_ASM_SRC) \
+ENDI_C_SRC := \
 	src/endi/endi.c
 
-ENDI_OBJ := $(ENDI_SRC:%=$(BUILD_DIR)/%.o)
-ENDI_DEP := $(ENDI_OBJ:%.o=%.d)
+$(eval $(call overlay,ENDI,endi))
 
-OBJ += $(ENDI_OBJ)
-DEP += $(ENDI_DEP)
-
-OVERLAY += ENDI
-
-EVL_ASM_SRC := $(shell find $(ASM_DIR)/evl -path '*.s' \
-		-not -path '$(ASM_DIR)/evl/*matchings*' 2> /dev/null)
-
-EVL_SRC := \
-	$(EVL_ASM_SRC) \
+EVL_C_SRC := \
 	src/evl/evl.c \
 	src/evl/evl_bss.c
 
-EVL_OBJ := $(EVL_SRC:%=$(BUILD_DIR)/%.o)
-EVL_DEP := $(EVL_OBJ:%.o=%.d)
+$(eval $(call overlay,EVL,evl))
 
-OBJ += $(EVL_OBJ)
-DEP += $(EVL_DEP)
-
-OVERLAY += EVL
-
-FISH_ASM_SRC := $(shell find $(ASM_DIR)/fish -path '*.s' \
-		-not -path '$(ASM_DIR)/fish/*matchings*' 2> /dev/null)
-
-FISH_SRC := \
-	$(FISH_ASM_SRC) \
+FISH_C_SRC := \
 	src/fish/fish.c \
 	src/fish/fish_model.c \
 	src/fish/fish_bss.c
 
+$(eval $(call overlay,FISH,fish))
+
 $(BUILD_DIR)/src/fish/fish.c.o: MWCCWRAP_FLAGS += -pragma "optimize_for_size on"
 
-FISH_OBJ := $(FISH_SRC:%=$(BUILD_DIR)/%.o)
-FISH_DEP := $(FISH_OBJ:%.o=%.d)
-
-OBJ += $(FISH_OBJ)
-DEP += $(FISH_DEP)
-
-OVERLAY += FISH
-
-KAR_ASM_SRC := $(shell find $(ASM_DIR)/kar -path '*.s' \
-		-not -path '$(ASM_DIR)/kar/*matchings*' 2> /dev/null)
-
-KAR_SRC := \
-	$(KAR_ASM_SRC) \
+KAR_C_SRC := \
 	src/kar/kar.c \
 	src/kar/kar_bss.c
 
-KAR_OBJ := $(KAR_SRC:%=$(BUILD_DIR)/%.o)
-KAR_DEP := $(KAR_OBJ:%.o=%.d)
+$(eval $(call overlay,KAR,kar))
 
-OBJ += $(KAR_OBJ)
-DEP += $(KAR_DEP)
-
-OVERLAY += KAR
-
-MOV_ASM_SRC := $(shell find $(ASM_DIR)/mov -path '*.s' \
-		-not -path '$(ASM_DIR)/mov/*matchings*' 2> /dev/null)
-
-MOV_SRC := \
-	$(MOV_ASM_SRC) \
+MOV_C_SRC := \
 	src/mov/mov.c \
 	src/mov/mov_bss.c
 
-MOV_OBJ := $(MOV_SRC:%=$(BUILD_DIR)/%.o)
-MOV_DEP := $(MOV_OBJ:%.o=%.d)
+$(eval $(call overlay,MOV,mov))
 
-OBJ += $(MOV_OBJ)
-DEP += $(MOV_DEP)
-
-OVERLAY += MOV
-
-MURD_ASM_SRC := $(shell find $(ASM_DIR)/murd -path '*.s' \
-		-not -path '$(ASM_DIR)/murd/*matchings*' 2> /dev/null)
-
-MURD_SRC := \
-	$(MURD_ASM_SRC) \
+MURD_C_SRC := \
 	src/murd/murd.c \
 	src/murd/murd_bss.c
 
-MURD_OBJ := $(MURD_SRC:%=$(BUILD_DIR)/%.o)
-MURD_DEP := $(MURD_OBJ:%.o=%.d)
+$(eval $(call overlay,MURD,murd))
 
-OBJ += $(MURD_OBJ)
-DEP += $(MURD_DEP)
-
-OVERLAY += MURD
-
-STD_ASM_SRC := $(shell find $(ASM_DIR)/std -path '*.s' \
-		-not -path '$(ASM_DIR)/std/*matchings*' 2> /dev/null)
-
-STD_SRC := \
-	$(STD_ASM_SRC) \
+STD_C_SRC := \
 	src/std/std_setup.c \
 	src/std/std_main.c \
 	src/std/std_hud.c \
 	src/std/std_bss.c \
 	src/std/std_effect.c
 
-STD_OBJ := $(STD_SRC:%=$(BUILD_DIR)/%.o)
-STD_DEP := $(STD_OBJ:%.o=%.d)
+$(eval $(call overlay,STD,std))
 
-OBJ += $(STD_OBJ)
-DEP += $(STD_DEP)
-
-OVERLAY += STD
-
-TRN2_ASM_SRC := $(shell find $(ASM_DIR)/trn2 -path '*.s' \
-		-not -path '$(ASM_DIR)/trn2/*matchings*' 2> /dev/null)
-
-TRN2_SRC := \
-	$(TRN2_ASM_SRC) \
+TRN2_C_SRC := \
 	src/trn2/trn2_hp_map99.c \
 	src/trn2/trn2_def_map99.c \
 	src/trn2/trn2_hp_map107.c \
@@ -383,19 +269,9 @@ TRN2_SRC := \
 	src/trn2/trn2_slots.c \
 	src/trn2/trn2_bss.c
 
-TRN2_OBJ := $(TRN2_SRC:%=$(BUILD_DIR)/%.o)
-TRN2_DEP := $(TRN2_OBJ:%.o=%.d)
+$(eval $(call overlay,TRN2,trn2))
 
-OBJ += $(TRN2_OBJ)
-DEP += $(TRN2_DEP)
-
-OVERLAY += TRN2
-
-TRN_ASM_SRC := $(shell find $(ASM_DIR)/trn -path '*.s' \
-		-not -path '$(ASM_DIR)/trn/*matchings*' 2> /dev/null)
-
-TRN_SRC := \
-	$(TRN_ASM_SRC) \
+TRN_C_SRC := \
 	src/trn/trn_reward.c \
 	src/trn/trn_hp.c \
 	src/trn/trn_mp.c \
@@ -407,32 +283,16 @@ TRN_SRC := \
 	src/trn/trn_slots.c \
 	src/trn/trn_bss.c
 
-TRN_OBJ := $(TRN_SRC:%=$(BUILD_DIR)/%.o)
-TRN_DEP := $(TRN_OBJ:%.o=%.d)
+$(eval $(call overlay,TRN,trn))
 
-OBJ += $(TRN_OBJ)
-DEP += $(TRN_DEP)
-
-OVERLAY += TRN
-
-VS_ASM_SRC := $(shell find $(ASM_DIR)/vs -path '*.s' \
-		-not -path '$(ASM_DIR)/vs/*matchings*' 2> /dev/null)
-
-VS_SRC := \
-	$(VS_ASM_SRC) \
+VS_C_SRC := \
 	src/vs/vs_bss.c \
 	src/vs/vs_effect.c \
 	src/vs/vs_hud.c \
 	src/vs/vs_main.c \
 	src/vs/vs_scene.c
 
-VS_OBJ := $(VS_SRC:%=$(BUILD_DIR)/%.o)
-VS_DEP := $(VS_OBJ:%.o=%.d)
-
-OBJ += $(VS_OBJ)
-DEP += $(VS_DEP)
-
-OVERLAY += VS
+$(eval $(call overlay,VS,vs))
 
 LINKER_SCRIPTS := $(addprefix $(BUILD_DIR)/generated/,\
 		  $(addsuffix .ld, main \
