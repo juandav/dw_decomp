@@ -137,7 +137,7 @@ void setShortWithStride();
 void getDrawingOffsetCopy(int32_t *x, int32_t *y);
 int32_t isTamerOnScreen(void);
 int32_t lerp(int32_t start, int32_t end, int32_t t0, int32_t t1, int32_t t);
-void renderParticleFlash(int16_t *params);
+void renderParticleFlash(ParticleFlashData *params);
 void renderFXParticle(SVECTOR *pos, int32_t size, uint8_t *color);
 int32_t worldPosToScreenPos(int16_t *world, int16_t *screen);
 void addFXPrim(POLY_FT4 *prim, int32_t x, int32_t y, int16_t width, int16_t height, int32_t depth);
@@ -492,7 +492,7 @@ void renderParticleFX(int32_t id)
 			flash.scale = (uint32_t)(fx->spread[3][i] * (VIEWPORT_DISTANCE * 8)) / (uint32_t)depth;
 			flash.depth = depth >> 4;
 			if ((flash.depth > 0x20) && (flash.depth < 0x1000)) {
-				renderParticleFlash((int16_t *)&flash);
+				renderParticleFlash(&flash);
 			}
 		}
 	}
@@ -904,7 +904,7 @@ void renderEFEFlash(int32_t id)
 		flash.depth = data->fixedDepth;
 	}
 	if ((flash.depth > 0x20) && (flash.depth < 0x1000)) {
-		renderParticleFlash((int16_t *)&flash);
+		renderParticleFlash(&flash);
 	}
 }
 
