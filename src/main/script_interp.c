@@ -132,7 +132,7 @@ void itemMenuSelectFirst(ItemMenuBox *box);
 int32_t isXPressedAfterDialogue(void);
 int32_t isKeyDown(int32_t mask);
 int32_t createItemMenuAmountBox(RECT *origin);
-int32_t createSingleCardShopMenu(RECT *origin);
+int32_t createItemMenuConfirmBox(RECT *origin);
 ItemMenuBox *getItemMenuFromType(void);
 int32_t createItemMenuDescriptionBox(ItemMenuBox *box, RECT *origin, int32_t uiBoxId);
 void itemMenuCursorTop(ItemMenuBox *box, int32_t startRow, int32_t style);
@@ -210,7 +210,7 @@ void renderString(int32_t a, int32_t b, int32_t c, int32_t d, int32_t e, int32_t
 void GsSortBoxFill(GsBOXF *bp, GsOT *otp, u_short pri);
 void renderHorizontalLine(uint8_t boxId, int16_t x, int16_t y, int32_t w);
 void drawString(char *str, int32_t x, int32_t y);
-int32_t flipMenuPage(uint8_t boxId);
+int32_t flipTextboxPage(uint8_t boxId);
 void MAIN_func_800D634C(int32_t param_1, int32_t param_2);
 
 static void *script_interp_text_order[] = {
@@ -2729,7 +2729,7 @@ void createCardMenuBox(void)
 	createTextbox(1, 0xf1, &rect, &origin, tickCardMenu,
 	              renderCardMenuBox);
 	registerTextbox(1, 9, 6, 1, 0);
-	createItemMenu(result, 1, 9);
+	openItemMenu(result, 1, 9);
 	layoutItemMenu(result, 9, 1);
 	MAIN_D_8013500C = 0;
 }
@@ -2875,13 +2875,13 @@ void createItemKeeperBoxes(void)
 	createTextbox(1, 0xe1, &rect, &origin, tickItemKeeperMenu,
 	              renderItemKeeperStoredBox);
 	registerTextbox(1, 9, 6, 1, 1);
-	createItemMenu(ITEM_MENU_LEFT, 1, 0xa);
+	openItemMenu(ITEM_MENU_LEFT, 1, 0xa);
 	layoutItemKeeperList(0);
 	setupBoxOrigin(0xfd, &origin);
 	setRECT(&rect, 0, -98, 148, 127);
 	createTextbox(2, 0xe1, &rect, &origin, 0, renderItemKeeperHandBox);
 	registerTextbox(2, 9, 6, 1, 2);
-	createItemMenu(ITEM_MENU_RIGHT, 2, 0xa);
+	openItemMenu(ITEM_MENU_RIGHT, 2, 0xa);
 	layoutItemKeeperList(1);
 }
 
@@ -3019,7 +3019,7 @@ void createTransportMenuBox(void)
 	createTextbox(1, 0xf1, &rect, &origin, tickTransportMenu,
 	              renderTransportMenuBox);
 	registerTextbox(1, 9, 6, 1, 0);
-	createItemMenu(ITEM_MENU_LEFT, 1, 9);
+	openItemMenu(ITEM_MENU_LEFT, 1, 9);
 	layoutItemMenu(ITEM_MENU_LEFT, 9, 3);
 	MAIN_D_8013500C = 0;
 }
@@ -3069,7 +3069,7 @@ void createTradeMenuBox(void)
 	createTextbox(1, 0xe1, &rect, &origin, tickTradeMenu,
 	              renderTradeMenuBox);
 	registerTextbox(1, 9, 4, 1, 0);
-	createItemMenu(ITEM_MENU_LEFT, 1, 0xa);
+	openItemMenu(ITEM_MENU_LEFT, 1, 0xa);
 	layoutTradeList();
 }
 
@@ -3120,7 +3120,7 @@ void tickCardMenu(void)
 		src = &ITEM_MENU_DESCRIPTION_RECTS[ITEM_MENU_TYPE];
 		if (ITEM_MENU_TYPE == 3) {
 			setRECT(&rect, src->x, src->y, src->w, src->h);
-			createSingleCardShopMenu(&rect);
+			createItemMenuConfirmBox(&rect);
 		} else if (ITEM_MENU_TYPE == 6) {
 			pickMeritCard();
 		} else {
@@ -4072,7 +4072,7 @@ void tickNamingBox(void)
 	int16_t idx;
 	uint8_t n;
 
-	if (flipMenuPage(1) != 0) {
+	if (flipTextboxPage(1) != 0) {
 		return;
 	}
 	if (UI_BOX_DATA[1].state != 1) {

@@ -118,15 +118,15 @@ void closeTextbox(int32_t boxId, RECT *target);
 void redrawItemMenuRow(ItemMenuBox *box, int32_t style);
 void renderShopBitBox(void);
 void tickItemMenu(void);
-void renderItemMenuBox(void);
+void renderItemMenu(void);
 void itemMenuCursorDown(ItemMenuBox *box, int32_t style);
 int32_t createItemMenuDescriptionBox(ItemMenuBox *box, RECT *origin, int32_t uiBoxId);
 void MAIN_func_801000E4(void);
 int32_t shopFillBuyItemList(void);
 int32_t fillInventoryItemList(void);
 int32_t pickMeritItem(void);
-void tickItemDescriptionBox(void);
-void renderItemDescriptionBox(void);
+void tickItemMenuDescriptionBox(void);
+void renderItemMenuDescriptionBox(void);
 void tickShopBitBox(void);
 uint8_t *doShopkeeperLine(int32_t idx);
 uint8_t *resolveMapHeadEntry(int32_t section, int32_t idx);
@@ -141,8 +141,8 @@ int32_t isItemMenuBoxBusy(ItemMenuBox *box);
 void itemMenuCursorTop(ItemMenuBox *box, int32_t startRow, int32_t style);
 void itemMenuCursorUp(ItemMenuBox *box, int32_t style);
 void itemMenuCursorBottom(ItemMenuBox *box, int32_t startRow, int32_t style);
-void reservePopupTextRow(void);
-int32_t flipMenuPage(uint8_t a);
+void setItemMenuSubTextboxLine(void);
+int32_t flipTextboxPage(uint8_t a);
 void itemMenuSelectLast(ItemMenuBox *box);
 void itemMenuSelectFirst(ItemMenuBox *box);
 uint8_t *MAIN_func_800FF444(uint8_t *data, int32_t index);
@@ -164,10 +164,10 @@ int32_t advanceTextbox(int32_t boxId);
 void setupDialogueBox(uint8_t owner);
 int32_t MAIN_func_80101EF8(int32_t boxId, int32_t speakerId);
 void layoutItemMenuAmountBox(void);
-void tickItemConfirmBox(void);
-void renderItemConfirmBox(void);
+void tickItemMenuConfirmBox(void);
+void renderItemMenuConfirmBox(void);
 int32_t createItemMenuAmountBox(RECT *origin);
-int32_t createSingleCardShopMenu(RECT *origin);
+int32_t createItemMenuConfirmBox(RECT *origin);
 void renderItemMenuSprite(int32_t boxId, int32_t idx, int16_t x, int16_t y);
 void renderItemMenuScrollBar(ItemMenuBox *box);
 void renderItemMenuItemList(ItemMenuBox *box, int16_t x1, int16_t y1, int16_t x2, int16_t y2, int32_t flag);
@@ -262,14 +262,14 @@ static void *script_common_text_order[] = {
 	layoutBgmTrackRow,
 	layoutCardRow,
 	layoutItemRow,
-	flipMenuPage,
+	flipTextboxPage,
 	lostAllLives,
 	showMapHeadTextbox,
 	renderCardSprite,
 	renderInsetWithoutBox,
 	renderHorizontalLine,
 	MAIN_func_800FDFB4,
-	reservePopupTextRow,
+	setItemMenuSubTextboxLine,
 	renderItemMenuItemList,
 	renderItemMenuScrollBar,
 	renderItemMenuSprite,
@@ -278,11 +278,11 @@ static void *script_common_text_order[] = {
 	itemMenuCursorBottom,
 	itemMenuCursorUp,
 	itemMenuCursorTop,
-	createSingleCardShopMenu,
+	createItemMenuConfirmBox,
 	createItemMenuAmountBox,
 	isItemMenuBoxBusy,
 	layoutItemMenu,
-	createItemMenu,
+	openItemMenu,
 	getItemMenuFromType,
 	tickPickItemMenu,
 	createItemMenuBox,
@@ -309,15 +309,15 @@ static void *script_common_text_order[] = {
 	doShopkeeperLine,
 	renderShopBitBox,
 	tickShopBitBox,
-	renderItemConfirmBox,
-	tickItemConfirmBox,
+	renderItemMenuConfirmBox,
+	tickItemMenuConfirmBox,
 	layoutItemMenuAmountBox,
 	renderSellItemBox,
 	tickSellItemBox,
-	renderItemDescriptionBox,
-	tickItemDescriptionBox,
+	renderItemMenuDescriptionBox,
+	tickItemMenuDescriptionBox,
 	pickMeritItem,
-	renderItemMenuBox,
+	renderItemMenu,
 	tickItemMenu,
 	fillInventoryItemList,
 	shopFillBuyItemList,
@@ -1278,7 +1278,7 @@ void tickItemMenu(void)
 			pickMeritItem();
 			break;
 		case 5:
-			createSingleCardShopMenu(&rect);
+			createItemMenuConfirmBox(&rect);
 			break;
 		}
 	} else if (isKeyDown(0x10)) {
@@ -1337,7 +1337,7 @@ int32_t pickMeritItem(void)
 	return 0;
 }
 
-void tickItemDescriptionBox(void)
+void tickItemMenuDescriptionBox(void)
 {
 	if (UI_BOX_DATA[3].state != 1) {
 		return;
@@ -1355,7 +1355,7 @@ void tickItemDescriptionBox(void)
 	playSound(0, 3);
 }
 
-void renderItemDescriptionBox(void)
+void renderItemMenuDescriptionBox(void)
 {
 	renderString(0, (int16_t)(UI_BOX_DATA[3].finalPos.x + 6),
 	             (int16_t)(UI_BOX_DATA[3].finalPos.y + 5), 0xfc, 0xc, 0,
@@ -1407,7 +1407,7 @@ void renderSellItemBox(void)
 	}
 }
 
-void renderItemMenuBox(void)
+void renderItemMenu(void)
 {
 	int16_t bx;
 	int16_t by;
@@ -1474,7 +1474,7 @@ void layoutItemMenuAmountBox(void)
 	TEXT_BOX_DATA[3].writeCount++;
 }
 
-void tickItemConfirmBox(void)
+void tickItemMenuConfirmBox(void)
 {
 	ItemMenuBox *box;
 	uint8_t amount;
@@ -1530,7 +1530,7 @@ void tickItemConfirmBox(void)
 	}
 }
 
-void renderItemConfirmBox(void)
+void renderItemMenuConfirmBox(void)
 {
 	MenuTextLayout layout;
 	int16_t *entry;
@@ -2197,9 +2197,9 @@ void createItemMenuBox(void)
 	dims = (int16_t *)((uint8_t *)ITEM_MENU_POS + ITEM_MENU_TYPE * 8);
 	setRECT(&rect, dims[0], dims[1], dims[2], dims[3]);
 	createTextbox(1, 0xf1, &rect, &origin, tickItemMenu,
-	              renderItemMenuBox);
+	              renderItemMenu);
 	registerTextbox(1, 9, 6, 1, 0);
-	createItemMenu(result, 1, 9);
+	openItemMenu(result, 1, 9);
 	layoutItemMenu(result, 9, 0);
 	MAIN_D_8013500C = 0;
 }
@@ -2260,7 +2260,7 @@ ItemMenuBox *getItemMenuFromType(void)
 	return 0;
 }
 
-void createItemMenu(ItemMenuBox *box, int32_t boxId, int32_t startRow)
+void openItemMenu(ItemMenuBox *box, int32_t boxId, int32_t startRow)
 {
 	int32_t i;
 
@@ -2347,7 +2347,7 @@ int32_t isItemMenuBoxBusy(ItemMenuBox *box)
 		return 1;
 	}
 
-	return flipMenuPage(box->boxId);
+	return flipTextboxPage(box->boxId);
 }
 
 int32_t createItemMenuAmountBox(RECT *origin)
@@ -2410,7 +2410,7 @@ int32_t createItemMenuAmountBox(RECT *origin)
 
 	SHOP_AMOUNT = 1;
 	MAIN_D_80134F82 = 1;
-	reservePopupTextRow();
+	setItemMenuSubTextboxLine();
 	boxY = UI_BOX_DATA[1].finalPos.y;
 	origin->x += UI_BOX_DATA[1].finalPos.x;
 	origin->y += (boxY + box->cursor * 18);
@@ -2428,7 +2428,7 @@ fail:
 	return 0;
 }
 
-int32_t createSingleCardShopMenu(RECT *origin)
+int32_t createItemMenuConfirmBox(RECT *origin)
 {
 	ItemMenuBox *box;
 	RECT rect;
@@ -2454,13 +2454,13 @@ int32_t createSingleCardShopMenu(RECT *origin)
 		}
 	}
 
-	reservePopupTextRow();
+	setItemMenuSubTextboxLine();
 	boxY = UI_BOX_DATA[1].finalPos.y;
 	origin->x += UI_BOX_DATA[1].finalPos.x;
 	origin->y += (boxY + box->cursor * 18);
 	setRECT(&rect, -0x38, -0x15, 0x70, 0x2a);
-	createTextbox(3, 0xc1, &rect, origin, tickItemConfirmBox,
-	              renderItemConfirmBox);
+	createTextbox(3, 0xc1, &rect, origin, tickItemMenuConfirmBox,
+	              renderItemMenuConfirmBox);
 	registerTextbox(3, ITEM_MENU_SUB_TEXTBOX_LINE, 2, 0, 0);
 	showMapHeadTextbox(0, 0xff, 3, 0x4d8);
 	SHOP_AMOUNT = 0;
@@ -2558,13 +2558,13 @@ int32_t createItemMenuDescriptionBox(ItemMenuBox *box, RECT *origin, int32_t uiB
 		return 0;
 	}
 
-	reservePopupTextRow();
+	setItemMenuSubTextboxLine();
 	boxY = UI_BOX_DATA[uiBoxId].finalPos.y;
 	origin->x += UI_BOX_DATA[uiBoxId].finalPos.x;
 	origin->y += (boxY + box->cursor * 18);
 	setRECT(&rect, -0x84, -0xb, 0x108, 0x16);
-	createTextbox(3, 0xc1, &rect, origin, tickItemDescriptionBox,
-	              renderItemDescriptionBox);
+	createTextbox(3, 0xc1, &rect, origin, tickItemMenuDescriptionBox,
+	              renderItemMenuDescriptionBox);
 	registerTextbox(3, ITEM_MENU_SUB_TEXTBOX_LINE, 1, 0, 0);
 	strcpy((out = TEXT_BUFFERS_PTR + (ITEM_MENU_SUB_TEXTBOX_LINE << 6), out),
 	       ITEM_DESC_PTR[item]);
@@ -2723,7 +2723,7 @@ void renderItemMenuItemList(ItemMenuBox *box, int16_t x1, int16_t y1, int16_t x2
 	}
 }
 
-void reservePopupTextRow(void)
+void setItemMenuSubTextboxLine(void)
 {
 	uint8_t *box = (uint8_t *)TEXT_BOX_DATA;
 
@@ -2944,7 +2944,7 @@ state3:
 	SELECTION_MENU_STATE = 2;
 }
 
-int32_t flipMenuPage(uint8_t a)
+int32_t flipTextboxPage(uint8_t a)
 {
 	TextBoxData *entry;
 
