@@ -4,12 +4,12 @@
 
 CROSS ?= mipsel-linux-gnu-
 
-BUILDDIR := build
+BUILD_DIR := build
 ASM_DIR := asm
-EXPECTEDDIR := expected
+EXPECTED_DIR := expected
 
-ELF := $(BUILDDIR)/SLUS_010.32.elf
-EXE := $(BUILDDIR)/SLUS_010.32
+ELF := $(BUILD_DIR)/SLUS_010.32.elf
+EXE := $(BUILD_DIR)/SLUS_010.32
 
 CC := $(CROSS)gcc
 LD := $(CROSS)ld
@@ -44,7 +44,7 @@ LDSCRIPT := \
 	config/overlay.ld \
 	config/main.ld
 
-CPPLDSCRIPT := $(LDSCRIPT:%=$(BUILDDIR)/%)
+CPPLDSCRIPT := $(LDSCRIPT:%=$(BUILD_DIR)/%)
 
 ARCHFLAGS := -march=r3000 -mtune=r3000 -mabi=32 -EL -mfp32 \
 	     -fno-pic -mno-shared -mno-abicalls -mno-llsc \
@@ -62,36 +62,36 @@ MAIN_ASM_SRC := $(shell find $(ASM_DIR)/main -path '*.s' \
 		-not -path '$(ASM_DIR)/main/*matchings*' 2> /dev/null)
 
 MAIN_SBSS := \
-	$(BUILDDIR)/generated/unk_0x80134C4C.sbss.s \
-	$(BUILDDIR)/generated/unk_0x80134CC0.sbss.s \
-	$(BUILDDIR)/generated/unk_0x80134D9C.sbss.s \
-	$(BUILDDIR)/generated/unk_0x80134E1C.sbss.s \
-	$(BUILDDIR)/generated/unk_0x80134E50.sbss.s \
-	$(BUILDDIR)/generated/unk_0x80134E68.sbss.s \
-	$(BUILDDIR)/generated/unk_0x80134E90.sbss.s
+	$(BUILD_DIR)/generated/unk_0x80134C4C.sbss.s \
+	$(BUILD_DIR)/generated/unk_0x80134CC0.sbss.s \
+	$(BUILD_DIR)/generated/unk_0x80134D9C.sbss.s \
+	$(BUILD_DIR)/generated/unk_0x80134E1C.sbss.s \
+	$(BUILD_DIR)/generated/unk_0x80134E50.sbss.s \
+	$(BUILD_DIR)/generated/unk_0x80134E68.sbss.s \
+	$(BUILD_DIR)/generated/unk_0x80134E90.sbss.s
 
 MAIN_BSS := \
-	$(BUILDDIR)/generated/libapi.bss.s \
-	$(BUILDDIR)/generated/libetc.bss.s \
-	$(BUILDDIR)/generated/libgpu.bss.s \
-	$(BUILDDIR)/generated/libgs.bss.s \
-	$(BUILDDIR)/generated/libgte.bss.s \
-	$(BUILDDIR)/generated/model.bss.s \
-	$(BUILDDIR)/generated/unk_0x80137A24.bss.s \
-	$(BUILDDIR)/generated/libcd.bss.s \
-	$(BUILDDIR)/generated/unk_0x8013C038.bss.s \
-	$(BUILDDIR)/generated/unk_0x8013D590.bss.s \
-	$(BUILDDIR)/generated/libspu.bss.s \
-	$(BUILDDIR)/generated/libsnd.bss.s \
-	$(BUILDDIR)/generated/unk_0x8014F060.bss.s \
-	$(BUILDDIR)/generated/unk_0x80154F80.bss.s \
-	$(BUILDDIR)/generated/libds.bss.s \
-	$(BUILDDIR)/generated/butterfly.bss.s \
-	$(BUILDDIR)/generated/libmrcd.bss.s \
-	$(BUILDDIR)/generated/bubble.bss.s \
-	$(BUILDDIR)/generated/battle_ui.bss.s \
-	$(BUILDDIR)/generated/unk_0x801555D0.bss.s \
-	$(BUILDDIR)/generated/unk_0x801BF768.bss.s
+	$(BUILD_DIR)/generated/libapi.bss.s \
+	$(BUILD_DIR)/generated/libetc.bss.s \
+	$(BUILD_DIR)/generated/libgpu.bss.s \
+	$(BUILD_DIR)/generated/libgs.bss.s \
+	$(BUILD_DIR)/generated/libgte.bss.s \
+	$(BUILD_DIR)/generated/model.bss.s \
+	$(BUILD_DIR)/generated/unk_0x80137A24.bss.s \
+	$(BUILD_DIR)/generated/libcd.bss.s \
+	$(BUILD_DIR)/generated/unk_0x8013C038.bss.s \
+	$(BUILD_DIR)/generated/unk_0x8013D590.bss.s \
+	$(BUILD_DIR)/generated/libspu.bss.s \
+	$(BUILD_DIR)/generated/libsnd.bss.s \
+	$(BUILD_DIR)/generated/unk_0x8014F060.bss.s \
+	$(BUILD_DIR)/generated/unk_0x80154F80.bss.s \
+	$(BUILD_DIR)/generated/libds.bss.s \
+	$(BUILD_DIR)/generated/butterfly.bss.s \
+	$(BUILD_DIR)/generated/libmrcd.bss.s \
+	$(BUILD_DIR)/generated/bubble.bss.s \
+	$(BUILD_DIR)/generated/battle_ui.bss.s \
+	$(BUILD_DIR)/generated/unk_0x801555D0.bss.s \
+	$(BUILD_DIR)/generated/unk_0x801BF768.bss.s
 
 MAIN_SRC := \
 	$(MAIN_ASM_SRC) \
@@ -158,7 +158,7 @@ MAIN_SRC := \
 	src/main/vs.c \
 	src/main/world_object.c
 
-MAIN_OBJ := $(MAIN_SRC:%=$(BUILDDIR)/%.o)
+MAIN_OBJ := $(MAIN_SRC:%=$(BUILD_DIR)/%.o)
 MAIN_DEP := $(MAIN_OBJ:%.o=%.d)
 
 OBJ += $(MAIN_OBJ)
@@ -179,7 +179,7 @@ BTL_SRC := \
 	src/btl/command_menu.c \
 	src/btl/command_shout.c
 
-BTL_OBJ := $(BTL_SRC:%=$(BUILDDIR)/%.o)
+BTL_OBJ := $(BTL_SRC:%=$(BUILD_DIR)/%.o)
 BTL_DEP := $(BTL_OBJ:%.o=%.d)
 
 OBJ += $(BTL_OBJ)
@@ -194,7 +194,7 @@ DGET_SRC := \
 	$(DGET_ASM_SRC) \
 	src/dget/dget.c
 
-DGET_OBJ := $(DGET_SRC:%=$(BUILDDIR)/%.o)
+DGET_OBJ := $(DGET_SRC:%=$(BUILD_DIR)/%.o)
 DGET_DEP := $(DGET_OBJ:%.o=%.d)
 
 OBJ += $(DGET_OBJ)
@@ -210,7 +210,7 @@ DOO2_SRC := \
 	src/doo2/doo2.c \
 	src/doo2/doo2_bss.c
 
-DOO2_OBJ := $(DOO2_SRC:%=$(BUILDDIR)/%.o)
+DOO2_OBJ := $(DOO2_SRC:%=$(BUILD_DIR)/%.o)
 DOO2_DEP := $(DOO2_OBJ:%.o=%.d)
 
 OBJ += $(DOO2_OBJ)
@@ -226,7 +226,7 @@ DOOA_SRC := \
 	src/dooa/dooa.c \
 	src/dooa/dooa_bss.c
 
-DOOA_OBJ := $(DOOA_SRC:%=$(BUILDDIR)/%.o)
+DOOA_OBJ := $(DOOA_SRC:%=$(BUILD_DIR)/%.o)
 DOOA_DEP := $(DOOA_OBJ:%.o=%.d)
 
 OBJ += $(DOOA_OBJ)
@@ -242,7 +242,7 @@ EAB_SRC := \
 	src/eab/eab.c \
 	src/eab/eab_bss.c
 
-EAB_OBJ := $(EAB_SRC:%=$(BUILDDIR)/%.o)
+EAB_OBJ := $(EAB_SRC:%=$(BUILD_DIR)/%.o)
 EAB_DEP := $(EAB_OBJ:%.o=%.d)
 
 OBJ += $(EAB_OBJ)
@@ -257,7 +257,7 @@ ENDI_SRC := \
 	$(ENDI_ASM_SRC) \
 	src/endi/endi.c
 
-ENDI_OBJ := $(ENDI_SRC:%=$(BUILDDIR)/%.o)
+ENDI_OBJ := $(ENDI_SRC:%=$(BUILD_DIR)/%.o)
 ENDI_DEP := $(ENDI_OBJ:%.o=%.d)
 
 OBJ += $(ENDI_OBJ)
@@ -273,7 +273,7 @@ EVL_SRC := \
 	src/evl/evl.c \
 	src/evl/evl_bss.c
 
-EVL_OBJ := $(EVL_SRC:%=$(BUILDDIR)/%.o)
+EVL_OBJ := $(EVL_SRC:%=$(BUILD_DIR)/%.o)
 EVL_DEP := $(EVL_OBJ:%.o=%.d)
 
 OBJ += $(EVL_OBJ)
@@ -290,9 +290,9 @@ FISH_SRC := \
 	src/fish/fish_model.c \
 	src/fish/fish_bss.c
 
-$(BUILDDIR)/src/fish/fish.c.o: MWCCWRAP_FLAGS += -pragma "optimize_for_size on"
+$(BUILD_DIR)/src/fish/fish.c.o: MWCCWRAP_FLAGS += -pragma "optimize_for_size on"
 
-FISH_OBJ := $(FISH_SRC:%=$(BUILDDIR)/%.o)
+FISH_OBJ := $(FISH_SRC:%=$(BUILD_DIR)/%.o)
 FISH_DEP := $(FISH_OBJ:%.o=%.d)
 
 OBJ += $(FISH_OBJ)
@@ -308,7 +308,7 @@ KAR_SRC := \
 	src/kar/kar.c \
 	src/kar/kar_bss.c
 
-KAR_OBJ := $(KAR_SRC:%=$(BUILDDIR)/%.o)
+KAR_OBJ := $(KAR_SRC:%=$(BUILD_DIR)/%.o)
 KAR_DEP := $(KAR_OBJ:%.o=%.d)
 
 OBJ += $(KAR_OBJ)
@@ -324,7 +324,7 @@ MOV_SRC := \
 	src/mov/mov.c \
 	src/mov/mov_bss.c
 
-MOV_OBJ := $(MOV_SRC:%=$(BUILDDIR)/%.o)
+MOV_OBJ := $(MOV_SRC:%=$(BUILD_DIR)/%.o)
 MOV_DEP := $(MOV_OBJ:%.o=%.d)
 
 OBJ += $(MOV_OBJ)
@@ -340,7 +340,7 @@ MURD_SRC := \
 	src/murd/murd.c \
 	src/murd/murd_bss.c
 
-MURD_OBJ := $(MURD_SRC:%=$(BUILDDIR)/%.o)
+MURD_OBJ := $(MURD_SRC:%=$(BUILD_DIR)/%.o)
 MURD_DEP := $(MURD_OBJ:%.o=%.d)
 
 OBJ += $(MURD_OBJ)
@@ -359,7 +359,7 @@ STD_SRC := \
 	src/std/std_bss.c \
 	src/std/std_effect.c
 
-STD_OBJ := $(STD_SRC:%=$(BUILDDIR)/%.o)
+STD_OBJ := $(STD_SRC:%=$(BUILD_DIR)/%.o)
 STD_DEP := $(STD_OBJ:%.o=%.d)
 
 OBJ += $(STD_OBJ)
@@ -383,7 +383,7 @@ TRN2_SRC := \
 	src/trn2/trn2_slots.c \
 	src/trn2/trn2_bss.c
 
-TRN2_OBJ := $(TRN2_SRC:%=$(BUILDDIR)/%.o)
+TRN2_OBJ := $(TRN2_SRC:%=$(BUILD_DIR)/%.o)
 TRN2_DEP := $(TRN2_OBJ:%.o=%.d)
 
 OBJ += $(TRN2_OBJ)
@@ -407,7 +407,7 @@ TRN_SRC := \
 	src/trn/trn_slots.c \
 	src/trn/trn_bss.c
 
-TRN_OBJ := $(TRN_SRC:%=$(BUILDDIR)/%.o)
+TRN_OBJ := $(TRN_SRC:%=$(BUILD_DIR)/%.o)
 TRN_DEP := $(TRN_OBJ:%.o=%.d)
 
 OBJ += $(TRN_OBJ)
@@ -426,7 +426,7 @@ VS_SRC := \
 	src/vs/vs_main.c \
 	src/vs/vs_scene.c
 
-VS_OBJ := $(VS_SRC:%=$(BUILDDIR)/%.o)
+VS_OBJ := $(VS_SRC:%=$(BUILD_DIR)/%.o)
 VS_DEP := $(VS_OBJ:%.o=%.d)
 
 OBJ += $(VS_OBJ)
@@ -434,7 +434,7 @@ DEP += $(VS_DEP)
 
 OVERLAY += VS
 
-LINKER_SCRIPTS := $(addprefix $(BUILDDIR)/generated/,\
+LINKER_SCRIPTS := $(addprefix $(BUILD_DIR)/generated/,\
 		  $(addsuffix .ld, main \
 		  $(shell echo $(OVERLAY) | tr A-Z a-z)))
 
@@ -449,31 +449,31 @@ compare:
 	@tools/cmp_bins.sh
 
 expected: $(OBJ)
-	rm -rf $(EXPECTEDDIR)
-	@mkdir -p $(EXPECTEDDIR)
-	cp -r $(BUILDDIR)/$(ASM_DIR) $(EXPECTEDDIR)/$(ASM_DIR)
-	cp -r $(BUILDDIR)/src $(EXPECTEDDIR)/src
+	rm -rf $(EXPECTED_DIR)
+	@mkdir -p $(EXPECTED_DIR)
+	cp -r $(BUILD_DIR)/$(ASM_DIR) $(EXPECTED_DIR)/$(ASM_DIR)
+	cp -r $(BUILD_DIR)/src $(EXPECTED_DIR)/src
 
 objdiff: expected
 	$(PYTHON) tools/objdiff/objdiff_generate.py tools/objdiff/config.yaml
 
 report: objdiff
 	$(OBJDIFF) report generate \
-		--config combineTextSections=false > $(BUILDDIR)/report.json
+		--config combineTextSections=false > $(BUILD_DIR)/report.json
 
-$(BUILDDIR)/%.ld: %.ld
+$(BUILD_DIR)/%.ld: %.ld
 	@mkdir -p $(dir $@)
 	$(CPP) -P -x c $(INC) -o $@ $<
 
-$(BUILDDIR)/%_REL.BIN: $(ELF) $(CPPLDSCRIPT)
+$(BUILD_DIR)/%_REL.BIN: $(ELF) $(CPPLDSCRIPT)
 	@mkdir -p $(dir $@)
-	$(OBJCOPY) -j $(@:$(BUILDDIR)/%_REL.BIN=.%) -O binary $< $@
+	$(OBJCOPY) -j $(@:$(BUILD_DIR)/%_REL.BIN=.%) -O binary $< $@
 
 $(ELF): $(OBJ) $(CPPLDSCRIPT)
 	@mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@
 
-$(EXE): $(ELF) $(OVERLAY:%=$(BUILDDIR)/%_REL.BIN)
+$(EXE): $(ELF) $(OVERLAY:%=$(BUILD_DIR)/%_REL.BIN)
 	@mkdir -p $(dir $@)
 	$(OBJCOPY) $(addprefix -R .,$(OVERLAY)) -O binary $< $@
 
@@ -483,7 +483,7 @@ $(EXE): $(ELF) $(OVERLAY:%=$(BUILDDIR)/%_REL.BIN)
 # when there are at least two of them. The expected objects also contain an
 # empty plain section, so add one here too, or a file with a single symbol in
 # one of them is never compared. The empty sections are discarded at link time.
-$(BUILDDIR)/%.c.o: %.c
+$(BUILD_DIR)/%.c.o: %.c
 	@mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEPFLAGS) $<
 	$(METROWRAP) -o $@ $(METROWRAP_FLAGS) $(MWCCWRAP_FLAGS) $(CPPFLAGS) $<
@@ -494,7 +494,7 @@ $(BUILDDIR)/%.c.o: %.c
 				--add-section .sdata=/dev/null \
 				--set-section-flags .sdata=alloc,load,data $@
 
-$(BUILDDIR)/%.s.o: %.s
+$(BUILD_DIR)/%.s.o: %.s
 	@mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEPFLAGS) $<
 	$(CC) -c $(CFLAGS) $(CPPFLAGS) $(ASFLAGS) -o $@ $<
@@ -506,28 +506,28 @@ $(BUILDDIR)/%.s.o: %.s
 				--set-section-alignment .sdata=4 $@
 
 # Fix objdiff jump table mismatches by making jump table labels local
-C_ASM_OBJ := $(patsubst $(BUILDDIR)/src/%.c.o,$(BUILDDIR)/$(ASM_DIR)/%.s.o,$(filter %.c.o,$(OBJ)))
+C_ASM_OBJ := $(patsubst $(BUILD_DIR)/src/%.c.o,$(BUILD_DIR)/$(ASM_DIR)/%.s.o,$(filter %.c.o,$(OBJ)))
 $(C_ASM_OBJ): ASFLAGS += -Wa,--defsym,LOCAL_JLABELS=1
 
 # Add a C file's small data in the main executable to its objdiff target
-c_sdata_asm = $(wildcard $(1:$(BUILDDIR)/$(ASM_DIR)/%.s.o=$(ASM_DIR)/main/data/%.sdata.s))
+c_sdata_asm = $(wildcard $(1:$(BUILD_DIR)/$(ASM_DIR)/%.s.o=$(ASM_DIR)/main/data/%.sdata.s))
 $(foreach o,$(C_ASM_OBJ),$(foreach s,$(call c_sdata_asm,$(o)),$(eval $(o): $(s))))
 $(foreach o,$(C_ASM_OBJ),$(foreach s,$(call c_sdata_asm,$(o)),$(eval $(o): ASFLAGS += -Wa,$(s))))
 
 $(MAIN_SBSS) &: config/sbss.yaml config/symbols.txt
 	@mkdir -p $(dir $@)
-	tools/gen_bss.py $^ $(BUILDDIR)/generated/
+	tools/gen_bss.py $^ $(BUILD_DIR)/generated/
 
 $(MAIN_BSS) &: config/bss.yaml config/symbols.txt
 	@mkdir -p $(dir $@)
-	tools/gen_bss.py $^ $(BUILDDIR)/generated/
+	tools/gen_bss.py $^ $(BUILD_DIR)/generated/
 
-$(BUILDDIR)/generated/%.ld: config/%.yaml
+$(BUILD_DIR)/generated/%.ld: config/%.yaml
 	@mkdir -p $(dir $@)
 	$(SPLAT) $< --disassemble-all --make-full-disasm-for-code
 
 clean:
-	rm -rf $(BUILDDIR)
+	rm -rf $(BUILD_DIR)
 
 reset: clean
 	rm -rf $(ASM_DIR)
