@@ -1041,9 +1041,11 @@ int32_t tickEntityMoveTo(scriptId1, scriptId2, targetX, targetZ, speed,
 	int8_t speed;
 	int8_t withCamera;
 {
+#ifdef __MWERKS__
 	/* TODO: get rid of extra declaration */
 	extern void setEntityPosition(int32_t entityId, int32_t x, long y,
 	                              int32_t z);
+#endif
 	Entity *entity;
 	Entity *targetEntity;
 	PositionData *position;

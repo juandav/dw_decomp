@@ -3513,8 +3513,10 @@ int32_t isLinearPathBlocked(int32_t x1, int32_t y1, int32_t x2, int32_t y2)
 
 void tickPartnerCollision(void)
 {
+#ifdef __MWERKS__
 	int32_t isFiveTileWidePathOpen(int8_t x1, int8_t y1, int8_t x2, int8_t y2);
 	int32_t isTileWithinScreenArea(int8_t tileX, int8_t tileZ);
+#endif
 	int16_t modelTileX;
 	int16_t modelTileY;
 	int8_t tamerTileX;
@@ -3770,7 +3772,9 @@ void collisionGrace(Entity *target, Entity *entity, int32_t dx, int32_t dy)
 
 void tickTamerWaypoints(void)
 {
+#ifdef __MWERKS__
 	int32_t isLinearPathBlocked(int8_t x1, int8_t y1, int8_t x2, int8_t y2);
+#endif
 	int16_t index;
 	int8_t tileX;
 	int8_t tileY;
@@ -3831,7 +3835,9 @@ void getEntityTileFromModel(Entity *entity, int8_t *outTileX,
 
 void tickPartnerWaypoints(void)
 {
+#ifdef __MWERKS__
 	int32_t isTileWithinScreenArea(int8_t tileX, int8_t tileZ);
+#endif
 	int16_t tamerTileX;
 	int16_t tamerTileY;
 	int16_t partnerTileX;
