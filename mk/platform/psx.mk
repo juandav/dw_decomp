@@ -17,7 +17,7 @@ LDSCRIPT := \
 
 CPPLDSCRIPT := $(LDSCRIPT:%=$(BUILD_DIR)/%)
 
-ARCHFLAGS := -march=r3000 -mtune=r3000 -mabi=32 -EL -mfp32 \
+ARCHFLAGS := -march=r3000 -mtune=r3000 -mabi=32 -EL -mfp32 -msoft-float \
 	     -fno-pic -mno-shared -mno-abicalls -mno-llsc \
 	     -fno-stack-protector -nostdlib -ffreestanding \
 	     -Xassembler -no-pad-sections

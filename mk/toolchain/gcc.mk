@@ -1,4 +1,4 @@
-GCC_FLAGS = -g -Wall -Wextra -std=c99 -Os $(ARCHFLAGS) -msoft-float -G8 \
+GCC_FLAGS = -g -Wall -Wextra -std=c99 -Os $(ARCHFLAGS) -G8 \
 	    -ffunction-sections -fdata-sections -fno-common \
 	    -fno-zero-initialized-in-bss -fno-builtin \
 	    -fno-strict-aliasing -fwrapv -fno-tree-switch-conversion \
