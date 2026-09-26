@@ -255,6 +255,8 @@ SECTIONS
         . = ALIGN(., 4);
         BUILD_DIR/src/main/math.c.o(.rodata.*);
         . = ALIGN(., 4);
+        BUILD_DIR/src/main/file_table.c.o(.rodata.*);
+        . = ALIGN(., 4);
         BUILD_DIR/src/main/graphics.c.o(.rodata.*);
         . = ALIGN(., 4);
         BUILD_DIR/src/main/_psstart.c.o(.rodata.*);
