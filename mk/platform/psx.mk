@@ -29,7 +29,7 @@ LDFLAGS := -g $(addprefix -T ,$(CPPLDSCRIPT)) -static \
 	   -Wl,--no-check-sections -Wl,-Map=% -Wl,--build-id=none \
 	   -Wl,--gc-sections -Wl,--print-gc-sections
 
-LINKER_SCRIPTS := $(addprefix $(BUILD_DIR)/generated/,\
+LINKER_SCRIPTS := $(addprefix $(GEN_DIR)/,\
 		  $(addsuffix .ld, main \
 		  $(shell echo $(OVERLAY) | tr A-Z a-z)))
 
@@ -66,12 +66,12 @@ $(BUILD_DIR)/%.s.o: %.s
 
 $(MAIN_SBSS) &: config/sbss.yaml config/symbols.txt
 	@mkdir -p $(dir $@)
-	tools/gen_bss.py $^ $(BUILD_DIR)/generated/
+	tools/gen_bss.py $^ $(GEN_DIR)/
 
 $(MAIN_BSS) &: config/bss.yaml config/symbols.txt
 	@mkdir -p $(dir $@)
-	tools/gen_bss.py $^ $(BUILD_DIR)/generated/
+	tools/gen_bss.py $^ $(GEN_DIR)/
 
-$(BUILD_DIR)/generated/%.ld: config/%.yaml
+$(GEN_DIR)/%.ld: config/%.yaml
 	@mkdir -p $(dir $@)
 	$(SPLAT) $< --disassemble-all --make-full-disasm-for-code

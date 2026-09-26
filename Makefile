@@ -2,6 +2,7 @@
 
 BUILD_DIR := build
 ASM_DIR := asm
+GEN_DIR := build/generated
 
 PYTHON := python3
 
@@ -21,7 +22,7 @@ clean:
 	rm -rf $(BUILD_DIR)
 
 reset: clean
-	rm -rf $(ASM_DIR)
+	rm -rf $(ASM_DIR) $(GEN_DIR)
 
 -include $(DEP)
 

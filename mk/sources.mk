@@ -17,36 +17,36 @@ OBJ :=
 DEP :=
 
 MAIN_SBSS := \
-	$(BUILD_DIR)/generated/unk_0x80134C4C.sbss.s \
-	$(BUILD_DIR)/generated/unk_0x80134CC0.sbss.s \
-	$(BUILD_DIR)/generated/unk_0x80134D9C.sbss.s \
-	$(BUILD_DIR)/generated/unk_0x80134E1C.sbss.s \
-	$(BUILD_DIR)/generated/unk_0x80134E50.sbss.s \
-	$(BUILD_DIR)/generated/unk_0x80134E68.sbss.s \
-	$(BUILD_DIR)/generated/unk_0x80134E90.sbss.s
+	$(GEN_DIR)/unk_0x80134C4C.sbss.s \
+	$(GEN_DIR)/unk_0x80134CC0.sbss.s \
+	$(GEN_DIR)/unk_0x80134D9C.sbss.s \
+	$(GEN_DIR)/unk_0x80134E1C.sbss.s \
+	$(GEN_DIR)/unk_0x80134E50.sbss.s \
+	$(GEN_DIR)/unk_0x80134E68.sbss.s \
+	$(GEN_DIR)/unk_0x80134E90.sbss.s
 
 MAIN_BSS := \
-	$(BUILD_DIR)/generated/libapi.bss.s \
-	$(BUILD_DIR)/generated/libetc.bss.s \
-	$(BUILD_DIR)/generated/libgpu.bss.s \
-	$(BUILD_DIR)/generated/libgs.bss.s \
-	$(BUILD_DIR)/generated/libgte.bss.s \
-	$(BUILD_DIR)/generated/model.bss.s \
-	$(BUILD_DIR)/generated/unk_0x80137A24.bss.s \
-	$(BUILD_DIR)/generated/libcd.bss.s \
-	$(BUILD_DIR)/generated/unk_0x8013C038.bss.s \
-	$(BUILD_DIR)/generated/unk_0x8013D590.bss.s \
-	$(BUILD_DIR)/generated/libspu.bss.s \
-	$(BUILD_DIR)/generated/libsnd.bss.s \
-	$(BUILD_DIR)/generated/unk_0x8014F060.bss.s \
-	$(BUILD_DIR)/generated/unk_0x80154F80.bss.s \
-	$(BUILD_DIR)/generated/libds.bss.s \
-	$(BUILD_DIR)/generated/butterfly.bss.s \
-	$(BUILD_DIR)/generated/libmrcd.bss.s \
-	$(BUILD_DIR)/generated/bubble.bss.s \
-	$(BUILD_DIR)/generated/battle_ui.bss.s \
-	$(BUILD_DIR)/generated/unk_0x801555D0.bss.s \
-	$(BUILD_DIR)/generated/unk_0x801BF768.bss.s
+	$(GEN_DIR)/libapi.bss.s \
+	$(GEN_DIR)/libetc.bss.s \
+	$(GEN_DIR)/libgpu.bss.s \
+	$(GEN_DIR)/libgs.bss.s \
+	$(GEN_DIR)/libgte.bss.s \
+	$(GEN_DIR)/model.bss.s \
+	$(GEN_DIR)/unk_0x80137A24.bss.s \
+	$(GEN_DIR)/libcd.bss.s \
+	$(GEN_DIR)/unk_0x8013C038.bss.s \
+	$(GEN_DIR)/unk_0x8013D590.bss.s \
+	$(GEN_DIR)/libspu.bss.s \
+	$(GEN_DIR)/libsnd.bss.s \
+	$(GEN_DIR)/unk_0x8014F060.bss.s \
+	$(GEN_DIR)/unk_0x80154F80.bss.s \
+	$(GEN_DIR)/libds.bss.s \
+	$(GEN_DIR)/butterfly.bss.s \
+	$(GEN_DIR)/libmrcd.bss.s \
+	$(GEN_DIR)/bubble.bss.s \
+	$(GEN_DIR)/battle_ui.bss.s \
+	$(GEN_DIR)/unk_0x801555D0.bss.s \
+	$(GEN_DIR)/unk_0x801BF768.bss.s
 
 MAIN_GEN_SRC := $(MAIN_BSS) $(MAIN_SBSS)
 
