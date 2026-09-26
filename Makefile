@@ -47,4 +47,4 @@ reset: clean
 
 -include $(DEP)
 
-.PHONY: all clean
+.PHONY: all generate regenerate clean reset compare expected objdiff report
