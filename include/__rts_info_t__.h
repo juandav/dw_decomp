@@ -1,7 +1,7 @@
 /*
  *	__rts_info_t__.h - Linker generated symbols
  *
- *	Copyright © 1995 metrowerks inc. All Rights Reserved.
+ *	Copyright (c) 1995 metrowerks inc. All Rights Reserved.
  *
  */
 
@@ -9,7 +9,11 @@
 /* generated symbols must be in the .data section otherwise we would	*/
 /* not be able to load GP!												*/
 
+#ifdef __MWERKS__
 #define SECTION __declspec(data) 
+#else
+#define SECTION __attribute__((section(".data")))
+#endif
 
 SECTION extern void (*__static_init[])(void);
 SECTION extern unsigned long _gp;
