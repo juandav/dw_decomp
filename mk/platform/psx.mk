@@ -39,7 +39,7 @@ generate: $(LINKER_SCRIPTS)
 
 $(BUILD_DIR)/%.ld: %.ld
 	@mkdir -p $(dir $@)
-	$(CPP) -P -x c $(INC) -o $@ $<
+	$(CPP) -P -x c $(INC) -DBUILD_DIR=$(BUILD_DIR) -o $@ $<
 
 $(BUILD_DIR)/%_REL.BIN: $(ELF) $(CPPLDSCRIPT)
 	@mkdir -p $(dir $@)
