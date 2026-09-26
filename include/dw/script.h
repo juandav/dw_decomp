@@ -164,7 +164,7 @@ void MAIN_func_800FCA14(int32_t idx, int32_t owner, int32_t boxId,
 void createItemMenuBox(void);
 void tickPickItemMenu(void);
 ItemMenuBox *getItemMenuFromType(void);
-void createItemMenu(ItemMenuBox *box, int32_t boxId, int32_t startRow);
+void openItemMenu(ItemMenuBox *box, int32_t boxId, int32_t startRow);
 void MAIN_func_800FDFB4(void);
 void showMapHeadTextbox(int32_t idx, int32_t owner, int32_t boxId,
 			int32_t section);
