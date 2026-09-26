@@ -1,5 +1,6 @@
 GCC_FLAGS = -g -Wall -Wextra -std=c99 -Os $(ARCHFLAGS) -msoft-float -G8 \
-	    -ffunction-sections -fdata-sections -fno-common -fno-builtin \
+	    -ffunction-sections -fdata-sections -fno-common \
+	    -fno-zero-initialized-in-bss -fno-builtin \
 	    -fno-strict-aliasing -fwrapv -fno-tree-switch-conversion \
 	    -finput-charset=UTF-8 -fexec-charset=CP932
 
