@@ -11,11 +11,7 @@ ifeq ($(filter $(CONFIG),$(CONFIGS)),)
 $(error unsupported PLATFORM/TOOLCHAIN $(CONFIG); supported: $(CONFIGS))
 endif
 
-ifeq ($(CONFIG),$(MATCHING_CONFIG))
-BUILD_DIR := build
-else
 BUILD_DIR := build/$(CONFIG)
-endif
 ASM_DIR := asm
 GEN_DIR := build/generated
 

@@ -154,7 +154,7 @@ def main():
     units = []
     for file in expected_objects:
         processed_path = _determine_categories(file, config)
-        base_path = "build/src/" + re.sub(r"\\", r"/", processed_path[1]).removesuffix(".s.o").removesuffix(".c.o") + ".c.o"
+        base_path = "build/psx/mwcc/src/" + re.sub(r"\\", r"/", processed_path[1]).removesuffix(".s.o").removesuffix(".c.o") + ".c.o"
         
         # Create mappings for compiler-generated symbols in base object
         # (objdiff report supports symbol mappings since v3.7.3)
