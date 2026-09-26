@@ -1,0 +1,77 @@
+CROSS ?= mipsel-linux-gnu-
+
+CC := $(CROSS)gcc
+LD := $(CROSS)ld
+OBJCOPY := $(CROSS)objcopy
+
+SPLAT := $(PYTHON) -m splat split
+
+ELF := $(BUILD_DIR)/SLUS_010.32.elf
+EXE := $(BUILD_DIR)/SLUS_010.32
+
+INC := -Iexternal/psyq_headers/mw_lib41/include -Iinclude
+
+LDSCRIPT := \
+	config/overlay.ld \
+	config/main.ld
+
+CPPLDSCRIPT := $(LDSCRIPT:%=$(BUILD_DIR)/%)
+
+ARCHFLAGS := -march=r3000 -mtune=r3000 -mabi=32 -EL -mfp32 \
+	     -fno-pic -mno-shared -mno-abicalls -mno-llsc \
+	     -fno-stack-protector -nostdlib -ffreestanding \
+	     -Xassembler -no-pad-sections
+ASFLAGS := -Wa,--sectname-subst
+CFLAGS := -g -Wall -Wextra -Werror -std=c99 -Os -G0 -mno-gpopt $(ARCHFLAGS)
+CPPFLAGS := -DLANGUAGE_C $(INC)
+DEPFLAGS = -MM -MF $(@:.o=.d) -MT $@
+LDFLAGS := -g $(addprefix -T ,$(CPPLDSCRIPT)) -static \
+	   -Wl,--no-check-sections -Wl,-Map=% -Wl,--build-id=none \
+	   -Wl,--gc-sections -Wl,--print-gc-sections
+
+LINKER_SCRIPTS := $(addprefix $(BUILD_DIR)/generated/,\
+		  $(addsuffix .ld, main \
+		  $(shell echo $(OVERLAY) | tr A-Z a-z)))
+
+all: $(EXE)
+
+generate: $(LINKER_SCRIPTS)
+
+$(BUILD_DIR)/%.ld: %.ld
+	@mkdir -p $(dir $@)
+	$(CPP) -P -x c $(INC) -o $@ $<
+
+$(BUILD_DIR)/%_REL.BIN: $(ELF) $(CPPLDSCRIPT)
+	@mkdir -p $(dir $@)
+	$(OBJCOPY) -j $(@:$(BUILD_DIR)/%_REL.BIN=.%) -O binary $< $@
+
+$(ELF): $(OBJ) $(CPPLDSCRIPT)
+	@mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@
+
+$(EXE): $(ELF) $(OVERLAY:%=$(BUILD_DIR)/%_REL.BIN)
+	@mkdir -p $(dir $@)
+	$(OBJCOPY) $(addprefix -R .,$(OVERLAY)) -O binary $< $@
+
+$(BUILD_DIR)/%.s.o: %.s
+	@mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEPFLAGS) $<
+	$(CC) -c $(CFLAGS) $(CPPFLAGS) $(ASFLAGS) -o $@ $<
+	@$(OBJCOPY) --set-section-alignment .text=4 \
+				--set-section-alignment .data=4 \
+				--set-section-alignment .rodata=4 \
+				--set-section-alignment .bss=4 \
+				--set-section-alignment .sbss=4 \
+				--set-section-alignment .sdata=4 $@
+
+$(MAIN_SBSS) &: config/sbss.yaml config/symbols.txt
+	@mkdir -p $(dir $@)
+	tools/gen_bss.py $^ $(BUILD_DIR)/generated/
+
+$(MAIN_BSS) &: config/bss.yaml config/symbols.txt
+	@mkdir -p $(dir $@)
+	tools/gen_bss.py $^ $(BUILD_DIR)/generated/
+
+$(BUILD_DIR)/generated/%.ld: config/%.yaml
+	@mkdir -p $(dir $@)
+	$(SPLAT) $< --disassemble-all --make-full-disasm-for-code
