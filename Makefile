@@ -2,7 +2,7 @@
 
 -include local.mk
 
-TOOLCHAIN ?= mipsel-linux-gnu-
+CROSS ?= mipsel-linux-gnu-
 
 BUILDDIR := build
 ASM_DIR := asm
@@ -11,9 +11,9 @@ EXPECTEDDIR := expected
 ELF := $(BUILDDIR)/SLUS_010.32.elf
 EXE := $(BUILDDIR)/SLUS_010.32
 
-CC := $(TOOLCHAIN)gcc
-LD := $(TOOLCHAIN)ld
-OBJCOPY := $(TOOLCHAIN)objcopy
+CC := $(CROSS)gcc
+LD := $(CROSS)ld
+OBJCOPY := $(CROSS)objcopy
 
 PYTHON := python3
 SPLAT := $(PYTHON) -m splat split
