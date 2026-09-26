@@ -5,6 +5,8 @@
  *
  */
  
+#ifdef __MWERKS__
+
 #include <__rts_info_t__.h>
 
 #ifdef __cplusplus
@@ -210,3 +212,28 @@ static void __start_c(void)
 	main();
 }
 
+#else
+
+__asm__(".section .text.__start, \"ax\", @progbits\n"
+	".global __start\n"
+	".type __start, @function\n"
+	"__start:\n"
+	/* Set the stack pointer, rounded down to a multiple of 16 */
+	"	lui	$t0, %hi(_stack_addr)\n"
+	"	lw	$sp, %lo(_stack_addr)($t0)\n"
+	"	li	$t0, -16\n"
+	"	and	$sp, $sp, $t0\n"
+	/* Set the global pointer */
+	"	lui	$t0, %hi(_gp_addr)\n"
+	"	lw	$gp, %lo(_gp_addr)($t0)\n"
+	/* Enable the GTE */
+	"	mfc0	$t0, $12\n"
+	"	lui	$t1, 0x4000\n"
+	"	or	$t0, $t0, $t1\n"
+	"	mtc0	$t0, $12\n"
+	/* Jump to main */
+	"	j	main\n"
+	".size __start, . - __start\n"
+	".previous\n");
+
+#endif
