@@ -9,7 +9,7 @@ SPLAT := $(PYTHON) -m splat split
 ELF := $(BUILD_DIR)/SLUS_010.32.elf
 EXE := $(BUILD_DIR)/SLUS_010.32
 
-INC := -Iexternal/psyq_headers/mw_lib41/include -Iinclude
+INC := -Iinclude/$(TOOLCHAIN) -Iexternal/psyq_headers/mw_lib41/include -Iinclude
 
 LDSCRIPT := \
 	config/overlay.ld \

@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <strings.h>
 
+#include <inline_n.h>
 #include <libgs.h>
-#include <mwinline_n.h>
 
 #include <dw/anim.h>
 #include <dw/btl.h>

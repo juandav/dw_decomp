@@ -1,10 +1,10 @@
 #include <stdlib.h>
 
+#include <inline_n.h>
 #include <libetc.h>
 #include <libgpu.h>
 #include <libgs.h>
 #include <libgte.h>
-#include <mwinline_n.h>
 
 #include <dw/anim.h>
 #include <dw/btl.h>

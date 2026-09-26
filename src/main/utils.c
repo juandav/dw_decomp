@@ -1,7 +1,7 @@
 #include <stdio.h>
 
+#include <inline_n.h>
 #include <libetc.h>
-#include <mwinline_n.h>
 
 #include <dw/btl.h>
 #include <dw/combat.h>

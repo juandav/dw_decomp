@@ -1,9 +1,9 @@
 #include <string.h>
 
+#include <inline_n.h>
 #include <libgpu.h>
 #include <libgs.h>
 #include <libgte.h>
-#include <mwinline_n.h>
 
 #include <dw/battle.h>
 #include <dw/btl.h>

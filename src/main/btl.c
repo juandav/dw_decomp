@@ -1,6 +1,6 @@
+#include <inline_n.h>
 #include <libetc.h>
 #include <libgs.h>
-#include <mwinline_n.h>
 
 #include <dw/anim.h>
 #include <dw/btl.h>

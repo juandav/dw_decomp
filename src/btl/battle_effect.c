@@ -2,11 +2,11 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <inline_n.h>
 #include <libcd.h>
 #include <libetc.h>
 #include <libgs.h>
 #include <libgte.h>
-#include <mwinline_n.h>
 
 #include <dw/aabb.h>
 #include <dw/attack_object.h>

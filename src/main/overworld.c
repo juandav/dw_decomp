@@ -1,4 +1,4 @@
-#include <mwinline_n.h>
+#include <inline_n.h>
 
 #include <dw/anim.h>
 #include <dw/clock.h>

@@ -4,7 +4,7 @@ set -e
 
 IGNORE='
 include/__rts_info_t__.h
-include/mwinline_n.h
+include/mwcc/inline_n.h
 src/main/_psstart.c
 '
 

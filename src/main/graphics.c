@@ -1,7 +1,7 @@
+#include <inline_n.h>
 #include <libgpu.h>
 #include <libgs.h>
 #include <libgte.h>
-#include <mwinline_n.h>
 
 #include <dw/aabb.h>
 #include <dw/attack_object.h>
