@@ -3,7 +3,7 @@ sha1: 31ec666b987d5b007dec40eecc4092d27ed9085b
 options:
   basename: main
   target_path: disks/us/SLUS_010.32
-  base_path: ..
+  base_path: ../..
   platform: psx
   compiler: PSYQ
 
@@ -25,9 +25,9 @@ options:
   section_order: [".text", ".rodata", ".data", ".sdata", ".sbss", ".bss"]
 
   symbol_addrs_path:
-    - config/symbols.txt
+    - config/us/symbols.txt
   reloc_addrs_path:
-    - config/relocs_main.txt
+    - config/us/relocs_main.txt
 
   undefined_funcs_auto_path: build/generated/undefined_funcs_auto_main.txt
   undefined_syms_auto_path: build/generated/undefined_syms_auto_main.txt

@@ -3,7 +3,7 @@ sha1: 0b6730efc0f337f8f7e2e74f46f65010a6d47344
 options:
   basename: btl
   target_path: disks/us/BTL_REL.BIN
-  base_path: ..
+  base_path: ../..
   platform: psx
   compiler: PSYQ
 
@@ -24,10 +24,10 @@ options:
   section_order: [".text", ".rodata", ".data", ".sdata", ".sbss", ".bss"]
 
   symbol_addrs_path:
-    - config/symbols.txt
-    - config/symbols_btl.txt
+    - config/us/symbols.txt
+    - config/us/symbols_btl.txt
   reloc_addrs_path:
-    - config/relocs_btl.txt
+    - config/us/relocs_btl.txt
 
   undefined_funcs_auto_path: build/generated/undefined_funcs_auto_btl.txt
   undefined_syms_auto_path: build/generated/undefined_syms_auto_btl.txt

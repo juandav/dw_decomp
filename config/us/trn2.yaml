@@ -3,7 +3,7 @@ sha1: 89868ddca44ab46a0bce0616dacee7b1e6db465f
 options:
   basename: trn2
   target_path: disks/us/TRN2_REL.BIN
-  base_path: ..
+  base_path: ../..
   platform: psx
   compiler: PSYQ
 
@@ -24,10 +24,10 @@ options:
   section_order: [".text", ".rodata", ".data", ".sdata", ".sbss", ".bss"]
 
   symbol_addrs_path:
-    - config/symbols.txt
-    - config/symbols_trn2.txt
+    - config/us/symbols.txt
+    - config/us/symbols_trn2.txt
   reloc_addrs_path:
-    - config/relocs_trn2.txt
+    - config/us/relocs_trn2.txt
 
   undefined_funcs_auto_path: build/generated/undefined_funcs_auto_trn2.txt
   undefined_syms_auto_path: build/generated/undefined_syms_auto_trn2.txt

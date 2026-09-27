@@ -3,7 +3,7 @@ sha1: ff25808371c7db2a67da02adc708026cd9844df7
 options:
   basename: vs
   target_path: disks/us/VS_REL.BIN
-  base_path: ..
+  base_path: ../..
   platform: psx
   compiler: PSYQ
 
@@ -24,10 +24,10 @@ options:
   section_order: [".text", ".rodata", ".data", ".sdata", ".sbss", ".bss"]
 
   symbol_addrs_path:
-    - config/symbols.txt
-    - config/symbols_vs.txt
+    - config/us/symbols.txt
+    - config/us/symbols_vs.txt
   reloc_addrs_path:
-    - config/relocs_vs.txt
+    - config/us/relocs_vs.txt
 
   undefined_funcs_auto_path: build/generated/undefined_funcs_auto_vs.txt
   undefined_syms_auto_path: build/generated/undefined_syms_auto_vs.txt

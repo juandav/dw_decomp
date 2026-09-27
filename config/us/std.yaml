@@ -3,7 +3,7 @@ sha1: dd623f866fb526299ef750f0a43f6610f0474e54
 options:
   basename: std
   target_path: disks/us/STD_REL.BIN
-  base_path: ..
+  base_path: ../..
   platform: psx
   compiler: PSYQ
 
@@ -24,10 +24,10 @@ options:
   section_order: [".text", ".rodata", ".data", ".sdata", ".sbss", ".bss"]
 
   symbol_addrs_path:
-    - config/symbols.txt
-    - config/symbols_std.txt
+    - config/us/symbols.txt
+    - config/us/symbols_std.txt
   reloc_addrs_path:
-    - config/relocs_std.txt
+    - config/us/relocs_std.txt
 
   undefined_funcs_auto_path: build/generated/undefined_funcs_auto_std.txt
   undefined_syms_auto_path: build/generated/undefined_syms_auto_std.txt

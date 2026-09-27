@@ -1,17 +1,17 @@
-name: endi
-sha1: d063a50c9ec6160fa6c6527ff2b5258363f21829
+name: eab
+sha1: 4db4561023284f41d6f08dfd9b837abda964e8ab
 options:
-  basename: endi
-  target_path: disks/us/ENDI_REL.BIN
-  base_path: ..
+  basename: eab
+  target_path: disks/us/EAB_REL.BIN
+  base_path: ../..
   platform: psx
   compiler: PSYQ
 
-  asm_path: asm/endi
-  src_path: src/endi
+  asm_path: asm/eab
+  src_path: src/eab
   build_path: build
 
-  ld_script_path: build/generated/endi.ld
+  ld_script_path: build/generated/eab.ld
 
   global_vram_start: 0x80000000
   global_vram_end: 0x80200000
@@ -24,13 +24,13 @@ options:
   section_order: [".text", ".rodata", ".data", ".sdata", ".sbss", ".bss"]
 
   symbol_addrs_path:
-    - config/symbols.txt
-    - config/symbols_endi.txt
+    - config/us/symbols.txt
+    - config/us/symbols_eab.txt
   reloc_addrs_path:
-    - config/relocs_endi.txt
+    - config/us/relocs_eab.txt
 
-  undefined_funcs_auto_path: build/generated/undefined_funcs_auto_endi.txt
-  undefined_syms_auto_path: build/generated/undefined_syms_auto_endi.txt
+  undefined_funcs_auto_path: build/generated/undefined_funcs_auto_eab.txt
+  undefined_syms_auto_path: build/generated/undefined_syms_auto_eab.txt
 
   string_encoding: ASCII
   data_string_encoding: ASCII
@@ -51,14 +51,15 @@ segments:
     align: 4
     subalign: 4
 
-  - name: endi
+  - name: eab
     type: code
     start: 0x40
     vram: 0x80060040
     align: 4
     subalign: 4
     subsegments:
-      - [0x40, c, endi]
-      - [0xD98, .data, endi]
+      - [0x40, c, eab]
+      - [0x16DC, .data, eab]
+      - [0x17D0, .data, eab_bss]
 
-  - [0x1534]
+  - [0x2054]

@@ -12,8 +12,8 @@ EXE := $(BUILD_DIR)/$(EXE_NAME)
 INC := -Iinclude/$(TOOLCHAIN) -Iexternal/psyq_headers/mw_lib41/include -Iinclude
 
 LDSCRIPT := \
-	config/overlay.ld \
-	config/main.ld
+	$(CONFIG_DIR)/overlay.ld \
+	$(CONFIG_DIR)/main.ld
 
 CPPLDSCRIPT := $(LDSCRIPT:%=$(BUILD_DIR)/%)
 
@@ -64,14 +64,14 @@ $(BUILD_DIR)/%.s.o: %.s
 				--set-section-alignment .sbss=4 \
 				--set-section-alignment .sdata=4 $@
 
-$(MAIN_SBSS) &: config/sbss.yaml config/symbols.txt
+$(MAIN_SBSS) &: $(CONFIG_DIR)/sbss.yaml $(CONFIG_DIR)/symbols.txt
 	@mkdir -p $(dir $@)
 	tools/gen_bss.py $^ $(GEN_DIR)/
 
-$(MAIN_BSS) &: config/bss.yaml config/symbols.txt
+$(MAIN_BSS) &: $(CONFIG_DIR)/bss.yaml $(CONFIG_DIR)/symbols.txt
 	@mkdir -p $(dir $@)
 	tools/gen_bss.py $^ $(GEN_DIR)/
 
-$(GEN_DIR)/%.ld: config/%.yaml
+$(GEN_DIR)/%.ld: $(CONFIG_DIR)/%.yaml
 	@mkdir -p $(dir $@)
 	$(SPLAT) $< --disassemble-all --make-full-disasm-for-code
