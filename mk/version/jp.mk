@@ -36,6 +36,9 @@ $(eval $(call overlay,MOV,mov))
 $(eval $(call overlay,MURD,murd))
 $(eval $(call overlay,SHOP,shop))
 $(eval $(call overlay,STD,std))
+TRN2_C_SRC := \
+	src/trn2/trn2_bss.c
+
 $(eval $(call overlay,TRN2,trn2))
 $(eval $(call overlay,TRN,trn))
 $(eval $(call overlay,VS,vs))

@@ -146,7 +146,7 @@ SECTIONS
 			KEEP(BUILD_DIR/asm/trn2/data/header.rodata.s.o(.rodata .rodata.*));
 			KEEP(BUILD_DIR/asm/trn2/trn2.s.o(.text .text.*));
 			KEEP(BUILD_DIR/asm/trn2/data/trn2.data.s.o(.data .data.*));
-			LONG(0);
+			BUILD_DIR/src/trn2/trn2_bss.c.o(.data .data.*);
 		}
 	}
 
