@@ -19,7 +19,7 @@ SECTIONS
     {
         main_TEXT_START = .;
         KEEP(BUILD_DIR/asm/main/main.s.o(.text .text.*));
-        KEEP(BUILD_DIR/asm/main/aabb.s.o(.text .text.*));
+        KEEP(BUILD_DIR/src/main/aabb.c.o(.text .text.*));
         KEEP(BUILD_DIR/asm/main/20E40.s.o(.text .text.*));
         main_TEXT_END = .;
         main_TEXT_SIZE = ABSOLUTE(main_TEXT_END - main_TEXT_START);

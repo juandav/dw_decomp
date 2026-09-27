@@ -1,3 +1,6 @@
+AddPrim = 0x80096D28;
+SetLineF4 = 0x80096E78;
+GsSetWorkBase = 0x80098EF0;
 __start = 0x800A6068;
 renderAABB = 0x800B08B4;
 findAABBHitEntity = 0x800B0A40;
@@ -17,3 +20,4 @@ MAP_ENTRIES = 0x8013541C; // size:0xFF0
 EVO_REQ_DATA = 0x80137AF0; // size:0x6E4
 EVO_PATHS_DATA = 0x80138570; // type:s8 size:0x2AA
 DIGIMON_DATA = 0x8013A924; // size:0x2490
+ENTITY_TABLE = 0x8013CDB4; // size:0x28

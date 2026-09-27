@@ -1,6 +1,7 @@
 MWCCWRAP ?= bin/mwccwrap/mwccwrap.exe
+MWCC_OPT_LEVEL ?= 4
 MWCCWRAP_FLAGS ?= -dll "bin/cc_mips/cc_mips_40.dll"
-MWCCWRAP_FLAGS += -O4 -sdata 8 -Werror -requireprotos -gccincludes \
+MWCCWRAP_FLAGS += -O$(MWCC_OPT_LEVEL) -sdata 8 -Werror -requireprotos -gccincludes \
 		  -lang c -Cpp_exceptions off -RTTI off -multibyteaware \
 		  -codepage 932
 

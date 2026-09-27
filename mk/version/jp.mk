@@ -1,5 +1,10 @@
 EXE_NAME := SLPS_017.97
 
+MWCC_OPT_LEVEL := 0
+
+MAIN_C_SRC := \
+	src/main/aabb.c
+
 $(eval $(call unit,MAIN,main))
 
 $(eval $(call overlay,BTL,btl))
