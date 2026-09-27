@@ -64,6 +64,8 @@ segments:
       - [0x208B4, c, aabb]
       - [0x20E40, c, efe]
       - [0x242CC, asm]
+      - [0x38390, c, overworld_evochart_text]
+      - [0x384D8, asm]
       - [0x386A4, c, overworld_card_text]
       - [0x38758, asm]
       - [0x78514, c, kar]
