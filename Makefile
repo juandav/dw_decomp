@@ -18,6 +18,7 @@ $(error unsupported PLATFORM/TOOLCHAIN $(CONFIG); supported: $(CONFIGS))
 endif
 
 BUILD_DIR := build/$(VERSION)/$(CONFIG)
+DISK_DIR := disks/$(VERSION)
 CONFIG_DIR := config/$(VERSION)
 ASM_DIR := asm/$(VERSION)
 GEN_DIR := build/$(VERSION)/$(PLATFORM)/generated

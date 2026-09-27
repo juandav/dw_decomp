@@ -3,7 +3,8 @@ EXPECTED_DIR := expected/$(VERSION)
 OBJDIFF ?= bin/objdiff-cli-linux-x86_64
 
 compare:
-	@tools/cmp_bins.sh
+	@tools/cmp_bins.sh $(DISK_DIR) $(BUILD_DIR) $(EXE_NAME) \
+		$(OVERLAY:%=%_REL.BIN)
 
 expected: $(OBJ)
 	rm -rf $(EXPECTED_DIR)
