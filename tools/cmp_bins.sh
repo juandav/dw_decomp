@@ -24,7 +24,7 @@ disks/us/VS_REL.BIN
 STATUS=0
 
 for BIN in $BINS; do
-	cmp "$TOP/$BIN" "$TOP/build/psx/mwcc/$(basename "$BIN")" || STATUS=1
+	cmp "$TOP/$BIN" "$TOP/build/us/psx/mwcc/$(basename "$BIN")" || STATUS=1
 done
 
 if [ "$STATUS" -eq 0 ]; then

@@ -15,7 +15,7 @@ LDSCRIPT := \
 	$(CONFIG_DIR)/overlay.ld \
 	$(CONFIG_DIR)/main.ld
 
-CPPLDSCRIPT := $(LDSCRIPT:%=$(BUILD_DIR)/%)
+CPPLDSCRIPT := $(LDSCRIPT:$(CONFIG_DIR)/%=$(BUILD_DIR)/config/%)
 
 ARCHFLAGS := -march=r3000 -mtune=r3000 -mabi=32 -EL -mfp32 -msoft-float \
 	     -fno-pic -mno-shared -mno-abicalls -mno-llsc \
@@ -37,7 +37,7 @@ all: $(EXE)
 
 generate: $(LINKER_SCRIPTS)
 
-$(BUILD_DIR)/%.ld: %.ld
+$(BUILD_DIR)/config/%.ld: $(CONFIG_DIR)/%.ld
 	@mkdir -p $(dir $@)
 	$(CPP) -P -x c $(INC) -DBUILD_DIR=$(BUILD_DIR) -o $@ $<
 
@@ -68,7 +68,7 @@ endef
 $(BUILD_DIR)/asm/%.s.o: $(ASM_DIR)/%.s
 	$(assemble)
 
-$(BUILD_DIR)/%.s.o: %.s
+$(BUILD_DIR)/generated/%.s.o: $(GEN_DIR)/%.s
 	$(assemble)
 
 $(MAIN_SBSS) &: $(CONFIG_DIR)/sbss.yaml $(CONFIG_DIR)/symbols.txt

@@ -17,10 +17,10 @@ ifeq ($(filter $(CONFIG),$(CONFIGS)),)
 $(error unsupported PLATFORM/TOOLCHAIN $(CONFIG); supported: $(CONFIGS))
 endif
 
-BUILD_DIR := build/$(CONFIG)
+BUILD_DIR := build/$(VERSION)/$(CONFIG)
 CONFIG_DIR := config/$(VERSION)
 ASM_DIR := asm/$(VERSION)
-GEN_DIR := build/generated
+GEN_DIR := build/$(VERSION)/$(PLATFORM)/generated
 
 VERSION_MACRO := VERSION_$(shell echo $(VERSION) | tr a-z A-Z)
 

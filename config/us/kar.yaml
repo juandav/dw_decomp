@@ -11,7 +11,7 @@ options:
   src_path: src/kar
   build_path: build
 
-  ld_script_path: build/generated/kar.ld
+  ld_script_path: build/us/psx/generated/kar.ld
 
   global_vram_start: 0x80000000
   global_vram_end: 0x80200000
@@ -29,8 +29,8 @@ options:
   reloc_addrs_path:
     - config/us/relocs_kar.txt
 
-  undefined_funcs_auto_path: build/generated/undefined_funcs_auto_kar.txt
-  undefined_syms_auto_path: build/generated/undefined_syms_auto_kar.txt
+  undefined_funcs_auto_path: build/us/psx/generated/undefined_funcs_auto_kar.txt
+  undefined_syms_auto_path: build/us/psx/generated/undefined_syms_auto_kar.txt
 
   string_encoding: ASCII
   data_string_encoding: ASCII

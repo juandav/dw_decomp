@@ -49,4 +49,4 @@ jobs:
       uses: actions/upload-artifact@v5
       with:
         name: SLUS_010.32_report
-        path: build/psx/mwcc/report.json
+        path: build/us/psx/mwcc/report.json
