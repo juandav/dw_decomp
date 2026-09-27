@@ -47,7 +47,6 @@
 
 # A data symbol.
 .macro dlabel label, visibility=global
-    .pushsection %S.\label
     .\visibility \label
     .type \label, @object
     \label:
@@ -55,6 +54,19 @@
 
 # End of a data symbol.
 .macro enddlabel label
+    .size \label, . - \label
+.endm
+
+# A data symbol in a section of its own.
+.macro dlabel_section label, visibility=global
+    .pushsection %S.\label
+    .\visibility \label
+    .type \label, @object
+    \label:
+.endm
+
+# End of a data symbol in a section of its own.
+.macro enddlabel_section label
     .size \label, . - \label
     .popsection
 .endm
