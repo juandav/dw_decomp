@@ -136,8 +136,6 @@ extern MapWarps MAP_WARPS;
 
 void entityLookAtLocation(Entity *entity, VECTOR *pos);
 void setupEntityMatrix(int32_t entityId);
-void fadeToBlack(int32_t frames);
-void fadeFromBlack(int32_t frames);
 void changeMap(uint8_t mapId, uint8_t exitId);
 void addMapNameObject(uint8_t mapId);
 void renderString(int32_t, int32_t, int32_t, int32_t, int32_t, int32_t,

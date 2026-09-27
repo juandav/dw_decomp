@@ -41,6 +41,9 @@ $(BUILD_DIR)/config/%.ld: $(CONFIG_DIR)/%.ld
 	@mkdir -p $(dir $@)
 	$(CPP) -P -x c $(INC) -DBUILD_DIR=$(BUILD_DIR) -o $@ $<
 
+$(GEN_DIR)/undefined_%.ld: $(GEN_DIR)/undefined_%.txt
+	sed -E 's/^(.+) = (.+);$$/PROVIDE(\1 = \2);/' $< > $@
+
 $(BUILD_DIR)/%_REL.BIN: $(ELF) $(CPPLDSCRIPT)
 	@mkdir -p $(dir $@)
 	$(OBJCOPY) -j $(@:$(BUILD_DIR)/%_REL.BIN=.%) -O binary $< $@

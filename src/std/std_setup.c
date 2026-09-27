@@ -80,7 +80,7 @@ void removeMapEntities(void);
 void STD_func_8006B6F4(void);
 void STD_func_80056CA8(int32_t arena, uint8_t *arg);
 void STD_func_8005A550(void);
-void fadeToBlack(int32_t mode);
+void fadeToBlack(int16_t mode);
 void STD_func_80057628(void);
 void STD_addEnemyHPBars(void);
 void STD_func_8005D964(void);
@@ -97,7 +97,7 @@ void STD_func_8006C6D0(void);
 void STD_func_8006CCD4(void);
 void STD_func_8006D15C(void);
 void STD_setVSPhase(int32_t arg);
-void fadeFromBlack(int32_t frames);
+void fadeFromBlack(int16_t frames);
 int32_t loadMapSounds(int32_t mapSoundId);
 uint32_t lookupFileSize(char *path);
 

@@ -12,12 +12,12 @@ extern uint8_t FADE_MODE;
 extern int32_t FADE_PROTECTION;
 
 void initializeFadeData(void);
-void fadeToBlack(int32_t frames);
+void fadeToBlack(int16_t frames);
 void renderFadeOut(void);
-void fadeFromBlack(int32_t frames);
-void renderFadeIn(int32_t arg0);
+void fadeFromBlack(int16_t frames);
+void renderFadeIn(int16_t instanceId);
 void renderFade(uint8_t progress);
-void fadeToWhite(int32_t frames);
-void fadeFromWhite(int32_t frames);
+void fadeToWhite(int16_t frames);
+void fadeFromWhite(int16_t frames);
 
 #endif

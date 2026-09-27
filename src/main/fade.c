@@ -13,7 +13,11 @@ int16_t FADE_IN_CURRENT;
 uint8_t FADE_PROGRESS;
 uint8_t FADE_MODE;
 int32_t FADE_PROTECTION;
-int8_t MAIN_D_80134CBC;
+uint8_t MAIN_D_80134CBC;
+
+void setPosDataPolyFT4(POLY_FT4 *prim, int16_t posX, int16_t posY, int16_t width, int16_t height);
+void setUVDataPolyFT4(POLY_FT4 *prim, int16_t xPos, int16_t yPos, int16_t width, int16_t height);
+extern GsOT *ACTIVE_ORDERING_TABLE;
 
 // Garbage function to force sbss symbol order and ensure
 // correct codegen for renderFadeOut()
@@ -27,7 +31,6 @@ static void __garbage__()
 	FADE_MODE = 0;
 	FADE_PROTECTION = 0;
 	MAIN_D_80134CBC = 0;
-	return;
 }
 
 void initializeFadeData(void)
@@ -39,13 +42,13 @@ void initializeFadeData(void)
 	FADE_PROGRESS = 0;
 	FADE_MODE = 2;
 	FADE_PROTECTION = 0;
-	return;
 }
 
-void fadeToBlack(int32_t frames)
+void fadeToBlack(int16_t frames)
 {
-	if (FADE_OUT_CURRENT || FADE_IN_CURRENT)
+	if (FADE_OUT_CURRENT || FADE_IN_CURRENT) {
 		removeObject(4005, 0);
+	}
 
 	FADE_OUT_TARGET = frames + 1;
 	FADE_OUT_CURRENT = 1;
@@ -53,62 +56,71 @@ void fadeToBlack(int32_t frames)
 	addObject(4005, 0, 0, (RenderFunction)renderFadeOut);
 	stopGameTime();
 	FADE_PROTECTION = 1;
-	return;
 }
 
-void fadeFromBlack(int32_t frames)
+void fadeFromBlack(int16_t frames)
 {
 	removeObject(4005, 0);
+	FADE_OUT_CURRENT = 0;
+#if defined(VERSION_JP)
+	removeObject(4005, 0);
+#endif
+
 	FADE_IN_TARGET = frames + 1;
 	FADE_IN_CURRENT = 1;
-	FADE_OUT_CURRENT = 0;
 	FADE_MODE = 2;
 	addObject(4005, 0, 0, (RenderFunction)renderFadeIn);
-	return;
 }
 
-void renderFadeIn(int32_t arg0)
+void renderFadeIn(int16_t instanceId)
 {
-    if (FADE_IN_CURRENT < FADE_IN_TARGET) {
-        short temp = FADE_IN_CURRENT * (160 / FADE_IN_TARGET);
-        
-        if (temp < 1)
-            temp = FADE_IN_CURRENT;
-            
-        renderFade(FADE_PROGRESS = 160 - temp);
-        
-        FADE_IN_CURRENT++;
-    } else {
-        FADE_IN_CURRENT = 0;
-        removeObject(4005, arg0);
-        FADE_PROTECTION = 0;
-    }
-    return;
+	int16_t temp;
+	uint8_t progress;
+
+	if (FADE_IN_CURRENT < FADE_IN_TARGET) {
+		temp = FADE_IN_CURRENT * (160 / FADE_IN_TARGET);
+
+		if (temp < 1) {
+			temp = FADE_IN_CURRENT;
+		}
+
+		FADE_PROGRESS = progress = 160 - temp;
+
+		if (progress < 0) {
+			FADE_PROGRESS = progress = 0;
+		}
+
+		renderFade(progress);
+
+		FADE_IN_CURRENT++;
+	} else {
+		FADE_IN_CURRENT = 0;
+		removeObject(4005, instanceId);
+		FADE_PROTECTION = 0;
+	}
 }
 
 void renderFadeOut(void)
 {
-  uint8_t next;
-  next = FADE_PROGRESS += 160 / FADE_OUT_TARGET;
-  if (160 < next)
-  {
-    next = 160;
-    FADE_PROGRESS = 160;
-  }
-  renderFade(next);
-  FADE_OUT_CURRENT++;
-  return;
-}
+	uint8_t next;
 
-void setPosDataPolyFT4(POLY_FT4 *prim, int16_t posX, int16_t posY, int16_t width, int16_t height);
-void setUVDataPolyFT4(POLY_FT4 *prim, int16_t xPos, int16_t yPos, int16_t width, int16_t height);
-extern GsOT *ACTIVE_ORDERING_TABLE;
+	next = FADE_PROGRESS += 160 / FADE_OUT_TARGET;
+
+	if (160 < next) {
+		FADE_PROGRESS = next = 160;
+	}
+
+	renderFade(next);
+
+	FADE_OUT_CURRENT++;
+}
 
 void renderFade(uint8_t progress)
 {
 	POLY_FT4 *prim;
 
 	prim = (POLY_FT4 *)GsGetWorkBase();
+
 	SetPolyFT4(prim);
 	SetSemiTrans(prim, 1);
 	prim->tpage = GetTPage(0, FADE_MODE, 896, 448);
@@ -123,31 +135,42 @@ void renderFade(uint8_t progress)
 	} else {
 		AddPrim(&ACTIVE_ORDERING_TABLE->org[10], prim);
 	}
+
 	prim++;
+
 	GsSetWorkBase((PACKET*)(prim));
-	return;
 }
 
-void fadeToWhite(int32_t frames)
+void fadeToWhite(int16_t frames)
 {
+#if !defined(VERSION_JP)
 	if (FADE_OUT_CURRENT || FADE_IN_CURRENT) {
 		removeObject(4005, 0);
 	}
+#endif
+
 	FADE_OUT_TARGET = frames + 1;
 	FADE_OUT_CURRENT = 1;
 	FADE_MODE = 1;
+
+#if defined(VERSION_JP)
+	if (!MAIN_D_80134CBC) {
+		addObject(4005, 0, 0, (RenderFunction)renderFadeOut);
+	}
+
+	MAIN_D_80134CBC = 1;
+#else
 	addObject(4005, 0, 0, (RenderFunction)renderFadeOut);
-	return;
+#endif
 }
 
-void fadeFromWhite(int32_t frames)
+void fadeFromWhite(int16_t frames)
 {
 	removeObject(4005, 0);
-	FADE_IN_TARGET = frames + 1;
 	FADE_OUT_CURRENT = 0;
+	FADE_IN_TARGET = frames + 1;
 	FADE_IN_CURRENT = 1;
 	FADE_MODE = 1;
 	MAIN_D_80134CBC = 0;
 	addObject(4005, 0, 0, (RenderFunction)renderFadeIn);
-	return;
 }

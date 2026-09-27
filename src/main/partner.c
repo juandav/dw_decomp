@@ -85,8 +85,6 @@ void tickPartnerCollision();
 void tickPartnerNormal();
 void tickPartnerPoopingMechanic();
 void detectEdiblePoop();
-void fadeToBlack(int32_t frames);
-void fadeFromBlack(int32_t frames);
 void sleepRegen();
 void handleSleeping();
 void setCameraFollowPlayer();

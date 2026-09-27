@@ -1,0 +1,7 @@
+name: sbss
+start: 0x8013DF1C
+end: 0x8013E6A8
+subsegments:
+  - [0x8013DF1C, unk_0x8013DF1C]
+  - [0x8013DF80, fade]
+  - [0x8013DF94, unk_0x8013DF94]

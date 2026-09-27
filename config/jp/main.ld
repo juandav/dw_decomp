@@ -19,7 +19,8 @@ SECTIONS
     {
         main_TEXT_START = .;
         KEEP(BUILD_DIR/asm/main/main.s.o(.text .text.*));
-        KEEP(BUILD_DIR/src/main/aabb.c.o(.text .text.*));
+        BUILD_DIR/src/main/fade.c.o(.text .text.*);
+        BUILD_DIR/src/main/aabb.c.o(.text .text.*);
         KEEP(BUILD_DIR/asm/main/20E40.s.o(.text .text.*));
         main_TEXT_END = .;
         main_TEXT_SIZE = ABSOLUTE(main_TEXT_END - main_TEXT_START);
@@ -46,6 +47,22 @@ SECTIONS
     __romPos = ALIGN(__romPos, 4);
     main_ROM_END = __romPos;
     main_ROM_SIZE = ABSOLUTE(main_ROM_END - main_ROM_START);
+    . = ALIGN(., 4);
+
+    sbss_ROM_START = __romPos;
+    .sbss main_SBSS_START : AT(sbss_ROM_START)
+    {
+        BUILD_DIR/generated/unk_0x8013DF1C.sbss.s.o(.sbss.*);
+        . = ALIGN(., 4);
+        BUILD_DIR/src/main/fade.c.o(.sbss.*);
+        . = ALIGN(., 4);
+        BUILD_DIR/generated/unk_0x8013DF94.sbss.s.o(.sbss.*);
+        . = ALIGN(., 4);
+        main_SBSS_END = .;
+        main_SBSS_SIZE = ABSOLUTE(main_SBSS_END - main_SBSS_START);
+    }
+    __romPos += SIZEOF(.sbss);
+    __romPos = ALIGN(__romPos, 4);
 
     /DISCARD/ :
     {

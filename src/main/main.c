@@ -182,7 +182,6 @@ void setDigimonRaised(uint16_t type);
 void MAIN_func_800D56E0(void);
 void runMapHeadScript(int32_t scriptId);
 int32_t readPStat(int32_t id);
-void fadeFromBlack(int32_t frames);
 void initializeUIBoxData(void);
 void initializeMedalModel(void);
 void initializeChest(void);
