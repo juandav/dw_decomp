@@ -75,6 +75,8 @@ segments:
       - [0x384D8, c, overworld_medal_text]
       - [0x386A4, c, overworld_card_text]
       - [0x38758, asm]
+      - [0x7587C, c, evl]
+      - [0x75B80, asm]
       - [0x78514, c, kar]
       - [0x7855C, c, efe_table]
       - [0x78668, asm]

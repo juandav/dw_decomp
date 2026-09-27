@@ -90,7 +90,7 @@ void tickEvoSequenceLoading(int32_t instanceId);
 void renderEvoSequenceLoading(int32_t instanceId);
 int32_t getEvoSequenceState(PartnerEntity *partner, void *buffer,
                             PartnerPara *para, int32_t target,
-                            int16_t isInitialized);
+                            int32_t isInitialized);
 int32_t evoSequenceAlwaysTrue(int32_t unused);
 
 void EVL_initEvoSequence(void);

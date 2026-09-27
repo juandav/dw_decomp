@@ -26,14 +26,12 @@ void* evl_functions[] = {
 void tickEvoSequenceLoading(int32_t instanceId)
 {
 	EvoSequenceData *data;
-	int iVar1;
 
 	data = &EVO_SEQUENCE_DATA;
 
 	switch (data->state) {
 	case 0:
-		iVar1 = evoSequenceAlwaysTrue(500);
-		if ((iVar1 == 1) && (data->timer > 55)) {
+		if ((evoSequenceAlwaysTrue(500) == 1) && (data->timer > 55)) {
 			data->state = 1;
 			data->timer = 0;
 			startAnimation(&PARTNER_ENTITY.digimonEntity.entity, 1);
@@ -60,7 +58,9 @@ void tickEvoSequenceLoading(int32_t instanceId)
 
 void renderEvoSequenceLoading(int32_t instanceId)
 {
-	(void)instanceId;
+	EvoSequenceData *data;
+
+	data = &EVO_SEQUENCE_DATA;
 }
 
 /* CodeWarrior retains scheduler state between functions. This unused function
@@ -85,13 +85,18 @@ static int32_t primeGetEvoSequenceStateScheduler(int32_t a, int32_t b,
 	return value;
 }
 
-int32_t getEvoSequenceState(PartnerEntity *partner, void *buffer,
-			    PartnerPara *para, int32_t target,
-			    int16_t isInitialized)
+int32_t getEvoSequenceState(partner, buffer, para, target, isInitialized)
+PartnerEntity *partner;
+void *buffer;
+PartnerPara *para;
+int16_t target;
+int16_t isInitialized;
 {
 	EvoSequenceData *data;
+	int32_t instanceId;
 
 	data = &EVO_SEQUENCE_DATA;
+	instanceId = 0;
 	if (isInitialized != 0) {
 		return data->timer;
 	}
@@ -113,14 +118,12 @@ int32_t getEvoSequenceState(PartnerEntity *partner, void *buffer,
 	loadVLALL(data->digimonId, GENERAL_BUFFER_PTR);
 	loadDynamicLibrary(EVL_REL, (uint8_t *)&EVL_LOADING_COMPLETE, 0, 0, 0);
 	EVL_LOADING_COMPLETE = 0;
-	addObject(0x809, 0, tickEvoSequenceLoading, renderEvoSequenceLoading);
+	addObject(0x809, instanceId, tickEvoSequenceLoading, renderEvoSequenceLoading);
 
 	return (int32_t)buffer;
 }
 
 int evoSequenceAlwaysTrue(int32_t unused)
 {
-	(void)unused;
-
 	return 1;
 }

@@ -20,6 +20,7 @@ MAIN_C_SRC := \
 	src/main/butterfly.c \
 	src/main/efe.c \
 	src/main/efe_table.c \
+	src/main/evl.c \
 	src/main/fade.c \
 	src/main/kar.c \
 	src/main/math.c \
