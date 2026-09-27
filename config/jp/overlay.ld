@@ -98,7 +98,10 @@ SECTIONS
 	OVERLAY 0x80010000 : NOCROSSREFS
 	{
 		.MOV {
-			KEEP(BUILD_DIR/asm/mov/data/mov.s.o(.data.*));
+			KEEP(BUILD_DIR/asm/mov/data/header.rodata.s.o(.rodata .rodata.*));
+			KEEP(BUILD_DIR/asm/mov/mov.s.o(.text .text.*));
+			KEEP(BUILD_DIR/asm/mov/data/mov.data.s.o(.data .data.*));
+			LONG(0);
 		}
 	}
 
