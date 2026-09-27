@@ -1,0 +1,3 @@
+FISH_loadTMDModel = 0x8007DD2C;
+FISH_getModelObject = 0x8007DEC8;
+FISH_remapClamped = 0x8007DF38;

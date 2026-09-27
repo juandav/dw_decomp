@@ -61,7 +61,6 @@ GsDOBJ2 *FISH_getModelObject(TMDFileLoadingData *model, int32_t idx)
 int32_t FISH_remapClamped(int32_t x, int32_t x0, int32_t x1, int32_t y0, int32_t y1)
 {
 	int32_t t;
-	int32_t d;
 
 	if (x1 == x0) {
 		return y0;
@@ -74,7 +73,5 @@ int32_t FISH_remapClamped(int32_t x, int32_t x0, int32_t x1, int32_t y0, int32_t
 	}
 
 	x = (x < x0) ? x0 : ((x1 < x) ? x1 : x);
-	d = x1 - x0;
-
-	return y0 + ((((y1 - y0) * (x - x0)) + (d / 2)) / d);
+	return y0 + ((((y1 - y0) * (x - x0)) + ((x1 - x0) / 2)) / (x1 - x0));
 }

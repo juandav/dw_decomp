@@ -37,6 +37,9 @@ $(eval $(call overlay,DOOA,dooa))
 $(eval $(call overlay,EAB,eab))
 $(eval $(call overlay,ENDI,endi))
 $(eval $(call overlay,EVL,evl))
+FISH_C_SRC := \
+	src/fish/fish_model.c
+
 $(eval $(call overlay,FISH,fish))
 $(eval $(call overlay,KAR,kar))
 $(eval $(call overlay,MOV,mov))

@@ -80,6 +80,7 @@ SECTIONS
 		.FISH {
 			KEEP(BUILD_DIR/asm/fish/data/header.rodata.s.o(.rodata .rodata.*));
 			KEEP(BUILD_DIR/asm/fish/fish.s.o(.text .text.*));
+			BUILD_DIR/src/fish/fish_model.c.o(.text .text.*);
 			KEEP(BUILD_DIR/asm/fish/data/fish.data.s.o(.data .data.*));
 			LONG(0);
 		}
