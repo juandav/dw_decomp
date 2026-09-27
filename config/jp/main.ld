@@ -19,6 +19,8 @@ SECTIONS
     {
         main_TEXT_START = .;
         KEEP(BUILD_DIR/asm/main/main.s.o(.text .text.*));
+        BUILD_DIR/src/main/math.c.o(.text .text.*);
+        KEEP(BUILD_DIR/asm/main/14DF8.s.o(.text .text.*));
         BUILD_DIR/src/main/_psstart.c.o(.text .text.*);
         KEEP(BUILD_DIR/asm/main/16190.s.o(.text .text.*));
         BUILD_DIR/src/main/fade.c.o(.text .text.*);

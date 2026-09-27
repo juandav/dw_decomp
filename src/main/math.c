@@ -4,7 +4,10 @@
 
 int32_t random(int32_t limit)
 {
-    return (limit * rand()) >> 15;
+    int32_t result;
+
+    result = (limit * rand()) >> 15;
+    return result;
 }
 
 int32_t _sin(int32_t input)
@@ -28,8 +31,10 @@ int32_t _cos(int32_t input)
 
 int32_t _atan(int32_t dy, int32_t dx)
 {
-    int32_t generalDirection;
     int32_t offset;
+    int32_t absDy;
+    int32_t absDx;
+    int32_t generalDirection;
     int32_t tmpVal;
 
     if (dy < 0) {
@@ -40,16 +45,16 @@ int32_t _atan(int32_t dy, int32_t dx)
         else generalDirection = 0;
     }
 
-    dy = DW_ABS(dy);
-    dx = DW_ABS(dx);
+    if (dy < 0) absDy = -dy;
+    else absDy = dy;
+    if (dx < 0) absDx = -dx;
+    else absDx = dx;
 
-    if (dy >= dx)
+    if (absDy >= absDx)
     {
-        int32_t tmpDx = dx; 
-
-        tmpDx *= 512; 
-        if (dy > 0)
-            offset = tmpDx / dy;
+        absDx *= 512;
+        if (absDy > 0)
+            offset = absDx / absDy;
         else
             offset = 0;
         if (offset > 511) offset = 511;
@@ -57,11 +62,9 @@ int32_t _atan(int32_t dy, int32_t dx)
     }
     else
     {
-        int32_t tmpDy = dy; 
-
-        tmpDy *= 512; 
-        if (dx > 0)
-            offset = tmpDy / dx; 
+        absDy *= 512;
+        if (absDx > 0)
+            offset = absDy / absDx;
         else
             offset = 0;
         if (offset > 511) offset = 511;
