@@ -18,3 +18,7 @@ $(eval $(call overlay,STD,std))
 $(eval $(call overlay,TRN2,trn2))
 $(eval $(call overlay,TRN,trn))
 $(eval $(call overlay,VS,vs))
+
+UNDEFINED_SYMS := $(foreach u,main $(shell echo $(OVERLAY) | tr A-Z a-z), \
+	$(GEN_DIR)/undefined_funcs_auto_$(u).txt \
+	$(GEN_DIR)/undefined_syms_auto_$(u).txt)

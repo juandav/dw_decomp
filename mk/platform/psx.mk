@@ -25,7 +25,7 @@ ASFLAGS := -Wa,--sectname-subst
 CFLAGS := -g -Wall -Wextra -Werror -std=c99 -Os -G0 -mno-gpopt $(ARCHFLAGS)
 CPPFLAGS := -DLANGUAGE_C -D$(VERSION_MACRO) $(INC)
 DEPFLAGS = -MM -MF $(@:.o=.d) -MT $@
-LDFLAGS := -g $(addprefix -T ,$(CPPLDSCRIPT)) -static \
+LDFLAGS := -g $(addprefix -T ,$(CPPLDSCRIPT) $(UNDEFINED_SYMS)) -static \
 	   -Wl,--no-check-sections -Wl,-Map=% -Wl,--build-id=none \
 	   -Wl,--gc-sections -Wl,--print-gc-sections
 
@@ -45,7 +45,7 @@ $(BUILD_DIR)/%_REL.BIN: $(ELF) $(CPPLDSCRIPT)
 	@mkdir -p $(dir $@)
 	$(OBJCOPY) -j $(@:$(BUILD_DIR)/%_REL.BIN=.%) -O binary $< $@
 
-$(ELF): $(OBJ) $(CPPLDSCRIPT)
+$(ELF): $(OBJ) $(CPPLDSCRIPT) $(UNDEFINED_SYMS)
 	@mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@
 
