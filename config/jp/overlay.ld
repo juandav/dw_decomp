@@ -143,7 +143,10 @@ SECTIONS
 	OVERLAY 0x80088800 : NOCROSSREFS
 	{
 		.TRN2 {
-			KEEP(BUILD_DIR/asm/trn2/data/trn2.s.o(.data.*));
+			KEEP(BUILD_DIR/asm/trn2/data/header.rodata.s.o(.rodata .rodata.*));
+			KEEP(BUILD_DIR/asm/trn2/trn2.s.o(.text .text.*));
+			KEEP(BUILD_DIR/asm/trn2/data/trn2.data.s.o(.data .data.*));
+			LONG(0);
 		}
 	}
 
