@@ -38,7 +38,10 @@ SECTIONS
 	OVERLAY 0x80080000 : NOCROSSREFS
 	{
 		.DOOA {
-			KEEP(BUILD_DIR/asm/dooa/data/dooa.s.o(.data.*));
+			KEEP(BUILD_DIR/asm/dooa/data/header.rodata.s.o(.rodata .rodata.*));
+			KEEP(BUILD_DIR/asm/dooa/dooa.s.o(.text .text.*));
+			KEEP(BUILD_DIR/asm/dooa/data/dooa.data.s.o(.data .data.*));
+			LONG(0);
 		}
 	}
 
