@@ -1,4 +1,4 @@
-EXPECTED_DIR := expected
+EXPECTED_DIR := expected/$(VERSION)
 
 OBJDIFF ?= bin/objdiff-cli-linux-x86_64
 

@@ -65,7 +65,7 @@ categories:
       - vs
 
 expected_paths:
-  asm: expected/asm
+  asm: expected/us/asm
 
 ignored_files:
   - main/psyq
