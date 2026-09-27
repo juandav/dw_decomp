@@ -1,11 +1,17 @@
 -include local.mk
 
+VERSION ?= us
 TOOLCHAIN ?= mwcc
 PLATFORM ?= psx
 
+VERSIONS := us
 CONFIG := $(PLATFORM)/$(TOOLCHAIN)
 CONFIGS := psx/mwcc psx/gcc
 MATCHING_CONFIG := psx/mwcc
+
+ifeq ($(filter $(VERSION),$(VERSIONS)),)
+$(error unsupported VERSION $(VERSION); supported: $(VERSIONS))
+endif
 
 ifeq ($(filter $(CONFIG),$(CONFIGS)),)
 $(error unsupported PLATFORM/TOOLCHAIN $(CONFIG); supported: $(CONFIGS))
@@ -15,10 +21,13 @@ BUILD_DIR := build/$(CONFIG)
 ASM_DIR := asm
 GEN_DIR := build/generated
 
+VERSION_MACRO := VERSION_$(shell echo $(VERSION) | tr a-z A-Z)
+
 PYTHON := python3
 
 .DEFAULT_GOAL := all
 
+include mk/version/$(VERSION).mk
 include mk/sources.mk
 include mk/toolchain/$(TOOLCHAIN).mk
 include mk/platform/$(PLATFORM).mk

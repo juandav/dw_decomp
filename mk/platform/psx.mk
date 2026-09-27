@@ -6,8 +6,8 @@ OBJCOPY := $(CROSS)objcopy
 
 SPLAT := $(PYTHON) -m splat split
 
-ELF := $(BUILD_DIR)/SLUS_010.32.elf
-EXE := $(BUILD_DIR)/SLUS_010.32
+ELF := $(BUILD_DIR)/$(EXE_NAME).elf
+EXE := $(BUILD_DIR)/$(EXE_NAME)
 
 INC := -Iinclude/$(TOOLCHAIN) -Iexternal/psyq_headers/mw_lib41/include -Iinclude
 
@@ -23,7 +23,7 @@ ARCHFLAGS := -march=r3000 -mtune=r3000 -mabi=32 -EL -mfp32 -msoft-float \
 	     -Xassembler -no-pad-sections
 ASFLAGS := -Wa,--sectname-subst
 CFLAGS := -g -Wall -Wextra -Werror -std=c99 -Os -G0 -mno-gpopt $(ARCHFLAGS)
-CPPFLAGS := -DLANGUAGE_C $(INC)
+CPPFLAGS := -DLANGUAGE_C -D$(VERSION_MACRO) $(INC)
 DEPFLAGS = -MM -MF $(@:.o=.d) -MT $@
 LDFLAGS := -g $(addprefix -T ,$(CPPLDSCRIPT)) -static \
 	   -Wl,--no-check-sections -Wl,-Map=% -Wl,--build-id=none \
