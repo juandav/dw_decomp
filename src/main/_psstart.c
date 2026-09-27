@@ -55,7 +55,11 @@ asm void __start(void)
 	move	t8,t0
 	move	t9,t0
 	
+#if defined(VERSION_JP)
+	move	s1,t0
+#else
 	move	s0,t0
+#endif
 	move	s1,t0
 	move	s2,t0
 	move	s3,t0
