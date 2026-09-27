@@ -48,7 +48,10 @@ SECTIONS
 	OVERLAY 0x80060000 : NOCROSSREFS
 	{
 		.EAB {
-			KEEP(BUILD_DIR/asm/eab/data/eab.s.o(.data.*));
+			KEEP(BUILD_DIR/asm/eab/data/header.rodata.s.o(.rodata .rodata.*));
+			KEEP(BUILD_DIR/asm/eab/eab.s.o(.text .text.*));
+			KEEP(BUILD_DIR/asm/eab/data/eab.data.s.o(.data .data.*));
+			LONG(0);
 		}
 	}
 

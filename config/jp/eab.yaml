@@ -29,12 +29,36 @@ options:
   undefined_funcs_auto_path: build/jp/psx/generated/undefined_funcs_auto_eab.txt
   undefined_syms_auto_path: build/jp/psx/generated/undefined_syms_auto_eab.txt
 
+  string_encoding: ASCII
+  data_string_encoding: ASCII
+  rodata_string_guesser_level: 2
+  data_string_guesser_level: 2
+
+  migrate_rodata_to_functions: False
+
+  create_data_pads: False
+
   use_gp_rel_macro: True
 
+  symbol_name_format: $VRAM_eab
+  symbol_name_format_no_rom: $VRAM_eab
+
 segments:
-  - name: eab
-    type: databin
+  - name: header
+    type: rodata
     start: 0x0
     vram: 0x80060000
+    align: 4
+    subalign: 4
 
-  - [0x26F4]
+  - name: eab
+    type: code
+    start: 0x40
+    vram: 0x80060040
+    align: 4
+    subalign: 4
+    subsegments:
+      - [0x40, asm, eab]
+      - [0x1D7C, data, eab]
+
+  - [0x26F0]
