@@ -10,7 +10,10 @@ SECTIONS
 	OVERLAY 0x80080800 : NOCROSSREFS
 	{
 		.DGET {
-			KEEP(BUILD_DIR/asm/dget/data/dget.s.o(.data.*));
+			KEEP(BUILD_DIR/asm/dget/data/header.rodata.s.o(.rodata .rodata.*));
+			KEEP(BUILD_DIR/asm/dget/dget.s.o(.text .text.*));
+			KEEP(BUILD_DIR/asm/dget/data/dget.data.s.o(.data .data.*));
+			LONG(0);
 		}
 	}
 
