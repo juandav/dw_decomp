@@ -3,7 +3,15 @@ SECTIONS
 	OVERLAY 0x80052AE0 : NOCROSSREFS
 	{
 		.BTL {
-			KEEP(BUILD_DIR/asm/btl/data/btl.s.o(.data.*));
+			KEEP(BUILD_DIR/asm/btl/data/texture.rodata.s.o(.rodata .rodata.*));
+			KEEP(BUILD_DIR/asm/btl/data/model_0.rodata.s.o(.rodata .rodata.*));
+			KEEP(BUILD_DIR/asm/btl/data/model_1.rodata.s.o(.rodata .rodata.*));
+			KEEP(BUILD_DIR/asm/btl/data/model_2.rodata.s.o(.rodata .rodata.*));
+			KEEP(BUILD_DIR/asm/btl/data/model_3.rodata.s.o(.rodata .rodata.*));
+			KEEP(BUILD_DIR/asm/btl/data/header.rodata.s.o(.rodata .rodata.*));
+			KEEP(BUILD_DIR/asm/btl/btl.s.o(.text .text.*));
+			KEEP(BUILD_DIR/asm/btl/data/btl.data.s.o(.data .data.*));
+			LONG(0);
 		}
 	}
 
