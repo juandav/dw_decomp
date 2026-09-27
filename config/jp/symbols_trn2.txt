@@ -1,3 +1,11 @@
+TRN2_tickMpTraining = 0x80089998;
+TRN2_startSlotSessionIfEnabled = 0x8008AFCC;
+TRN2_statGainsAreZero = 0x8008B3B0;
+TRN2_awardMpTrainingGains = 0x8008B440;
+TRN2_applyBaseStats = 0x8008C724;
+TRN2_closeUIBox = 0x8008D370;
+TRN2_getSlotSessionResult = 0x8008E58C;
+TRN2_startSlotSpin = 0x8008E770;
 TRN2_D_8008DC1C = 0x8008EA6C; // size:0x10
 TRN2_D_8008DC2C = 0x8008EA7C; // size:0x10
 TRN2_D_8008DC3C = 0x8008EA8C; // size:0x18

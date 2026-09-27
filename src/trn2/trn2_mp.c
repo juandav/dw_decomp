@@ -1,8 +1,8 @@
 #include <dw/anim.h>
 #include <dw/entity.h>
+#include <dw/input.h>
 #include <dw/partner.h>
 #include <dw/sound.h>
-#include <dw/tamer.h>
 #include <dw/training.h>
 #include <dw/trn2.h>
 #include <dw/types.h>
@@ -12,12 +12,15 @@ extern int32_t TRAINING_COMPLETE;
 extern uint32_t POLLED_INPUT;
 
 void createCameraMovement(VECTOR *pos, int32_t speed);
+void setTamerState(int8_t state);
+int32_t tickEntityWalkTo();
 
 static void *trn2_mp_functions[] = {
 	TRN2_tickMpTraining,
 };
 
-void TRN2_tickMpTraining(int32_t instanceId)
+void TRN2_tickMpTraining(instanceId)
+int16_t instanceId;
 {
 	int32_t r;
 
@@ -56,7 +59,7 @@ void TRN2_tickMpTraining(int32_t instanceId)
 		if (MAIN_D_801353BC == 1) {
 			r = TRN2_getSlotSessionResult();
 		}
-		if ((((MAIN_D_801353C2 >= 0x4b0) || (POLLED_INPUT & 0x10)) && (MAIN_D_801353BC == 0)) || ((MAIN_D_801353BC == 1) && (r >= 0))) {
+		if ((((MAIN_D_801353C2 >= 0x4b0) || (POLLED_INPUT & CANCEL_BUTTON)) && (MAIN_D_801353BC == 0)) || ((MAIN_D_801353BC == 1) && (r >= 0))) {
 			playSound(8, 0xa);
 			TRN2_awardMpTrainingGains(PARTNER_ENTITY.digimonEntity.entity.type, 8, r);
 			createCameraMovement(&TAMER_ENTITY.entity.posData->location, 10);
