@@ -9,6 +9,12 @@ permissions:
 jobs:
   build:
     if: github.repository == 'jype0/dw_decomp'
+    strategy:
+      fail-fast: false
+      matrix:
+        version: ["us"]
+    env:
+      VERSION: ${{ matrix.version }}
     container:
       image: ghcr.io/jype0/dw-build:latest
       options: --user root
@@ -39,7 +45,8 @@ jobs:
         tar -xf tmp/cc_mips.tar.gz -C bin/cc_mips/
         rm -rf tmp
     - run: tools/dl_deps.sh
-    - run: |
+    - name: Build and compare matching binaries
+      run: |
         make -j$(nproc) generate
         make -j$(nproc)
         make compare
@@ -48,5 +55,7 @@ jobs:
     - if: github.ref == 'refs/heads/main' && github.event_name == 'push'
       uses: actions/upload-artifact@v5
       with:
-        name: SLUS_010.32_report
-        path: build/us/psx/mwcc/report.json
+        name: ${{ matrix.version }}_report
+        path: build/${{ matrix.version }}/psx/mwcc/report.json
+    - name: Build gcc binaries
+      run: make -j$(nproc) TOOLCHAIN=gcc
