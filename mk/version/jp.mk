@@ -19,6 +19,7 @@ MAIN_C_SRC := \
 	src/main/aabb.c \
 	src/main/bubble.c \
 	src/main/butterfly.c \
+	src/main/door_mapdata.c \
 	src/main/efe.c \
 	src/main/efe_table.c \
 	src/main/evl.c \

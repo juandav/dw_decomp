@@ -65,7 +65,7 @@ SECTIONS
         main_DATA_START = .;
         KEEP(BUILD_DIR/asm/main/data/main.data.s.o(.data .data.*));
         BUILD_DIR/src/main/toilet_data.c.o(.data .data.*);
-        KEEP(BUILD_DIR/asm/main/data/9EBAC.data.s.o(.data .data.*));
+        BUILD_DIR/src/main/door_mapdata.c.o(.data .data.*);
         BUILD_DIR/src/main/efe.c.o(.data .data.*);
         KEEP(BUILD_DIR/asm/main/data/9F198.data.s.o(.data .data.*));
         BUILD_DIR/src/main/efe_table.c.o(.data .data.*);

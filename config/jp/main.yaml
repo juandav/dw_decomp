@@ -96,7 +96,7 @@ segments:
       - [0x8AD50, rodata]
       - [0x8B9CC, data, main]
       - [0x9EB5C, .data, toilet_data]
-      - [0x9EBAC, data]
+      - [0x9EBAC, .data, door_mapdata]
       - [0x9F0BC, .data, efe]
       - [0x9F198, data]
       - [0xA8A38, .data, efe_table]
