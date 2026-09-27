@@ -58,9 +58,9 @@ typedef struct {
 } EntityParticleFX;
 
 typedef struct {
-	int16_t v;
-	int16_t pad1;
-	int16_t pad2;
+	int16_t vx;
+	int16_t vy;
+	int16_t vz;
 } EfeParticleField;
 
 typedef struct {
@@ -141,14 +141,14 @@ void renderParticleFlash(ParticleFlashData *params);
 void renderFXParticle(SVECTOR *pos, int32_t size, uint8_t *color);
 int32_t worldPosToScreenPos(int16_t *world, int16_t *screen);
 void addFXPrim(POLY_FT4 *prim, int32_t x, int32_t y, int16_t width, int16_t height, int32_t depth);
-void renderSprite(GsSPRITE *spr, int16_t x, int16_t y, int32_t depth,
+void renderSprite(GsSPRITE *spr, int32_t x, int32_t y, int32_t depth,
                   int32_t sx, int32_t sy);
 
 void initializeParticleFX();
-void createParticleFX(uint8_t kind, int32_t count, SVECTOR *pos, Entity *entity, int32_t lifetime);
+void createParticleFX(int32_t kind, int32_t count, SVECTOR *pos, Entity *entity, int32_t lifetime);
 void tickParticleFX(int32_t id);
 void renderParticleFX();
-int32_t addEntityParticleFX(Entity *owner, int16_t timer);
+int32_t addEntityParticleFX(Entity *owner, int32_t timer);
 void initializeEntityParticleFX();
 void tickEntityParticleFX(int32_t id);
 void renderEntityParticleFX(int32_t id);
@@ -164,8 +164,10 @@ void createFlash(void);
 void tickEFEFlash();
 void renderEFEFlash(int32_t id);
 int32_t setEFEFlashOffset(int32_t id, int16_t x, int16_t y);
+#if !defined(VERSION_JP)
 void downloadSomeImage();
 void modifySomeImage(int32_t dim);
+#endif
 void findEFEDATFile(void);
 void initializeEFE();
 void getEFEDATEntry();
@@ -173,11 +175,11 @@ void renderParticleFlash();
 
 extern int16_t MAIN_D_80138AA4[];
 extern int16_t MAIN_D_801389B4[];
+#if !defined(VERSION_JP)
 extern u_long SOME_IMAGE_DATA[];
+#endif
 extern uint8_t MAIN_D_801387B8[];
 extern EfeParticleField MAIN_D_80138888[];
-extern EfeParticleField MAIN_D_8013888A[];
-extern EfeParticleField MAIN_D_8013888C[];
 extern GsOT *ACTIVE_ORDERING_TABLE;
 extern int32_t FLASH_INSTANCE;
 extern int32_t DRAWING_OFFSET_X;
@@ -189,8 +191,10 @@ static void *efe_functions[] = {
 	getEFEDATEntry,
 	initializeEFE,
 	findEFEDATFile,
+#if !defined(VERSION_JP)
 	modifySomeImage,
 	downloadSomeImage,
+#endif
 	setEFEFlashOffset,
 	renderEFEFlash,
 	tickEFEFlash,
@@ -255,18 +259,17 @@ void initializeParticleFX(void)
 		ang.vx = (((rand() & 0x7F) - 0x40) << 12) / 64;
 		ang.vy = (((rand() & 0x7F) - 0x40) << 12) / 64;
 		ang.vz = (((rand() & 0x7F) - 0x40) << 12) / 64;
-		vec.vy = 0;
-		vec.vx = 0;
+		vec.vx = vec.vy = 0;
 		vec.vz = ((rand() % 150) + 0xFA) * 0x10;
 		RotMatrixZYX(&ang, &m);
 		ApplyMatrixSV(&m, &vec, &vec);
-		MAIN_D_80138888[i].v = vec.vx;
-		MAIN_D_8013888A[i].v = vec.vy;
-		MAIN_D_8013888C[i].v = vec.vz;
+		MAIN_D_80138888[i].vx = vec.vx;
+		MAIN_D_80138888[i].vy = vec.vy;
+		MAIN_D_80138888[i].vz = vec.vz;
 	}
 }
 
-void createParticleFX(uint8_t kind, int32_t count, SVECTOR *pos, Entity *entity, int32_t lifetime)
+void createParticleFX(int32_t kind, int32_t count, SVECTOR *pos, Entity *entity, int32_t lifetime)
 {
 	ParticleFX *fx;
 	int32_t i;
@@ -383,22 +386,20 @@ void tickParticleFX(int32_t id)
 {
 	ParticleFX *fx;
 	Entity *entity;
-	PositionData *posData;
-	SVECTOR pos;
-	int16_t state;
 	int32_t i;
 	int32_t angle;
 	int32_t dist;
-	int16_t baseX;
-	int16_t baseZ;
+	SVECTOR pos;
 	int16_t radius;
 	int16_t spread;
+	int16_t baseX;
+	int16_t baseZ;
 
 	fx = &((ParticleFX *)MAIN_D_801387B8)[id];
 	entity = fx->entity;
 	fx->state++;
 	fx->endFrame--;
-	if ((state = fx->state) == 10) {
+	if (fx->state == 10) {
 		switch (fx->mode) {
 		case 0:
 			if (entity != NULL) {
@@ -417,7 +418,7 @@ void tickParticleFX(int32_t id)
 		}
 		return;
 	}
-	if (state == 13) {
+	if (fx->state == 13) {
 		switch (fx->mode) {
 		case 0:
 			if (entity != NULL) {
@@ -435,9 +436,8 @@ void tickParticleFX(int32_t id)
 		return;
 	}
 	if ((fx->endFrame < 4) && (fx->endFrame >= 0) && (fx->mode == 1)) {
-		posData = fx->entity->posData;
-		baseX = posData->posMatrix.workm.t[0];
-		baseZ = posData->posMatrix.workm.t[2];
+		baseX = fx->entity->posData->posMatrix.workm.t[0];
+		baseZ = fx->entity->posData->posMatrix.workm.t[2];
 		radius = DIGIMON_DATA[entity->type].radius;
 		spread = radius >> 1;
 		for (i = 0; i < fx->endFrame + 2; i++) {
@@ -449,7 +449,7 @@ void tickParticleFX(int32_t id)
 		}
 		return;
 	}
-	if ((state >= fx->timer) && (fx->endFrame < 0)) {
+	if ((fx->state >= fx->timer) && (fx->endFrame < 0)) {
 		fx->state = -1;
 		removeObject(0x600, id);
 	}
@@ -460,18 +460,20 @@ void renderParticleFX(int32_t id)
 	ParticleFX *fx;
 	ParticleFlashData flash;
 	SVECTOR world;
-	DVECTOR screen;
-	uint8_t color[4];
-	int32_t i;
 	int32_t depth;
-	int16_t flashCount;
-	int16_t particleCount;
+	DVECTOR screen;
+	Entity *entity;
 	int32_t timer;
+	uint8_t color[4];
+	int16_t particleCount;
+	int16_t flashCount;
+	int32_t i;
 	int32_t state;
 
 	fx = &((ParticleFX *)MAIN_D_801387B8)[id];
 	flashCount = MAIN_D_80134214[fx->mode];
 	particleCount = MAIN_D_80134218[fx->mode];
+	entity = fx->entity;
 	if (fx->state == 2) {
 		for (i = 0; i < flashCount; i++) {
 			world.vx = fx->position.vx + fx->spread[0][i];
@@ -507,18 +509,17 @@ void renderParticleFX(int32_t id)
 	state = lerp(0, 0x6e, 0, timer, state);
 	state = _sin(state) >> 7;
 	for (i = 0; i < particleCount; i++) {
-		world.vx = fx->position.vx + ((state * MAIN_D_80138888[i].v) >> 9);
-		world.vy = fx->position.vy + ((state * MAIN_D_8013888A[i].v) >> 9);
-		world.vz = fx->position.vz + ((state * MAIN_D_8013888C[i].v) >> 9);
+		world.vx = fx->position.vx + ((state * MAIN_D_80138888[i].vx) >> 9);
+		world.vy = fx->position.vy + ((state * MAIN_D_80138888[i].vy) >> 9);
+		world.vz = fx->position.vz + ((state * MAIN_D_80138888[i].vz) >> 9);
 		renderFXParticle(&world, 0x28, color);
 	}
 }
 
-int32_t addEntityParticleFX(Entity *owner, int16_t timer)
+int32_t addEntityParticleFX(Entity *owner, int32_t timer)
 {
-	EntityParticleFX *fx;
 	int32_t i;
-	int32_t r;
+	EntityParticleFX *fx;
 
 	for (i = 0; i < 20; i++) {
 		if (((EntityParticleFX *)MAIN_D_801389B4)[i].timer < 0) {
@@ -530,8 +531,7 @@ int32_t addEntityParticleFX(Entity *owner, int16_t timer)
 	}
 	fx = &((EntityParticleFX *)MAIN_D_801389B4)[i];
 	fx->timer = timer;
-	r = rand();
-	fx->boneId = (r % (DIGIMON_DATA[owner->type].boneCount - 1)) + 1;
+	fx->boneId = ((int32_t)rand() % (DIGIMON_DATA[owner->type].boneCount - 1)) + 1;
 	fx->unk8 = 0;
 	fx->owner = owner;
 	addObject(0x502, i, tickEntityParticleFX, renderEntityParticleFX);
@@ -545,45 +545,46 @@ void initializeEntityParticleFX(void)
 
 void tickEntityParticleFX(int32_t id)
 {
-	char *e;
-	int32_t bc;
+	EntityParticleFX *fx;
 
-	e = (char *)&MAIN_D_801389B4[id * 6];
-	if (*(int16_t *)e <= 0) {
+	fx = &((EntityParticleFX *)MAIN_D_801389B4)[id];
+	if (fx->timer <= 0) {
 		removeEntityParticleFX(id);
 		return;
 	}
-	if ((*(int16_t *)e % 4) == 0) {
-		bc = DIGIMON_DATA[**(int32_t **)(e + 4)].boneCount - 1;
-		*(int16_t *)(e + 2) = (rand() % bc) + 1;
-		*(int16_t *)(e + 8) = rand() % 9;
+	if ((fx->timer % 4) == 0) {
+		fx->boneId = (rand() % (DIGIMON_DATA[fx->owner->type].boneCount - 1)) + 1;
+		fx->unk8 = rand() % 9;
 	}
-	*(int16_t *)e = *(int16_t *)e - 1;
+	fx->timer--;
 }
 
 void renderEntityParticleFX(int32_t id)
 {
 	EntityParticleFX *fx;
 	Entity *owner;
-	POLY_FT4 *prim;
-	EntityParticleSprite *sprite;
-	PositionData *bone;
+	int32_t boneId;
+	int32_t depth;
 	DVECTOR screenPos;
 	SVECTOR worldPos;
-	int32_t depth;
+	PositionData *bone;
+	POLY_FT4 *prim;
+	EntityParticleSprite *sprite;
 
 	fx = &((EntityParticleFX *)MAIN_D_801389B4)[id];
 	owner = fx->owner;
+	owner = fx->owner;
 	prim = (POLY_FT4 *)GsGetWorkBase();
+	boneId = fx->boneId;
 	sprite = &((EntityParticleSprite *)MAIN_D_80123370)[fx->unk8];
-	bone = &owner->posData[fx->boneId];
+	bone = &owner->posData[boneId];
 	worldPos.vx = bone->posMatrix.workm.t[0];
 	worldPos.vy = bone->posMatrix.workm.t[1];
 	worldPos.vz = bone->posMatrix.workm.t[2];
 	depth = worldPosToScreenPos((int16_t *)&worldPos, (int16_t *)&screenPos);
 	SetPolyFT4(prim);
 	SetSemiTrans(prim, 1);
-	setSemiTrans(prim, 1);
+	prim->code |= 2;
 	prim->r0 = prim->g0 = prim->b0 = 0x80;
 	prim->tpage = getTPage(0, 1, 768, 256);
 	prim->clut = getClut(192, 490);
@@ -593,7 +594,7 @@ void renderEntityParticleFX(int32_t id)
 
 void removeEntityParticleFX(int32_t id)
 {
-	MAIN_D_801389B4[id * 6] = -1;
+	((EntityParticleFX *)MAIN_D_801389B4)[id].timer = -1;
 	removeObject(0x502, id);
 }
 
@@ -765,16 +766,16 @@ char *initializeFlashData(char *base)
 void createFlash(void)
 {
 	EfeFlashData *data;
-	EfeColor *colorMax;
-	EfeColor *colorMin;
-	VECTOR *worldPos;
-	int32_t scaleMax;
-	int32_t scaleMin;
-	int32_t tMax;
-	int32_t fixedDepth;
-	int32_t mode;
-	int32_t absMode;
 	int32_t i;
+	VECTOR *worldPos;
+	int32_t absMode;
+	int32_t fixedDepth;
+	int32_t tMax;
+	int32_t scaleMin;
+	int32_t scaleMax;
+	EfeColor *colorMin;
+	EfeColor *colorMax;
+	int32_t mode;
 	int32_t offsetX;
 	int32_t offsetY;
 
@@ -785,7 +786,8 @@ void createFlash(void)
 	tMax = EFE_POP1(int32_t);
 	fixedDepth = EFE_POP1(int32_t);
 	worldPos = EFE_POP1(VECTOR *);
-	absMode = mode = EFE_POP1(int32_t);
+	absMode = EFE_POP1(int32_t);
+	mode = absMode;
 	if (absMode < 0) {
 		absMode = -absMode;
 	}
@@ -800,7 +802,10 @@ void createFlash(void)
 	}
 	data = &EFE_FLASH_DATA[i];
 	FLASH_INSTANCE = i;
-	if ((absMode == 0x20) || (absMode == 1) || (absMode == 0)) {
+	switch (absMode) {
+	case 0:
+	case 1:
+	case 0x20:
 		addObject(0x602, i, tickEFEFlash, renderEFEFlash);
 		copyVector(&data->worldPos, worldPos);
 		data->progress = 0;
@@ -819,15 +824,20 @@ void createFlash(void)
 			data->offsetX = 0;
 			data->offsetY = 0;
 		} else {
+#if defined(VERSION_JP)
+			getDrawingOffsetCopy(&offsetX, &offsetY);
+#else
 			if (isTamerOnScreen() == 1) {
 				getDrawingOffsetCopy(&offsetX, &offsetY);
 			} else {
 				offsetX = DRAWING_OFFSET_X;
 				offsetY = DRAWING_OFFSET_Y;
 			}
+#endif
 			data->offsetX = 160 - offsetX;
 			data->offsetY = 120 - offsetY;
 		}
+		break;
 	}
 }
 
@@ -846,13 +856,13 @@ void tickEFEFlash(int32_t id)
 void renderEFEFlash(int32_t id)
 {
 	EfeFlashData *data;
-	ParticleFlashData flash;
-	int32_t depth;
+	int32_t factor;
 	int32_t absMode;
 	int32_t red;
 	int32_t green;
 	int32_t blue;
-	int32_t factor;
+	int32_t depth;
+	ParticleFlashData flash;
 
 	data = &EFE_FLASH_DATA[id];
 	absMode = data->mode;
@@ -864,11 +874,11 @@ void renderEFEFlash(int32_t id)
 	}
 	depth = worldPosToScreenPos((int16_t *)&data->worldPos, (int16_t *)&flash.screenPos);
 	if (data->mode >= 0) {
-		flash.screenPos.vx += (int16_t)(data->offsetX * VIEWPORT_DISTANCE / depth);
-		flash.screenPos.vy += (int16_t)(data->offsetY * VIEWPORT_DISTANCE / depth);
+		flash.screenPos.vx += data->offsetX * VIEWPORT_DISTANCE / depth;
+		flash.screenPos.vy += data->offsetY * VIEWPORT_DISTANCE / depth;
 	} else {
-		flash.screenPos.vx = flash.screenPos.vx + data->offsetX;
-		flash.screenPos.vy = flash.screenPos.vy + data->offsetY;
+		flash.screenPos.vx += (int32_t)data->offsetX;
+		flash.screenPos.vy += (int32_t)data->offsetY;
 	}
 	flash.sizeX = flash.sizeY = 0x40;
 	switch (absMode) {
@@ -888,13 +898,15 @@ void renderEFEFlash(int32_t id)
 	red = lerp(data->redMin, data->redMax, 0, data->tMax, data->progress);
 	green = lerp(data->greenMin, data->greenMax, 0, data->tMax, data->progress);
 	blue = lerp(data->blueMin, data->blueMax, 0, data->tMax, data->progress);
-	factor = _sin(lerp(0x80, 0x14, 0, data->tMax, data->progress));
+	factor = lerp(0x80, 0x14, 0, data->tMax, data->progress);
+	factor = _sin(factor);
 	flash.color.r = (red * factor) >> 12;
 	flash.color.g = (green * factor) >> 12;
 	flash.color.b = (blue * factor) >> 12;
 	flash.colorScale = 0x80;
 	flash.scale = (uint32_t)(VIEWPORT_DISTANCE * lerp(data->scaleMin, data->scaleMax, 0, data->tMax, data->progress) * 10) / (uint32_t)depth;
-	flash.scale += ((_sin(lerp(0, 0x1eb, 0, 0x17, data->progress)) * 300) >> 12) + 1;
+	factor = lerp(0, 0x1eb, 0, 0x17, data->progress);
+	flash.scale += ((_sin(factor) * 300) >> 12) + 1;
 	if (flash.scale >= 0x8000) {
 		return;
 	}
@@ -917,6 +929,7 @@ int32_t setEFEFlashOffset(int32_t id, int16_t x, int16_t y)
 	data->offsetY = y;
 }
 
+#if !defined(VERSION_JP)
 void downloadSomeImage(void)
 {
 	RECT r;
@@ -960,6 +973,7 @@ void modifySomeImage(int32_t dim)
 	LoadImage(&rect, (u_long *)buffer);
 	DrawSync(0);
 }
+#endif
 
 void findEFEDATFile(void)
 {
@@ -968,14 +982,14 @@ void findEFEDATFile(void)
 	uint8_t mode;
 	int32_t i;
 
-	i = 0;
 	while (CdReadSync(1, 0) != 0) {
 	}
+	i = 0;
 	mode = 0x80;
 	name[0] = 0x5C;
 	strcpy(&name[1], MAIN_D_8012342C);
 	strcat(name, MAIN_D_80134220);
-	while ((int32_t)CdSearchFile(&file, name) == -1) {
+	while (CdSearchFile(&file, name) == (CdlFILE *)-1) {
 	}
 	CdControl(0xE, &mode, 0);
 	MAIN_D_8012343C[i] = CdPosToInt(&file.pos);
@@ -990,31 +1004,38 @@ void initializeEFE(void)
 
 void getEFEDATEntry(int32_t id)
 {
+	int32_t sector;
 	CdlLOC loc;
 
 	id -= 0x100;
-	CdIntToPos(MAIN_D_8012343C[0] + (id * 0xA), &loc);
+	sector = MAIN_D_8012343C[0] + (id * 0xA);
+	CdIntToPos(sector, &loc);
 }
 
 void renderParticleFlash(ParticleFlashData *params)
 {
 	POLY_FT4 *prim;
+	int32_t i;
 	int32_t sx;
 	int32_t sy;
 	GsOT_TAG *ot;
 	int16_t r;
 	int16_t g;
 	int16_t b;
+	int32_t cols;
+	int32_t j;
 	int32_t rows;
 	int32_t cellW;
 	int32_t cellH;
-	int32_t vStep;
-	int32_t cols;
 	int32_t uStep;
-	int32_t h1;
+#if defined(VERSION_JP)
+	uint8_t w1;
+	uint8_t h1;
+#else
 	int32_t w1;
-	int32_t i;
-	int32_t j;
+	int32_t h1;
+#endif
+	int32_t vStep;
 	int32_t px;
 	int32_t py;
 
@@ -1045,6 +1066,7 @@ void renderParticleFlash(ParticleFlashData *params)
 	sy += 1;
 	if ((sx < 0x400) && (sy < 0x200)) {
 		cols = 0;
+		rows = 0;
 	} else {
 		cols = ((sx + 1) / 1024) + 1;
 		if (cols != 0) {
@@ -1063,12 +1085,12 @@ void renderParticleFlash(ParticleFlashData *params)
 
 	for (j = 0; j <= rows; j++) {
 		py = params->screenPos.vy - sy + cellH * j;
-		if ((py + cellH < -DRAWING_OFFSET_Y) || (py > -DRAWING_OFFSET_Y + 0xf0)) {
+		if ((py + cellH < -DRAWING_OFFSET_Y) || (-DRAWING_OFFSET_Y + 0xf0 < py)) {
 			continue;
 		}
 		for (i = 0; i <= cols; i++) {
 			px = params->screenPos.vx - sx + cellW * i;
-			if ((px + cellW < -DRAWING_OFFSET_X) || (px > -DRAWING_OFFSET_X + 0x140)) {
+			if ((px + cellW < -DRAWING_OFFSET_X) || (-DRAWING_OFFSET_X + 0x140 < px)) {
 				continue;
 			}
 			SetPolyFT4(prim);
@@ -1103,7 +1125,7 @@ void renderParticleFlash(ParticleFlashData *params)
 
 	for (j = 0; j <= rows; j++) {
 		py = params->screenPos.vy - sy + cellH * j;
-		if ((py + cellH < -DRAWING_OFFSET_Y) || (py > -DRAWING_OFFSET_Y + 0xf0)) {
+		if ((py + cellH < -DRAWING_OFFSET_Y) || (-DRAWING_OFFSET_Y + 0xf0 < py)) {
 			continue;
 		}
 		for (i = 0; i <= cols; i++) {
@@ -1148,7 +1170,7 @@ void renderParticleFlash(ParticleFlashData *params)
 		}
 		for (i = 0; i <= cols; i++) {
 			px = params->screenPos.vx - sx + cellW * i;
-			if ((px + cellW < -DRAWING_OFFSET_X) || (px > -DRAWING_OFFSET_X + 0x140)) {
+			if ((px + cellW < -DRAWING_OFFSET_X) || (-DRAWING_OFFSET_X + 0x140 < px)) {
 				continue;
 			}
 			SetPolyFT4(prim);
