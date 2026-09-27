@@ -1,3 +1,9 @@
+FISH_loadFishing = 0x8007D67C;
+FISH_init = 0x8007D78C;
+FISH_deinitialize = 0x8007D858;
+FISH_tamerTick = 0x8007D8D4;
 FISH_loadTMDModel = 0x8007DD2C;
 FISH_getModelObject = 0x8007DEC8;
 FISH_remapClamped = 0x8007DF38;
+FISHING_MAP_DATA = 0x8007E9F8; // size:0x70
+FISHING_DATA = 0x8007EB80; // size:0x2D10

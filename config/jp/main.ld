@@ -36,6 +36,8 @@ SECTIONS
         BUILD_DIR/src/main/overworld_medal_text.c.o(.text .text.*);
         BUILD_DIR/src/main/overworld_card_text.c.o(.text .text.*);
         KEEP(BUILD_DIR/asm/main/38758.s.o(.text .text.*));
+        BUILD_DIR/src/main/fish.c.o(.text .text.*);
+        KEEP(BUILD_DIR/asm/main/72DFC.s.o(.text .text.*));
         BUILD_DIR/src/main/evl.c.o(.text .text.*);
         KEEP(BUILD_DIR/asm/main/75B80.s.o(.text .text.*));
         BUILD_DIR/src/main/kar.c.o(.text .text.*);

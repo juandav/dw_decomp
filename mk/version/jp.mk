@@ -22,6 +22,7 @@ MAIN_C_SRC := \
 	src/main/efe_table.c \
 	src/main/evl.c \
 	src/main/fade.c \
+	src/main/fish.c \
 	src/main/kar.c \
 	src/main/math.c \
 	src/main/overworld_card_text.c \
