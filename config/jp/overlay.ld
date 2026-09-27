@@ -163,7 +163,15 @@ SECTIONS
 	OVERLAY 0x80052AE0 : NOCROSSREFS
 	{
 		.VS {
-			KEEP(BUILD_DIR/asm/vs/data/vs.s.o(.data.*));
+			KEEP(BUILD_DIR/asm/vs/data/texture.rodata.s.o(.rodata .rodata.*));
+			KEEP(BUILD_DIR/asm/vs/data/model_0.rodata.s.o(.rodata .rodata.*));
+			KEEP(BUILD_DIR/asm/vs/data/model_1.rodata.s.o(.rodata .rodata.*));
+			KEEP(BUILD_DIR/asm/vs/data/model_2.rodata.s.o(.rodata .rodata.*));
+			KEEP(BUILD_DIR/asm/vs/data/model_3.rodata.s.o(.rodata .rodata.*));
+			KEEP(BUILD_DIR/asm/vs/data/header.rodata.s.o(.rodata .rodata.*));
+			KEEP(BUILD_DIR/asm/vs/vs.s.o(.text .text.*));
+			KEEP(BUILD_DIR/asm/vs/data/vs.data.s.o(.data .data.*));
+			LONG(0);
 		}
 	}
 }

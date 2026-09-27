@@ -29,12 +29,71 @@ options:
   undefined_funcs_auto_path: build/jp/psx/generated/undefined_funcs_auto_vs.txt
   undefined_syms_auto_path: build/jp/psx/generated/undefined_syms_auto_vs.txt
 
+  string_encoding: ASCII
+  data_string_encoding: ASCII
+  rodata_string_guesser_level: 2
+  data_string_guesser_level: 2
+
+  migrate_rodata_to_functions: False
+
+  create_data_pads: False
+
   use_gp_rel_macro: True
 
+  symbol_name_format: $VRAM_vs
+  symbol_name_format_no_rom: $VRAM_vs
+
 segments:
-  - name: vs
-    type: databin
+  - name: texture
+    type: rodata
     start: 0x0
     vram: 0x80052AE0
+    align: 4
+    subalign: 4
 
-  - [0x34180]
+  - name: model_0
+    type: rodata
+    start: 0xD20
+    vram: 0x80053800
+    align: 4
+    subalign: 4
+
+  - name: model_1
+    type: rodata
+    start: 0x1D58
+    vram: 0x80054838
+    align: 4
+    subalign: 4
+
+  - name: model_2
+    type: rodata
+    start: 0x2220
+    vram: 0x80054D00
+    align: 4
+    subalign: 4
+
+  - name: model_3
+    type: rodata
+    start: 0x2848
+    vram: 0x80055328
+    align: 4
+    subalign: 4
+
+  - name: header
+    type: rodata
+    start: 0x4188
+    vram: 0x80056C68
+    align: 4
+    subalign: 4
+
+  - name: vs
+    type: code
+    start: 0x41C8
+    vram: 0x80056CA8
+    align: 4
+    subalign: 4
+    subsegments:
+      - [0x41C8, asm, vs]
+      - [0x3050C, data, vs]
+
+  - [0x3417C]
