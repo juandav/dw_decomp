@@ -108,7 +108,10 @@ SECTIONS
 	OVERLAY 0x8007C000 : NOCROSSREFS
 	{
 		.MURD {
-			KEEP(BUILD_DIR/asm/murd/data/murd.s.o(.data.*));
+			KEEP(BUILD_DIR/asm/murd/data/header.rodata.s.o(.rodata .rodata.*));
+			KEEP(BUILD_DIR/asm/murd/murd.s.o(.text .text.*));
+			KEEP(BUILD_DIR/asm/murd/data/murd.data.s.o(.data .data.*));
+			LONG(0);
 		}
 	}
 
