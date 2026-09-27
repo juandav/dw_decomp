@@ -23,6 +23,7 @@ MAIN_C_SRC := \
 	src/main/efe_table.c \
 	src/main/evl.c \
 	src/main/fade.c \
+	src/main/file.c \
 	src/main/fish.c \
 	src/main/kar.c \
 	src/main/math.c \

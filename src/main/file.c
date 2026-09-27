@@ -16,11 +16,10 @@ static void empty_800a31f0(char *path)
 int32_t lookupFileTable(FileLookup *lookup, char *path)
 {
 	char *filename;
-	int32_t result;
 	FileEntry *entry;
 
 	entry = (FileEntry *)&FILE_TABLE;
-	if ((filename = strrchr(path, '\\')) == NULL) {
+	if (NULL == (filename = strrchr(path, '\\'))) {
 		filename = path;
 	} else {
 		++filename;
@@ -34,8 +33,7 @@ int32_t lookupFileTable(FileLookup *lookup, char *path)
 		}
 	}
 
-	result = entry->size;
-	if (result) {
+	if (entry->size) {
 		return 1;
 	} else {
 		empty_800a31f0(path);
@@ -54,78 +52,65 @@ uint32_t lookupFileSize(char *path)
 
 int32_t loadTextureFile(char *path, uint32_t *outTPage, uint32_t *outClut)
 {
+	u_long *addr;
 	GsIMAGE image;
 	RECT rect;
-	int32_t result;
-	uint32_t tpage;
-	uint32_t clut;
+	int32_t size;
+	u_long *buf;
 
-	lookupFileSize(path);
-	result = readFile(path, (void *)TEXTURE_BUFFER);
+	size = lookupFileSize(path);
+	addr = buf = (u_long *)TEXTURE_BUFFER;
+	readFile(path, buf);
 
-	GsGetTimInfo(&((u_long *)TEXTURE_BUFFER)[1], &image);
+	GsGetTimInfo(buf + 1, &image);
 
 	setRECT(&rect, image.px, image.py, image.pw, image.ph);
-	result = LoadImage(&rect, image.pixel);
+	LoadImage(&rect, image.pixel);
 
-	result = tpage = GetTPage(image.pmode & 3, 0, image.px, image.py);
-	*outTPage = tpage;
+	*outTPage = GetTPage(image.pmode & 3, 0, image.px, image.py);
 
 	if (((image.pmode >> 3) & 1) != 0) {
 		setRECT(&rect, image.cx, image.cy, image.cw, image.ch);
-		result = LoadImage(&rect,image.clut);
+		LoadImage(&rect, image.clut);
 
-		result = clut = GetClut(image.cx, image.cy);
-		*outClut = clut;
+		*outClut = GetClut(image.cx, image.cy);
 	}
-
-	return result;
 }
 
 int32_t readFile(char *path, void *buffer)
 {
 	FileLookup lookup;
-	uint32_t sector;
 	int32_t result;
-	int32_t err;
 
-	result = err = lookupFileTable(&lookup, path);
-	if (err != 0) {
+	if (lookupFileTable(&lookup, path) != 0) {
 		do {
 			do {
 				while (CdControl(CdlSetloc,
 						 (u_char *)&lookup.pos,
 						 NULL) == 0);
-				sector = ((lookup.size + 0x7ff) &
-					  ~0x7ff) >> 11;
-			} while (CdRead(sector, (u_long *)buffer,
-					CdlModeSpeed) == 0);
+			} while (CdRead(((lookup.size + 0x7ff) & ~0x7ff) >> 11,
+					(u_long *)buffer, CdlModeSpeed) == 0);
 			while ((result = CdReadSync(0, NULL)) > 0);
 		} while (result != 0);
-
-		return result;
 	}
-} // NOLINT undefined behavior intentional
+}
 
 int32_t loadTIMFile(char *path, void *buffer)
 {
 	GsIMAGE image;
 	RECT rect;
-	int32_t result;
 
-	result = readFile(path,(char *)buffer);
+	readFile(path, buffer);
 
-	GsGetTimInfo(&((u_long *)buffer)[1], &image);
+	GsGetTimInfo((u_long *)buffer + 1, &image);
 
 	setRECT(&rect, image.px, image.py, image.pw, image.ph);
-	result = LoadImage(&rect, image.pixel);
+	LoadImage(&rect, image.pixel);
 
 	if (((image.pmode >> 3) & 1) != 0) {
 		setRECT(&rect, image.cx, image.cy, image.cw, image.ch);
-		result = LoadImage(&rect,image.clut);
+		LoadImage(&rect, image.clut);
 	}
-
-	return result;
 }
 
 int32_t loadStackedTIMEntry(char *path, void *buffer, int32_t offset,
@@ -133,34 +118,27 @@ int32_t loadStackedTIMEntry(char *path, void *buffer, int32_t offset,
 {
 	GsIMAGE image;
 	RECT rect;
-	int32_t result;
 
-	result = readFileSectors(path, buffer, offset, sectors);
-	GsGetTimInfo(&((u_long *)buffer)[1], &image);
+	readFileSectors(path, buffer, offset, sectors);
+	GsGetTimInfo((u_long *)buffer + 1, &image);
 
 	setRECT(&rect, image.px, image.py, image.pw, image.ph);
-	result = LoadImage(&rect,image.pixel);
+	LoadImage(&rect, image.pixel);
 
 	if (((image.pmode >> 3) & 1) != 0) {
 		setRECT(&rect, image.cx, image.cy, image.cw, image.ch);
-		result = LoadImage(&rect,image.clut);
+		LoadImage(&rect, image.clut);
 	}
-
-	return result;
 }
 
 int32_t readFileSectors(char *path, void *buffer, int32_t offset,
 			int32_t sectors)
 {
 	FileLookup lookup;
-	int32_t sector;
 	int32_t result;
-	int32_t err;
 
-	result = err = lookupFileTable(&lookup, path);
-	if (err != 0) {
-		sector = CdPosToInt(&lookup.pos);
-		CdIntToPos(offset + sector, &lookup.pos);
+	if (lookupFileTable(&lookup, path) != 0) {
+		CdIntToPos(offset + CdPosToInt(&lookup.pos), &lookup.pos);
 		do {
 			do {
 				while (CdControl(CdlSetloc,
@@ -169,7 +147,5 @@ int32_t readFileSectors(char *path, void *buffer, int32_t offset,
 			} while (CdRead(sectors, buffer, CdlModeSpeed) == 0);
 			while ((result = CdReadSync(0, NULL)) > 0);
 		} while (result != 0);
-
-		return result;
 	}
-} // NOLINT undefined behavior intentional
+}
