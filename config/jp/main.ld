@@ -29,6 +29,8 @@ SECTIONS
         BUILD_DIR/src/main/aabb.c.o(.text .text.*);
         BUILD_DIR/src/main/efe.c.o(.text .text.*);
         KEEP(BUILD_DIR/asm/main/242CC.s.o(.text .text.*));
+        BUILD_DIR/src/main/overworld_moves_text.c.o(.text .text.*);
+        KEEP(BUILD_DIR/asm/main/36CC0.s.o(.text .text.*));
         BUILD_DIR/src/main/overworld_playerinfo_text.c.o(.text .text.*);
         BUILD_DIR/src/main/overworld_evochart_text.c.o(.text .text.*);
         BUILD_DIR/src/main/overworld_medal_text.c.o(.text .text.*);
@@ -48,6 +50,7 @@ SECTIONS
         KEEP(BUILD_DIR/asm/main/data/main.rodata.s.o(.rodata .rodata.*));
         BUILD_DIR/src/main/efe.c.o(.rodata .rodata.*);
         KEEP(BUILD_DIR/asm/main/data/8A71C.rodata.s.o(.rodata .rodata.*));
+        BUILD_DIR/src/main/overworld_moves_text.c.o(.rodata .rodata.*);
         BUILD_DIR/src/main/overworld_playerinfo_text.c.o(.rodata .rodata.*);
         BUILD_DIR/src/main/overworld_medal_text.c.o(.rodata .rodata.*);
         KEEP(BUILD_DIR/asm/main/data/8AD50.rodata.s.o(.rodata .rodata.*));
