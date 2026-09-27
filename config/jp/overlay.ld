@@ -58,7 +58,10 @@ SECTIONS
 	OVERLAY 0x80060000 : NOCROSSREFS
 	{
 		.ENDI {
-			KEEP(BUILD_DIR/asm/endi/data/endi.s.o(.data.*));
+			KEEP(BUILD_DIR/asm/endi/data/header.rodata.s.o(.rodata .rodata.*));
+			KEEP(BUILD_DIR/asm/endi/endi.s.o(.text .text.*));
+			KEEP(BUILD_DIR/asm/endi/data/endi.data.s.o(.data .data.*));
+			LONG(0);
 		}
 	}
 
