@@ -164,7 +164,11 @@ SECTIONS
 		.TRN {
 			KEEP(BUILD_DIR/asm/trn/data/header.rodata.s.o(.rodata .rodata.*));
 			KEEP(BUILD_DIR/asm/trn/trn.s.o(.text .text.*));
+			BUILD_DIR/src/trn/trn_speed.c.o(.text .text.*);
+			KEEP(BUILD_DIR/asm/trn/51AC.s.o(.text .text.*));
 			KEEP(BUILD_DIR/asm/trn/data/trn.data.s.o(.data .data.*));
+			BUILD_DIR/src/trn/trn_speed.c.o(.rodata .rodata.*);
+			KEEP(BUILD_DIR/asm/trn/data/79FC.data.s.o(.data .data.*));
 			BUILD_DIR/src/trn/trn_bss.c.o(.data .data.*);
 		}
 	}

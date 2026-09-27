@@ -1,11 +1,11 @@
 #include <dw/anim.h>
 #include <dw/entity.h>
+#include <dw/input.h>
 #include <dw/model.h>
 #include <dw/params.h>
 #include <dw/partner.h>
 #include <dw/script.h>
 #include <dw/sound.h>
-#include <dw/tamer.h>
 #include <dw/trn.h>
 #include <dw/types.h>
 
@@ -13,6 +13,8 @@ extern uint32_t POLLED_INPUT;
 extern int32_t TRAINING_COMPLETE;
 
 void createCameraMovement(VECTOR *pos, int32_t speed);
+void setTamerState(int8_t state);
+int32_t tickEntityWalkTo();
 void setCameraFollowPlayer(void);
 void unsetCameraFollowPlayer(void);
 void TRN_func_800888A0(int8_t arg);
@@ -23,7 +25,8 @@ static void *trn_speed_functions[] = {
 	TRN_setupSpeedTraining,
 };
 
-void TRN_setupSpeedTraining(int32_t arg)
+void TRN_setupSpeedTraining(arg)
+int16_t arg;
 {
 	switch (arg) {
 	case 0x70:
@@ -96,7 +99,7 @@ void TRN_tickSpeedTraining(int32_t instanceId)
 		if (MAIN_D_80135370 == 1) {
 			r = TRN_getSlotSessionResult();
 		}
-		if ((((MAIN_D_8013537A >= 0x4b0) || (POLLED_INPUT & 0x10)) && (MAIN_D_80135370 == 0)) || ((MAIN_D_80135370 == 1) && (r >= 0))) {
+		if ((((MAIN_D_8013537A >= 0x4b0) || (POLLED_INPUT & CANCEL_BUTTON)) && (MAIN_D_80135370 == 0)) || ((MAIN_D_80135370 == 1) && (r >= 0))) {
 			TRN_awardSpeedTrainingGains(PARTNER_ENTITY.digimonEntity.entity.type, instanceId, r);
 			startAnimation(&PARTNER_ENTITY.digimonEntity.entity, 0x12);
 			playSound(8, 0xa);
