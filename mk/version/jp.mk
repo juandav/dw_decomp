@@ -19,6 +19,7 @@ MAIN_C_SRC := \
 	src/main/efe.c \
 	src/main/fade.c \
 	src/main/kar.c \
+	src/main/overworld_card_text.c \
 	src/main/toilet_data.c
 
 $(eval $(call unit,MAIN,main))

@@ -23,6 +23,8 @@ SECTIONS
         BUILD_DIR/src/main/aabb.c.o(.text .text.*);
         BUILD_DIR/src/main/efe.c.o(.text .text.*);
         KEEP(BUILD_DIR/asm/main/242CC.s.o(.text .text.*));
+        BUILD_DIR/src/main/overworld_card_text.c.o(.text .text.*);
+        KEEP(BUILD_DIR/asm/main/38758.s.o(.text .text.*));
         BUILD_DIR/src/main/kar.c.o(.text .text.*);
         KEEP(BUILD_DIR/asm/main/7855C.s.o(.text .text.*));
         BUILD_DIR/src/main/butterfly.c.o(.text .text.*);

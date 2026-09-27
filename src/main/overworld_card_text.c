@@ -14,22 +14,18 @@ int32_t drawCardViewStrings(void);
 int32_t drawCardViewStrings(void)
 {
 	RECT rect;
-	int32_t state;
 
 	rect = CARD_VIEW_TEXT_AREA;
-	state = MENU_SUB_STATE;
-	if (state != 1) {
-		if (state != 0) {
-			goto ret0;
-		}
+	switch (MENU_SUB_STATE) {
+	case 0:
 		clearTextSubArea(&rect);
 		drawString(MAIN_D_80124C54, 0, 0xF0);
 		MENU_SUB_STATE = 1;
-		goto ret0;
+		break;
+	case 1:
+		drawString(CARD_CHART_LABELS[0], 0, 0xC);
+		SELECTED_CARD = 0;
+		return 1;
 	}
-	drawString(CARD_CHART_LABELS[0], 0, 0xC);
-	SELECTED_CARD = 0;
-	return 1;
-ret0:
 	return 0;
 }
