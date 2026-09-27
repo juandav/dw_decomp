@@ -1,5 +1,8 @@
+TRN2_tickHpTrainingMap99 = 0x80088840;
 TRN2_tickMpTraining = 0x80089998;
 TRN2_startSlotSessionIfEnabled = 0x8008AFCC;
+TRN2_func_8008AA84 = 0x8008B00C;
+TRN2_awardHpTrainingGains = 0x8008B088;
 TRN2_statGainsAreZero = 0x8008B3B0;
 TRN2_awardMpTrainingGains = 0x8008B440;
 TRN2_applyBaseStats = 0x8008C724;

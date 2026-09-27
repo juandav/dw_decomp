@@ -111,6 +111,8 @@ SECTIONS
         BUILD_DIR/src/main/fade.c.o(.sbss.*);
         . = ALIGN(., 4);
         BUILD_DIR/generated/unk_0x8013DF94.sbss.s.o(.sbss.*);
+        BUILD_DIR/src/trn2/trn2_hp_map99.c.o(.sbss.*);
+        BUILD_DIR/generated/unk_0x8013E66E.sbss.s.o(.sbss.*);
         . = ALIGN(., 4);
         main_SBSS_END = .;
         main_SBSS_SIZE = ABSOLUTE(main_SBSS_END - main_SBSS_START);

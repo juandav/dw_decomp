@@ -59,10 +59,12 @@ segments:
     align: 4
     subalign: 4
     subsegments:
-      - [0x40, asm, trn2]
+      - [0x40, c, trn2_hp_map99]
+      - [0x560, asm, trn2]
       - [0x1198, c, trn2_mp]
       - [0x1538, asm]
       - [0x5F80, data, trn2]
+      - [0x5F98, .rodata, trn2_hp_map99]
       - [0x5FB0, .rodata, trn2_mp]
       - [0x5FCC, data]
       - [0x626C, .data, trn2_bss]

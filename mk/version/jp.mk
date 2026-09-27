@@ -4,7 +4,8 @@ MWCC_OPT_LEVEL := 0
 
 MAIN_SBSS := \
 	$(GEN_DIR)/unk_0x8013DF1C.sbss.s \
-	$(GEN_DIR)/unk_0x8013DF94.sbss.s
+	$(GEN_DIR)/unk_0x8013DF94.sbss.s \
+	$(GEN_DIR)/unk_0x8013E66E.sbss.s
 
 MAIN_BSS := \
 	$(GEN_DIR)/unk_0x8013E6A8.bss.s \
@@ -55,6 +56,7 @@ $(eval $(call overlay,MURD,murd))
 $(eval $(call overlay,SHOP,shop))
 $(eval $(call overlay,STD,std))
 TRN2_C_SRC := \
+	src/trn2/trn2_hp_map99.c \
 	src/trn2/trn2_mp.c \
 	src/trn2/trn2_bss.c
 
