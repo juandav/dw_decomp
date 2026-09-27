@@ -272,5 +272,5 @@ void renderDropShadow(Entity *entity)
 	box.extent.vx = DIGIMON_DATA[entity->type].radius;
 	box.extent.vy = DIGIMON_DATA[entity->type].height >> 1;
 	box.extent.vz = DIGIMON_DATA[entity->type].radius;
-	unusedAABB(&box);
+	renderAABB(&box);
 }
