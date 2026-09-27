@@ -1,0 +1,40 @@
+name: kar
+sha1: e5b7c3180310da392c521f0827547993c7ef419f
+options:
+  basename: kar
+  target_path: disks/jp/KAR_REL.BIN
+  base_path: ../..
+  platform: psx
+  compiler: PSYQ
+
+  asm_path: asm/jp/kar
+  src_path: src/kar
+  asset_path: build/jp/psx/generated/assets/kar
+  build_path: build
+
+  ld_script_path: build/jp/psx/generated/kar.ld
+
+  global_vram_start: 0x80000000
+  global_vram_end: 0x80200000
+
+  gp_value: 0x80144E0C
+
+  generate_asm_macros_files: False
+
+  section_order: [".text", ".rodata", ".data", ".sdata", ".sbss", ".bss"]
+
+  symbol_addrs_path:
+    - config/jp/symbols.txt
+
+  undefined_funcs_auto_path: build/jp/psx/generated/undefined_funcs_auto_kar.txt
+  undefined_syms_auto_path: build/jp/psx/generated/undefined_syms_auto_kar.txt
+
+  use_gp_rel_macro: True
+
+segments:
+  - name: kar
+    type: databin
+    start: 0x0
+    vram: 0x80053800
+
+  - [0x126AC]

@@ -1,0 +1,40 @@
+name: btl
+sha1: 7585908ac200c07c6eb9d6a08a301b02ac5d27e5
+options:
+  basename: btl
+  target_path: disks/jp/BTL_REL.BIN
+  base_path: ../..
+  platform: psx
+  compiler: PSYQ
+
+  asm_path: asm/jp/btl
+  src_path: src/btl
+  asset_path: build/jp/psx/generated/assets/btl
+  build_path: build
+
+  ld_script_path: build/jp/psx/generated/btl.ld
+
+  global_vram_start: 0x80000000
+  global_vram_end: 0x80200000
+
+  gp_value: 0x80144E0C
+
+  generate_asm_macros_files: False
+
+  section_order: [".text", ".rodata", ".data", ".sdata", ".sbss", ".bss"]
+
+  symbol_addrs_path:
+    - config/jp/symbols.txt
+
+  undefined_funcs_auto_path: build/jp/psx/generated/undefined_funcs_auto_btl.txt
+  undefined_syms_auto_path: build/jp/psx/generated/undefined_syms_auto_btl.txt
+
+  use_gp_rel_macro: True
+
+segments:
+  - name: btl
+    type: databin
+    start: 0x0
+    vram: 0x80052AE0
+
+  - [0x2BCD4]

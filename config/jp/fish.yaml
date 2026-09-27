@@ -1,0 +1,40 @@
+name: fish
+sha1: a26f3b509124ffa11a0b754eec474db13b0c690b
+options:
+  basename: fish
+  target_path: disks/jp/FISH_REL.BIN
+  base_path: ../..
+  platform: psx
+  compiler: PSYQ
+
+  asm_path: asm/jp/fish
+  src_path: src/fish
+  asset_path: build/jp/psx/generated/assets/fish
+  build_path: build
+
+  ld_script_path: build/jp/psx/generated/fish.ld
+
+  global_vram_start: 0x80000000
+  global_vram_end: 0x80200000
+
+  gp_value: 0x80144E0C
+
+  generate_asm_macros_files: False
+
+  section_order: [".text", ".rodata", ".data", ".sdata", ".sbss", ".bss"]
+
+  symbol_addrs_path:
+    - config/jp/symbols.txt
+
+  undefined_funcs_auto_path: build/jp/psx/generated/undefined_funcs_auto_fish.txt
+  undefined_syms_auto_path: build/jp/psx/generated/undefined_syms_auto_fish.txt
+
+  use_gp_rel_macro: True
+
+segments:
+  - name: fish
+    type: databin
+    start: 0x0
+    vram: 0x80070000
+
+  - [0x11894]

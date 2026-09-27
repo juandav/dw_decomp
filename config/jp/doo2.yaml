@@ -1,0 +1,40 @@
+name: doo2
+sha1: 863c0d2d4e019dd6a3b511e023f4ac71c328ec63
+options:
+  basename: doo2
+  target_path: disks/jp/DOO2_REL.BIN
+  base_path: ../..
+  platform: psx
+  compiler: PSYQ
+
+  asm_path: asm/jp/doo2
+  src_path: src/doo2
+  asset_path: build/jp/psx/generated/assets/doo2
+  build_path: build
+
+  ld_script_path: build/jp/psx/generated/doo2.ld
+
+  global_vram_start: 0x80000000
+  global_vram_end: 0x80200000
+
+  gp_value: 0x80144E0C
+
+  generate_asm_macros_files: False
+
+  section_order: [".text", ".rodata", ".data", ".sdata", ".sbss", ".bss"]
+
+  symbol_addrs_path:
+    - config/jp/symbols.txt
+
+  undefined_funcs_auto_path: build/jp/psx/generated/undefined_funcs_auto_doo2.txt
+  undefined_syms_auto_path: build/jp/psx/generated/undefined_syms_auto_doo2.txt
+
+  use_gp_rel_macro: True
+
+segments:
+  - name: doo2
+    type: databin
+    start: 0x0
+    vram: 0x80070000
+
+  - [0xC3A4]

@@ -1,0 +1,40 @@
+name: trn
+sha1: f14125503af113d251962e0b7a5f9f265db61845
+options:
+  basename: trn
+  target_path: disks/jp/TRN_REL.BIN
+  base_path: ../..
+  platform: psx
+  compiler: PSYQ
+
+  asm_path: asm/jp/trn
+  src_path: src/trn
+  asset_path: build/jp/psx/generated/assets/trn
+  build_path: build
+
+  ld_script_path: build/jp/psx/generated/trn.ld
+
+  global_vram_start: 0x80000000
+  global_vram_end: 0x80200000
+
+  gp_value: 0x80144E0C
+
+  generate_asm_macros_files: False
+
+  section_order: [".text", ".rodata", ".data", ".sdata", ".sbss", ".bss"]
+
+  symbol_addrs_path:
+    - config/jp/symbols.txt
+
+  undefined_funcs_auto_path: build/jp/psx/generated/undefined_funcs_auto_trn.txt
+  undefined_syms_auto_path: build/jp/psx/generated/undefined_syms_auto_trn.txt
+
+  use_gp_rel_macro: True
+
+segments:
+  - name: trn
+    type: databin
+    start: 0x0
+    vram: 0x80088800
+
+  - [0x7E3C]

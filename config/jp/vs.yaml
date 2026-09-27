@@ -1,0 +1,40 @@
+name: vs
+sha1: 0f7d865db632468381e8022b1c59f98133cf8067
+options:
+  basename: vs
+  target_path: disks/jp/VS_REL.BIN
+  base_path: ../..
+  platform: psx
+  compiler: PSYQ
+
+  asm_path: asm/jp/vs
+  src_path: src/vs
+  asset_path: build/jp/psx/generated/assets/vs
+  build_path: build
+
+  ld_script_path: build/jp/psx/generated/vs.ld
+
+  global_vram_start: 0x80000000
+  global_vram_end: 0x80200000
+
+  gp_value: 0x80144E0C
+
+  generate_asm_macros_files: False
+
+  section_order: [".text", ".rodata", ".data", ".sdata", ".sbss", ".bss"]
+
+  symbol_addrs_path:
+    - config/jp/symbols.txt
+
+  undefined_funcs_auto_path: build/jp/psx/generated/undefined_funcs_auto_vs.txt
+  undefined_syms_auto_path: build/jp/psx/generated/undefined_syms_auto_vs.txt
+
+  use_gp_rel_macro: True
+
+segments:
+  - name: vs
+    type: databin
+    start: 0x0
+    vram: 0x80052AE0
+
+  - [0x34180]

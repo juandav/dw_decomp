@@ -1,0 +1,45 @@
+name: main
+sha1: d11336b31aeceec48267062676e9c3f0833ec13f
+options:
+  basename: main
+  target_path: disks/jp/SLPS_017.97
+  base_path: ../..
+  platform: psx
+  compiler: PSYQ
+
+  asm_path: asm/jp/main
+  src_path: src/main
+  asset_path: build/jp/psx/generated/assets/main
+  build_path: build
+
+  ld_script_path: build/jp/psx/generated/main.ld
+
+  global_vram_start: 0x80000000
+  global_vram_end: 0x80200000
+
+  gp_value: 0x80144E0C
+
+  generate_asm_macros_files: False
+
+  section_order: [".text", ".rodata", ".data", ".sdata", ".sbss", ".bss"]
+
+  symbol_addrs_path:
+    - config/jp/symbols.txt
+
+  undefined_funcs_auto_path: build/jp/psx/generated/undefined_funcs_auto_main.txt
+  undefined_syms_auto_path: build/jp/psx/generated/undefined_syms_auto_main.txt
+
+  use_gp_rel_macro: True
+
+segments:
+  - name: header
+    type: databin
+    start: 0x0
+    vram: 0x80090000
+
+  - name: main
+    type: databin
+    start: 0x800
+    vram: 0x80090800
+
+  - [0xADF1C]

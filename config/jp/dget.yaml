@@ -1,0 +1,40 @@
+name: dget
+sha1: a421e40603734afa1a51317495871dcaea25c52d
+options:
+  basename: dget
+  target_path: disks/jp/DGET_REL.BIN
+  base_path: ../..
+  platform: psx
+  compiler: PSYQ
+
+  asm_path: asm/jp/dget
+  src_path: src/dget
+  asset_path: build/jp/psx/generated/assets/dget
+  build_path: build
+
+  ld_script_path: build/jp/psx/generated/dget.ld
+
+  global_vram_start: 0x80000000
+  global_vram_end: 0x80200000
+
+  gp_value: 0x80144E0C
+
+  generate_asm_macros_files: False
+
+  section_order: [".text", ".rodata", ".data", ".sdata", ".sbss", ".bss"]
+
+  symbol_addrs_path:
+    - config/jp/symbols.txt
+
+  undefined_funcs_auto_path: build/jp/psx/generated/undefined_funcs_auto_dget.txt
+  undefined_syms_auto_path: build/jp/psx/generated/undefined_syms_auto_dget.txt
+
+  use_gp_rel_macro: True
+
+segments:
+  - name: dget
+    type: databin
+    start: 0x0
+    vram: 0x80080800
+
+  - [0x19E0]

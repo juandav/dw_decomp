@@ -1,0 +1,40 @@
+name: mov
+sha1: a6bef17e9a03232afe371c7d80a85d4c0d3e072d
+options:
+  basename: mov
+  target_path: disks/jp/MOV_REL.BIN
+  base_path: ../..
+  platform: psx
+  compiler: PSYQ
+
+  asm_path: asm/jp/mov
+  src_path: src/mov
+  asset_path: build/jp/psx/generated/assets/mov
+  build_path: build
+
+  ld_script_path: build/jp/psx/generated/mov.ld
+
+  global_vram_start: 0x80000000
+  global_vram_end: 0x80200000
+
+  gp_value: 0x80144E0C
+
+  generate_asm_macros_files: False
+
+  section_order: [".text", ".rodata", ".data", ".sdata", ".sbss", ".bss"]
+
+  symbol_addrs_path:
+    - config/jp/symbols.txt
+
+  undefined_funcs_auto_path: build/jp/psx/generated/undefined_funcs_auto_mov.txt
+  undefined_syms_auto_path: build/jp/psx/generated/undefined_syms_auto_mov.txt
+
+  use_gp_rel_macro: True
+
+segments:
+  - name: mov
+    type: databin
+    start: 0x0
+    vram: 0x80010000
+
+  - [0x7364C]

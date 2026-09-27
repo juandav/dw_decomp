@@ -1,0 +1,40 @@
+name: dooa
+sha1: df3a59166ccccd05a23f995d07d2b837e527a8c3
+options:
+  basename: dooa
+  target_path: disks/jp/DOOA_REL.BIN
+  base_path: ../..
+  platform: psx
+  compiler: PSYQ
+
+  asm_path: asm/jp/dooa
+  src_path: src/dooa
+  asset_path: build/jp/psx/generated/assets/dooa
+  build_path: build
+
+  ld_script_path: build/jp/psx/generated/dooa.ld
+
+  global_vram_start: 0x80000000
+  global_vram_end: 0x80200000
+
+  gp_value: 0x80144E0C
+
+  generate_asm_macros_files: False
+
+  section_order: [".text", ".rodata", ".data", ".sdata", ".sbss", ".bss"]
+
+  symbol_addrs_path:
+    - config/jp/symbols.txt
+
+  undefined_funcs_auto_path: build/jp/psx/generated/undefined_funcs_auto_dooa.txt
+  undefined_syms_auto_path: build/jp/psx/generated/undefined_syms_auto_dooa.txt
+
+  use_gp_rel_macro: True
+
+segments:
+  - name: dooa
+    type: databin
+    start: 0x0
+    vram: 0x80080000
+
+  - [0x9248]
