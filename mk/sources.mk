@@ -1,8 +1,8 @@
 define unit
 $(1)_ASM_SRC := $$(shell find $$(ASM_DIR)/$(2) -path '*.s' \
 		-not -path '$$(ASM_DIR)/$(2)/*matchings*' 2> /dev/null)
-$(1)_SRC := $$($(1)_ASM_SRC) $$($(1)_GEN_SRC) $$($(1)_C_SRC)
-$(1)_OBJ := $$($(1)_SRC:%=$$(BUILD_DIR)/%.o)
+$(1)_OBJ := $$($(1)_ASM_SRC:$$(ASM_DIR)/%=$$(BUILD_DIR)/asm/%.o) \
+	$$($(1)_GEN_SRC:%=$$(BUILD_DIR)/%.o) $$($(1)_C_SRC:%=$$(BUILD_DIR)/%.o)
 $(1)_DEP := $$($(1)_OBJ:%.o=%.d)
 OBJ += $$($(1)_OBJ)
 DEP += $$($(1)_DEP)

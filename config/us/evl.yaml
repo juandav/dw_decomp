@@ -7,7 +7,7 @@ options:
   platform: psx
   compiler: PSYQ
 
-  asm_path: asm/evl
+  asm_path: asm/us/evl
   src_path: src/evl
   build_path: build
 

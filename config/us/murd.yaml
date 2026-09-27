@@ -7,7 +7,7 @@ options:
   platform: psx
   compiler: PSYQ
 
-  asm_path: asm/murd
+  asm_path: asm/us/murd
   src_path: src/murd
   build_path: build
 

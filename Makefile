@@ -19,7 +19,7 @@ endif
 
 BUILD_DIR := build/$(CONFIG)
 CONFIG_DIR := config/$(VERSION)
-ASM_DIR := asm
+ASM_DIR := asm/$(VERSION)
 GEN_DIR := build/generated
 
 VERSION_MACRO := VERSION_$(shell echo $(VERSION) | tr a-z A-Z)

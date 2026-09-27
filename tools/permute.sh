@@ -9,7 +9,7 @@ usage() {
 	echo "  --clean         : Clean the output directory before processing"
 	echo "  --run           : Run the permuter after setup"
 	echo "  <c-file>        : Path to C source file"
-	echo "  <asm-file>      : Path to assembly source file in asm/*/*matchings"
+	echo "  <asm-file>      : Path to assembly source file in asm/*/*/*matchings"
 	echo "  <function-name> : Function name to permute"
 	exit 1
 }

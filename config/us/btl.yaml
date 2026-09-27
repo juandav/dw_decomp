@@ -7,7 +7,7 @@ options:
   platform: psx
   compiler: PSYQ
 
-  asm_path: asm/btl
+  asm_path: asm/us/btl
   src_path: src/btl
   build_path: build
 

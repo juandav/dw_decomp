@@ -7,7 +7,7 @@ options:
   platform: psx
   compiler: PSYQ
 
-  asm_path: asm/eab
+  asm_path: asm/us/eab
   src_path: src/eab
   build_path: build
 

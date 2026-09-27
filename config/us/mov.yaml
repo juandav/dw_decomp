@@ -7,7 +7,7 @@ options:
   platform: psx
   compiler: PSYQ
 
-  asm_path: asm/mov
+  asm_path: asm/us/mov
   src_path: src/mov
   build_path: build
 

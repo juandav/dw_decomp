@@ -7,7 +7,7 @@ options:
   platform: psx
   compiler: PSYQ
 
-  asm_path: asm/fish
+  asm_path: asm/us/fish
   src_path: src/fish
   build_path: build
 

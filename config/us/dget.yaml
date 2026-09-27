@@ -7,7 +7,7 @@ options:
   platform: psx
   compiler: PSYQ
 
-  asm_path: asm/dget
+  asm_path: asm/us/dget
   src_path: src/dget
   build_path: build
 

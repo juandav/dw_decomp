@@ -7,7 +7,7 @@ options:
   platform: psx
   compiler: PSYQ
 
-  asm_path: asm/endi
+  asm_path: asm/us/endi
   src_path: src/endi
   build_path: build
 

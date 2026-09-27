@@ -7,7 +7,7 @@ options:
   platform: psx
   compiler: PSYQ
 
-  asm_path: asm/doo2
+  asm_path: asm/us/doo2
   src_path: src/doo2
   build_path: build
 

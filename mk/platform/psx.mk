@@ -53,7 +53,7 @@ $(EXE): $(ELF) $(OVERLAY:%=$(BUILD_DIR)/%_REL.BIN)
 	@mkdir -p $(dir $@)
 	$(OBJCOPY) $(addprefix -R .,$(OVERLAY)) -O binary $< $@
 
-$(BUILD_DIR)/%.s.o: %.s
+define assemble
 	@mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEPFLAGS) $<
 	$(CC) -c $(CFLAGS) $(CPPFLAGS) $(ASFLAGS) -o $@ $<
@@ -63,6 +63,13 @@ $(BUILD_DIR)/%.s.o: %.s
 				--set-section-alignment .bss=4 \
 				--set-section-alignment .sbss=4 \
 				--set-section-alignment .sdata=4 $@
+endef
+
+$(BUILD_DIR)/asm/%.s.o: $(ASM_DIR)/%.s
+	$(assemble)
+
+$(BUILD_DIR)/%.s.o: %.s
+	$(assemble)
 
 $(MAIN_SBSS) &: $(CONFIG_DIR)/sbss.yaml $(CONFIG_DIR)/symbols.txt
 	@mkdir -p $(dir $@)
