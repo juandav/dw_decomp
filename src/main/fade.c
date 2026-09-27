@@ -2,7 +2,6 @@
 
 #include <dw/clock.h>
 #include <dw/fade.h>
-#include <dw/world_object.h>
 
 #include "common.h"
 
@@ -15,6 +14,8 @@ uint8_t FADE_MODE;
 int32_t FADE_PROTECTION;
 uint8_t MAIN_D_80134CBC;
 
+int32_t addObject(int16_t objectId, int16_t instanceId, void *tick, void *render);
+int32_t removeObject(int16_t objectId, int16_t instanceId);
 void setPosDataPolyFT4(POLY_FT4 *prim, int16_t posX, int16_t posY, int16_t width, int16_t height);
 void setUVDataPolyFT4(POLY_FT4 *prim, int16_t xPos, int16_t yPos, int16_t width, int16_t height);
 extern GsOT *ACTIVE_ORDERING_TABLE;
@@ -53,7 +54,7 @@ void fadeToBlack(int16_t frames)
 	FADE_OUT_TARGET = frames + 1;
 	FADE_OUT_CURRENT = 1;
 	FADE_MODE = 2;
-	addObject(4005, 0, 0, (RenderFunction)renderFadeOut);
+	addObject(4005, 0, 0, renderFadeOut);
 	stopGameTime();
 	FADE_PROTECTION = 1;
 }
@@ -69,7 +70,7 @@ void fadeFromBlack(int16_t frames)
 	FADE_IN_TARGET = frames + 1;
 	FADE_IN_CURRENT = 1;
 	FADE_MODE = 2;
-	addObject(4005, 0, 0, (RenderFunction)renderFadeIn);
+	addObject(4005, 0, 0, renderFadeIn);
 }
 
 void renderFadeIn(int16_t instanceId)
@@ -155,12 +156,12 @@ void fadeToWhite(int16_t frames)
 
 #if defined(VERSION_JP)
 	if (!MAIN_D_80134CBC) {
-		addObject(4005, 0, 0, (RenderFunction)renderFadeOut);
+		addObject(4005, 0, 0, renderFadeOut);
 	}
 
 	MAIN_D_80134CBC = 1;
 #else
-	addObject(4005, 0, 0, (RenderFunction)renderFadeOut);
+	addObject(4005, 0, 0, renderFadeOut);
 #endif
 }
 
@@ -172,5 +173,5 @@ void fadeFromWhite(int16_t frames)
 	FADE_IN_CURRENT = 1;
 	FADE_MODE = 1;
 	MAIN_D_80134CBC = 0;
-	addObject(4005, 0, 0, (RenderFunction)renderFadeIn);
+	addObject(4005, 0, 0, renderFadeIn);
 }
