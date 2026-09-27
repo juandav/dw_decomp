@@ -118,7 +118,10 @@ SECTIONS
 	OVERLAY 0x80080800 : NOCROSSREFS
 	{
 		.SHOP {
-			KEEP(BUILD_DIR/asm/shop/data/shop.s.o(.data.*));
+			KEEP(BUILD_DIR/asm/shop/data/header.rodata.s.o(.rodata .rodata.*));
+			KEEP(BUILD_DIR/asm/shop/shop.s.o(.text .text.*));
+			KEEP(BUILD_DIR/asm/shop/data/shop.data.s.o(.data .data.*));
+			LONG(0);
 		}
 	}
 
