@@ -25,6 +25,7 @@ options:
 
   symbol_addrs_path:
     - config/jp/symbols.txt
+    - config/jp/symbols_trn.txt
 
   undefined_funcs_auto_path: build/jp/psx/generated/undefined_funcs_auto_trn.txt
   undefined_syms_auto_path: build/jp/psx/generated/undefined_syms_auto_trn.txt
@@ -60,5 +61,6 @@ segments:
     subsegments:
       - [0x40, asm, trn]
       - [0x79A8, data, trn]
+      - [0x7D88, .data, trn_bss]
 
-  - [0x7E38]
+  - [0x7E3C]

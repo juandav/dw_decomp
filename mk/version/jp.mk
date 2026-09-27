@@ -41,6 +41,9 @@ TRN2_C_SRC := \
 	src/trn2/trn2_bss.c
 
 $(eval $(call overlay,TRN2,trn2))
+TRN_C_SRC := \
+	src/trn/trn_bss.c
+
 $(eval $(call overlay,TRN,trn))
 $(eval $(call overlay,VS,vs))
 
