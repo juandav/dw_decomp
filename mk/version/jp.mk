@@ -24,6 +24,7 @@ MAIN_C_SRC := \
 	src/main/overworld_card_text.c \
 	src/main/overworld_evochart_text.c \
 	src/main/overworld_medal_text.c \
+	src/main/overworld_playerinfo_text.c \
 	src/main/toilet_data.c
 
 $(eval $(call unit,MAIN,main))

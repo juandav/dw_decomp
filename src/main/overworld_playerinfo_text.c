@@ -17,7 +17,9 @@ int32_t drawPlayerInfoStrings(void);
 int32_t drawPlayerInfoStrings(void)
 {
 	RECT rect;
+#if !defined(VERSION_JP)
 	char buf[8];
+#endif
 	int32_t i;
 
 	rect = PLAYER_INFO_TEXT_AREA;
@@ -28,13 +30,15 @@ int32_t drawPlayerInfoStrings(void)
 		MENU_SUB_STATE = 1;
 		break;
 	case 1:
+#if !defined(VERSION_JP)
 		sprintf(buf, FMT_PLAYTIME, (int)PLAYTIME_HOURS, (int)PLAYTIME_MINUTES);
 		drawString(buf, 0, 0xe4);
+#endif
 	case 2:
 	case 3:
 		drawString(PLAYER_VIEW_LABELS[MENU_SUB_STATE + 1], 0,
 		    (MENU_SUB_STATE - 1) * 0xc + 0xc);
-		MENU_SUB_STATE = MENU_SUB_STATE + 1;
+		MENU_SUB_STATE++;
 		break;
 	case 4:
 		drawString((char *)DIGIMON_DATA, 0, 0x30);
