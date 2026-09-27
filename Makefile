@@ -29,8 +29,8 @@ PYTHON := python3
 
 .DEFAULT_GOAL := all
 
-include mk/version/$(VERSION).mk
 include mk/sources.mk
+include mk/version/$(VERSION).mk
 include mk/toolchain/$(TOOLCHAIN).mk
 include mk/platform/$(PLATFORM).mk
 
