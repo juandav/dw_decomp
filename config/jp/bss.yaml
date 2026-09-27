@@ -3,5 +3,7 @@ start: 0x8013E6A8
 end: 0x801C754C
 subsegments:
   - [0x8013E6A8, unk_0x8013E6A8]
+  - [0x801406E8, world_object]
+  - [0x80140CF4, unk_0x80140CF4]
   - [0x80168910, butterfly]
   - [0x80168920, unk_0x80168920]

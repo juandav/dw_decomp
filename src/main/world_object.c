@@ -16,8 +16,11 @@ void initializeWorldObjects(void)
 }
 
 
-int32_t addObject(int32_t objectId, int32_t instanceId, TickFunction tick,
-		  RenderFunction render)
+int32_t addObject(objectId, instanceId, tick, render)
+int16_t objectId;
+int16_t instanceId;
+TickFunction tick;
+RenderFunction render;
 {
 	int32_t i;
 
@@ -45,7 +48,9 @@ int32_t addObject(int32_t objectId, int32_t instanceId, TickFunction tick,
 }
 
 
-int32_t removeObject(int32_t objectId, int32_t instanceId)
+int32_t removeObject(objectId, instanceId)
+int16_t objectId;
+int16_t instanceId;
 {
 	int32_t i;
 

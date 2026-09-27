@@ -8,6 +8,7 @@ MAIN_SBSS := \
 
 MAIN_BSS := \
 	$(GEN_DIR)/unk_0x8013E6A8.bss.s \
+	$(GEN_DIR)/unk_0x80140CF4.bss.s \
 	$(GEN_DIR)/unk_0x80168920.bss.s
 
 MAIN_GEN_SRC := $(MAIN_BSS) $(MAIN_SBSS)
@@ -26,7 +27,8 @@ MAIN_C_SRC := \
 	src/main/overworld_evochart_text.c \
 	src/main/overworld_medal_text.c \
 	src/main/overworld_playerinfo_text.c \
-	src/main/toilet_data.c
+	src/main/toilet_data.c \
+	src/main/world_object.c
 
 $(eval $(call unit,MAIN,main))
 

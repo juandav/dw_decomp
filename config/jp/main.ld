@@ -19,6 +19,8 @@ SECTIONS
     {
         main_TEXT_START = .;
         KEEP(BUILD_DIR/asm/main/main.s.o(.text .text.*));
+        BUILD_DIR/src/main/world_object.c.o(.text .text.*);
+        KEEP(BUILD_DIR/asm/main/1443C.s.o(.text .text.*));
         BUILD_DIR/src/main/math.c.o(.text .text.*);
         KEEP(BUILD_DIR/asm/main/14DF8.s.o(.text .text.*));
         BUILD_DIR/src/main/_psstart.c.o(.text .text.*);
@@ -112,6 +114,10 @@ SECTIONS
     .bss main_BSS_START : AT(bss_ROM_START)
     {
         BUILD_DIR/generated/unk_0x8013E6A8.bss.s.o(.bss.*);
+        . = ALIGN(., 4);
+        BUILD_DIR/src/main/world_object.c.o(.bss.*);
+        . = ALIGN(., 4);
+        BUILD_DIR/generated/unk_0x80140CF4.bss.s.o(.bss.*);
         . = ALIGN(., 4);
         BUILD_DIR/src/main/butterfly.c.o(.bss.*);
         . = ALIGN(., 4);
