@@ -10,7 +10,7 @@ expected: $(OBJ)
 	rm -rf $(EXPECTED_DIR)
 	@mkdir -p $(EXPECTED_DIR)
 	cp -r $(BUILD_DIR)/asm $(EXPECTED_DIR)/asm
-	cp -r $(BUILD_DIR)/src $(EXPECTED_DIR)/src
+	$(if $(wildcard $(BUILD_DIR)/src),cp -r $(BUILD_DIR)/src $(EXPECTED_DIR)/src)
 
 objdiff: expected
 	$(PYTHON) tools/objdiff/objdiff_generate.py tools/objdiff/config.yaml \
