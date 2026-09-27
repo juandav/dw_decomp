@@ -41,6 +41,8 @@ class Config:
 def _create_config():
     parser = ArgumentParser()
     parser.add_argument("config", type = Path)
+    parser.add_argument("base_dir", type = Path)
+    parser.add_argument("target_dir", type = Path)
     args = parser.parse_args()
 
     if not args.config.exists() or args.config.is_dir() or args.config.suffix != ".yaml":
@@ -48,7 +50,7 @@ def _create_config():
 
     with open(args.config) as stream:
         try:
-            return yaml.safe_load(stream)
+            return args, yaml.safe_load(stream)
         except yaml.YAMLError as exc:
             raise exc
 
@@ -131,11 +133,8 @@ def _collect_objects(path: Path, config) -> list[Path]:
         if not any(name in path.name for name in EXCLUDED_NAMES ) and not any(file in str(path) for file in ignored)
     ]
 
-def _determine_categories(path: Path, config) -> tuple[UnitMetadata, str]:
-    if path.name.endswith(".s.o"):
-        modified_path = path.relative_to(config["expected_paths"]["asm"])
-    else:
-        modified_path = path.relative_to(config["expected_paths"]["src"])
+def _determine_categories(path: Path, target_dir: Path, config) -> tuple[UnitMetadata, str]:
+    modified_path = path.relative_to(target_dir)
 
     categories = []
     for category in config["categories"]:
@@ -146,15 +145,15 @@ def _determine_categories(path: Path, config) -> tuple[UnitMetadata, str]:
 
 def main():
     logging.basicConfig(level = logging.INFO)
-    config = _create_config()
+    args, config = _create_config()
     
-    expected_objects = _collect_objects(Path(config["expected_paths"]["asm"]), config)
+    expected_objects = _collect_objects(args.target_dir, config)
     
     logging.info(f"Accounting for {len(expected_objects)} objects.")
     units = []
     for file in expected_objects:
-        processed_path = _determine_categories(file, config)
-        base_path = "build/us/psx/mwcc/src/" + re.sub(r"\\", r"/", processed_path[1]).removesuffix(".s.o").removesuffix(".c.o") + ".c.o"
+        processed_path = _determine_categories(file, args.target_dir, config)
+        base_path = str(args.base_dir) + "/" + re.sub(r"\\", r"/", processed_path[1]).removesuffix(".s.o").removesuffix(".c.o") + ".c.o"
         
         # Create mappings for compiler-generated symbols in base object
         # (objdiff report supports symbol mappings since v3.7.3)

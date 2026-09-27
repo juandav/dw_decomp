@@ -13,7 +13,8 @@ expected: $(OBJ)
 	cp -r $(BUILD_DIR)/src $(EXPECTED_DIR)/src
 
 objdiff: expected
-	$(PYTHON) tools/objdiff/objdiff_generate.py tools/objdiff/config.yaml
+	$(PYTHON) tools/objdiff/objdiff_generate.py tools/objdiff/config.yaml \
+		$(BUILD_DIR)/src $(EXPECTED_DIR)/asm
 
 report: objdiff
 	$(OBJDIFF) report generate \
