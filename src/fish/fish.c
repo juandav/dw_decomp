@@ -2113,7 +2113,7 @@ void FISH_beginTension(void)
 	t->limit = (FISHING_DATA_PTR->rod.swimmerType == 1) ? 0x1388 : 0x2710;
 }
 
-inline int32_t FISH_tensionOverLimit(FishingTension *t, int32_t level)
+static inline int32_t FISH_tensionOverLimit(FishingTension *t, int32_t level)
 {
 	return t->limit < level;
 }

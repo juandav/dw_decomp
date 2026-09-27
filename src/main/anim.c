@@ -144,7 +144,7 @@ void setupModelMatrix(PositionData *posData)
 	matrix->flg = 0;
 }
 
-inline int16_t *getAnimInt16Ptr(uint8_t *ptr)
+static inline int16_t *getAnimInt16Ptr(uint8_t *ptr)
 {
 	return (int16_t *)ptr;
 }
@@ -365,12 +365,12 @@ void startAnimation(entity, animId)
 	anim->animInstrPtr = instrPtr;
 }
 
-inline int32_t peekAnimationTextureHighByte(int16_t **instrPtr)
+static inline int32_t peekAnimationTextureHighByte(int16_t **instrPtr)
 {
 	return (**instrPtr & 0xff00) >> 8;
 }
 
-inline int32_t readAnimationTextureLowByte(int16_t **instrPtr)
+static inline int32_t readAnimationTextureLowByte(int16_t **instrPtr)
 {
 	return *(*instrPtr)++ & 0xff;
 }
