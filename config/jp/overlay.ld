@@ -88,7 +88,10 @@ SECTIONS
 	OVERLAY 0x80053800 : NOCROSSREFS
 	{
 		.KAR {
-			KEEP(BUILD_DIR/asm/kar/data/kar.s.o(.data.*));
+			KEEP(BUILD_DIR/asm/kar/data/header.rodata.s.o(.rodata .rodata.*));
+			KEEP(BUILD_DIR/asm/kar/kar.s.o(.text .text.*));
+			KEEP(BUILD_DIR/asm/kar/data/kar.data.s.o(.data .data.*));
+			LONG(0);
 		}
 	}
 
