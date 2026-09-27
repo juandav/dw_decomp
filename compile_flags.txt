@@ -2,6 +2,8 @@
 -Iinclude/gcc/
 -Iinclude/ 
 -Iexternal/psyq_headers/mw_lib41/include/
+-DLANGUAGE_C
+-DVERSION_US
 -std=c99
 -Wall
 -Wextra
