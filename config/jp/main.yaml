@@ -62,6 +62,8 @@ segments:
       - [0x208B4, c, aabb]
       - [0x20E40, c, efe]
       - [0x242CC, asm]
+      - [0x78514, c, kar]
+      - [0x7855C, asm]
       - [0x799BC, c, butterfly]
       - [0x79D94, asm]
       - [0x842D8, c, bubble]

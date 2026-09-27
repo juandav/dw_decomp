@@ -17,7 +17,8 @@ MAIN_C_SRC := \
 	src/main/bubble.c \
 	src/main/butterfly.c \
 	src/main/efe.c \
-	src/main/fade.c
+	src/main/fade.c \
+	src/main/kar.c
 
 $(eval $(call unit,MAIN,main))
 
