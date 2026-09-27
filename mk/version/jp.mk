@@ -18,7 +18,8 @@ MAIN_C_SRC := \
 	src/main/butterfly.c \
 	src/main/efe.c \
 	src/main/fade.c \
-	src/main/kar.c
+	src/main/kar.c \
+	src/main/toilet_data.c
 
 $(eval $(call unit,MAIN,main))
 
