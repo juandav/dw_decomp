@@ -35,6 +35,9 @@ MAIN_C_SRC := \
 
 $(eval $(call unit,MAIN,main))
 
+BTL_C_SRC := \
+	src/btl/command_shout.c
+
 $(eval $(call overlay,BTL,btl))
 $(eval $(call overlay,DGET,dget))
 $(eval $(call overlay,DOO2,doo2))

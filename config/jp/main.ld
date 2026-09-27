@@ -88,6 +88,9 @@ SECTIONS
         BUILD_DIR/src/main/bubble.c.o(.sdata .sdata.*);
         . = ALIGN(., 4);
         KEEP(BUILD_DIR/asm/main/data/AD8E4.sdata.s.o(.sdata .sdata.*));
+        BUILD_DIR/src/btl/command_shout.c.o(.sdata .sdata.*);
+        . = ALIGN(., 4);
+        KEEP(BUILD_DIR/asm/main/data/AD94C.sdata.s.o(.sdata .sdata.*));
         main_SDATA_END = .;
         main_SDATA_SIZE = ABSOLUTE(main_SDATA_END - main_SDATA_START);
 

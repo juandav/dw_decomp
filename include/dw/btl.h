@@ -10,7 +10,7 @@
 #include <dw/types.h>
 
 typedef struct {
-	int32_t frame;
+	long frame;
 	int16_t x;
 	int16_t y;
 	uint8_t width;

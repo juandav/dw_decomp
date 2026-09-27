@@ -9,10 +9,47 @@
 
 extern BtlCommandShout BTL_COMMAND_SHOUT;
 
-int16_t entityGetTechFromAnim(Entity *entity, int32_t anim);
+int32_t entityGetTechFromAnim(Entity *entity, int32_t anim);
 void BTL_removeCommandShout(void);
 void BTL_renderCommandShout(void);
 
+#if defined(VERSION_JP)
+char BTL_STR_SHOUT_RUN[] = "にげろ";
+char BTL_STR_SHOUT_ATTACK[] = "おもいっきり";
+char BTL_STR_SHOUT_YOUR_CALL[] = "まかせた";
+char BTL_STR_SHOUT_MODERATE[] = "ほどほど";
+char BTL_STR_SHOUT_DISTANCE[] = "はなれろ";
+char BTL_STR_SHOUT_DEFENSE[] = "がまんだ";
+char BTL_STR_SHOUT_CHANGE[] = "ターゲットチェンジ";
+
+char *BTL_SHOUTS[7] = {
+	BTL_STR_SHOUT_RUN,
+	BTL_STR_SHOUT_ATTACK,
+	BTL_STR_SHOUT_YOUR_CALL,
+	BTL_STR_SHOUT_MODERATE,
+	BTL_STR_SHOUT_DISTANCE,
+	BTL_STR_SHOUT_DEFENSE,
+	BTL_STR_SHOUT_CHANGE,
+};
+
+char BTL_STR_COMMAND_RUN[] = "にげる";
+char BTL_STR_COMMAND_YOUR_CALL[] = "おまかせ";
+char BTL_STR_COMMAND_DISTANCE[] = "はなれる";
+char BTL_STR_COMMAND_DEFENSE[] = "ガマンする";
+char BTL_STR_COMMAND_CHANGE[] = "ターゲットをかえる";
+
+char *BTL_COMMAND_NAMES[7] = {
+	BTL_STR_COMMAND_RUN,
+	BTL_STR_SHOUT_ATTACK,
+	BTL_STR_COMMAND_YOUR_CALL,
+	BTL_STR_SHOUT_MODERATE,
+	BTL_STR_COMMAND_DISTANCE,
+	BTL_STR_COMMAND_DEFENSE,
+	BTL_STR_COMMAND_CHANGE,
+};
+
+char BTL_STR_SHOUT_EXCLAMATION[] = "！";
+#else
 char BTL_STR_SHOUT_RUN[] = "Run!";
 char BTL_STR_SHOUT_ATTACK[] = "Attack!";
 char BTL_STR_SHOUT_CHANGE[] = "Change!";
@@ -31,6 +68,7 @@ const char *BTL_SHOUTS[7] = {
 	BTL_STR_SHOUT_DEFENSE,
 	BTL_STR_SHOUT_CHANGE,
 };
+#endif
 
 void BTL_drawCommandShout(uint32_t command)
 {
@@ -57,7 +95,13 @@ void BTL_drawCommandShout(uint32_t command)
 		length = strlen(BTL_SHOUTS[(int32_t)command - 1]);
 	}
 
+#if defined(VERSION_JP)
+	drawString(BTL_STR_SHOUT_EXCLAMATION, (length / 2) * 12, 204);
+	length += 2;
+	BTL_COMMAND_SHOUT.width = (length / 2) * 12;
+#else
 	BTL_COMMAND_SHOUT.width = length * 12;
+#endif
 	if ((screenPos[0] - (BTL_COMMAND_SHOUT.width / 2)) < -140) {
 		screenPos[0] = (BTL_COMMAND_SHOUT.width / 2) - 140;
 	}
@@ -90,7 +134,6 @@ void BTL_removeCommandShout(void)
 void BTL_renderCommandShout(void)
 {
 	GsSPRITE sprite;
-	int32_t y;
 
 	sprite.attribute = 0;
 	sprite.tpage = getTPage(0, 0, 704, 256);
@@ -103,26 +146,24 @@ void BTL_renderCommandShout(void)
 	sprite.u = 0;
 	sprite.v = 204;
 
-	if (BTL_COMMAND_SHOUT.frame < 4L) {
+	if (BTL_COMMAND_SHOUT.frame < 4) {
 		sprite.scaley = sprite.scalex = (((BTL_COMMAND_SHOUT.frame * 2) + 2) << 12) / 10;
 	} else {
-		sprite.scaley = sprite.scalex = 0x1000;
+		sprite.scalex = 0x1000;
+		sprite.scaley = 0x1000;
 	}
 
 	sprite.x = BTL_COMMAND_SHOUT.x;
-	y = BTL_COMMAND_SHOUT.y;
-	if (y < -40) {
-		sprite.y = y + BTL_SHOUT_DROP_OFFSETS[BTL_COMMAND_SHOUT.frame++];
+	if (BTL_COMMAND_SHOUT.y < -40) {
+		sprite.y = (int32_t)(int16_t)BTL_COMMAND_SHOUT.y + BTL_SHOUT_DROP_OFFSETS[BTL_COMMAND_SHOUT.frame++];
 	} else {
-		sprite.y = y + BTL_SHOUT_HOP_OFFSETS[BTL_COMMAND_SHOUT.frame++];
+		sprite.y = (int32_t)(int16_t)BTL_COMMAND_SHOUT.y + BTL_SHOUT_HOP_OFFSETS[BTL_COMMAND_SHOUT.frame++];
 	}
 
 	sprite.rotate = 0;
 	GsSortSprite(&sprite, ACTIVE_ORDERING_TABLE, 7);
 
-	sprite.b = 0;
-	sprite.g = 0;
-	sprite.r = 0;
+	sprite.r = sprite.g = sprite.b = 0;
 	sprite.x++;
 	sprite.y++;
 	GsSortSprite(&sprite, ACTIVE_ORDERING_TABLE, 7);

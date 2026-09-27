@@ -25,6 +25,7 @@ options:
 
   symbol_addrs_path:
     - config/jp/symbols.txt
+    - config/jp/symbols_main.txt
 
   undefined_funcs_auto_path: build/jp/psx/generated/undefined_funcs_auto_main.txt
   undefined_syms_auto_path: build/jp/psx/generated/undefined_syms_auto_main.txt
@@ -111,5 +112,7 @@ segments:
       - [0xAD7D8, sdata]
       - [0xAD870, .sdata, bubble]
       - [0xAD8E4, sdata]
+      - [0xAD938, .sdata, btl/command_shout]
+      - [0xAD94C, sdata]
 
   - [0xADF1C]

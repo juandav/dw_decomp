@@ -10,7 +10,11 @@ SECTIONS
 			KEEP(BUILD_DIR/asm/btl/data/model_3.rodata.s.o(.rodata .rodata.*));
 			KEEP(BUILD_DIR/asm/btl/data/header.rodata.s.o(.rodata .rodata.*));
 			KEEP(BUILD_DIR/asm/btl/btl.s.o(.text .text.*));
+			BUILD_DIR/src/btl/command_shout.c.o(.text .text.*);
+			KEEP(BUILD_DIR/asm/btl/115D4.s.o(.text .text.*));
 			KEEP(BUILD_DIR/asm/btl/data/btl.data.s.o(.data .data.*));
+			BUILD_DIR/src/btl/command_shout.c.o(.data .data.*);
+			KEEP(BUILD_DIR/asm/btl/data/28B68.data.s.o(.data .data.*));
 			LONG(0);
 		}
 	}
