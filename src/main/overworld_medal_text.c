@@ -17,7 +17,6 @@ int32_t drawMedalViewStrings(void)
 {
 	RECT rect1;
 	RECT rect2;
-	int32_t i;
 
 	rect1 = MEDAL_VIEW_TEXT_AREA;
 	rect2 = MEDAL_DETAIL_AREA;
@@ -38,10 +37,9 @@ int32_t drawMedalViewStrings(void)
 	case 3:
 	case 4:
 	case 5:
-		i = MENU_SUB_STATE - 3;
-		drawString(MEDAL_DESCRIPTIONS[i + MEDAL_SELECTOR_INDEX * 3], 0,
-			   i * 0xc + 0x24);
-		MENU_SUB_STATE = MENU_SUB_STATE + 1;
+		drawString(MEDAL_DESCRIPTIONS[(MENU_SUB_STATE - 3) + MEDAL_SELECTOR_INDEX * 3], 0,
+			   (MENU_SUB_STATE - 3) * 0xc + 0x24);
+		MENU_SUB_STATE++;
 		if (MENU_SUB_STATE == 6) {
 			return 1;
 		}
