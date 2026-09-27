@@ -6,10 +6,15 @@ MAIN_SBSS := \
 	$(GEN_DIR)/unk_0x8013DF1C.sbss.s \
 	$(GEN_DIR)/unk_0x8013DF94.sbss.s
 
-MAIN_GEN_SRC := $(MAIN_SBSS)
+MAIN_BSS := \
+	$(GEN_DIR)/unk_0x8013E6A8.bss.s \
+	$(GEN_DIR)/unk_0x80168920.bss.s
+
+MAIN_GEN_SRC := $(MAIN_BSS) $(MAIN_SBSS)
 
 MAIN_C_SRC := \
 	src/main/aabb.c \
+	src/main/butterfly.c \
 	src/main/fade.c
 
 $(eval $(call unit,MAIN,main))

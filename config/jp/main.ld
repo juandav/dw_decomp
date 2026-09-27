@@ -22,6 +22,8 @@ SECTIONS
         BUILD_DIR/src/main/fade.c.o(.text .text.*);
         BUILD_DIR/src/main/aabb.c.o(.text .text.*);
         KEEP(BUILD_DIR/asm/main/20E40.s.o(.text .text.*));
+        BUILD_DIR/src/main/butterfly.c.o(.text .text.*);
+        KEEP(BUILD_DIR/asm/main/79D94.s.o(.text .text.*));
         main_TEXT_END = .;
         main_TEXT_SIZE = ABSOLUTE(main_TEXT_END - main_TEXT_START);
 
@@ -32,6 +34,8 @@ SECTIONS
 
         main_DATA_START = .;
         KEEP(BUILD_DIR/asm/main/data/main.data.s.o(.data .data.*));
+        BUILD_DIR/src/main/butterfly.c.o(.data .data.*);
+        KEEP(BUILD_DIR/asm/main/data/A9A68.data.s.o(.data .data.*));
         main_DATA_END = .;
         main_DATA_SIZE = ABSOLUTE(main_DATA_END - main_DATA_START);
 
@@ -60,8 +64,25 @@ SECTIONS
         . = ALIGN(., 4);
         main_SBSS_END = .;
         main_SBSS_SIZE = ABSOLUTE(main_SBSS_END - main_SBSS_START);
+        main_BSS_START = .;
     }
     __romPos += SIZEOF(.sbss);
+    __romPos = ALIGN(__romPos, 4);
+    . = ALIGN(., 4);
+
+    bss_ROM_START = __romPos;
+    .bss main_BSS_START : AT(bss_ROM_START)
+    {
+        BUILD_DIR/generated/unk_0x8013E6A8.bss.s.o(.bss.*);
+        . = ALIGN(., 4);
+        BUILD_DIR/src/main/butterfly.c.o(.bss.*);
+        . = ALIGN(., 4);
+        BUILD_DIR/generated/unk_0x80168920.bss.s.o(.bss.*);
+        . = ALIGN(., 4);
+        main_BSS_END = .;
+        main_BSS_SIZE = ABSOLUTE(main_BSS_END - main_BSS_START);
+    }
+    __romPos += SIZEOF(.bss);
     __romPos = ALIGN(__romPos, 4);
 
     /DISCARD/ :

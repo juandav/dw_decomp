@@ -17,7 +17,7 @@ int32_t lerp(int32_t start, int32_t end, int32_t tMin, int32_t tMax,
 	     int32_t tCurrent);
 void translateConditionFXToEntity(Entity *entity, SVECTOR *out);
 int32_t worldPosToScreenPos(SVECTOR *worldPos, DVECTOR *screenPos);
-void renderSprite(GsSPRITE *sprite, int16_t x, int16_t y, int32_t distance,
+void renderSprite(GsSPRITE *sprite, int32_t x, int32_t y, int32_t distance,
 		  int32_t scaleX, int32_t scaleY);
 
 extern int32_t IS_IN_MENU;
