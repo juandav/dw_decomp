@@ -51,6 +51,7 @@ done
 C_FILE="$1"
 ASM_FILE="$2"
 FUNCTION_NAME="$3"
+VERSION="${VERSION:-us}"
 
 shift 3
 
@@ -93,12 +94,15 @@ echo "Generating permuter/$FUNCTION_NAME/target.s"
 } > "permuter/$FUNCTION_NAME/target.s"
 
 echo "Preprocessing permuter/$FUNCTION_NAME/base.c"
-mipsel-linux-gnu-gcc -E -P -Iexternal/psyq_headers/mw_lib41/include -Iinclude "$C_FILE" > "permuter/$FUNCTION_NAME/base.c"
+mipsel-linux-gnu-gcc -E -P -DLANGUAGE_C \
+	-DVERSION_"$(printf '%s' "$VERSION" | tr a-z A-Z)" \
+	-Iinclude/mwcc -Iexternal/psyq_headers/mw_lib41/include -Iinclude \
+	"$C_FILE" > "permuter/$FUNCTION_NAME/base.c"
 python3 external/decomp-permuter/strip_other_fns.py "permuter/$FUNCTION_NAME/base.c" "$FUNCTION_NAME"
 
 echo "Assembling permuter/$FUNCTION_NAME/target.o"
 mipsel-linux-gnu-gcc -c -g -Wall -Wextra -Werror -std=c99 -Os -G0 -mno-gpopt \
-	-march=r3000 -mtune=r3000 -mabi=32 -EL -mfp32 \
+	-march=r3000 -mtune=r3000 -mabi=32 -EL -mfp32 -msoft-float \
 	-fno-pic -mno-shared -mno-abicalls -mno-llsc \
 	-fno-stack-protector -nostdlib -ffreestanding \
 	-Xassembler -no-pad-sections \
