@@ -78,7 +78,10 @@ SECTIONS
 	OVERLAY 0x80070000 : NOCROSSREFS
 	{
 		.FISH {
-			KEEP(BUILD_DIR/asm/fish/data/fish.s.o(.data.*));
+			KEEP(BUILD_DIR/asm/fish/data/header.rodata.s.o(.rodata .rodata.*));
+			KEEP(BUILD_DIR/asm/fish/fish.s.o(.text .text.*));
+			KEEP(BUILD_DIR/asm/fish/data/fish.data.s.o(.data .data.*));
+			LONG(0);
 		}
 	}
 
