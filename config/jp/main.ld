@@ -28,7 +28,8 @@ SECTIONS
         BUILD_DIR/src/main/overworld_card_text.c.o(.text .text.*);
         KEEP(BUILD_DIR/asm/main/38758.s.o(.text .text.*));
         BUILD_DIR/src/main/kar.c.o(.text .text.*);
-        KEEP(BUILD_DIR/asm/main/7855C.s.o(.text .text.*));
+        BUILD_DIR/src/main/efe_table.c.o(.text .text.*);
+        KEEP(BUILD_DIR/asm/main/78668.s.o(.text .text.*));
         BUILD_DIR/src/main/butterfly.c.o(.text .text.*);
         KEEP(BUILD_DIR/asm/main/79D94.s.o(.text .text.*));
         BUILD_DIR/src/main/bubble.c.o(.text .text.*);
@@ -50,6 +51,8 @@ SECTIONS
         KEEP(BUILD_DIR/asm/main/data/9EBAC.data.s.o(.data .data.*));
         BUILD_DIR/src/main/efe.c.o(.data .data.*);
         KEEP(BUILD_DIR/asm/main/data/9F198.data.s.o(.data .data.*));
+        BUILD_DIR/src/main/efe_table.c.o(.data .data.*);
+        KEEP(BUILD_DIR/asm/main/data/A8A78.data.s.o(.data .data.*));
         BUILD_DIR/src/main/butterfly.c.o(.data .data.*);
         KEEP(BUILD_DIR/asm/main/data/A9A68.data.s.o(.data .data.*));
         BUILD_DIR/src/main/bubble.c.o(.data .data.*);
@@ -62,6 +65,9 @@ SECTIONS
         BUILD_DIR/src/main/efe.c.o(.sdata .sdata.*);
         . = ALIGN(., 4);
         KEEP(BUILD_DIR/asm/main/data/AD4F0.sdata.s.o(.sdata .sdata.*));
+        BUILD_DIR/src/main/efe_table.c.o(.sdata .sdata.*);
+        . = ALIGN(., 4);
+        KEEP(BUILD_DIR/asm/main/data/AD7D8.sdata.s.o(.sdata .sdata.*));
         BUILD_DIR/src/main/bubble.c.o(.sdata .sdata.*);
         . = ALIGN(., 4);
         KEEP(BUILD_DIR/asm/main/data/AD8E4.sdata.s.o(.sdata .sdata.*));

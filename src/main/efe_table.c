@@ -23,16 +23,18 @@ void fillEFEXTable(void)
     EFEX_FileLookup *itr;
     int8_t path[64];
     CdlFILE searchResult;
+    uint8_t mode;
 
     itr = EFEX_TABLE;
 
     while (CdReadSync(1, 0));
 
     for (i = 0; i < NUM_EFEX_FILES; i++) {
+        mode = CdlModeSpeed;
         path[0] = '\\';
         strcpy(&path[1], EFEX_PATH_ARRAY[i]);
         strcat(path, ";1");
-        while ((int32_t)CdSearchFile(&searchResult,path) == -1);
+        while (CdSearchFile(&searchResult,path) == (CdlFILE *)-1);
         itr->pos = searchResult.pos;
         itr->size = searchResult.size;
         itr++;

@@ -18,6 +18,7 @@ MAIN_C_SRC := \
 	src/main/bubble.c \
 	src/main/butterfly.c \
 	src/main/efe.c \
+	src/main/efe_table.c \
 	src/main/fade.c \
 	src/main/kar.c \
 	src/main/overworld_card_text.c \
