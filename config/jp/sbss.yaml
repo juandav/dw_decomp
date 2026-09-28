@@ -5,5 +5,7 @@ subsegments:
   - [0x8013DF1C, unk_0x8013DF1C]
   - [0x8013DF80, fade]
   - [0x8013DF94, unk_0x8013DF94]
+  - [0x8013E1E8, file_queue]
+  - [0x8013E1FC, unk_0x8013E1FC]
   - [0x8013E664, trn2_hp_map99]
   - [0x8013E66E, unk_0x8013E66E]

@@ -74,29 +74,27 @@ void _renderFileReadQueue(int32_t instanceId)
 
 void tickFileReadQueue(int32_t unused)
 {
-	char pathBuf[64];
 	FileRequest *req;
-	FileRequest *next;
-	CdlFILE *searchResult;
-	CdlFILE file;
 	int32_t result;
+	char pathBuf[64];
+	CdlFILE file;
+	uint8_t mode;
 
-	req = FILE_READ_QUEUE_HEAD;
-
-	if (0) {}
-
-	if (req == NULL) {
+	if (FILE_READ_QUEUE_HEAD == NULL) {
 		return;
 	}
+	if (0) {}
 
+	req = FILE_READ_QUEUE_HEAD;
+	if (0) {}
 	if (req->state == 0) {
 		req->state = -1;
-		next = req->next;
-		if (next == NULL) {
+		if (req->next == NULL) {
 			FILE_READ_QUEUE_HEAD = NULL;
 			FILE_READ_QUEUE_TAIL = NULL;
 		} else {
-			FILE_READ_QUEUE_HEAD = next;
+			if (0) {}
+			FILE_READ_QUEUE_HEAD = req->next;
 			req->next = NULL;
 			req = FILE_READ_QUEUE_HEAD;
 		}
@@ -104,11 +102,11 @@ void tickFileReadQueue(int32_t unused)
 
 	if (req->state == 2) {
 		if ((int32_t)req->size < 0) {
+			mode = CdlModeSpeed;
 			pathBuf[0] = '\\';
 			strcpy(&pathBuf[1], req->filename);
 			strcat(pathBuf, ";1");
-			searchResult = CdSearchFile(&file, pathBuf);
-			if (searchResult == NULL) {
+			if (CdSearchFile(&file, pathBuf) == NULL) {
 				return;
 			}
 
@@ -117,13 +115,9 @@ void tickFileReadQueue(int32_t unused)
 		}
 
 		do {
-			do {
-				result = CdControl(CdlSetloc,
-						   (u_char *)&req->pos, NULL);
-			} while (result == 0);
-			result = CdRead(((req->size + 0x7ff) & ~0x7ff) >> 11,
-					(u_long *)req->targetBuffer, 0x80);
-		} while (result == 0);
+			while (CdControl(CdlSetloc, (u_char *)&req->pos, NULL) == 0);
+		} while (CdRead(((req->size + 0x7ff) & ~0x7ff) >> 11,
+				(u_long *)req->targetBuffer, CdlModeSpeed) == 0);
 
 		req->state = 1;
 
@@ -184,8 +178,8 @@ int32_t addFileReadRequest(char *path, uint8_t *buffer, uint8_t *isRunning,
 			   CdlLOC *loc, int32_t size)
 {
 	FileRequest *slot;
-	int32_t result;
 	int32_t i;
+	int32_t result;
 	char ch;
 
 	while (1) {
@@ -249,11 +243,9 @@ int32_t addFileReadRequestSection(char *path, uint8_t *buffer, int32_t offset,
 				  void *callbackParam)
 {
 	FileLookup lookup;
-	int32_t sector;
 
 	if (lookupFileTable(&lookup, path) != 0) {
-		sector = CdPosToInt(&lookup.pos);
-		CdIntToPos(offset + sector, &lookup.pos);
+		CdIntToPos(offset + CdPosToInt(&lookup.pos), &lookup.pos);
 		return addFileReadRequest(path, buffer, isRunning, callback,
 					  callbackParam, &lookup.pos,
 					  sectors << 11);

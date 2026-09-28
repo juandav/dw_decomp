@@ -38,6 +38,8 @@ SECTIONS
         BUILD_DIR/src/main/overworld_medal_text.c.o(.text .text.*);
         BUILD_DIR/src/main/overworld_card_text.c.o(.text .text.*);
         KEEP(BUILD_DIR/asm/main/38758.s.o(.text .text.*));
+        BUILD_DIR/src/main/file_queue.c.o(.text .text.*);
+        KEEP(BUILD_DIR/asm/main/70ECC.s.o(.text .text.*));
         BUILD_DIR/src/main/fish.c.o(.text .text.*);
         KEEP(BUILD_DIR/asm/main/72DFC.s.o(.text .text.*));
         BUILD_DIR/src/main/tournament.c.o(.text .text.*);
@@ -86,6 +88,9 @@ SECTIONS
         BUILD_DIR/src/main/efe.c.o(.sdata .sdata.*);
         . = ALIGN(., 4);
         KEEP(BUILD_DIR/asm/main/data/AD4F0.sdata.s.o(.sdata .sdata.*));
+        BUILD_DIR/src/main/file_queue.c.o(.sdata .sdata.*);
+        . = ALIGN(., 4);
+        KEEP(BUILD_DIR/asm/main/data/AD7C8.sdata.s.o(.sdata .sdata.*));
         BUILD_DIR/src/main/efe_table.c.o(.sdata .sdata.*);
         . = ALIGN(., 4);
         KEEP(BUILD_DIR/asm/main/data/AD7D8.sdata.s.o(.sdata .sdata.*));
@@ -115,6 +120,10 @@ SECTIONS
         BUILD_DIR/src/main/fade.c.o(.sbss.*);
         . = ALIGN(., 4);
         BUILD_DIR/generated/unk_0x8013DF94.sbss.s.o(.sbss.*);
+        . = ALIGN(., 4);
+        BUILD_DIR/src/main/file_queue.c.o(.sbss.*);
+        . = ALIGN(., 4);
+        BUILD_DIR/generated/unk_0x8013E1FC.sbss.s.o(.sbss.*);
         BUILD_DIR/src/trn2/trn2_hp_map99.c.o(.sbss.*);
         BUILD_DIR/generated/unk_0x8013E66E.sbss.s.o(.sbss.*);
         . = ALIGN(., 4);
@@ -134,6 +143,10 @@ SECTIONS
         BUILD_DIR/src/main/world_object.c.o(.bss.*);
         . = ALIGN(., 4);
         BUILD_DIR/generated/unk_0x80140CF4.bss.s.o(.bss.*);
+        . = ALIGN(., 4);
+        BUILD_DIR/src/main/file_queue.c.o(.bss.*);
+        . = ALIGN(., 4);
+        BUILD_DIR/generated/unk_0x80168460.bss.s.o(.bss.*);
         . = ALIGN(., 4);
         BUILD_DIR/src/main/butterfly.c.o(.bss.*);
         . = ALIGN(., 4);
