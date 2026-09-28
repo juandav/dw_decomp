@@ -46,7 +46,7 @@ extern char *STD_D_8007A358[];
 extern int8_t MAP_COLLISION_DATA[];
 
 void STD_func_80058488(void);
-void STD_func_80056E2C(int32_t type, int16_t slot, int32_t tier);
+void STD_func_80056E2C(int16_t type, int16_t slot, uint8_t tier);
 void initializeDigimonObject(int32_t type, int32_t instanceId, void (*tick)(int32_t));
 int32_t entityGetTechFromAnim(Entity *entity, int32_t anim);
 void scriptLoadModel(int32_t modelId);
@@ -57,7 +57,12 @@ void STD_initializeCamera(void);
 void STD_func_80058254(void);
 void STD_func_80057FC4(void);
 void STD_func_80057778(void);
+#if defined(VERSION_JP)
+void STD_func_80057FD0(int32_t which);
+#else
 void STD_func_80057FD0(int16_t which);
+#endif
+int16_t STD_func_800579D8(uint8_t *arg);
 int16_t STD_func_80057510(int32_t a, int16_t b);
 void STD_func_80058E28(int32_t arg);
 int32_t STD_func_8006314C(Entity *entity, int32_t arg);
@@ -260,19 +265,18 @@ void STD_func_80056CA8(int32_t arena, uint8_t *arg)
 	initializeBuffModel(STD_BUFF_MODEL);
 }
 
-void STD_func_80056E2C(int32_t type, int16_t slot, int32_t tier)
+void STD_func_80056E2C(int16_t type, int16_t slot, uint8_t tier)
 {
-	uint8_t listB[16];
-	uint8_t listA[16];
-	Stats *stats;
-	int32_t base;
-	int32_t mul;
-	int32_t div;
-	int32_t i;
 	int32_t nb;
 	int32_t na;
-	int32_t tech;
-	uint32_t m;
+	int32_t div;
+	int32_t mul;
+	uint8_t listB[16];
+	uint8_t listA[16];
+	int16_t tech;
+	Stats *stats;
+	int32_t i;
+	int16_t base;
 
 	base = STD_D_800799B4[tier];
 	scriptLoadModel(type);
@@ -280,7 +284,8 @@ void STD_func_80056E2C(int32_t type, int16_t slot, int32_t tier)
 	initializeDigimonObject(type, slot + 2, STD_tickNPCTournament);
 	switch (DIGIMON_DATA[ENTITY_TABLE[slot + 2]->type].level) {
 	case 3:
-		mul = div = 1;
+		div = 1;
+		mul = 1;
 		break;
 	case 4:
 		div = 1;
@@ -296,9 +301,12 @@ void STD_func_80056E2C(int32_t type, int16_t slot, int32_t tier)
 	stats->base.def = mul * (base + base * (0x1e - random(0x3d)) / 100) / div;
 	stats->base.speed = mul * (base + base * (0x1e - random(0x3d)) / 100) / div;
 	stats->base.brain = mul * (base + base * (0x1e - random(0x3d)) / 100) / div;
-	base = base * 10;
-	stats->base.hp = mul * (base + base * (0x1e - random(0x3d)) / 100) / div;
-	stats->base.mp = mul * (base + base * (0x1e - random(0x3d)) / 100) / div;
+	stats->base.hp = mul * (base * 10 + base * 10 * (0x1e - random(0x3d)) / 100) / div;
+	stats->base.mp = mul * (base * 10 + base * 10 * (0x1e - random(0x3d)) / 100) / div;
+#if defined(VERSION_JP)
+	stats->current.currentHP = stats->base.hp;
+	stats->current.currentMP = stats->base.mp;
+#endif
 	if (stats->base.off >= 0x3e8) {
 		stats->base.off = 0x3e7;
 	}
@@ -317,15 +325,17 @@ void STD_func_80056E2C(int32_t type, int16_t slot, int32_t tier)
 	if (stats->base.mp >= 0x2710) {
 		stats->base.mp = 0x270f;
 	}
+#if !defined(VERSION_JP)
 	stats->current.currentHP = stats->base.hp;
 	stats->current.currentMP = stats->base.mp;
+#endif
 	stats->current.chargeMode = 0;
 	ENTITY_TABLE[slot + 2]->isOnMap = 1;
 	ENTITY_TABLE[slot + 2]->isOnScreen = 1;
 	nb = 0;
 	na = 0;
 	for (i = 0; i < 0xf; i++) {
-		tech = (int16_t)entityGetTechFromAnim(ENTITY_TABLE[slot + 2], i + 0x2e);
+		tech = entityGetTechFromAnim(ENTITY_TABLE[slot + 2], i + 0x2e);
 		if (tech == 0xff) {
 			continue;
 		}
@@ -440,6 +450,9 @@ void STD_func_80057778(void)
 {
 	removeObject(0xfa2, 0);
 	removeObject(0xfa0, 0);
+#if defined(VERSION_JP)
+	removeObject(0xfa6, 0);
+#endif
 	removeObject(0xfa8, 0);
 }
 
@@ -477,27 +490,27 @@ void STD_loadTIMToVRAM(char *path)
 	int32_t i;
 
 	p = (int32_t *)GENERAL_BUFFER;
-	readFile(path, GENERAL_BUFFER);
+	readFile(path, p);
 	for (i = 0; i < 6; i++) {
 		p = (int32_t *)((char *)p + 4);
 		GsGetTimInfo((u_long *)p, &img);
-		p = &p[((img.pw * img.ph) / 2) + 4];
+		p += ((img.pw * img.ph) / 2) + 4;
 		LoadImage((RECT *)&img.px, img.pixel);
 		if ((img.pmode >> 3) & 1) {
 			LoadImage((RECT *)&img.cx, img.clut);
-			p = &p[((img.cw * img.ch) / 2) + 3];
+			p += ((img.cw * img.ch) / 2) + 3;
 		}
 	}
 }
 
 int16_t STD_func_800579D8(uint8_t *arg)
 {
-	uint8_t local[4];
-	int32_t n;
-	int32_t m;
-	int32_t i;
 	int32_t j;
+	int32_t m;
+	uint8_t local[4];
 	int16_t arena;
+	long n;
+	long i;
 
 	for (n = 1; n < 8; n++) {
 		if (arg[n] == 0x40) {
@@ -537,8 +550,8 @@ int16_t STD_func_800579D8(uint8_t *arg)
 			STD_battleTickFrame();
 		}
 		STD_func_8005DF94(1);
-		STD_func_80056E2C(local[i], (int16_t)i, arg[0]);
-		MAIN_D_801350E8 = (ENTITY_TABLE + 2)[i];
+		STD_func_80056E2C(local[i], i, arg[0]);
+		MAIN_D_801350E8 = ENTITY_TABLE[i + 2];
 		MAIN_D_801350E4 = STD_func_80057510((int32_t)ENTITY_TABLE[i + 2], arena);
 		j++;
 		if (MAIN_D_801350E4 == 1) {
@@ -594,15 +607,15 @@ void STD_loadArenaTIMToVRAM(char *path, int32_t count)
 	int32_t i;
 
 	p = (int32_t *)GENERAL_BUFFER;
-	readFile(path, GENERAL_BUFFER);
+	readFile(path, p);
 	for (i = 0; i < count; i++) {
 		p = (int32_t *)((char *)p + 4);
 		GsGetTimInfo((u_long *)p, &img);
-		p = &p[((img.pw * img.ph) / 2) + 4];
+		p += ((img.pw * img.ph) / 2) + 4;
 		LoadImage((RECT *)&img.px, img.pixel);
 		if ((img.pmode >> 3) & 1) {
 			LoadImage((RECT *)&img.cx, img.clut);
-			p = &p[((img.cw * img.ch) / 2) + 3];
+			p += ((img.cw * img.ch) / 2) + 3;
 		}
 	}
 }
@@ -613,9 +626,8 @@ void STD_func_80057E5C(id)
 // clang-format on
 {
 	int32_t i;
-	uint8_t *tims = MAIN_D_801347FC.timCount;
 
-	STD_loadArenaTIMToVRAM(STD_D_8007A338[id], tims[id]);
+	STD_loadArenaTIMToVRAM(STD_D_8007A338[id], ((uint8_t *)MAIN_D_801347FC.timCount)[id]);
 	MAIN_D_80135130 = malloc3(((int32_t)lookupFileSize(STD_D_8007A304[id]) + 0x7ff) & ~0x7ff);
 	readFile(STD_D_8007A304[id], MAIN_D_80135130);
 	GsMapModelingData((u_long *)MAIN_D_80135130 + 1);
@@ -633,7 +645,14 @@ void STD_func_80057FC4(void)
 	free3(MAIN_D_80135130);
 }
 
+// clang-format off
+#if defined(VERSION_JP)
+void STD_func_80057FD0(which)
+	uint8_t which;
+#else
 void STD_func_80057FD0(int16_t which)
+#endif
+// clang-format on
 {
 	switch (which) {
 	case 0:

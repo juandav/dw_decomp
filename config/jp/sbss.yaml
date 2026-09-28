@@ -15,6 +15,8 @@ subsegments:
   - [0x8013E2F8, battle_setup]
   - [0x8013E304, command_menu]
   - [0x8013E310, unk_0x8013E310]
+  - [0x8013E364, std_setup]
+  - [0x8013E37C, unk_0x8013E37C]
   - [0x8013E5B4, mov]
   - [0x8013E5C0, unk_0x8013E5C0]
   - [0x8013E61C, trn_hp]

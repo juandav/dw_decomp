@@ -172,6 +172,8 @@ segments:
       - [0xAD924, sdata]
       - [0xAD938, .sdata, btl/command_shout]
       - [0xAD94C, sdata]
+      - [0xADA24, .sdata, std/std_setup]
+      - [0xADA28, sdata]
       - [0xADE28, .sdata, trn/trn_hud]
       - [0xADE38, .sdata, trn/trn_slots]
       - [0xADE50, .sdata, main/script_menu]

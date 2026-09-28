@@ -187,6 +187,9 @@ SECTIONS
         BUILD_DIR/src/btl/command_shout.c.o(.sdata .sdata.*);
         . = ALIGN(., 4);
         KEEP(BUILD_DIR/asm/main/data/AD94C.sdata.s.o(.sdata .sdata.*));
+        BUILD_DIR/src/std/std_setup.c.o(.sdata .sdata.*);
+        . = ALIGN(., 4);
+        KEEP(BUILD_DIR/asm/main/data/ADA28.sdata.s.o(.sdata .sdata.*));
         BUILD_DIR/src/trn/trn_hud.c.o(.sdata .sdata.*);
         . = ALIGN(., 4);
         BUILD_DIR/src/trn/trn_slots.c.o(.sdata .sdata.*);
@@ -244,6 +247,10 @@ SECTIONS
         BUILD_DIR/src/btl/command_menu.c.o(.sbss.*);
         . = ALIGN(., 4);
         BUILD_DIR/generated/unk_0x8013E310.sbss.s.o(.sbss.*);
+        . = ALIGN(., 4);
+        BUILD_DIR/src/std/std_setup.c.o(.sbss.*);
+        . = ALIGN(., 4);
+        BUILD_DIR/generated/unk_0x8013E37C.sbss.s.o(.sbss.*);
         . = ALIGN(., 4);
         BUILD_DIR/src/mov/mov.c.o(.sbss.*);
         . = ALIGN(., 4);

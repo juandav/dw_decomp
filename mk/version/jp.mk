@@ -9,6 +9,7 @@ MAIN_SBSS := \
 	$(GEN_DIR)/unk_0x8013E1FC.sbss.s \
 	$(GEN_DIR)/unk_0x8013E228.sbss.s \
 	$(GEN_DIR)/unk_0x8013E310.sbss.s \
+	$(GEN_DIR)/unk_0x8013E37C.sbss.s \
 	$(GEN_DIR)/unk_0x8013E5C0.sbss.s
 
 MAIN_BSS := \
@@ -105,6 +106,9 @@ SHOP_C_SRC := \
 	src/main/script_menu.c
 
 $(eval $(call overlay,SHOP,shop))
+STD_C_SRC := \
+	src/std/std_setup.c
+
 $(eval $(call overlay,STD,std))
 TRN2_C_SRC := \
 	src/trn2/trn2_def_map108.c \

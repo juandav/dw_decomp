@@ -156,11 +156,6 @@ extern SVECTOR MAIN_D_80134940;
 extern SVECTOR MAIN_D_80134948;
 extern SVECTOR MAIN_D_80134950;
 
-#if defined(VERSION_JP)
-int32_t STD_func_800579D8(uint8_t *arg);
-#else
-int16_t STD_func_800579D8(uint8_t *arg);
-#endif
 void STD_tickNPCTournament(int32_t instanceId);
 void STD_tickPartnerTournament(int32_t instanceId);
 void STD_tickTamerTournament(int32_t instanceId);
