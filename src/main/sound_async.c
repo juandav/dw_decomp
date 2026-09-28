@@ -65,7 +65,7 @@ void loadFullVHB(int32_t vabId, char *path, uint8_t *buffer)
 
 	sb = &SOUND_BUFFERS[vabId];
 
-	if ((filename = strrchr(path, '\\')) == NULL) {
+	if (NULL == (filename = strrchr(path, '\\'))) {
 		filename = path;
 	} else {
 		++filename;
@@ -105,7 +105,7 @@ void loadVHBFile(int32_t vabId, char *path, uint8_t *buffer, int32_t offset,
 
 	sb = &SOUND_BUFFERS[vabId];
 
-	if ((filename = strrchr(path, '\\')) == NULL) {
+	if (NULL == (filename = strrchr(path, '\\'))) {
 		filename = path;
 	} else {
 		++filename;
@@ -123,31 +123,27 @@ int32_t loadSoundCompleteCallback(void *param)
 {
 	SoundBuffer *sb;
 	uint8_t *buffer;
-	uint32_t *words;
-	short vabid;
-	int32_t vabId;
+	unsigned long addr;
 
-	vabId = (int32_t)param;
-	sb = &SOUND_BUFFERS[vabId];
+	sb = &SOUND_BUFFERS[(int32_t)param];
 	buffer = sb->buffer;
 
 	switch (LOAD_SOUND_COMPLETE_STATE) {
 	case 0:
 		sb->vabId = 0;
-		words = (uint32_t *)buffer;
-		memcpy(VHB_HEADER_ADDR[vabId], &buffer[(words[0] >> 2) << 2],
-		       words[1] - words[0]);
+		memcpy(VHB_HEADER_ADDR[(int32_t)param],
+		       &buffer[(((uint32_t *)buffer)[0] >> 2) << 2],
+		       ((uint32_t *)buffer)[1] - ((uint32_t *)buffer)[0]);
 
-		SsVabClose(vabId);
-		if ((sb->vabId = SsVabOpenHeadSticky(VHB_HEADER_ADDR[vabId],
-						     vabId,
-						     VHB_SOUNDBUFFER_START[vabId])) < 0) {
+		SsVabClose((int32_t)param);
+		if ((sb->vabId = SsVabOpenHeadSticky(VHB_HEADER_ADDR[(int32_t)param],
+						     (int32_t)param,
+						     VHB_SOUNDBUFFER_START[(int32_t)param])) < 0) {
 			sb->vabId = -1;
 			return 0;
 		}
 
-		vabid = sb->vabId;
-		if (SsVabTransBody(&buffer[words[1]], vabid) != vabid) {
+		if (sb->vabId != SsVabTransBody(&buffer[((uint32_t *)buffer)[1]], sb->vabId)) {
 			sb->vabId = -1;
 			return 0;
 		}
@@ -160,7 +156,7 @@ int32_t loadSoundCompleteCallback(void *param)
 		}
 		return 1;
 	case 5:
-		SsUtGetVBaddrInSB(sb->vabId);
+		addr = SsUtGetVBaddrInSB(sb->vabId);
 		return 0;
 	}
 }
@@ -169,15 +165,14 @@ void uploadSoundBuffer(int32_t vabId)
 {
 	SoundBuffer *sb;
 	uint8_t *buffer;
-	uint32_t *words;
-	short vabid;
+	unsigned long addr;
 
 	sb = &SOUND_BUFFERS[vabId];
 	buffer = sb->buffer;
 	sb->vabId = 0;
-	words = (uint32_t *)buffer;
-	memcpy(VHB_HEADER_ADDR[vabId], &buffer[(words[0] >> 2) << 2],
-	       words[1] - words[0]);
+	memcpy(VHB_HEADER_ADDR[vabId],
+	       &buffer[(((uint32_t *)buffer)[0] >> 2) << 2],
+	       ((uint32_t *)buffer)[1] - ((uint32_t *)buffer)[0]);
 
 	SsVabClose(vabId);
 	if ((sb->vabId = SsVabOpenHeadSticky(VHB_HEADER_ADDR[vabId], vabId,
@@ -186,14 +181,13 @@ void uploadSoundBuffer(int32_t vabId)
 		return;
 	}
 
-	vabid = sb->vabId;
-	if (SsVabTransBody(&buffer[words[1]], vabid) != vabid) {
+	if (sb->vabId != SsVabTransBody(&buffer[((uint32_t *)buffer)[1]], sb->vabId)) {
 		sb->vabId = -1;
 		return;
 	}
 
 	SsVabTransCompleted(1);
-	SsUtGetVBaddrInSB(sb->vabId);
+	addr = SsUtGetVBaddrInSB(sb->vabId);
 }
 
 int32_t isSoundBufferLoading(int32_t vabId)
@@ -217,35 +211,30 @@ int32_t loadSB(void)
 int32_t readVBALLSection(int32_t vabId, int32_t idx)
 {
 	SoundBuffer *sb;
+	int32_t soundId;
 
 	sb = &SOUND_BUFFERS[vabId];
 	if ((vabId < 4) || (7 < vabId)) {
 		sb->vabId = -1;
 	}
 
-	loadVHBFile(vabId, "VBALL", GENERAL_BUFFER,
-		    DIGIMON_VBALL_SOUND_ID[idx] * 7, 7);
+	soundId = DIGIMON_VBALL_SOUND_ID[idx];
+	loadVHBFile(vabId, "VBALL", GENERAL_BUFFER, soundId * 7, 7);
 
 	return vabId;
 }
 
 int32_t loadMapSounds2(int32_t mapSoundId)
 {
-	MapSoundPara *para;
-	uint32_t sectors;
-	uint32_t offset;
-
 	if (ACTIVE_MAP_SOUND_ID == mapSoundId) {
 		return 1;
 	}
 
 	ACTIVE_MAP_SOUND_ID = mapSoundId;
 
-	para = &MAP_SOUND_PARA[mapSoundId];
-	sectors = para->sectorCount / 2;
-	offset = MAP_SOUND_PARA[mapSoundId].sectorId / 2;
-
-	loadVHBFile(8, "ESALL", GENERAL_BUFFER, offset, sectors);
+	loadVHBFile(8, "ESALL", GENERAL_BUFFER,
+		    MAP_SOUND_PARA[mapSoundId].sectorId / 2,
+		    MAP_SOUND_PARA[mapSoundId].sectorCount / 2);
 
 	return 8;
 }
@@ -264,16 +253,22 @@ int32_t isSoundLoaded(int32_t mode, int32_t vabId)
 		return -1;
 	}
 
-	return (sb->vabId == -1) ? 0 : 1;
+	if (sb->vabId == -1) {
+		return 0;
+	}
+
+	return 1;
 }
 
 int32_t loadVLALL(int32_t idx, uint8_t *buffer)
 {
 	uint32_t soundId;
-	char *filename;
+	int32_t vabId;
 	char *path;
+	uint8_t *vhbBuffer;
 	char pathBuf[64];
 	SoundBuffer *sb;
+	char *filename;
 
 	readVBALLSection(4, idx);
 
@@ -283,10 +278,12 @@ int32_t loadVLALL(int32_t idx, uint8_t *buffer)
 		soundId = 0xf;
 	}
 
+	vabId = 3;
 	path = "VLALL";
-	sb = &SOUND_BUFFERS[3];
+	vhbBuffer = buffer;
+	sb = &SOUND_BUFFERS[vabId];
 
-	if ((filename = strrchr(path, '\\')) == NULL) {
+	if (NULL == (filename = strrchr(path, '\\'))) {
 		filename = path;
 	} else {
 		++filename;
@@ -294,9 +291,8 @@ int32_t loadVLALL(int32_t idx, uint8_t *buffer)
 
 	concatStrings2(pathBuf, filename, ".VHB");
 
-	/* Original code stores buffer twice */
-	sb->buffer = buffer;
-	sb->buffer = buffer;
+	sb->buffer = vhbBuffer;
+	sb->buffer = vhbBuffer;
 
 	addFileReadRequestSection(pathBuf, GENERAL_BUFFER, soundId * 0xf, 0xf,
 				  (uint8_t *)&sb->isLoading, NULL, 0);

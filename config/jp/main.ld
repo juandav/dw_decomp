@@ -51,7 +51,8 @@ SECTIONS
         KEEP(BUILD_DIR/asm/main/75B80.s.o(.text .text.*));
         BUILD_DIR/src/main/kar.c.o(.text .text.*);
         BUILD_DIR/src/main/efe_table.c.o(.text .text.*);
-        KEEP(BUILD_DIR/asm/main/78668.s.o(.text .text.*));
+        BUILD_DIR/src/main/sound_async.c.o(.text .text.*);
+        KEEP(BUILD_DIR/asm/main/79008.s.o(.text .text.*));
         BUILD_DIR/src/main/butterfly.c.o(.text .text.*);
         KEEP(BUILD_DIR/asm/main/79D94.s.o(.text .text.*));
         BUILD_DIR/src/main/bubble.c.o(.text .text.*);
@@ -81,7 +82,8 @@ SECTIONS
         BUILD_DIR/src/main/entity_text.c.o(.data .data.*);
         KEEP(BUILD_DIR/asm/main/data/A6BF4.data.s.o(.data .data.*));
         BUILD_DIR/src/main/efe_table.c.o(.data .data.*);
-        KEEP(BUILD_DIR/asm/main/data/A8A78.data.s.o(.data .data.*));
+        BUILD_DIR/src/main/sound_async.c.o(.data .data.*);
+        KEEP(BUILD_DIR/asm/main/data/A8AD4.data.s.o(.data .data.*));
         BUILD_DIR/src/main/butterfly.c.o(.data .data.*);
         KEEP(BUILD_DIR/asm/main/data/A9A68.data.s.o(.data .data.*));
         BUILD_DIR/src/main/bubble.c.o(.data .data.*);
@@ -102,7 +104,9 @@ SECTIONS
         KEEP(BUILD_DIR/asm/main/data/AD7C8.sdata.s.o(.sdata .sdata.*));
         BUILD_DIR/src/main/efe_table.c.o(.sdata .sdata.*);
         . = ALIGN(., 4);
-        KEEP(BUILD_DIR/asm/main/data/AD7D8.sdata.s.o(.sdata .sdata.*));
+        BUILD_DIR/src/main/sound_async.c.o(.sdata .sdata.*);
+        . = ALIGN(., 4);
+        KEEP(BUILD_DIR/asm/main/data/AD7F8.sdata.s.o(.sdata .sdata.*));
         BUILD_DIR/src/main/bubble.c.o(.sdata .sdata.*);
         . = ALIGN(., 4);
         KEEP(BUILD_DIR/asm/main/data/AD8E4.sdata.s.o(.sdata .sdata.*));
@@ -133,6 +137,10 @@ SECTIONS
         BUILD_DIR/src/main/file_queue.c.o(.sbss.*);
         . = ALIGN(., 4);
         BUILD_DIR/generated/unk_0x8013E1FC.sbss.s.o(.sbss.*);
+        . = ALIGN(., 4);
+        BUILD_DIR/src/main/sound_async.c.o(.sbss.*);
+        . = ALIGN(., 4);
+        BUILD_DIR/generated/unk_0x8013E228.sbss.s.o(.sbss.*);
         BUILD_DIR/src/trn/trn_mp.c.o(.sbss.*);
         BUILD_DIR/generated/unk_0x8013E62E.sbss.s.o(.sbss.*);
         BUILD_DIR/src/trn2/trn2_hp_map99.c.o(.sbss.*);

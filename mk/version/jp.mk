@@ -6,6 +6,7 @@ MAIN_SBSS := \
 	$(GEN_DIR)/unk_0x8013DF1C.sbss.s \
 	$(GEN_DIR)/unk_0x8013DF94.sbss.s \
 	$(GEN_DIR)/unk_0x8013E1FC.sbss.s \
+	$(GEN_DIR)/unk_0x8013E228.sbss.s \
 	$(GEN_DIR)/unk_0x8013E62E.sbss.s \
 	$(GEN_DIR)/unk_0x8013E676.sbss.s
 
@@ -41,6 +42,7 @@ MAIN_C_SRC := \
 	src/main/overworld_moves_text.c \
 	src/main/overworld_playerinfo_text.c \
 	src/main/particle.c \
+	src/main/sound_async.c \
 	src/main/toilet_data.c \
 	src/main/tournament.c \
 	src/main/world_object.c
