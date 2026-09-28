@@ -78,7 +78,7 @@ void MOV_onSliceDecoded(void)
 	index = MOV_ENV.sliceIndex;
 	rect = MOV_ENV.slice;
 	MOV_ENV.sliceIndex = (MOV_ENV.sliceIndex != 0) ? 0 : 1;
-	MOV_ENV.slice.x = MOV_ENV.slice.x + MOV_ENV.slice.w;
+	MOV_ENV.slice.x += MOV_ENV.slice.w;
 	if (MOV_ENV.slice.x < (MOV_ENV.frame[MOV_ENV.frameIndex].x + MOV_ENV.frame[MOV_ENV.frameIndex].w)) {
 		DecDCTout(MOV_ENV.sliceBuffer[MOV_ENV.sliceIndex], (MOV_ENV.slice.w * MOV_ENV.slice.h) / 2);
 	} else {
@@ -117,8 +117,8 @@ void MOV_startRead(CdlLOC *loc)
 
 int32_t MOV_decodeFrame(MovieEnv *env, MovieEntry *movie)
 {
-	u_long *bs;
 	int32_t retries;
+	u_long *bs;
 
 	retries = 2000;
 
@@ -191,6 +191,7 @@ int32_t MOV_playMovie(int32_t movieId)
 {
 	DISPENV disp;
 	DRAWENV draw;
+	int32_t dispFrame;
 	CdlFILE file;
 	CdlLOC loc;
 	RECT rect;
@@ -230,7 +231,8 @@ int32_t MOV_playMovie(int32_t movieId)
 		}
 		MOV_waitForFlip(&MOV_ENV, 0);
 		VSync(0);
-		MAIN_func_80092A44(&disp, 0, ((MOV_ENV.frameIndex != 0) ? 0 : 1) * 240, 0x1e0, 0xf0);
+		dispFrame = (MOV_ENV.frameIndex != 0) ? 0 : 1;
+		MAIN_func_80092A44(&disp, 0, dispFrame * 240, 0x1e0, 0xf0);
 		disp.isrgb24 = 1;
 		disp.disp.w = (disp.disp.w * 2) / 3;
 		PutDispEnv(&disp);
@@ -244,5 +246,9 @@ int32_t MOV_playMovie(int32_t movieId)
 	ClearImage(&rect, 0, 0, 0);
 	DrawSync(0);
 
-	return (MOVIE_COMPLETED == 0) ? 0 : 1;
+	if (MOVIE_COMPLETED == 0) {
+		return 0;
+	}
+
+	return 1;
 }

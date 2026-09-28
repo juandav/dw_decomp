@@ -7,6 +7,7 @@ MAIN_SBSS := \
 	$(GEN_DIR)/unk_0x8013DF94.sbss.s \
 	$(GEN_DIR)/unk_0x8013E1FC.sbss.s \
 	$(GEN_DIR)/unk_0x8013E228.sbss.s \
+	$(GEN_DIR)/unk_0x8013E5C0.sbss.s \
 	$(GEN_DIR)/unk_0x8013E62E.sbss.s \
 	$(GEN_DIR)/unk_0x8013E676.sbss.s
 
@@ -68,6 +69,9 @@ FISH_C_SRC := \
 
 $(eval $(call overlay,FISH,fish))
 $(eval $(call overlay,KAR,kar))
+MOV_C_SRC := \
+	src/mov/mov.c
+
 $(eval $(call overlay,MOV,mov))
 $(eval $(call overlay,MURD,murd))
 $(eval $(call overlay,SHOP,shop))

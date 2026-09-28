@@ -9,6 +9,8 @@ subsegments:
   - [0x8013E1FC, unk_0x8013E1FC]
   - [0x8013E224, sound_async]
   - [0x8013E228, unk_0x8013E228]
+  - [0x8013E5B4, mov]
+  - [0x8013E5C0, unk_0x8013E5C0]
   - [0x8013E61C, trn_hp]
   - [0x8013E622, trn_mp]
   - [0x8013E62E, unk_0x8013E62E]

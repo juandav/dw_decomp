@@ -6,3 +6,4 @@ TRN_setupMpTraining = 0x8008B774;
 TRN2_setupHpTraining = 0x8008929C;
 TRN_setupHpTraining = 0x8008B0C8;
 TRN_setupBrainsTraining = 0x8008D9AC;
+MOV_playMovie = 0x800107A4;

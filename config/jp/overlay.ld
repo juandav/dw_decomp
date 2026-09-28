@@ -125,8 +125,9 @@ SECTIONS
 			mov_START = .;
 
 			KEEP(BUILD_DIR/asm/mov/data/header.rodata.s.o(.rodata .rodata.*));
-			KEEP(BUILD_DIR/asm/mov/mov.s.o(.text .text.*));
-			KEEP(BUILD_DIR/asm/mov/data/mov.data.s.o(.data .data.*));
+			BUILD_DIR/src/mov/mov.c.o(.text .text.*);
+			BUILD_DIR/src/mov/mov.c.o(.data .data.*);
+			KEEP(BUILD_DIR/asm/mov/data/C10.data.s.o(.data .data.*));
 			LONG(0);
 		}
 	}
