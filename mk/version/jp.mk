@@ -12,6 +12,7 @@ MAIN_SBSS := \
 	$(GEN_DIR)/unk_0x8013E228.sbss.s \
 	$(GEN_DIR)/unk_0x8013E34C.sbss.s \
 	$(GEN_DIR)/unk_0x8013E37C.sbss.s \
+	$(GEN_DIR)/unk_0x8013E438.sbss.s \
 	$(GEN_DIR)/unk_0x8013E5D4.sbss.s
 
 MAIN_BSS := \
@@ -127,6 +128,7 @@ SHOP_C_SRC := \
 
 $(eval $(call overlay,SHOP,shop))
 STD_C_SRC := \
+	src/std/std_hud.c \
 	src/std/std_setup.c
 
 $(eval $(call overlay,STD,std))

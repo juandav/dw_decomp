@@ -195,6 +195,8 @@ segments:
       - [0xAD9A4, sdata]
       - [0xADA24, .sdata, std/std_setup]
       - [0xADA28, sdata]
+      - [0xADAD4, .sdata, std/std_hud]
+      - [0xADAF8, sdata]
       - [0xADDF0, .sdata, doo2/doo2]
       - [0xADE0C, sdata]
       - [0xADE20, .sdata, trn/trn_reward]
