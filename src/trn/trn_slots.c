@@ -3,6 +3,7 @@
 #include <libgpu.h>
 #include <libgs.h>
 
+#include <dw/input.h>
 #include <dw/script.h>
 #include <dw/sound.h>
 #include <dw/training.h>
@@ -155,17 +156,16 @@ static void trn_slots__garbage__(void)
 void TRN_tickSlotMachine(arg)
 	int16_t arg;
 {
-	RECT rect;
 	SlotMachine *p;
 	int32_t i;
 	int32_t t;
-	int32_t k;
+	RECT rect;
 
 	rect = MAIN_D_80134BD8;
 	p = &TRN_SLOT_MACHINE;
-	switch (TRN_SLOT_MACHINE.state) {
+	switch (p->state) {
 	case 0:
-		if (((POLLED_INPUT & ~POLLED_INPUT_PREVIOUS) & 0x40) || (p->autoStart >= 0)) {
+		if (((POLLED_INPUT & ~POLLED_INPUT_PREVIOUS) & CONFIRM_BUTTON) || (p->autoStart >= 0)) {
 			p->state = 1;
 			p->spinSpeed[0] = 0x400;
 			p->spinSpeed[1] = 0x400;
@@ -199,10 +199,19 @@ void TRN_tickSlotMachine(arg)
 					}
 				}
 			}
-			k = p->state - 1;
-			if ((k == i) && ((POLLED_INPUT & ~POLLED_INPUT_PREVIOUS) & 0x40)) {
-				TRN_chooseReelStop(k, p);
+#if defined(VERSION_JP)
+			if ((p->state - 1 == i) && ((POLLED_INPUT & ~POLLED_INPUT_PREVIOUS) & CONFIRM_BUTTON)) {
+				TRN_chooseReelStop(p->state - 1, p);
 			}
+#else
+			{
+				int32_t k = p->state - 1;
+
+				if ((k == i) && ((POLLED_INPUT & ~POLLED_INPUT_PREVIOUS) & CONFIRM_BUTTON)) {
+					TRN_chooseReelStop(k, p);
+				}
+			}
+#endif
 			t = p->scrollY[i] + (p->spinSpeed[i] >> 6);
 			if (t == 0x20) {
 				t--;
@@ -210,12 +219,12 @@ void TRN_tickSlotMachine(arg)
 			if (t >= 0x20) {
 				if ((i < (p->state - 1)) && (p->stopSteps[i] <= 0)) {
 					p->settling[i]++;
-				} else if ((i == (p->state - 1)) && (p->stopSteps[i] <= 0) && ((POLLED_INPUT & ~POLLED_INPUT_PREVIOUS) & 0x40)) {
+				} else if ((i == (p->state - 1)) && (p->stopSteps[i] <= 0) && ((POLLED_INPUT & ~POLLED_INPUT_PREVIOUS) & CONFIRM_BUTTON)) {
 					p->settling[i]++;
 				}
 			}
 		}
-		if ((p->state < 4) && ((POLLED_INPUT & ~POLLED_INPUT_PREVIOUS) & 0x40)) {
+		if ((p->state < 4) && ((POLLED_INPUT & ~POLLED_INPUT_PREVIOUS) & CONFIRM_BUTTON)) {
 			playSound(8, 7);
 			p->state++;
 		}
@@ -241,7 +250,7 @@ void TRN_tickSlotMachine(arg)
 				playSound(8, 0xd);
 				p->payout = 5;
 			}
-		} else if ((p->resultTimer >= 0x1e) || ((POLLED_INPUT & ~POLLED_INPUT_PREVIOUS) & 0x40)) {
+		} else if ((p->resultTimer >= 0x1e) || ((POLLED_INPUT & ~POLLED_INPUT_PREVIOUS) & CONFIRM_BUTTON)) {
 			p->state++;
 		}
 		p->resultTimer++;
@@ -258,14 +267,15 @@ void TRN_tickSlotMachine(arg)
 	}
 }
 
-void TRN_renderSlotMachine(int32_t arg)
+void TRN_renderSlotMachine(arg)
+	int16_t arg;
 {
+	int32_t i = 0;
 	SlotMachine *p;
-	int32_t i;
-	int32_t k;
 	int32_t y;
-	int32_t c;
 	int32_t depth;
+	int32_t k;
+	int32_t c;
 
 	depth = 6 - arg;
 	p = &TRN_SLOT_MACHINE;
@@ -287,8 +297,8 @@ void TRN_renderSlotMachine(int32_t arg)
 			y += 2;
 		}
 		for (k = 0; k < 4; k++) {
-			c = TRN_D_8008F1AC[i][(p->reelPos[i] + (11 + k)) % 13];
-			TRN_SLOT_SPRITE1.u = (c - 1) << 5;
+			c = (p->reelPos[i] + (11 + k)) % 13;
+			TRN_SLOT_SPRITE1.u = (TRN_D_8008F1AC[i][c] - 1) << 5;
 			if (y < -0x4a) {
 				TRN_SLOT_SPRITE1.y = -0x4a;
 				TRN_SLOT_SPRITE1.v = 0x8e - y;
@@ -313,7 +323,6 @@ void TRN_renderSlotMachine(int32_t arg)
 void TRN_chooseReelStop(int16_t i, SlotMachine *p)
 {
 	int32_t j;
-	int8_t t;
 
 	switch (i) {
 	case 0:
@@ -356,9 +365,8 @@ scan:
 			if (p->targetSymbol[0] == 7) {
 				goto shift;
 			}
-			t = p->targetSymbol[0];
 			for (j = 1; j < 3; j++) {
-				if (TRN_D_8008F1AC[i][(p->reelPos[i] + 13 - j) % 13] == t) {
+				if (TRN_D_8008F1AC[i][(p->reelPos[i] + 13 - j) % 13] == p->targetSymbol[0]) {
 					break;
 				}
 			}
@@ -384,8 +392,7 @@ scan:
 			if (p->targetSymbol[0] != p->targetSymbol[1]) {
 				break;
 			}
-			t = p->targetSymbol[0];
-			if (t != TRN_D_8008F1AC[i][(p->reelPos[i] + 12) % 13]) {
+			if (p->targetSymbol[0] != TRN_D_8008F1AC[i][(p->reelPos[i] + 12) % 13]) {
 				break;
 			}
 			p->stopSteps[i] = (rand() % 2) + 1;
@@ -394,10 +401,9 @@ scan:
 			if (p->targetSymbol[0] != p->targetSymbol[1]) {
 				break;
 			}
-			t = p->targetSymbol[0];
-			if (t != 7) {
+			if (p->targetSymbol[0] != 7) {
 				for (j = 1; j < 3; j++) {
-					if (TRN_D_8008F1AC[i][(p->reelPos[i] + 13 - j) % 13] == t) {
+					if (TRN_D_8008F1AC[i][(p->reelPos[i] + 13 - j) % 13] == p->targetSymbol[0]) {
 						break;
 					}
 				}
@@ -439,19 +445,22 @@ int16_t TRN_getSlotSessionResult(void)
 	return MAIN_D_801353A0[0];
 }
 
-void TRN_createSlotMachineBox(int16_t arg)
+void TRN_createSlotMachineBox(int32_t arg)
 {
-	SlotMachine *st = &TRN_SLOT_MACHINE;
-	RECT startPos;
+	SlotMachine *st;
 	int32_t i;
+	int32_t id;
+	RECT startPos;
 
+	st = &TRN_SLOT_MACHINE;
+	id = 3;
 	startPos = MAIN_D_80134BD0;
-	TRN_SLOT_MACHINE.result = -1;
-	TRN_SLOT_MACHINE.payout = -1;
-	TRN_SLOT_MACHINE.state = 0;
-	TRN_SLOT_MACHINE.stat = arg;
-	TRN_SLOT_MACHINE.autoStart = -1;
-	TRN_SLOT_MACHINE.assist = TRN_D_8008F2CC[rand() % 10];
+	st->result = -1;
+	st->payout = -1;
+	st->state = 0;
+	st->stat = arg;
+	st->autoStart = -1;
+	st->assist = TRN_D_8008F2CC[rand() % 10];
 	for (i = 0; i < 3; i++) {
 		st->reelPos[i] = rand() % 13;
 		st->scrollY[i] = 0;
@@ -464,7 +473,7 @@ void TRN_createSlotMachineBox(int16_t arg)
 		startPos.y -= (int16_t)(0x7e - DRAWING_OFFSET_Y);
 	}
 
-	createAnimatedUIBox(3, 0, 2, &MAIN_D_80134BC8, &startPos, (TickFunction)TRN_tickSlotMachine, (RenderFunction)TRN_renderSlotMachine);
+	createAnimatedUIBox(id, 0, 2, &MAIN_D_80134BC8, &startPos, (TickFunction)TRN_tickSlotMachine, (RenderFunction)TRN_renderSlotMachine);
 }
 
 int32_t TRN_getSlotMachineResult(void)
