@@ -1,9 +1,9 @@
 #include <dw/anim.h>
 #include <dw/entity.h>
+#include <dw/input.h>
 #include <dw/partner.h>
 #include <dw/script.h>
 #include <dw/sound.h>
-#include <dw/tamer.h>
 #include <dw/trn2.h>
 #include <dw/types.h>
 #include <dw/world_object.h>
@@ -12,12 +12,14 @@ extern int32_t TRAINING_COMPLETE;
 extern uint32_t POLLED_INPUT;
 
 void createCameraMovement(VECTOR *pos, int32_t speed);
-void loadMapObjectPosition(int16_t *xData, int16_t *yData, int16_t startIndex, int16_t count);
+void loadMapObjectPosition();
 void setMapObjectsFlag(int16_t start, int16_t count, int32_t flag);
 void setCameraFollowPlayer(void);
 void createParticleFX(uint8_t kind, int32_t count, void *arg2, Entity *entity, int32_t arg4);
 void resetMapObjectAnimation(int16_t startIndex, int16_t count);
 void entityLookAtLocation(Entity *entity, VECTOR *pos);
+void setTamerState(int8_t state);
+int32_t tickEntityWalkTo();
 
 static void *trn2_def_map108_functions[] = {
 	TRN2_setupSpeedTraining,
@@ -44,8 +46,8 @@ void TRN2_tickDefenseTrainingMap108(int32_t instanceId)
 			setMapObjectsFlag(MAIN_D_801353B8, MAIN_D_801353BA, 1);
 			setMapObjectsFlag(MAIN_D_801353BE, MAIN_D_801353C0, 0);
 			resetMapObjectAnimation(MAIN_D_801353BE, MAIN_D_801353C0);
-			MAIN_D_801353BD = 2;
 			MAIN_D_801353CC = 0;
+			MAIN_D_801353BD = 2;
 			if (MAIN_D_801353BC == 1) {
 				TRN2_startSlotSpin();
 			}
@@ -71,11 +73,11 @@ void TRN2_tickDefenseTrainingMap108(int32_t instanceId)
 			MAIN_D_801353CC = 0;
 			MAIN_D_801353BD = 2;
 		}
-		if (POLLED_INPUT & 0x10) {
+		if (POLLED_INPUT & CANCEL_BUTTON) {
 			MAIN_D_801353C2 = 0x4b0;
 		}
-		MAIN_D_801353C2++;
 		r = 10;
+		MAIN_D_801353C2++;
 		if (MAIN_D_801353BC == 1) {
 			r = TRN2_getSlotSessionResult();
 		}
@@ -185,7 +187,8 @@ static void trn2_def_map108__garbage__(void)
 	TRN2_D_8008DC54[3] = (v19 * v0) + v1;
 }
 
-void TRN2_setupSpeedTraining(int32_t arg)
+void TRN2_setupSpeedTraining(arg)
+int16_t arg;
 {
 	if (arg == 0x6c) {
 		TRN2_D_8008DC2C.vx = 0xf7;

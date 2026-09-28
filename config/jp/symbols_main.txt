@@ -1,2 +1,3 @@
 BTL_drawCommandShout = 0x80063B0C;
 TRN_setupSpeedTraining = 0x8008D468;
+TRN2_setupSpeedTraining = 0x8008AB38;
