@@ -1,10 +1,10 @@
 #include <dw/anim.h>
 #include <dw/entity.h>
+#include <dw/input.h>
 #include <dw/params.h>
 #include <dw/partner.h>
 #include <dw/script.h>
 #include <dw/sound.h>
-#include <dw/tamer.h>
 #include <dw/trn.h>
 #include <dw/types.h>
 #include <dw/world_object.h>
@@ -14,9 +14,11 @@ extern int32_t TRAINING_COMPLETE;
 
 void createCameraMovement(VECTOR *pos, int32_t speed);
 void removeAllCloudFX(void);
-void storeMapObjectPosition(int16_t *outX, int16_t *outY, int16_t a, int16_t count);
-void loadMapObjectPosition(int16_t *xData, int16_t *yData, int16_t startIndex, int16_t count);
-int32_t moveMapObjectsWithLimit(int16_t startIndex, int16_t count, int16_t dx, int16_t dy, int16_t limitX, int16_t limitY);
+void storeMapObjectPosition();
+void loadMapObjectPosition();
+int32_t moveMapObjectsWithLimit();
+void setTamerState(int8_t state);
+int32_t tickEntityWalkTo();
 void TRN_func_800888A0(int8_t arg);
 void TRN_tickHpTraining(int32_t instanceId);
 
@@ -102,7 +104,8 @@ static void trn_hp__garbage__(void)
 	TRN_D_8008F368[3] = (v19 * v0) + v1;
 }
 
-void TRN_setupHpTraining(int32_t arg)
+void TRN_setupHpTraining(arg)
+int16_t arg;
 {
 	if (arg == 0x70) {
 		TRN_D_8008F320.vx = 0x58c;
@@ -122,9 +125,11 @@ void TRN_setupHpTraining(int32_t arg)
 	MAIN_D_80135371 = 0;
 }
 
-void TRN_tickHpTraining(int32_t instanceId)
+void TRN_tickHpTraining(instanceId)
+int16_t instanceId;
 {
 	int32_t r;
+	int32_t done;
 
 	switch (MAIN_D_80135371) {
 	case 0:
@@ -172,11 +177,11 @@ void TRN_tickHpTraining(int32_t instanceId)
 		if (MAIN_D_80135370 == 1) {
 			r = TRN_getSlotSessionResult();
 		}
-		if ((((MAIN_D_8013537A >= 0x4b0) || (POLLED_INPUT & 0x10)) && (MAIN_D_80135370 == 0)) || ((MAIN_D_80135370 == 1) && (0 <= r))) {
+		if ((((MAIN_D_8013537A >= 0x4b0) || (POLLED_INPUT & CANCEL_BUTTON)) && (MAIN_D_80135370 == 0)) || ((MAIN_D_80135370 == 1) && (0 <= r))) {
 			MAIN_D_8013537A %= 0x4b0;
 			playSound(8, 0xa);
 			MAIN_D_80135371 = 3;
-			MAIN_D_8013537A = MAIN_D_8013537A / 120;
+			MAIN_D_8013537A /= 120;
 			startAnimation(&PARTNER_ENTITY.digimonEntity.entity, 0x12);
 			TRN_awardHpTrainingGains(PARTNER_ENTITY.digimonEntity.entity.type, 0, r);
 			createCameraMovement(&TAMER_ENTITY.entity.posData->location, 10);
@@ -200,7 +205,8 @@ void TRN_tickHpTraining(int32_t instanceId)
 		if (MAIN_D_8013537A > 0) {
 			moveMapObjectsWithLimit(MAIN_D_8013536C, MAIN_D_8013536E, -1, 2, 0, 0);
 		}
-		if ((tickEntityWalkTo(0xfc, 0xfd, 0, 0, 0) == 1) && (MAIN_D_8013537A <= 0)) {
+		done = tickEntityWalkTo(0xfc, 0xfd, 0, 0, 0);
+		if ((done == 1) && (MAIN_D_8013537A <= 0)) {
 			TRN_applyBaseStats();
 			TRN_closeUIBox(1);
 			setPartnerState(1);

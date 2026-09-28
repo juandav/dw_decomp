@@ -60,11 +60,13 @@ segments:
     subalign: 4
     subsegments:
       - [0x40, asm, trn]
+      - [0x28C8, c, trn_hp]
       - [0x2F74, c, trn_mp]
       - [0x3588, asm]
       - [0x4C68, c, trn_speed]
       - [0x51AC, asm]
-      - [0x79A8, data, trn]
+      - [0x79A8, .rodata, trn_hp]
+      - [0x79C0, data]
       - [0x79E4, .rodata, trn_speed]
       - [0x79FC, data]
       - [0x7A38, .rodata, trn_mp]
