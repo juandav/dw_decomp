@@ -25,6 +25,7 @@ options:
 
   symbol_addrs_path:
     - config/jp/symbols.txt
+    - config/jp/symbols_murd.txt
 
   undefined_funcs_auto_path: build/jp/psx/generated/undefined_funcs_auto_murd.txt
   undefined_syms_auto_path: build/jp/psx/generated/undefined_syms_auto_murd.txt
@@ -60,5 +61,6 @@ segments:
     subsegments:
       - [0x40, asm, murd]
       - [0x21C0, data, murd]
+      - [0x2298, .data, murd_bss]
 
-  - [0x33D4]
+  - [0x33D8]

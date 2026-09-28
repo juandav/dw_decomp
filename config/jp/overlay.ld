@@ -144,7 +144,7 @@ SECTIONS
 			KEEP(BUILD_DIR/asm/murd/data/header.rodata.s.o(.rodata .rodata.*));
 			KEEP(BUILD_DIR/asm/murd/murd.s.o(.text .text.*));
 			KEEP(BUILD_DIR/asm/murd/data/murd.data.s.o(.data .data.*));
-			LONG(0);
+			BUILD_DIR/src/murd/murd_bss.c.o(.data .data.*);
 		}
 	}
 

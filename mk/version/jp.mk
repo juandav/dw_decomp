@@ -85,6 +85,9 @@ MOV_C_SRC := \
 	src/mov/mov.c
 
 $(eval $(call overlay,MOV,mov))
+MURD_C_SRC := \
+	src/murd/murd_bss.c
+
 $(eval $(call overlay,MURD,murd))
 $(eval $(call overlay,SHOP,shop))
 $(eval $(call overlay,STD,std))
