@@ -105,6 +105,7 @@ int32_t STD_tickMeleeAttack(DigimonEntity *digimon, DigimonEntity *target, Fight
 void STD_func_80065540(DigimonEntity *digimon, DigimonEntity *target, FighterData *fighter);
 int16_t STD_getMostEffectiveMove(int32_t arg0, int16_t *flags);
 void addEntityText(DigimonEntity *digimon, int32_t slot, int16_t color, int32_t value, uint8_t flag);
+void addWithLimit(/* int16_t *value, int16_t amount, int16_t limit */);
 int32_t entityGetTechFromAnim(Entity *entity, int32_t anim);
 void STD_removeStatusEffectVisual(DigimonEntity *digimon, FighterData *fighter, int32_t arg2);
 void STD_addStatusEffectVisual(DigimonEntity *digimon, FighterData *fighter, int32_t arg2);

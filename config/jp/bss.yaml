@@ -7,6 +7,8 @@ subsegments:
   - [0x80140CF4, unk_0x80140CF4]
   - [0x80140ED0, font]
   - [0x801414B8, unk_0x801414B8]
+  - [0x80145F2C, item]
+  - [0x80146048, unk_0x80146048]
   - [0x8014677C, sound]
   - [0x801566A4, unk_0x801566A4]
   - [0x80167BE0, file_queue]

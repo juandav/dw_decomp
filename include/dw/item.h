@@ -54,22 +54,20 @@ extern ItemFunction ITEM_FUNCTIONS[128];
 
 void initializeInventory(void);
 void setInventorySize(uint8_t size);
-int32_t giveItem(uint32_t type, uint8_t amount);
-void removeItem(int32_t type, uint32_t amount);
+int32_t giveItem(int32_t type, int32_t amount);
+void removeItem(int32_t type, int32_t amount);
 int32_t getItemCount(int32_t type);
 
 void initializeDroppedItems(void);
 void clearDroppedItems(void);
-void spawnItem(int32_t type, int16_t tileX, int16_t tileY);
+void spawnItem(uint8_t type, int16_t tileX, int16_t tileY);
 void spawnDroppedItems(Entity *e, uint8_t type);
 int32_t pickupItem(int16_t itemId);
 void removeTamerItem(void);
 void renderOverworldItem(WorldItem *item);
 
-void addWithLimit(/* int16_t *value, int16_t amount, int16_t limit */);
-
 void handleBuffDisks(int32_t type);
-void handleChips(int32_t chipId);
+void handleChips(int16_t chipId);
 void handleDoubleFloppy(int32_t itemId);
 void handleEvoItems(int16_t arg);
 void handleFood(int16_t arg);

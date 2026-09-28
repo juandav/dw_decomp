@@ -3513,7 +3513,7 @@ int32_t MAIN_func_80108A98(void)
 		}
 
 		p = (uint8_t *)((uint32_t)item + (uint32_t)SCRIPT_STATE_PTR);
-		p[0x54] = (uint32_t)p[0x54] - amount;
+		p[0x54] -= amount;
 		giveItem(item, amount);
 		MAIN_func_80107444();
 		MAIN_func_80108C88(item);
@@ -3549,7 +3549,7 @@ int32_t MAIN_func_80108A98(void)
 
 	removeItem(item, amount);
 	p = (uint8_t *)((uint32_t)item2 + (uint32_t)SCRIPT_STATE_PTR);
-	p[0x54] = (uint32_t)p[0x54] + amount;
+	p[0x54] += amount;
 	MAIN_func_80107444();
 	MAIN_func_80108DC0(item);
 	MAIN_func_80108C88(item);

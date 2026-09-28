@@ -50,9 +50,9 @@ void renderDroppedItemShadow(WorldItem *item);
 void handlePoopWeightLoss(int32_t type);
 void closeInventoryBoxes(void);
 void BTL_healStatusEffect(int32_t arg);
-void addEntityText(Entity *entity, int32_t a, int32_t b, int16_t value,
-                   int32_t kind);
-int32_t handleMedicineHealing(int32_t injuryChance, int32_t sicknessChance);
+void addEntityText(Entity *entity, int16_t slotId, int16_t color, int32_t value, uint8_t icon);
+void addWithLimit(int16_t *value, int16_t amount, int16_t limit);
+int32_t handleMedicineHealing(int16_t injuryChance, int16_t sicknessChance);
 void handlePortaPotty(void);
 void handleItemSickness(int16_t arg);
 void addTamerLevel(int32_t chance, int32_t amount);
@@ -63,7 +63,9 @@ DroppedItem DROPPED_ITEMS[11];
 
 int16_t HEAL_AMOUNTS[4] = { 500, 1500, 5000, 9999 };
 uint8_t HEAL_EFFECT_VARIANT[4] = { 0, 0, 1, 1 };
+#if !defined(VERSION_JP)
 char NAME_FORMAT[] = "%s";
+#endif
 
 void *item_text_order[] = {
 	handleItemSickness,
@@ -113,7 +115,6 @@ GARBAGE(handleEvoItems, 15);
 
 void handleEvoItems(int16_t item)
 {
-	int32_t target;
 	int16_t level;
 
 	if (item >= 0x7d) {
@@ -127,8 +128,7 @@ void handleEvoItems(int16_t item)
 			EVOLUTION_TARGET = 0x41;
 		}
 	} else {
-		target = EVOLUTION_ITEM_TARGET[item - 0x47];
-		level = DIGIMON_DATA[target].level - 1;
+		level = DIGIMON_DATA[EVOLUTION_ITEM_TARGET[item - 0x47]].level - 1;
 		if (level != DIGIMON_DATA[ENTITY_TABLE[1]->type].level) {
 			return;
 		}
@@ -143,8 +143,6 @@ void handleEvoItems(int16_t item)
 
 void handleStatusItems(int32_t itemId)
 {
-	int32_t cured;
-
 	if (PARTNER_ENTITY.digimonEntity.stats.current.currentHP != 0) {
 		switch (itemId) {
 		case 8:
@@ -160,40 +158,30 @@ void handleStatusItems(int32_t itemId)
 			COMBAT_DATA_PTR->fighter[0].flags |= 0x100;
 			break;
 		case 0xd:
-			cured = handleMedicineHealing(3, 2);
-			if (cured == 1) {
+			if (handleMedicineHealing(3, 2) == 1) {
 				addHealingParticleEffect(ENTITY_TABLE[1], 0);
 				return;
 			}
 			break;
 		case 0xe:
-			cured = handleMedicineHealing(3, 10);
-			if (cured == 1) {
+			if (handleMedicineHealing(3, 10) == 1) {
 				addHealingParticleEffect(ENTITY_TABLE[1], 0);
 			}
 		}
 	}
 }
 
-void handleChips(int32_t chipId)
+void handleChips(int16_t chipId)
 {
 	int16_t lifetime;
 	int16_t off;
-	int16_t hp;
-	int16_t mp;
 	int16_t def;
 	int16_t speed;
 	int16_t brain;
-	int16_t zero;
+	int16_t hp;
+	int16_t mp;
 
-	/* The ROM clears the six stat deltas through one shared temporary. */
-	lifetime = 0;
-	mp = zero = 0;
-	hp = zero = 0;
-	brain = zero = 0;
-	speed = zero = 0;
-	def = zero = 0;
-	off = zero = 0;
+	off = def = speed = brain = hp = mp = lifetime = 0;
 	switch (chipId) {
 	case 0x16:
 		if (IS_SCRIPT_PAUSED == 1) {
@@ -252,6 +240,8 @@ void handleChips(int32_t chipId)
 
 void handleRestore(int16_t type)
 {
+	CombatData *combat = COMBAT_DATA_PTR;
+	uint16_t *flags = &combat->fighter[0].flags;
 	int16_t amount;
 
 	if (GAME_STATE == 1) {
@@ -262,16 +252,17 @@ void handleRestore(int16_t type)
 		startAnimation(ENTITY_TABLE[1], 0x2c);
 	}
 
-	if (type != 0xc) {
-		if (type == 0xb) {
-			amount = PARTNER_ENTITY.digimonEntity.stats.base.hp / 2;
-		}
-	} else {
+	switch (type) {
+	case 0xb:
+		amount = PARTNER_ENTITY.digimonEntity.stats.base.hp / 2;
+		break;
+	case 0xc:
 		if (GAME_STATE == 1) {
 			BTL_healStatusEffect(0);
 		}
 
 		amount = 0x270f;
+		break;
 	}
 
 	addWithLimit(&PARTNER_ENTITY.digimonEntity.stats.current.currentHP,
@@ -303,8 +294,7 @@ void handleMPHealingItem(uint8_t idx)
 	if (PARTNER_ENTITY.digimonEntity.stats.current.currentHP != 0) {
 		addWithLimit(&PARTNER_ENTITY.digimonEntity.stats.current.currentMP, HEAL_AMOUNTS[idx - 4], PARTNER_ENTITY.digimonEntity.stats.base.mp);
 		if (GAME_STATE == 1) {
-			int16_t amount;
-			addEntityText(ENTITY_TABLE[1], 0, 0xb, amount = HEAL_AMOUNTS[idx - 4], 2);
+			addEntityText(ENTITY_TABLE[1], 0, 0xb, HEAL_AMOUNTS[idx - 4], 2);
 		}
 		addHealingParticleEffect(ENTITY_TABLE[1], HEAL_EFFECT_VARIANT[idx - 4]);
 	}
@@ -315,8 +305,7 @@ void handleHPHealingItem(uint8_t idx)
 	if (PARTNER_ENTITY.digimonEntity.stats.current.currentHP != 0) {
 		addWithLimit(&PARTNER_ENTITY.digimonEntity.stats.current.currentHP, HEAL_AMOUNTS[idx], PARTNER_ENTITY.digimonEntity.stats.base.hp);
 		if (GAME_STATE == 1) {
-			int16_t amount;
-			addEntityText(ENTITY_TABLE[1], 0, 0xb, amount = HEAL_AMOUNTS[idx], 1);
+			addEntityText(ENTITY_TABLE[1], 0, 0xb, HEAL_AMOUNTS[idx], 1);
 		}
 		addHealingParticleEffect(ENTITY_TABLE[1], HEAL_EFFECT_VARIANT[idx]);
 	}
@@ -363,17 +352,15 @@ void spawnDroppedItems(Entity *e, uint8_t type)
 
 void renderDroppedItem(int32_t instanceId)
 {
-	WorldItem *item;
-
 	if (MAP_LAYER_ENABLED != 0) {
-		renderOverworldItem(item = &DROPPED_ITEMS[instanceId].worldItem);
-		renderDroppedItemShadow(item);
+		renderOverworldItem(&DROPPED_ITEMS[instanceId].worldItem);
+		renderDroppedItemShadow(&DROPPED_ITEMS[instanceId].worldItem);
 	}
 }
 
 GARBAGE(spawnItem, 24);
 
-void spawnItem(int32_t itemId, int16_t tileX, int16_t tileY)
+void spawnItem(uint8_t itemId, int16_t tileX, int16_t tileY)
 {
 	int32_t i;
 
@@ -417,14 +404,13 @@ void renderOverworldItem(WorldItem *item)
 	int32_t otz;
 	POLY_FT4 *prim;
 	int16_t width;
-	uint32_t depth;
 
 	GsSetLsMatrix(&GsWSMATRIX);
 	gte_ldv0(&item->spriteLocation);
 	gte_rtps();
 	gte_stsxy(&screen);
 	gte_stszotz(&otz);
-	width = (uint32_t)(VIEWPORT_DISTANCE << 7) / (depth = (uint32_t)(otz * 4));
+	width = (uint32_t)(VIEWPORT_DISTANCE << 7) / (uint32_t)(int32_t)(otz * 4);
 	otz = otz >> 2;
 	if ((0 < otz) && (otz < 0x1000)) {
 		prim = (POLY_FT4 *)GsGetWorkBase();
@@ -486,13 +472,14 @@ void renderDroppedItemShadow(WorldItem *item)
 	GsSetWorkBase((PACKET *)prim);
 }
 
-int32_t getItemCount(int32_t type)
+// clang-format off
+int32_t getItemCount(type)
+	uint8_t type;
+// clang-format on
 {
 	int32_t i;
-	uint8_t size;
 
-	size = INVENTORY.size;
-	for (i = 0; i < size; i++) {
+	for (i = 0; i < INVENTORY.size; i++) {
 		if (INVENTORY.types.array[i] == type) {
 			return INVENTORY.amounts.array[i];
 		}
@@ -501,18 +488,20 @@ int32_t getItemCount(int32_t type)
 	return 0;
 }
 
-int32_t giveItem(uint32_t item, uint8_t amount)
+// clang-format off
+int32_t giveItem(item, amount)
+	uint8_t item;
+	uint8_t amount;
+// clang-format on
 {
 	int16_t used[30];
 	int32_t i;
 	int32_t j;
-	int32_t size;
 	uint8_t *count;
+	int32_t result;
 
-	/* The ROM re-reads the inventory size on every pass of the first loop and
-	 * reuses the last value read as the bound of the second; the volatile view
-	 * is what keeps mwcc from hoisting that load. */
-	for (i = 0; i < (size = ((volatile Inventory *)&INVENTORY)->size); i++) {
+	result = 0;
+	for (i = 0; i < INVENTORY.size; i++) {
 		if (INVENTORY.types.array[i] == item) {
 			count = &INVENTORY.amounts.array[i];
 			if (*count != 99) {
@@ -523,39 +512,48 @@ int32_t giveItem(uint32_t item, uint8_t amount)
 				return 1;
 			}
 			return 0;
+			/* unreachable */
+			INVENTORY.types.array[i] = 0xff;
+			INVENTORY.amounts.array[i] = 0;
+			INVENTORY.names.array[i] = 0xff;
 		}
 	}
 
-	for (i = 0; i < size; i++) {
-		if (INVENTORY.types.array[i] == 0xff) {
-			INVENTORY.types.array[i] = item;
-			INVENTORY.amounts.array[i] = amount;
-			for (j = 0; j < INVENTORY.size; j++) {
-				used[j] = 0;
-			}
-			for (j = 0; j < INVENTORY.size; j++) {
-				if (INVENTORY.names.array[j] != 0xff) {
-					used[INVENTORY.names.array[j]] = 1;
+	if (result == 0) {
+		for (i = 0; i < INVENTORY.size; i++) {
+			if (INVENTORY.types.array[i] == 0xff) {
+				INVENTORY.types.array[i] = item;
+				INVENTORY.amounts.array[i] = amount;
+				for (j = 0; j < INVENTORY.size; j++) {
+					used[j] = 0;
 				}
-			}
-			for (j = 0; j < INVENTORY.size; j++) {
-				if (used[j] == 0) {
-					INVENTORY.names.array[i] = j;
-					break;
+				for (j = 0; j < INVENTORY.size; j++) {
+					if (INVENTORY.names.array[j] != 0xff) {
+						used[INVENTORY.names.array[j]] = 1;
+					}
 				}
+				for (j = 0; j < INVENTORY.size; j++) {
+					if (used[j] == 0) {
+						INVENTORY.names.array[i] = j;
+						break;
+					}
+				}
+				return 1;
 			}
-			return 1;
 		}
 	}
 
-	return 0;
+	return result;
 }
 
-void removeItem(int32_t type, uint32_t amount)
+// clang-format off
+void removeItem(type, amount)
+	uint8_t type;
+	uint8_t amount;
+// clang-format on
 {
 	int32_t i;
 	uint8_t *count;
-	uint32_t held;
 
 	if (type == 0xff) {
 		return;
@@ -564,9 +562,8 @@ void removeItem(int32_t type, uint32_t amount)
 	for (i = 0; i < INVENTORY.size; i++) {
 		if (INVENTORY.types.array[i] == type) {
 			count = &INVENTORY.amounts.array[i];
-			held = *count;
-			if (amount < held) {
-				*count = held - amount;
+			if (amount < *count) {
+				*count -= amount;
 			} else {
 				*count = 0;
 				INVENTORY.types.array[i] = 0xff;
@@ -578,13 +575,11 @@ void removeItem(int32_t type, uint32_t amount)
 
 int32_t pickupItem(int16_t itemId)
 {
-	int32_t *type;
+	uint8_t type;
 	int32_t got;
 
-	/* The ROM indexes the type field of element 0 by whole elements rather
-	 * than addressing DROPPED_ITEMS[itemId] and reading the field. */
-	type = &DROPPED_ITEMS[0].worldItem.type;
-	got = giveItem((uint8_t)type[itemId * (sizeof(DroppedItem) / sizeof(int32_t))], 1);
+	type = DROPPED_ITEMS[itemId].worldItem.type;
+	got = giveItem(type, 1);
 	if (got != 0) {
 		deleteDroppedItem(itemId);
 	}
@@ -630,35 +625,24 @@ void handleFood(int16_t itemId)
 	int16_t happiness;
 	int16_t weight;
 	int16_t tiredness;
-	int16_t sicknessChance;
-	int16_t healedHP;
-	int16_t healedMP;
-	int16_t addedHP;
-	int16_t addedMP;
-	int16_t trainDuration;
 	int16_t discipline;
 	int16_t lifetime;
+	int16_t addedHP;
+	int16_t addedMP;
+	int16_t healedHP;
+	int16_t healedMP;
 	int16_t addedOffense;
 	int16_t addedDefense;
 	int16_t addedSpeed;
 	int16_t addedBrain;
 	int16_t trainFlag;
 	int16_t trainValue;
-	int16_t zero;
-	int32_t effect;
+	int16_t trainDuration;
+	int16_t sicknessChance;
 
-	/* The shared zero preserves the ROM's signed-short initialization. */
-	lifetime = 0;
-	energy = tiredness = happiness = weight = discipline = zero = 0;
-	addedBrain = 0;
-	addedHP = addedMP = healedHP = healedMP = zero = 0;
-	addedSpeed = zero = 0;
-	addedDefense = zero = 0;
-	addedOffense = zero = 0;
-	trainValue = zero = 0;
-	sicknessChance = 0;
-	trainDuration = zero = 0;
-	trainFlag = zero = 0;
+	energy = tiredness = happiness = discipline = weight = lifetime = 0;
+	addedHP = addedMP = healedHP = healedMP = addedOffense = addedDefense = addedSpeed = addedBrain = 0;
+	trainFlag = trainValue = trainDuration = sicknessChance = 0;
 
 	switch (itemId) {
 	case 0x26:
@@ -705,12 +689,12 @@ void handleFood(int16_t itemId)
 		break;
 	case 0x2e:
 		energy = 38;
-		effect = 10;
-		addedOffense = effect;
-		addedDefense = effect;
-		addedSpeed = effect;
-		addedBrain = effect;
-		addedMP = addedHP = 100;
+		addedOffense = 10;
+		addedDefense = 10;
+		addedSpeed = 10;
+		addedBrain = 10;
+		addedHP = 100;
+		addedMP = 100;
 		weight = 4;
 		break;
 	case 0x2f:
@@ -727,10 +711,9 @@ void handleFood(int16_t itemId)
 		break;
 	case 0x31:
 		energy = 25;
-		effect = 20;
-		tiredness = effect;
-		happiness = effect;
-		discipline = effect;
+		tiredness = 20;
+		happiness = 20;
+		discipline = 20;
 		weight = 2;
 		break;
 	case 0x32:
@@ -757,23 +740,28 @@ void handleFood(int16_t itemId)
 		break;
 	case 0x37:
 		energy = 24;
-		healedMP = healedHP = 1000;
+		healedHP = 1000;
+		healedMP = 1000;
 		weight = 2;
 		break;
 	case 0x38:
-		addedOffense = energy = 20;
+		energy = 20;
+		addedOffense = 20;
 		weight = 2;
 		break;
 	case 0x39:
-		addedDefense = energy = 20;
+		energy = 20;
+		addedDefense = 20;
 		weight = 2;
 		break;
 	case 0x3a:
-		addedSpeed = energy = 20;
+		energy = 20;
+		addedSpeed = 20;
 		weight = 2;
 		break;
 	case 0x3b:
-		addedBrain = energy = 20;
+		energy = 20;
+		addedBrain = 20;
 		weight = 2;
 		break;
 	case 0x3c:
@@ -800,12 +788,12 @@ void handleFood(int16_t itemId)
 		break;
 	case 0x41:
 		energy = 27;
-		effect = 1;
-		addedOffense = effect;
-		addedDefense = effect;
-		addedSpeed = effect;
-		addedBrain = effect;
-		addedMP = addedHP = 10;
+		addedOffense = 1;
+		addedDefense = 1;
+		addedSpeed = 1;
+		addedBrain = 1;
+		addedHP = 10;
+		addedMP = 10;
 		weight = -2;
 		break;
 	case 0x42:
@@ -814,7 +802,8 @@ void handleFood(int16_t itemId)
 		break;
 	case 0x43:
 		energy = 35;
-		healedMP = healedHP = 9999;
+		healedHP = 9999;
+		healedMP = 9999;
 		lifetime = 3;
 		sicknessChance = 20;
 		weight = 4;
@@ -826,17 +815,15 @@ void handleFood(int16_t itemId)
 		break;
 	case 0x45:
 		energy = 15;
-		effect = 30;
-		happiness = effect;
-		tiredness = effect;
-		sicknessChance = effect;
+		happiness = 30;
+		tiredness = 30;
+		sicknessChance = 30;
 		weight = 1;
 		break;
 	case 0x46:
 		energy = 50;
-		effect = 50;
-		happiness = effect;
-		tiredness = effect;
+		happiness = 50;
+		tiredness = 50;
 		lifetime = 20;
 		sicknessChance = 5;
 		weight = 3;
@@ -876,12 +863,7 @@ void handleFood(int16_t itemId)
 	addWithLimit(&PARTNER_ENTITY.digimonEntity.stats.base.brain, addedBrain, 999);
 }
 
-// clang-format off
-void addWithLimit(value, amount, limit)
-	int16_t *value;
-	int16_t amount;
-	int16_t limit;
-// clang-format on
+void addWithLimit(int16_t *value, int16_t amount, int16_t limit)
 {
 	*value += amount;
 	if (*value > limit) {
@@ -889,26 +871,21 @@ void addWithLimit(value, amount, limit)
 	}
 }
 
-int32_t handleMedicineHealing(int32_t injuryChance, int32_t sicknessChance)
+int32_t handleMedicineHealing(int16_t injuryChance, int16_t sicknessChance)
 {
-	int32_t roll;
-	int32_t cured;
+	int16_t roll;
 
-	if (((PARTNER_PARA.condition & CONDITION_INJURED) != 0) &&
-	    (roll = random(3), (int16_t)roll < injuryChance)) {
+	if (((PARTNER_PARA.condition & CONDITION_INJURED) != 0) && (roll = random(3), roll < injuryChance)) {
 		PARTNER_PARA.condition &= ~CONDITION_INJURED;
 		PARTNER_PARA.injuryTimer = 0;
 	}
-	if (((PARTNER_PARA.condition & CONDITION_SICK) != 0) &&
-	    (roll = random(10), (int16_t)roll < sicknessChance)) {
+	if (((PARTNER_PARA.condition & CONDITION_SICK) != 0) && (roll = random(10), roll < sicknessChance)) {
 		PARTNER_PARA.condition &= ~CONDITION_SICK;
 		PARTNER_PARA.sicknessTimer = 0;
 		PARTNER_PARA.areaEffectTimer = 0;
-		cured = 1;
-	} else {
-		cured = 0;
+		return 1;
 	}
-	return cured;
+	return 0;
 }
 
 void handlePortaPotty(void)
@@ -982,7 +959,10 @@ void decreasePoopLevel(void)
 	PARTNER_PARA.poopLevel--;
 }
 
-void setTrainingBoost(int32_t flag, int32_t value, int32_t duration)
+void setTrainingBoost(flag, value, duration)
+int16_t flag;
+int16_t value;
+int16_t duration;
 {
 	PARTNER_PARA.trainBoostFlag = flag;
 	PARTNER_PARA.trainBoostValue = value;
@@ -993,7 +973,12 @@ void handleItemSickness(int16_t chance)
 {
 	int32_t isSick;
 	int16_t r;
+#if defined(VERSION_JP)
+	int32_t halfLen;
+#else
 	char buf[0x18];
+#endif
+
 	r = random(0x64);
 	isSick = PARTNER_PARA.condition & CONDITION_SICK;
 	if ((r < chance) && (!isSick)) {
@@ -1007,8 +992,15 @@ void handleItemSickness(int16_t chance)
 		setTamerState(0x14);
 		clearTextArea();
 		setTextColor(0xa);
+#if defined(VERSION_JP)
+		drawString(PARTNER_ENTITY.name, 0, 0x78);
+		halfLen = strlen(PARTNER_ENTITY.name) / 2;
+		setTextColor(1);
+		drawString(IS_SICK_SUFFIX, halfLen * 12, 0x78);
+#else
 		sprintf(buf, NAME_FORMAT, PARTNER_ENTITY.name);
 		strcat(buf, IS_SICK_SUFFIX);
 		drawString(buf, 0, 0x78);
+#endif
 	}
 }

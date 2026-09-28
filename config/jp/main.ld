@@ -45,7 +45,7 @@ SECTIONS
         BUILD_DIR/src/main/particle.c.o(.text .text.*);
         BUILD_DIR/src/main/anim.c.o(.text .text.*);
         BUILD_DIR/src/main/ui.c.o(.text .text.*);
-        KEEP(BUILD_DIR/asm/main/3C720.s.o(.text .text.*));
+        BUILD_DIR/src/main/item.c.o(.text .text.*);
         BUILD_DIR/src/main/sound.c.o(.text .text.*);
         KEEP(BUILD_DIR/asm/main/3FEF4.s.o(.text .text.*));
         BUILD_DIR/src/main/clock.c.o(.text .text.*);
@@ -85,7 +85,8 @@ SECTIONS
         BUILD_DIR/src/main/overworld_moves_text.c.o(.rodata .rodata.*);
         BUILD_DIR/src/main/overworld_playerinfo_text.c.o(.rodata .rodata.*);
         BUILD_DIR/src/main/overworld_medal_text.c.o(.rodata .rodata.*);
-        KEEP(BUILD_DIR/asm/main/data/8AD50.rodata.s.o(.rodata .rodata.*));
+        BUILD_DIR/src/main/item.c.o(.rodata .rodata.*);
+        KEEP(BUILD_DIR/asm/main/data/8AD98.rodata.s.o(.rodata .rodata.*));
         BUILD_DIR/src/main/partner.c.o(.rodata .rodata.*);
         KEEP(BUILD_DIR/asm/main/data/8B014.rodata.s.o(.rodata .rodata.*));
         BUILD_DIR/src/main/graphics2.c.o(.rodata .rodata.*);
@@ -163,6 +164,8 @@ SECTIONS
         BUILD_DIR/src/main/ui.c.o(.sdata .sdata.*);
         . = ALIGN(., 4);
         KEEP(BUILD_DIR/asm/main/data/AD60C.sdata.s.o(.sdata .sdata.*));
+        BUILD_DIR/src/main/item.c.o(.sdata .sdata.*);
+        . = ALIGN(., 4);
         BUILD_DIR/src/main/sound.c.o(.sdata .sdata.*);
         . = ALIGN(., 4);
         KEEP(BUILD_DIR/asm/main/data/AD64C.sdata.s.o(.sdata .sdata.*));
@@ -306,6 +309,10 @@ SECTIONS
         BUILD_DIR/src/main/font.c.o(.bss.*);
         . = ALIGN(., 4);
         BUILD_DIR/generated/unk_0x801414B8.bss.s.o(.bss.*);
+        . = ALIGN(., 4);
+        BUILD_DIR/src/main/item.c.o(.bss.*);
+        . = ALIGN(., 4);
+        BUILD_DIR/generated/unk_0x80146048.bss.s.o(.bss.*);
         . = ALIGN(., 4);
         BUILD_DIR/src/main/sound.c.o(.bss.*);
         . = ALIGN(., 4);

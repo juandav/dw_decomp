@@ -16,6 +16,7 @@ MAIN_BSS := \
 	$(GEN_DIR)/unk_0x8013E6A8.bss.s \
 	$(GEN_DIR)/unk_0x80140CF4.bss.s \
 	$(GEN_DIR)/unk_0x801414B8.bss.s \
+	$(GEN_DIR)/unk_0x80146048.bss.s \
 	$(GEN_DIR)/unk_0x801566A4.bss.s \
 	$(GEN_DIR)/unk_0x80168460.bss.s \
 	$(GEN_DIR)/unk_0x80168920.bss.s
@@ -43,6 +44,7 @@ MAIN_C_SRC := \
 	src/main/fish.c \
 	src/main/font.c \
 	src/main/graphics2.c \
+	src/main/item.c \
 	src/main/kar.c \
 	src/main/map_collision.c \
 	src/main/math.c \

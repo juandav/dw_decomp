@@ -1916,9 +1916,8 @@ void tickPartnerNormal(void)
 	PARTNER_PARA.areaEffectTimer++;
 	if (PARTNER_PARA.areaEffectTimer > 28800)
 		PARTNER_PARA.areaEffectTimer = 0;
-	/* Retail accesses trainBoostTimer as a signed halfword. */
-	((int16_t *)&PARTNER_PARA)[0x50 / 2]--;
-	if (((int16_t *)&PARTNER_PARA)[0x50 / 2] <= 0) {
+	PARTNER_PARA.trainBoostTimer--;
+	if (PARTNER_PARA.trainBoostTimer <= 0) {
 		PARTNER_PARA.trainBoostFlag = 0;
 		PARTNER_PARA.trainBoostTimer = 0;
 	}

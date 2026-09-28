@@ -95,6 +95,7 @@ uint8_t VS_isFighterDefeated(uint8_t index);
 void VS_renderMoveName(int32_t i);
 void VS_setCommandIconUV(DigimonEntity *digimon, POLY_FT4 *prim, int32_t index);
 void addEntityText(DigimonEntity *digimon, int32_t slot, int16_t color, int32_t value, uint8_t flag);
+void addWithLimit(/* int16_t *value, int16_t amount, int16_t limit */);
 void VS_stopEFESubEffect(int32_t a, int32_t b);
 int32_t VS_addPoisonEffect(DigimonEntity *digimon);
 void VS_removePoisonEffect(int32_t i, DigimonEntity *digimon);

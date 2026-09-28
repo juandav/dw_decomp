@@ -1,5 +1,7 @@
 KAR_start = 0x80053CAC;
+BTL_healStatusEffect = 0x80060E70;
 BTL_drawCommandShout = 0x80063B0C;
+BTL_removeDeathCountdown = 0x80065C7C;
 STD_tickPartnerTournament = 0x8006E520;
 DOOA_tick = 0x80085F34;
 DOOA_getSequenceState = 0x80086164;
