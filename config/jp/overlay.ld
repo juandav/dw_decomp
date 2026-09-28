@@ -22,6 +22,7 @@ SECTIONS
 			BUILD_DIR/src/btl/command_menu.c.o(.rodata .rodata.*);
 			BUILD_DIR/src/btl/command_shout.c.o(.data .data.*);
 			KEEP(BUILD_DIR/asm/btl/data/28B68.data.s.o(.data .data.*));
+			BUILD_DIR/src/btl/btl_bss.c.o(.data .data.*);
 			LONG(0);
 		}
 	}

@@ -69,6 +69,7 @@ $(eval $(call unit,MAIN,main))
 
 BTL_C_SRC := \
 	src/btl/battle_setup.c \
+	src/btl/btl_bss.c \
 	src/btl/command_menu.c \
 	src/btl/command_shout.c
 

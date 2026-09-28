@@ -104,5 +104,6 @@ segments:
       - [0x28A7C, .rodata, command_menu]
       - [0x28AA4, .data, command_shout]
       - [0x28B68, data]
+      - [0x29BAC, .data, btl_bss]
 
   - [0x2BCD0]
