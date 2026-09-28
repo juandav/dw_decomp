@@ -73,6 +73,8 @@ segments:
       - [0x208B4, c, aabb]
       - [0x20E40, c, efe]
       - [0x242CC, asm]
+      - [0x311F8, c, overworld_evochart_detail]
+      - [0x32020, asm]
       - [0x34B98, c, overworld_evochart_view]
       - [0x35208, asm]
       - [0x3696C, c, overworld_moves_text]

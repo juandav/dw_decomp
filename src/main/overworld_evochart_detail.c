@@ -155,183 +155,178 @@ static void renderEvoChartDetail__garbage__(LocalMapObjectInstance *mapObjects,
 
 void renderEvoChartDetail(void)
 {
-	int32_t uVar3;
-	int32_t uVar4;
-	Line4Points *psVar6;
-	ChartSprite *psVar11;
-	Line4Points *psVar7;
-	ChartSprite *psVar10;
-	int32_t iVar5;
-	int32_t iVar8;
-	int32_t iVar9;
-	int32_t iVar13;
-	unsigned short local_10;
-	int32_t new_var;
-	int32_t limit;
-	int32_t bound;
-	int8_t count2;
+	Line4Points *fromLines;
+	Line4Points *toLines;
+	int32_t j;
+	ChartSprite *fromSprites;
+	ChartSprite *toSprites;
+	uint32_t color1;
+	uint32_t color2;
+	int32_t id;
+	int32_t len;
+	EvoClutTable clut;
+	int32_t i;
 	int8_t count1;
-	EvoClutTable local_c;
-	local_c = MAIN_D_80123E6C;
+	int8_t count2;
+	int8_t fromCount;
+	int8_t toCount;
+
+	clut = MAIN_D_80123E6C;
 	MENU_SUB_STATE = 2;
 	drawEvoChartStrings((int8_t)MAIN_D_80134D40);
 	count1 = (count2 = 0);
-	iVar5 = MAIN_D_80134D40 - 1;
-	for (iVar13 = 0; iVar13 < 5; iVar13++) {
-		if (EVO_PATHS_DATA[iVar5].from[iVar13] != (-1)) {
-			++count1;
+	for (i = 0; i < 5; i++) {
+		if (EVO_PATHS_DATA[MAIN_D_80134D40 - 1].from[i] != -1) {
+			count1++;
 		}
 	}
-	for (iVar13 = 0; iVar13 < 6; iVar13++) {
-		if (EVO_PATHS_DATA[(MAIN_D_80134D40 - 1)].to[iVar13] != (-1)) {
-			++count2;
+	for (i = 0; i < 6; i++) {
+		if (EVO_PATHS_DATA[MAIN_D_80134D40 - 1].to[i] != -1) {
+			count2++;
 		}
 	}
-	uVar3 = count1 % 2;
-	if (uVar3 == 0) {
-		psVar6 = MAIN_D_80124944;
-		psVar11 = MAIN_D_80124AA8;
-		local_10 = 4;
+
+	if ((count1 % 2) == 0) {
+		fromLines = MAIN_D_80124944;
+		fromSprites = MAIN_D_80124AA8;
+		fromCount = 4;
 	} else {
-		psVar6 = MAIN_D_80124984;
-		psVar11 = MAIN_D_80124AC8;
-		local_10 = 5;
+		fromLines = MAIN_D_80124984;
+		fromSprites = MAIN_D_80124AC8;
+		fromCount = 5;
 	}
-	uVar4 = count2 % 2;
-	if (uVar4 == 0) {
-		psVar7 = MAIN_D_801249D4;
-		psVar10 = MAIN_D_80124AF0;
-		limit = 6;
+	if ((count2 % 2) == 0) {
+		toLines = MAIN_D_801249D4;
+		toSprites = MAIN_D_80124AF0;
+		toCount = 6;
 	} else {
-		psVar7 = MAIN_D_80124A34;
-		psVar10 = MAIN_D_80124B20;
-		limit = 5;
+		toLines = MAIN_D_80124A34;
+		toSprites = MAIN_D_80124B20;
+		toCount = 5;
 	}
-	for (iVar8 = 0; iVar8 < local_10; iVar8++) {
-		if (EVO_PATHS_DATA[MAIN_D_80134D40 - 1].from[iVar8] > 0) {
+
+	for (j = 0; j < fromCount; j++) {
+		if (EVO_PATHS_DATA[MAIN_D_80134D40 - 1].from[j] > 0) {
 			renderTrianglePrimitive(0x65db,
-						psVar6->x1, psVar6->y1 - 1,
-						psVar6->x2, psVar6->y2 - 1,
-						psVar6->x3, psVar6->y3 - 1,
+						fromLines->x1, fromLines->y1 - 1,
+						fromLines->x2, fromLines->y2 - 1,
+						fromLines->x3, fromLines->y3 - 1,
 						4, 0);
 			renderLinePrimitive(0x65db,
-					    psVar6->x3, psVar6->y3 - 1,
-					    psVar6->x4, psVar6->y4 - 1,
+					    fromLines->x3, fromLines->y3 - 1,
+					    fromLines->x4, fromLines->y4 - 1,
 					    4, 0);
 			renderTrianglePrimitive(0x794e3,
-						psVar6->x1, psVar6->y1,
-						psVar6->x2, psVar6->y2,
-						psVar6->x3, psVar6->y3,
+						fromLines->x1, fromLines->y1,
+						fromLines->x2, fromLines->y2,
+						fromLines->x3, fromLines->y3,
 						4, 0);
 			renderLinePrimitive(0x794e3,
-					    psVar6->x3, psVar6->y3,
-					    psVar6->x4, psVar6->y4,
+					    fromLines->x3, fromLines->y3,
+					    fromLines->x4, fromLines->y4,
 					    4, 0);
 			renderTrianglePrimitive(0x65db,
-						psVar6->x1, psVar6->y1 + 1,
-						psVar6->x2, psVar6->y2 + 1,
-						psVar6->x3, psVar6->y3 + 1,
+						fromLines->x1, fromLines->y1 + 1,
+						fromLines->x2, fromLines->y2 + 1,
+						fromLines->x3, fromLines->y3 + 1,
 						4, 0);
 			renderLinePrimitive(0x65db,
-					    psVar6->x3, psVar6->y3 + 1,
-					    psVar6->x4, psVar6->y4 + 1,
+					    fromLines->x3, fromLines->y3 + 1,
+					    fromLines->x4, fromLines->y4 + 1,
 					    4, 0);
 		}
-		psVar6++;
+		fromLines++;
 	}
-	iVar8 = 0;
-	iVar9 = 0;
-	bound = limit;
-	limit = bound;
-	for (; iVar8 < bound; iVar8++, iVar9 += 2) {
-		new_var = iVar9;
-		if (EVO_PATHS_DATA[MAIN_D_80134D40 - 1].to[iVar8] > 0) {
-			int32_t color1;
-			int32_t color2;
-			color1 = (MAIN_D_80124A84[new_var].r |
-				  (MAIN_D_80124A84[new_var].g << 8) |
-				  (MAIN_D_80124A84[new_var].b << 16));
-			color2 = (MAIN_D_80124A84[new_var + 1].r |
-				  (MAIN_D_80124A84[new_var + 1].g << 8) |
-				  (MAIN_D_80124A84[new_var + 1].b << 16));
+
+	for (j = 0; j < toCount; j++) {
+		if (EVO_PATHS_DATA[MAIN_D_80134D40 - 1].to[j] > 0) {
+			color1 = (MAIN_D_80124A84[j * 2].r & 0xff) |
+				 ((MAIN_D_80124A84[j * 2].g & 0xff) << 8) |
+				 ((MAIN_D_80124A84[j * 2].b & 0xff) << 16);
+			color2 = (MAIN_D_80124A84[(j * 2) + 1].r & 0xff) |
+				 ((MAIN_D_80124A84[(j * 2) + 1].g & 0xff) << 8) |
+				 ((MAIN_D_80124A84[(j * 2) + 1].b & 0xff) << 16);
 			renderTrianglePrimitive(color2,
-						psVar7->x1, psVar7->y1 - 1,
-						psVar7->x2, psVar7->y2 - 1,
-						psVar7->x3, psVar7->y3 - 1,
+						toLines->x1, toLines->y1 - 1,
+						toLines->x2, toLines->y2 - 1,
+						toLines->x3, toLines->y3 - 1,
 						4, 0);
 			renderLinePrimitive(color2,
-					    psVar7->x3, psVar7->y3 - 1,
-					    (long)psVar7->x4, psVar7->y4 - 1,
+					    toLines->x3, toLines->y3 - 1,
+					    toLines->x4, toLines->y4 - 1,
 					    4, 0);
 			renderTrianglePrimitive(color1,
-						psVar7->x1, psVar7->y1,
-						psVar7->x2, psVar7->y2,
-						psVar7->x3, psVar7->y3,
+						toLines->x1, toLines->y1,
+						toLines->x2, toLines->y2,
+						toLines->x3, toLines->y3,
 						4, 0);
 			renderLinePrimitive(color1,
-					    psVar7->x3, psVar7->y3,
-					    psVar7->x4, psVar7->y4,
+					    toLines->x3, toLines->y3,
+					    toLines->x4, toLines->y4,
 					    4, 0);
 			renderTrianglePrimitive(color2,
-						psVar7->x1, psVar7->y1 + 1,
-						psVar7->x2, psVar7->y2 + 1,
-						psVar7->x3, psVar7->y3 + 1,
+						toLines->x1, toLines->y1 + 1,
+						toLines->x2, toLines->y2 + 1,
+						toLines->x3, toLines->y3 + 1,
 						4, 0);
 			renderLinePrimitive(color2,
-					    psVar7->x3, psVar7->y3 + 1,
-					    psVar7->x4, psVar7->y4 + 1,
+					    toLines->x3, toLines->y3 + 1,
+					    toLines->x4, toLines->y4 + 1,
 					    4, 0);
 		}
-		psVar7++;
+		toLines++;
 	}
-	iVar8 = (MAIN_D_80134D40 - 1) * 8;
+
 	renderRectPolyFT4(-8, -0x14, 0x10, 0x10,
 			  MAIN_D_80124544[MAIN_D_80134D40 - 1].u,
 			  MAIN_D_80124544[MAIN_D_80134D40 - 1].v, 0x18,
-			  local_c.m[MAIN_D_80124544[MAIN_D_80134D40 - 1].clut],
+			  clut.m[MAIN_D_80124544[MAIN_D_80134D40 - 1].clut],
 			  4, 0);
 	renderSpriteBox(0x97, 99, 0x12, 0x12, 0xbebebe, 0x3c3c3c, 0x87, 0x87,
 			0x87, 4);
-	for (iVar8 = 0; iVar8 < local_10; iVar8++) {
-		int32_t from;
-		from = EVO_PATHS_DATA[MAIN_D_80134D40 - 1].from[iVar8];
-		if (from > 0) {
-			if (hasDigimonRaised(from & 0xffff) == 1) {
-				renderRectPolyFT4(psVar11->posX, psVar11->posY,
+
+	for (j = 0; j < fromCount; j++) {
+		id = EVO_PATHS_DATA[MAIN_D_80134D40 - 1].from[j];
+		if (id > 0) {
+			if (hasDigimonRaised(id & 0xffff) == 1) {
+				renderRectPolyFT4(fromSprites->posX, fromSprites->posY,
 						  0x10, 0x10,
-						  MAIN_D_80124544[from - 1].u,
-						  MAIN_D_80124544[from - 1].v,
-						  0x18,
-						  local_c.m[MAIN_D_80124544[from - 1].clut],
+						  MAIN_D_80124544[id - 1].u,
+						  MAIN_D_80124544[id - 1].v, 0x18,
+						  clut.m[MAIN_D_80124544[id - 1].clut],
 						  4, 0);
 			}
-			renderSpriteBox((int16_t)(psVar11->posX + 0x9f),
-					(int16_t)(psVar11->posY + 0x77),
-					0x12, 0x12, 0xbebebe, 0x3c3c3c, 0x87,
-					0x87, 0x87, 4);
+			renderSpriteBox(fromSprites->posX + 0x9f,
+					fromSprites->posY + 0x77, 0x12, 0x12,
+					0xbebebe, 0x3c3c3c, 0x87, 0x87, 0x87, 4);
 		}
-		psVar11++;
+		fromSprites++;
 	}
-	for (iVar8 = 0; iVar8 < limit; iVar8++) {
-		int32_t to;
-		to = EVO_PATHS_DATA[MAIN_D_80134D40 - 1].to[iVar8];
-		if (to > 0) {
-			if (hasDigimonRaised(to & 0xffff) == 1) {
-				renderRectPolyFT4(psVar10->posX, psVar10->posY,
+
+	for (j = 0; j < toCount; j++) {
+		id = EVO_PATHS_DATA[MAIN_D_80134D40 - 1].to[j];
+		if (id > 0) {
+			if (hasDigimonRaised(id & 0xffff) == 1) {
+				renderRectPolyFT4(toSprites->posX, toSprites->posY,
 						  0x10, 0x10,
-						  MAIN_D_80124544[to - 1].u,
-						  MAIN_D_80124544[to - 1].v,
-						  0x18,
-						  local_c.m[MAIN_D_80124544[to - 1].clut],
+						  MAIN_D_80124544[id - 1].u,
+						  MAIN_D_80124544[id - 1].v, 0x18,
+						  clut.m[MAIN_D_80124544[id - 1].clut],
 						  4, 0);
 			}
-			renderSpriteBox((int16_t)(psVar10->posX + 0x9f),
-					(int16_t)(psVar10->posY + 0x77),
-					0x12, 0x12, 0xbebebe, 0x3c3c3c, 0x87,
-					0x87, 0x87, 4);
+			renderSpriteBox(toSprites->posX + 0x9f,
+					toSprites->posY + 0x77, 0x12, 0x12,
+					0xbebebe, 0x3c3c3c, 0x87, 0x87, 0x87, 4);
 		}
-		psVar10++;
+		toSprites++;
 	}
+
+#if defined(VERSION_JP)
+	renderString(3, -0x19, -0x4f, 0x30, 0xc, 0, 0x18, 4);
+	renderString(0, -0x56, 0x3a, 0x24, 0xc,
+		     ((DIGIMON_DATA[MAIN_D_80134D40].level - 1) * 36) + 0x30, 0x18,
+		     4);
+#else
 	renderString(3, -0x14, -0x4f, 0x24, 0xc, 0, 0x18, 4);
 	switch (DIGIMON_DATA[MAIN_D_80134D40].level) {
 	case 1:
@@ -349,12 +344,12 @@ void renderEvoChartDetail(void)
 	case 5:
 		renderString(0, -0x64, 0x3a, 0x41, 0xc, 0, 0x3c, 4);
 	}
-	new_var = strlen(DIGIMON_DATA[MAIN_D_80134D40].name) / 2;
-	renderString(0, -0x5c - ((new_var - 4) * 6), 0x4d, 0x78, 0xc, 0, 0x30, 4);
-	for (iVar13 = 0; iVar13 < 6; ++iVar13) {
-		renderInsetBox(MAIN_D_80124B48[iVar13].posX,
-			       MAIN_D_80124B48[iVar13].posY,
-			       MAIN_D_80124B48[iVar13].width,
-			       MAIN_D_80124B48[iVar13].height, 4);
+#endif
+	len = strlen(DIGIMON_DATA[MAIN_D_80134D40].name) / 2;
+	renderString(0, -0x5c - ((len - 4) * 6), 0x4d, 0x78, 0xc, 0, 0x30, 4);
+	for (i = 0; i < 6; i++) {
+		renderInsetBox(MAIN_D_80124B48[i].posX, MAIN_D_80124B48[i].posY,
+			       MAIN_D_80124B48[i].width,
+			       MAIN_D_80124B48[i].height, 4);
 	}
 }
