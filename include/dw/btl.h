@@ -165,7 +165,6 @@ void BTL_addDeathCountdown(Entity *entity);
 void entityLookAtLocation(Entity *entity, VECTOR *pos);
 int32_t entityCheckCollision(Entity *a, Entity *entity, int32_t c, int32_t d);
 int32_t entityIsOffScreen(Entity *entity, int32_t width, int32_t height);
-void startBattleIdleAnimation(DigimonEntity *entity, Stats *stats, int32_t flags);
 void BTL_battleTickFrame(void);
 void BTL_initializeBattleStartText(void);
 void BTL_removeBattleStartText(void);

@@ -23,6 +23,7 @@ int32_t isInvisible(Entity *entity);
 void entityLookAtTile(Entity *entity, int32_t tileX, int32_t tileY);
 void getModelTile(VECTOR *pos, int16_t *outTileX, int16_t *outTileY);
 void tickPartnerCollision(void);
+void startBattleIdleAnimation(DigimonEntity *entity, Stats *stats, int32_t flags);
 void playSound(int32_t soundId, uint32_t flag);
 void MAIN_func_800D3ADC(void);
 

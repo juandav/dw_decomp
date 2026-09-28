@@ -60,6 +60,7 @@ extern const uint8_t BTL_D_80072EE8[8][2];
 void removeObject(int32_t objectId, int32_t instanceId);
 void addObject(int32_t objectId, int32_t instanceId, void *tick, void *render);
 void getEntityTileFromModel(Entity *entity, int8_t *outTileX, int8_t *outTileY);
+void startBattleIdleAnimation(DigimonEntity *entity, Stats *stats, int32_t flags);
 void tickObjects(void);
 void renderObjects(void);
 void handlePause(void);

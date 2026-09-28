@@ -25,8 +25,6 @@ typedef struct {
 	int16_t evoTarget;
 	int16_t state;
 	int32_t heightFactor;
-	int32_t unk_0x34;
-	int32_t unk_0x38;
 } EvoSequenceData;
 
 typedef struct {

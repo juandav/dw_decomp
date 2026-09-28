@@ -26,6 +26,7 @@ MAIN_C_SRC := \
 	src/main/_psstart.c \
 	src/main/aabb.c \
 	src/main/anim.c \
+	src/main/btl.c \
 	src/main/bubble.c \
 	src/main/butterfly.c \
 	src/main/clock.c \

@@ -27,9 +27,9 @@
 #define NUM_CONCAVE_SCREENS	18
 
 typedef struct {
+	uint8_t unk[8];
 	int16_t frame;
 	int16_t type;
-	uint8_t unused[8];
 } FleeBubbleState;
 
 extern uint8_t CURRENT_SCREEN;
@@ -72,6 +72,7 @@ void setFleeBubble(int16_t id, int16_t v);
 void renderFleeBubble(int32_t instanceId);
 void removeFleeBubble(int32_t id);
 int32_t handleBattleStart(int32_t id);
+void startBattleIdleAnimation(DigimonEntity *entity, Stats *stats, uint16_t flags);
 
 static void *btl_functions[] = {
 	startBattleIdleAnimation,
@@ -118,15 +119,15 @@ void loadCombatDataTick(void)
 	GsDrawOt(ACTIVE_ORDERING_TABLE);
 }
 
-void handleBattleIdle(DigimonEntity *entity, Stats *stats, int32_t flags)
+void handleBattleIdle(entity, stats, flags)
+	DigimonEntity *entity;
+	Stats *stats;
+	uint16_t flags;
 {
-	DigimonEntity *p;
-
-	p = entity;
-	if ((MAIN_D_80134D74 == 0) || (&p->entity != MAIN_D_80134D60)) {
-		if ((p->entity.anim.animId != 0x21) &&
-		    (p->entity.anim.animId != 0x22)) {
-			startBattleIdleAnimation(p, &p->stats, flags);
+	if ((MAIN_D_80134D74 == 0) || (&entity->entity != MAIN_D_80134D60)) {
+		if ((entity->entity.anim.animId != 0x21) &&
+		    (entity->entity.anim.animId != 0x22)) {
+			startBattleIdleAnimation(entity, &entity->stats, flags);
 		}
 	}
 }
@@ -138,35 +139,33 @@ static void setFleeBubble__garbage__(void)
 	int32_t t2;
 	int32_t t3;
 
-	t0 = ((int16_t *)FLEE_BUBBLE_DATA)[0];
-	t1 = ((int16_t *)FLEE_BUBBLE_DATA)[1];
-	t2 = ((int16_t *)FLEE_BUBBLE_DATA)[2];
-	t3 = ((int16_t *)FLEE_BUBBLE_DATA)[3];
+	t0 = (&FLEE_BUBBLE_DATA[0].frame)[0];
+	t1 = (&FLEE_BUBBLE_DATA[0].frame)[1];
+	t2 = (&FLEE_BUBBLE_DATA[0].frame)[2];
+	t3 = (&FLEE_BUBBLE_DATA[0].frame)[3];
 	removeFleeBubble(t0);
 	removeFleeBubble(t1);
-	((int16_t *)FLEE_BUBBLE_DATA)[0] = t0 + 1;
-	((int16_t *)FLEE_BUBBLE_DATA)[1] = t1 + 2;
-	((int16_t *)FLEE_BUBBLE_DATA)[2] = t2 + 3;
-	((int16_t *)FLEE_BUBBLE_DATA)[3] = t3 + 4;
+	(&FLEE_BUBBLE_DATA[0].frame)[0] = t0 + 1;
+	(&FLEE_BUBBLE_DATA[0].frame)[1] = t1 + 2;
+	(&FLEE_BUBBLE_DATA[0].frame)[2] = t2 + 3;
+	(&FLEE_BUBBLE_DATA[0].frame)[3] = t3 + 4;
 }
 
 void setFleeBubble(int16_t id, int16_t v)
 {
-	int32_t i;
-
-	i = id - 2;
-	FLEE_BUBBLE_DATA[i].frame = 0;
-	FLEE_BUBBLE_DATA[i].type = v;
+	FLEE_BUBBLE_DATA[id - 2].frame = 0;
+	FLEE_BUBBLE_DATA[id - 2].type = v;
 	addObject(0x196, id, NULL, renderFleeBubble);
 }
 
-void removeFleeBubble(int32_t id)
+void removeFleeBubble(id)
+	int16_t id;
 {
 	removeObject(0x196, id);
 }
 
 void startBattleIdleAnimation(DigimonEntity *entity, Stats *stats,
-			      int32_t flags)
+			      uint16_t flags)
 {
 	int32_t f;
 	int32_t anim;
@@ -185,24 +184,24 @@ void startBattleIdleAnimation(DigimonEntity *entity, Stats *stats,
 	startAnimation(&entity->entity, (uint8_t)anim);
 }
 
-int32_t handleBattleStart(int32_t id)
+// clang-format off
+int32_t handleBattleStart(id)
+	int16_t id;
+// clang-format on
 {
+	int32_t j;
+	int32_t chance;
+	int32_t hasA;
+	int32_t hasB;
+	int32_t concave;
 	uint8_t slots[4];
+	int16_t flag;
 	int8_t tx0;
 	int8_t ty0;
 	int8_t tx1;
 	int8_t ty1;
+	long i;
 	int32_t count;
-	int32_t i;
-	int32_t j;
-	int32_t concave;
-	int16_t flag;
-	int32_t pt;
-	int32_t row;
-	int32_t chance;
-	int32_t hasA;
-	int32_t hasB;
-	uint8_t partnerType;
 
 	COMBAT_DATA_PTR->player.entityIds[0] = 1;
 	COMBAT_DATA_PTR->player.unk4 = 0;
@@ -233,7 +232,7 @@ int32_t handleBattleStart(int32_t id)
 			if (isInvisible(ENTITY_TABLE[i])) {
 				continue;
 			}
-			setFleeBubble((int16_t)i, 1);
+			setFleeBubble(i, 1);
 		}
 
 		return count;
@@ -249,27 +248,34 @@ int32_t handleBattleStart(int32_t id)
 			continue;
 		}
 		if (i == id) {
-			setFleeBubble((int16_t)i, 0);
+			setFleeBubble(i, 0);
 			continue;
 		}
-		if ((NPC_ENTITIES - 2)[i].digimonEntity.entity.isOnScreen == 0) {
-			(NPC_ENTITIES - 2)[i].digimonEntity.entity.isOnMap = 0;
+		if (NPC_ENTITIES[i - 2].digimonEntity.entity.isOnScreen == 0) {
+			NPC_ENTITIES[i - 2].digimonEntity.entity.isOnMap = 0;
 			continue;
 		}
 		if (count == 3) {
-			setFleeBubble((int16_t)i, 1);
+			setFleeBubble(i, 1);
 			continue;
 		}
 		if (concave != 0) {
 			getEntityTileFromModel(ENTITY_TABLE[0], &tx0, &ty0);
+#if defined(VERSION_JP)
+			if (0) {
+				ty1 = 0;
+			}
+			getEntityTileFromModel(ENTITY_TABLE[i], &tx1, (int8_t *)ty1);
+#else
 			getEntityTileFromModel(ENTITY_TABLE[i], &tx1, &ty1);
+#endif
 			if (isLinearPathBlocked(tx0, ty0, tx1, ty1)) {
-				setFleeBubble((int16_t)i, 1);
+				setFleeBubble(i, 1);
 				continue;
 			}
 			getEntityTileFromModel(ENTITY_TABLE[1], &tx0, &ty0);
 			if (isLinearPathBlocked(tx0, ty0, tx1, ty1)) {
-				setFleeBubble((int16_t)i, 1);
+				setFleeBubble(i, 1);
 				continue;
 			}
 		}
@@ -297,13 +303,9 @@ int32_t handleBattleStart(int32_t id)
 		}
 
 		flag = 1;
-		partnerType = DIGIMON_DATA[PARTNER_ENTITY.digimonEntity.entity.type].type;
-		pt = partnerType;
-		if (partnerType != 0xff) {
-			j = DIGIMON_DATA[(NPC_ENTITIES - 2)[i].digimonEntity.entity.type].type;
-			row = pt;
-			row = row - 1;
-			if (chance < (&FLEE_CHANCE_TABLE[row * 3])[j - 1]) {
+		if (DIGIMON_DATA[PARTNER_ENTITY.digimonEntity.entity.type].type != 0xff) {
+			if (chance < (&FLEE_CHANCE_TABLE[(DIGIMON_DATA[PARTNER_ENTITY.digimonEntity.entity.type].type - 1) * 3])
+			                     [DIGIMON_DATA[NPC_ENTITIES[i - 2].digimonEntity.entity.type].type - 1]) {
 				COMBAT_DATA_PTR->player.entityIds[++count] = i;
 				flag = 0;
 			}
@@ -313,7 +315,7 @@ int32_t handleBattleStart(int32_t id)
 				flag = 0;
 			}
 		}
-		setFleeBubble((int16_t)i, flag);
+		setFleeBubble(i, flag);
 	}
 
 	return count;
@@ -321,48 +323,45 @@ int32_t handleBattleStart(int32_t id)
 
 void loadBattleData(int32_t entityId, int32_t count)
 {
+	int32_t unused;
+#if !defined(VERSION_JP)
+	int32_t type;
+#endif
+	int32_t move;
+	int32_t slot;
+	int32_t n;
 	int16_t moveList[18];
 	int16_t efeList[18];
 	int8_t loadState;
 	int32_t i;
 	int32_t j;
-	int32_t n;
-	int32_t slot;
-	int32_t vabId;
-	int32_t music;
-	int32_t type;
-	int32_t move;
 	DigimonEntity *e;
 
 	ENEMY_COUNT = count;
 	if (ENTITY_TABLE[COMBAT_DATA_PTR->player.entityIds[1]]->type == 0x73) {
 		playMusic(0x21, 3);
-		music = -1;
 	} else if ((entityId >= 2) && (entityId < 10)) {
 		if (IS_PREDEFINED_BATTLE == 1) {
 			playMusic(0x21, 0);
-			music = -1;
 		} else {
+#if defined(VERSION_JP)
+			if ((ENTITY_TABLE[entityId]->type >= 0x43) &&
+			    (ENTITY_TABLE[entityId]->type < 0x70)) {
+#else
 			type = ENTITY_TABLE[entityId]->type;
 			if ((type >= 0x43) && (type < 0x70)) {
-				playMusic(0x21,
-					  BATTLE_MUSIC[ENTITY_TABLE[entityId]
-					  ->type -
-					  0x43]);
-				music = -1;
+#endif
+				playMusic(0x21, BATTLE_MUSIC[ENTITY_TABLE[entityId]->type - 0x43]);
 			} else {
 				playMusic(0x21, 1);
-				music = -1;
 			}
 		}
 	} else if (IS_PREDEFINED_BATTLE == 1) {
 		playMusic(0x21, 0);
-		music = -1;
 	} else {
 		playMusic(0x21, 1);
-		music = -1;
 	}
-	LOAD_EFE_STATE = music;
+	LOAD_EFE_STATE = -1;
 	loadDynamicLibrary(BTL_REL, (uint8_t *)&loadState, 1, NULL, NULL);
 	tickPartnerWaypoints();
 	PARTNER_ENTITY.digimonEntity.entity.isOnScreen = 1;
@@ -376,6 +375,7 @@ void loadBattleData(int32_t entityId, int32_t count)
 		}
 	}
 	GAME_STATE = 3;
+	unused = 0;
 	if (IS_PREDEFINED_BATTLE != 1) {
 		startAnimation(ENTITY_TABLE[1], 0x24);
 	}
@@ -392,11 +392,11 @@ void loadBattleData(int32_t entityId, int32_t count)
 		loadCombatDataTick();
 	}
 	loadSB();
-	for (i = 0, vabId = 4; i <= ENEMY_COUNT; i++, vabId++) {
+	for (i = 0; i <= ENEMY_COUNT; i++) {
 		e = (DigimonEntity *)ENTITY_TABLE[COMBAT_DATA_PTR->player.entityIds[i]];
 		if (i != 0) {
-			e->stats.current.vabId = vabId;
-			slot = readVBALLSection(vabId, e->entity.type);
+			e->stats.current.vabId = i + 4;
+			slot = readVBALLSection(i + 4, e->entity.type);
 		}
 	}
 	while (isSoundBufferLoading(slot) != 0) {
@@ -448,12 +448,12 @@ void loadBattleData(int32_t entityId, int32_t count)
 		e->stats.current.unk1 = -1;
 		e->stats.current.efeSubEffect = -1;
 		for (j = 0; j < 4; j++) {
-			move = e->stats.base.moves[j];
-			if (move != 0xff) {
-				if (entityGetTechFromAnim(&e->entity, move) == 0xff) {
+			if (e->stats.base.moves[j] != 0xff) {
+				if (entityGetTechFromAnim(&e->entity, e->stats.base.moves[j]) == 0xff) {
 					e->stats.base.moves[j] = 0xff;
 				} else {
-					moveList[n++] = DIGIMON_DATA[e->entity.type].moves[e->stats.base.moves[j] - 0x2e] + 0x100;
+					move = DIGIMON_DATA[e->entity.type].moves[e->stats.base.moves[j] - 0x2e] + 0x100;
+					moveList[n++] = move;
 				}
 			}
 		}
@@ -501,39 +501,41 @@ static void renderFleeBubble__garbage(void)
 	int32_t t7;
 	int32_t t8;
 
-	t0 = ((int16_t *)FLEE_BUBBLE_DATA)[0];
-	t1 = ((int16_t *)FLEE_BUBBLE_DATA)[1];
-	t2 = ((int16_t *)FLEE_BUBBLE_DATA)[2];
-	t3 = ((int16_t *)FLEE_BUBBLE_DATA)[3];
-	t4 = ((int16_t *)FLEE_BUBBLE_DATA)[4];
-	t5 = ((int16_t *)FLEE_BUBBLE_DATA)[5];
-	t6 = ((int16_t *)FLEE_BUBBLE_DATA)[6];
-	t7 = ((int16_t *)FLEE_BUBBLE_DATA)[7];
-	t8 = ((int16_t *)FLEE_BUBBLE_DATA)[8];
-	((int16_t *)FLEE_BUBBLE_DATA)[0] = t0 + 1;
-	((int16_t *)FLEE_BUBBLE_DATA)[1] = t1 + 2;
-	((int16_t *)FLEE_BUBBLE_DATA)[2] = t2 + 3;
-	((int16_t *)FLEE_BUBBLE_DATA)[3] = t3 + 4;
-	((int16_t *)FLEE_BUBBLE_DATA)[4] = t4 + 5;
-	((int16_t *)FLEE_BUBBLE_DATA)[5] = t5 + 6;
-	((int16_t *)FLEE_BUBBLE_DATA)[6] = t6 + 7;
-	((int16_t *)FLEE_BUBBLE_DATA)[7] = t7 + 8;
-	((int16_t *)FLEE_BUBBLE_DATA)[8] = t8 + 9;
+	t0 = (&FLEE_BUBBLE_DATA[0].frame)[0];
+	t1 = (&FLEE_BUBBLE_DATA[0].frame)[1];
+	t2 = (&FLEE_BUBBLE_DATA[0].frame)[2];
+	t3 = (&FLEE_BUBBLE_DATA[0].frame)[3];
+	t4 = (&FLEE_BUBBLE_DATA[0].frame)[4];
+	t5 = (&FLEE_BUBBLE_DATA[0].frame)[5];
+	t6 = (&FLEE_BUBBLE_DATA[0].frame)[6];
+	t7 = (&FLEE_BUBBLE_DATA[0].frame)[7];
+	t8 = (&FLEE_BUBBLE_DATA[0].frame)[8];
+	(&FLEE_BUBBLE_DATA[0].frame)[0] = t0 + 1;
+	(&FLEE_BUBBLE_DATA[0].frame)[1] = t1 + 2;
+	(&FLEE_BUBBLE_DATA[0].frame)[2] = t2 + 3;
+	(&FLEE_BUBBLE_DATA[0].frame)[3] = t3 + 4;
+	(&FLEE_BUBBLE_DATA[0].frame)[4] = t4 + 5;
+	(&FLEE_BUBBLE_DATA[0].frame)[5] = t5 + 6;
+	(&FLEE_BUBBLE_DATA[0].frame)[6] = t6 + 7;
+	(&FLEE_BUBBLE_DATA[0].frame)[7] = t7 + 8;
+	(&FLEE_BUBBLE_DATA[0].frame)[8] = t8 + 9;
 }
 
 void renderFleeBubble(int32_t instanceId)
 {
+	Entity *e;
 	SVECTOR pos;
+	int32_t dx;
+	int32_t dy;
+	int32_t depth;
 	DVECTOR screen;
 	GsSPRITE sprite;
-	Entity *e;
-	VECTOR *loc;
-	POLY_FT4 *prim;
-	int16_t scale;
-	int16_t sc;
 	int16_t sx;
 	int16_t sy;
-	int32_t depth;
+	int16_t scale;
+	int16_t sc;
+	VECTOR *loc;
+	POLY_FT4 *prim;
 
 	e = ENTITY_TABLE[instanceId];
 	loc = &e->posData->location;
@@ -555,7 +557,7 @@ void renderFleeBubble(int32_t instanceId)
 		sc = sc * FLEE_BUBBLE_SCALE[(FLEE_BUBBLE_DATA[instanceId - 2].frame - 5) % 10] / 100;
 	}
 
-	sx = (sy = screen.vx) - (0xa0 - DRAWING_OFFSET_X);
+	sx = (int16_t)screen.vx - (0xa0 - DRAWING_OFFSET_X);
 	sy = screen.vy - (0x78 - DRAWING_OFFSET_Y);
 	if (sx < -0x8c) {
 		sx = -0x8c;
@@ -572,7 +574,6 @@ void renderFleeBubble(int32_t instanceId)
 
 	sprite.attribute = 0;
 	setWH(&sprite, (sc < 0x30) ? 0x18 : 0x17, (sc < 0x30) ? 0x18 : 0x17);
-	scale = sc;
 	sprite.mx = 0xb;
 	sprite.my = 0xc;
 	sprite.r = 0x80;
@@ -583,7 +584,7 @@ void renderFleeBubble(int32_t instanceId)
 	sprite.u = FLEE_BUBBLE_DATA[instanceId - 2].type * 24 + 0xb8;
 	sprite.v = 0x80;
 	sprite.tpage = getTPage(0, 0, 896, 256);
-	sprite.scaley = sprite.scalex = (scale << 12) / sprite.w;
+	sprite.scaley = sprite.scalex = (sc << 12) / sprite.w;
 	sprite.x = sx;
 	sprite.y = sy;
 
@@ -591,21 +592,23 @@ void renderFleeBubble(int32_t instanceId)
 	gte_ldv0(&pos);
 	gte_rtps();
 	gte_stsxy(&screen);
-	screen.vx = (depth = screen.vx) - (0xa0 - DRAWING_OFFSET_X);
+	screen.vx = (int16_t)screen.vx - (0xa0 - DRAWING_OFFSET_X);
 	screen.vy = screen.vy - (0x78 - DRAWING_OFFSET_Y);
-	sprite.rotate = _atan(-(screen.vy - sprite.y), screen.vx - sprite.x) * 15 * 3 * 8;
-	scale = scale * 2 / 3;
+	dx = screen.vx - sprite.x;
+	dy = screen.vy - sprite.y;
+	sprite.rotate = _atan(-dy, dx) * 360;
+	scale = sc * 2 / 3;
 
 	prim = (POLY_FT4 *)GsGetWorkBase();
 	SetPolyFT4(prim);
 	setRGB0(prim, 0x80, 0x80, 0x80);
 	prim->tpage = getTPage(0, 0, 896, 256);
-	setClut(prim, 0x100, 0x1e7);
+	prim->clut = GetClut(0x100, 0x1e7);
 	SetSemiTrans(prim, 1);
 	setUVWH(prim,
-		FLEE_BUBBLE_DATA[instanceId - 2].type * 16 + 0xc8, 0x98,
-		(sprite.w == 0x18) ? 0x10 : 0xf,
-		(sprite.w == 0x18) ? 0x10 : 0xf);
+	        FLEE_BUBBLE_DATA[instanceId - 2].type * 16 + 0xc8, 0x98,
+	        (sprite.w == 0x18) ? 0x10 : 0xf,
+	        (sprite.w == 0x18) ? 0x10 : 0xf);
 
 	setXYWH(prim, sx - scale / 2, sy - scale / 2, scale, scale);
 

@@ -6388,8 +6388,8 @@ MEDAL_OBJECT = 0x801546A0; // size:0x10
 MEDAL_COORDINATES = 0x801546B0; // size:0x50
 FILE_REQUEST_TABLE = 0x80154700; // size:0x880
 MAIN_D_80154F80 = 0x80154F80;
-EVO_SEQUENCE_DATA = 0x80154F90; // size:0x3c
-FLEE_BUBBLE_DATA = 0x80154FCC; // size:0x58
+EVO_SEQUENCE_DATA = 0x80154F90; // size:0x34
+FLEE_BUBBLE_DATA = 0x80154FC4; // size:0x60
 // TODO: Look into EFEX_TABLE size and potential alignment/padding
 // as there appear to be 4 bytes of unused space at the end
 EFEX_TABLE = 0x80155024;
