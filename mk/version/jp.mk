@@ -13,6 +13,7 @@ MAIN_SBSS := \
 	$(GEN_DIR)/unk_0x8013E34C.sbss.s \
 	$(GEN_DIR)/unk_0x8013E37C.sbss.s \
 	$(GEN_DIR)/unk_0x8013E438.sbss.s \
+	$(GEN_DIR)/unk_0x8013E498.sbss.s \
 	$(GEN_DIR)/unk_0x8013E59C.sbss.s \
 	$(GEN_DIR)/unk_0x8013E5D4.sbss.s
 
@@ -109,6 +110,9 @@ ENDI_C_SRC := \
 	src/endi/endi.c
 
 $(eval $(call overlay,ENDI,endi))
+EVL_C_SRC := \
+	src/evl/evl.c
+
 $(eval $(call overlay,EVL,evl))
 FISH_C_SRC := \
 	src/fish/fish_bss.c \

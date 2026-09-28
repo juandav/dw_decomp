@@ -53,8 +53,8 @@ extern u_long EVL_D_80065398[];
 extern u_long EVL_D_8006569C[];
 extern char EVL_D_80065FA0[];
 extern char EVL_D_80066274[];
-extern EfeFlashData EVL_D_800677B0[12];
-extern int16_t EVL_D_80067990[42];
+extern EfeFlashBuffer EVL_D_800677B0;
+extern int16_t EVL_D_80067994[40];
 extern GsRVIEW2 GS_VIEWPOINT;
 extern GsRVIEW2 EVL_D_800688E8;
 extern int32_t VIEWPORT_DISTANCE;
@@ -96,21 +96,21 @@ int32_t worldPosToScreenPos(SVECTOR *worldPos, DVECTOR *screenPos);
 void EVL_setScratchTop(int32_t size);
 void EVL_resetParticles(void);
 void EVL_resetSparks(void);
-void EVL_storeClutBank1(u_long *pixels);
+void EVL_storeClutBank1(int32_t buffer);
 void EVL_releaseAllParticles(void);
 void EVL_tickParticle(int32_t id);
-void EVL_storeDigimonClut(uint16_t *buffer, Entity *entity);
-void EVL_storeClutBank0(u_long *pixels);
+void EVL_storeDigimonClut(int32_t buffer, Entity *entity);
+void EVL_storeClutBank0(int32_t buffer);
 void EVL_setOtherEntitiesVisible(int32_t restore);
 int32_t EVL_spawnParticle(VECTOR *position, RGB8 *color);
 void EVL_renderParticle(int32_t id);
-char *EVL_initShardSets(char *base);
+int32_t EVL_initShardSets(int32_t base);
 void EVL_tickEvoSequence(int32_t instanceId);
 void EVL_fadeClutBank0(int16_t *srcClut, void *entity, int16_t *dstClut, int32_t startFrame, int32_t endFrame, int32_t frame);
 void EVL_fadeClutBank1(int16_t *srcClut, void *entity, int16_t *dstClut, int32_t startFrame, int32_t endFrame, int32_t frame);
 void EVL_updateEvoCamera(Entity *entity, int32_t unused, int32_t frame);
 int32_t EVL_buildShardSet(Entity *entity, int32_t objIndex, int32_t bone);
-int32_t EVL_spawnSpark(void *owner, int32_t timer, int32_t param);
+int32_t EVL_spawnSpark(Entity *entity, int32_t bone, int32_t timer);
 void EVL_calculateCameraVectors(VECTOR *viewRef, VECTOR *viewPos, Entity *entity, SVECTOR *rotation, int32_t distance, int32_t height);
 void EVL_tickShardSet(int32_t id);
 void EVL_renderShardSet(int32_t index);
@@ -119,7 +119,7 @@ void EVL_renderQuadShard(EvlModelVertex *drift, int32_t unused1, int16_t speed, 
 void EVL_renderSparkStreak(int32_t id);
 void EVL_tickSpark(int32_t id);
 void EVL_applyEvolution(Entity *entity, Stats *stats, PartnerPara *para, int16_t digimonId);
-void EVL_scaleBaseStats(Stats *stats, int16_t pct, int32_t unused);
+void EVL_scaleBaseStats(Stats *stats, int16_t pct, int16_t unused);
 void EVL_clampBaseStats(void);
 void EVL_renderEvoSequence(void);
 
@@ -128,8 +128,13 @@ static void *evl_functions[] = {
 	EVL_scaleBaseStats,
 	EVL_applyEvolution,
 	EVL_initEvoSequence,
+#if defined(VERSION_JP)
+	EVL_renderSparkStreak,
+	EVL_tickSpark,
+#else
 	EVL_tickSpark,
 	EVL_renderSparkStreak,
+#endif
 	EVL_renderParticle,
 	EVL_tickParticle,
 	EVL_renderQuadShard,
@@ -172,7 +177,7 @@ int32_t MAIN_D_801351F8;
 int32_t MAIN_D_801351FC;
 int32_t MAIN_D_80135200;
 int32_t MAIN_D_80135204;
-char *MAIN_D_80135208;
+EvlShardSet *MAIN_D_80135208;
 int32_t MAIN_D_8013520C;
 uint8_t *MAIN_D_80135210;
 EvlModelVertex *MAIN_D_80135214;
@@ -211,51 +216,50 @@ int8_t EVL_D_80063F28[18] = {
 };
 // clang-format on
 
-void EVL_storeDigimonClut(uint16_t *buffer, Entity *entity)
+void EVL_storeDigimonClut(int32_t buffer, Entity *entity)
 {
 	ModelComponent *model;
+	TMDModel *tmd;
 	RECT rect;
 
 	model = getEntityModelComponent(entity->type, getEntityType(entity));
+	tmd = model->modelPtr;
 	setRECT(&rect, (model->clutPage & 0x3f) << 4, model->clutPage >> 6, 0x10, 0x18);
 	StoreImage(&rect, (u_long *)buffer);
 
 	DrawSync(0);
 }
 
-void EVL_storeClutBank0(u_long *pixels)
+void EVL_storeClutBank0(int32_t buffer)
 {
 	RECT rect;
 
 	setRECT(&rect, 0, 488, 16, 24);
-	StoreImage(&rect, pixels);
+	StoreImage(&rect, (u_long *)buffer);
 	DrawSync(0);
 }
 
-void EVL_storeClutBank1(u_long *pixels)
+void EVL_storeClutBank1(int32_t buffer)
 {
 	RECT rect;
 
 	setRECT(&rect, 32, 488, 48, 24);
-	StoreImage(&rect, pixels);
+	StoreImage(&rect, (u_long *)buffer);
 	DrawSync(0);
 }
 
-char *EVL_initShardSets(char *base)
+int32_t EVL_initShardSets(int32_t base)
 {
 	int32_t i;
-	int32_t off;
-	int32_t rem;
 
-	rem = (int32_t)base & 3;
-	if (rem != 0) {
-		base = (char *)((int32_t)base + (4 - rem));
+	if ((base & 3) != 0) {
+		base += 4 - (base & 3L);
 	}
 
-	MAIN_D_80135208 = base;
-	base = (char *)((int32_t)base + 0x2d0);
-	for (i = 0, off = 0; i < 30; i++, off += 0x18) {
-		*(int16_t *)(MAIN_D_80135208 + off) = -1;
+	MAIN_D_80135208 = (EvlShardSet *)base;
+	base += 0x2d0;
+	for (i = 0; i < 30; i++) {
+		MAIN_D_80135208[i].timer = -1;
 	}
 
 	return base;
@@ -263,11 +267,8 @@ char *EVL_initShardSets(char *base)
 
 void EVL_setScratchTop(int32_t size)
 {
-	int32_t rem;
-
-	rem = size & 3;
-	if (rem != 0) {
-		size += 4 - rem;
+	if ((size & 3) != 0) {
+		size += 4 - (size & 3L);
 	}
 
 	MAIN_D_8013520C = size;
@@ -293,32 +294,35 @@ void EVL_resetSparks(void)
 
 void EVL_tickEvoSequence(int32_t instanceId)
 {
+	int32_t i;
+	int32_t tmp;
+	int32_t size;
+	int32_t height;
+	int32_t bone;
+	int32_t obj;
+	MATRIX *workm;
 	VECTOR colorStart;
 	VECTOR colorEnd;
 	VECTOR viewRef;
 	VECTOR viewPos;
-	RGB8 color;
-	SVECTOR rot;
-	int32_t bone;
-	int8_t obj;
-	PartnerEntity *partner;
-	EvoSequenceData *data;
-	int32_t frame;
-	int32_t tmp;
-	int32_t size;
-	int32_t height;
 	int32_t alpha;
+	int32_t unused[3];
+	RGB8 color;
 	VECTOR *scale;
-	int32_t hRatio;
 	int32_t rRatio;
-	MATRIX *workm;
-	int32_t i;
-	int32_t t;
-	int32_t t2;
+	int32_t hRatio;
+	SVECTOR rot;
+	int32_t camSize;
+	EvoSequenceData *data;
+	PartnerEntity *partner;
+	int32_t frame;
 
-	partner = EVO_SEQUENCE_DATA.partner;
-	frame = EVO_SEQUENCE_DATA.timer;
 	data = &EVO_SEQUENCE_DATA;
+	partner = data->partner;
+	frame = data->timer;
+	if (0) {
+		unused[0] = 0;
+	}
 
 	if ((partner->digimonEntity.entity.anim.animId == 0xc) &&
 	    (partner->digimonEntity.entity.anim.animFrame == partner->digimonEntity.entity.anim.frameCount)) {
@@ -327,7 +331,11 @@ void EVL_tickEvoSequence(int32_t instanceId)
 
 	switch (data->state) {
 	case 0:
-		alpha = (frame < 0x20) ? lerp(0, 0xff, 0, 0x20, frame) : 0xff;
+		if (frame < 0x20) {
+			alpha = lerp(0, 0xff, 0, 0x20, frame);
+		} else {
+			alpha = 0xff;
+		}
 		MAIN_func_800D9BA8(alpha, EVL_D_80063F3C, 0);
 		MAIN_func_800D9F14(alpha, EVL_D_80064D50, 0);
 		if ((frame & 1) == 0) {
@@ -365,17 +373,15 @@ void EVL_tickEvoSequence(int32_t instanceId)
 			color.g = lerp(0x32, 0xe6, 1, 5, EVL_D_80063F28[frame % 18]);
 			EVL_spawnParticle(&EVL_D_80064D40, &color);
 		}
-		t = data->timer;
-		if ((t >= 0x70) && (t < 0xcd)) {
+		if ((data->timer >= 0x70) && (data->timer < 0xcdL)) {
 			EVL_brightenDigimonClut((int16_t *)EVL_D_80065094, &partner->digimonEntity.entity, EVL_D_800679E4, 0x70, 0x9a, data->timer);
 		}
-		t = data->timer;
-		if ((t >= 0x70) && (t < 0x9b)) {
-			tmp = (EVL_D_80063EFC - 0x70)[data->timer];
+		if ((data->timer >= 0x70) && (data->timer < 0x9bL)) {
+			tmp = EVL_D_80063EFC[data->timer - 0x70L];
 			if (tmp >= 0) {
 shards:
 				if (data->unk_0x8 < DIGIMON_DATA[partner->digimonEntity.entity.type].boneCount - 1) {
-					bone = (&EVL_D_80067990[2])[data->unk_0x8++];
+					bone = EVL_D_80067994[data->unk_0x8++];
 					obj = DIGIMON_SKELETONS[partner->digimonEntity.entity.type][bone].objIndex;
 					if (obj == -1) {
 						goto shards;
@@ -383,7 +389,7 @@ shards:
 					playSound2(8, (rand() % 3) + 2);
 					EVL_buildShardSet(&partner->digimonEntity.entity, obj, bone);
 					PARTNER_WIREFRAME_SUB[bone] = 0;
-					EVL_spawnSpark(partner, (int16_t)bone, (int16_t)(0x11c - data->timer));
+					EVL_spawnSpark(&partner->digimonEntity.entity, (int16_t)bone, (int16_t)(0x11c - data->timer));
 					workm = &partner->digimonEntity.entity.posData[bone].posMatrix.workm;
 					*EFE_DATA_STACK++ = 1;
 					*EFE_DATA_STACK++ = (int32_t)workm->t;
@@ -398,22 +404,19 @@ shards:
 					createFlash();
 				}
 			}
-		} else {
-			if ((int32_t)*(uint8_t **)&data->timer >= 0x9b) {
-				t2 = (int32_t)*(uint8_t **)&data->timer;
-				if (t2 < 0x11c) {
-					goto shards;
-				}
+		} else if ((int32_t)*(uint8_t **)&data->timer >= 0x9b) {
+			if ((int32_t)*(uint8_t **)&data->timer < 0x11c) {
+				goto shards;
 			}
 		}
 		if ((int32_t)*(uint8_t **)&data->timer < 0xcc) {
 			tmp = DIGIMON_DATA[partner->digimonEntity.entity.type].radius;
 			size = DIGIMON_DATA[partner->digimonEntity.entity.type].height;
-			height = size;
+			height = DIGIMON_DATA[partner->digimonEntity.entity.type].height;
 		} else if (((int32_t)*(uint8_t **)&data->timer >= 0xcc) && ((int32_t)*(uint8_t **)&data->timer < 0x108)) {
 			scale = &partner->digimonEntity.entity.posData->scale;
-			hRatio = (DIGIMON_DATA[data->digimonId].height << 12) / DIGIMON_DATA[partner->digimonEntity.entity.type].height;
 			rRatio = (DIGIMON_DATA[data->digimonId].radius << 12) / DIGIMON_DATA[partner->digimonEntity.entity.type].radius;
+			hRatio = (DIGIMON_DATA[data->digimonId].height << 12) / DIGIMON_DATA[partner->digimonEntity.entity.type].height;
 			scale->vx = lerp(0x1000, rRatio, 0xcc, 0x108, data->timer);
 			scale->vy = lerp(0x1000, hRatio, 0xcc, 0x108, data->timer);
 			scale->vz = scale->vx;
@@ -423,7 +426,7 @@ shards:
 		} else if ((int32_t)*(uint8_t **)&data->timer >= 0x108) {
 			tmp = DIGIMON_DATA[data->digimonId].radius;
 			size = DIGIMON_DATA[data->digimonId].height;
-			height = size;
+			height = DIGIMON_DATA[data->digimonId].height;
 		}
 		if (data->timer >= 0xa5) {
 			if (data->timer >= 0xc3) {
@@ -433,10 +436,13 @@ shards:
 			}
 			rot = MAIN_D_801349EC;
 			rot.vy = MAIN_D_801351F8 + partner->digimonEntity.entity.posData->rotation.vy;
-			size = (tmp < size) ? size : tmp;
-			size = (size * 5) + 0x4b0;
-			EVL_calculateCameraVectors(&viewRef, &viewPos, &partner->digimonEntity.entity, &rot, size, height);
-			tmp = size;
+			if (tmp < size) {
+				camSize = size;
+			} else {
+				camSize = tmp;
+			}
+			camSize = (camSize * 5) + 0x4b0;
+			EVL_calculateCameraVectors(&viewRef, &viewPos, &partner->digimonEntity.entity, &rot, camSize, height);
 			GS_VIEWPOINT.vrx = viewRef.vx;
 			GS_VIEWPOINT.vry = viewRef.vy;
 			GS_VIEWPOINT.vrz = viewRef.vz;
@@ -538,27 +544,24 @@ void EVL_renderEvoSequence(void)
 
 void EVL_fadeClutBank0(int16_t *srcClut, void *entity, int16_t *dstClut, int32_t startFrame, int32_t endFrame, int32_t frame)
 {
+	RECT rect;
 	int32_t i;
 	int16_t r;
 	int16_t g;
 	int16_t b;
 	int16_t stp;
-	int16_t *dst;
+	int16_t noiseR;
+	int16_t noiseG;
+	int16_t noiseB;
 	int16_t *src;
-	RECT rect;
+	int16_t *dst;
 
 	src = srcClut;
 	dst = dstClut;
-	rand();
-	rand();
-	rand();
+	noiseR = rand() % 100;
+	noiseG = rand() % 100;
+	noiseB = rand() % 100;
 	for (i = 0; i < 384; i++) {
-		int32_t den;
-		int32_t num;
-
-		num = endFrame - frame;
-		den = endFrame - startFrame;
-
 		r = *src & 0x1f;
 		g = (*src >> 5) & 0x1f;
 		b = (*src >> 10) & 0x1f;
@@ -567,14 +570,14 @@ void EVL_fadeClutBank0(int16_t *srcClut, void *entity, int16_t *dstClut, int32_t
 		if (frame != startFrame) {
 			stp = 1;
 		}
-		r = r * num / den;
-		g = g * num / den;
-		b = b * num / den;
+		r = (int16_t)r * (endFrame - frame) / (endFrame - startFrame);
+		g = (int16_t)g * (endFrame - frame) / (endFrame - startFrame);
+		b = (int16_t)b * (endFrame - frame) / (endFrame - startFrame);
 
 		*dst = r;
-		*dst += (int16_t)(g << 5);
-		*dst += (int16_t)(b << 10);
-		*dst++ += (int16_t)(stp << 15);
+		*dst += g << 5;
+		*dst += b << 10;
+		*dst++ += stp << 15;
 	}
 
 	setRECT(&rect, 0, 488, 16, 24);
@@ -583,27 +586,24 @@ void EVL_fadeClutBank0(int16_t *srcClut, void *entity, int16_t *dstClut, int32_t
 
 void EVL_fadeClutBank1(int16_t *srcClut, void *entity, int16_t *dstClut, int32_t startFrame, int32_t endFrame, int32_t frame)
 {
+	RECT rect;
 	int32_t i;
 	int16_t r;
 	int16_t g;
 	int16_t b;
 	int16_t stp;
-	int16_t *dst;
+	int16_t noiseR;
+	int16_t noiseG;
+	int16_t noiseB;
 	int16_t *src;
-	RECT rect;
+	int16_t *dst;
 
 	src = srcClut;
 	dst = dstClut;
-	rand();
-	rand();
-	rand();
+	noiseR = rand() % 100;
+	noiseG = rand() % 100;
+	noiseB = rand() % 100;
 	for (i = 0; i < 1152; i++) {
-		int32_t den;
-		int32_t num;
-
-		num = endFrame - frame;
-		den = endFrame - startFrame;
-
 		r = *src & 0x1f;
 		g = (*src >> 5) & 0x1f;
 		b = (*src >> 10) & 0x1f;
@@ -612,14 +612,14 @@ void EVL_fadeClutBank1(int16_t *srcClut, void *entity, int16_t *dstClut, int32_t
 		if (frame != startFrame) {
 			stp = 1;
 		}
-		r = r * num / den;
-		g = g * num / den;
-		b = b * num / den;
+		r = (int16_t)r * (endFrame - frame) / (endFrame - startFrame);
+		g = (int16_t)g * (endFrame - frame) / (endFrame - startFrame);
+		b = (int16_t)b * (endFrame - frame) / (endFrame - startFrame);
 
 		*dst = r;
-		*dst += (int16_t)(g << 5);
-		*dst += (int16_t)(b << 10);
-		*dst++ += (int16_t)(stp << 15);
+		*dst += g << 5;
+		*dst += b << 10;
+		*dst++ += stp << 15;
 	}
 
 	setRECT(&rect, 32, 488, 48, 24);
@@ -651,58 +651,71 @@ void EVL_setOtherEntitiesVisible(int32_t restore)
 
 void EVL_updateEvoCamera(Entity *entity, int32_t unused, int32_t frame)
 {
-	int32_t size;
 	VECTOR viewRef;
 	VECTOR viewPos;
-	SVECTOR pos;
-	DVECTOR screen;
-	SVECTOR rot;
-	SVECTOR rot2;
-	int32_t t;
 
 	if (frame >= 0x11c) {
 		return;
 	}
 
 	if ((frame >= 0x20) && (frame < 0x61)) {
+		int32_t t;
+		int32_t start;
+		int32_t mid;
+		int32_t end;
+		SVECTOR pos;
+		DVECTOR screen;
+		SVECTOR rot;
+		int32_t size;
+
+		start = 0x20;
+		mid = 0x40;
+		end = 0x60;
 		pos.vx = entity->posData->location.vx;
 		pos.vy = entity->posData->location.vy;
 		pos.vz = entity->posData->location.vz;
 		worldPosToScreenPos(&pos, &screen);
 		MAIN_D_801351F8 = 0x638;
 		rot = MAIN_D_801349F8;
-		rot.vy = entity->posData->rotation.vy + 0x638;
-		size = (DIGIMON_DATA[entity->type].height < DIGIMON_DATA[entity->type].radius) ? (int32_t)DIGIMON_DATA[entity->type].radius : (int32_t)DIGIMON_DATA[entity->type].height;
-		size = (size * 5) + 0x4b0;
-		EVL_calculateCameraVectors(&viewRef, &viewPos, entity, &rot, size, DIGIMON_DATA[entity->type].height);
-		if (frame < 0x41) {
-			GS_VIEWPOINT.vrx = lerp(EVL_D_800688E8.vrx, viewRef.vx, 0x20, 0x40, frame);
-			GS_VIEWPOINT.vry = lerp(EVL_D_800688E8.vry, viewRef.vy, 0x20, 0x40, frame);
-			GS_VIEWPOINT.vrz = lerp(EVL_D_800688E8.vrz, viewRef.vz, 0x20, 0x40, frame);
-			GS_VIEWPOINT.rz = 0;
-			DRAWING_OFFSET_X = lerp(MAIN_D_801351E4, 0xa0, 0x20, 0x40, frame);
-			DRAWING_OFFSET_Y = lerp(MAIN_D_801351E8, 0x78, 0x20, 0x40, frame);
-		} else if (frame < 0x61) {
-			GS_VIEWPOINT.vpx = lerp(EVL_D_800688E8.vpx, viewPos.vx, 0x40, 0x60, frame);
-			GS_VIEWPOINT.vpy = lerp(EVL_D_800688E8.vpy, viewPos.vy, 0x40, 0x60, frame);
-			GS_VIEWPOINT.vpz = lerp(EVL_D_800688E8.vpz, viewPos.vz, 0x40, 0x60, frame);
-			t = lerp(0, 0x14, 0, 0xc8, DIGIMON_DATA[entity->type].height);
-			DRAWING_OFFSET_Y = lerp(0x78, t + 0x78, 0x40, 0x60, frame);
-			VIEWPORT_DISTANCE = lerp(MAIN_D_801351EC, 0x3e8, 0x40, 0x60, frame);
-		}
-	}
-
-	if (frame >= 0x61) {
-		MAIN_D_801351F8 += 0x16;
-		rot2 = MAIN_D_80134A00;
-		rot2.vy = MAIN_D_801351F8 + entity->posData->rotation.vy;
+		rot.vy = MAIN_D_801351F8 + entity->posData->rotation.vy;
 		if (DIGIMON_DATA[entity->type].height < DIGIMON_DATA[entity->type].radius) {
 			size = DIGIMON_DATA[entity->type].radius;
 		} else {
 			size = DIGIMON_DATA[entity->type].height;
 		}
 		size = (size * 5) + 0x4b0;
-		EVL_calculateCameraVectors(&viewRef, &viewPos, entity, &rot2, size, DIGIMON_DATA[entity->type].height);
+		EVL_calculateCameraVectors(&viewRef, &viewPos, entity, &rot, size, DIGIMON_DATA[entity->type].height);
+		if (frame <= mid) {
+			GS_VIEWPOINT.vrx = lerp(EVL_D_800688E8.vrx, viewRef.vx, start, mid, frame);
+			GS_VIEWPOINT.vry = lerp(EVL_D_800688E8.vry, viewRef.vy, start, mid, frame);
+			GS_VIEWPOINT.vrz = lerp(EVL_D_800688E8.vrz, viewRef.vz, start, mid, frame);
+			GS_VIEWPOINT.rz = 0;
+			DRAWING_OFFSET_X = lerp(MAIN_D_801351E4, 0xa0, start, mid, frame);
+			DRAWING_OFFSET_Y = lerp(MAIN_D_801351E8, 0x78, start, mid, frame);
+		} else if (frame <= end) {
+			GS_VIEWPOINT.vpx = lerp(EVL_D_800688E8.vpx, viewPos.vx, mid, end, frame);
+			GS_VIEWPOINT.vpy = lerp(EVL_D_800688E8.vpy, viewPos.vy, mid, end, frame);
+			GS_VIEWPOINT.vpz = lerp(EVL_D_800688E8.vpz, viewPos.vz, mid, end, frame);
+			t = lerp(0, 0x14, 0, 0xc8, DIGIMON_DATA[entity->type].height);
+			DRAWING_OFFSET_Y = lerp(0x78, t + 0x78, mid, end, frame);
+			VIEWPORT_DISTANCE = lerp(MAIN_D_801351EC, 0x3e8, mid, end, frame);
+		}
+	}
+
+	if (frame >= 0x61) {
+		SVECTOR rot;
+		int32_t size;
+
+		MAIN_D_801351F8 += 0x16;
+		rot = MAIN_D_80134A00;
+		rot.vy = MAIN_D_801351F8 + entity->posData->rotation.vy;
+		if (DIGIMON_DATA[entity->type].height < DIGIMON_DATA[entity->type].radius) {
+			size = DIGIMON_DATA[entity->type].radius;
+		} else {
+			size = DIGIMON_DATA[entity->type].height;
+		}
+		size = (size * 5) + 0x4b0;
+		EVL_calculateCameraVectors(&viewRef, &viewPos, entity, &rot, size, DIGIMON_DATA[entity->type].height);
 		GS_VIEWPOINT.vrx = viewRef.vx;
 		GS_VIEWPOINT.vry = viewRef.vy;
 		GS_VIEWPOINT.vrz = viewRef.vz;
@@ -739,10 +752,15 @@ int32_t EVL_spawnParticle(VECTOR *position, RGB8 *color)
 	return i;
 }
 
-int32_t EVL_spawnSpark(void *owner, int32_t timer, int32_t param)
+// clang-format off
+int32_t EVL_spawnSpark(entity, bone, timer)
+	Entity *entity;
+	int16_t bone;
+	int16_t timer;
+// clang-format on
 {
 	int32_t i;
-	int16_t *p;
+	EvlSpark *spark;
 
 	for (i = 0; i < 16; i++) {
 		if (EVL_D_80068F84[i].bone == -1) {
@@ -754,10 +772,10 @@ int32_t EVL_spawnSpark(void *owner, int32_t timer, int32_t param)
 		return -1;
 	}
 
-	p = (int16_t *)&EVL_D_80068F84[i];
-	p[0] = timer;
-	*(int32_t *)&p[2] = (int32_t)owner;
-	p[1] = param;
+	spark = &EVL_D_80068F84[i];
+	spark->bone = bone;
+	spark->entity = entity;
+	spark->timer = timer;
 	addObject(0x605, i, EVL_tickSpark, EVL_renderSparkStreak);
 
 	return i;
@@ -802,7 +820,7 @@ void EVL_tickShardSet(int32_t id)
 {
 	int16_t *p;
 
-	p = (int16_t *)(MAIN_D_80135208 + (id * 0x18));
+	p = &MAIN_D_80135208[id].timer;
 	if (*p >= 0x1f) {
 		removeObject(0x604, id);
 		*p = -1;
@@ -817,9 +835,8 @@ void EVL_renderShardSet(int32_t index)
 	EvlShardSet *entry;
 	int32_t shards;
 	int32_t count;
-	int32_t code;
 
-	entry = &((EvlShardSet *)MAIN_D_80135208)[index];
+	entry = &MAIN_D_80135208[index];
 	shards = entry->centers;
 	model = getEntityModelComponent(entry->model[0], 3);
 	count = entry->centerCount;
@@ -830,11 +847,11 @@ void EVL_renderShardSet(int32_t index)
 	MAIN_D_80135218[2] = MAIN_D_80135218[0];
 
 	while (count-- > 0) {
-		if (((code = ((int8_t *)MAIN_D_80135210)[3]) == 0x34) || (code == 0x36)) {
+		if ((((int8_t *)MAIN_D_80135210)[3] == 0x34) || (((int8_t *)MAIN_D_80135210)[3] == 0x36)) {
 			EVL_renderTriShard((EvlModelVertex *)shards, 0, 60, entry->timer, model);
 			shards += 6;
 			MAIN_D_80135210 += 0x1c;
-		} else if ((code == 0x3c) || (code == 0x3e)) {
+		} else if ((((int8_t *)MAIN_D_80135210)[3] == 0x3c) || (((int8_t *)MAIN_D_80135210)[3] == 0x3e)) {
 			EVL_renderQuadShard((EvlModelVertex *)shards, 0, 60, entry->timer, model);
 			shards += 6;
 			MAIN_D_80135210 += 0x24;
@@ -848,11 +865,9 @@ void EVL_renderTriShard(EvlModelVertex *drift, int32_t unused1, int16_t speed, i
 	SVECTOR b;
 	SVECTOR c;
 	POLY_FT4 *prim;
-	TMD_P_TG3 *tri;
 	EvlModelVertex *v;
-	int16_t dx;
-	int16_t dy;
-	int16_t dz;
+	TMD_P_TG3 *tri;
+	SVECTOR offset;
 
 	tri = (TMD_P_TG3 *)MAIN_D_80135210;
 	prim = (POLY_FT4 *)GsGetWorkBase();
@@ -863,118 +878,115 @@ void EVL_renderTriShard(EvlModelVertex *drift, int32_t unused1, int16_t speed, i
 	prim->clut = tri->clut;
 	setUV3(prim, tri->tu0, tri->tv0, tri->tu1, tri->tv1, tri->tu2, tri->tv2);
 
-	dx = drift->vx * timer / speed;
-	dy = drift->vy * timer / speed;
-	dz = drift->vz * timer / speed;
+	offset.vx = drift->vx * timer / speed;
+	offset.vy = drift->vy * timer / speed;
+	offset.vz = drift->vz * timer / speed;
 
 	v = &MAIN_D_80135214[tri->v0];
-	a.vx = v->vx + dx;
-	a.vy = v->vy + dy;
-	a.vz = v->vz + dz;
+	a.vx = v->vx + offset.vx;
+	a.vy = v->vy + offset.vy;
+	a.vz = v->vz + offset.vz;
 	v = &MAIN_D_80135214[tri->v1];
-	b.vx = v->vx + dx;
-	b.vy = v->vy + dy;
-	b.vz = v->vz + dz;
+	b.vx = v->vx + offset.vx;
+	b.vy = v->vy + offset.vy;
+	b.vz = v->vz + offset.vz;
 	v = &MAIN_D_80135214[tri->v2];
-	c.vx = v->vx + dx;
-	c.vy = v->vy + dy;
-	c.vz = v->vz + dz;
-	setSemiTrans(prim, 1);
+	c.vx = v->vx + offset.vx;
+	c.vy = v->vy + offset.vy;
+	c.vz = v->vz + offset.vz;
+	prim->code |= 2;
 	addScreenPolyFT3(prim, &a, &b, &c);
 }
 
-void EVL_brightenDigimonClut(int16_t *clut, Entity *entity, int16_t *dst,
-                             int32_t start, int32_t end, int32_t t)
+void EVL_brightenDigimonClut(int16_t *clut, Entity *entity, int16_t *dst, int32_t start, int32_t end, int32_t t)
 {
 	ModelComponent *model;
+	TMDModel *tmd;
 	RECT rect;
-	int16_t redFactor;
-	int16_t greenFactor;
-	int16_t blueFactor;
 	int16_t red;
 	int16_t green;
 	int16_t blue;
 	int16_t stp;
-	int32_t amount;
+	int16_t redFactor;
+	int16_t greenFactor;
+	int16_t blueFactor;
+	int16_t *src;
 	int32_t i;
-	int32_t color;
-	int32_t channels;
 
 	model = getEntityModelComponent(entity->type, getEntityType(entity));
-	if (end < t) {
+	tmd = model->modelPtr;
+	src = clut;
+	if (t > end) {
 		t = end;
 	}
 
 	redFactor = rand() % 100;
 	greenFactor = rand() % 100;
 	blueFactor = rand() % 100;
-	i = 0;
-
-	while (i < 0x180) {
-		red = *clut & 0x1f;
-		color = *clut;
-		channels = color;
-		green = (channels >> 5) & 0x1f;
-		blue = (channels >> 10) & 0x1f;
-		stp = (*clut++ >> 15) & 1;
+	for (i = 0; i < 0x180; i++) {
+		red = *src & 0x1f;
+		green = (*src >> 5) & 0x1f;
+		blue = (*src >> 10) & 0x1f;
+		stp = (*src++ >> 15) & 1;
 		if (red || green || blue) {
 			if (t != start) {
 				stp = 1;
 			}
 
-			color = ((0x1f - red) * (t - start)) / (end - start);
-			red += (redFactor * color) / 100;
-			amount = ((0x1f - green) * (t - start)) / (end - start);
-			green += (greenFactor * amount) / 100;
-			amount = ((0x1f - blue) * (t - start)) / (end - start);
-			blue += (blueFactor * amount) / 100;
+			red += redFactor * (((0x1f - red) * (t - start)) / (end - start)) / 100;
+			green += greenFactor * (((0x1f - green) * (t - start)) / (end - start)) / 100;
+			blue += blueFactor * (((0x1f - blue) * (t - start)) / (end - start)) / 100;
 		}
 
 		dst[i] = red;
 		dst[i] += green << 5;
 		dst[i] += blue << 10;
 		dst[i] += stp << 15;
-		i++;
 	}
 
-	setRECT(&rect, (model->clutPage & 0x3f) << 4,
-	        model->clutPage >> 6, 0x10, 0x18);
+	setRECT(&rect, (model->clutPage & 0x3f) << 4, model->clutPage >> 6, 0x10, 0x18);
 	LoadImage(&rect, (u_long *)dst);
 }
 
 int32_t EVL_buildShardSet(Entity *entity, int32_t objIndex, int32_t bone)
 {
+	ModelComponent *model;
+	TMDModel *tmd;
+	TMDModel *header;
+	struct TMD_STRUCT *objects;
+	int32_t outStart;
 	SVECTOR tmp;
 	MATRIX m1;
+	int32_t slot;
+	SVECTOR *src;
+	int32_t i;
 	MATRIX m2;
-	SVECTOR p0;
-	SVECTOR p1;
-	SVECTOR p2;
-	SVECTOR p3;
-	ModelComponent *model;
-	struct TMD_STRUCT *obj;
-	EvlShardSet *entry;
+	int32_t prim;
+	int32_t j;
 	SVECTOR *va;
 	SVECTOR *vb;
 	SVECTOR *vc;
 	SVECTOR *vd;
+	SVECTOR p0;
+	SVECTOR p1;
+	SVECTOR p2;
+	SVECTOR p3;
+	SVECTOR center;
+	int32_t tri;
+	int32_t quad;
+	struct TMD_STRUCT *obj;
 	int32_t out;
-	int32_t outStart;
-	SVECTOR *src;
-	int32_t prim;
-	int32_t slot;
-	int32_t i;
-	int32_t j;
-	int16_t cx;
-	int16_t cy;
-	int16_t cz;
+	EvlShardSet *entry;
 
 	out = MAIN_D_8013520C;
 	model = getEntityModelComponent(entity->type, 3);
-	obj = &((struct TMD_STRUCT *)((uint32_t)model->modelPtr + 12))[objIndex];
+	tmd = model->modelPtr;
+	header = tmd;
+	objects = (struct TMD_STRUCT *)((uint32_t)header + 12);
+	obj = &objects[objIndex];
 
 	for (slot = 0; slot < 30; slot++) {
-		if (((EvlShardSet *)MAIN_D_80135208)[slot].timer < 0) {
+		if (MAIN_D_80135208[slot].timer < 0) {
 			break;
 		}
 	}
@@ -983,8 +995,8 @@ int32_t EVL_buildShardSet(Entity *entity, int32_t objIndex, int32_t bone)
 	}
 
 	calculateBoneMatrix(entity, bone, &m1);
-	src = (SVECTOR *)obj->vertop;
 	outStart = out;
+	src = (SVECTOR *)obj->vertop;
 	calculateBoneMatrix(entity, bone, &m2);
 	for (i = 0; (uint32_t)i < obj->vern; i++) {
 		ApplyMatrixSV(&m2, src++, &tmp);
@@ -994,7 +1006,7 @@ int32_t EVL_buildShardSet(Entity *entity, int32_t objIndex, int32_t bone)
 		out += sizeof(EvlModelVertex);
 	}
 
-	entry = &((EvlShardSet *)MAIN_D_80135208)[slot];
+	entry = &MAIN_D_80135208[slot];
 	entry->timer = 0;
 	entry->primCount = obj->primn;
 	entry->centers = out;
@@ -1010,45 +1022,44 @@ int32_t EVL_buildShardSet(Entity *entity, int32_t objIndex, int32_t bone)
 		switch (((int8_t *)prim)[3]) {
 		case 0x34:
 		case 0x36:
-			va = &((SVECTOR *)obj->nortop)[((TMD_P_TG3 *)prim)->n0];
-			vb = &((SVECTOR *)obj->nortop)[((TMD_P_TG3 *)prim)->n1];
-			vc = &((SVECTOR *)obj->nortop)[((TMD_P_TG3 *)prim)->n2];
+			tri = prim;
+			va = &((SVECTOR *)obj->nortop)[((TMD_P_TG3 *)tri)->n0];
+			vb = &((SVECTOR *)obj->nortop)[((TMD_P_TG3 *)tri)->n1];
+			vc = &((SVECTOR *)obj->nortop)[((TMD_P_TG3 *)tri)->n2];
 			ApplyMatrixSV(&m1, va, &p0);
 			ApplyMatrixSV(&m1, vb, &p1);
 			ApplyMatrixSV(&m1, vc, &p2);
-			cx = (p0.vx + p1.vx + p2.vx) / 3;
-			cy = (p0.vy + p1.vy + p2.vy) / 3;
-			cz = (p0.vz + p1.vz + p2.vz) / 3;
-			((EvlModelVertex *)out)->vx = cx;
-			((EvlModelVertex *)out)->vy = cy;
-			((EvlModelVertex *)out)->vz = cz;
+			center.vx = (p0.vx + p1.vx + p2.vx) / 3;
+			center.vy = (p0.vy + p1.vy + p2.vy) / 3;
+			center.vz = (p0.vz + p1.vz + p2.vz) / 3;
+			((EvlModelVertex *)out)->vx = center.vx;
+			((EvlModelVertex *)out)->vy = center.vy;
+			((EvlModelVertex *)out)->vz = center.vz;
 			out += sizeof(EvlModelVertex);
 			prim += sizeof(TMD_P_TG3);
 			break;
 		case 0x3c:
 		case 0x3e:
-			va = &((SVECTOR *)obj->nortop)[((TMD_P_TG4 *)prim)->n0];
-			vb = &((SVECTOR *)obj->nortop)[((TMD_P_TG4 *)prim)->n1];
-			vc = &((SVECTOR *)obj->nortop)[((TMD_P_TG4 *)prim)->n2];
-			vd = &((SVECTOR *)obj->nortop)[((TMD_P_TG4 *)prim)->n3];
+			quad = prim;
+			va = &((SVECTOR *)obj->nortop)[((TMD_P_TG4 *)quad)->n0];
+			vb = &((SVECTOR *)obj->nortop)[((TMD_P_TG4 *)quad)->n1];
+			vc = &((SVECTOR *)obj->nortop)[((TMD_P_TG4 *)quad)->n2];
+			vd = &((SVECTOR *)obj->nortop)[((TMD_P_TG4 *)quad)->n3];
 			ApplyMatrixSV(&m1, va, &p0);
 			ApplyMatrixSV(&m1, vb, &p1);
 			ApplyMatrixSV(&m1, vc, &p2);
 			ApplyMatrixSV(&m1, vd, &p3);
-			cx = (p0.vx + p1.vx + p2.vx) / 3;
-			cy = (p0.vy + p1.vy + p2.vy) / 3;
-			cz = (p0.vz + p1.vz + p2.vz) / 3;
-			((EvlModelVertex *)out)->vx = cx;
-			((EvlModelVertex *)out)->vy = cy;
-			((EvlModelVertex *)out)->vz = cz;
+			center.vx = (p0.vx + p1.vx + p2.vx) / 3;
+			center.vy = (p0.vy + p1.vy + p2.vy) / 3;
+			center.vz = (p0.vz + p1.vz + p2.vz) / 3;
+			((EvlModelVertex *)out)->vx = center.vx;
+			((EvlModelVertex *)out)->vy = center.vy;
+			((EvlModelVertex *)out)->vz = center.vz;
 			out += sizeof(EvlModelVertex);
 			prim += sizeof(TMD_P_TG4);
 			break;
 		}
 	}
-	(void)cx;
-	(void)cy;
-	(void)cz;
 
 	MAIN_D_8013520C = out;
 	return slot;
@@ -1063,9 +1074,7 @@ void EVL_renderQuadShard(EvlModelVertex *drift, int32_t unused1, int16_t speed, 
 	POLY_FT4 *prim;
 	TMD_P_TG4 *tri;
 	EvlModelVertex *v;
-	int16_t dx;
-	int16_t dy;
-	int16_t dz;
+	SVECTOR offset;
 
 	tri = (TMD_P_TG4 *)MAIN_D_80135210;
 	prim = (POLY_FT4 *)GsGetWorkBase();
@@ -1077,27 +1086,27 @@ void EVL_renderQuadShard(EvlModelVertex *drift, int32_t unused1, int16_t speed, 
 	setUV4(prim, tri->tu0, tri->tv0, tri->tu1, tri->tv1, tri->tu2, tri->tv2, tri->tu3,
 	       tri->tv3);
 
-	dx = drift->vx * timer / speed;
-	dy = drift->vy * timer / speed;
-	dz = drift->vz * timer / speed;
+	offset.vx = drift->vx * timer / speed;
+	offset.vy = drift->vy * timer / speed;
+	offset.vz = drift->vz * timer / speed;
 
 	v = &MAIN_D_80135214[tri->v0];
-	a.vx = v->vx + dx;
-	a.vy = v->vy + dy;
-	a.vz = v->vz + dz;
+	a.vx = v->vx + offset.vx;
+	a.vy = v->vy + offset.vy;
+	a.vz = v->vz + offset.vz;
 	v = &MAIN_D_80135214[tri->v1];
-	b.vx = v->vx + dx;
-	b.vy = v->vy + dy;
-	b.vz = v->vz + dz;
+	b.vx = v->vx + offset.vx;
+	b.vy = v->vy + offset.vy;
+	b.vz = v->vz + offset.vz;
 	v = &MAIN_D_80135214[tri->v2];
-	c.vx = v->vx + dx;
-	c.vy = v->vy + dy;
-	c.vz = v->vz + dz;
+	c.vx = v->vx + offset.vx;
+	c.vy = v->vy + offset.vy;
+	c.vz = v->vz + offset.vz;
 	v = &MAIN_D_80135214[tri->v3];
-	d.vx = v->vx + dx;
-	d.vy = v->vy + dy;
-	d.vz = v->vz + dz;
-	setSemiTrans(prim, 1);
+	d.vx = v->vx + offset.vx;
+	d.vy = v->vy + offset.vy;
+	d.vz = v->vz + offset.vz;
+	prim->code |= 2;
 	add3DSpritePrim(prim, &a, &b, &c, &d);
 }
 
@@ -1116,14 +1125,13 @@ void EVL_tickParticle(int32_t id)
 
 void EVL_renderParticle(int32_t id)
 {
+	int32_t size;
 	SVECTOR corners[4];
 	DVECTOR screen[4];
 	int32_t depth[4];
 	EvlParticle *e;
 	LINE_F2 *prim;
-	int32_t size;
 	int32_t i;
-	int32_t j;
 
 	e = &EVL_D_80068944[id];
 	size = lerp(8, 0x9c4, 0, 0x56, e->timer);
@@ -1143,17 +1151,16 @@ void EVL_renderParticle(int32_t id)
 
 	prim = (LINE_F2 *)GsGetWorkBase();
 	for (i = 0; i < 4; i++) {
-		if ((*(int32_t *)&depth[i] > 0x20) && (depth[i] < 0x1000)) {
-			j = (i + 1) % 4;
-			if ((*(int32_t *)&depth[j] > 0x20) && (depth[j] < 0x1000)) {
+		if ((depth[i] > 0x20) && (depth[i] < 0x1000L)) {
+			if ((depth[(i + 1) % 4] > 0x20) && (depth[(i + 1) % 4] < 0x1000L)) {
 				SetLineF2(prim);
 				prim->r0 = lerp(e->r, 0, 0, 0x56, e->timer);
 				prim->g0 = lerp(e->g, 0, 0, 0x56, e->timer);
 				prim->b0 = lerp(e->b, 0, 0, 0x56, e->timer);
 				prim->x0 = screen[i].vx;
 				prim->y0 = screen[i].vy;
-				prim->x1 = screen[j].vx;
-				prim->y1 = screen[j].vy;
+				prim->x1 = screen[(i + 1) % 4].vx;
+				prim->y1 = screen[(i + 1) % 4].vy;
 				AddPrim(ACTIVE_ORDERING_TABLE->org + 0xfa1, prim++);
 			}
 		}
@@ -1219,34 +1226,38 @@ void EVL_tickSpark(int32_t id)
 
 void EVL_initEvoSequence(void)
 {
-	int16_t order[80];
-	PartnerEntity *partner;
-	int32_t i;
+	int32_t instance;
 	int32_t j;
+	int16_t order[80];
 	int32_t bestVal;
 	int32_t best;
+	EvoSequenceData *data;
+	PartnerEntity *partner;
+	int32_t i;
 
-	partner = EVO_SEQUENCE_DATA.partner;
-	EVO_SEQUENCE_DATA.timer = 0;
-	EVO_SEQUENCE_DATA.unk_0x8 = 0;
-	EVO_SEQUENCE_DATA.state = 0;
+	data = &EVO_SEQUENCE_DATA;
+	instance = 0;
+	partner = data->partner;
+	data->timer = 0;
+	data->unk_0x8 = 0;
+	data->state = 0;
 	copyVector(&EVL_D_80064D40, &partner->digimonEntity.entity.posData->location);
 	MAIN_func_800D9B60(EVL_D_80063F3C);
 	MAIN_func_800D9E68(EVL_D_80064D50);
-	EVL_storeDigimonClut(EVL_D_80065094, (Entity *)partner);
-	EVL_storeClutBank0(EVL_D_80065398);
-	EVL_storeClutBank1(EVL_D_8006569C);
-	EVL_initShardSets(EVL_D_80065FA0);
+	EVL_storeDigimonClut((int32_t)EVL_D_80065094, &partner->digimonEntity.entity);
+	EVL_storeClutBank0((int32_t)EVL_D_80065398);
+	EVL_storeClutBank1((int32_t)EVL_D_8006569C);
+	EVL_initShardSets((int32_t)EVL_D_80065FA0);
 	EVL_setScratchTop((int32_t)EVL_D_80066274);
-	initializeFlashData((char *)EVL_D_800677B0);
+	initializeFlashData((char *)EVL_D_800677B0.data);
 	EVL_resetParticles();
 	EVL_resetSparks();
 
 	for (i = 0; i < 40; i++) {
-		(EVL_D_80067990 + 2)[i] = -1;
+		EVL_D_80067994[i] = -1;
 	}
 
-	(EVL_D_80067990 + 1)[DIGIMON_DATA[partner->digimonEntity.entity.type].boneCount] = -2;
+	EVL_D_80067994[DIGIMON_DATA[partner->digimonEntity.entity.type].boneCount - 1L] = -2;
 
 	for (i = 1; i < DIGIMON_DATA[partner->digimonEntity.entity.type].boneCount; i++) {
 		order[i] = rand() & 0xfff;
@@ -1256,46 +1267,45 @@ void EVL_initEvoSequence(void)
 		best = 1;
 		bestVal = order[1];
 		for (j = 2; j < DIGIMON_DATA[partner->digimonEntity.entity.type].boneCount; j++) {
-			if (order[j] < bestVal) {
+			if (bestVal > order[j]) {
 				best = j;
 				bestVal = order[j];
 			}
 		}
-		(EVL_D_80067990 + 1)[i] = best;
+		EVL_D_80067994[i - 1L] = best;
 		order[best] = 0x1000;
 	}
 
-	addObject(0x80a, 0, EVL_tickEvoSequence, (RenderFunction)EVL_renderEvoSequence);
+	addObject(0x80a, instance, EVL_tickEvoSequence, (RenderFunction)EVL_renderEvoSequence);
 }
 
 void EVL_applyEvolution(Entity *entity, Stats *stats, PartnerPara *para, int16_t digimonId)
 {
-	EvoStatsGains *gains;
-	int32_t newId;
-	int16_t targetLevel;
 	int32_t oldType;
-	long currentType;
-	int32_t moveBase;
-	uint8_t special;
-	uint8_t *moves;
-	uint8_t *movePtr;
+	int32_t newId;
 	uint8_t candidates[16];
-	uint8_t best;
-	int32_t move;
+	uint8_t *movePtr;
 	int32_t i;
 	int32_t count;
-	PositionData *position;
-	int16_t x, y, z;
-	int16_t rx, ry, rz;
+	int16_t x;
+	int16_t y;
+	int16_t z;
+	int16_t rx;
+	int16_t ry;
+	int16_t rz;
+	int16_t level;
 	int16_t oldLevel;
+	uint8_t moveBase;
+	uint8_t best;
+	uint8_t special;
+	EvoStatsGains *gains;
 
 	gains = &EVO_GAINS_DATA[digimonId];
-	currentType = PARTNER_ENTITY.digimonEntity.entity.type;
-	oldLevel = DIGIMON_DATA[currentType].level;
 	newId = gains->targetDigimon;
-	targetLevel = DIGIMON_DATA[digimonId].level;
+	oldLevel = DIGIMON_DATA[PARTNER_ENTITY.digimonEntity.entity.type].level;
+	level = DIGIMON_DATA[digimonId].level;
 	if (digimonId == 0x0b || digimonId == 0x27 || digimonId == 0x35 || digimonId == 6 ||
-	    currentType == 0x27 || targetLevel < 3) {
+	    PARTNER_ENTITY.digimonEntity.entity.type == 0x27L || level < 3) {
 		EVL_scaleBaseStats(stats, (int8_t)gains->brains, digimonId);
 		newId = gains->targetDigimon;
 	} else {
@@ -1351,7 +1361,8 @@ void EVL_applyEvolution(Entity *entity, Stats *stats, PartnerPara *para, int16_t
 	para->weight = RAISE_DATA[newId].defaultWeight;
 	para->careMistakes = 0;
 	para->battles = 0;
-	if (DIGIMON_DATA[newId].level == 5 && HAS_USED_EVOITEM == 0) {
+	level = DIGIMON_DATA[newId].level;
+	if (level == 5 && HAS_USED_EVOITEM == 0) {
 		para->remainingLifetime += 96;
 	}
 	special = DIGIMON_DATA[newId].special[0];
@@ -1371,10 +1382,9 @@ void EVL_applyEvolution(Entity *entity, Stats *stats, PartnerPara *para, int16_t
 		moveBase = 49;
 	}
 	movePtr = DIGIMON_DATA[newId].moves;
-	moves = movePtr;
 	count = 0;
 	for (i = 0; i < 16; movePtr++, i++) {
-		if ((uint32_t)*movePtr >= (uint32_t)moveBase && *movePtr <= moveBase + 8) {
+		if (moveBase <= *movePtr && *movePtr <= moveBase + 8) {
 			candidates[count] = *movePtr;
 			count++;
 		}
@@ -1382,13 +1392,12 @@ void EVL_applyEvolution(Entity *entity, Stats *stats, PartnerPara *para, int16_t
 	candidates[count] = 0xff;
 	best = candidates[0];
 	for (count = 0; candidates[count] != 0xff; count++) {
-		move = candidates[count];
-		if (MOVE_DATA[best].power > MOVE_DATA[move].power && MOVE_DATA[move].power != 0) {
-			best = move;
+		if (MOVE_DATA[best].power > MOVE_DATA[candidates[count]].power && MOVE_DATA[candidates[count]].power != 0) {
+			best = candidates[count];
 		}
 	}
 	learnMove(best);
-	for (movePtr = moves, i = 0; i < 16; i++) {
+	for (movePtr = DIGIMON_DATA[newId].moves, i = 0; i < 16; i++) {
 		if (*movePtr++ == best) {
 			break;
 		}
@@ -1415,15 +1424,15 @@ void EVL_applyEvolution(Entity *entity, Stats *stats, PartnerPara *para, int16_t
 	if (i < 0) {
 		PARTNER_ENTITY.digimonEntity.stats.base.moves[3] = 0xff;
 	}
-	position = entity->posData;
-	x = position->location.vx;
-	y = position->location.vy;
-	z = position->location.vz;
-	rx = position->rotation.vx;
-	ry = position->rotation.vy;
-	rz = position->rotation.vz;
+	level = DIGIMON_DATA[PARTNER_ENTITY.digimonEntity.entity.type].level;
+	x = entity->posData->location.vx;
+	y = entity->posData->location.vy;
+	z = entity->posData->location.vz;
+	rx = entity->posData->rotation.vx;
+	ry = entity->posData->rotation.vy;
+	rz = entity->posData->rotation.vz;
 	oldType = PARTNER_ENTITY.digimonEntity.entity.type;
-	removeEntity(oldType, 1);
+	removeEntity(PARTNER_ENTITY.digimonEntity.entity.type, 1);
 	ENTITY_TABLE[1] = NULL;
 	thunkUnloadModel(oldType, 3);
 	initializeEvolvedPartner(newId, x, y, z, rx, ry, rz);
@@ -1433,7 +1442,7 @@ void EVL_applyEvolution(Entity *entity, Stats *stats, PartnerPara *para, int16_t
 	}
 }
 
-void EVL_scaleBaseStats(Stats *stats, int16_t pct, int32_t unused)
+void EVL_scaleBaseStats(Stats *stats, int16_t pct, int16_t unused)
 {
 	if (HAS_USED_EVOITEM != 0) {
 		return;

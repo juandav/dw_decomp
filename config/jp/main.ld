@@ -224,6 +224,9 @@ SECTIONS
         BUILD_DIR/src/std/std_hud.c.o(.sdata .sdata.*);
         . = ALIGN(., 4);
         KEEP(BUILD_DIR/asm/main/data/ADAF8.sdata.s.o(.sdata .sdata.*));
+        BUILD_DIR/src/evl/evl.c.o(.sdata .sdata.*);
+        . = ALIGN(., 4);
+        KEEP(BUILD_DIR/asm/main/data/ADC14.sdata.s.o(.sdata .sdata.*));
         BUILD_DIR/src/vs/vs_hud.c.o(.sdata .sdata.*);
         . = ALIGN(., 4);
         KEEP(BUILD_DIR/asm/main/data/ADD7C.sdata.s.o(.sdata .sdata.*));
@@ -306,6 +309,10 @@ SECTIONS
         BUILD_DIR/src/std/std_hud.c.o(.sbss.*);
         . = ALIGN(., 4);
         BUILD_DIR/generated/unk_0x8013E438.sbss.s.o(.sbss.*);
+        . = ALIGN(., 4);
+        BUILD_DIR/src/evl/evl.c.o(.sbss.*);
+        . = ALIGN(., 4);
+        BUILD_DIR/generated/unk_0x8013E498.sbss.s.o(.sbss.*);
         . = ALIGN(., 4);
         BUILD_DIR/src/vs/vs_hud.c.o(.sbss.*);
         . = ALIGN(., 4);

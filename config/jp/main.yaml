@@ -201,6 +201,8 @@ segments:
       - [0xADA28, sdata]
       - [0xADAD4, .sdata, std/std_hud]
       - [0xADAF8, sdata]
+      - [0xADBF0, .sdata, evl/evl]
+      - [0xADC14, sdata]
       - [0xADD48, .sdata, vs/vs_hud]
       - [0xADD7C, sdata]
       - [0xADDF0, .sdata, doo2/doo2]

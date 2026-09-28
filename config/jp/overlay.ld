@@ -102,8 +102,10 @@ SECTIONS
 			evl_START = .;
 
 			KEEP(BUILD_DIR/asm/evl/data/header.rodata.s.o(.rodata .rodata.*));
-			KEEP(BUILD_DIR/asm/evl/evl.s.o(.text .text.*));
-			KEEP(BUILD_DIR/asm/evl/data/evl.data.s.o(.data .data.*));
+			BUILD_DIR/src/evl/evl.c.o(.text .text.*);
+			BUILD_DIR/src/evl/evl.c.o(.rodata .rodata.*);
+			BUILD_DIR/src/evl/evl.c.o(.data .data.*);
+			KEEP(BUILD_DIR/asm/evl/data/5784.data.s.o(.data .data.*));
 			LONG(0);
 		}
 	}
