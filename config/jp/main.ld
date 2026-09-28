@@ -56,7 +56,7 @@ SECTIONS
         BUILD_DIR/src/main/graphics2.c.o(.text .text.*);
         BUILD_DIR/src/main/fish.c.o(.text .text.*);
         BUILD_DIR/src/main/utils.c.o(.text .text.*);
-        KEEP(BUILD_DIR/asm/main/737BC.s.o(.text .text.*));
+        BUILD_DIR/src/main/utils2.c.o(.text .text.*);
         BUILD_DIR/src/main/tournament.c.o(.text .text.*);
         BUILD_DIR/src/main/evl.c.o(.text .text.*);
         KEEP(BUILD_DIR/asm/main/75B80.s.o(.text .text.*));

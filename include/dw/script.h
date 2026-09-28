@@ -325,7 +325,7 @@ int32_t MAIN_func_80102514(void);
 int32_t MAIN_func_80102564(void);
 int32_t MAIN_func_801025E8(void);
 int32_t MAIN_func_80102630(void);
-int32_t enforceStatsLimits(int32_t stat, int32_t value);
+int16_t enforceStatsLimits(int32_t stat, int16_t value);
 void tickScriptedMovements(void);
 void scriptInstructionFBtoFF(int32_t op);
 void scriptInstruction10to27(int32_t op);

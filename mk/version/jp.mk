@@ -59,6 +59,7 @@ MAIN_C_SRC := \
 	src/main/tournament.c \
 	src/main/ui.c \
 	src/main/utils.c \
+	src/main/utils2.c \
 	src/main/world_object.c
 
 $(eval $(call unit,MAIN,main))

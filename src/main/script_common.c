@@ -4929,9 +4929,9 @@ void scriptInstructionFBtoFF(int32_t op)
 	longjmp(SCRIPT_JMP_BUF, 1);
 }
 
-int32_t enforceStatsLimits(int32_t stat, int32_t value)
+int16_t enforceStatsLimits(int32_t stat, int16_t value)
 {
-	int32_t cap;
+	int16_t cap;
 
 	if (stat == SCRIPT_STAT_CURRENT_HP) {
 		cap = PARTNER_ENTITY.digimonEntity.stats.base.hp;

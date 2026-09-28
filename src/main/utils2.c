@@ -36,27 +36,27 @@ void setMapLayerEnabled(uint8_t enabled);
 int32_t isInvisible(Entity* entity);
 int32_t isTamerOnScreen(void);
 void startMovie(int32_t movieId);
-void playMovie(int32_t movieId, int8_t shouldPlay);
+void playMovie(int16_t movieId, int32_t shouldPlay);
 void initializeFramebuffer(void);
 void initStringFT4(POLY_FT4* poly);
-void convertValueToDigits(int32_t n, int32_t value, int32_t *outCount,
+void convertValueToDigits(int16_t n, int32_t value, int32_t *outCount,
 			  int32_t *digits);
 void renderSelectionCursor(int32_t x, int32_t y, int16_t w, int16_t h,
 			   int32_t layer);
 void renderTrianglePrimitive();
 void loadStackedTIMFile(char *path);
-void renderString(int32_t color, int16_t x, int16_t y, int16_t w, int16_t h,
+void renderString(uint8_t color, int16_t x, int16_t y, int16_t w, int16_t h,
 		  uint8_t u, uint8_t v, int32_t layer, int32_t shadow);
 void pauseFrame(void);
 void renderItemSprite(uint8_t type, int16_t x, int16_t y, int32_t layer);
 void setItemTexture(POLY_FT4 *p, uint8_t id);
 uint8_t entityGetTechFromAnim(Entity *e, uint8_t anim);
-void entityLookAtTile(Entity *entity, int32_t tileX, int32_t tileY);
+void entityLookAtTile(Entity *entity, int8_t tileX, int8_t tileY);
 void setEntityTextDigit(POLY_FT4* poly, int32_t x, int32_t y);
 void MAIN_func_800E642C(void);
-void renderSmallNumber(int32_t color, int32_t n, int32_t x, int16_t y,
+void renderSmallNumber(int32_t color, int16_t n, int16_t x, int16_t y,
 		       int16_t value, int32_t layer);
-void drawEntityText(int32_t color, int32_t n, int32_t x, int16_t y,
+void drawEntityText(int32_t color, int16_t n, int16_t x, int16_t y,
 			int16_t value, int32_t layer);
 int32_t hasMove(int32_t move);
 void learnMove(int32_t move);
@@ -66,7 +66,7 @@ void handlePause(void);
 void renderPauseBox(int32_t instanceId);
 void setPosDataPolyFT4(POLY_FT4 *prim, int16_t posX, int16_t posY, int16_t width, int16_t height);
 void setUVDataPolyFT4(POLY_FT4 *prim, int16_t xPos, int16_t yPos, int16_t width, int16_t height);
-void drawEntityTextIcon(int16_t x, int16_t y, int16_t u, int32_t otOffset);
+void drawEntityTextIcon(int16_t x, int16_t y, uint8_t u, int32_t otOffset);
 
 extern MapLightUpdateData MAP_LIGHT_UPDATE_DATA[];
 extern char *MAIN_D_8012BA8C[];
@@ -80,7 +80,7 @@ extern uint8_t MAIN_D_80134E78[2];
 extern int32_t MAIN_D_80134E7C;
 extern char MAIN_D_80134430;
 
-void drawEntityText(int32_t color, int32_t n, int32_t x, int16_t y,
+void drawEntityText(int32_t color, int16_t n, int16_t x, int16_t y,
 			int16_t value, int32_t layer)
 {
 	POLY_FT4 *prim;
@@ -104,7 +104,7 @@ void drawEntityText(int32_t color, int32_t n, int32_t x, int16_t y,
 	GsSetWorkBase((PACKET *)prim);
 }
 
-void renderSmallNumber(int32_t color, int32_t n, int32_t x, int16_t y,
+void renderSmallNumber(int32_t color, int16_t n, int16_t x, int16_t y,
 		       int16_t value, int32_t layer)
 {
 	POLY_FT4 *prim;
@@ -132,13 +132,11 @@ void renderSmallNumber(int32_t color, int32_t n, int32_t x, int16_t y,
 void renderSelectionCursor(int32_t x, int32_t y, int16_t w, int16_t h,
 			   int32_t layer)
 {
-	uint32_t right;
 	GsBOXF box;
 
 	renderTrianglePrimitive(0xb0b0b0, x, y + h - 1, x, y, x + w - 1, y, layer,
 				0);
-	right = x + w;
-	renderTrianglePrimitive(0x121212, right, y, right, y + h, x, y + h, layer,
+	renderTrianglePrimitive(0x121212, x + w, y, x + w, y + h, x, y + h, layer,
 				0);
 	box.attribute = 0x40000000;
 	box.r = box.g = box.b = 0x80;
@@ -146,11 +144,13 @@ void renderSelectionCursor(int32_t x, int32_t y, int16_t w, int16_t h,
 	GsSortBoxFill(&box, ACTIVE_ORDERING_TABLE, (uint16_t)layer);
 }
 
-void renderString(int32_t color, int16_t x, int16_t y, int16_t w, int16_t h,
+void renderString(uint8_t color, int16_t x, int16_t y, int16_t w, int16_t h,
 		  uint8_t u, uint8_t v, int32_t layer, int32_t shadow)
 {
 	POLY_FT4 *prim;
+#if !defined(VERSION_JP)
 	GsOT *ot;
+#endif
 
 	prim = (POLY_FT4 *)GsGetWorkBase();
 	initStringFT4(prim);
@@ -158,7 +158,11 @@ void renderString(int32_t color, int16_t x, int16_t y, int16_t w, int16_t h,
 		TEXT_COLORS[color].b);
 	setUVDataPolyFT4(prim, u, v, w, h);
 	setPosDataPolyFT4(prim, x, y, w, h);
+#if defined(VERSION_JP)
+	AddPrim(ACTIVE_ORDERING_TABLE->org + layer, prim++);
+#else
 	AddPrim((ot = ACTIVE_ORDERING_TABLE)->org + layer, prim++);
+#endif
 	if (shadow != 0) {
 		initStringFT4(prim);
 		setRGB0(prim, 0, 0, 0);
@@ -235,27 +239,16 @@ void learnMove(int32_t move)
 
 uint8_t entityGetTechFromAnim(Entity *e, uint8_t anim)
 {
-	uint8_t new_var4;
-	int32_t *new_var;
-	int new_var3;
-	int new_var2;
-	if (anim == 0xFF)
-	{
-		return 0xFF;
+	if (anim == 0xff) {
+		return 0xff;
 	}
-	if ((e->type == 0x3C) && (anim == 0x3C))
-	{
+	if ((e->type == 0x3cL) && (anim == 0x3c)) {
 		return 0x70;
 	}
-	new_var = (int32_t *) e;
-	new_var2 = 0x23;
-	e = e;
-	new_var3 = 0x2E;
-	new_var4 = ((uint8_t *) (((char *) DIGIMON_DATA) + new_var2))[((new_var[0] * 0x34) & 0xFFFFFFFFFFFFFFFF) + (anim - new_var3)];
-	return new_var4;
+	return DIGIMON_DATA[e->type].moves[anim - 0x2e];
 }
 
-void entityLookAtTile(Entity *entity, int32_t tileX, int32_t tileY)
+void entityLookAtTile(Entity *entity, int8_t tileX, int8_t tileY)
 {
 	VECTOR loc;
 
@@ -265,7 +258,7 @@ void entityLookAtTile(Entity *entity, int32_t tileX, int32_t tileY)
 	entityLookAtLocation(entity, &loc);
 }
 
-void drawEntityTextIcon(int16_t x, int16_t y, int16_t u, int32_t otOffset)
+void drawEntityTextIcon(int16_t x, int16_t y, uint8_t u, int32_t otOffset)
 {
 	POLY_FT4 *prim;
 
@@ -287,7 +280,7 @@ int32_t isInvisible(Entity* entity)
 	return 0;
 }
 
-void loadDynamicLibrary(Overlay lib, uint8_t *isComplete, int8_t isAsync,
+void loadDynamicLibrary(Overlay lib, uint8_t *isComplete, uint8_t isAsync,
 			FileCallback callback, void *param)
 {
 	uint8_t *nv;
@@ -315,8 +308,6 @@ void startMovie(int32_t movieId)
 
 void handlePause(void)
 {
-	uint32_t pad;
-
 	if (MAIN_D_80134E78[0] != 0) {
 		MAIN_func_800E642C();
 		MAIN_D_80134E78[0] = 0;
@@ -328,8 +319,7 @@ void handlePause(void)
 		return;
 	}
 	MAIN_D_80134E70 = PadRead(1);
-	pad = MAIN_D_80134E70;
-	if ((pad & 0x800) && !(MAIN_D_80134E74 & 0x800)) {
+	if ((MAIN_D_80134E70 & 0x800) && !(MAIN_D_80134E74 & 0x800)) {
 		MAIN_D_80134E78[1] = (MAIN_D_80134E78[1] + 1) & 1;
 	}
 	MAIN_D_80134E74 = MAIN_D_80134E70;
@@ -341,8 +331,7 @@ void handlePause(void)
 	}
 	while (MAIN_D_80134E78[1] != 0) {
 		MAIN_D_80134E70 = PadRead(1);
-		pad = MAIN_D_80134E70;
-		if ((pad & 0x800) && !(MAIN_D_80134E74 & 0x800)) {
+		if ((MAIN_D_80134E70 & 0x800) && !(MAIN_D_80134E74 & 0x800)) {
 			MAIN_D_80134E78[1] = (MAIN_D_80134E78[1] + 1) & 1;
 		}
 		MAIN_D_80134E74 = MAIN_D_80134E70;
@@ -364,25 +353,33 @@ void createPauseBox(void)
 
 	if (MAIN_D_80134E7C != 1) {
 		drawString(&MAIN_D_80134430, 0x78, 0xF0);
+#if defined(VERSION_JP)
+		setRECT(&pos, -0x1A, -0xE, 0x30, 0x18);
+#else
 		setRECT(&pos, -0x1A, -0xE, 0x38, 0x18);
+#endif
 		createStaticUIBox(5, 1, 0, &pos, NULL, renderPauseBox);
 		MAIN_D_80134E7C = 1;
 		playSound(0, 3);
 	}
 }
 
-void renderPauseBox(int32_t instanceId)
+void renderPauseBox(instanceId)
+	int16_t instanceId;
 {
 	GsBOXF box;
-	RECT *new_var;
+	RECT *pos;
+
 	box.attribute = 0x40000000;
-	box.b = 0;
-	box.g = 0;
-	box.r = 0;
+	box.r = box.g = box.b = 0;
 	setRECT(&box, -0xA0, -0x78, 0x140, 0xF0);
 	GsSortBoxFill(&box, ACTIVE_ORDERING_TABLE, 7 - instanceId);
-	new_var = &UI_BOX_DATA[5].finalPos;
-	renderString(0, (int16_t) ((*new_var).x + 6), (int16_t) ((*new_var).y + 6), 0x2A, 0xC, 0x78, 0xF0, 0, 1);
+	pos = &UI_BOX_DATA[5].finalPos;
+#if defined(VERSION_JP)
+	renderString(0, pos->x + 6, pos->y + 6, 0x24, 0xC, 0x78, 0xF0, 0, 1);
+#else
+	renderString(0, pos->x + 6, pos->y + 6, 0x2A, 0xC, 0x78, 0xF0, 0, 1);
+#endif
 }
 
 void MAIN_thunk_func_800D92EC(void)
@@ -398,23 +395,23 @@ void setMapLayerEnabled(uint8_t enabled)
 void loadStackedTIMFile(char *path)
 {
 	GsIMAGE img;
-	int32_t *p;
+	uint8_t *p;
 
-	p = (int32_t *)GENERAL_BUFFER;
-	readFile(path, GENERAL_BUFFER);
-	while (*p == 0x10) {
-		p = (int32_t *)((char *)p + 4);
+	p = GENERAL_BUFFER;
+	readFile(path, p);
+	while (*(int32_t *)p == 0x10) {
+		p = (uint8_t *)(p + 4);
 		GsGetTimInfo((u_long *)p, &img);
-		p = &p[((img.pw * img.ph) / 2) + 4];
+		p += ((img.pw * img.ph) / 2 + 4) * 4;
 		LoadImage((RECT *)&img.px, img.pixel);
 		if ((img.pmode >> 3) & 1) {
 			LoadImage((RECT *)&img.cx, img.clut);
-			p = &p[((img.cw * img.ch) / 2) + 3];
+			p += ((img.cw * img.ch) / 2 + 3) * 4;
 		}
 	}
 }
 
-void playMovie(int32_t movieId, int8_t shouldPlay)
+void playMovie(int16_t movieId, int32_t shouldPlay)
 {
 	if (shouldPlay) {
 		startMovie(movieId);
@@ -424,7 +421,7 @@ void playMovie(int32_t movieId, int8_t shouldPlay)
 
 void unlearnMove(int32_t move)
 {
-	int32_t i;
+	int32_t i = 0;
 	uint16_t mask;
 
 	for (i = 0; i < 4; i++) {
@@ -445,6 +442,7 @@ void unlearnMove(int32_t move)
 	PARTNER_ENTITY.learnedMoves[move / 32] &= mask;
 }
 
+#if !defined(VERSION_JP)
 int32_t isTamerOnScreen(void)
 {
 	if (ENTITY_TABLE[0]->isOnScreen == 1) {
@@ -453,6 +451,7 @@ int32_t isTamerOnScreen(void)
 
 	return 0;
 }
+#endif
 
 void updateMapLightState(void)
 {
@@ -480,53 +479,49 @@ void updateMapLightState(void)
 
 void startTournament(void)
 {
-	struct {
-		uint8_t cup;
-		uint8_t opponents[10];
-		uint8_t isComplete;
-	} t;
-	uint8_t c;
-	uint8_t *w;
-	int32_t count;
-	uint8_t id;
 	uint8_t *p;
 	uint8_t *pool;
-	uint8_t i;
+	uint8_t *jumpTable;
+	uint8_t *w;
+	struct {
+		uint8_t cup;
+		uint8_t opponents[7];
+	} t;
 	int16_t result;
 	int16_t expected;
-	int32_t trig;
+	uint8_t id;
+	uint8_t isComplete;
+	uint8_t i;
+	int32_t count;
 
 	id = readPStat(3);
 	t.cup = id;
 	pool = (uint8_t *)allocateArray(0x70);
 	w = pool;
-	p = getCupDataJumpTableEntry(getCupDataJumpTable(10, id), 4) + 2;
+	jumpTable = getCupDataJumpTable(10, id);
+	p = getCupDataJumpTableEntry(jumpTable, 4) + 2;
 	count = 0;
-	c = *p;
-	if (c < 0xfe) {
+	i = *p;
+	if (i < 0xfe) {
 		if (id != 0x16) {
-			while ((c = *p++) < 0xfe) {
-				if (isTriggerSet(c + 200) != 0) {
-					*w++ = c;
+			while ((i = *p++) < 0xfe) {
+				if (isTriggerSet(i + 200) != 0) {
+					*w++ = i;
 					count++;
 				}
 			}
 		} else {
-			while ((c = *p++) < 0xfe) {
-				*w++ = c;
+			while ((i = *p++) < 0xfe) {
+				*w++ = i;
 				count++;
 			}
 		}
 	} else {
-		i = 0;
-		trig = 200;
-		while (i < 0x70) {
-			if (isTriggerSet(trig) != 0) {
+		for (i = 0; i < 0x70; i++) {
+			if (isTriggerSet(i + 200) != 0) {
 				*w++ = i;
 				count++;
 			}
-			i++;
-			trig++;
 		}
 	}
 	p = t.opponents;
@@ -544,7 +539,7 @@ void startTournament(void)
 	} else {
 		id = PARTNER_ENTITY.digimonEntity.entity.type;
 		for (i = 0; i < count; i++) {
-			if (pool[i] == id) {
+			if (id == pool[i]) {
 				pool[i] = 0xff;
 				count--;
 				break;
@@ -566,7 +561,7 @@ void startTournament(void)
 	}
 	freeArray((uint32_t *)pool);
 	stopBGM();
-	loadDynamicLibrary(STD_REL, &t.isComplete, 0, NULL, NULL);
+	loadDynamicLibrary(STD_REL, &isComplete, 0, NULL, NULL);
 	result = STD_func_800579D8(&t.cup);
 	MAIN_thunk_func_800D92EC();
 	unsetTrigger(0x25);

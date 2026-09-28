@@ -98,7 +98,7 @@ segments:
       - [0x70ECC, c, graphics2]
       - [0x729B4, c, fish]
       - [0x72DFC, c, utils]
-      - [0x737BC, asm]
+      - [0x737BC, c, utils2]
       - [0x75268, c, tournament]
       - [0x7587C, c, evl]
       - [0x75B80, asm]
