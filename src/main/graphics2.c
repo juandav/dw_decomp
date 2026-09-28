@@ -56,10 +56,10 @@ const uint8_t MAIN_D_80114D68[256] = {
 };
 
 void setLineBlendingMode(int32_t mode, int32_t order);
-void renderTrianglePrimitive(uint32_t color, int16_t x0, int16_t y0,
-			     int16_t x1, int32_t y1, int32_t x2, int32_t y2,
+void renderTrianglePrimitive(uint32_t color, int32_t x0, int32_t y0,
+			     int32_t x1, int32_t y1, int32_t x2, int32_t y2,
 			     int32_t order, uint32_t mode);
-void renderLinePrimitive(uint32_t color, int16_t x0, int16_t y0, int16_t x1,
+void renderLinePrimitive(uint32_t color, int32_t x0, int32_t y0, int32_t x1,
 			 int32_t y1, int32_t order, uint32_t mode);
 void MAIN_func_800E4038(VECTOR *output, int32_t x, int32_t y,
 			int32_t *success);
@@ -85,14 +85,14 @@ void setLineBlendingMode(int32_t mode, int32_t order)
 	}
 
 	prim = (DR_TPAGE *)GsGetWorkBase();
-	setDrawTPage(prim, 1, 1, (mode & 3) << 5);
+	setDrawTPage(prim, 1, 1, getTPage(0, mode & 3, 0, 0));
 
 	addPrim(&ACTIVE_ORDERING_TABLE->org[order], prim);
 	GsSetWorkBase((PACKET *)&prim[1]);
 }
 
-void renderTrianglePrimitive(uint32_t color, int16_t x0, int16_t y0,
-			     int16_t x1, int32_t y1, int32_t x2, int32_t y2,
+void renderTrianglePrimitive(uint32_t color, int32_t x0, int32_t y0,
+			     int32_t x1, int32_t y1, int32_t x2, int32_t y2,
 			     int32_t order, uint32_t mode)
 {
 	LINE_F3 *prim;
@@ -109,7 +109,7 @@ void renderTrianglePrimitive(uint32_t color, int16_t x0, int16_t y0,
 	setLineBlendingMode(mode, order);
 }
 
-void renderLinePrimitive(uint32_t color, int16_t x0, int16_t y0, int16_t x1,
+void renderLinePrimitive(uint32_t color, int32_t x0, int32_t y0, int32_t x1,
 			 int32_t y1, int32_t order, uint32_t mode)
 {
 	LINE_F2 *prim;
@@ -127,20 +127,18 @@ void renderLinePrimitive(uint32_t color, int16_t x0, int16_t y0, int16_t x1,
 	setLineBlendingMode(mode, order);
 }
 
-void MAIN_func_800E3FB8(int16_t *pos, VECTOR *out);
+void MAIN_func_800E3FB8(SVECTOR *pos, VECTOR *out);
 
-void MAIN_func_800E3FB8(int16_t *pos, VECTOR *out)
+void MAIN_func_800E3FB8(SVECTOR *pos, VECTOR *out)
 {
-  MATRIX m;
-  int32_t *new_var;
-  int32_t new_var2;
-  SVECTOR v;
-  int32_t *cam;
-  cam = (int32_t *)GsWSMATRIX.t;
-  new_var2 = (new_var = cam)[0];
- do { v.vx = pos[0] - new_var2; v.vy = pos[1] - new_var[1]; v.vz = pos[2] - new_var[2]; } while (0);
-  TransposeMatrix(&GsWSMATRIX, &m);
-  ApplyMatrix(&m, &v, out);
+	MATRIX m;
+	SVECTOR v;
+
+	v.vx = pos->vx - ((VECTOR *)GsWSMATRIX.t)->vx;
+	v.vy = pos->vy - ((VECTOR *)GsWSMATRIX.t)->vy;
+	v.vz = pos->vz - ((VECTOR *)GsWSMATRIX.t)->vz;
+	TransposeMatrix(&GsWSMATRIX, &m);
+	ApplyMatrix(&m, &v, out);
 }
 
 void MAIN_func_800E4038(VECTOR *output, int32_t x, int32_t y,
@@ -162,7 +160,7 @@ void MAIN_func_800E4038(VECTOR *output, int32_t x, int32_t y,
 	positions[1].vz = VIEWPORT_DISTANCE;
 
 	for (i = 0; i < 2; i++) {
-		MAIN_func_800E3FB8((int16_t *)&positions[i], &transformed[i]);
+		MAIN_func_800E3FB8(&positions[i], &transformed[i]);
 	}
 
 	transformed[1].vx -= transformed[0].vx;
@@ -208,79 +206,52 @@ void toEulerAngles(SVECTOR *output, int32_t deltaX, int32_t deltaY,
 	output->vz = 0;
 
 	output->vx &= 0xfff;
-	adjustment = output->vx >= 0x800 ? 0x1000 : 0;
+	if (output->vx >= 0x800)
+		adjustment = 0x1000;
+	else
+		adjustment = 0;
 	output->vx -= adjustment;
 
 	output->vy &= 0xfff;
-	adjustment = output->vy >= 0x800 ? 0x1000 : 0;
-	output->vy -= adjustment;
+	output->vy -= output->vy >= 0x800 ? 0x1000 : 0;
 }
 
 int32_t getDistance(int32_t deltaX, int32_t deltaY, int32_t deltaZ)
 {
-	int32_t absX;
-	int32_t absZ;
-	int32_t sum;
-	int32_t leadingZeroes;
 	int32_t shift;
-	int32_t value;
-	int32_t estimate;
+	int32_t leadingZeroes;
 
-	value = value = deltaX;
-	if (value > 0) {
-		absX = value;
-	} else {
-		absX = -value;
-	}
-	value = absX;
-	if (deltaY > 0) {
-		deltaX = deltaY;
-	} else {
-		deltaX = -deltaY;
-	}
-	deltaY = deltaX;
-	if (deltaZ > 0) {
-		absZ = deltaZ;
-	} else {
-		absZ = -deltaZ;
-	}
-	deltaZ = absZ;
-	sum = absX + deltaX + absZ;
+	deltaX = ABS_VALUE(deltaX);
+	deltaY = ABS_VALUE(deltaY);
+	deltaZ = ABS_VALUE(deltaZ);
+	shift = deltaX + deltaY + deltaZ;
 
-	gte_ldlzc(sum);
-	if (sum <= 0) {
-		return sum != 0 ? 0x80000000 : 0;
+	gte_ldlzc(shift);
+	if (shift <= 0) {
+		return shift != 0 ? 0x80000000 : 0;
 	}
 
 	gte_stlzc(&leadingZeroes);
 	shift = 17 - leadingZeroes;
-	if (shift < 0) {
-		goto negative_shift;
-	}
-	value >>= shift;
-	goto shift_complete;
-negative_shift:
-	shift = (shift = 0);
-	value >>= shift;
-shift_complete:
-
+	shift = shift >= 0 ? shift : 0;
+	deltaX >>= shift;
 	deltaY >>= shift;
 	deltaZ >>= shift;
-	value = value * value + deltaY * deltaY + deltaZ * deltaZ;
+	deltaX = deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ;
 
-	gte_ldlzc(value);
-	estimate = MAIN_D_80114D68[value & 0xff];
-	if (value >= 0x100) {
+	gte_ldlzc(deltaX);
+	deltaY = MAIN_D_80114D68[deltaX & 0xff];
+	if (deltaX >= 0x100) {
 		gte_stlzc(&leadingZeroes);
 		deltaY = (leadingZeroes & 1) + 24 - leadingZeroes;
-		estimate = MAIN_D_80114D68[value >> deltaY] << (deltaY >> 1);
+		deltaY = MAIN_D_80114D68[deltaX >> deltaY] << (deltaY >> 1);
 
-		estimate += ((value / estimate) - estimate) >> 1;
-		estimate += ((value / estimate) - estimate) >> 1;
+		deltaY += ((deltaX / deltaY) - deltaY) >> 1;
+		deltaY += ((deltaX / deltaY) - deltaY) >> 1;
 	}
 
-	value = estimate << shift;
-	return value < 0 ? 0x80000000 : value;
+	deltaX = deltaY << shift;
+	return deltaX < 0 ? 0x80000000 : deltaX;
 }
 
 void MAIN_func_800E4470(MATRIX *matrix, SVECTOR *output)
@@ -289,10 +260,8 @@ void MAIN_func_800E4470(MATRIX *matrix, SVECTOR *output)
 	int32_t cosX;
 	int32_t sinZ;
 	int32_t cosZ;
-	int32_t maximum;
 	int32_t value;
-
-	value = value;
+	int32_t maximum;
 
 	if (matrix->m[2][2] == 0 && matrix->m[0][0] == 0) {
 		output->vy = matrix->m[0][2] > 0 ? 0x400 : -0x400;
@@ -327,14 +296,13 @@ void MAIN_func_800E4470(MATRIX *matrix, SVECTOR *output)
 
 void matrixToEuler2(MATRIX *matrix, SVECTOR *output)
 {
+	int32_t sinX;
+	int32_t value;
 	int32_t sinY;
 	int32_t cosY;
 	int32_t sinZ;
 	int32_t cosZ;
 	int32_t maximum;
-	int32_t value;
-
-	value = value;
 
 	if (matrix->m[2][2] == 0 && matrix->m[0][2] == 0) {
 		output->vx = matrix->m[1][2] > 0 ? -0x400 : 0x400;
@@ -364,28 +332,26 @@ void matrixToEuler2(MATRIX *matrix, SVECTOR *output)
 		value = (matrix->m[1][1] << 12) / cosZ;
 	}
 
-	output->vx = ratan2(-matrix->m[1][2], value);
+	sinX = -matrix->m[1][2];
+	output->vx = ratan2(sinX, value);
 }
 
 void calculatePosition(GsCOORDINATE2 *coord, MATRIX *matrix)
 {
 	GsCOORDINATE2 *stack[100];
+	int32_t i;
 	GsCOORDINATE2 **ptr;
 
 	ptr = stack;
 	*ptr++ = coord;
-	while (coord->super != NULL) {
-		coord = coord->super;
-		*ptr++ = coord;
-	}
+	while (coord->super != NULL)
+		*ptr++ = coord = coord->super;
 
-	ptr--;
-	*matrix = (*ptr)->coord;
+	*matrix = (*--ptr)->coord;
+	i = 0;
 
-	while (stack < ptr) {
-		ptr--;
-		GsMulCoord3(matrix, &(*ptr)->coord);
-	}
+	while (stack < ptr)
+		GsMulCoord3(matrix, &(*--ptr)->coord);
 }
 
 void multiplyRotations(SVECTOR *rotation1, SVECTOR *rotation2)
@@ -408,8 +374,6 @@ void multiplyRotations(SVECTOR *rotation1, SVECTOR *rotation2)
 
 int32_t customRandom(int32_t min, int32_t max)
 {
-	uint32_t combined;
-	uint32_t range;
 	int32_t tmp;
 
 	if (max == min) {
@@ -425,9 +389,6 @@ int32_t customRandom(int32_t min, int32_t max)
 	CUSTOM_RNG_1 = CUSTOM_RNG_1 * CUSTOM_RNG_FACTOR + CUSTOM_RNG_VALUE;
 	CUSTOM_RNG_2 = CUSTOM_RNG_2 * CUSTOM_RNG_FACTOR + CUSTOM_RNG_VALUE;
 
-	combined = (CUSTOM_RNG_1 >> 16) | (CUSTOM_RNG_2 << 16);
-
-	range = max - min + 1;
-
-	return min + (int32_t)(combined % range);
+	return min + (int32_t)(((CUSTOM_RNG_1 >> 16) | (CUSTOM_RNG_2 << 16)) %
+			       (max - min + 1));
 }

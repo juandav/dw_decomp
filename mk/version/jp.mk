@@ -40,6 +40,7 @@ MAIN_C_SRC := \
 	src/main/file_queue.c \
 	src/main/fish.c \
 	src/main/font.c \
+	src/main/graphics2.c \
 	src/main/kar.c \
 	src/main/map_collision.c \
 	src/main/math.c \

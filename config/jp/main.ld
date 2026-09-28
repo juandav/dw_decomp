@@ -53,7 +53,7 @@ SECTIONS
         BUILD_DIR/src/main/entity_text.c.o(.text .text.*);
         KEEP(BUILD_DIR/asm/main/621F4.s.o(.text .text.*));
         BUILD_DIR/src/main/file_queue.c.o(.text .text.*);
-        KEEP(BUILD_DIR/asm/main/70ECC.s.o(.text .text.*));
+        BUILD_DIR/src/main/graphics2.c.o(.text .text.*);
         BUILD_DIR/src/main/fish.c.o(.text .text.*);
         BUILD_DIR/src/main/utils.c.o(.text .text.*);
         KEEP(BUILD_DIR/asm/main/737BC.s.o(.text .text.*));
@@ -80,6 +80,8 @@ SECTIONS
         BUILD_DIR/src/main/overworld_playerinfo_text.c.o(.rodata .rodata.*);
         BUILD_DIR/src/main/overworld_medal_text.c.o(.rodata .rodata.*);
         KEEP(BUILD_DIR/asm/main/data/8AD50.rodata.s.o(.rodata .rodata.*));
+        BUILD_DIR/src/main/graphics2.c.o(.rodata .rodata.*);
+        KEEP(BUILD_DIR/asm/main/data/8B6E0.rodata.s.o(.rodata .rodata.*));
         BUILD_DIR/src/main/bubble.c.o(.rodata .rodata.*);
         main_RODATA_END = .;
         main_RODATA_SIZE = ABSOLUTE(main_RODATA_END - main_RODATA_START);
@@ -131,7 +133,8 @@ SECTIONS
         KEEP(BUILD_DIR/asm/main/data/AD6C4.sdata.s.o(.sdata .sdata.*));
         BUILD_DIR/src/main/file_queue.c.o(.sdata .sdata.*);
         . = ALIGN(., 4);
-        KEEP(BUILD_DIR/asm/main/data/AD7C8.sdata.s.o(.sdata .sdata.*));
+        BUILD_DIR/src/main/graphics2.c.o(.sdata .sdata.*);
+        . = ALIGN(., 4);
         BUILD_DIR/src/main/utils.c.o(.sdata .sdata.*);
         . = ALIGN(., 4);
         BUILD_DIR/src/main/efe_table.c.o(.sdata .sdata.*);
