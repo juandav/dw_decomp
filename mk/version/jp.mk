@@ -30,6 +30,7 @@ MAIN_C_SRC := \
 	src/main/math.c \
 	src/main/overworld_card_text.c \
 	src/main/overworld_evochart_text.c \
+	src/main/overworld_evochart_view.c \
 	src/main/overworld_medal_text.c \
 	src/main/overworld_moves_text.c \
 	src/main/overworld_playerinfo_text.c \

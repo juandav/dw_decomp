@@ -34,14 +34,12 @@ void renderEvoChartView(void);
 
 void renderEvoChartView(void)
 {
-	int32_t iVar1;
-	int32_t cVar2;
-	int32_t uVar4;
-	int32_t iVar5;
-	int32_t iVar7;
-	EvoClutTable local_c;
+	int32_t i;
+	int16_t x;
+	int8_t shift;
+	EvoClutTable cluts;
 
-	local_c = MAIN_D_80123E1C;
+	cluts = MAIN_D_80123E1C;
 	switch (MENU_STATE) {
 	case 0:
 		if (drawEvoChartStrings(0) == 1) {
@@ -51,40 +49,38 @@ void renderEvoChartView(void)
 	case 2:
 	case 3:
 	case 4:
-		if ((iVar5 = MAIN_D_80134D42) < 3) {
-			iVar5 = (int16_t)(iVar5 * 0x25 + 0x1c);
-		} else if (iVar5 < 7) {
-			iVar5 = (int16_t)((iVar5 - 3) * 0x18 + 0x8b);
+		if (MAIN_D_80134D42 < 3) {
+			x = (int16_t)(MAIN_D_80134D42 * 0x25 + 0x1c);
+		} else if (MAIN_D_80134D42 < 7) {
+			x = (int16_t)((MAIN_D_80134D42 - 3) * 0x18 + 0x8b);
 		} else {
-			iVar5 = (int16_t)((iVar5 - 7) * 0x18 + 0xf8);
+			x = (int16_t)((MAIN_D_80134D42 - 7) * 0x18 + 0xf8);
 		}
-		renderRectPolyFT4((int16_t)(iVar5 - 0xa2),
+		renderRectPolyFT4((int16_t)(x - 0xa2),
 			(int16_t)(MAIN_D_80134D44 * 0x13 - 0x4e), 0x18, 0x14,
 			0, 0xe8, 0x18, 0x7dc7, 5, 0);
 		/* fall through */
 	case 1:
-		for (iVar7 = 0, uVar4 = 1; iVar7 < 0x3e; iVar7++, uVar4++) {
-			iVar1 = hasDigimonRaised(uVar4 & 0xffff);
-			if (iVar1 != 0) {
-				cVar2 = 0;
-				if ((uVar4 == MAIN_D_80134D40) &&
-				    (1 < MENU_STATE) &&
+		for (i = 0; i < 0x3e; i++) {
+			if (hasDigimonRaised((i + 1) & 0xffff)) {
+				shift = 0;
+				if ((i + 1 == MAIN_D_80134D40) && (1 < MENU_STATE) &&
 				    ((PLAYTIME_FRAMES % 10) < 5)) {
-					cVar2 = 0x10;
+					shift = 0x10;
 				}
 				renderRectPolyFT4(
-					(int16_t)(MAIN_D_80124544[iVar7].posX - 0xa0),
-					(int16_t)(MAIN_D_80124544[iVar7].posY - 0x78),
+					(int16_t)(MAIN_D_80124544[i].posX - 0xa0),
+					(int16_t)(MAIN_D_80124544[i].posY - 0x78),
 					0x10, 0x10,
-					(uint8_t)(cVar2 + MAIN_D_80124544[iVar7].u),
-					MAIN_D_80124544[iVar7].v, 0x18,
-					local_c.m[MAIN_D_80124544[iVar7].clut],
+					(uint8_t)(shift + MAIN_D_80124544[i].u),
+					MAIN_D_80124544[i].v, 0x18,
+					cluts.m[MAIN_D_80124544[i].clut],
 					5, 0);
 			}
 		}
-		for (iVar7 = 0; iVar7 < 0x3e; iVar7++) {
-			renderSpriteBox((MAIN_D_80124544[iVar7].posX - 1),
-				(MAIN_D_80124544[iVar7].posY - 1), 0x12, 0x12,
+		for (i = 0; i < 0x3e; i++) {
+			renderSpriteBox((MAIN_D_80124544[i].posX - 1),
+				(MAIN_D_80124544[i].posY - 1), 0x12, 0x12,
 				0xbebebe, 0x3c3c3c, 0x87, 0x87, 0x87, 5);
 		}
 		renderSpriteBox(0x15, 0x27, 0x22, 0x9f, 0xaaa0c8, 0x5a3c8c,
@@ -97,9 +93,17 @@ void renderEvoChartView(void)
 				0, 0x87, 0x41, 5);
 		renderSpriteBox(0xf1, 0x27, 0x38, 0x9f, 0x6996d2, 0x1e4178,
 				0xaf, 0x64, 0x2d, 5);
+#if defined(VERSION_JP)
+		renderString(0xe, -0x1a, 0x54, 0xc, 0xc, 0, 0xc, 5, 1);
+#else
 		renderString(0xf, -0x1a, 0x54, 0xc, 0xc, 0, 0xc, 5, 1);
+#endif
 		renderString(0, -0xe, 0x54, 0x3c, 0xc, 0xc, 0xc, 5, 1);
+#if defined(VERSION_JP)
+		renderString(0xf, 0x3a, 0x54, 0xc, 0xc, 0x48, 0xc, 5, 1);
+#else
 		renderString(7, 0x3a, 0x54, 0xc, 0xc, 0x48, 0xc, 5, 1);
+#endif
 		renderString(0, 0x46, 0x54, 0x3c, 0xc, 0x54, 0xc, 5, 1);
 	}
 }
