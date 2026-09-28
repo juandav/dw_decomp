@@ -37,9 +37,9 @@ static void *command_menu_sbss_order[] = {
 
 void BTL_initializeCommandMenu(void)
 {
+	MAIN_D_80135094 = 1;
 	MAIN_D_80135084 = -0x98;
 	MAIN_D_80135086 = -0x78;
-	MAIN_D_80135094 = 1;
 	MAIN_D_80135088 = 0;
 	MAIN_D_80135089 = 0;
 	MAIN_D_8013508A = 0;
@@ -54,8 +54,6 @@ void BTL_initializeCommandMenu(void)
 		break;
 	case 5:
 		MAIN_D_8013508C = 2;
-		break;
-	case 6:
 		break;
 	case 7:
 		MAIN_D_8013508C = 3;
@@ -100,17 +98,16 @@ void BTL_tickCommandMenu(void)
 	}
 }
 
-void BTL_renderCommandMenu(int32_t arg0)
+void BTL_renderCommandMenu(arg0)
+int16_t arg0;
 {
 	POLY_FT4 *prim;
 	int32_t i;
-	int32_t off;
-	int16_t base;
-	int16_t count;
 	int16_t x;
-	int32_t y;
 	int16_t rowY;
 	int16_t width;
+	int16_t base;
+	int16_t count;
 
 	base = ((COMBAT_DATA_PTR->player.numCommands[0] - 1) * 0xe) - 0x8c;
 	if (GAME_STATE == 1) {
@@ -128,6 +125,8 @@ void BTL_renderCommandMenu(int32_t arg0)
 		setRGB0(prim, 0x80, 0x80, 0x80);
 		setUVDataPolyFT4(prim, 0x3d, 0xe0, 0x16, 0x16);
 		if ((count % 2) == 0) {
+			int32_t y;
+
 			if ((COMBAT_DATA_PTR->player.hoveredCommand[0] % 2) == 0) {
 				y = -0x64;
 			} else {
@@ -135,6 +134,8 @@ void BTL_renderCommandMenu(int32_t arg0)
 			}
 			setPosDataPolyFT4(prim, x - 3, y, 0x16, 0x16);
 		} else {
+			int32_t y;
+
 			if ((COMBAT_DATA_PTR->player.hoveredCommand[0] % 2) == 1) {
 				y = -0x64;
 			} else {
@@ -145,13 +146,23 @@ void BTL_renderCommandMenu(int32_t arg0)
 		AddPrim(ACTIVE_ORDERING_TABLE->org + 7, prim++);
 	}
 
-	for (i = 1, off = 0xe; i < COMBAT_DATA_PTR->player.numCommands[0]; i++, off += 0xe) {
+	for (i = 1; i < COMBAT_DATA_PTR->player.numCommands[0]; i++) {
 		SetPolyFT4(prim);
 		prim->tpage = getTPage(0, 0, 960, 256);
 		setClut(prim, 272, 496);
 		setRGB0(prim, 0x80, 0x80, 0x80);
 		BTL_setCommandIconUV((DigimonEntity *)ENTITY_TABLE[COMBAT_DATA_PTR->player.entityIds[arg0]], prim, COMBAT_DATA_PTR->player.availableCommands[0][i]);
-		x = base - off;
+		if (i > 0) {
+			rowY = ((i - 1) * 0xe) + 0xb;
+		} else {
+			rowY = 0;
+		}
+		if ((i == 0) || (i == (COMBAT_DATA_PTR->player.numCommands[0] - 1))) {
+			width = 0xb;
+		} else {
+			width = 0xe;
+		}
+		x = (int16_t)base - (i * 0xe);
 		if ((count % 2) == 0) {
 			setXY4(prim, x, ((i % 2) == 0) ? MAIN_D_80135084 + 3 : MAIN_D_80135084 + 0xd, x + 0x10, ((i % 2) == 0) ? MAIN_D_80135084 + 3 : MAIN_D_80135084 + 0xd, x, ((i % 2) == 0) ? MAIN_D_80135086 - 0xd : MAIN_D_80135086 - 3, x + 0x10, ((i % 2) == 0) ? MAIN_D_80135086 - 0xd : MAIN_D_80135086 - 3);
 		} else {

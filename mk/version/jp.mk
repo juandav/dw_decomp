@@ -7,6 +7,7 @@ MAIN_SBSS := \
 	$(GEN_DIR)/unk_0x8013DF94.sbss.s \
 	$(GEN_DIR)/unk_0x8013E1FC.sbss.s \
 	$(GEN_DIR)/unk_0x8013E228.sbss.s \
+	$(GEN_DIR)/unk_0x8013E310.sbss.s \
 	$(GEN_DIR)/unk_0x8013E5C0.sbss.s \
 	$(GEN_DIR)/unk_0x8013E62E.sbss.s \
 	$(GEN_DIR)/unk_0x8013E676.sbss.s
@@ -53,6 +54,7 @@ MAIN_C_SRC := \
 $(eval $(call unit,MAIN,main))
 
 BTL_C_SRC := \
+	src/btl/command_menu.c \
 	src/btl/command_shout.c
 
 $(eval $(call overlay,BTL,btl))

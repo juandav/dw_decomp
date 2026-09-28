@@ -96,8 +96,10 @@ segments:
     subsegments:
       - [0x41C8, asm, btl]
       - [0x1102C, c, command_shout]
-      - [0x115D4, asm]
+      - [0x115D4, c, command_menu]
+      - [0x12450, asm]
       - [0x28A4C, data, btl]
+      - [0x28A7C, .rodata, command_menu]
       - [0x28AA4, .data, command_shout]
       - [0x28B68, data]
 

@@ -153,6 +153,10 @@ SECTIONS
         . = ALIGN(., 4);
         BUILD_DIR/generated/unk_0x8013E228.sbss.s.o(.sbss.*);
         . = ALIGN(., 4);
+        BUILD_DIR/src/btl/command_menu.c.o(.sbss.*);
+        . = ALIGN(., 4);
+        BUILD_DIR/generated/unk_0x8013E310.sbss.s.o(.sbss.*);
+        . = ALIGN(., 4);
         BUILD_DIR/src/mov/mov.c.o(.sbss.*);
         . = ALIGN(., 4);
         BUILD_DIR/generated/unk_0x8013E5C0.sbss.s.o(.sbss.*);
