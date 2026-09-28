@@ -104,7 +104,7 @@ extern int32_t MAIN_D_80134D70;
 extern int32_t MAIN_D_80134D74;
 extern int32_t MAIN_D_80134D7C[2];
 extern uint8_t MAIN_D_80135078;
-extern int32_t MAIN_D_8013507C;
+extern long MAIN_D_8013507C;
 extern int32_t MAIN_D_80135080;
 extern int8_t MAIN_D_80135094;
 extern StatsGains INITIAL_COMBAT_STATS[];

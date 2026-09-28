@@ -130,6 +130,9 @@ SECTIONS
         BUILD_DIR/src/main/bubble.c.o(.sdata .sdata.*);
         . = ALIGN(., 4);
         KEEP(BUILD_DIR/asm/main/data/AD8E4.sdata.s.o(.sdata .sdata.*));
+        BUILD_DIR/src/btl/battle_setup.c.o(.sdata .sdata.*);
+        . = ALIGN(., 4);
+        KEEP(BUILD_DIR/asm/main/data/AD924.sdata.s.o(.sdata .sdata.*));
         BUILD_DIR/src/btl/command_shout.c.o(.sdata .sdata.*);
         . = ALIGN(., 4);
         KEEP(BUILD_DIR/asm/main/data/AD94C.sdata.s.o(.sdata .sdata.*));
@@ -166,6 +169,8 @@ SECTIONS
         BUILD_DIR/src/main/sound_async.c.o(.sbss.*);
         . = ALIGN(., 4);
         BUILD_DIR/generated/unk_0x8013E228.sbss.s.o(.sbss.*);
+        . = ALIGN(., 4);
+        BUILD_DIR/src/btl/battle_setup.c.o(.sbss.*);
         . = ALIGN(., 4);
         BUILD_DIR/src/btl/command_menu.c.o(.sbss.*);
         . = ALIGN(., 4);

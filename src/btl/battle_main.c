@@ -2159,7 +2159,7 @@ void BTL_tickAttackHits(void)
 			if (i == 0) {
 				BTL_removeFinisherChargeup();
 			}
-			if ((*(int32_t *)&MAIN_D_8013507C) != -1) {
+			if (MAIN_D_8013507C != -1) {
 				BTL_removeFinisherAura(MAIN_D_8013507C);
 			}
 			MAIN_D_80134D74 = 0;

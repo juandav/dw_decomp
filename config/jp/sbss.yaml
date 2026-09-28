@@ -10,6 +10,7 @@ subsegments:
   - [0x8013E1FC, unk_0x8013E1FC]
   - [0x8013E224, sound_async]
   - [0x8013E228, unk_0x8013E228]
+  - [0x8013E2F8, battle_setup]
   - [0x8013E304, command_menu]
   - [0x8013E310, unk_0x8013E310]
   - [0x8013E5B4, mov]

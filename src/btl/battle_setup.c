@@ -30,7 +30,7 @@ int16_t MAIN_D_801346D8[4] = { 0, 1024, 2048, 3072 };
 uint8_t MAIN_D_801346E0[5] = { 3, 4, 5, 7, 8 };
 
 uint8_t MAIN_D_80135078;
-int32_t MAIN_D_8013507C;
+long MAIN_D_8013507C;
 int32_t MAIN_D_80135080;
 
 static void *battle_setup_sbss_order[] = {
@@ -42,12 +42,12 @@ static void *battle_setup_sbss_order[] = {
 void BTL_initializeCombat(void)
 {
 	int32_t i;
-	int32_t sound;
-	int32_t j;
-	int16_t brains;
-	int16_t *dst;
 	FighterData *f;
 	Stats *stats;
+	int32_t j;
+	int16_t *dst;
+	DigimonEntity *digimon;
+	int16_t brains;
 
 	BTL_initializeDeathCountdown();
 	resetFlattenGlobal();
@@ -55,14 +55,13 @@ void BTL_initializeCombat(void)
 	BTL_initializePartnerTile();
 	BTL_initializeEnemyHPBarSprites();
 	COMBAT_DATA_PTR->player.remainingChargeupTime[0] = -1;
-	MAIN_D_80134D60 = NULL;
 	MAIN_D_80135078 = PARTNER_ENTITY.digimonEntity.stats.current.chargeMode;
-	MAIN_D_80134D66 = 1;
+	MAIN_D_80134D60 = NULL;
 	MAIN_D_80134D7C[1] = 0;
 	MAIN_D_80135080 = 0;
-	MAIN_D_80134D68 = 0;
-	MAIN_D_80134D6A = 0;
+	MAIN_D_80134D6A = MAIN_D_80134D68 = 0;
 	MAIN_D_80134D64 = 0;
+	MAIN_D_80134D66 = 1;
 	COMBAT_DATA_PTR->player.unk7 = 0;
 	COMBAT_DATA_PTR->player.changeTarget = 0;
 	MAIN_D_80134D74 = 0;
@@ -86,8 +85,9 @@ void BTL_initializeCombat(void)
 	COMBAT_DATA_PTR->player.unk2 = 0;
 	COMBAT_DATA_PTR->player.statusedCount = 0;
 
-	for (i = 0; ENEMY_COUNT >= i; i++) {
-		stats = &((DigimonEntity *)ENTITY_TABLE[COMBAT_DATA_PTR->player.entityIds[i]])->stats;
+	for (i = 0; i <= ENEMY_COUNT; i++) {
+		digimon = (DigimonEntity *)ENTITY_TABLE[COMBAT_DATA_PTR->player.entityIds[i]];
+		stats = &digimon->stats;
 		stats->current.isHit = 0;
 		f->targetId = 0xff;
 		f->hpDamageBuffer = 0;
@@ -143,8 +143,6 @@ void BTL_initializeCombat(void)
 		COMBAT_DATA_PTR->player.availableCommands[0][3] = 2;
 		COMBAT_DATA_PTR->player.availableCommands[0][4] = 3;
 		break;
-	case 6:
-		break;
 	case 7:
 		COMBAT_DATA_PTR->player.availableCommands[0][2] = 7;
 		COMBAT_DATA_PTR->player.availableCommands[0][3] = 5;
@@ -180,10 +178,9 @@ void BTL_initializeCombat(void)
 	}
 
 	COMBAT_DATA_PTR->player.hoveredCommand[0] = COMBAT_DATA_PTR->player.numCommands[0] - 1;
-	COMBAT_DATA_PTR->player.bufferedCommand[0] = 3;
-	COMBAT_DATA_PTR->player.currentCommand[0] = 3;
+	COMBAT_DATA_PTR->player.currentCommand[0] = COMBAT_DATA_PTR->player.bufferedCommand[0] = 3;
 
-	for (i = 0; ENEMY_COUNT >= i; i++) {
+	for (i = 0; i <= ENEMY_COUNT; i++) {
 		stats = &((DigimonEntity *)ENTITY_TABLE[COMBAT_DATA_PTR->player.entityIds[i]])->stats;
 		dst = (int16_t *)&INITIAL_COMBAT_STATS[i];
 		*dst++ = stats->base.hp;
@@ -191,15 +188,15 @@ void BTL_initializeCombat(void)
 		*dst++ = stats->base.off;
 		*dst++ = stats->base.def;
 		*dst++ = stats->base.speed;
-		*dst++ = stats->base.brain;
+		*dst = stats->base.brain;
 	}
 
 	if ((PARTNER_PARA.condition & 0x60) != 0) {
 		stats = &PARTNER_ENTITY.digimonEntity.stats;
-		stats->base.off = stats->base.off - (int16_t)(stats->base.off / 5);
-		stats->base.def = stats->base.def - (int16_t)(stats->base.def / 5);
-		stats->base.speed = stats->base.speed - (int16_t)(stats->base.speed / 5);
-		stats->base.brain = stats->base.brain - (int16_t)(stats->base.brain / 5);
+		stats->base.off -= (int16_t)(stats->base.off / 5);
+		stats->base.def -= (int16_t)(stats->base.def / 5);
+		stats->base.speed -= (int16_t)(stats->base.speed / 5);
+		stats->base.brain -= (int16_t)(stats->base.brain / 5);
 	}
 
 	COMBAT_DATA_PTR->player.startingHP = PARTNER_ENTITY.digimonEntity.stats.current.currentHP;
@@ -208,21 +205,20 @@ void BTL_initializeCombat(void)
 
 void BTL_handleBattleIntro(void)
 {
+	int32_t i;
+	NPCEntity *npc;
+	long j;
+	int32_t timer;
+	int32_t count;
 	int16_t found[8];
 	VECTOR pos;
 	SVECTOR flee;
-	int16_t tileX;
-	int16_t tileY;
-	NPCEntity *npc;
-	int32_t i;
-	int32_t sound;
-	int32_t j;
-	int32_t count;
-	int32_t timer;
 	int32_t allOffScreen;
 	int32_t done;
 	int16_t wp;
 	int16_t result;
+	int16_t tileX;
+	int16_t tileY;
 
 	startBattleIdleAnimation(&PARTNER_ENTITY.digimonEntity, &PARTNER_ENTITY.digimonEntity.stats, COMBAT_DATA_PTR->fighter[0].flags);
 	entityLookAtLocation(&PARTNER_ENTITY.digimonEntity.entity, &ENTITY_TABLE[COMBAT_DATA_PTR->player.entityIds[1]]->posData->location);
@@ -231,7 +227,7 @@ void BTL_handleBattleIntro(void)
 	for (i = 2; i < 0xa; i++) {
 		npc = (NPCEntity *)ENTITY_TABLE[i];
 		if (isInvisible(&npc->digimonEntity.entity) == 0) {
-			for (j = 1; ENEMY_COUNT >= j; j++) {
+			for (j = 1; j <= ENEMY_COUNT; j++) {
 				if (COMBAT_DATA_PTR->player.entityIds[j] == i) {
 					break;
 				}
@@ -280,7 +276,7 @@ void BTL_handleBattleIntro(void)
 			}
 		}
 		if (wp == -1) {
-			for (i = 1; ENEMY_COUNT >= i; i++) {
+			for (i = 1; i <= ENEMY_COUNT; i++) {
 			}
 		}
 		if ((result == 0xb) && (ENTITY_TABLE[0]->anim.animId != 1)) {
@@ -336,7 +332,6 @@ int32_t BTL_isBattleFinished(void)
 	Entity *entity;
 	Stats *stats;
 	int32_t i;
-	int32_t sound;
 
 	entity = ENTITY_TABLE[1];
 	if ((MAIN_D_80134D68 >= 0x29) && ((PARTNER_ENTITY.digimonEntity.stats.current.currentHP - COMBAT_DATA_PTR->fighter[0].hpDamageBuffer) > 0)) {
@@ -349,14 +344,11 @@ int32_t BTL_isBattleFinished(void)
 			COMBAT_DATA_PTR->fighter[0].flags &= 0x7fff;
 			PARTNER_ENTITY.digimonEntity.stats.current.isHit = 0;
 			if (MAIN_D_80134D74 != 0) {
-				sound = MAIN_D_8013507C;
-				do {
-					if (sound != -1) {
-						BTL_removeFinisherAura(sound);
-					}
-					MAIN_D_80134D74 = 0;
-					MAIN_D_80134D60 = NULL;
-				} while (0);
+				if (MAIN_D_8013507C != -1) {
+					BTL_removeFinisherAura(MAIN_D_8013507C);
+				}
+				MAIN_D_80134D74 = 0;
+				MAIN_D_80134D60 = NULL;
 			}
 			for (i = 0; ENEMY_COUNT >= i; i++) {
 				COMBAT_DATA_PTR->fighter[i].cooldown = 0;
