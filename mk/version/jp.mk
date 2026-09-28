@@ -6,6 +6,7 @@ MAIN_SBSS := \
 	$(GEN_DIR)/unk_0x8013DF20.sbss.s \
 	$(GEN_DIR)/unk_0x8013DF94.sbss.s \
 	$(GEN_DIR)/unk_0x8013E070.sbss.s \
+	$(GEN_DIR)/unk_0x8013E0EC.sbss.s \
 	$(GEN_DIR)/unk_0x8013E1FC.sbss.s \
 	$(GEN_DIR)/unk_0x8013E228.sbss.s \
 	$(GEN_DIR)/unk_0x8013E310.sbss.s \
@@ -44,6 +45,7 @@ MAIN_C_SRC := \
 	src/main/fish.c \
 	src/main/font.c \
 	src/main/graphics2.c \
+	src/main/inventory.c \
 	src/main/item.c \
 	src/main/kar.c \
 	src/main/map_collision.c \

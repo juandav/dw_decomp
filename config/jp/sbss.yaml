@@ -8,6 +8,8 @@ subsegments:
   - [0x8013DF94, unk_0x8013DF94]
   - [0x8013E064, sound]
   - [0x8013E070, unk_0x8013E070]
+  - [0x8013E0D0, inventory]
+  - [0x8013E0EC, unk_0x8013E0EC]
   - [0x8013E1E8, file_queue]
   - [0x8013E1FC, unk_0x8013E1FC]
   - [0x8013E224, sound_async]

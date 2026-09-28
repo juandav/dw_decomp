@@ -20,7 +20,7 @@
 #endif
 
 void damageTick(FighterData* fighter, Stats* stats);
-void sortItemsById(uint8_t *data, int32_t count);
+void sortItemsById(uint8_t *data, long count);
 void initStringFT4(POLY_FT4* poly);
 #if defined(VERSION_JP)
 void renderNumber(int32_t color, int16_t x, int16_t y, int16_t n,
@@ -236,7 +236,7 @@ void damageTick(FighterData* fighter, Stats* stats)
 	}
 }
 
-void sortItemsById(uint8_t *data, int32_t count)
+void sortItemsById(uint8_t *data, long count)
 {
 	int32_t i;
 	int32_t j;
