@@ -193,7 +193,8 @@ SECTIONS
         . = ALIGN(., 4);
         BUILD_DIR/src/trn2/trn2_slots.c.o(.sdata .sdata.*);
         . = ALIGN(., 4);
-        KEEP(BUILD_DIR/asm/main/data/ADED0.sdata.s.o(.sdata .sdata.*));
+        BUILD_DIR/src/murd/murd.c.o(.sdata .sdata.*);
+        . = ALIGN(., 4);
         BUILD_DIR/src/endi/endi.c.o(.sdata .sdata.*);
         . = ALIGN(., 4);
         BUILD_DIR/src/eab/eab.c.o(.sdata .sdata.*);
@@ -256,7 +257,7 @@ SECTIONS
         BUILD_DIR/src/trn2/trn2_reward.c.o(.sbss.*);
         BUILD_DIR/src/trn2/trn2_hud.c.o(.sbss.*);
         . = ALIGN(., 4);
-        BUILD_DIR/generated/unk_0x8013E698.sbss.s.o(.sbss.*);
+        BUILD_DIR/src/murd/murd.c.o(.sbss.*);
         . = ALIGN(., 4);
         BUILD_DIR/src/eab/eab.c.o(.sbss.*);
         . = ALIGN(., 4);

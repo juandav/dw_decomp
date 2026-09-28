@@ -5,6 +5,7 @@
 
 #include <dw/btl.h>
 #include <dw/dooa.h>
+#include <dw/efe.h>
 #include <dw/entity.h>
 #include <dw/file.h>
 #include <dw/file_queue.h>
@@ -38,7 +39,7 @@ void setMapLayerEnabled(int32_t enabled);
 int32_t lerp(int32_t start, int32_t end, int32_t t0, int32_t t1, int32_t t);
 int32_t worldPosToScreenPos(SVECTOR *pos, DVECTOR *out);
 int32_t getDistance(int32_t x, int32_t y, int32_t z);
-void renderParticleFlash(int16_t *params);
+void renderParticleFlash(ParticleFlashData *params);
 void renderDropShadow(Entity *entity);
 
 void MAIN_func_800D91EC(int32_t message, int32_t value);
@@ -50,7 +51,7 @@ void MAIN_func_800D9BA8(int32_t level, int16_t *src, int32_t unused);
 void MURD_tickScene(int32_t instanceId);
 void MURD_renderScene(void);
 void MURD_initializeOrderingTables(void);
-void MURD_storeDigimonTexture(uint16_t *buffer, Entity *entity);
+void MURD_storeDigimonTexture(u_long buffer, Entity *entity);
 int32_t MURD_isDigimonLargerThanIris(Entity *entity, int32_t start, int32_t end, int32_t t);
 void MURD_setOtherEntitiesVisible(int32_t restore);
 void MURD_createLivesBox(Entity *entity);
@@ -337,20 +338,20 @@ void MURD_renderScene(void)
 
 void MURD_initializeOrderingTables(void)
 {
-	GsOT_TAG *tags = MURD_ORDERING_TABLE_0;
-
 	MURD_ORDERING_TABLES[0].length = 0xb;
-	MURD_ORDERING_TABLES[0].org = tags;
+	MURD_ORDERING_TABLES[0].org = MURD_ORDERING_TABLE_0;
 	MURD_ORDERING_TABLES[1].length = 0xb;
-	MURD_ORDERING_TABLES[1].org = tags + 0x800;
+	MURD_ORDERING_TABLES[1].org = MURD_ORDERING_TABLE_0 + 0x800;
 }
 
-void MURD_storeDigimonTexture(uint16_t *buffer, Entity *entity)
+void MURD_storeDigimonTexture(u_long buffer, Entity *entity)
 {
-	ModelComponent *model;
+	TMDModel *tmd;
 	RECT rect;
+	ModelComponent *model;
 
 	model = getEntityModelComponent(entity->type, getEntityType(entity));
+	tmd = model->modelPtr;
 	setRECT(&rect, (model->clutPage & 0x3f) << 4, model->clutPage >> 6, 0x10, 0x18);
 	StoreImage(&rect, (u_long *)buffer);
 
@@ -360,10 +361,13 @@ void MURD_storeDigimonTexture(uint16_t *buffer, Entity *entity)
 int32_t MURD_isDigimonLargerThanIris(Entity *entity, int32_t start, int32_t end, int32_t t)
 {
 	SVECTOR pos;
-	DVECTOR screen;
 	int32_t size;
+	int32_t projected;
 	int32_t radius;
+	DVECTOR screen;
+	int32_t layer;
 	int32_t z;
+	int32_t result;
 
 	pos.vx = entity->posData->location.vx;
 	pos.vy = entity->posData->location.vy - (DIGIMON_DATA[entity->type].height / 2);
@@ -376,11 +380,16 @@ int32_t MURD_isDigimonLargerThanIris(Entity *entity, int32_t start, int32_t end,
 		return 1;
 	}
 
-	if (((int32_t)(((uint32_t)(size * VIEWPORT_DISTANCE) / (uint32_t)z) << 12) / 256) >= radius) {
-		return 1;
+	projected = (uint32_t)(size * VIEWPORT_DISTANCE) / (uint32_t)z;
+	if (radius <= (projected << 12) / 256) {
+		layer = 0xfa0;
+		result = 1;
+	} else {
+		layer = 0x21;
+		result = 0;
 	}
 
-	return 0;
+	return result;
 }
 
 void MURD_setOtherEntitiesVisible(int32_t restore)
@@ -410,41 +419,52 @@ void MURD_createLivesBox(Entity *entity)
 {
 	RECT start;
 	SVECTOR pos;
+	MurdLivesBox *box;
+	int32_t id;
 
+	box = &MURD_LIVES_BOX;
+	id = 3;
 	start = MURD_LIVES_BOX_START_POS;
-	MURD_LIVES_BOX.frame = 0;
-	MURD_LIVES_BOX.state = 0;
-	MURD_LIVES_BOX.partner = (PartnerEntity *)entity;
+	box->frame = 0;
+	box->state = 0;
+	box->partner = (PartnerEntity *)entity;
 
 	copyVector(&pos, &entity->posData->location);
 	worldPosToScreenPos(&pos, (DVECTOR *)&start);
 
-	start.x = start.x - (int16_t)(0xa8 - DRAWING_OFFSET_X);
-	start.y = start.y - (int16_t)(0x7e - DRAWING_OFFSET_Y);
-	createAnimatedUIBox(3, 0, 2, &MURD_LIVES_BOX_FINAL_POS, &start, (TickFunction)MURD_tickLivesBox, (RenderFunction)MURD_renderLivesBox);
+	start.x -= 0xa8 - DRAWING_OFFSET_X;
+	start.y -= 0x7e - DRAWING_OFFSET_Y;
+	createAnimatedUIBox(id, 0, 2, &MURD_LIVES_BOX_FINAL_POS, &start, (TickFunction)MURD_tickLivesBox, (RenderFunction)MURD_renderLivesBox);
 }
 
 void MURD_animateLivesBoxOut(void)
 {
 	RECT target;
 	SVECTOR pos;
+	MurdLivesBox *box;
+	int32_t id;
+	PartnerEntity *partner;
 
+	box = &MURD_LIVES_BOX;
+	id = 3;
 	target = MURD_LIVES_BOX_TARGET_POS;
+	partner = box->partner;
 
-	copyVector(&pos, &MURD_LIVES_BOX.partner->digimonEntity.entity.posData->location);
+	copyVector(&pos, &partner->digimonEntity.entity.posData->location);
 	worldPosToScreenPos(&pos, (DVECTOR *)&target);
 
-	target.x = target.x - (int16_t)(0xa8 - DRAWING_OFFSET_X);
-	target.y = target.y - (int16_t)(0x7e - DRAWING_OFFSET_Y);
-	removeAnimatedUIBox(3, &target);
+	target.x -= 0xa8 - DRAWING_OFFSET_X;
+	target.y -= 0x7e - DRAWING_OFFSET_Y;
+	removeAnimatedUIBox(id, &target);
 }
 
 void MURD_renderFullscreenFade(VECTOR *color)
 {
 	POLY_FT4 *prim;
-	int32_t layer = 0;
+	int32_t layer;
 
 	prim = (POLY_FT4 *)GsGetWorkBase();
+	layer = 0;
 
 	SetPolyFT4(prim);
 	SetSemiTrans(prim, 1);
@@ -461,16 +481,23 @@ void MURD_renderFullscreenFade(VECTOR *color)
 
 void MURD_removeLivesBox(void)
 {
-	removeStaticUIBox(3);
+	int32_t id;
+
+	id = 3;
+	removeStaticUIBox(id);
 }
 
 void MURD_renderDigimon(Entity *entity, int32_t depth)
 {
 	MATRIX m;
-	PositionData *pos;
-	int32_t count;
-	int32_t i;
+	VECTOR location;
+	SVECTOR rotation;
+	int32_t type;
 	int32_t bone;
+	int32_t count;
+	uint8_t animId;
+	PositionData *pos;
+	int32_t i;
 
 	for (i = 0; i < ENTITY_MAX; i++) {
 		if (ENTITY_TABLE[i] == entity) {
@@ -485,8 +512,12 @@ void MURD_renderDigimon(Entity *entity, int32_t depth)
 	GsClearOt(0, 2, &MURD_ORDERING_TABLES[ACTIVE_FRAMEBUFFER]);
 
 	MURD_ORDERING_TABLES[ACTIVE_FRAMEBUFFER].point = depth;
-	count = DIGIMON_DATA[entity->type].boneCount;
+	type = entity->type;
+	animId = entity->anim.animId;
 	pos = entity->posData;
+	count = DIGIMON_DATA[type].boneCount;
+	location = pos->location;
+	rotation = pos->rotation;
 	m = GsWSMATRIX;
 
 	for (bone = 0; bone < count; pos++, bone++) {
@@ -506,38 +537,41 @@ void MURD_renderDigimon(Entity *entity, int32_t depth)
 int32_t MURD_renderIris(Entity *entity, int32_t start, int32_t end, int32_t t)
 {
 	SVECTOR pos;
-	DVECTOR screen;
-	int16_t flash[14];
-	POLY_FT4 *prim;
 	int32_t size;
+	int32_t projected;
 	int32_t radius;
+	DVECTOR screen;
 	int32_t z;
+	int32_t layer;
 	int32_t visible;
-	int32_t c = 0x80;
+	ParticleFlashData flash;
+	POLY_FT4 *prim;
 	int32_t left;
-	int32_t right;
-	int32_t cx;
 	int32_t top;
 	int32_t bottom;
 	int32_t sl;
 	int32_t sr;
 	int32_t st;
-	int32_t st2;
-	int32_t st3;
 	int32_t sb;
+	int32_t scale;
 	int32_t thickness;
 	int32_t lx;
 	int32_t ly;
 	int32_t lw;
+	int32_t lh;
 	int32_t rx;
 	int32_t ry;
 	int32_t rw;
+	int32_t rh;
+	int32_t tx;
 	int32_t ty;
 	int32_t tw;
 	int32_t th;
+	int32_t bx;
 	int32_t by;
 	int32_t bw;
 	int32_t bh;
+	int32_t right;
 
 	pos.vx = entity->posData->location.vx;
 	pos.vy = entity->posData->location.vy - (DIGIMON_DATA[entity->type].height / 2);
@@ -549,74 +583,78 @@ int32_t MURD_renderIris(Entity *entity, int32_t start, int32_t end, int32_t t)
 		return 1;
 	}
 
-	if (((int32_t)(((uint32_t)(size * VIEWPORT_DISTANCE) / (uint32_t)z) << 12) / 256) >= radius) {
+	projected = (uint32_t)(size * VIEWPORT_DISTANCE) / (uint32_t)z;
+	if (radius <= (projected << 12) / 256) {
+		layer = 0xfa0;
 		visible = 1;
 	} else {
+		layer = 0x21;
 		visible = 0;
 	}
 
-	flash[0] = screen.vx;
-	flash[1] = screen.vy;
-	flash[7] = 0x40;
-	flash[6] = 0x40;
-	flash[8] = getTPage(1, 2, 832, 256);
-	((uint8_t *)flash)[0x12] = 0;
-	((uint8_t *)flash)[0x13] = c;
-	flash[10] = getClut(0, 487);
-	((uint8_t *)flash)[0x16] = c;
-	((uint8_t *)flash)[0x17] = c;
-	((uint8_t *)flash)[0x18] = c;
-	((uint8_t *)flash)[0x19] = c;
-	*(int32_t *)&flash[4] = radius;
-	flash[2] = 0x22;
-	renderParticleFlash(flash);
+	layer = 0x22;
+	flash.screenPos.vx = screen.vx;
+	flash.screenPos.vy = screen.vy;
+	flash.sizeX = flash.sizeY = 0x40;
+	flash.tpage = getTPage(1, 2, 832, 256);
+	flash.uBase = 0;
+	flash.vBase = 0x80;
+	flash.clut = getClut(0, 487);
+	flash.color.r = 0x80;
+	flash.color.g = 0x80;
+	flash.color.b = 0x80;
+	flash.colorScale = 0x80;
+	flash.scale = radius;
+	flash.depth = layer;
+	renderParticleFlash(&flash);
 	prim = (POLY_FT4 *)GsGetWorkBase();
-	right = (radius << 8) / 4096;
+	scale = radius;
+	right = (scale << 8) / 4096;
+	left = screen.vx - right;
 	top = screen.vy - right;
-	cx = screen.vx;
-	left = cx - right;
 	bottom = screen.vy + right;
-	right = right + cx;
+	right = right + ((DVECTOR *)&screen)->vx;
 	sl = left - (0xa0 - DRAWING_OFFSET_X);
 	sr = right - (0xa0 - DRAWING_OFFSET_X);
 	st = top - (0x78 - DRAWING_OFFSET_Y);
 	sb = bottom - (0x78 - DRAWING_OFFSET_Y);
-	st2 = st;
-	st3 = st;
 	thickness = lerp(4, 1, 0x1860, 0, radius);
 
 	lx = left - (sl + 0xa0);
 	ly = top - (st + 0x78);
 	lw = (sl + 0xa0) + thickness;
 	if (lw > 0) {
+		lh = 0xf0;
 		SetPolyFT4(prim);
 		SetSemiTrans(prim, 2);
 		prim->r0 = prim->g0 = prim->b0 = 0x80;
 		prim->tpage = getTPage(1, 2, 832, 256);
 		prim->clut = getClut(0, 487);
 		setUVWH(prim, 0, 0x80, 3, 3);
-		setXYWH(prim, lx, ly, lw, 0xf0);
-		AddPrim(ACTIVE_ORDERING_TABLE->org + 0x22, prim++);
+		setXYWH(prim, lx, ly, lw, lh);
+		AddPrim(ACTIVE_ORDERING_TABLE->org + layer, prim++);
 	}
 
-	ry = top - (st2 + 0x78);
-	rw = (0xa0 - sr) + thickness;
 	rx = right - thickness;
+	ry = top - (st + 0x78L);
+	rw = (0xa0 - sr) + thickness;
 	if (rw > 0) {
+		rh = 0xf0;
 		SetPolyFT4(prim);
 		prim->r0 = prim->g0 = prim->b0 = 0x80;
 		SetSemiTrans(prim, 2);
 		prim->tpage = getTPage(1, 2, 832, 256);
 		prim->clut = getClut(0, 487);
 		setUVWH(prim, 0, 0x80, 3, 3);
-		setXYWH(prim, rx, ry, rw, 0xf0);
-		AddPrim(ACTIVE_ORDERING_TABLE->org + 0x22, prim++);
+		setXYWH(prim, rx, ry, rw, rh);
+		AddPrim(ACTIVE_ORDERING_TABLE->org + layer, prim++);
 	}
 
-	ty = top - (st3 + 0x78);
+	tx = left;
+	ty = top - ((int32_t)st + 0x78);
 	tw = right - left;
 	if (tw > 0) {
-		th = (st3 + 0x78) + thickness;
+		th = ((int32_t)st + 0x78) + thickness;
 		if (th > 0) {
 			SetPolyFT4(prim);
 			prim->r0 = prim->g0 = prim->b0 = 0x80;
@@ -624,11 +662,12 @@ int32_t MURD_renderIris(Entity *entity, int32_t start, int32_t end, int32_t t)
 			prim->tpage = getTPage(1, 2, 832, 256);
 			prim->clut = getClut(0, 487);
 			setUVWH(prim, 0, 0x80, 3, 3);
-			setXYWH(prim, left, ty, tw, th);
-			AddPrim(ACTIVE_ORDERING_TABLE->org + 0x22, prim++);
+			setXYWH(prim, tx, ty, tw, th);
+			AddPrim(ACTIVE_ORDERING_TABLE->org + layer, prim++);
 		}
 	}
 
+	bx = left;
 	by = bottom - thickness;
 	bw = (int32_t)right - left;
 	if (bw > 0) {
@@ -640,8 +679,8 @@ int32_t MURD_renderIris(Entity *entity, int32_t start, int32_t end, int32_t t)
 			prim->tpage = getTPage(1, 2, 832, 256);
 			prim->clut = getClut(0, 487);
 			setUVWH(prim, 0, 0x80, 3, 3);
-			setXYWH(prim, left, by, bw, bh);
-			AddPrim(ACTIVE_ORDERING_TABLE->org + 0x22, prim++);
+			setXYWH(prim, bx, by, bw, bh);
+			AddPrim(ACTIVE_ORDERING_TABLE->org + layer, prim++);
 		}
 	}
 
@@ -672,19 +711,21 @@ void MURD_tickLivesBox(void)
 	}
 }
 
-void MURD_renderLivesBox(int32_t layer)
+void MURD_renderLivesBox(layer)
+	int16_t layer;
 {
-	int32_t depth = 6 - layer;
-	PartnerEntity *partner = MURD_LIVES_BOX.partner;
-	MurdLivesBox *box = &MURD_LIVES_BOX;
-	int32_t offset = 0;
+	PartnerEntity *partner;
+	int32_t depth;
+	MurdLivesBox *box;
 	int32_t i;
-	int32_t x;
 
+	box = &MURD_LIVES_BOX;
+	depth = 6 - layer;
+	partner = box->partner;
 	GsSortSprite(&MURD_LIVES_BACKDROP, ACTIVE_ORDERING_TABLE, depth);
 
-	for (i = 0, x = -0xb; i < (partner->lives + offset); i++, x += 0x22) {
-		MURD_LIFE_FULL.x = x;
+	for (i = 0; i < ((partner->lives + 1) - 1); i++) {
+		MURD_LIFE_FULL.x = (i * 0x22) - 0xb;
 		GsSortSprite(&MURD_LIFE_FULL, ACTIVE_ORDERING_TABLE, depth);
 	}
 
@@ -707,22 +748,29 @@ void MURD_renderLivesBox(int32_t layer)
 		break;
 	}
 
-	for (i = partner->lives + 1, x = (i * 0x22) - 0xb; i < 3; i++, x += 0x22) {
-		MURD_LIFE_EMPTY.x = x;
+	for (i = partner->lives + 1; i < 3; i++) {
+		MURD_LIFE_EMPTY.x = (i * 0x22) - 0xb;
 		GsSortSprite(&MURD_LIFE_EMPTY, ACTIVE_ORDERING_TABLE, depth);
 	}
 }
 
-int32_t MURD_tick(PartnerEntity *partner, int32_t isInitialized)
+// clang-format off
+int32_t MURD_tick(partner, isInitialized)
+	PartnerEntity *partner;
+	int16_t isInitialized;
+// clang-format on
 {
-	MurdScene *scene = &MURD_SCENE;
+	int32_t id;
+	MurdScene *scene;
 	int32_t message;
 
+	scene = &MURD_SCENE;
+	id = 0;
 	if (isInitialized != 0) {
 		return scene->timer;
 	}
 
-	addObject(0x60a, 0, MURD_tickScene, (RenderFunction)MURD_renderScene);
+	addObject(0x60a, id, MURD_tickScene, (RenderFunction)MURD_renderScene);
 
 	scene->timer = 0;
 	scene->phase = 0;
@@ -744,7 +792,7 @@ int32_t MURD_tick(PartnerEntity *partner, int32_t isInitialized)
 	}
 
 	MURD_initializeOrderingTables();
-	MURD_storeDigimonTexture(MURD_TEXTURE_BUFFER, (Entity *)partner);
+	MURD_storeDigimonTexture((u_long)MURD_TEXTURE_BUFFER, (Entity *)partner);
 
 	return 0;
 }

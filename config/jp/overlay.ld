@@ -147,8 +147,9 @@ SECTIONS
 			murd_START = .;
 
 			KEEP(BUILD_DIR/asm/murd/data/header.rodata.s.o(.rodata .rodata.*));
-			KEEP(BUILD_DIR/asm/murd/murd.s.o(.text .text.*));
-			KEEP(BUILD_DIR/asm/murd/data/murd.data.s.o(.data .data.*));
+			BUILD_DIR/src/murd/murd.c.o(.text .text.*);
+			BUILD_DIR/src/murd/murd.c.o(.rodata .rodata.*);
+			BUILD_DIR/src/murd/murd.c.o(.data .data.*);
 			BUILD_DIR/src/murd/murd_bss.c.o(.data .data.*);
 		}
 	}

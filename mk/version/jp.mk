@@ -9,8 +9,7 @@ MAIN_SBSS := \
 	$(GEN_DIR)/unk_0x8013E1FC.sbss.s \
 	$(GEN_DIR)/unk_0x8013E228.sbss.s \
 	$(GEN_DIR)/unk_0x8013E310.sbss.s \
-	$(GEN_DIR)/unk_0x8013E5C0.sbss.s \
-	$(GEN_DIR)/unk_0x8013E698.sbss.s
+	$(GEN_DIR)/unk_0x8013E5C0.sbss.s
 
 MAIN_BSS := \
 	$(GEN_DIR)/unk_0x8013E6A8.bss.s \
@@ -97,6 +96,7 @@ MOV_C_SRC := \
 
 $(eval $(call overlay,MOV,mov))
 MURD_C_SRC := \
+	src/murd/murd.c \
 	src/murd/murd_bss.c
 
 $(eval $(call overlay,MURD,murd))

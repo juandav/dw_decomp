@@ -174,7 +174,7 @@ segments:
       - [0xADE58, sdata]
       - [0xADEA8, .sdata, trn2/trn2_hud]
       - [0xADEB8, .sdata, trn2/trn2_slots]
-      - [0xADED0, sdata]
+      - [0xADED0, .sdata, murd/murd]
       - [0xADEEC, .sdata, endi/endi]
       - [0xADEF8, .sdata, eab/eab]
 

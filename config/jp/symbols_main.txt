@@ -36,3 +36,4 @@ BTL_initializeUnk3 = 0x8007A72C;
 BTL_initializeUnk2 = 0x8007B150;
 EAB_startBuildup = 0x80061AAC;
 EAB_tick = 0x80061B80;
+MURD_tick = 0x8007E050;

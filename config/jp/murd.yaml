@@ -59,8 +59,8 @@ segments:
     align: 4
     subalign: 4
     subsegments:
-      - [0x40, asm, murd]
-      - [0x21C0, data, murd]
+      - [0x40, c, murd]
+      - [0x21C0, .data, murd]
       - [0x2298, .data, murd_bss]
 
   - [0x33D8]
