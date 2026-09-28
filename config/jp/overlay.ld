@@ -18,6 +18,7 @@ SECTIONS
 			KEEP(BUILD_DIR/asm/btl/12450.s.o(.text .text.*));
 			KEEP(BUILD_DIR/asm/btl/data/btl.data.s.o(.data .data.*));
 			BUILD_DIR/src/btl/battle_setup.c.o(.rodata .rodata.*);
+			BUILD_DIR/src/btl/command_shout.c.o(.rodata .rodata.*);
 			BUILD_DIR/src/btl/command_menu.c.o(.rodata .rodata.*);
 			BUILD_DIR/src/btl/command_shout.c.o(.data .data.*);
 			KEEP(BUILD_DIR/asm/btl/data/28B68.data.s.o(.data .data.*));
@@ -82,6 +83,7 @@ SECTIONS
 
 			KEEP(BUILD_DIR/asm/endi/data/header.rodata.s.o(.rodata .rodata.*));
 			BUILD_DIR/src/endi/endi.c.o(.text .text.*);
+			BUILD_DIR/src/endi/endi.c.o(.rodata .rodata.*);
 			BUILD_DIR/src/endi/endi.c.o(.data .data.*);
 		}
 	}
@@ -106,6 +108,7 @@ SECTIONS
 			KEEP(BUILD_DIR/asm/fish/data/header.rodata.s.o(.rodata .rodata.*));
 			KEEP(BUILD_DIR/asm/fish/fish.s.o(.text .text.*));
 			BUILD_DIR/src/fish/fish_model.c.o(.text .text.*);
+			BUILD_DIR/src/fish/fish_model.c.o(.rodata .rodata.*);
 			KEEP(BUILD_DIR/asm/fish/data/fish.data.s.o(.data .data.*));
 			LONG(0);
 		}
@@ -130,6 +133,7 @@ SECTIONS
 
 			KEEP(BUILD_DIR/asm/mov/data/header.rodata.s.o(.rodata .rodata.*));
 			BUILD_DIR/src/mov/mov.c.o(.text .text.*);
+			BUILD_DIR/src/mov/mov.c.o(.rodata .rodata.*);
 			BUILD_DIR/src/mov/mov.c.o(.data .data.*);
 			KEEP(BUILD_DIR/asm/mov/data/C10.data.s.o(.data .data.*));
 			LONG(0);
@@ -229,6 +233,7 @@ SECTIONS
 			BUILD_DIR/src/trn/trn_def.c.o(.rodata .rodata.*);
 			BUILD_DIR/src/trn/trn_mp.c.o(.rodata .rodata.*);
 			BUILD_DIR/src/trn/trn_brain.c.o(.rodata .rodata.*);
+			BUILD_DIR/src/trn/trn_hud.c.o(.rodata .rodata.*);
 			KEEP(BUILD_DIR/asm/trn/data/7A6C.rodata.s.o(.rodata .rodata.*));
 			BUILD_DIR/src/trn/trn_slots.c.o(.rodata .rodata.*);
 			KEEP(BUILD_DIR/asm/trn/data/7AA0.data.s.o(.data .data.*));
