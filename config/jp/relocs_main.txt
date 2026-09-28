@@ -15,3 +15,4 @@ rom:0x000A88A4 reloc:MIPS_32 symbol:murd_START
 rom:0x000A88A8 reloc:MIPS_32 symbol:endi_START
 rom:0x000A88AC reloc:MIPS_32 symbol:eab_START
 rom:0x000ADAEC reloc:MIPS_32 symbol:STD_D_8007AAB0
+rom:0x000ADD70 reloc:MIPS_32 symbol:VS_D_80070B1C

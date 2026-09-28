@@ -13,6 +13,7 @@ MAIN_SBSS := \
 	$(GEN_DIR)/unk_0x8013E34C.sbss.s \
 	$(GEN_DIR)/unk_0x8013E37C.sbss.s \
 	$(GEN_DIR)/unk_0x8013E438.sbss.s \
+	$(GEN_DIR)/unk_0x8013E59C.sbss.s \
 	$(GEN_DIR)/unk_0x8013E5D4.sbss.s
 
 MAIN_BSS := \
@@ -159,6 +160,9 @@ TRN_C_SRC := \
 	src/trn/trn_bss.c
 
 $(eval $(call overlay,TRN,trn))
+VS_C_SRC := \
+	src/vs/vs_hud.c
+
 $(eval $(call overlay,VS,vs))
 
 UNDEFINED_SYMS := $(foreach u,main $(shell echo $(OVERLAY) | tr A-Z a-z), \

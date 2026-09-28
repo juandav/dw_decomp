@@ -24,6 +24,8 @@ subsegments:
   - [0x8013E37C, unk_0x8013E37C]
   - [0x8013E40C, std_hud]
   - [0x8013E438, unk_0x8013E438]
+  - [0x8013E564, vs_hud]
+  - [0x8013E59C, unk_0x8013E59C]
   - [0x8013E5B4, mov]
   - [0x8013E5C0, doo2]
   - [0x8013E5D4, unk_0x8013E5D4]

@@ -8,7 +8,9 @@
 #include <dw/battle.h>
 #include <dw/combat.h>
 #include <dw/garbage.h>
+#include <dw/input.h>
 #include <dw/math.h>
+#include <dw/sound.h>
 #include <dw/types.h>
 #include <dw/vs.h>
 
@@ -26,6 +28,9 @@ extern uint8_t VS_D_80070764[][10];
 extern uint32_t POLLED_INPUT;
 extern uint32_t POLLED_INPUT_PREVIOUS;
 extern char MAIN_D_801A8B98[];
+#if defined(VERSION_JP)
+extern int16_t MAIN_D_80135278[2];
+#endif
 
 void VS_removeFinisherChargeup(void);
 void VS_tickCommandMenu(uint8_t i);
@@ -35,15 +40,21 @@ void VS_renderCommandMenu(uint8_t id);
 void VS_renderTargetCursor(uint8_t id);
 void VS_tickTargetCursor(uint8_t id);
 void VS_removeTargetCursor(uint8_t index);
+#if defined(VERSION_JP)
+void VS__tickPlayerInput(int32_t player);
+void VS__tickInput(int32_t instanceId);
+void VS__tickDigimonP1(int32_t instanceId);
+void VS__tickDigimonP2(int32_t instanceId);
+#endif
 void VS_shuffleBattleStartTextPieces(void);
 void VS_renderBattleStartText(void);
 void VS_renderBattleStartTextBurst(void);
-void VS_renderNumber(int32_t a, int32_t digits, int32_t x, int32_t y, int16_t value, int32_t layer);
-void VS_renderFighterHPBar(int32_t id);
-void VS_renderHPBarFill(int32_t id);
-void VS_renderHPBarDigits(int16_t i, int32_t id);
+void VS_renderNumber(int32_t a, int32_t digits, int16_t x, int16_t y, int16_t value, int32_t layer);
+void VS_renderFighterHPBar(int16_t id);
+void VS_renderHPBarFill(int16_t id);
+void VS_renderHPBarDigits(int16_t i, int16_t id);
 void VS_tickFighterStatusBars(void);
-void VS_renderFighterStatusBars(uint8_t id);
+void VS_renderFighterStatusBars(int32_t id);
 void VS_tickVersusModelScene(void);
 void VS_renderVersusModelScene(void);
 void VS_loadStageModels(void);
@@ -91,9 +102,19 @@ static void *vs_hud_functions[] = {
 	VS_renderBattleStartText,
 	VS_initializeBattleStartText,
 	VS_shuffleBattleStartTextPieces,
+#if defined(VERSION_JP)
+	VS__tickDigimonP2,
+	VS__tickDigimonP1,
+	VS__tickInput,
+	VS__tickPlayerInput,
+	VS_removeTargetCursor,
+	VS_renderTargetCursor,
+	VS_tickTargetCursor,
+#else
 	VS_removeTargetCursor,
 	VS_tickTargetCursor,
 	VS_renderTargetCursor,
+#endif
 	VS_addTargetCursor,
 	VS_removeCommandMenu,
 	VS_renderCommandMenu,
@@ -319,15 +340,13 @@ int32_t VS_D_80070A60[12] = {
 	0x000000e0, 0x000000c0, 0x000000a0, 0x00000080,
 };
 
-BarSprite VS_D_80070A90[2] = {
+BarSprite VS_D_80070A90[6] = {
 	{ 0x01ec, 0x80, 0xa8, 0x68, 0x08, 0x0000, 0x0000 },
 	{ 0x01eb, 0x90, 0xb0, 0x0b, 0x0b, 0x0003, 0xfffe },
-};
-
-int16_t VS_D_80070AA4[20] = {
-	0x01eb, 0xb080, 0x0202, 0x0012, 0x0003, 0x01ec, 0xa880, 0x0868,
-	0x0000, 0x0000, 0x01eb, 0xb09b, 0x0b0b, 0x0003, 0xfffe, 0x01eb,
-	0xb084, 0x0202, 0x0012, 0x0003,
+	{ 0x01eb, 0x80, 0xb0, 0x02, 0x02, 0x0012, 0x0003 },
+	{ 0x01ec, 0x80, 0xa8, 0x68, 0x08, 0x0000, 0x0000 },
+	{ 0x01eb, 0x9b, 0xb0, 0x0b, 0x0b, 0x0003, 0xfffe },
+	{ 0x01eb, 0x84, 0xb0, 0x02, 0x02, 0x0012, 0x0003 },
 };
 
 int32_t VS_D_80070ACC[8] = {
@@ -415,13 +434,11 @@ void VS_renderCommandMenu(uint8_t id)
 {
 	POLY_FT4 *prim;
 	int32_t i;
-	int32_t off;
-	int16_t base;
-	int16_t count;
-	int16_t x;
-	int32_t y;
 	int16_t rowY;
 	int16_t width;
+	int16_t base;
+	int16_t x;
+	int16_t count;
 
 	base = (id * 0xa6) - 0x8c + ((COMBAT_DATA_PTR->player.numCommands[id] - 1) * 0xe);
 	if (GAME_STATE == 4) {
@@ -435,10 +452,12 @@ void VS_renderCommandMenu(uint8_t id)
 		x = base - (COMBAT_DATA_PTR->player.hoveredCommand[id] * 0xe);
 		SetPolyFT4(prim);
 		prim->tpage = getTPage(0, 0, 960, 256);
-		prim->clut = GetClut(0x11a, 0x1f1);
+		setClut(prim, 282, 497);
 		setRGB0(prim, 0x80, 0x80, 0x80);
 		setUVDataPolyFT4(prim, 0x3d, 0xe0, 0x16, 0x16);
 		if ((count % 2) == 0) {
+			int32_t y;
+
 			if ((COMBAT_DATA_PTR->player.hoveredCommand[id] % 2) == 0) {
 				y = MAIN_D_801352AC[id];
 			} else {
@@ -446,6 +465,8 @@ void VS_renderCommandMenu(uint8_t id)
 			}
 			setPosDataPolyFT4(prim, x - 3, y, 0x16, 0x16);
 		} else {
+			int32_t y;
+
 			if ((COMBAT_DATA_PTR->player.hoveredCommand[id] % 2) == 1) {
 				y = MAIN_D_801352AC[id];
 			} else {
@@ -456,13 +477,23 @@ void VS_renderCommandMenu(uint8_t id)
 		AddPrim(ACTIVE_ORDERING_TABLE->org + 7, prim++);
 	}
 
-	for (i = 1, off = 0xe; i < COMBAT_DATA_PTR->player.numCommands[id]; i++, off += 0xe) {
+	for (i = 1; i < COMBAT_DATA_PTR->player.numCommands[id]; i++) {
 		SetPolyFT4(prim);
 		prim->tpage = getTPage(0, 0, 960, 256);
-		prim->clut = GetClut(0x110, 0x1f0);
+		setClut(prim, 272, 496);
 		setRGB0(prim, 0x80, 0x80, 0x80);
 		VS_setCommandIconUV((DigimonEntity *)ENTITY_TABLE[COMBAT_DATA_PTR->player.entityIds[id]], prim, COMBAT_DATA_PTR->player.availableCommands[id][i]);
-		x = base - off;
+		if (i > 0) {
+			rowY = ((i - 1) * 0xe) + 0xb;
+		} else {
+			rowY = 0;
+		}
+		if ((i == 0) || (i == (COMBAT_DATA_PTR->player.numCommands[id] - 1))) {
+			width = 0xb;
+		} else {
+			width = 0xe;
+		}
+		x = (int16_t)base - (i * 0xe);
 		if ((count % 2) == 0) {
 			setXY4(prim, x, ((i % 2) == 0) ? MAIN_D_801352AC[id] + 3 : MAIN_D_801352AC[id] + 0xd, x + 0x10, ((i % 2) == 0) ? MAIN_D_801352AC[id] + 3 : MAIN_D_801352AC[id] + 0xd, x, ((i % 2) == 0) ? MAIN_D_801352B0[id] - 0xd : MAIN_D_801352B0[id] - 3, x + 0x10, ((i % 2) == 0) ? MAIN_D_801352B0[id] - 0xd : MAIN_D_801352B0[id] - 3);
 		} else {
@@ -480,8 +511,8 @@ void VS_renderCommandMenu(uint8_t id)
 	for (i = 0; i < COMBAT_DATA_PTR->player.numCommands[id]; i++) {
 		SetPolyFT4(prim);
 		setSemiTrans(prim, 1);
-		prim->tpage = GetTPage(0, 0, 0x3c0, 0x100);
-		prim->clut = GetClut(0x110, 0x1f1);
+		setTPage(prim, 0, 0, 960, 256);
+		setClut(prim, 272, 497);
 		setRGB0(prim, 0x80, 0x80, 0x80);
 		setUVWH(prim, MAIN_D_80134AE8[VS_D_80070764[MAIN_D_801352B8[id]][i]], 0xe0, MAIN_D_80134AF0[VS_D_80070764[MAIN_D_801352B8[id]][i]], 31);
 		if (i > 0) {
@@ -519,8 +550,7 @@ void VS_addTargetCursor(id, tech)
 	if (COMBAT_DATA_PTR->player.hoveredCommand[id] == 0) {
 		COMBAT_DATA_PTR->player.hoveredCommand[id] = COMBAT_DATA_PTR->player.numCommands[id] - 1;
 	}
-	COMBAT_DATA_PTR->player.currentCommand[id] = 3;
-	COMBAT_DATA_PTR->player.bufferedCommand[id] = 3;
+	COMBAT_DATA_PTR->player.bufferedCommand[id] = COMBAT_DATA_PTR->player.currentCommand[id] = 3;
 	MAIN_D_801352BC[id] = id * 0xea - 0x8c;
 	MAIN_D_801352C0[id] = -0x4a;
 	addObject(0x19a, id, VS_tickTargetCursor, VS_renderTargetCursor);
@@ -530,28 +560,23 @@ void VS_renderTargetCursor(uint8_t id)
 {
 	POLY_FT4 prim;
 	int32_t i;
-	int32_t x;
 	int16_t bars;
-	uint32_t n;
-	int32_t px;
 
 	SetPolyFT4(&prim);
 	prim.tpage = getTPage(0, 0, 960, 256);
-	prim.clut = GetClut(0x110, 0x1f2);
+	setClut(&prim, 272, 498);
 	setRGB0(&prim, 0x80, 0x80, 0x80);
 	setUVWH(&prim, 0x58, 0xe0, 46, 12);
 	setXYWH(&prim, MAIN_D_801352BC[id], MAIN_D_801352C0[id], 0x2e, 0xc);
-	n = id;
 	GsSortPoly(&prim, ACTIVE_ORDERING_TABLE, 7);
-	bars = COMBAT_DATA_PTR->player.finisherChargeup[n] / 8;
+	bars = COMBAT_DATA_PTR->player.finisherChargeup[id] / 8;
 	setUVWH(&prim, 0x88, 0xe0, 4, 6);
-	for (i = 0, x = 0; i < bars; i++, x += 4) {
-		px = MAIN_D_801352BC[n] + 3;
-		setXYWH(&prim, px + x, MAIN_D_801352C0[n] + 3, 4, 6);
+	for (i = 0; i < bars; i++) {
+		setXYWH(&prim, (int32_t)(MAIN_D_801352BC[id] + 3 + i * 4), MAIN_D_801352C0[id] + 3, 4, 6);
 		GsSortPoly(&prim, ACTIVE_ORDERING_TABLE, 7);
 	}
 
-	if (COMBAT_DATA_PTR->player.remainingChargeupTime[n] == 0) {
+	if (COMBAT_DATA_PTR->player.remainingChargeupTime[id] == 0) {
 		VS_removeTargetCursor(id);
 	}
 }
@@ -561,7 +586,6 @@ void VS_tickTargetCursor(uint8_t id)
 	uint32_t input;
 	uint32_t prev;
 	int32_t up;
-	uint32_t charge;
 
 	input = POLLED_INPUT;
 	prev = POLLED_INPUT_PREVIOUS;
@@ -577,9 +601,8 @@ void VS_tickTargetCursor(uint8_t id)
 	if (((POLLED_INPUT & ~POLLED_INPUT_PREVIOUS) & 8) != 0) {
 		up = 1;
 	}
-	charge = COMBAT_DATA_PTR->player.finisherChargeup[id];
-	if ((charge < 0x50) && (up != 0)) {
-		COMBAT_DATA_PTR->player.finisherChargeup[id] = charge + 2;
+	if ((COMBAT_DATA_PTR->player.finisherChargeup[id] < 0x50) && (up != 0)) {
+		COMBAT_DATA_PTR->player.finisherChargeup[id] += 2;
 	}
 	POLLED_INPUT = input;
 	POLLED_INPUT_PREVIOUS = prev;
@@ -587,18 +610,95 @@ void VS_tickTargetCursor(uint8_t id)
 
 void VS_removeTargetCursor(uint8_t index)
 {
-	if (((int8_t *)((uint32_t)index + (uint32_t)COMBAT_DATA_PTR))[0x66a] != -1) {
+	if (COMBAT_DATA_PTR->player.remainingChargeupTime[index] != -1) {
 		removeObject(0x19a, index);
-		((int8_t *)((uint32_t)index + (uint32_t)COMBAT_DATA_PTR))[0x66a] = -1;
+		COMBAT_DATA_PTR->player.remainingChargeupTime[index] = -1;
 	}
 }
+
+#if defined(VERSION_JP)
+void VS__tickPlayerInput(int32_t player)
+{
+	uint32_t input;
+	uint32_t previous;
+
+	input = POLLED_INPUT;
+	previous = POLLED_INPUT_PREVIOUS;
+	if (player == 1) {
+		POLLED_INPUT = (POLLED_INPUT >> 16) & 0xffff;
+		POLLED_INPUT_PREVIOUS = (POLLED_INPUT_PREVIOUS >> 16) & 0xffff;
+	}
+	if ((POLLED_INPUT & ~POLLED_INPUT_PREVIOUS) & 0x8000) {
+		playSound(0, 2);
+		COMBAT_DATA_PTR->player.hoveredCommand[player]++;
+		if (COMBAT_DATA_PTR->player.hoveredCommand[player] > COMBAT_DATA_PTR->player.numCommands[player] - 1) {
+			COMBAT_DATA_PTR->player.hoveredCommand[player] = 1;
+		}
+	}
+	if ((POLLED_INPUT & ~POLLED_INPUT_PREVIOUS) & 0x2000) {
+		playSound(0, 2);
+		COMBAT_DATA_PTR->player.hoveredCommand[player]--;
+		if (COMBAT_DATA_PTR->player.hoveredCommand[player] <= 0) {
+			COMBAT_DATA_PTR->player.hoveredCommand[player] = COMBAT_DATA_PTR->player.numCommands[player] - 1;
+		}
+	}
+	if ((POLLED_INPUT & ~POLLED_INPUT_PREVIOUS) & CONFIRM_BUTTON) {
+		playSound(0, 3);
+		COMBAT_DATA_PTR->player.bufferedCommand[player] = COMBAT_DATA_PTR->player.availableCommands[player][COMBAT_DATA_PTR->player.hoveredCommand[player]];
+		if (MAIN_D_80135278[player] < 0x46) {
+			COMBAT_DATA_PTR->player.commandDelay[player] = 0xa0 - MAIN_D_80135278[player] / 10;
+		} else {
+			COMBAT_DATA_PTR->player.commandDelay[player] = (0xa - MAIN_D_80135278[player] / 10) * 10;
+		}
+		COMBAT_DATA_PTR->player.commandDelay[player] = 0;
+	}
+	if ((POLLED_INPUT & ~POLLED_INPUT_PREVIOUS) & 0x80) {
+		if (COMBAT_DATA_PTR->fighter[player].finisherProgress == COMBAT_DATA_PTR->fighter[player].finisherGoal) {
+			COMBAT_DATA_PTR->player.bufferedCommand[player] = 0xb;
+			playSound(0, 3);
+			COMBAT_DATA_PTR->player.commandDelay[player] = 0;
+			COMBAT_DATA_PTR->player.currentCommand[player] = 0xb;
+		}
+	}
+	POLLED_INPUT = input;
+	POLLED_INPUT_PREVIOUS = previous;
+}
+
+// clang-format off
+void VS__tickInput(instanceId)
+	int16_t instanceId;
+// clang-format on
+{
+	if (GAME_STATE == 4) {
+		VS__tickPlayerInput(instanceId);
+	}
+}
+
+// clang-format off
+void VS__tickDigimonP1(instanceId)
+	int16_t instanceId;
+// clang-format on
+{
+	tickAnimation(ENTITY_TABLE[instanceId]);
+}
+
+// clang-format off
+void VS__tickDigimonP2(instanceId)
+	int16_t instanceId;
+// clang-format on
+{
+	tickAnimation(ENTITY_TABLE[instanceId]);
+}
+#endif
 
 void VS_shuffleBattleStartTextPieces(void)
 {
 	int32_t i;
+	int32_t r;
 
 	for (i = 0; i < 0x9b; i++) {
-		swapByte(&VS_D_80071B38[i][0x11], &VS_D_80071B38[random(0x9b)][0x11]);
+		r = random(0x9b);
+		swapByte(&VS_D_80071B38[i][0x11], &VS_D_80071B38[r][0x11]);
 	}
 }
 
@@ -608,7 +708,9 @@ void VS_initializeBattleStartText(void)
 	int32_t sgn;
 	int32_t i;
 	int32_t r;
+#if !defined(VERSION_JP)
 	int32_t t;
+#endif
 
 	MAIN_D_801352C4 = 0;
 	MAIN_D_801352C8 = 0;
@@ -629,7 +731,7 @@ void VS_initializeBattleStartText(void)
 			sgn = -1;
 		}
 		((int16_t *)*p)[5] = VS_D_800707F4[i][1];
-		(*p)[0x10] = -sgn * ((random(3) + 1) << 5);
+		((int8_t *)*p)[0x10] = -sgn * ((random(3) + 1) << 5);
 		if ((0 <= i) && (i < 0x33)) {
 			((int16_t *)*p)[4] = (sgn * 500) + random(100) - 50;
 		} else if ((0x33 <= i) && (i < 0x65)) {
@@ -638,10 +740,15 @@ void VS_initializeBattleStartText(void)
 			((int16_t *)*p)[4] = (sgn * 700) + random(100) - 50;
 		}
 		r = random(5);
+#if defined(VERSION_JP)
+		((int16_t *)*p)[6] = (r + 8) * VS_D_800707F4[i][0] / 8;
+		((int16_t *)*p)[7] = (r + 8) * VS_D_800707F4[i][1] / 8;
+#else
 		t = VS_D_800707F4[i][0];
 		((int16_t *)*p)[6] = (r + 8) * t / 8;
 		t = VS_D_800707F4[i][1];
 		((int16_t *)*p)[7] = (r + 8) * t / 8;
+#endif
 		((int16_t *)*p)[0] = 0;
 		((int16_t *)*p)[1] = 0;
 		((int16_t *)*p)[2] = 0;
@@ -652,15 +759,12 @@ void VS_initializeBattleStartText(void)
 
 void VS_renderBattleStartText(void)
 {
-	POLY_FT4 *ft;
 	POLY_F4 *shadow;
 	uint8_t (*p)[20];
 	POLY_FT4 *prim;
-	GsOT_TAG *ot;
 	int32_t i;
 	int32_t n;
-	int32_t y;
-	uint16_t clut;
+	GsOT_TAG *ot;
 	int32_t otz;
 	SVECTOR p0;
 	SVECTOR p1;
@@ -670,9 +774,13 @@ void VS_renderBattleStartText(void)
 	SVECTOR q1;
 	SVECTOR q2;
 	SVECTOR q3;
+	POLY_FT4 *ft;
+	uint16_t clut;
+#if !defined(VERSION_JP)
 	MATRIX m;
 
 	m = GsWSMATRIX;
+#endif
 	GsSetProjection(0x200);
 	GsSetLsMatrix(&VS_D_800707D4);
 
@@ -685,11 +793,10 @@ void VS_renderBattleStartText(void)
 	}
 
 	if (n == 0x9b) {
-		y = MAIN_D_801352C4++;
-		clut = GetClut(0x100, y % 6 / 2 + 0x1e8);
+		clut = GetClut(256, (MAIN_D_801352C4++ % 6 / 2) + 488);
 		MAIN_D_801352C8 = 1;
 	} else {
-		clut = GetClut(0x100, 0x1e8);
+		clut = GetClut(256, 488);
 	}
 
 	p = VS_D_80071B38;
@@ -727,7 +834,7 @@ void VS_renderBattleStartText(void)
 		p3.vz = 0;
 
 		ft = prim;
-		setEntityTextDigit(prim, 0x100, 0x1e8);
+		setEntityTextDigit(prim, 256, 488);
 		setRGB0(prim, 0x80, 0x80, 0x80);
 		prim->clut = clut;
 		gte_ldv3(&p0, &p1, &p2);
@@ -737,13 +844,13 @@ void VS_renderBattleStartText(void)
 		gte_ldv0(&p3);
 		gte_rtps();
 		gte_stsxy(&prim->x3);
-		setUVWH(prim, ((uint8_t *)*p)[0x13] * 8 + 0x80, 0x80, 8, 8);
+		setUVWH(prim, (((uint8_t *)*p)[0x13] * 8) + 0x80, 0x80, 8, 8);
 		AddPrim(ot + 5, prim++);
 
 		if (n != 0x9b) {
 			SetPolyFT4(prim);
 			setRGB0(prim, 0x80, 0x80, 0x80);
-			prim->tpage = GetTPage(0, 0, 0x380, 0x180);
+			setTPage(prim, 0, 0, 896, 384);
 			prim->clut = clut;
 			SetSemiTrans(prim, 1);
 			if (((int8_t *)*p)[0x10] > 0) {
@@ -787,7 +894,11 @@ void VS_renderBattleStartText(void)
 
 	GsSetWorkBase((PACKET *)prim);
 	GsSetProjection(VIEWPORT_DISTANCE);
+#if defined(VERSION_JP)
+	GsSetRefView2(&GS_VIEWPOINT);
+#else
 	GsWSMATRIX = m;
+#endif
 }
 
 void VS_removeBattleStartText(void)
@@ -803,24 +914,26 @@ void VS_initializeBattleStartTextBurst(void)
 
 void VS_renderBattleStartTextBurst(void)
 {
-	POLY_FT4 *ft;
 	POLY_F4 *shadow;
 	uint8_t (*p)[20];
 	POLY_FT4 *prim;
-	GsOT_TAG *ot;
 	int32_t i;
-	int32_t dead;
 	int32_t j;
-	int16_t cx;
-	int16_t cy;
 	int32_t otz;
+	int32_t dead;
+	GsOT_TAG *ot;
 	SVECTOR corner[4];
 	SVECTOR pts[4];
 	SVECTOR out;
 	MATRIX m;
+	POLY_FT4 *ft;
+	int16_t cx;
+	int16_t cy;
+#if !defined(VERSION_JP)
 	MATRIX saved;
 
 	saved = GsWSMATRIX;
+#endif
 	GsSetProjection(0x200);
 	GsSetLsMatrix(&VS_D_800707D4);
 
@@ -837,9 +950,9 @@ void VS_renderBattleStartTextBurst(void)
 	corner[3].vy = 6;
 	corner[3].vz = 0;
 
-	ot = ACTIVE_ORDERING_TABLE->org;
 	dead = 0;
 	p = VS_D_80071B38;
+	ot = ACTIVE_ORDERING_TABLE->org;
 	prim = (POLY_FT4 *)GsGetWorkBase();
 	for (i = 0; i < 0x9b; i++, p++) {
 		if ((((int16_t *)*p)[6] == 0) && (((int16_t *)*p)[7] == 0)) {
@@ -874,9 +987,9 @@ void VS_renderBattleStartTextBurst(void)
 		PopMatrix();
 
 		ft = prim;
-		setEntityTextDigit(prim, 0x100, 0x1e8);
+		setEntityTextDigit(prim, 256, 488);
 		setRGB0(prim, 0x80, 0x80, 0x80);
-		prim->clut = GetClut(0x100, 0x1e8);
+		setClut(prim, 256, 488);
 		gte_ldv3(&pts[0], &pts[1], &pts[2]);
 		gte_rtpt();
 		gte_stsxy3(&prim->x0, &prim->x1, &prim->x2);
@@ -884,7 +997,7 @@ void VS_renderBattleStartTextBurst(void)
 		gte_ldv0(&pts[3]);
 		gte_rtps();
 		gte_stsxy(&prim->x3);
-		setUVWH(prim, ((uint8_t *)*p)[0x13] * 8 + 0x80, 0x80, 8, 8);
+		setUVWH(prim, (((uint8_t *)*p)[0x13] * 8) + 0x80, 0x80, 8, 8);
 		AddPrim(ot + 5, prim++);
 		shadow = (POLY_F4 *)prim;
 		SetPolyF4(shadow);
@@ -899,8 +1012,8 @@ void VS_renderBattleStartTextBurst(void)
 			((int16_t *)*p)[6] = 0;
 			((int16_t *)*p)[7] = 0;
 		}
-		((int16_t *)*p)[4] = ((int16_t *)*p)[4] + ((int16_t *)*p)[6];
-		((int16_t *)*p)[5] = ((int16_t *)*p)[5] + ((int16_t *)*p)[7];
+		((int16_t *)*p)[4] += ((int16_t *)*p)[6];
+		((int16_t *)*p)[5] += ((int16_t *)*p)[7];
 	}
 
 	GsSetWorkBase((PACKET *)prim);
@@ -908,7 +1021,11 @@ void VS_renderBattleStartTextBurst(void)
 		MAIN_D_801352C8 = 1;
 	}
 	GsSetProjection(VIEWPORT_DISTANCE);
+#if defined(VERSION_JP)
+	GsSetRefView2(&GS_VIEWPOINT);
+#else
 	GsWSMATRIX = saved;
+#endif
 }
 
 void VS_removeBattleStartTextBurst(void)
@@ -921,93 +1038,89 @@ int32_t VS_isBattleStartTextFinished(void)
 	return MAIN_D_801352C8;
 }
 
-void VS_renderNumber(int32_t a, int32_t digits, int32_t x, int32_t y, int16_t value, int32_t layer)
+void VS_renderNumber(int32_t a, int32_t digits, int16_t x, int16_t y, int16_t value, int32_t layer)
 {
 	POLY_FT4 *prim;
 	int32_t i;
-	uint32_t width;
 	int32_t count;
 	int32_t buf[4];
+#if !defined(VERSION_JP)
+	uint32_t width;
+#endif
 
 	prim = (POLY_FT4 *)GsGetWorkBase();
-
+#if !defined(VERSION_JP)
 	width = digits;
+#endif
 	convertValueToDigits(digits, value, &count, buf);
-
 	for (i = count - 1; i >= 0; i--) {
 		setEntityTextDigit(prim, 256, 492);
 		setRGB0(prim, 0x80, 0x80, 0x80);
 		setUVDataPolyFT4(prim, buf[i] * 7, 172, 7, 11);
-		setPosDataPolyFT4(prim, x + ((((int32_t)width - 1) - i) * 7), y, 7, 11);
+#if defined(VERSION_JP)
+		setPosDataPolyFT4(prim, x + ((digits - 1) - i) * 7, y, 7, 11);
+#else
+		setPosDataPolyFT4(prim, x + (((int32_t)width - 1) - i) * 7, y, 7, 11);
+#endif
 		AddPrim(ACTIVE_ORDERING_TABLE->org + layer, prim++);
 	}
-
 	GsSetWorkBase((PACKET *)prim);
 }
 
-void VS_renderFighterHPBar(int32_t id)
+void VS_renderFighterHPBar(int16_t id)
 {
 	int32_t n;
 	int32_t i;
-	uint8_t v;
-	uint32_t k;
-	uint32_t v2;
 
 	if (GAME_STATE != 4) {
 		return;
 	}
 
-	k = id;
-	n = (COMBAT_DATA_PTR->fighter[id].finisherProgress * 6) /
-	    COMBAT_DATA_PTR->fighter[id].finisherGoal;
+	n = (COMBAT_DATA_PTR->fighter[id].finisherProgress * 6) / COMBAT_DATA_PTR->fighter[id].finisherGoal;
 
-	if (MAIN_D_801352D4[k] != n) {
-		MAIN_D_801352D0[k] = 0;
-		MAIN_D_801352D4[k] = n;
+	if (MAIN_D_801352D4[id] != n) {
+		MAIN_D_801352D0[id] = 0;
+		MAIN_D_801352D4[id] = n;
 	}
 
-	MAIN_D_801352D2[k] = VS_D_80070A60[MAIN_D_801352D0[k]];
-	if (MAIN_D_801352D0[k] < 0xb) {
-		MAIN_D_801352D0[k]++;
+	MAIN_D_801352D2[id] = VS_D_80070A60[MAIN_D_801352D0[id]];
+	if (MAIN_D_801352D0[id] < 0xb) {
+		MAIN_D_801352D0[id]++;
 	}
 
 	if (n == 6) {
-		if (MAIN_D_801352CE[k] < 0xa) {
-			MAIN_D_801352CE[k]++;
+		if (MAIN_D_801352CE[id] < 0xa) {
+			MAIN_D_801352CE[id]++;
 		}
-		v = MAIN_D_801352CE[k];
-		v2 = v;
-		if (v >= 3) {
+		if (MAIN_D_801352CE[id] >= 3) {
 			n++;
 		}
-		if (v2 >= 5) {
+		if (MAIN_D_801352CE[id] >= 5) {
 			n++;
 			VS_renderHPBarFill(id);
-			if (MAIN_D_801352CE[k] == 0xa) {
-				MAIN_D_801352D6[k] = 1;
-				MAIN_D_801352D0[k] = (uint32_t)MAIN_D_801352D0[k] % 0xb;
+			if (MAIN_D_801352CE[id] == 0xa) {
+				MAIN_D_801352D6[id] = 1;
+				MAIN_D_801352D0[id] %= 0xb;
 			}
 		}
 	}
 
 	for (i = 0; i < n; i++) {
-		VS_renderHPBarDigits((int16_t)i, id);
+		VS_renderHPBarDigits(i, id);
 	}
 }
 
-void VS_renderHPBarFill(int32_t id)
+void VS_renderHPBarFill(int16_t id)
 {
 	GsBOXF box;
 	POLY_FT4 *prim;
-	uint32_t n;
 
 	prim = (POLY_FT4 *)GsGetWorkBase();
 	setEntityTextDigit(prim, 256, 0x1e2);
-	n = id;
-	if ((MAIN_D_801352D6[id] != 1) || (((uint8_t *)COMBAT_DATA_PTR + n)[0x64e] == 0xb)) {
+	if ((MAIN_D_801352D6[id] != 1) || (((uint8_t *)COMBAT_DATA_PTR + id)[0x64e] == 0xb)) {
 		setRGB0(prim, 0x80, 0x80, 0x80);
 	} else {
-		setRGB0(prim, MAIN_D_801352D2[n], MAIN_D_801352D2[n], MAIN_D_801352D2[n]);
+		setRGB0(prim, MAIN_D_801352D2[id], MAIN_D_801352D2[id], MAIN_D_801352D2[id]);
 	}
 
 	setUVWH(prim, 0x80, 0x88, 37, 9);
@@ -1016,10 +1129,10 @@ void VS_renderHPBarFill(int32_t id)
 	GsSetWorkBase((PACKET *)prim);
 
 	box.attribute = 0x40000000;
-	if ((MAIN_D_801352D6[n] != 1) || (((uint8_t *)COMBAT_DATA_PTR + n)[0x64e] == 0xb)) {
+	if ((MAIN_D_801352D6[id] != 1) || (((uint8_t *)COMBAT_DATA_PTR + id)[0x64e] == 0xb)) {
 		box.r = box.g = box.b = 0x80;
 	} else {
-		box.r = box.g = box.b = MAIN_D_801352D2[n];
+		box.r = box.g = box.b = MAIN_D_801352D2[id];
 	}
 
 	setWH(&box, 0x29, 0xb);
@@ -1028,21 +1141,17 @@ void VS_renderHPBarFill(int32_t id)
 	GsSortBoxFill(&box, ACTIVE_ORDERING_TABLE, 8);
 }
 
-void VS_renderHPBarDigits(int16_t i, int32_t id)
+void VS_renderHPBarDigits(int16_t i, int16_t id)
 {
 	POLY_FT4 *prim;
 	int32_t n;
-	uint32_t k;
 
-	k = id;
-	n = (COMBAT_DATA_PTR->fighter[id].finisherProgress * 6) /
-	    COMBAT_DATA_PTR->fighter[id].finisherGoal;
+	n = (COMBAT_DATA_PTR->fighter[id].finisherProgress * 6) / COMBAT_DATA_PTR->fighter[id].finisherGoal;
 	prim = (POLY_FT4 *)GsGetWorkBase();
 	setEntityTextDigit(prim, 0x100, 0x1ec);
 
-	if ((((n - 1) == i) || (MAIN_D_801352D6[k] == 1)) &&
-	    (((uint8_t *)COMBAT_DATA_PTR + k)[0x64e] != 0xb)) {
-		setRGB0(prim, MAIN_D_801352D2[k], MAIN_D_801352D2[k], MAIN_D_801352D2[k]);
+	if ((((n - 1) == i) || (MAIN_D_801352D6[id] == 1)) && (((uint8_t *)COMBAT_DATA_PTR + id)[0x64e] != 0xb)) {
+		setRGB0(prim, MAIN_D_801352D2[id], MAIN_D_801352D2[id], MAIN_D_801352D2[id]);
 	} else {
 		setRGB0(prim, 0x80, 0x80, 0x80);
 	}
@@ -1072,43 +1181,38 @@ void VS_tickFighterStatusBars(void)
 {
 }
 
-void VS_renderFighterStatusBars(uint8_t id)
+// clang-format off
+void VS_renderFighterStatusBars(id)
+	int16_t id;
+// clang-format on
 {
-	POLY_FT4 *prim;
-	BarSprite *p;
-	FighterData *fighter;
-	DigimonEntity *e;
-	int16_t *hpPtr;
-	int16_t *mpPtr;
-	int32_t maxHp;
-	int32_t maxMp;
 	int32_t bar;
 	int32_t k;
+	int16_t *hpPtr;
+	FighterData *fighter;
+	POLY_FT4 *prim;
+	BarSprite *p;
+	int16_t *mpPtr;
+	int16_t cur;
+	int16_t fill;
+	int16_t maxHp;
+	int16_t maxMp;
 	int16_t x0;
 	int16_t y0;
-	int16_t fill;
-	int16_t cur;
-	int16_t nx;
-	int16_t ny;
-	int32_t w;
-	int32_t t;
 
-	p = (BarSprite *)COMBAT_DATA_PTR;
 	fighter = &COMBAT_DATA_PTR->fighter[id];
-	e = (DigimonEntity *)ENTITY_TABLE[((CombatData *)p)->player.entityIds[id]];
-	hpPtr = &e->stats.current.currentHP;
-	mpPtr = &((DigimonEntity *)ENTITY_TABLE[((CombatData *)p)->player.entityIds[id]])->stats.current.currentMP;
-	maxHp = ((DigimonEntity *)ENTITY_TABLE[((CombatData *)p)->player.entityIds[id]])->stats.base.hp;
-	maxMp = ((DigimonEntity *)ENTITY_TABLE[((CombatData *)p)->player.entityIds[id]])->stats.base.mp;
+	hpPtr = &((DigimonEntity *)ENTITY_TABLE[COMBAT_DATA_PTR->player.entityIds[id]])->stats.current.currentHP;
+	mpPtr = &((DigimonEntity *)ENTITY_TABLE[COMBAT_DATA_PTR->player.entityIds[id]])->stats.current.currentMP;
+	maxHp = ((DigimonEntity *)ENTITY_TABLE[COMBAT_DATA_PTR->player.entityIds[id]])->stats.base.hp;
+	maxMp = ((DigimonEntity *)ENTITY_TABLE[COMBAT_DATA_PTR->player.entityIds[id]])->stats.base.mp;
 
 	if (*hpPtr == 0) {
 		fighter->hpDamageBuffer = 0;
 	}
 	if (fighter->hpDamageBuffer != 0) {
-		damageTick(fighter,
-		           &((DigimonEntity *)ENTITY_TABLE[COMBAT_DATA_PTR->player.entityIds[id]])->stats);
+		damageTick(fighter, &((DigimonEntity *)ENTITY_TABLE[COMBAT_DATA_PTR->player.entityIds[id]])->stats);
 	}
-	*mpPtr = *mpPtr - fighter->mpDamageBuffer;
+	*mpPtr -= fighter->mpDamageBuffer;
 	fighter->mpDamageBuffer = 0;
 	if (*mpPtr < 0) {
 		*mpPtr = 0;
@@ -1124,8 +1228,7 @@ void VS_renderFighterStatusBars(uint8_t id)
 			}
 			y0 = -0x64;
 			cur = *hpPtr;
-			w = cur;
-			fill = w * 50 / maxHp;
+			fill = *hpPtr * 50 / maxHp;
 		} else {
 			if (id == 0) {
 				x0 = -0x8c;
@@ -1134,12 +1237,9 @@ void VS_renderFighterStatusBars(uint8_t id)
 			}
 			y0 = -0x58;
 			cur = *mpPtr;
-			w = cur;
-			fill = w * 50 / maxMp;
+			fill = *mpPtr * 50 / maxMp;
 		}
-		nx = x0 + 0x49;
-		ny = y0 - 3;
-		VS_renderNumber(0, 4, nx, ny, cur, 8);
+		VS_renderNumber(0, 4, x0 + 0x49, y0 - 3, cur, 8);
 		prim = (POLY_FT4 *)GsGetWorkBase();
 		for (k = 0; k < 3; k++, p--) {
 			SetPolyFT4(prim);
@@ -1148,23 +1248,11 @@ void VS_renderFighterStatusBars(uint8_t id)
 			setRGB0(prim, 0x80, 0x80, 0x80);
 			setUVWH(prim, p->u, p->v, p->w, p->h);
 			setXY0(prim, x0 + p->x, y0 + p->y);
-			if (k == 0) {
-				w = fill;
-			} else {
-				w = p->w;
-			}
-			t = x0 + p->x;
-			prim->x1 = t + w;
+			prim->x1 = x0 + p->x + (k == 0 ? fill : p->w);
 			prim->y1 = y0 + p->y;
 			prim->x2 = x0 + p->x;
 			prim->y2 = p->h + (y0 + p->y);
-			if (k == 0) {
-				w = fill;
-			} else {
-				w = p->w;
-			}
-			t = x0 + p->x;
-			prim->x3 = t + w;
+			prim->x3 = x0 + p->x + (k == 0 ? fill : p->w);
 			prim->y3 = p->h + (y0 + p->y);
 			AddPrim(ACTIVE_ORDERING_TABLE->org + 8, prim++);
 		}
@@ -1173,7 +1261,10 @@ void VS_renderFighterStatusBars(uint8_t id)
 	VS_renderFighterHPBar(id);
 }
 
-void VS_removeFighterStatusBars(int32_t i)
+// clang-format off
+void VS_removeFighterStatusBars(i)
+	int16_t i;
+// clang-format on
 {
 	removeObject(0x19c, i);
 }
@@ -1219,7 +1310,7 @@ void VS_tickVersusModelScene(void)
 
 	MAIN_D_801352E0++;
 	for (i = 0; i < 4; i++) {
-		if (i * 5 < MAIN_D_801352E0) {
+		if (MAIN_D_801352E0 > i * 5) {
 			if (VS_D_80072754[i].data.location.vx != MAIN_D_80134B14[i]) {
 				VS_D_80072754[i].data.location.vx -= 200;
 				if (VS_D_80072754[i].data.location.vx < MAIN_D_80134B14[i]) {
@@ -1270,24 +1361,21 @@ int32_t VS_isVersusModelSceneFinished(void)
 
 void VS_loadStageModels(void)
 {
-	int32_t i;
-	int32_t v;
-	uint32_t buf;
+	long i;
+	uint8_t *buf;
 
 	for (i = 0x14; i < 0x29; i++) {
-		(&VS_D_80072974[-0x14])[i] = ((i * 0x2000) / 40) & 0xfff;
-		(&VS_D_800729A0[-0x14])[i] = (((i * 0x800) / 40) + 0x800) & 0xfff;
+		VS_D_80072974[i - 0x14] = ((i * 0x2000) / 40) & 0xfff;
+		VS_D_800729A0[i - 0x14] = (((i * 0x800) / 40) + 0x800) & 0xfff;
 		if ((i >= 0x14) && (i < 0x25)) {
-			(&VS_D_800729CC[-0x14])[i] = VS_D_80070AEC[0x24 - i] - 0x134;
-			v = VS_D_80070AEC[0x24 - i];
-			(&VS_D_800729F8[-0x14])[i] = v - 0x140;
-			(&VS_D_80072A24[-0x14])[i] = 0x111 - v;
+			VS_D_800729CC[i - 0x14] = VS_D_80070AEC[0x24 - i] - 0x134;
+			VS_D_800729F8[i - 0x14] = VS_D_80070AEC[0x24 - i] - 0x140;
+			VS_D_80072A24[i - 0x14] = 0x111 - VS_D_80070AEC[0x24 - i];
 		}
 		if ((i >= 0x25) && (i < 0x29)) {
-			(&VS_D_800729CC[-0x14])[i] = VS_D_80070AA4[i] - 0x134;
-			v = VS_D_80070AA4[i];
-			(&VS_D_800729F8[-0x14])[i] = v - 0x140;
-			(&VS_D_80072A24[-0x14])[i] = 0x111 - v;
+			VS_D_800729CC[i - 0x14] = VS_D_80070AEC[i - 0x24] - 0x134;
+			VS_D_800729F8[i - 0x14] = VS_D_80070AEC[i - 0x24] - 0x140;
+			VS_D_80072A24[i - 0x14] = 0x111 - VS_D_80070AEC[i - 0x24];
 		}
 	}
 
@@ -1295,8 +1383,8 @@ void VS_loadStageModels(void)
 	VS_D_80071764[0].org = VS_D_8007178C;
 	VS_D_80071764[1].length = 5;
 	VS_D_80071764[1].org = VS_D_8007180C;
-	buf = (uint32_t)MAIN_D_801A8B98;
-	readFile(VS_D_80070B30, (void *)buf);
+	buf = (uint8_t *)MAIN_D_801A8B98;
+	readFile(VS_D_80070B30, buf);
 	GsMapModelingData((u_long *)(buf + 4));
 	for (i = 0; i < 7; i++) {
 		GsLinkObject4((u_long)(buf + 0xc), &VS_D_80072A50[i].data.obj, i);
@@ -1309,7 +1397,6 @@ void VS_loadStageModels(void)
 void VS_addResultModelScene(Entity *entity)
 {
 	int32_t i;
-	int32_t k;
 
 	MAIN_D_801352E0 = 0;
 	if (entity == ENTITY_TABLE[1]) {
@@ -1340,47 +1427,46 @@ void VS_addResultModelScene(Entity *entity)
 	VS_D_80072A50[6].data.location.vz = -0x4d0;
 	for (i = 0; i < 5; i++) {
 		VS_D_80072E08[i] = 0;
-		k = VS_D_80070B10[MAIN_D_801352E2][i];
-		VS_D_80072A50[k].data.scale.vx = 0x1000;
-		VS_D_80072A50[k].data.scale.vy = 0x1000;
-		VS_D_80072A50[k].data.scale.vz = 0x1000;
-		VS_D_80072A50[k].data.rotation.vx = 0;
-		VS_D_80072A50[k].data.rotation.vy = 0;
-		VS_D_80072A50[k].data.rotation.vz = 0;
-		setupModelMatrix(&VS_D_80072A50[k].data);
+		VS_D_80072A50[VS_D_80070B10[MAIN_D_801352E2][i]].data.scale.vx = 0x1000;
+		VS_D_80072A50[VS_D_80070B10[MAIN_D_801352E2][i]].data.scale.vy = 0x1000;
+		VS_D_80072A50[VS_D_80070B10[MAIN_D_801352E2][i]].data.scale.vz = 0x1000;
+		VS_D_80072A50[VS_D_80070B10[MAIN_D_801352E2][i]].data.rotation.vx = 0;
+		VS_D_80072A50[VS_D_80070B10[MAIN_D_801352E2][i]].data.rotation.vy = 0;
+		VS_D_80072A50[VS_D_80070B10[MAIN_D_801352E2][i]].data.rotation.vz = 0;
+		setupModelMatrix(&VS_D_80072A50[VS_D_80070B10[MAIN_D_801352E2][i]].data);
 	}
 	addObject(0x19d, MAIN_D_801352E2, VS_tickResultModelScene, VS_renderResultModelScene);
 }
 
-void VS_tickResultModelScene(int32_t won)
+// clang-format off
+void VS_tickResultModelScene(won)
+	int16_t won;
+// clang-format on
 {
 	int32_t i;
-	int32_t t;
-	int32_t k;
 
 	if (MAIN_D_801352E0 < 0xa0) {
 		MAIN_D_801352E0++;
 	}
-	for (i = 0, t = 0x3c; i < 5; i++, t += 6) {
-		if (t < MAIN_D_801352E0) {
-			k = VS_D_80070B10[MAIN_D_801352E2][i];
-			if (VS_D_80072A50[k].data.location.vz < 0xdc) {
-				VS_D_80072A50[k].data.location.vz += 0x42;
+	for (i = 0; i < 5; i++) {
+		if (MAIN_D_801352E0 > i * 6 + 0x3c) {
+			if (VS_D_80072A50[VS_D_80070B10[MAIN_D_801352E2][i]].data.location.vz < 0xdc) {
+				VS_D_80072A50[VS_D_80070B10[MAIN_D_801352E2][i]].data.location.vz += 0x42;
 			}
 			if (VS_D_80072E08[i] < 0x14) {
 				VS_D_80072E08[i]++;
 			}
-			VS_D_80072A50[k].data.rotation.vx = VS_D_80072974[VS_D_80072E08[i]];
-			VS_D_80072A50[k].data.rotation.vy = VS_D_800729A0[VS_D_80072E08[i]];
+			VS_D_80072A50[VS_D_80070B10[MAIN_D_801352E2][i]].data.rotation.vx = VS_D_80072974[VS_D_80072E08[i]];
+			VS_D_80072A50[VS_D_80070B10[MAIN_D_801352E2][i]].data.rotation.vy = VS_D_800729A0[VS_D_80072E08[i]];
 			if (i == 0) {
 				if (won == 0) {
-					VS_D_80072A50[k].data.location.vx = VS_D_800729CC[VS_D_80072E08[i]];
+					VS_D_80072A50[VS_D_80070B10[MAIN_D_801352E2][i]].data.location.vx = VS_D_800729CC[VS_D_80072E08[i]];
 				} else {
-					VS_D_80072A50[k].data.location.vx = VS_D_800729F8[VS_D_80072E08[i]];
+					VS_D_80072A50[VS_D_80070B10[MAIN_D_801352E2][i]].data.location.vx = VS_D_800729F8[VS_D_80072E08[i]];
 				}
 			}
 			if (i == 4) {
-				VS_D_80072A50[k].data.location.vx = VS_D_80072A24[VS_D_80072E08[4]];
+				VS_D_80072A50[VS_D_80070B10[MAIN_D_801352E2][i]].data.location.vx = VS_D_80072A24[VS_D_80072E08[4]];
 			}
 		}
 		setupModelMatrix(&VS_D_80072A50[VS_D_80070B10[MAIN_D_801352E2][i]].data);
