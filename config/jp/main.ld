@@ -68,7 +68,8 @@ SECTIONS
         BUILD_DIR/src/main/butterfly.c.o(.text .text.*);
         KEEP(BUILD_DIR/asm/main/79D94.s.o(.text .text.*));
         BUILD_DIR/src/main/bubble.c.o(.text .text.*);
-        KEEP(BUILD_DIR/asm/main/84F04.s.o(.text .text.*));
+        BUILD_DIR/src/main/battle_ui.c.o(.text .text.*);
+        KEEP(BUILD_DIR/asm/main/86F48.s.o(.text .text.*));
         main_TEXT_END = .;
         main_TEXT_SIZE = ABSOLUTE(main_TEXT_END - main_TEXT_START);
 
@@ -84,6 +85,8 @@ SECTIONS
         KEEP(BUILD_DIR/asm/main/data/8AD50.rodata.s.o(.rodata .rodata.*));
         BUILD_DIR/src/main/graphics2.c.o(.rodata .rodata.*);
         KEEP(BUILD_DIR/asm/main/data/8B6E0.rodata.s.o(.rodata .rodata.*));
+        BUILD_DIR/src/main/battle_ui.c.o(.rodata .rodata.*);
+        KEEP(BUILD_DIR/asm/main/data/8B9B0.rodata.s.o(.rodata .rodata.*));
         BUILD_DIR/src/main/bubble.c.o(.rodata .rodata.*);
         BUILD_DIR/src/main/world_object.c.o(.rodata .rodata.*);
         BUILD_DIR/src/main/file.c.o(.rodata .rodata.*);
@@ -175,7 +178,9 @@ SECTIONS
         KEEP(BUILD_DIR/asm/main/data/AD7F8.sdata.s.o(.sdata .sdata.*));
         BUILD_DIR/src/main/bubble.c.o(.sdata .sdata.*);
         . = ALIGN(., 4);
-        KEEP(BUILD_DIR/asm/main/data/AD8E4.sdata.s.o(.sdata .sdata.*));
+        BUILD_DIR/src/main/battle_ui.c.o(.sdata .sdata.*);
+        . = ALIGN(., 4);
+        KEEP(BUILD_DIR/asm/main/data/AD900.sdata.s.o(.sdata .sdata.*));
         BUILD_DIR/src/btl/battle_setup.c.o(.sdata .sdata.*);
         . = ALIGN(., 4);
         KEEP(BUILD_DIR/asm/main/data/AD924.sdata.s.o(.sdata .sdata.*));

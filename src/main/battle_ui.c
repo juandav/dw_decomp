@@ -4,6 +4,7 @@
 #include <dw/entity.h>
 #include <dw/font.h>
 #include <dw/graphics.h>
+#include <dw/input.h>
 #include <dw/item.h>
 #include <dw/math.h>
 #include <dw/move.h>
@@ -55,7 +56,7 @@ void renderFinalBalance(int32_t layer);
 void resetStatsAfterCombat();
 void createPostBattleStatsBox();
 void tickPostBattleStatsBox();
-void renderPostBattleStatsBox(uint8_t depth);
+void renderPostBattleStatsBox(int16_t depth);
 void closeBattleEndBox(int32_t id);
 
 extern uint8_t MOVE_LEARN_CHANCES[58][3];
@@ -78,7 +79,15 @@ extern uint8_t GAME_STATE;
 extern uint8_t CURRENT_SCREEN;
 
 int8_t STAT_GAIN_FACTORS[4] = { 10, 12, 16, 0 };
+#if defined(VERSION_JP)
+/* Money obtained */
+char BITS_LABEL[] = "取得金";
+char STR_BRACES[] = "｛｝";
+/* Money held */
+char STR_SHOJIKIN[] = "所持金";
+#else
 char BITS_LABEL[] = "Bits";
+#endif
 
 static void *battle_ui_functions[] = {
 	closeBattleEndBox,
@@ -100,20 +109,22 @@ static void *battle_ui_functions[] = {
 
 void battleStatsGainsAndDrops(uint8_t *droppedItems)
 {
+	int32_t den;
+	int32_t partnerStat;
+	int32_t enemyStat;
 	int32_t i;
 	int32_t stat;
-	int32_t den;
 	int32_t chance;
+#if !defined(VERSION_JP)
 	int32_t type;
+#endif
 
 	for (i = 0; i < 6; i++) {
 		STATS_GAINS[i] = 0;
 	}
 
 	for (stat = 0; stat < 6; stat++) {
-		int32_t partnerStat;
-		int32_t enemyStat = INITIAL_COMBAT_STATS[1][stat];
-
+		enemyStat = INITIAL_COMBAT_STATS[1][stat];
 		partnerStat = INITIAL_COMBAT_STATS[0][stat];
 
 		for (i = 1; i <= ENEMY_COUNT; i++) {
@@ -172,6 +183,12 @@ void battleStatsGainsAndDrops(uint8_t *droppedItems)
 				continue;
 			}
 
+#if defined(VERSION_JP)
+			if (DIGIMON_DATA[ENTITY_TABLE[COMBAT_DATA_PTR->player.entityIds[i + 1]]->type].dropChance > random(100)) {
+				droppedItems[i] = DIGIMON_DATA[ENTITY_TABLE[COMBAT_DATA_PTR->player.entityIds[i + 1]]->type].dropItem;
+				continue;
+			}
+#else
 			type = ENTITY_TABLE[(COMBAT_DATA_PTR->player.entityIds + 1)[i]]->type;
 
 			chance = DIGIMON_DATA[type].dropChance;
@@ -179,6 +196,7 @@ void battleStatsGainsAndDrops(uint8_t *droppedItems)
 				droppedItems[i] = DIGIMON_DATA[type].dropItem;
 				continue;
 			}
+#endif
 		}
 		droppedItems[i] = 0xff;
 	}
@@ -186,9 +204,9 @@ void battleStatsGainsAndDrops(uint8_t *droppedItems)
 
 void handleBattleInjury(void)
 {
+	int16_t roll;
 	int16_t hpRatio;
 	int16_t chance;
-	int16_t roll;
 
 	hpRatio = (100 * PARTNER_ENTITY.digimonEntity.stats.current.currentHP) / PARTNER_ENTITY.digimonEntity.stats.base.hp;
 	chance = PARTNER_PARA.tiredness - hpRatio;
@@ -200,13 +218,12 @@ void handleBattleInjury(void)
 
 void battleMoveLearning(void)
 {
-	uint8_t learnableMoves[12];
 	int32_t i;
 	int32_t count;
+	uint8_t learnableMoves[12];
+	uint8_t foundIdx;
 	int32_t j;
 	int16_t moveId;
-	uint8_t foundIdx;
-	int32_t threshold;
 
 	count = 0;
 	for (i = 0; i < 12; i++) {
@@ -240,8 +257,7 @@ void battleMoveLearning(void)
 			continue;
 		}
 
-		threshold = MOVE_LEARN_CHANCES[moveId][foundIdx];
-		if (random(100) < threshold) {
+		if (MOVE_LEARN_CHANCES[moveId][foundIdx] > random(100)) {
 			learnableMoves[count++] = moveId;
 		}
 	}
@@ -269,6 +285,9 @@ void createBitBox(void)
 	createAnimatedUIBox(1, 0, 2, &finalPos, &startPos, tickBitBox, (RenderFunction)renderBitBox);
 
 	drawString(BITS_LABEL, 0, 72);
+#if defined(VERSION_JP)
+	drawString(STR_BRACES, 0x9c, 0xf0);
+#endif
 }
 
 void handleBattleEndBox(void)
@@ -276,7 +295,9 @@ void handleBattleEndBox(void)
 	uint8_t droppedItems[3];
 	RECT boxPosition;
 	int32_t i;
+#if !defined(VERSION_JP)
 	int32_t slot;
+#endif
 	int32_t done;
 
 	initBitBox();
@@ -290,6 +311,15 @@ void handleBattleEndBox(void)
 	setRECT(&boxPosition, -78, 54, 156, 24);
 	BTL_initializeBattleEndText(0x60, 2, &boxPosition);
 
+#if defined(VERSION_JP)
+	for (i = 0; i < 3; i++) {
+		if (droppedItems[i] == 0xff) {
+			continue;
+		}
+
+		BTL_appendItemDroppedText(ENTITY_TABLE[COMBAT_DATA_PTR->player.entityIds[i + 1]]);
+	}
+#else
 	for (i = 0; i < 3; i++) {
 		slot = i;
 
@@ -299,6 +329,7 @@ void handleBattleEndBox(void)
 
 		BTL_appendItemDroppedText(ENTITY_TABLE[COMBAT_DATA_PTR->player.entityIds[slot + 1]]);
 	}
+#endif
 
 	if (!(PARTNER_PARA.condition & 0x20)) {
 		if (MAIN_D_80134D70 == 1) {
@@ -377,6 +408,16 @@ void handleBattleEndBox(void)
 		BTL_battleTickFrame();
 	}
 
+#if defined(VERSION_JP)
+	for (i = 0; i < ENEMY_COUNT; i++) {
+		if (droppedItems[i] == 0xff) {
+			continue;
+		}
+
+		spawnDroppedItems(ENTITY_TABLE[COMBAT_DATA_PTR->player.entityIds[i + 1]],
+				  droppedItems[i]);
+	}
+#else
 	for (i = 0; i < ENEMY_COUNT; i++) {
 		slot = i;
 
@@ -387,6 +428,7 @@ void handleBattleEndBox(void)
 		spawnDroppedItems(ENTITY_TABLE[COMBAT_DATA_PTR->player.entityIds[slot + 1]],
 				  droppedItems[i]);
 	}
+#endif
 
 	resetStatsAfterCombat();
 	closeBattleEndBox(0);
@@ -394,29 +436,28 @@ void handleBattleEndBox(void)
 	closeBattleEndBox(2);
 }
 
-void tickBitBox(int32_t instanceId)
+void tickBitBox(instanceId)
+	int16_t instanceId;
 {
-	int32_t bits;
-
 	if (UI_BOX_DATA[2].state != 1) {
 		return;
 	}
 
-	if ((bits = BITS_TO_GAIN) == 0) {
-		BTL_tickBattleEndText(instanceId, bits);
+	if (BITS_TO_GAIN == 0) {
+		BTL_tickBattleEndText(instanceId);
 		return;
 	}
 
-	if ((POLLED_INPUT == 0x40) || (POLLED_INPUT == 0x10)) {
-		if (!(POLLED_INPUT_PREVIOUS & 0x40) &&
-		    !(POLLED_INPUT_PREVIOUS & 0x10)) {
+	if ((POLLED_INPUT == CONFIRM_BUTTON) || (POLLED_INPUT == CANCEL_BUTTON)) {
+		if (!(POLLED_INPUT_PREVIOUS & CONFIRM_BUTTON) &&
+		    !(POLLED_INPUT_PREVIOUS & CANCEL_BUTTON)) {
 			SHOULD_SKIP_BIT_COUNTING = 1;
 		}
 	}
 
 	if (SHOULD_SKIP_BIT_COUNTING == 1) {
+		MONEY += BITS_TO_GAIN;
 		BITS_TO_GAIN = 0;
-		MONEY += bits;
 	} else {
 		playSound(0, 0x16);
 		--BITS_TO_GAIN;
@@ -461,7 +502,11 @@ void renderFinalBalance(int32_t layer)
 	renderString(0,
 		     UI_BOX_DATA[2].finalPos.x + 10,
 		     UI_BOX_DATA[2].finalPos.y + 10,
+#if defined(VERSION_JP)
+		     36, 12, 0, 84, 6 - layer, 0);
+#else
 		     36, 12, 0, 72, 6 - layer, 0);
+#endif
 }
 
 void resetStatsAfterCombat(void)
@@ -476,12 +521,10 @@ void resetStatsAfterCombat(void)
 
 void createPostBattleStatsBox(void)
 {
-	int32_t i;
-	int32_t row;
-	int32_t y;
 	int16_t screenPos[2];
 	RECT finalPos;
 	RECT startPos;
+	int32_t i;
 
 	SHOULD_SKIP_BIT_COUNTING = 0;
 	clearTextArea();
@@ -494,15 +537,15 @@ void createPostBattleStatsBox(void)
 		}
 	}
 	for (i = 0; i < 4; i++) {
-		y = i * 12;
-		row = i * 2;
-
 		if (i < 3) {
-			drawString(&MAIN_D_80124C0C[row * 12], 0, y * 2);
-			drawString(&MAIN_D_80124C0C[(row + 1) * 12], 0, (row + 1) * 12);
+			drawString(&MAIN_D_80124C0C[i * 2 * 12], 0, i * 12 * 2);
+			drawString(&MAIN_D_80124C0C[(i * 2 + 1) * 12], 0, (i * 2 + 1) * 12);
 		}
 
 		if (i == 3) {
+#if defined(VERSION_JP)
+			drawString(STR_SHOJIKIN, 0, 84);
+#endif
 			drawString(MAIN_D_80124C54, 0, 240);
 		}
 
@@ -523,7 +566,6 @@ void createPostBattleStatsBox(void)
 void tickPostBattleStatsBox(void)
 {
 	int32_t i;
-	int16_t gain;
 
 	if (POST_BATTLE_STATS_TIMER > 0) {
 		POST_BATTLE_STATS_TIMER--;
@@ -535,9 +577,9 @@ void tickPostBattleStatsBox(void)
 		}
 	}
 
-	if ((POLLED_INPUT == 0x40) || (POLLED_INPUT == 0x10)) {
-		if (!(POLLED_INPUT_PREVIOUS & 0x40) &&
-		    !(POLLED_INPUT_PREVIOUS & 0x10)) {
+	if ((POLLED_INPUT == CONFIRM_BUTTON) || (POLLED_INPUT == CANCEL_BUTTON)) {
+		if (!(POLLED_INPUT_PREVIOUS & CONFIRM_BUTTON) &&
+		    !(POLLED_INPUT_PREVIOUS & CANCEL_BUTTON)) {
 			SHOULD_SKIP_BIT_COUNTING = 1;
 		}
 	}
@@ -548,10 +590,9 @@ void tickPostBattleStatsBox(void)
 
 	for (i = 0; i < 6; i++) {
 		if (STATS_GAINS[i] != 0) {
-			gain = STATS_GAINS[i];
-			INITIAL_COMBAT_STATS[0][i] += gain;
+			INITIAL_COMBAT_STATS[0][i] += STATS_GAINS[i];
 
-			if (gain > 0) {
+			if (STATS_GAINS[i] > 0) {
 				if (i < 2) {
 					if (INITIAL_COMBAT_STATS[0][i] >= 10000) {
 						INITIAL_COMBAT_STATS[0][i] = 9999;
@@ -570,15 +611,16 @@ void tickPostBattleStatsBox(void)
 	POST_BATTLE_STATS_TIMER = 0;
 }
 
-void renderPostBattleStatsBox(uint8_t depth)
+void renderPostBattleStatsBox(int16_t depth)
 {
-	RECT *box = &UI_BOX_DATA[0].finalPos;
+	RECT *box;
 	GsBOXF rect;
-	int32_t i;
 	int32_t first;
 	int16_t y;
-	int32_t hasStatGain;
+	int32_t i;
+	POLY_FT4 *prim;
 
+	box = &UI_BOX_DATA[0].finalPos;
 	first = 1;
 	for (i = 0; i < 6; i++) {
 		if (STATS_GAINS[i] == 0) {
@@ -589,7 +631,7 @@ void renderPostBattleStatsBox(uint8_t depth)
 		    (STATS_GAINS[i] > 0) &&
 		    (first == 1)) {
 			playSound(0, 0x16);
-			STATS_GAINS[i] = STATS_GAINS[i] - 1;
+			STATS_GAINS[i]--;
 			INITIAL_COMBAT_STATS[0][i] += 1;
 
 			if (i < 2) {
@@ -606,7 +648,7 @@ void renderPostBattleStatsBox(uint8_t depth)
 		}
 
 		if (STATS_GAINS[i] != 0) {
-			POLY_FT4 *prim = (POLY_FT4 *)GsGetWorkBase();
+			prim = (POLY_FT4 *)GsGetWorkBase();
 			setEntityTextDigit(prim, 256, 491);
 			setRGB0(prim, 0x80, 0x80, 0x80);
 			setUVDataPolyFT4(prim, 96, 180, 12, 12);
@@ -655,15 +697,14 @@ void renderPostBattleStatsBox(uint8_t depth)
 			rect.w = INITIAL_COMBAT_STATS[0][i] * 50 / 999;
 		}
 
-		hasStatGain = HAS_STAT_GAIN[i];
-		if (hasStatGain != 1) {
-			if (hasStatGain == 0) {
-				rect.r = rect.g = rect.b = 0x78;
-				GsSortBoxFill(&rect, ACTIVE_ORDERING_TABLE,
-					      (uint16_t)(6 - depth));
-				rect.r = rect.g = rect.b = 0x28;
-			}
-		} else {
+		switch (HAS_STAT_GAIN[i]) {
+		case 0:
+			rect.r = rect.g = rect.b = 0x78;
+			GsSortBoxFill(&rect, ACTIVE_ORDERING_TABLE,
+				      (uint16_t)(6 - depth));
+			rect.r = rect.g = rect.b = 0x28;
+			break;
+		case 1:
 			rect.r = 0x69;
 			rect.g = 0xc2;
 			rect.b = 0xff;
@@ -672,6 +713,7 @@ void renderPostBattleStatsBox(uint8_t depth)
 			rect.r = 0;
 			rect.g = 0x5a;
 			rect.b = 0x96;
+			break;
 		}
 
 		rect.w = 50;

@@ -357,7 +357,7 @@ void initializeDroppedItems(void)
 	}
 }
 
-void spawnDroppedItems(Entity *e, int32_t type)
+void spawnDroppedItems(Entity *e, uint8_t type)
 {
 	int32_t i;
 	DroppedItem *it;

@@ -61,7 +61,7 @@ int32_t getItemCount(int32_t type);
 void initializeDroppedItems(void);
 void clearDroppedItems(void);
 void spawnItem(int32_t type, int16_t tileX, int16_t tileY);
-void spawnDroppedItems(Entity *e, int32_t type);
+void spawnDroppedItems(Entity *e, uint8_t type);
 int32_t pickupItem(int16_t itemId);
 void removeTamerItem(void);
 void renderOverworldItem(WorldItem *item);
