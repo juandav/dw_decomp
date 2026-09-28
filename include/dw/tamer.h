@@ -17,12 +17,12 @@ int32_t isTrainingComplete(void);
 
 void loadMapEntities(uint8_t *data, int32_t mapId, int32_t warpIdx);
 
-void setFullState(int8_t state, int8_t substate);
-void setTamerState(int8_t state);
+void setFullState(int32_t state, int32_t substate);
+void setTamerState(int32_t state);
 
 void startAnimationTamer(int32_t animId);
 
-int32_t startBattle(int16_t instanceId);
+int8_t startBattle(int16_t instanceId);
 
 int32_t tickEntityMoveTo(/* uint8_t scriptId1, uint8_t scriptId2,
 			 int32_t targetX, int32_t targetZ, int8_t speed,

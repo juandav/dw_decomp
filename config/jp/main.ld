@@ -27,6 +27,7 @@ SECTIONS
         KEEP(BUILD_DIR/asm/main/15BCC.s.o(.text .text.*));
         BUILD_DIR/src/main/_psstart.c.o(.text .text.*);
         KEEP(BUILD_DIR/asm/main/16190.s.o(.text .text.*));
+        BUILD_DIR/src/main/tamer.c.o(.text .text.*);
         BUILD_DIR/src/main/fade.c.o(.text .text.*);
         BUILD_DIR/src/main/aabb.c.o(.text .text.*);
         BUILD_DIR/src/main/efe.c.o(.text .text.*);
@@ -80,6 +81,7 @@ SECTIONS
 
         main_RODATA_START = .;
         KEEP(BUILD_DIR/asm/main/data/main.rodata.s.o(.rodata .rodata.*));
+        BUILD_DIR/src/main/tamer.c.o(.rodata .rodata.*);
         BUILD_DIR/src/main/efe.c.o(.rodata .rodata.*);
         KEEP(BUILD_DIR/asm/main/data/8A71C.rodata.s.o(.rodata .rodata.*));
         BUILD_DIR/src/main/overworld_menu_views.c.o(.rodata .rodata.*);
@@ -137,6 +139,7 @@ SECTIONS
         KEEP(BUILD_DIR/asm/main/data/main.data.s.o(.data .data.*));
         BUILD_DIR/src/main/font.c.o(.data .data.*);
         KEEP(BUILD_DIR/asm/main/data/9E298.data.s.o(.data .data.*));
+        BUILD_DIR/src/main/tamer.c.o(.data .data.*);
         BUILD_DIR/src/main/toilet_data.c.o(.data .data.*);
         BUILD_DIR/src/main/door_mapdata.c.o(.data .data.*);
         BUILD_DIR/src/main/efe.c.o(.data .data.*);
@@ -167,6 +170,8 @@ SECTIONS
         BUILD_DIR/src/main/font.c.o(.sdata .sdata.*);
         . = ALIGN(., 4);
         KEEP(BUILD_DIR/asm/main/data/AD4C0.sdata.s.o(.sdata .sdata.*));
+        BUILD_DIR/src/main/tamer.c.o(.sdata .sdata.*);
+        . = ALIGN(., 4);
         BUILD_DIR/src/main/efe.c.o(.sdata .sdata.*);
         . = ALIGN(., 4);
         KEEP(BUILD_DIR/asm/main/data/AD4F0.sdata.s.o(.sdata .sdata.*));

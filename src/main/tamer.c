@@ -13,6 +13,7 @@
 #include <dw/entity.h>
 #include <dw/fade.h>
 #include <dw/font.h>
+#include <dw/input.h>
 #include <dw/item.h>
 #include <dw/kar.h>
 #include <dw/main.h>
@@ -29,6 +30,16 @@
 #include <dw/ui.h>
 #include <dw/utils.h>
 
+#if defined(VERSION_JP)
+char MAIN_D_801341FC[] = "「あっ！だ！」";
+char MAIN_D_80122D68[] = "「でも、持ち物がいっぱいで持てないや。」";
+char MAIN_D_80122D80[] = "「ちぇっ！　カラッポだ」";
+char MAIN_D_80122D94[] = "テイマーレベルが上がった！！！";
+char MAIN_D_80122DAC[] = "テイマーレベルが下がった！！！";
+char MAIN_D_80122DC8[] = "おめでとうございます！";
+char MAIN_D_80122DDC[] = "あなたのすばらしい功績に対して";
+char MAIN_D_80122DF4[] = "メダルがおくられました！";
+#else
 char MAIN_D_80122D68[] = "I can't hold anymore.";
 char MAIN_D_80122D80[] = "Hey! It's empty!";
 char MAIN_D_80122D94[] = "Tamer level went up!!!";
@@ -36,6 +47,7 @@ char MAIN_D_80122DAC[] = "Tamer level went down!!!";
 char MAIN_D_80122DC8[] = "Congratulations!";
 char MAIN_D_80122DDC[24] = "To recognize your great";
 char MAIN_D_80122DF4[] = "recors, they sent a Medal!";
+#endif
 
 static void *tamer_data_order[] = {
 	MAIN_D_80122DF4,
@@ -45,10 +57,15 @@ static void *tamer_data_order[] = {
 	MAIN_D_80122D94,
 	MAIN_D_80122D80,
 	MAIN_D_80122D68,
+#if defined(VERSION_JP)
+	MAIN_D_801341FC,
+#endif
 };
 
 RECT MAIN_D_801341F4 = {0, 12, 256, 200};
+#if !defined(VERSION_JP)
 char MAIN_D_801341FC[] = "Woah!";
+#endif
 RECT MAIN_D_80134204 = {0, 12, 256, 200};
 RECT MAIN_D_8013420C = {0, 12, 256, 200};
 
@@ -84,7 +101,7 @@ extern int32_t IS_STANDING_ON_DROP;
 extern int32_t IS_IN_MENU;
 extern int16_t MOVE_TO_DELTA_X;
 extern int16_t MAIN_D_80134C9A;
-extern uint8_t MAIN_D_80134DF9;
+extern int8_t MAIN_D_80134DF9;
 extern int16_t MAIN_D_801386A4[16];
 extern uint32_t POLLED_INPUT;
 extern uint32_t CHANGED_INPUT;
@@ -146,9 +163,9 @@ int32_t isSoundLoaded(int32_t isAsync, int32_t soundId);
 void playSound(int32_t vabId, uint32_t note);
 void setCameraFollowPlayer(void);
 void unsetCameraFollowPlayer(void);
-int16_t entityCheckCollision(Entity *a, Entity *b, int32_t c, int32_t d);
+int32_t entityCheckCollision(Entity *a, Entity *b, int32_t c, int32_t d);
 void collisionGrace(int32_t a, Entity *b, int32_t c, int32_t d);
-int32_t tickEntityWalkTo(uint8_t scriptId1, uint8_t scriptId2, int32_t targetX, int32_t targetZ, int8_t withCamera);
+int32_t tickEntityWalkTo(/* uint8_t scriptId, uint8_t targetId, int16_t x, int16_t z, int8_t useCamera */);
 void setTrigger(uint16_t trigger);
 int32_t tickOpenChestTray(int32_t chestId);
 int32_t tickCloseChestTray(int32_t chestId);
@@ -161,7 +178,7 @@ void closeTriangleMenu(void);
 void removeTriangleMenu(void);
 void closeInventoryBoxes(void);
 void removeUIBox1(void);
-void callScriptSection(int32_t, int32_t, int32_t);
+void callScriptSection(uint16_t scriptId, uint32_t scriptSection, uint32_t param);
 void addGameMenu(void);
 void setPartnerIdling(void);
 int32_t getTileTrigger(VECTOR *pos);
@@ -173,7 +190,7 @@ void getRotationDifference(PositionData *data, VECTOR *target,
 int32_t rotateEntity(SVECTOR *rot, int16_t *outX, int16_t *outY,
                      int16_t *outZ, int32_t speed);
 void tickTamerWaypoints(void);
-void loadMapDigimon(uint8_t *data, int32_t a);
+void loadMapDigimon(uint8_t *data, int16_t a);
 void tickTamerBattle(int32_t instanceId);
 void tickConditionBoundaries(void);
 void handlePostBattleTiredness(void);
@@ -187,7 +204,8 @@ void loadBattleData(int32_t a, int32_t b);
 int32_t BTL_battleMain(void);
 int32_t isKeyDown(uint32_t key);
 void memcpy(uint8_t *dst, uint8_t *src, uint32_t size);
-void setupPartnerOnWarp(int16_t x, int16_t y, int16_t z, uint32_t rotationY);
+int32_t strlen(char *s);
+void setupPartnerOnWarp(int32_t x, int32_t y, int32_t z, int32_t rotationY);
 extern int32_t DRAWING_OFFSET_X;
 extern int32_t DRAWING_OFFSET_Y;
 extern GsOT GS_ORDERING_TABLE[2];
@@ -197,13 +215,13 @@ extern int32_t FADE_PROTECTION;
 
 void tickTamerBattle(int32_t instanceId);
 void tickTamerOverworld(int16_t instanceId);
-void tickWalkingState(void);
+void tickWalkingState();
 void tickChangeMap(void);
 void tickPickupItem(void);
 void tickTakeChest(void);
 void tickIdle(void);
 void tickTraining(void);
-void tickPraiseScold(int8_t state, int8_t unused);
+void tickPraiseScold(int8_t state);
 void tickFishing(void);
 void tickOpening(void);
 void tickEnding(void);
@@ -216,7 +234,7 @@ void tickTamer(int16_t instanceId);
 void renderItemPickupTextbox(int32_t instanceId);
 void renderAwardSomethingTextbox(int32_t instanceId);
 void setTamerDirection(int32_t direction);
-void setupTamerOnWarp(int32_t x, int32_t y, int32_t z, int32_t rotationY);
+void setupTamerOnWarp(int16_t x, int16_t y, int16_t z, int16_t rotationY);
 int16_t getMapRotation(void);
 void advanceBattleTime(int32_t result);
 void addTamerLevel(int32_t chance, int32_t amount);
@@ -227,9 +245,9 @@ void checkPendingAwards(void);
 void tickPickupItem(void);
 void tickTakeChest(void);
 void tickAwardSomething(void);
-void tickWalkingState(void);
+void tickWalkingState();
 void tickChangeMap(void);
-void tickPraiseScold(int8_t state, int8_t unused);
+void tickPraiseScold(int8_t state);
 void tickOpening(void);
 void tickEnding(void);
 void tickSicknessLostLife(void);
@@ -325,54 +343,44 @@ void initializeTamer(int32_t type, int32_t posX, int32_t posY, int32_t posZ,
 	LEVELS_INCREASED = 1;
 }
 
-void loadMapEntities(uint8_t *data, int32_t mapId, int32_t warpIdx)
+// clang-format off
+void loadMapEntities(data, mapId, warpIdx)
+	uint8_t *data;
+	int16_t mapId;
+	int16_t warpIdx;
+// clang-format on
 {
-	uint8_t *mapDigimonData;
-	int16_t spawnY;
-	int16_t rotation;
-	uint32_t rot;
 	int16_t x;
-	int16_t rotationY;
+	int16_t spawnY;
 	int16_t z;
+	int16_t rotation;
 
 	memcpy((void *)&MAP_WARPS, data, sizeof(MAP_WARPS));
+	data += sizeof(MAP_WARPS);
 
 	x = MAP_WARPS.spawnX[warpIdx];
 	spawnY = MAP_WARPS.spawnY[warpIdx];
 	z = MAP_WARPS.spawnZ[warpIdx];
+	rotation = MAP_WARPS.rotation[warpIdx];
 
-	rotationY = MAP_WARPS.rotation[warpIdx];
-	rotation = rotationY;
-
-	mapDigimonData = &data[sizeof(MAP_WARPS)];
-
-	setupTamerOnWarp(x, (int32_t)spawnY, z, rotationY);
+	setupTamerOnWarp(x, spawnY, z, rotation);
 
 	if ((rotation <= 0x200) || (rotation > 0xe00)) {
 		z += 200;
 	} else if ((rotation > 0x200) && (rotation <= 0x600)) {
 		x += 200;
-	} else {
-		if ((rotation > 0x600) && (0xa00 >= rotation)) {
-			z -= 200;
-		} else {
-			if ((0xa00 < rotation) && (rotation <= 0xe00)) {
-				x -= 200;
-			}
-		}
+	} else if ((rotation > 0x600) && (rotation <= 0xa00)) {
+		z -= 200;
+	} else if ((rotation > 0xa00) && (rotation <= 0xe00)) {
+		x -= 200;
 	}
 
-	rot = (rotation + 2048) & 0xfff;
-	if (((rotation + (long)2048) < 0) && (rot != 0)) {
-		rot -= 4096;
-	}
-
-	setupPartnerOnWarp(x, spawnY, z, rot);
-	loadMapDigimon(mapDigimonData, mapId);
+	setupPartnerOnWarp(x, spawnY, z, (rotation + 0x800) % 0x1000);
+	loadMapDigimon(data, mapId);
 	STORED_TAMER_POS = TAMER_ENTITY.entity.posData->location;
 }
 
-void setupTamerOnWarp(int32_t x, int32_t y, int32_t z, int32_t rotationY)
+void setupTamerOnWarp(int16_t x, int16_t y, int16_t z, int16_t rotationY)
 {
 	setEntityPosition(0, x, y, z);
 	setEntityRotation(0, TAMER_ENTITY.entity.posData->rotation.vx, rotationY,
@@ -406,11 +414,9 @@ void tickTamer(int16_t instanceId)
 
 void tickTamerOverworld(int16_t instanceId)
 {
-	int8_t state;
-
-	switch (state = TAMER_STATE) {
+	switch (TAMER_STATE) {
 	case 0:
-		tickWalkingState();
+		tickWalkingState(instanceId);
 		break;
 	case 1:
 		setTamerState(6);
@@ -432,7 +438,7 @@ void tickTamerOverworld(int16_t instanceId)
 		break;
 	case 9:
 	case 13:
-		tickPraiseScold(state, state);
+		tickPraiseScold(TAMER_STATE);
 		break;
 	case 11:
 		tickFishing();
@@ -466,15 +472,16 @@ void tickTamerOverworld(int16_t instanceId)
 
 void tickWalkingState(void)
 {
-	int16_t rawRotation;
-	int32_t mapRotation;
-	int32_t originalRotation;
+	int16_t rotation;
+	int16_t quadrant;
 
 	tickTamerWaypoints();
 
 	if ((isKeyDown(0x10) != 0) &&
 	    (IS_SCRIPT_PAUSED == 1) &&
+#if !defined(VERSION_JP)
 	    (FADE_PROTECTION == 0) &&
+#endif
 	    (UI_BOX_DATA[0].state != 1) &&
 	    (UI_BOX_DATA[0].frame == 0)) {
 		addGameMenu();
@@ -495,7 +502,7 @@ void tickWalkingState(void)
 	    ((POLLED_INPUT & 0x8000) != 0) ||
 	    ((POLLED_INPUT & 0x2000) != 0)) {
 		if (((POLLED_INPUT & 8) != 0) ||
-		    ((POLLED_INPUT & 0x10) != 0)) {
+		    ((POLLED_INPUT & CANCEL_BUTTON) != 0)) {
 			if (TAMER_ENTITY.entity.anim.animId != 2) {
 				startAnimation(&TAMER_ENTITY.entity, 2);
 			}
@@ -507,35 +514,33 @@ void tickWalkingState(void)
 		startAnimation(&TAMER_ENTITY.entity, 0);
 	}
 
-	rawRotation = getMapRotation();
-	mapRotation = rawRotation;
-	originalRotation = mapRotation;
-	mapRotation = (int16_t)(mapRotation / 0x200);
-	if ((originalRotation % 0x200) >= 0x100) {
-		mapRotation = (int16_t)(mapRotation + 1);
+	rotation = getMapRotation();
+	quadrant = (int16_t)(rotation / 0x200);
+	if ((rotation % 0x200) >= 0x100) {
+		quadrant++;
 	}
-	mapRotation = (int16_t)(mapRotation * 0x200);
+	rotation = (int16_t)(quadrant * 0x200);
 
 	if ((POLLED_INPUT & 0x1000) != 0) {
 		if ((POLLED_INPUT & 0x8000) != 0) {
-			setTamerDirection((int16_t)(mapRotation + 0x600));
+			setTamerDirection((int16_t)(rotation + 0x600));
 		} else if ((POLLED_INPUT & 0x2000) != 0) {
-			setTamerDirection((int16_t)(mapRotation + 0xa00));
+			setTamerDirection((int16_t)(rotation + 0xa00));
 		} else {
-			setTamerDirection((int16_t)(mapRotation + 0x800));
+			setTamerDirection((int16_t)(rotation + 0x800));
 		}
 	} else if ((POLLED_INPUT & 0x4000) != 0) {
 		if ((POLLED_INPUT & 0x8000) != 0) {
-			setTamerDirection((int16_t)(mapRotation + 0x200));
+			setTamerDirection((int16_t)(rotation + 0x200));
 		} else if ((POLLED_INPUT & 0x2000) != 0) {
-			setTamerDirection((int16_t)(mapRotation + 0xe00));
+			setTamerDirection((int16_t)(rotation + 0xe00));
 		} else {
-			setTamerDirection((int16_t)mapRotation);
+			setTamerDirection((int16_t)(rotation + 0));
 		}
 	} else if ((POLLED_INPUT & 0x8000) != 0) {
-		setTamerDirection((int16_t)(mapRotation + 0x400));
+		setTamerDirection((int16_t)(rotation + 0x400));
 	} else if ((POLLED_INPUT & 0x2000) != 0) {
-		setTamerDirection((int16_t)(mapRotation + 0xc00));
+		setTamerDirection((int16_t)(rotation + 0xc00));
 	}
 
 	checkItemPickup();
@@ -548,21 +553,25 @@ void tickWalkingState(void)
 
 int16_t getMapRotation(void)
 {
-	int16_t dz;
+	int16_t angle;
 	int16_t dx;
+	int16_t dz;
 
-	dz = GS_VIEWPOINT.vpz - GS_VIEWPOINT.vrz;
-	dx = GS_VIEWPOINT.vpx - GS_VIEWPOINT.vrx;
-
-	return _atan(dz, dx);
+	dx = (int16_t)(GS_VIEWPOINT.vpx - GS_VIEWPOINT.vrx);
+	dz = (int16_t)(GS_VIEWPOINT.vpz - GS_VIEWPOINT.vrz);
+	angle = (int16_t)_atan(dz, dx);
+	return angle;
 }
 
-void setTamerDirection(int32_t direction)
+// clang-format off
+void setTamerDirection(direction)
+	int16_t direction;
+// clang-format on
 {
-	if (0xfff < direction) {
-		direction = (direction + -0x1000) * 0x10000 >> 0x10;
+	if (direction > 0xfff) {
+		direction -= 0x1000;
 	}
-	TAMER_ENTITY.entity.posData->rotation.vy = (int16_t)direction;
+	TAMER_ENTITY.entity.posData->rotation.vy = direction;
 }
 
 void checkItemPickup(void)
@@ -573,22 +582,21 @@ void checkItemPickup(void)
 	int16_t tileY;
 
 	getModelTile(&TAMER_ENTITY.entity.posData->location, &tileX, &tileY);
-	PICKUP_ITEM_TYPE = 0xff;
-
 	item = DROPPED_ITEMS;
+	PICKUP_ITEM_TYPE = 0xff;
 	for (i = 0; i < 11; ++i) {
 		if (item->worldItem.type == 0xff) {
 			++item;
 			continue;
 		}
 
-		if ((item->tileX < tileX - 1) ||
-		    (tileX + 1 < item->tileX)) {
+		if ((tileX - 1 > item->tileX) ||
+		    (item->tileX > tileX + 1)) {
 			goto next;
 		}
 
-		if ((item->tileY < tileY - 1) ||
-		    (tileY + 1 < item->tileY)) {
+		if ((tileY - 1 > item->tileY) ||
+		    (item->tileY > tileY + 1)) {
 			goto next;
 		}
 
@@ -619,7 +627,7 @@ void checkMapInteraction(void)
 		TAMER_ENTITY.entity.anim.animFlag |= 2;
 		if (((NPC_ENTITIES[collision - 2].autotalk == 1) ||
 		     ((NPC_ENTITIES[collision - 2].autotalk == 0) &&
-		      ((CHANGED_INPUT & 0x40) != 0))) &&
+		      ((CHANGED_INPUT & CONFIRM_BUTTON) != 0))) &&
 		    (IS_SCRIPT_PAUSED == 1)) {
 			TALKED_TO_ENTITY = collision;
 			removeTriangleMenu();
@@ -656,14 +664,14 @@ void checkMapInteraction(void)
 			callScriptSection(CURRENT_SCRIPT_ID, trigger, 0);
 		}
 	} else if ((trigger >= 80) && (trigger < 110)) {
-		if (((CHANGED_INPUT & 0x40) != 0) &&
+		if (((CHANGED_INPUT & CONFIRM_BUTTON) != 0) &&
 		    (IS_SCRIPT_PAUSED == 1)) {
 			callScriptSection(CURRENT_SCRIPT_ID, trigger, 0);
 		}
 	}
 
 	trigger = checkChestCollision();
-	if ((trigger != 0xff) && ((CHANGED_INPUT & 0x40) != 0)) {
+	if ((trigger != 0xff) && ((CHANGED_INPUT & CONFIRM_BUTTON) != 0)) {
 		INTERACTED_CHEST = trigger;
 		setTamerState(14);
 	}
@@ -751,9 +759,21 @@ void checkPendingAwards(void)
 
 void renderItemPickupTextbox(int32_t instanceId)
 {
+#if defined(VERSION_JP)
+	int32_t halfLength;
+
+	renderString(0xf, -0x7d, 0x2d, 0x48, 0xc, 0, 0xc, 5, 0);
+#endif
 	if (INTERACTED_CHEST_STATE == 0) {
+#if defined(VERSION_JP)
+		renderString(0, -0x7d, 0x39, 0x30, 0xc, 0, 0x24, 5, 0);
+		renderString(0xf, -0x4d, 0x39, 0x60, 0xc, 0, 0x18, 5, 0);
+		halfLength = strlen(ITEM_PARA[RECEIVED_ITEM_TYPE].name) / 2;
+		renderString(0, halfLength * 12 - 0x4d, 0x39, 0x24, 0xc, 0x30, 0x24, 5, 0);
+#else
 		renderString(0, 0xffffff83, 0x39, 0x5a, 0xc, 0, 0x24, 5, 0);
 		renderString(0xf, 0xffffff83, 0x2d, 0x60, 0xc, 0, 0x18, 5, 0);
+#endif
 	} else if (INTERACTED_CHEST_STATE == 1) {
 		renderString(0, 0xffffff83, 0x39, 0xf0, 0xc, 0, 0x18, 5, 0);
 	} else {
@@ -764,10 +784,9 @@ void renderItemPickupTextbox(int32_t instanceId)
 	++TEXTBOX_OPEN_TIMER;
 }
 
-int32_t startBattle(int16_t instanceId)
+int8_t startBattle(int16_t instanceId)
 {
-	int8_t battleResult;
-	int32_t result;
+	int8_t result;
 	int32_t battleData;
 
 	GAME_STATE = 1;
@@ -779,20 +798,19 @@ int32_t startBattle(int16_t instanceId)
 
 	battleData = handleBattleStart(instanceId);
 	loadBattleData(instanceId, battleData);
-	battleResult = BTL_battleMain();
-	result = battleResult;
+	result = BTL_battleMain();
 
 	GAME_STATE = 0;
 
 	if (result == -1) {
-		PARTNER_PARA.happiness = PARTNER_PARA.happiness - 0x1e;
-		PARTNER_PARA.discipline = PARTNER_PARA.discipline - 0x14;
+		PARTNER_PARA.happiness -= 0x1e;
+		PARTNER_PARA.discipline -= 0x14;
 		setPartnerState(-1);
 		SKIP_DAYTIME_TRANSITION = 1;
 	} else if (result == 0) {
-		PARTNER_PARA.happiness = PARTNER_PARA.happiness - 10;
-		PARTNER_PARA.discipline = PARTNER_PARA.discipline - 6;
-		PARTNER_PARA.tiredness = PARTNER_PARA.tiredness + 2;
+		PARTNER_PARA.happiness -= 10;
+		PARTNER_PARA.discipline -= 6;
+		PARTNER_PARA.tiredness += 2;
 		handlePostBattleTiredness();
 		SKIP_DAYTIME_TRANSITION = 1;
 	} else if (result == 1) {
@@ -800,10 +818,10 @@ int32_t startBattle(int16_t instanceId)
 		readMapTFS(CURRENT_SCREEN);
 		STORED_TAMER_POS = TAMER_ENTITY.entity.posData->location;
 		setPartnerState(1);
-		PARTNER_PARA.happiness = PARTNER_PARA.happiness + 2;
+		PARTNER_PARA.happiness += 2;
 		handlePostBattleTiredness();
-		SKIP_DAYTIME_TRANSITION = 0;
 		++PARTNER_PARA.battles;
+		SKIP_DAYTIME_TRANSITION = 0;
 	}
 
 	tickConditionBoundaries();
@@ -818,7 +836,10 @@ int32_t startBattle(int16_t instanceId)
 	return result;
 }
 
-void advanceBattleTime(int32_t result)
+// clang-format off
+void advanceBattleTime(result)
+	int8_t result;
+// clang-format on
 {
 	MINUTE += 20;
 
@@ -851,11 +872,11 @@ void advanceBattleTime(int32_t result)
 
 		if (0x17 < HOUR) {
 			++DAY;
-			CURRENT_FRAME = MINUTE * 20;
 			HOUR = 0;
+			CURRENT_FRAME = MINUTE * 20;
 			if (0x1d < DAY) {
-				++YEAR;
 				DAY = 0;
+				++YEAR;
 				if (YEAR > 99) {
 					YEAR = 0;
 				}
@@ -898,7 +919,11 @@ void advanceBattleTime(int32_t result)
 	}
 }
 
-void setFullState(int8_t state, int8_t substate)
+// clang-format off
+void setFullState(state, substate)
+	int16_t state;
+	int16_t substate;
+// clang-format on
 {
 	TAMER_STATE = state;
 	TAMER_SUBSTATE = substate;
@@ -909,15 +934,25 @@ int32_t getTamerState(void)
 	return TAMER_STATE;
 }
 
-void startAnimationTamer(int32_t animId)
+// clang-format off
+void startAnimationTamer(animId)
+	int16_t animId;
+// clang-format on
 {
 	startAnimation(&TAMER_ENTITY.entity, animId);
 }
 
-int32_t tickEntityWalkTo(uint8_t scriptId, uint8_t targetId, int32_t x, int32_t z, int8_t useCamera)
+// clang-format off
+int32_t tickEntityWalkTo(scriptId, targetId, x, z, useCamera)
+	uint8_t scriptId;
+	uint8_t targetId;
+	int16_t x;
+	int16_t z;
+	int8_t useCamera;
+// clang-format on
 {
 	Entity *e;
-	PositionData *pd;
+	Entity *target;
 	VECTOR from;
 	VECTOR to;
 	int16_t fromTileX;
@@ -933,16 +968,15 @@ int32_t tickEntityWalkTo(uint8_t scriptId, uint8_t targetId, int32_t x, int32_t 
 		NPC_IS_WALKING_TOWARDS[scriptId - 2] = 1;
 	}
 
-	pd = e->posData;
-	from = pd->location;
+	from = e->posData->location;
 
 	if (targetId == 0xFF) {
 		to.vx = x;
 		to.vy = e->posData->location.vy;
 		to.vz = z;
 	} else {
-		pd = getEntityFromScriptId(&targetId)->posData;
-		to = pd->location;
+		target = getEntityFromScriptId(&targetId);
+		to = target->posData->location;
 	}
 
 	if ((PREVIOUS_CAMERA_POS_INITIALIZED == 0) && (useCamera == 1)) {
@@ -978,6 +1012,7 @@ int32_t tickEntityWalkTo(uint8_t scriptId, uint8_t targetId, int32_t x, int32_t 
 
 int32_t tickLookAtEntity(uint8_t scriptId1, uint8_t scriptId2)
 {
+	Entity *target;
 	int32_t result;
 	Entity *entity;
 	int8_t entityId;
@@ -1002,8 +1037,8 @@ int32_t tickLookAtEntity(uint8_t scriptId1, uint8_t scriptId2)
 	result = 0;
 	switch (HAS_ROTATION_DATA[entityId]) {
 	case 0:
-		MAIN_D_801386A0[entityId] =
-			getEntityFromScriptId(&scriptId2)->posData->location;
+		target = getEntityFromScriptId(&scriptId2);
+		MAIN_D_801386A0[entityId] = target->posData->location;
 		HAS_ROTATION_DATA[entityId] = 1;
 		break;
 	case 1:
@@ -1035,24 +1070,19 @@ int32_t tickEntityMoveTo(scriptId1, scriptId2, targetX, targetZ, speed,
 			 withCamera)
 	uint8_t scriptId1;
 	uint8_t scriptId2;
-	int32_t targetX;
+	int16_t targetX;
 	int32_t targetZ;
 	int8_t speed;
 	int8_t withCamera;
 {
 #ifdef __MWERKS__
-	/* TODO: get rid of extra declaration */
-	extern void setEntityPosition(int32_t entityId, int32_t x, long y,
-	                              int32_t z);
+	extern void setEntityPosition(int32_t entityId, long x, long y, long z);
 #endif
 	Entity *entity;
 	Entity *targetEntity;
-	PositionData *position;
 	int8_t finishedX;
 	int8_t finishedZ;
-	int32_t destinationX;
 
-	destinationX = targetX;
 	entity = getEntityFromScriptId(&scriptId1);
 	if (PREVIOUS_CAMERA_POS_INITIALIZED == 0) {
 		if (scriptId2 == 0xff) {
@@ -1072,21 +1102,20 @@ int32_t tickEntityMoveTo(scriptId1, scriptId2, targetX, targetZ, speed,
 		PREVIOUS_CAMERA_POS_INITIALIZED = 1;
 		PREVIOUS_CAMERA_POS = entity->posData->location;
 	} else {
-		position = entity->posData;
 		setEntityPosition(scriptId1,
-		                  position->location.vx + MOVE_TO_DELTA_X,
-		                  position->location.vy,
-		                  position->location.vz + MAIN_D_80134C9A);
+		                  entity->posData->location.vx + MOVE_TO_DELTA_X,
+		                  entity->posData->location.vy,
+		                  entity->posData->location.vz + MAIN_D_80134C9A);
 		setupEntityMatrix(scriptId1);
 
 		finishedX = finishedZ = 0;
 		if (MOVE_TO_DELTA_X < 0) {
-			if (entity->posData->location.vx <= destinationX) {
-				entity->posData->location.vx = destinationX;
+			if (targetX >= entity->posData->location.vx) {
+				entity->posData->location.vx = targetX;
 				finishedX = 1;
 			}
-		} else if (entity->posData->location.vx >= destinationX) {
-			entity->posData->location.vx = destinationX;
+		} else if (targetX <= entity->posData->location.vx) {
+			entity->posData->location.vx = targetX;
 			finishedX = 1;
 		}
 
@@ -1118,12 +1147,17 @@ int32_t tickEntityMoveTo(scriptId1, scriptId2, targetX, targetZ, speed,
 int32_t tickEntityMoveToAxis(scriptId, target, axis, speed, withCamera)
 	uint8_t scriptId;
 	int32_t target;
-	int32_t axis;
-	int32_t speed;
+	int8_t axis;
+	int8_t speed;
 	int8_t withCamera;
 {
+#ifdef __MWERKS__
+	extern void setEntityPosition(int32_t entityId, long x, long y, long z);
+#endif
 	Entity *entity;
 	long *axisValue;
+	int8_t finishedX;
+	int8_t finishedZ;
 
 	entity = getEntityFromScriptId(&scriptId);
 	if (axis == 0) {
@@ -1144,6 +1178,7 @@ int32_t tickEntityMoveToAxis(scriptId, target, axis, speed, withCamera)
 		                  entity->posData->location.vy,
 		                  entity->posData->location.vz);
 		setupEntityMatrix(scriptId);
+		finishedX = finishedZ = 0;
 
 		if (MOVE_TO_DELTA_X < 0) {
 			if (*axisValue <= target) {
@@ -1187,15 +1222,10 @@ Entity *getEntityFromScriptId(uint8_t *scriptId)
 	}
 }
 
-static inline int16_t tamer_s16(int16_t a)
-{
-	return a;
-}
 void worldPosToScreenPos2(int16_t *x, int16_t *y, int16_t *z)
 {
 	SVECTOR v;
 	SVECTOR sxy;
-	int16_t new_var;
 
 	SetRotMatrix(&GsWSMATRIX);
 	SetTransMatrix(&GsWSMATRIX);
@@ -1205,8 +1235,7 @@ void worldPosToScreenPos2(int16_t *x, int16_t *y, int16_t *z)
 	gte_ldv0(&v);
 	gte_rtps();
 	gte_stsxy((long *)&sxy);
-	new_var = sxy.vx;
-	*x = tamer_s16(new_var) - (0xA0 - DRAWING_OFFSET_X);
+	*x = (int16_t)sxy.vx - (0xA0 - DRAWING_OFFSET_X);
 	*y = sxy.vy - (0x78 - DRAWING_OFFSET_Y);
 }
 
@@ -1231,13 +1260,17 @@ uint8_t checkChestCollision(void)
 	return 0xff;
 }
 
-void addTamerLevel(int32_t chance, int32_t amount)
+// clang-format off
+void addTamerLevel(chance, amount)
+	int16_t chance;
+	int8_t amount;
+// clang-format on
 {
 	int32_t r;
 
 	r = random(100);
 	if (r < chance) {
-		TAMER_ENTITY.tamerLevel = TAMER_ENTITY.tamerLevel + amount;
+		TAMER_ENTITY.tamerLevel += amount;
 		if ((0 <= TAMER_ENTITY.tamerLevel) &&
 		    (TAMER_ENTITY.tamerLevel < 11)) {
 			clearTextArea();
@@ -1277,7 +1310,10 @@ void renderAwardSomethingTextbox(int32_t instanceId)
 	++TEXTBOX_OPEN_TIMER;
 }
 
-void setTamerState(int8_t state)
+// clang-format off
+void setTamerState(state)
+	int16_t state;
+// clang-format on
 {
 	TAMER_STATE = state;
 	TAMER_SUBSTATE = 0;
@@ -1318,7 +1354,6 @@ void tickChangeMap(void)
 
 void tickPickupItem(void)
 {
-	int32_t available;
 	RECT textRect;
 	RECT targetRect;
 	RECT sourceRect;
@@ -1340,8 +1375,7 @@ void tickPickupItem(void)
 		TAMER_SUBSTATE = 1;
 		break;
 	case 1:
-		available = isUIBoxAvailable(1);
-		if (available == 1) {
+		if (isUIBoxAvailable(1) == 1) {
 			setRECT(&targetRect, -130, 42, 262, 59);
 			getEntityScreenPos(ENTITY_TABLE[0], 1, screenPos);
 			setRECT(&sourceRect,
@@ -1357,16 +1391,14 @@ void tickPickupItem(void)
 		break;
 	case 2:
 		++TAKE_ITEM_FRAME_COUNT;
-		available = isKeyDown(0x40);
-		if ((available != 0) && (4 < TAKE_ITEM_FRAME_COUNT)) {
+		if ((isKeyDown(CONFIRM_BUTTON) != 0) && (4 < TAKE_ITEM_FRAME_COUNT)) {
 			if (TAKE_ITEM_FRAME_COUNT < 0x3c) {
 				playSound(0, 3);
 			}
-			available = giveItem(DROPPED_ITEMS[PICKUP_ITEM_TYPE].worldItem.type & 0xff, 0);
-			if (available == 0) {
+			if (giveItem(DROPPED_ITEMS[PICKUP_ITEM_TYPE].worldItem.type & 0xff, 0) == 0) {
 				drawString(MAIN_D_80122D68, 0, 0x18);
-				INTERACTED_CHEST_STATE = 1;
 				TAKE_ITEM_FRAME_COUNT = 0;
+				INTERACTED_CHEST_STATE = 1;
 				TAMER_SUBSTATE = 3;
 			} else {
 				playSound(0, 7);
@@ -1376,8 +1408,7 @@ void tickPickupItem(void)
 		break;
 	case 3:
 		++TAKE_ITEM_FRAME_COUNT;
-		available = isKeyDown(0x40);
-		if ((available != 0) && (4 < TAKE_ITEM_FRAME_COUNT)) {
+		if ((isKeyDown(CONFIRM_BUTTON) != 0) && (4 < TAKE_ITEM_FRAME_COUNT)) {
 			if (TAKE_ITEM_FRAME_COUNT < 0x3c) {
 				playSound(0, 3);
 			}
@@ -1407,8 +1438,6 @@ void tickPickupItem(void)
 
 void tickTakeChest(void)
 {
-	int32_t available;
-	int32_t trayResult;
 	RECT textRect;
 	RECT targetRect;
 	RECT sourceRect;
@@ -1437,10 +1466,8 @@ void tickTakeChest(void)
 		TAMER_SUBSTATE = 1;
 		break;
 	case 1:
-		available = isUIBoxAvailable(1);
-		if (available == 1) {
-			trayResult = tickOpenChestTray(INTERACTED_CHEST);
-			if (trayResult == 1) {
+		if (isUIBoxAvailable(1) == 1) {
+			if (tickOpenChestTray(INTERACTED_CHEST) == 1) {
 				setRECT(&targetRect, -130, 42, 262, 59);
 				getEntityScreenPos(ENTITY_TABLE[0], 1,
 						   screenPos);
@@ -1464,11 +1491,10 @@ void tickTakeChest(void)
 		break;
 	case 2:
 		++TAKE_ITEM_FRAME_COUNT;
-		if (((POLLED_INPUT & PADRdown) != 0) &&
+		if (((POLLED_INPUT & CONFIRM_BUTTON) != 0) &&
 		    (5 < TAKE_ITEM_FRAME_COUNT)) {
 			TAKE_ITEM_FRAME_COUNT = 0;
-			available = giveItem(RECEIVED_ITEM_TYPE, 0);
-			if (available == 0) {
+			if (giveItem(RECEIVED_ITEM_TYPE, 0) == 0) {
 				drawString(MAIN_D_80122D68, 0, 0x18);
 				INTERACTED_CHEST_STATE = 1;
 				TAMER_SUBSTATE = 3;
@@ -1479,14 +1505,13 @@ void tickTakeChest(void)
 		}
 		break;
 	case 3:
-		available = tickCloseChestTray(INTERACTED_CHEST);
-		if (available == 1) {
+		if (tickCloseChestTray(INTERACTED_CHEST) == 1) {
 			TAMER_SUBSTATE = 4;
 		}
 		break;
 	case 4:
 		++TAKE_ITEM_FRAME_COUNT;
-		if (((POLLED_INPUT & PADRdown) != 0) &&
+		if (((POLLED_INPUT & CONFIRM_BUTTON) != 0) &&
 		    (5 < TAKE_ITEM_FRAME_COUNT)) {
 			getEntityScreenPos(&TAMER_ENTITY.entity, 1,
 					   screenPos);
@@ -1534,7 +1559,7 @@ void tickTraining(void)
 	}
 }
 
-void tickPraiseScold(int8_t state, int8_t unused)
+void tickPraiseScold(int8_t state)
 {
 	int32_t type;
 
@@ -1593,8 +1618,6 @@ void tickOpening(void)
 
 void tickEnding(void)
 {
-	int32_t value;
-
 	switch (TAMER_SUBSTATE) {
 	case 0:
 		isSoundLoaded(0, 8);
@@ -1602,8 +1625,7 @@ void tickEnding(void)
 		TAMER_SUBSTATE = 1;
 		break;
 	case 1:
-		value = ENDI_tickEnding(ENTITY_TABLE[0], 1);
-		if (0 > value) {
+		if (0 > ENDI_tickEnding(ENTITY_TABLE[0], 1)) {
 			SOME_SCRIPT_SYNC_BIT = 1;
 		}
 	default:
@@ -1665,7 +1687,6 @@ void tickBattleLostLife(void)
 
 void tickAwardSomething(void)
 {
-	int32_t available;
 	RECT textRect;
 	RECT targetRect;
 	RECT sourceRect;
@@ -1712,8 +1733,7 @@ void tickAwardSomething(void)
 		TAMER_SUBSTATE = 4;
 		break;
 	case 4:
-		available = isUIBoxAvailable(1);
-		if (available == 1) {
+		if (isUIBoxAvailable(1) == 1) {
 			setRECT(&targetRect, -130, 42, 262, 59);
 			getEntityScreenPos(ENTITY_TABLE[0], 1, screenPos);
 			setRECT(&sourceRect,
@@ -1729,7 +1749,7 @@ void tickAwardSomething(void)
 		}
 		break;
 	case 5:
-		if ((POLLED_INPUT & PADRdown) != 0) {
+		if ((POLLED_INPUT & CONFIRM_BUTTON) != 0) {
 			TAKE_ITEM_FRAME_COUNT = 0;
 			getEntityScreenPos(&TAMER_ENTITY.entity, 1,
 					   screenPos);

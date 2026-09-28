@@ -68,6 +68,7 @@ MAIN_C_SRC := \
 	src/main/partner.c \
 	src/main/sound.c \
 	src/main/sound_async.c \
+	src/main/tamer.c \
 	src/main/toilet_data.c \
 	src/main/tournament.c \
 	src/main/ui.c \
