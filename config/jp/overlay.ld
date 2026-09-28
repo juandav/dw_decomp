@@ -153,6 +153,8 @@ SECTIONS
 		.SHOP {
 			KEEP(BUILD_DIR/asm/shop/data/header.rodata.s.o(.rodata .rodata.*));
 			KEEP(BUILD_DIR/asm/shop/shop.s.o(.text .text.*));
+			BUILD_DIR/src/main/script_menu.c.o(.text .text.*);
+			BUILD_DIR/src/main/script_menu.c.o(.rodata .rodata.*);
 			KEEP(BUILD_DIR/asm/shop/data/shop.data.s.o(.data .data.*));
 			LONG(0);
 		}

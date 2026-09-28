@@ -361,7 +361,11 @@ void pollNextTwoScriptBytes(uint8_t *out1, uint8_t *out2);
 int32_t scriptCompareValues(uint8_t op, uint32_t lhs, uint32_t rhs);
 void skipOneReadInteger(int32_t *out);
 void scriptLearnMove(int32_t moveId);
+#if defined(VERSION_JP)
+uint8_t getCardAmount(int32_t cardId);
+#else
 int32_t getCardAmount(int32_t cardId);
+#endif
 uint32_t dateToSeconds(uint32_t years, uint32_t days, uint32_t hours,
 		       uint32_t minutes);
 void pollNextInt(int32_t *out);
