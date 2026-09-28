@@ -52,6 +52,7 @@ MAIN_C_SRC := \
 	src/main/overworld_moves_box.c \
 	src/main/overworld_moves_text.c \
 	src/main/overworld_playerinfo_text.c \
+	src/main/overworld_status_boxes.c \
 	src/main/particle.c \
 	src/main/sound.c \
 	src/main/sound_async.c \

@@ -8,6 +8,15 @@
 
 #include "common.h"
 
+/* Colors of the two button glyphs in the medal and card view footers */
+#if defined(VERSION_JP)
+#define FOOTER_GLYPH1_COLOR 0xe
+#define FOOTER_GLYPH2_COLOR 0xf
+#else
+#define FOOTER_GLYPH1_COLOR 0xf
+#define FOOTER_GLYPH2_COLOR 7
+#endif
+
 typedef struct {
 	int8_t v[66];
 } CardSprites;
@@ -26,7 +35,7 @@ extern GsRVIEW2 MAIN_D_80123860;
 extern GsRVIEW2 GS_VIEWPOINT;
 extern int32_t VIEWPORT_DISTANCE;
 extern GsF_LIGHT LIGHT_DATA[3];
-void startAnimation(Entity *entity, int32_t animId);
+void startAnimation(Entity *entity, uint8_t animId);
 void tickAnimation(Entity *entity);
 extern char *STATUS_VIEW_LABELS[];
 extern char MAIN_D_80124C24[];
@@ -58,7 +67,7 @@ void renderInsetBox(int16_t a, int16_t b, int16_t c, int16_t d, int32_t otz);
 void renderMedalView(void);
 void renderCardsView(void);
 int32_t drawDigimonStatsStrings(void);
-void renderDigimonStatsBar(int32_t a, int32_t b, int32_t c, int16_t d, int16_t e);
+void renderDigimonStatsBar(int32_t a, int32_t b, int32_t c, int32_t d, int32_t e);
 void renderDigimonStatusConditions(int32_t condition);
 void renderDigiviceEntity(Entity *entity, int32_t entityId);
 
@@ -78,149 +87,116 @@ void renderMedalView(void)
 {
 	int32_t i;
 	int32_t j;
-	int32_t ty;
-	int32_t tv;
-	int32_t state;
 
-	state = MENU_STATE;
-
-	if (state == 1) {
-		goto grid;
-	}
-
-	if (state == 2) {
-		goto cursor;
-	}
-
-	if (state == 3) {
-		goto opening;
-	}
-
-	if (state != 0) {
+	switch (MENU_STATE) {
+	case 0:
+		if (drawMedalViewStrings() == 1) {
+			MENU_STATE = 1;
+		}
 		return;
-	}
+	case 3:
+		if (drawMedalViewStrings() == 1) {
+			MENU_STATE = 2;
+		}
+	case 2:
+		renderRectPolyFT4(((MEDAL_SELECTOR_INDEX % 5) * 38) - 0x7e,
+				  ((MEDAL_SELECTOR_INDEX / 5) * 24) - 0x3d, 0x18, 0x18, 0, 0xd0,
+				  0x18, 0x7dc7, 1, 0);
+	case 1:
+		renderSeperatorLines(MAIN_D_8012472C, 0xe, 5);
+		renderString(3, -0x36, -0x51, 0x6c, 0xc, 0, 0xc, 5, 1);
 
-	if (drawMedalViewStrings() == 1) {
-		MENU_STATE = 1;
-	}
-
-	return;
-
-opening:
-	if (drawMedalViewStrings() == 1) {
-		MENU_STATE = 2;
-	}
-
-cursor:
-	renderRectPolyFT4(((MEDAL_SELECTOR_INDEX % 5) * 38) - 0x7e,
-			  ((MEDAL_SELECTOR_INDEX / 5) * 24) - 0x3d, 0x18, 0x18, 0, 0xd0,
-			  0x18, 0x7dc7, 1, 0);
-
-grid:
-	renderSeperatorLines(MAIN_D_8012472C, 0xe, 5);
-	renderString(3, -0x36, -0x51, 0x6c, 0xc, 0, 0xc, 5, 1);
-
-	for (i = 0; i < 0xf; i++) {
-		if (hasMedal(i) != 0) {
-			if (MEDAL_SELECTOR_INDEX == i) {
-				if (MENU_STATE != 3) {
-					renderString(0, -0x5d, 0x17, 0xac, 0xc, 0, 0x18, 5, 1);
-
-					for (j = 0, tv = 0x24, ty = 0x27; j < 3; j++, ty += 0xd, tv += 0xc) {
-						renderString(0, -0x7e, ty, 0xfc, 0xc, 0, tv, 5, 1);
+		for (i = 0; i < 0xf; i++) {
+			if (hasMedal(i) != 0) {
+				if (MEDAL_SELECTOR_INDEX == i) {
+					if (MENU_STATE != 3) {
+#if defined(VERSION_JP)
+						renderString(0, -0x42, 0x17, 0x84, 0xc, 0, 0x18, 5, 1);
+#else
+						renderString(0, -0x5d, 0x17, 0xac, 0xc, 0, 0x18, 5, 1);
+#endif
+						for (j = 0; j < 3; j++) {
+							renderString(0, -0x7e, j * 13 + 0x27, 0xfc, 0xc, 0,
+								     j * 12 + 0x24, 5, 1);
+						}
 					}
+					renderDigiviceMedals();
 				}
-
-				renderDigiviceMedals();
+			} else {
+#if defined(VERSION_JP)
+				if (MEDAL_SELECTOR_INDEX == i) {
+					renderString(0, -0x42, 0x17, 0xc, 0xc, 0xe4, 0xc, 5, 1);
+					renderString(0, -0x7e, 0x27, 0xc, 0xc, 0xe4, 0xc, 5, 1);
+				}
+#endif
+				renderRectPolyFT4(((i % 5) * 38) - 0x7c, ((i / 5) * 24) - 0x3d, 0xf,
+						  0x18, 0xf0, 0xc8, 0x18, 0x7dc7, 5, 0);
 			}
-		} else {
-			renderRectPolyFT4(((i % 5) * 38) - 0x7c, ((i / 5) * 24) - 0x3d, 0xf,
-					  0x18, 0xf0, 0xc8, 0x18, 0x7dc7, 5, 0);
+
+			renderRectPolyFT4(((i % 5) * 38) - 0x7a, ((i / 5) * 24) - 0x3d, 0xf, 0x18,
+					  0xf0, 0xb0, 0x18, 0x7dc7, 5, 0);
 		}
 
-		renderRectPolyFT4(((i % 5) * 38) - 0x7a, ((i / 5) * 24) - 0x3d, 0xf, 0x18,
-				  0xf0, 0xb0, 0x18, 0x7dc7, 5, 0);
+#if defined(VERSION_JP)
+		renderInsetBox(0x5c, 0x8d, 0x88, 0xe, 5);
+#else
+		renderInsetBox(0x3e, 0x8d, 0xb0, 0xe, 5);
+#endif
+		renderString(FOOTER_GLYPH1_COLOR, -0x23, 0x55, 0xc, 0xc, 0x6c, 0xc, 5, 1);
+		renderString(0, -0x17, 0x55, 0x18, 0xc, 0x84, 0xc, 5, 1);
+		renderString(0, 1, 0x55, 0x24, 0xc, 0x9c, 0xc, 5, 1);
+		renderString(FOOTER_GLYPH2_COLOR, 0x2b, 0x55, 0xc, 0xc, 0x78, 0xc, 5, 1);
+#if defined(VERSION_JP)
+		renderString(0, 0x37, 0x55, 0x18, 0xc, 0x84, 0xc, 5, 1);
+		renderString(0, 0x4f, 0x55, 0x24, 0xc, 0xc0, 0xc, 5, 1);
+#else
+		renderString(0, 0x37, 0x55, 0x30, 0xc, 0xc0, 0xc, 5, 1);
+#endif
 	}
-
-	renderInsetBox(0x3e, 0x8d, 0xb0, 0xe, 5);
-	renderString(0xf, -0x23, 0x55, 0xc, 0xc, 0x6c, 0xc, 5, 1);
-	renderString(0, -0x17, 0x55, 0x18, 0xc, 0x84, 0xc, 5, 1);
-	renderString(0, 1, 0x55, 0x24, 0xc, 0x9c, 0xc, 5, 1);
-	renderString(7, 0x2b, 0x55, 0xc, 0xc, 0x78, 0xc, 5, 1);
-	renderString(0, 0x37, 0x55, 0x30, 0xc, 0xc0, 0xc, 5, 1);
 }
 
 void renderCardsView(void)
 {
 	CardSprites sprites;
-	int32_t col;
-	int32_t colX;
-	int32_t idx;
-	int32_t x1;
-	int32_t x2;
-	int32_t row;
-	int32_t y1;
-	int32_t y2;
+	int32_t j;
+	int32_t i;
 	int8_t card;
-	int32_t state;
+	int8_t amount;
 
 	sprites = MAIN_D_80123E28;
 
-	state = MENU_STATE;
-
-	if (state == 1) {
-		goto grid;
-	}
-
-	if ((state == 3) || (state == 2)) {
-		goto highlight;
-	}
-
-	if (state != 0) {
-		return;
-	}
-
-	if (drawCardViewStrings() == 1) {
-		MENU_STATE = 1;
-	}
-
-	return;
-
-highlight:
-	renderRectPolyFT4(((SELECTED_CARD % 11) * 24) - 0x84,
-			  ((SELECTED_CARD / 11) * 24) - 0x40, 0x18, 0x14, 0, 0xe8,
-			  0x18, 0x7dc7, 5, 0);
-
-grid:
-	for (col = 0, colX = 0; col < 6; col++, colX += 0x18) {
-		col = col;
-		colX = colX;
-		row = 0;
-		idx = (col * 11) + row;
-		x1 = -0x81;
-		x2 = 0x1e;
-		y1 = colX - 0x3e;
-		y2 = colX + 0x39;
-
-		for (; row < 11; row++, x2 += 0x18, x1 += 0x18, idx++) {
-			card = idx;
-
-			if ((int8_t)getCardAmount(card) > 0) {
-				renderRectPolyFT4(x1, y1, 0x10, 0x10, (card % 8) * 32,
-						  (card / 8) * 16, 0x18,
-						  (sprites.v[card] * 64) + 0x7a07, 5, 0);
-			}
-
-			renderSpriteBox(x2, y2, 0x12, 0x12, 0xbebebe, 0x3c3c3c, 0x69, 0x69,
-					0x69, 5);
+	switch (MENU_STATE) {
+	case 0:
+		if (drawCardViewStrings() == 1) {
+			MENU_STATE = 1;
 		}
-	}
+		return;
+	case 2:
+	case 3:
+		renderRectPolyFT4(((SELECTED_CARD % 11) * 24) - 0x84,
+				  ((SELECTED_CARD / 11) * 24) - 0x40, 0x18, 0x14, 0, 0xe8,
+				  0x18, 0x7dc7, 5, 0);
+	case 1:
+		for (i = 0; i < 6; i++) {
+			for (j = 0; j < 11; j++) {
+				card = j + i * 11;
+				amount = getCardAmount(card);
+				if (amount > 0) {
+					renderRectPolyFT4(j * 24 - 0x81, i * 24 - 0x3e, 0x10, 0x10,
+							  (card % 8) * 32, (card / 8) * 16, 0x18,
+							  sprites.v[card] * 64 + 0x7a07, 5, 0);
+				}
+				renderSpriteBox(j * 24 + 0x1e, i * 24 + 0x39, 0x12, 0x12,
+						0xbebebe, 0x3c3c3c, 0x69, 0x69, 0x69, 5);
+			}
+		}
 
-	renderString(3, -0x24, -0x50, 0x48, 0xc, 0, 0xc, 5, 1);
-	renderString(0xf, -0x23, 0x53, 0xc, 0xc, 0x48, 0xc, 5, 1);
-	renderString(0, -0x17, 0x53, 0x3c, 0xc, 0x54, 0xc, 5, 1);
-	renderString(7, 0x2b, 0x53, 0xc, 0xc, 0x90, 0xc, 5, 1);
-	renderString(0, 0x37, 0x53, 0x3c, 0xc, 0x9c, 0xc, 5, 1);
+		renderString(3, -0x24, -0x50, 0x48, 0xc, 0, 0xc, 5, 1);
+		renderString(FOOTER_GLYPH1_COLOR, -0x23, 0x53, 0xc, 0xc, 0x48, 0xc, 5, 1);
+		renderString(0, -0x17, 0x53, 0x3c, 0xc, 0x54, 0xc, 5, 1);
+		renderString(FOOTER_GLYPH2_COLOR, 0x2b, 0x53, 0xc, 0xc, 0x90, 0xc, 5, 1);
+		renderString(0, 0x37, 0x53, 0x3c, 0xc, 0x9c, 0xc, 5, 1);
+	}
 }
 
 static int32_t renderInsetBox__garbage__(int32_t seed)
@@ -262,31 +238,13 @@ static int32_t renderInsetBox__garbage__(int32_t seed)
 	return seed + t0 + t1 + t2 + t3 + t4 + t5 + t6 + t7 + t8 + t9 + t10 + t11 + t12 + t13 + t14 + t15 + t16 + t17 + t18 + t19 + t20 + t21 + t22 + t23 + t24 + t25 + t26 + t27 + t28 + t29 + t30 + t31 + t32;
 }
 
-void renderInsetBox(int16_t a, int16_t b, int16_t c, int16_t d, int32_t otz)
+void renderInsetBox(int16_t x, int16_t y, int16_t w, int16_t h, int32_t otz)
 {
-#ifdef __MWERKS__
-	void renderBoxBar(int32_t x, int32_t y, int32_t w, int32_t h, uint8_t r,
-			  uint8_t g, uint8_t b, uint8_t flags, int32_t otz);
-#endif
-	int32_t x;
-	int32_t y;
-	int32_t y0;
-	int32_t x0;
-	int32_t cc;
-	int32_t dd;
-
-	y = b;
-	x = a;
-	x = (int16_t)(x - 0xa0);
-	y = (int16_t)(y - 0x78);
-	y = y0 = y;
-	x = x0 = x;
-	dd = d;
-	cc = c;
-	renderTrianglePrimitive(0x20202, x0, y0 + dd, x0, y0, x0 + cc, y0, otz, 0);
-	renderTrianglePrimitive(0xa08769, x0, y0 + dd, x0 + cc, y0 + dd, x0 + cc, y0,
-				otz, 0);
-	renderBoxBar(x, y, cc, dd, 0x35, 0x4b, 0x5c, 0, otz);
+	x -= 0xa0;
+	y -= 0x78;
+	renderTrianglePrimitive(0x20202, x, y + h, x, y, x + w, y, otz, 0);
+	renderTrianglePrimitive(0xa08769, x, y + h, x + w, y + h, x + w, y, otz, 0);
+	renderBoxBar(x, y, w, h, 0x35, 0x4b, 0x5c, 0, otz);
 }
 
 void renderBoxBar(int16_t x, int16_t y, int16_t w, int16_t h, uint8_t r,
@@ -331,15 +289,10 @@ void renderBoxBar(int16_t x, int16_t y, int16_t w, int16_t h, uint8_t r,
 void renderSpriteBox(int16_t x, int16_t y, int16_t w, int16_t h, int32_t c1,
 		     int32_t c2, uint8_t r, uint8_t g, uint8_t b, int32_t a10)
 {
-	int32_t py;
-	int32_t px;
-
-	x = x - 0xa0;
-	y = y - 0x78;
-	py = y;
-	px = x;
-	renderTrianglePrimitive(c1, px, py + h, px, py, px + w, py, a10, 0);
-	renderTrianglePrimitive(c2, px, py + h, px + w, py + h, px + w, py, a10, 0);
+	x -= 0xa0;
+	y -= 0x78;
+	renderTrianglePrimitive(c1, x, y + h, x, y, x + w, y, a10, 0);
+	renderTrianglePrimitive(c2, x, y + h, x + w, y + h, x + w, y, a10, 0);
 	renderBoxBar(x, y, w, h, r, g, b, 0, a10);
 }
 
@@ -358,7 +311,11 @@ int32_t drawDigimonStatsStrings(void)
 		MENU_SUB_STATE = 1;
 		break;
 	case 1:
+#if defined(VERSION_JP)
+		drawString(DIGIMON_DATA[ENTITY_TABLE[1]->type].name, 0x9c, 0x24);
+#else
 		drawString(DIGIMON_DATA[ENTITY_TABLE[1]->type].name, 0, 0x48);
+#endif
 		drawString(PARTNER_ENTITY.name, 0, 0x3c);
 		MENU_SUB_STATE = 2;
 		break;
@@ -375,9 +332,17 @@ int32_t drawDigimonStatsStrings(void)
 	return 0;
 }
 
-void renderDigimonStatsBar(int32_t a, int32_t b, int32_t c, int16_t d, int16_t e)
+void renderDigimonStatsBar(a, b, c, d, e)
+	int16_t a;
+	int16_t b;
+	uint8_t c;
+	int16_t d;
+	int16_t e;
 {
-	renderBoxBar(d, e, (uint8_t)(c * a / b), 2, 0x32, 0xc8, 0xc8, 0, 5);
+	uint8_t w;
+
+	w = c * a / b;
+	renderBoxBar(d, e, w, 2, 0x32, 0xc8, 0xc8, 0, 5);
 }
 
 extern uint16_t PLAYTIME_FRAMES;
@@ -469,18 +434,18 @@ static int32_t renderDigiviceEntity__garbage__(int32_t seed)
 
 void renderDigiviceEntity(entity, entityId)
 Entity *entity;
-int16_t entityId;
+int8_t entityId;
 {
 	MATRIX m;
 	VECTOR savedPos;
 	SVECTOR savedRot;
 	GsF_LIGHT lights[3];
 	PositionData *pos;
-	int32_t count;
-	int32_t anim;
 	int32_t type;
-	int32_t i;
 	int32_t bone;
+	int32_t count;
+	int32_t i;
+	uint8_t anim;
 
 	FRAMEBUFFER_OT[0]->length = 9;
 	FRAMEBUFFER_OT[0]->org = FRAMEBUFFER0_ORIGIN;
@@ -497,9 +462,9 @@ int16_t entityId;
 		GsSetFlatLight(i, &lights[i]);
 	}
 
-	pos = entity->posData;
 	type = entity->type;
 	anim = entity->anim.animId;
+	pos = entity->posData;
 	count = DIGIMON_DATA[type].boneCount;
 	savedPos = pos->location;
 	savedRot = pos->rotation;

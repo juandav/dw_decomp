@@ -34,7 +34,7 @@ SECTIONS
         BUILD_DIR/src/main/overworld_evochart_detail.c.o(.text .text.*);
         KEEP(BUILD_DIR/asm/main/32020.s.o(.text .text.*));
         BUILD_DIR/src/main/overworld_evochart_view.c.o(.text .text.*);
-        KEEP(BUILD_DIR/asm/main/35208.s.o(.text .text.*));
+        BUILD_DIR/src/main/overworld_status_boxes.c.o(.text .text.*);
         BUILD_DIR/src/main/overworld_moves_text.c.o(.text .text.*);
         BUILD_DIR/src/main/overworld_moves_box.c.o(.text .text.*);
         BUILD_DIR/src/main/overworld_playerinfo_text.c.o(.text .text.*);
