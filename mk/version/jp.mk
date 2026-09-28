@@ -7,7 +7,7 @@ MAIN_SBSS := \
 	$(GEN_DIR)/unk_0x8013DF94.sbss.s \
 	$(GEN_DIR)/unk_0x8013E1FC.sbss.s \
 	$(GEN_DIR)/unk_0x8013E62E.sbss.s \
-	$(GEN_DIR)/unk_0x8013E66E.sbss.s
+	$(GEN_DIR)/unk_0x8013E676.sbss.s
 
 MAIN_BSS := \
 	$(GEN_DIR)/unk_0x8013E6A8.bss.s \
@@ -68,6 +68,7 @@ $(eval $(call overlay,SHOP,shop))
 $(eval $(call overlay,STD,std))
 TRN2_C_SRC := \
 	src/trn2/trn2_def_map108.c \
+	src/trn2/trn2_def_map99.c \
 	src/trn2/trn2_hp_map107.c \
 	src/trn2/trn2_hp_map99.c \
 	src/trn2/trn2_mp.c \

@@ -10,4 +10,5 @@ subsegments:
   - [0x8013E622, trn_mp]
   - [0x8013E62E, unk_0x8013E62E]
   - [0x8013E664, trn2_hp_map99]
-  - [0x8013E66E, unk_0x8013E66E]
+  - [0x8013E66E, trn2_def_map99]
+  - [0x8013E676, unk_0x8013E676]

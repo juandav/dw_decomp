@@ -60,7 +60,7 @@ segments:
     subalign: 4
     subsegments:
       - [0x40, c, trn2_hp_map99]
-      - [0x560, asm, trn2]
+      - [0x560, c, trn2_def_map99]
       - [0xBA4, c, trn2_hp_map107]
       - [0x1198, c, trn2_mp]
       - [0x1538, asm]
@@ -71,7 +71,8 @@ segments:
       - [0x5FB0, .rodata, trn2_mp]
       - [0x5FCC, data]
       - [0x6004, .rodata, trn2_def_map108]
-      - [0x6020, data]
+      - [0x6020, .rodata, trn2_def_map99]
+      - [0x603C, data]
       - [0x626C, .data, trn2_bss]
 
   - [0x6310]

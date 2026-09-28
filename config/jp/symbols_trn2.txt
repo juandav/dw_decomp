@@ -1,4 +1,6 @@
 TRN2_tickHpTrainingMap99 = 0x80088840;
+TRN2_tickDefenseTrainingMap99 = 0x80088D60;
+TRN2_setupHpTraining = 0x8008929C;
 TRN2_tickHpTrainingMap107 = 0x800893A4;
 TRN2_saveTrainingStartTime = 0x800898BC;
 TRN2_setupMpTraining = 0x800898E8;

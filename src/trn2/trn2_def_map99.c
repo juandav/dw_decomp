@@ -1,9 +1,9 @@
 #include <dw/anim.h>
 #include <dw/entity.h>
+#include <dw/input.h>
 #include <dw/partner.h>
 #include <dw/script.h>
 #include <dw/sound.h>
-#include <dw/tamer.h>
 #include <dw/trn2.h>
 #include <dw/types.h>
 #include <dw/world_object.h>
@@ -12,14 +12,16 @@ extern int32_t TRAINING_COMPLETE;
 extern uint32_t POLLED_INPUT;
 
 void createCameraMovement(VECTOR *pos, int32_t speed);
-void storeMapObjectPosition(int16_t *outX, int16_t *outY, int16_t a, int16_t count);
-void loadMapObjectPosition(int16_t *xData, int16_t *yData, int16_t startIndex, int16_t count);
+void storeMapObjectPosition();
+void loadMapObjectPosition();
 int32_t moveMapObjectsWithLimit(int16_t startIndex, int16_t count, int16_t dx, int16_t dy, int16_t limitX, int16_t limitY);
 void setMapObjectsFlag(int16_t start, int16_t count, int32_t flag);
 void setCameraFollowPlayer(void);
 void createParticleFX(uint8_t kind, int32_t count, void *arg2, Entity *entity, int32_t arg4);
 void resetMapObjectAnimation(int16_t startIndex, int16_t count);
 void entityLookAtLocation(Entity *entity, VECTOR *pos);
+void setTamerState(int8_t state);
+int32_t tickEntityWalkTo();
 
 static void *trn2_def_map99_functions[] = {
 	TRN2_setupHpTraining,
@@ -38,9 +40,11 @@ static void *trn2_def_map99_sbss_order[] = {
 	&MAIN_D_801353BE,
 };
 
-void TRN2_tickDefenseTrainingMap99(int32_t instanceId)
+void TRN2_tickDefenseTrainingMap99(instanceId)
+int16_t instanceId;
 {
 	int32_t r;
+	int32_t done;
 
 	switch (MAIN_D_801353BD) {
 	case 0:
@@ -59,8 +63,8 @@ void TRN2_tickDefenseTrainingMap99(int32_t instanceId)
 			entityLookAtLocation(ENTITY_TABLE[1], &TAMER_ENTITY.entity.posData->location);
 			startAnimation(ENTITY_TABLE[1], 0x25);
 			setMapObjectsFlag(MAIN_D_801353B8, MAIN_D_801353BA, 0);
-			MAIN_D_801353BD = 2;
 			MAIN_D_801353CC = 0;
+			MAIN_D_801353BD = 2;
 			if (MAIN_D_801353BC == 1) {
 				TRN2_startSlotSpin();
 			}
@@ -68,7 +72,8 @@ void TRN2_tickDefenseTrainingMap99(int32_t instanceId)
 		break;
 	case 2:
 		MAIN_D_801353C2++;
-		if (moveMapObjectsWithLimit(MAIN_D_801353B4, MAIN_D_801353B6, 0, 0x28, 0, 0xc8) == 1) {
+		done = moveMapObjectsWithLimit(MAIN_D_801353B4, MAIN_D_801353B6, 0, 0x28, 0, 0xc8);
+		if (done == 1) {
 			createParticleFX(0, 0, &TRN2_D_8008DC3C[0], NULL, 0);
 			setMapObjectsFlag(MAIN_D_801353B8, MAIN_D_801353BA, 1);
 			setMapObjectsFlag(MAIN_D_801353BE, MAIN_D_801353C0, 0);
@@ -89,7 +94,7 @@ void TRN2_tickDefenseTrainingMap99(int32_t instanceId)
 			setMapObjectsFlag(MAIN_D_801353BE, MAIN_D_801353C0, 1);
 			MAIN_D_801353BD = 2;
 		}
-		if (POLLED_INPUT & 0x10) {
+		if (POLLED_INPUT & CANCEL_BUTTON) {
 			MAIN_D_801353C2 = 0x4b0;
 		}
 		r = 10;
@@ -202,7 +207,8 @@ static void trn2_def_map99__garbage__(void)
 	TRN2_D_8008DC54[3] = (v19 * v0) + v1;
 }
 
-void TRN2_setupHpTraining(int32_t arg)
+void TRN2_setupHpTraining(arg)
+int16_t arg;
 {
 	switch (arg) {
 	case 0x6b:
@@ -216,10 +222,14 @@ void TRN2_setupHpTraining(int32_t arg)
 	case 0x63:
 		TRN2_D_8008DC1C.vx = 0;
 		TRN2_D_8008DC1C.vy = 0;
+#if defined(VERSION_JP)
+		TRN2_D_8008DC1C.vz = -0x78;
+#else
 		TRN2_D_8008DC1C.vz = -0x96;
+#endif
+		MAIN_D_801353B4 = 0;
 		MAIN_D_801353B6 = 2;
 		MAIN_D_801353B8 = 0xf;
-		MAIN_D_801353B4 = 0;
 		MAIN_D_801353BA = 0x11;
 		addObject(0xfab, 3, (TickFunction)TRN2_tickHpTrainingMap99, NULL);
 		break;
