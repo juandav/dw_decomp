@@ -196,7 +196,8 @@ SECTIONS
         KEEP(BUILD_DIR/asm/main/data/ADED0.sdata.s.o(.sdata .sdata.*));
         BUILD_DIR/src/endi/endi.c.o(.sdata .sdata.*);
         . = ALIGN(., 4);
-        KEEP(BUILD_DIR/asm/main/data/ADEF8.sdata.s.o(.sdata .sdata.*));
+        BUILD_DIR/src/eab/eab.c.o(.sdata .sdata.*);
+        . = ALIGN(., 4);
         main_SDATA_END = .;
         main_SDATA_SIZE = ABSOLUTE(main_SDATA_END - main_SDATA_START);
 
@@ -256,6 +257,8 @@ SECTIONS
         BUILD_DIR/src/trn2/trn2_hud.c.o(.sbss.*);
         . = ALIGN(., 4);
         BUILD_DIR/generated/unk_0x8013E698.sbss.s.o(.sbss.*);
+        . = ALIGN(., 4);
+        BUILD_DIR/src/eab/eab.c.o(.sbss.*);
         . = ALIGN(., 4);
         main_SBSS_END = .;
         main_SBSS_SIZE = ABSOLUTE(main_SBSS_END - main_SBSS_START);

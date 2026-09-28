@@ -29,3 +29,4 @@ subsegments:
   - [0x8013E678, trn2_reward]
   - [0x8013E67E, trn2_hud]
   - [0x8013E698, unk_0x8013E698]
+  - [0x8013E6A0, eab]

@@ -69,8 +69,9 @@ SECTIONS
 			eab_START = .;
 
 			KEEP(BUILD_DIR/asm/eab/data/header.rodata.s.o(.rodata .rodata.*));
-			KEEP(BUILD_DIR/asm/eab/eab.s.o(.text .text.*));
-			KEEP(BUILD_DIR/asm/eab/data/eab.data.s.o(.data .data.*));
+			BUILD_DIR/src/eab/eab.c.o(.text .text.*);
+			BUILD_DIR/src/eab/eab.c.o(.rodata .rodata.*);
+			BUILD_DIR/src/eab/eab.c.o(.data .data.*);
 			BUILD_DIR/src/eab/eab_bss.c.o(.data .data.*);
 			LONG(0);
 		}

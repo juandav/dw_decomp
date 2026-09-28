@@ -68,8 +68,13 @@ static void *eab_functions[] = {
 	EAB_setEntitiesVisible,
 	EAB_renderFlash,
 	EAB_initializeParticles,
+#if defined(VERSION_JP)
+	EAB_renderSpawn,
+	EAB_tickSpawn,
+#else
 	EAB_tickSpawn,
 	EAB_renderSpawn,
+#endif
 	EAB_removeRings,
 	EAB_renderSpawnRing,
 	EAB_tickSpawnRing,
@@ -89,7 +94,7 @@ SVECTOR MAIN_D_80134C2C = { 0, 0x800, 0, 0 };
 SVECTOR MAIN_D_80134C34 = { 0, 0x800, 0, 0 };
 RGB8 MAIN_D_80134C3C = { 0x0a, 0xff, 0x0a };
 SVECTOR MAIN_D_80134C40 = { 0 };
-uint8_t MAIN_D_80134C48 = 1;
+int8_t MAIN_D_80134C48 = 1;
 
 EabHudState MAIN_D_801353F0;
 
@@ -124,52 +129,53 @@ VECTOR EAB_D_800617C0 = { 0x000000ff, 0x000000ff, 0x000000ff, 0x00000000 };
 
 void EAB_setModelColor(int32_t *color)
 {
-	int32_t *hdr;
 	int32_t *rec;
+	int32_t *hdr;
+	int32_t idx;
 	int32_t i;
 	int32_t count;
-	int32_t t;
-	int32_t idx;
-
-	char (*pr)[0x20];
-	char (*pg)[0x20];
-	char (*pb)[0x20];
+	uint8_t t;
 
 	idx = 0;
-	hdr = (int32_t *)((int32_t)((uint32_t)BOSS_EFE_TMD + 0xc) + (idx * 28));
-	rec = (int32_t *)hdr[4];
+	hdr = (int32_t *)(BOSS_EFE_TMD + 0xc);
+	hdr += idx * 7;
 	count = hdr[5];
-	pr = (char (*)[0x20])((char *)rec + 0x14);
-	pg = (char (*)[0x20])((char *)rec + 0x15);
-	pb = (char (*)[0x20])((char *)rec + 0x16);
+	rec = (int32_t *)hdr[4];
 	for (i = 0; i < count; i++) {
-		t = (*rec >> 24) & 0xff;
-		if ((t == 0x2f) || (t == 0x2d)) {
-			(*pr)[0] = (int16_t)color[0];
-			(*pg)[0] = (int16_t)color[1];
-			(*pb)[0] = (int16_t)color[2];
-			rec = (int32_t *)((int32_t)rec + 0x20);
-			pr++;
-			pg++;
-			pb++;
+		t = *rec >> 24;
+		switch (t) {
+		case 0x2d:
+		case 0x2f:
+			((char (*)[0x20])((char *)rec + 0x14))[0][0] = (int16_t)color[0];
+			((char (*)[0x20])((char *)rec + 0x15))[0][0] = (int16_t)color[1];
+			((char (*)[0x20])((char *)rec + 0x16))[0][0] = (int16_t)color[2];
+			rec += 8;
+			break;
 		}
 	}
 }
 
 void EAB_tickBuildup(void)
 {
+	EabHudState *hud;
 	Entity *entity;
 
-	entity = MAIN_D_801353F0.entity;
-	MAIN_D_801353F0.frame += 1;
-	MAIN_D_801353F0.frame %= 18;
-	if ((MAIN_D_801353F0.frame % 6) == 0) {
+	hud = &MAIN_D_801353F0;
+	entity = hud->entity;
+	hud->frame += 1;
+	hud->frame %= 18;
+	if ((hud->frame % 6) == 0) {
 		EAB_addBuildupRing(entity);
 	}
 }
 
 void EAB_renderBuildup(void)
 {
+	EabHudState *hud;
+	Entity *entity;
+
+	hud = &MAIN_D_801353F0;
+	entity = hud->entity;
 }
 
 void EAB_initializeRings(void)
@@ -222,12 +228,14 @@ int32_t EAB_addBuildupRing(Entity *entity)
 
 void EAB_tickBuildupRing(int32_t id)
 {
-	int16_t *p;
+	EabModelFX *fx;
+	Entity *entity;
 
-	p = &EAB_D_800617D0[id].timer;
-	*p += 1;
-	if (*p >= 0x12) {
-		*p = -1;
+	fx = &EAB_D_800617D0[id];
+	entity = fx->entity;
+	fx->timer += 1;
+	if (fx->timer >= 0x12) {
+		fx->timer = -1;
 		removeObject(0x60d, id);
 	}
 }
@@ -238,15 +246,17 @@ void EAB_renderBuildupRing(int32_t id)
 	VECTOR trans;
 	SVECTOR rot;
 	VECTOR scale;
-	int16_t *p;
+	EabModelFX *fx;
 	Entity *entity;
+	int32_t angle;
 
-	p = &EAB_D_800617D0[id].timer;
-	entity = ((Entity **)p)[1];
+	fx = &EAB_D_800617D0[id];
+	entity = fx->entity;
 	rot = MAIN_D_80134C2C;
 	scale = EAB_D_800616EC;
-	scale.vx = scale.vz = lerp(0x10b8, 0x614, 1, 0x12, p[0]);
-	scale.vy = ((_sin(lerp(0, 0x80, 1, 0x12, p[0])) * 0xc3c) / 4096) + 0x15c;
+	scale.vx = scale.vz = lerp(0x10b8, 0x614, 1, 0x12, fx->timer);
+	angle = lerp(0, 0x80, 1, 0x12, fx->timer);
+	scale.vy = ((_sin(angle) * 0xc3c) / 4096) + 0x15c;
 	copyVector(&trans, &entity->posData->location);
 	renderTMDModel((uint8_t *)BOSS_EFE_TMD, 0, &coord, NULL, &trans, &rot, &scale);
 }
@@ -275,12 +285,14 @@ int32_t EAB_addSpawnRing(Entity *entity)
 
 void EAB_tickSpawnRing(int32_t id)
 {
-	int16_t *p;
+	EabModelFX *fx;
+	Entity *entity;
 
-	p = &EAB_D_800617D0[id].timer;
-	*p += 1;
-	if (*p >= 9) {
-		*p = -1;
+	fx = &EAB_D_800617D0[id];
+	entity = fx->entity;
+	fx->timer += 1;
+	if (fx->timer >= 9) {
+		fx->timer = -1;
 		removeObject(0x60d, id);
 	}
 }
@@ -291,15 +303,17 @@ void EAB_renderSpawnRing(int32_t id)
 	VECTOR trans;
 	SVECTOR rot;
 	VECTOR scale;
-	int16_t *p;
+	EabModelFX *fx;
 	Entity *entity;
+	int32_t angle;
 
-	p = &EAB_D_800617D0[id].timer;
-	entity = ((Entity **)p)[1];
+	fx = &EAB_D_800617D0[id];
+	entity = fx->entity;
 	rot = MAIN_D_80134C34;
 	scale = EAB_D_800616FC;
-	scale.vx = scale.vz = lerp(0x16cc, 0x10b8, 1, 0x12, p[0]);
-	scale.vy = ((_sin(lerp(0, 0x80, 1, 0x12, p[0])) * 0x2b8) / 4096) + 0xae;
+	scale.vx = scale.vz = lerp(0x16cc, 0x10b8, 1, 0x12, fx->timer);
+	angle = lerp(0, 0x80, 1, 0x12, fx->timer);
+	scale.vy = ((_sin(angle) * 0x2b8) / 4096) + 0xae;
 	copyVector(&trans, &entity->posData->location);
 	renderTMDModel((uint8_t *)BOSS_EFE_TMD, 0, &coord, NULL, &trans, &rot, &scale);
 }
@@ -329,6 +343,9 @@ void EAB_tickSpawn(int32_t instanceId)
 	VECTOR viewRef;
 	VECTOR viewPos;
 	SVECTOR rotation;
+	int32_t angle;
+	int32_t distance;
+	int32_t height;
 	Entity *entity;
 	EabState *state;
 
@@ -375,8 +392,8 @@ void EAB_tickSpawn(int32_t instanceId)
 			particleColor = MAIN_D_80134C3C;
 			particleColor.g = lerp(0x32, 0xe6, 1, 5,
 			                       EAB_D_8006179C[state->frame % 18]);
-			particleColor.g = particleColor.g *
-			                  _sin(lerp(0, 0x80, 0x32, 0x122, state->frame)) / 4096;
+			angle = lerp(0, 0x80, 0x32, 0x122, state->frame);
+			particleColor.g = particleColor.g * _sin(angle) / 4096;
 			EAB_addParticle(&entity->posData->location, &particleColor);
 		}
 		overlayColor = EAB_D_800617C0;
@@ -392,9 +409,10 @@ void EAB_tickSpawn(int32_t instanceId)
 			rotation.vy = 0x171c;
 		}
 		rotation.vy += entity->posData->rotation.vy;
+		distance = lerp(0xdac, 0xbb8, 0x32, 0x140, state->frame);
+		height = lerp(0x258, 0x32, 0x32, 0x140, state->frame);
 		EAB_calculateCameraOrbit(&viewRef, &viewPos, entity, &rotation,
-		                         lerp(0xdac, 0xbb8, 0x32, 0x140, state->frame),
-		                         lerp(0x258, 0x32, 0x32, 0x140, state->frame));
+		                         distance, height);
 		GS_VIEWPOINT.vrx = viewRef.vx;
 		GS_VIEWPOINT.vry = viewRef.vy;
 		GS_VIEWPOINT.vrz = viewRef.vz;
@@ -441,8 +459,10 @@ void EAB_initializeParticles(void)
 void EAB_renderFlash(VECTOR *color)
 {
 	POLY_FT4 *prim;
+	int32_t depth;
 
 	prim = (POLY_FT4 *)GsGetWorkBase();
+	depth = 0xa;
 	SetPolyFT4(prim);
 	SetSemiTrans(prim, 1);
 	prim->tpage = getTPage(1, 2, 832, 256);
@@ -450,7 +470,7 @@ void EAB_renderFlash(VECTOR *color)
 	setXYWH(prim, -0xa0, -0x78, 320, 240);
 	setUVWH(prim, 0, 0x80, 3, 3);
 	setRGB0(prim, color->vx, color->vy, color->vz);
-	AddPrim(ACTIVE_ORDERING_TABLE->org + 0xa, prim);
+	AddPrim(ACTIVE_ORDERING_TABLE->org + depth, prim);
 	prim++;
 	GsSetWorkBase((PACKET *)prim);
 }
@@ -508,8 +528,10 @@ int32_t EAB_addParticle(VECTOR *position, RGB8 *color)
 void EAB_renderBackdrop(VECTOR *color)
 {
 	POLY_FT4 *prim;
+	int32_t depth;
 
 	prim = (POLY_FT4 *)GsGetWorkBase();
+	depth = 0xfa0;
 	SetPolyFT4(prim);
 	SetSemiTrans(prim, 1);
 	prim->tpage = getTPage(1, 2, 832, 256);
@@ -517,7 +539,7 @@ void EAB_renderBackdrop(VECTOR *color)
 	setXY4(prim, -DRAWING_OFFSET_X, -DRAWING_OFFSET_Y, 0x140 - DRAWING_OFFSET_X, -DRAWING_OFFSET_Y, -DRAWING_OFFSET_X, 0xf0 - DRAWING_OFFSET_Y, 0x140 - DRAWING_OFFSET_X, 0xf0 - DRAWING_OFFSET_Y);
 	setUVWH(prim, 0, 0x80, 3, 3);
 	setRGB0(prim, color->vx, color->vy, color->vz);
-	AddPrim(ACTIVE_ORDERING_TABLE->org + 0xfa0, prim);
+	AddPrim(ACTIVE_ORDERING_TABLE->org + depth, prim);
 	prim++;
 	GsSetWorkBase((PACKET *)prim);
 }
@@ -573,14 +595,13 @@ void EAB_tickParticle(int32_t id)
 
 void EAB_renderParticle(int32_t id)
 {
+	int32_t size;
 	SVECTOR corners[4];
 	DVECTOR screen[4];
 	int32_t depth[4];
 	EabParticle *e;
 	LINE_F2 *prim;
-	int32_t size;
 	int32_t i;
-	int32_t j;
 
 	e = &EAB_D_80061A10[id];
 	size = lerp(8, 0x9c4, 0, 0x56, e->timer);
@@ -601,11 +622,10 @@ void EAB_renderParticle(int32_t id)
 	prim = (LINE_F2 *)GsGetWorkBase();
 	for (i = 0; i < 4; i++) {
 		if ((*(int32_t *)&depth[i] > 0x20) && (depth[i] < 0x1000)) {
-			j = (i + 1) % 4;
-			if ((*(int32_t *)&depth[j] > 0x20) && (depth[j] < 0x1000)) {
+			if ((*(int32_t *)&depth[(i + 1) % 4] > 0x20) && (depth[(i + 1) % 4] < 0x1000)) {
 				SetLineF2(prim);
 				setRGB0(prim, lerp(e->r, 0, 0, 0x56, e->timer), lerp(e->g, 0, 0, 0x56, e->timer), lerp(e->b, 0, 0, 0x56, e->timer));
-				setXY2(prim, screen[i].vx, screen[i].vy, screen[j].vx, screen[j].vy);
+				setXY2(prim, screen[i].vx, screen[i].vy, screen[(i + 1) % 4].vx, screen[(i + 1) % 4].vy);
 				AddPrim(ACTIVE_ORDERING_TABLE->org + 0xf9f, prim++);
 			}
 		}
@@ -617,27 +637,37 @@ void EAB_renderParticle(int32_t id)
 void EAB_startBuildup(Entity *entity)
 {
 	VECTOR color;
+	EabHudState *hud;
+	int32_t id;
 
+	hud = &MAIN_D_801353F0;
+	id = 0;
 	GsMapModelingData((unsigned long *)(BOSS_EFE_TMD + 4));
 	color = EAB_D_800616DC;
 	EAB_setModelColor((int32_t *)&color);
-	MAIN_D_801353F0.frame = 0;
-	MAIN_D_801353F0.phase = 0;
-	MAIN_D_801353F0.entity = entity;
-	addObject(0x60b, 0, (TickFunction)EAB_tickBuildup, (RenderFunction)EAB_renderBuildup);
+	hud->frame = 0;
+	hud->phase = 0;
+	hud->entity = entity;
+	addObject(0x60b, id, (TickFunction)EAB_tickBuildup, (RenderFunction)EAB_renderBuildup);
 	EAB_initializeRings();
 	entity->isOnMap = 0;
 	playSound2(8, 0);
 }
 
-int32_t EAB_tick(Entity *entity, int32_t isInitialized)
+// clang-format off
+int32_t EAB_tick(entity, isInitialized)
+	Entity *entity;
+	int16_t isInitialized;
+// clang-format on
 {
+	int32_t id;
 	VECTOR colorEnd;
 	VECTOR colorStart;
 	EabState *state;
 	int32_t i;
 
 	state = &EAB_D_800617E8;
+	id = 0;
 	if (isInitialized != 0) {
 		return state->frame;
 	}
@@ -646,7 +676,7 @@ int32_t EAB_tick(Entity *entity, int32_t isInitialized)
 	state->phase = 0;
 	state->entity = entity;
 	state->location = entity->posData->location;
-	addObject(0x60c, 0, EAB_tickSpawn, (RenderFunction)EAB_renderSpawn);
+	addObject(0x60c, id, EAB_tickSpawn, (RenderFunction)EAB_renderSpawn);
 	EAB_initializeParticles();
 	initializeFlashData((char *)EAB_D_80061800.data);
 	for (i = 0; i < 9; i++) {
