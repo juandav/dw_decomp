@@ -133,6 +133,8 @@ SECTIONS
         BUILD_DIR/src/main/file_queue.c.o(.sbss.*);
         . = ALIGN(., 4);
         BUILD_DIR/generated/unk_0x8013E1FC.sbss.s.o(.sbss.*);
+        BUILD_DIR/src/trn/trn_mp.c.o(.sbss.*);
+        BUILD_DIR/generated/unk_0x8013E62E.sbss.s.o(.sbss.*);
         BUILD_DIR/src/trn2/trn2_hp_map99.c.o(.sbss.*);
         BUILD_DIR/generated/unk_0x8013E66E.sbss.s.o(.sbss.*);
         . = ALIGN(., 4);

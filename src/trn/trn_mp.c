@@ -1,10 +1,10 @@
 #include <dw/anim.h>
 #include <dw/entity.h>
+#include <dw/input.h>
 #include <dw/params.h>
 #include <dw/partner.h>
 #include <dw/script.h>
 #include <dw/sound.h>
-#include <dw/tamer.h>
 #include <dw/training.h>
 #include <dw/trn.h>
 #include <dw/types.h>
@@ -14,11 +14,13 @@ extern uint32_t POLLED_INPUT;
 extern int32_t TRAINING_COMPLETE;
 
 void createCameraMovement(VECTOR *pos, int32_t speed);
-void storeMapObjectPosition(int16_t *outX, int16_t *outY, int16_t a, int16_t count);
-void loadMapObjectPosition(int16_t *xData, int16_t *yData, int16_t startIndex, int16_t count);
+void storeMapObjectPosition();
+void loadMapObjectPosition();
 void setMapObjectsFlag(int16_t start, int16_t count, int32_t flag);
 void moveMapObjects(int32_t startIndex, int32_t count, int32_t dx, int32_t dy);
 void getDrawPosition(SVECTOR *worldPos, int16_t *outX, int16_t *outY);
+void setTamerState(int8_t state);
+int32_t tickEntityWalkTo();
 
 static void *trn_mp_functions[] = {
 	TRN_tickMpTraining,
@@ -41,7 +43,8 @@ static void *trn_mp_sbss_order[] = {
 	&MAIN_D_80135372,
 };
 
-void TRN_tickMpTraining(int32_t instanceId)
+void TRN_tickMpTraining(instanceId)
+int16_t instanceId;
 {
 	SVECTOR svec;
 	SVECTOR screen;
@@ -88,7 +91,7 @@ void TRN_tickMpTraining(int32_t instanceId)
 		if (MAIN_D_80135370 == 1) {
 			r = TRN_getSlotSessionResult();
 		}
-		if ((((MAIN_D_8013537A >= 0x4b0) || (POLLED_INPUT & 0x10)) && (MAIN_D_80135370 == 0)) || ((MAIN_D_80135370 == 1) && (r >= 0))) {
+		if ((((MAIN_D_8013537A >= 0x4b0) || (POLLED_INPUT & CANCEL_BUTTON)) && (MAIN_D_80135370 == 0)) || ((MAIN_D_80135370 == 1) && (r >= 0))) {
 			TRN_awardMpTrainingGains(PARTNER_ENTITY.digimonEntity.entity.type, 0, r);
 			setMapObjectsFlag(MAIN_D_80135372, MAIN_D_80135374, 0);
 			setMapObjectsFlag(MAIN_D_80135376, MAIN_D_80135378, 1);
@@ -193,7 +196,8 @@ static void trn_mp__garbage__(void)
 	TRN_D_8008F368[3] = (v19 * v0) + v1;
 }
 
-void TRN_setupMpTraining(int32_t arg)
+void TRN_setupMpTraining(arg)
+int16_t arg;
 {
 	if (arg == 0x70) {
 		TRN_D_8008F330.vx = 0x290;

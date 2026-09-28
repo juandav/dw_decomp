@@ -6,6 +6,7 @@ MAIN_SBSS := \
 	$(GEN_DIR)/unk_0x8013DF1C.sbss.s \
 	$(GEN_DIR)/unk_0x8013DF94.sbss.s \
 	$(GEN_DIR)/unk_0x8013E1FC.sbss.s \
+	$(GEN_DIR)/unk_0x8013E62E.sbss.s \
 	$(GEN_DIR)/unk_0x8013E66E.sbss.s
 
 MAIN_BSS := \
@@ -74,6 +75,7 @@ TRN2_C_SRC := \
 
 $(eval $(call overlay,TRN2,trn2))
 TRN_C_SRC := \
+	src/trn/trn_mp.c \
 	src/trn/trn_speed.c \
 	src/trn/trn_bss.c
 
