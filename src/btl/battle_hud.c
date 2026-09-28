@@ -655,6 +655,7 @@ void BTL_appendMoveLearnedText(int32_t move)
 void BTL_drawBattleEndText(int32_t flag)
 {
 	uint8_t c;
+	uint16_t glyph;
 	uint16_t w;
 
 	while (flag) {
@@ -683,7 +684,8 @@ void BTL_drawBattleEndText(int32_t flag)
 		if (c == '0') {
 			return;
 		}
-		w = drawGlyph(swapShortBytes(convertAsciiToJis(c)), BATTLE_END_PEN_X, BATTLE_END_PEN_Y);
+		glyph = swapShortBytes(convertAsciiToJis(c));
+		w = drawGlyph(glyph, BATTLE_END_PEN_X, BATTLE_END_PEN_Y);
 		BATTLE_END_PEN_X += w;
 		BATTLE_END_CURSOR++;
 		return;

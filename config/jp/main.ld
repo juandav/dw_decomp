@@ -23,6 +23,8 @@ SECTIONS
         BUILD_DIR/src/main/file.c.o(.text .text.*);
         BUILD_DIR/src/main/math.c.o(.text .text.*);
         KEEP(BUILD_DIR/asm/main/14DF8.s.o(.text .text.*));
+        BUILD_DIR/src/main/font.c.o(.text .text.*);
+        KEEP(BUILD_DIR/asm/main/15BCC.s.o(.text .text.*));
         BUILD_DIR/src/main/_psstart.c.o(.text .text.*);
         KEEP(BUILD_DIR/asm/main/16190.s.o(.text .text.*));
         BUILD_DIR/src/main/fade.c.o(.text .text.*);
@@ -78,6 +80,8 @@ SECTIONS
 
         main_DATA_START = .;
         KEEP(BUILD_DIR/asm/main/data/main.data.s.o(.data .data.*));
+        BUILD_DIR/src/main/font.c.o(.data .data.*);
+        KEEP(BUILD_DIR/asm/main/data/9E298.data.s.o(.data .data.*));
         BUILD_DIR/src/main/toilet_data.c.o(.data .data.*);
         BUILD_DIR/src/main/door_mapdata.c.o(.data .data.*);
         BUILD_DIR/src/main/efe.c.o(.data .data.*);
@@ -99,6 +103,9 @@ SECTIONS
 
         main_SDATA_START = .;
         KEEP(BUILD_DIR/asm/main/data/main.sdata.s.o(.sdata .sdata.*));
+        BUILD_DIR/src/main/font.c.o(.sdata .sdata.*);
+        . = ALIGN(., 4);
+        KEEP(BUILD_DIR/asm/main/data/AD4C0.sdata.s.o(.sdata .sdata.*));
         BUILD_DIR/src/main/efe.c.o(.sdata .sdata.*);
         . = ALIGN(., 4);
         KEEP(BUILD_DIR/asm/main/data/AD4F0.sdata.s.o(.sdata .sdata.*));
@@ -142,7 +149,9 @@ SECTIONS
     sbss_ROM_START = __romPos;
     .sbss main_SBSS_START : AT(sbss_ROM_START)
     {
-        BUILD_DIR/generated/unk_0x8013DF1C.sbss.s.o(.sbss.*);
+        BUILD_DIR/src/main/font.c.o(.sbss.*);
+        . = ALIGN(., 4);
+        BUILD_DIR/generated/unk_0x8013DF20.sbss.s.o(.sbss.*);
         . = ALIGN(., 4);
         BUILD_DIR/src/main/fade.c.o(.sbss.*);
         . = ALIGN(., 4);
@@ -192,6 +201,10 @@ SECTIONS
         BUILD_DIR/src/main/world_object.c.o(.bss.*);
         . = ALIGN(., 4);
         BUILD_DIR/generated/unk_0x80140CF4.bss.s.o(.bss.*);
+        . = ALIGN(., 4);
+        BUILD_DIR/src/main/font.c.o(.bss.*);
+        . = ALIGN(., 4);
+        BUILD_DIR/generated/unk_0x801414B8.bss.s.o(.bss.*);
         . = ALIGN(., 4);
         BUILD_DIR/src/main/file_queue.c.o(.bss.*);
         . = ALIGN(., 4);

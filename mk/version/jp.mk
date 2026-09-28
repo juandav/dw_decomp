@@ -3,7 +3,7 @@ EXE_NAME := SLPS_017.97
 MWCC_OPT_LEVEL := 0
 
 MAIN_SBSS := \
-	$(GEN_DIR)/unk_0x8013DF1C.sbss.s \
+	$(GEN_DIR)/unk_0x8013DF20.sbss.s \
 	$(GEN_DIR)/unk_0x8013DF94.sbss.s \
 	$(GEN_DIR)/unk_0x8013E1FC.sbss.s \
 	$(GEN_DIR)/unk_0x8013E228.sbss.s \
@@ -15,6 +15,7 @@ MAIN_SBSS := \
 MAIN_BSS := \
 	$(GEN_DIR)/unk_0x8013E6A8.bss.s \
 	$(GEN_DIR)/unk_0x80140CF4.bss.s \
+	$(GEN_DIR)/unk_0x801414B8.bss.s \
 	$(GEN_DIR)/unk_0x80168460.bss.s \
 	$(GEN_DIR)/unk_0x80168920.bss.s
 
@@ -35,6 +36,7 @@ MAIN_C_SRC := \
 	src/main/file.c \
 	src/main/file_queue.c \
 	src/main/fish.c \
+	src/main/font.c \
 	src/main/kar.c \
 	src/main/map_collision.c \
 	src/main/math.c \

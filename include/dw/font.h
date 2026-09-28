@@ -9,7 +9,11 @@ void initializeFontCLUT(void);
 void clearTextArea(void);
 void clearTextSubArea(RECT *rect);
 void setTextColor(int32_t color);
-int32_t drawGlyph(uint16_t codepoint, int32_t x, int32_t y);
-void drawString(/* char *str, uint16_t x, int32_t y */);
+#if defined(VERSION_JP)
+void drawGlyph(uint16_t codepoint, uint16_t x, uint16_t y);
+#else
+int32_t drawGlyph(/* uint16_t codepoint, uint16_t x, uint16_t y */);
+#endif
+void drawString(/* char *str, uint16_t x, uint16_t y */);
 
 #endif
