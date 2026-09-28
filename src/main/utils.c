@@ -13,11 +13,22 @@
 
 #define shop_START		((char *)0x80080800)
 
+#if defined(VERSION_JP)
+#define DIGIT_WIDTH 12
+#else
+#define DIGIT_WIDTH 8
+#endif
+
 void damageTick(FighterData* fighter, Stats* stats);
 void sortItemsById(uint8_t *data, int32_t count);
 void initStringFT4(POLY_FT4* poly);
-void renderNumber(int32_t color, int32_t x, int16_t y, int32_t n,
+#if defined(VERSION_JP)
+void renderNumber(int32_t color, int16_t x, int16_t y, int16_t n,
 		  int32_t value, int32_t layer);
+#else
+void renderNumber(int32_t color, int16_t x, int16_t y, int32_t n,
+		  int32_t value, int32_t layer);
+#endif
 void convertValueToDigits(int32_t n, int32_t value, int32_t *outCount,
 			  int32_t *digits);
 void pauseFrame(void);
@@ -168,7 +179,11 @@ uint8_t CONCAVE_SCREENS[18] = {
 	0x0d, 0x65,
 };
 
+#if defined(VERSION_JP)
+char MAIN_D_80134430[] = "ポーズ";
+#else
 char MAIN_D_80134430[] = "Pause";
+#endif
 // clang-format on
 
 void pauseFrame(void)
@@ -211,7 +226,11 @@ void damageTick(FighterData* fighter, Stats* stats)
 		fighter->hpDamageBuffer -= 1;
 	}
 
+#if defined(VERSION_JP)
+	if (stats->current.currentHP < 0) {
+#else
 	if (stats->current.currentHP <= 0) {
+#endif
 		stats->current.currentHP = 0;
 		fighter->hpDamageBuffer = 0;
 	}
@@ -223,21 +242,22 @@ void sortItemsById(uint8_t *data, int32_t count)
 	int32_t j;
 	int16_t minIdx;
 	uint8_t minVal;
-	uint8_t *dst;
 
-	for (i = 0, dst = data; i < count; ++i, ++dst) {
+	for (i = 0; i < count; i++) {
 		minVal = data[i];
 		minIdx = i;
 
-		for (j = i; j < count; ++j) {
-			if (data[j] < minVal) {
+		for (j = i; j < count; j++) {
+			if (minVal > data[j]) {
 				minIdx = j;
 				minVal = data[j];
 			}
 		}
 
-		swapByte(dst, &data[minIdx]);
+		swapByte(&data[i], &data[minIdx]);
 	}
+
+	(void)j;
 }
 
 void swapByte(uint8_t *a, uint8_t *b)
@@ -267,11 +287,13 @@ void swapInt(int32_t *a, int32_t *b)
 	*b = tmp;
 }
 
-void getEntityScreenPos(Entity *e, int32_t boneId, int16_t *out)
+void getEntityScreenPos(e, boneId, out)
+Entity *e;
+int16_t boneId;
+int16_t *out;
 {
 	MATRIX *w;
 	SVECTOR v;
-	int16_t ox;
 
 	GsSetLsMatrix(&GsWSMATRIX);
 	w = &e->posData[boneId].posMatrix.workm;
@@ -281,12 +303,14 @@ void getEntityScreenPos(Entity *e, int32_t boneId, int16_t *out)
 	gte_ldv0(&v);
 	gte_rtps();
 	gte_stsxy((long *)out);
-	ox = 0xA0 - DRAWING_OFFSET_X;
-	out[0] = out[0] - ox;
+	out[0] -= 0xA0 - DRAWING_OFFSET_X;
 	out[1] -= 0x78 - DRAWING_OFFSET_Y;
 }
 
-void setEntityTextDigit(POLY_FT4* poly, int32_t x, int32_t y)
+void setEntityTextDigit(poly, x, y)
+POLY_FT4 *poly;
+int16_t x;
+int16_t y;
 {
 	SetPolyFT4(poly);
 	poly->tpage = getTPage(0, 0, 896, 256);
@@ -300,8 +324,13 @@ void initStringFT4(POLY_FT4* poly)
 	setClut(poly, 0xD0, 0x1E8);
 }
 
-void renderNumber(int32_t color, int32_t x, int16_t y, int32_t n,
+#if defined(VERSION_JP)
+void renderNumber(int32_t color, int16_t x, int16_t y, int16_t n,
 		  int32_t value, int32_t layer)
+#else
+void renderNumber(int32_t color, int16_t x, int16_t y, int32_t n,
+		  int32_t value, int32_t layer)
+#endif
 {
 	POLY_FT4 *prim;
 	int32_t i;
@@ -316,14 +345,36 @@ void renderNumber(int32_t color, int32_t x, int16_t y, int32_t n,
 		initStringFT4(prim);
 		setRGB0(prim, TEXT_COLORS[color].r, TEXT_COLORS[color].g,
 			TEXT_COLORS[color].g);
-		setUVDataPolyFT4(prim, buf[i] * 8, 0xf0, 8, 12);
-		setPosDataPolyFT4(prim, x + (((n - 1) - i) * 8), y, 8, 12);
+		setUVDataPolyFT4(prim, buf[i] * DIGIT_WIDTH, 0xf0, DIGIT_WIDTH, 12);
+		setPosDataPolyFT4(prim, x + (((n - 1) - i) * DIGIT_WIDTH), y, DIGIT_WIDTH, 12);
 		AddPrim(ACTIVE_ORDERING_TABLE->org + layer, prim++);
 	}
 
 	GsSetWorkBase((PACKET *)prim);
 }
 
+#if defined(VERSION_JP)
+void convertValueToDigits(int32_t n, int32_t value, int32_t *outCount,
+			  int32_t *digits)
+{
+	char buf[8];
+	int32_t i;
+
+	sprintf(buf, &MAIN_D_8012B94C[(n - 1) * 5], value);
+	for (i = 0; i < n; i++) {
+		*(digits + n - 1 - i) = buf[i] - '0';
+	}
+	*outCount = n;
+	for (i = n - 1; i >= 0; i--) {
+		if (digits[i] != 0) {
+			break;
+		}
+		if (i != 0) {
+			(*outCount)--;
+		}
+	}
+}
+#else
 void convertValueToDigits(int32_t n, int32_t value, int32_t *outCount,
 			  int32_t *digits)
 {
@@ -355,6 +406,7 @@ void convertValueToDigits(int32_t n, int32_t value, int32_t *outCount,
 		}
 	}
 }
+#endif
 
 void setUVDataPolyFT4(POLY_FT4 *p, int16_t u, int16_t v, int16_t w, int16_t h)
 {

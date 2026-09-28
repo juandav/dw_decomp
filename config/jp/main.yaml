@@ -26,6 +26,8 @@ options:
   symbol_addrs_path:
     - config/jp/symbols.txt
     - config/jp/symbols_main.txt
+  reloc_addrs_path:
+    - config/jp/relocs_main.txt
 
   undefined_funcs_auto_path: build/jp/psx/generated/undefined_funcs_auto_main.txt
   undefined_syms_auto_path: build/jp/psx/generated/undefined_syms_auto_main.txt
@@ -85,7 +87,8 @@ segments:
       - [0x707DC, c, file_queue]
       - [0x70ECC, asm]
       - [0x729B4, c, fish]
-      - [0x72DFC, asm]
+      - [0x72DFC, c, utils]
+      - [0x737BC, asm]
       - [0x75268, c, tournament]
       - [0x7587C, c, evl]
       - [0x75B80, asm]
@@ -112,6 +115,7 @@ segments:
       - [0x9F198, data]
       - [0xA6BDC, .data, entity_text]
       - [0xA6BF4, data]
+      - [0xA881C, .data, utils]
       - [0xA8A38, .data, efe_table]
       - [0xA8A78, .data, sound_async]
       - [0xA8AD4, data]
@@ -126,6 +130,7 @@ segments:
       - [0xAD6C4, sdata]
       - [0xAD7C4, .sdata, file_queue]
       - [0xAD7C8, sdata]
+      - [0xAD7CC, .sdata, utils]
       - [0xAD7D4, .sdata, efe_table]
       - [0xAD7D8, .sdata, sound_async]
       - [0xAD7F8, sdata]

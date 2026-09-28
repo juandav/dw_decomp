@@ -1,0 +1,16 @@
+rom:0x000A8870 reloc:MIPS_32 symbol:btl_START
+rom:0x000A8874 reloc:MIPS_32 symbol:std_START
+rom:0x000A8878 reloc:MIPS_32 symbol:fish_START
+rom:0x000A887C reloc:MIPS_32 symbol:evl_START
+rom:0x000A8880 reloc:MIPS_32 symbol:kar_START
+rom:0x000A8884 reloc:MIPS_32 symbol:vs_START
+rom:0x000A8888 reloc:MIPS_32 symbol:mov_START
+rom:0x000A888C reloc:MIPS_32 symbol:doo2_START
+rom:0x000A8890 reloc:MIPS_32 symbol:dooa_START
+rom:0x000A8894 reloc:MIPS_32 symbol:trn_START
+//rom:0x000A8898 reloc:MIPS_32 symbol:SHOP_D_80080800
+rom:0x000A889C reloc:MIPS_32 symbol:dget_START
+rom:0x000A88A0 reloc:MIPS_32 symbol:trn2_START
+rom:0x000A88A4 reloc:MIPS_32 symbol:murd_START
+rom:0x000A88A8 reloc:MIPS_32 symbol:endi_START
+rom:0x000A88AC reloc:MIPS_32 symbol:eab_START

@@ -45,7 +45,8 @@ SECTIONS
         BUILD_DIR/src/main/file_queue.c.o(.text .text.*);
         KEEP(BUILD_DIR/asm/main/70ECC.s.o(.text .text.*));
         BUILD_DIR/src/main/fish.c.o(.text .text.*);
-        KEEP(BUILD_DIR/asm/main/72DFC.s.o(.text .text.*));
+        BUILD_DIR/src/main/utils.c.o(.text .text.*);
+        KEEP(BUILD_DIR/asm/main/737BC.s.o(.text .text.*));
         BUILD_DIR/src/main/tournament.c.o(.text .text.*);
         BUILD_DIR/src/main/evl.c.o(.text .text.*);
         KEEP(BUILD_DIR/asm/main/75B80.s.o(.text .text.*));
@@ -81,6 +82,7 @@ SECTIONS
         KEEP(BUILD_DIR/asm/main/data/9F198.data.s.o(.data .data.*));
         BUILD_DIR/src/main/entity_text.c.o(.data .data.*);
         KEEP(BUILD_DIR/asm/main/data/A6BF4.data.s.o(.data .data.*));
+        BUILD_DIR/src/main/utils.c.o(.data .data.*);
         BUILD_DIR/src/main/efe_table.c.o(.data .data.*);
         BUILD_DIR/src/main/sound_async.c.o(.data .data.*);
         KEEP(BUILD_DIR/asm/main/data/A8AD4.data.s.o(.data .data.*));
@@ -102,6 +104,8 @@ SECTIONS
         BUILD_DIR/src/main/file_queue.c.o(.sdata .sdata.*);
         . = ALIGN(., 4);
         KEEP(BUILD_DIR/asm/main/data/AD7C8.sdata.s.o(.sdata .sdata.*));
+        BUILD_DIR/src/main/utils.c.o(.sdata .sdata.*);
+        . = ALIGN(., 4);
         BUILD_DIR/src/main/efe_table.c.o(.sdata .sdata.*);
         . = ALIGN(., 4);
         BUILD_DIR/src/main/sound_async.c.o(.sdata .sdata.*);

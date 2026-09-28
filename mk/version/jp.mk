@@ -45,6 +45,7 @@ MAIN_C_SRC := \
 	src/main/sound_async.c \
 	src/main/toilet_data.c \
 	src/main/tournament.c \
+	src/main/utils.c \
 	src/main/world_object.c
 
 $(eval $(call unit,MAIN,main))
