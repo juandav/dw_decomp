@@ -43,7 +43,7 @@ SECTIONS
         BUILD_DIR/src/main/overworld_card_text.c.o(.text .text.*);
         BUILD_DIR/src/main/map_collision.c.o(.text .text.*);
         BUILD_DIR/src/main/particle.c.o(.text .text.*);
-        KEEP(BUILD_DIR/asm/main/39950.s.o(.text .text.*));
+        BUILD_DIR/src/main/anim.c.o(.text .text.*);
         BUILD_DIR/src/main/ui.c.o(.text .text.*);
         KEEP(BUILD_DIR/asm/main/3C720.s.o(.text .text.*));
         BUILD_DIR/src/main/sound.c.o(.text .text.*);

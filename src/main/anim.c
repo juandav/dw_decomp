@@ -27,7 +27,7 @@ void readMomentumInstruction(int16_t *delta, int16_t *reload1,
 			     int16_t *subDelta, int16_t *reload2,
 			     int8_t *sign, int16_t **instrPtr,
 			     int16_t *divisor);
-int32_t applyMomentum(int32_t base, int16_t reload, int16_t delta,
+int32_t applyMomentum(int16_t base, int16_t reload, int16_t delta,
 		      int16_t *counter, int8_t step, int32_t offset);
 void applyRootMomentum(MomentumData *momentum, Entity *entity);
 
@@ -50,9 +50,6 @@ void calculatePosMatrix(PositionData *posData, int32_t unused1,
 {
 	GsCOORDINATE2 *matrix;
 
-	(void)unused1;
-	(void)unused2;
-
 	matrix = &posData->posMatrix;
 	if (translate != 0) {
 		TransMatrix(&matrix->coord, &posData->location);
@@ -67,9 +64,7 @@ void resetMomentumData(MomentumData *momentum)
 {
 	AnimVec zero;
 
-	zero.z = 0;
-	zero.y = 0;
-	zero.x = 0;
+	zero.x = zero.y = zero.z = 0;
 	memcpy(&momentum->delta[3], &zero, 6);
 	memcpy(&momentum->delta[6], &zero, 6);
 	memcpy(&momentum->delta[0], &zero, 6);
@@ -80,44 +75,32 @@ void resetMomentumData(MomentumData *momentum)
 
 void animateEntityTexture(Entity *entity, EntityAnim *anim)
 {
-	int32_t type;
 	int16_t texX;
 	int16_t frame;
 	RECT rect;
 
-	type = entity->type;
-	if (type == 0x7f)
-		goto tex_2c;
-	if (type == 0x45)
-		goto tex_10;
-	if (type == 0x65)
-		goto tex_10;
-	if (type == 0x8f)
-		goto tex_28;
-	if (type == 0x6a)
-		goto tex_28;
-	if (type == 0x15)
-		goto tex_28;
-	if (type == 0x68)
-		goto tex_1e;
-	if (type == 0x85)
-		goto tex_1e;
-	if (type != 0x09)
+	switch (entity->type) {
+	case 0x09:
+	case 0x85:
+	case 0x68:
+		texX = 0x1e;
+		break;
+	case 0x15:
+	case 0x6a:
+	case 0x8f:
+		texX = 0x28;
+		break;
+	case 0x65:
+	case 0x45:
+		texX = 0x10;
+		break;
+	case 0x7f:
+		texX = 0x2c;
+		break;
+	default:
 		return;
+	}
 
-tex_1e:
-	texX = 0x1e;
-	goto tex_done;
-tex_28:
-	texX = 0x28;
-	goto tex_done;
-tex_10:
-	texX = 0x10;
-	goto tex_done;
-tex_2c:
-	texX = 0x2c;
-
-tex_done:
 	if (PLAYTIME_FRAMES % 2)
 		return;
 
@@ -144,110 +127,67 @@ void setupModelMatrix(PositionData *posData)
 	matrix->flg = 0;
 }
 
-static inline int16_t *getAnimInt16Ptr(uint8_t *ptr)
-{
-	return (int16_t *)ptr;
-}
-
 void tickMomentum(Entity *entity, MomentumData *momentumBase)
 {
+	int32_t i;
 	int32_t boneCount;
 	PositionData *posData;
+	long *scale;
+	long *location;
+	int32_t j;
+	int16_t *scale1;
+	int16_t *subScale;
+	int16_t *rotation;
+	int8_t *subValue;
+	int16_t *subDelta;
 	int16_t *delta;
 	int32_t updateScale;
-	int32_t elemIndex;
-	int32_t value;
 	int32_t updateRot;
 	int32_t updateLoc;
-	struct {
-		long *scale;
-		long *location;
-		int16_t *subDelta;
-		int16_t *delta;
-		int16_t *subScale;
-		int8_t *subValue;
-	} volatile pointers;
-	int16_t *scale1;
-	int16_t *subDelta;
-	int16_t *subScale;
-	int8_t *subValue;
-	int32_t boneIndex;
-	int32_t scaleOffset;
-	int32_t rotOffset;
-	int16_t *rotation;
 
 	posData = entity->posData;
 	boneCount = DIGIMON_DATA[entity->type].boneCount;
-	pointers.scale = &posData->scale.vx;
-	pointers.location = &posData->location.vx;
-	rotation = &posData->rotation.vx;
-	pointers.subDelta = &momentumBase->subDelta[0];
-	pointers.delta = &momentumBase->delta[0];
-	pointers.subScale = &momentumBase->subScale[0];
-	pointers.subValue = &momentumBase->subValue[0];
 
-	for (boneIndex = 0; boneIndex < boneCount;) {
+	for (i = 0; i < boneCount; i++, momentumBase++, posData++) {
 		updateLoc = 0;
 		updateRot = 0;
 		updateScale = 0;
 
+		scale = &posData->scale.vx;
+		location = &posData->location.vx;
+		rotation = &posData->rotation.vx;
 		scale1 = &momentumBase->scale1[0];
-		delta = pointers.delta;
-		subDelta = pointers.subDelta;
-		subScale = pointers.subScale;
-		subValue = pointers.subValue;
-		elemIndex = 0;
-		scaleOffset = 0;
-		rotOffset = 0;
+		subDelta = &momentumBase->subDelta[0];
+		delta = &momentumBase->delta[0];
+		subScale = &momentumBase->subScale[0];
+		subValue = &momentumBase->subValue[0];
 
-		for (; elemIndex < 9;) {
-			value = *delta;
-			if (value == 0 && *subDelta == 0)
-				goto advance;
+		for (j = 0; j < 9; scale1++, subDelta++, delta++, subScale++,
+				   subValue++, j++) {
+			if (*delta != 0 || *subDelta != 0) {
+				if (j < 3) {
+					updateScale = 1;
+					scale[j] = applyMomentum(*delta, *scale1,
+								 *subDelta, subScale,
+								 *subValue, scale[j]);
+				} else if (j < 6) {
+					updateRot = 1;
+					*(rotation + j - 3) = applyMomentum(
+						*delta, *scale1, *subDelta, subScale,
+						*subValue, *(rotation + j - 3));
+				} else {
+					if (i == 0)
+						break;
 
-			if (elemIndex < 3) {
-				updateScale = 1;
-				*(long *)((uint8_t *)pointers.scale + scaleOffset) =
-					applyMomentum(
+					updateLoc = 1;
+					*(location + j - 6) = applyMomentum(
 						*delta, *scale1, *subDelta, subScale,
-						*subValue,
-						*(long *)((uint8_t *)pointers.scale +
-							 scaleOffset));
-			} else if (elemIndex < 6) {
-				updateRot = 1;
-				*getAnimInt16Ptr((uint8_t *)rotation + rotOffset - 6) =
-					(int16_t)applyMomentum(
-						*delta, *scale1, *subDelta, subScale,
-						*subValue,
-						*getAnimInt16Ptr((uint8_t *)rotation +
-								    rotOffset - 6));
-			} else {
-				if (boneIndex == 0)
-					break;
-
-				updateLoc = 1;
-				*(long *)((uint8_t *)((uintptr_t)scaleOffset +
-							  (uintptr_t)pointers.location) -
-					  24) =
-					applyMomentum(
-						*delta, *scale1, *subDelta, subScale,
-						*subValue,
-						*(long *)((uint8_t *)pointers.location +
-							    scaleOffset - 24));
+						*subValue, *(location + j - 6));
+				}
 			}
-
-		advance:
-			scale1++;
-			subDelta++;
-			delta++;
-			subScale++;
-			subValue++;
-			elemIndex++;
-			rotOffset += 2;
-			scaleOffset += 4;
 		}
 
-		if (boneIndex == 0) {
+		if (i == 0) {
 			calculatePosMatrix(posData, 1, 1, 0);
 			applyRootMomentum(momentumBase, entity);
 			setupModelMatrix(posData);
@@ -255,27 +195,6 @@ void tickMomentum(Entity *entity, MomentumData *momentumBase)
 			calculatePosMatrix(posData, updateScale, updateRot,
 					   updateLoc);
 		}
-
-		boneIndex++;
-		momentumBase++;
-		rotation = getAnimInt16Ptr((uint8_t *)rotation +
-					       sizeof(PositionData));
-		pointers.subValue = (int8_t *)((uint8_t *)pointers.subValue +
-						      sizeof(MomentumData));
-		pointers.subScale =
-			(int16_t *)((uint8_t *)pointers.subScale +
-				    sizeof(MomentumData));
-		pointers.delta = (int16_t *)((uint8_t *)pointers.delta +
-						 sizeof(MomentumData));
-		pointers.subDelta =
-			(int16_t *)((uint8_t *)pointers.subDelta +
-				    sizeof(MomentumData));
-		posData++;
-		pointers.location =
-			(long *)((uint8_t *)pointers.location +
-				 sizeof(PositionData));
-		pointers.scale = (long *)((uint8_t *)pointers.scale +
-					 sizeof(PositionData));
 	}
 }
 
@@ -283,37 +202,26 @@ void startAnimation(entity, animId)
 	Entity *entity;
 	uint8_t animId;
 {
-	int16_t *animData;
-	int16_t *instrPtr;
+	int32_t i;
+	uint32_t *animTable;
+	VECTOR *location;
 	MomentumData *momentum;
+	ModelComponent *model;
+	int32_t hasScale;
+	int16_t *instrPtr;
 	PositionData *posData;
 	EntityAnim *anim;
-	ModelComponent *model;
-	VECTOR *location;
-	int32_t hasScale;
-	int32_t boneCount;
-	int32_t entityType;
-	int32_t i;
+	uint8_t boneCount;
 
-	{
-		int32_t loadedOffset;
-		int32_t *animTable;
-		int32_t animOffset;
+	animTable = (uint32_t *)entity->animPtr;
+	if (animTable[animId] == 0)
+		return;
 
-		animTable = entity->animPtr;
-		loadedOffset = animTable[animId];
-		if ((animOffset = loadedOffset) == 0)
-			return;
-
-		animData = (int16_t *)((uint8_t *)animTable + animOffset);
-	}
-	instrPtr = animData;
-	posData = entity->posData;
+	instrPtr = (int16_t *)((int32_t)animTable + animTable[animId]);
 	anim = &entity->anim;
-
-	boneCount = DIGIMON_DATA[entity->type].boneCount & 0xff;
-	entityType = getEntityType(entity);
-	model = getEntityModelComponent(entity->type, entityType);
+	boneCount = DIGIMON_DATA[entity->type].boneCount;
+	posData = entity->posData;
+	model = getEntityModelComponent(entity->type, getEntityType(entity));
 
 	anim->textureX = (model->pixelPage - 0x10) * 64;
 	anim->textureY = model->pixelOffsetY + 0x100;
@@ -365,125 +273,80 @@ void startAnimation(entity, animId)
 	anim->animInstrPtr = instrPtr;
 }
 
-static inline int32_t peekAnimationTextureHighByte(int16_t **instrPtr)
-{
-	return (**instrPtr & 0xff00) >> 8;
-}
-
-static inline int32_t readAnimationTextureLowByte(int16_t **instrPtr)
-{
-	return *(*instrPtr)++ & 0xff;
-}
-
 void tickAnimation(Entity *entity)
 {
 	EntityAnim *anim;
 	MomentumData *momentum;
 	int16_t **instrPtrPtr;
 	int16_t *framePtr;
-	int32_t opcode;
-	int16_t *instrPtr;
-	int32_t instruction;
-	int32_t loopInstruction;
+	RECT rect;
+	int16_t bankId;
 
 	anim = &entity->anim;
-	momentum = anim->momentum;
 	instrPtrPtr = &anim->animInstrPtr;
 	framePtr = &anim->animFrame;
+	momentum = anim->momentum;
 
 	if (!(anim->animFlag & 1))
 		return;
 
 	tickMomentum(entity, momentum);
 
-	opcode = **instrPtrPtr;
-	instruction = opcode;
-	opcode &= 0x1000;
-	if (opcode) {
-		anim->loopCount = instruction;
+	if (**instrPtrPtr & 0x1000) {
+		anim->loopCount = **instrPtrPtr & 0xff;
 		(*instrPtrPtr)++;
 		anim->loopStart = *instrPtrPtr;
 		anim->loopEndFrame = **instrPtrPtr & 0xfff;
 	}
-	goto frame_update;
 
-loop:
-	instrPtr = *instrPtrPtr;
-	opcode = *instrPtr;
-	loopInstruction = opcode;
-	opcode &= 0xf000;
-
-	if (opcode == 0x4000)
-		goto op_4000;
-	if (opcode == 0x3000)
-		goto op_3000;
-	if (opcode == 0x2000)
-		goto op_2000;
-	if (opcode == 0x1000)
-		goto op_1000;
-	if (opcode != 0x0000)
-		goto op_end;
-
-	*instrPtrPtr = instrPtr + 1;
-	readMomentumInstructions(momentum, instrPtrPtr);
-	goto op_end;
-
-op_1000:
-	anim->loopCount = loopInstruction;
-	(*instrPtrPtr)++;
-	anim->loopStart = *instrPtrPtr;
-	goto op_end;
-
-op_2000:
-	if (anim->loopCount != 0xff)
-		anim->loopCount--;
-	if (anim->loopCount == 0) {
-		*instrPtrPtr += 2;
-	} else {
-		(*instrPtrPtr)++;
-		*framePtr = **instrPtrPtr;
-		*instrPtrPtr = anim->loopStart;
-	}
-	goto op_end;
-
-op_3000:
-	{
-		RECT rect;
-
-		*instrPtrPtr = instrPtr + 1;
-		setRECT(&rect, anim->textureX + ((**instrPtrPtr & 0xff00) >> 8), anim->textureY + (*(*instrPtrPtr)++ & 0xff), (**instrPtrPtr & 0xff00) >> 8, *(*instrPtrPtr)++ & 0xff);
-		MoveImage(&rect,
-			  anim->textureX + peekAnimationTextureHighByte(instrPtrPtr),
-			  anim->textureY + readAnimationTextureLowByte(instrPtrPtr));
-	}
-	goto op_end;
-
-op_4000:
-	*instrPtrPtr = instrPtr + 1;
-	opcode = instruction = **instrPtrPtr;
-	opcode &= 0xff00;
-	{
-		int16_t bankId;
-		int32_t soundInstruction;
-		int32_t vabId;
-
-		soundInstruction = instruction;
-		bankId = opcode >> 8;
-		if (entity->isOnScreen == 1) {
-			vabId = bankId != 4
-					? bankId
-					: ((DigimonEntity *)entity)->stats.current.vabId;
-			playSound(vabId, soundInstruction & 0xff);
+	while (*framePtr == anim->loopEndFrame) {
+		switch (**instrPtrPtr & 0xf000) {
+		case 0x0000:
+			(*instrPtrPtr)++;
+			readMomentumInstructions(momentum, instrPtrPtr);
+			break;
+		case 0x1000:
+			anim->loopCount = **instrPtrPtr & 0xff;
+			(*instrPtrPtr)++;
+			anim->loopStart = *instrPtrPtr;
+			break;
+		case 0x2000:
+			if (anim->loopCount != 0xff)
+				anim->loopCount--;
+			if (anim->loopCount == 0) {
+				*instrPtrPtr += 2;
+			} else {
+				(*instrPtrPtr)++;
+				*framePtr = **instrPtrPtr;
+				*instrPtrPtr = anim->loopStart;
+			}
+			break;
+		case 0x3000:
+			(*instrPtrPtr)++;
+			setRECT(&rect,
+				anim->textureX + ((**instrPtrPtr & 0xff00) >> 8),
+				anim->textureY + (*(*instrPtrPtr)++ & 0xff),
+				(**instrPtrPtr & 0xff00) >> 8,
+				*(*instrPtrPtr)++ & 0xff);
+			MoveImage(&rect,
+				  anim->textureX + ((**instrPtrPtr & 0xff00) >> 8),
+				  anim->textureY + (*(*instrPtrPtr)++ & 0xff));
+			break;
+		case 0x4000:
+			(*instrPtrPtr)++;
+			bankId = (**instrPtrPtr & 0xff00) >> 8;
+			if (entity->isOnScreen == 1) {
+				playSound(bankId != 4
+						  ? bankId
+						  : ((DigimonEntity *)entity)
+							    ->stats.current.vabId,
+					  **instrPtrPtr & 0xff);
+			}
+			(*instrPtrPtr)++;
+			break;
 		}
+		anim->loopEndFrame = **instrPtrPtr & 0xfff;
 	}
-	(*instrPtrPtr)++;
-
-op_end:
-	anim->loopEndFrame = **instrPtrPtr & 0xfff;
-
-frame_update:
-	if (*framePtr == anim->loopEndFrame)
-		goto loop;
 
 	if (*framePtr == anim->frameCount)
 		anim->animFlag &= 0xfe;
@@ -496,13 +359,13 @@ frame_update:
 void readMomentumInstructions(MomentumData *base, int16_t **instrPtr)
 {
 	MomentumData *momentum;
-	int32_t instruction;
-	int16_t divisor;
 	int16_t *reload1;
 	int16_t *subDelta;
 	int16_t *delta;
 	int16_t *reload2;
 	int8_t *sign;
+	int16_t instruction;
+	int16_t divisor;
 	uint16_t flag;
 	int32_t i;
 
@@ -512,8 +375,8 @@ void readMomentumInstructions(MomentumData *base, int16_t **instrPtr)
 		momentum = &base[instruction & 0x3f];
 		divisor = *(*instrPtr)++;
 
-		subDelta = &momentum->subDelta[0];
 		reload1 = &momentum->scale1[0];
+		subDelta = &momentum->subDelta[0];
 		delta = &momentum->delta[0];
 		reload2 = &momentum->subScale[0];
 		sign = &momentum->subValue[0];
@@ -537,13 +400,9 @@ void readMomentumInstruction(int16_t *delta, int16_t *reload1,
 			     int8_t *sign, int16_t **instrPtr,
 			     int16_t *divisor)
 {
-	int16_t *ptr;
 	int16_t value;
-	int16_t reload;
 
-	ptr = *instrPtr;
-	*instrPtr = ptr + 1;
-	value = *ptr;
+	value = *(*instrPtr)++;
 	*delta = value / *divisor;
 	*subDelta = value % *divisor;
 	if (*subDelta != 0) {
@@ -554,13 +413,11 @@ void readMomentumInstruction(int16_t *delta, int16_t *reload1,
 		}
 
 		*subDelta = abs(*subDelta);
-		reload = *divisor;
-		*reload1 = reload;
-		*reload2 = reload;
+		*reload2 = *reload1 = *divisor;
 	}
 }
 
-int32_t applyMomentum(int32_t base, int16_t reload, int16_t delta,
+int32_t applyMomentum(int16_t base, int16_t reload, int16_t delta,
 		      int16_t *counter, int8_t step, int32_t offset)
 {
 	if (delta != 0) {
@@ -577,22 +434,22 @@ int32_t applyMomentum(int32_t base, int16_t reload, int16_t delta,
 void applyRootMomentum(MomentumData *momentum, Entity *entity)
 {
 	int32_t i;
+	VECTOR input;
+	VECTOR result;
+	PositionData *posData;
+	int32_t base[3];
 	int16_t *scale1;
 	int16_t *subDelta;
 	int16_t *delta;
 	int16_t *subScale;
 	int8_t *subValue;
-	VECTOR input;
-	VECTOR result;
-	int32_t base[3];
 	EntityAnim *anim;
-	PositionData *posData;
 
+	anim = &entity->anim;
 	scale1 = &momentum->scale1[6];
 	subDelta = &momentum->subDelta[6];
 	delta = &momentum->delta[6];
 	subScale = &momentum->subScale[6];
-	anim = &entity->anim;
 	subValue = &momentum->subValue[6];
 	i = 0;
 

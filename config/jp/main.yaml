@@ -85,7 +85,7 @@ segments:
       - [0x386A4, c, overworld_card_text]
       - [0x38758, c, map_collision]
       - [0x39084, c, particle]
-      - [0x39950, asm]
+      - [0x39950, c, anim]
       - [0x3AF64, c, ui]
       - [0x3C720, asm]
       - [0x3EEC8, c, sound]
