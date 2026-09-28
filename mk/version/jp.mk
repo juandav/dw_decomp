@@ -104,6 +104,7 @@ ENDI_C_SRC := \
 $(eval $(call overlay,ENDI,endi))
 $(eval $(call overlay,EVL,evl))
 FISH_C_SRC := \
+	src/fish/fish_bss.c \
 	src/fish/fish_model.c
 
 $(eval $(call overlay,FISH,fish))

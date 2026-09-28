@@ -62,5 +62,6 @@ segments:
       - [0x40, asm, fish]
       - [0xDD2C, c, fish_model]
       - [0xE034, data, fish]
+      - [0xEA68, .data, fish_bss]
 
   - [0x11890]

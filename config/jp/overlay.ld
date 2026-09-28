@@ -113,6 +113,7 @@ SECTIONS
 			BUILD_DIR/src/fish/fish_model.c.o(.text .text.*);
 			BUILD_DIR/src/fish/fish_model.c.o(.rodata .rodata.*);
 			KEEP(BUILD_DIR/asm/fish/data/fish.data.s.o(.data .data.*));
+			BUILD_DIR/src/fish/fish_bss.c.o(.data .data.*);
 			LONG(0);
 		}
 	}
