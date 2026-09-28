@@ -189,6 +189,7 @@ SECTIONS
 			BUILD_DIR/src/trn2/trn2_def_map108.c.o(.text .text.*);
 			BUILD_DIR/src/trn2/trn2_reward.c.o(.text .text.*);
 			KEEP(BUILD_DIR/asm/trn2/35C8.s.o(.text .text.*));
+			BUILD_DIR/src/trn2/trn2_slots.c.o(.text .text.*);
 			BUILD_DIR/src/trn2/trn2_hp_map107.c.o(.rodata .rodata.*);
 			BUILD_DIR/src/trn2/trn2_hp_map99.c.o(.rodata .rodata.*);
 			BUILD_DIR/src/trn2/trn2_mp.c.o(.rodata .rodata.*);
@@ -196,9 +197,11 @@ SECTIONS
 			BUILD_DIR/src/trn2/trn2_reward.c.o(.rodata .rodata.*);
 			BUILD_DIR/src/trn2/trn2_def_map108.c.o(.rodata .rodata.*);
 			BUILD_DIR/src/trn2/trn2_def_map99.c.o(.rodata .rodata.*);
-			KEEP(BUILD_DIR/asm/trn2/data/603C.data.s.o(.data .data.*));
+			KEEP(BUILD_DIR/asm/trn2/data/603C.rodata.s.o(.rodata .rodata.*));
+			BUILD_DIR/src/trn2/trn2_slots.c.o(.rodata .rodata.*);
 			BUILD_DIR/src/trn2/trn2_off.c.o(.data .data.*);
 			KEEP(BUILD_DIR/asm/trn2/data/60F8.data.s.o(.data .data.*));
+			BUILD_DIR/src/trn2/trn2_slots.c.o(.data .data.*);
 			BUILD_DIR/src/trn2/trn2_bss.c.o(.data .data.*);
 		}
 	}

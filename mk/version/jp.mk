@@ -100,6 +100,7 @@ TRN2_C_SRC := \
 	src/trn2/trn2_mp.c \
 	src/trn2/trn2_off.c \
 	src/trn2/trn2_reward.c \
+	src/trn2/trn2_slots.c \
 	src/trn2/trn2_bss.c
 
 $(eval $(call overlay,TRN2,trn2))

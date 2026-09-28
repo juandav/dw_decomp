@@ -68,7 +68,7 @@ void TRN2_tickSlotSession(void);
 void TRN2_renderSlotSession(void);
 int32_t TRN2_startSlotSession(int32_t arg);
 int16_t TRN2_getSlotSessionResult(void);
-void TRN2_createSlotMachineBox(int16_t arg);
+void TRN2_createSlotMachineBox(int32_t arg);
 int16_t TRN2_getSlotMachineResult(void);
 void TRN2_startSlotSpin(void);
 
