@@ -9,6 +9,7 @@
 #include <dw/combat.h>
 #include <dw/entity.h>
 #include <dw/font.h>
+#include <dw/garbage.h>
 #include <dw/item.h>
 #include <dw/math.h>
 #include <dw/params.h>
@@ -108,28 +109,7 @@ static void *item_bss_order[] = {
 	&INVENTORY,
 };
 
-static void handleEvoItems__garbage__(void)
-{
-	int32_t t0;
-	int32_t t1;
-	int32_t t2;
-	int32_t t3;
-	int32_t t4;
-	int32_t t5;
-
-	t0 = DROPPED_ITEMS[0].tileX;
-	t1 = DROPPED_ITEMS[1].tileX;
-	t2 = DROPPED_ITEMS[2].tileX;
-	t3 = DROPPED_ITEMS[3].tileX;
-	t4 = DROPPED_ITEMS[4].tileX;
-	t5 = DROPPED_ITEMS[5].tileX;
-	DROPPED_ITEMS[0].tileX = t0 + 1;
-	DROPPED_ITEMS[1].tileX = t1 + 2;
-	DROPPED_ITEMS[2].tileX = t2 + 3;
-	DROPPED_ITEMS[3].tileX = t3 + 4;
-	DROPPED_ITEMS[4].tileX = t4 + 5;
-	DROPPED_ITEMS[5].tileX = t5 + 6;
-}
+GARBAGE(handleEvoItems, 15);
 
 void handleEvoItems(int16_t item)
 {
@@ -391,40 +371,7 @@ void renderDroppedItem(int32_t instanceId)
 	}
 }
 
-static void spawnItem__garbage__(void)
-{
-	int32_t t0;
-	int32_t t1;
-	int32_t t2;
-	int32_t t3;
-	int32_t t4;
-	int32_t t5;
-	int32_t t6;
-	int32_t t7;
-	int32_t t8;
-	int32_t t9;
-
-	t0 = DROPPED_ITEMS[0].tileX;
-	t1 = DROPPED_ITEMS[1].tileX;
-	t2 = DROPPED_ITEMS[2].tileX;
-	t3 = DROPPED_ITEMS[3].tileX;
-	t4 = DROPPED_ITEMS[4].tileX;
-	t5 = DROPPED_ITEMS[5].tileX;
-	t6 = DROPPED_ITEMS[6].tileX;
-	t7 = DROPPED_ITEMS[7].tileX;
-	t8 = DROPPED_ITEMS[8].tileX;
-	t9 = DROPPED_ITEMS[9].tileX;
-	DROPPED_ITEMS[0].tileX = t0 + 1;
-	DROPPED_ITEMS[1].tileX = t1 + 2;
-	DROPPED_ITEMS[2].tileX = t2 + 3;
-	DROPPED_ITEMS[3].tileX = t3 + 4;
-	DROPPED_ITEMS[4].tileX = t4 + 5;
-	DROPPED_ITEMS[5].tileX = t5 + 6;
-	DROPPED_ITEMS[6].tileX = t6 + 7;
-	DROPPED_ITEMS[7].tileX = t7 + 8;
-	DROPPED_ITEMS[8].tileX = t8 + 9;
-	DROPPED_ITEMS[9].tileX = t9 + 10;
-}
+GARBAGE(spawnItem, 24);
 
 void spawnItem(int32_t itemId, int16_t tileX, int16_t tileY)
 {

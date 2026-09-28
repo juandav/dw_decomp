@@ -7,6 +7,7 @@
 #include <dw/anim.h>
 #include <dw/battle.h>
 #include <dw/combat.h>
+#include <dw/garbage.h>
 #include <dw/math.h>
 #include <dw/types.h>
 #include <dw/vs.h>
@@ -57,11 +58,9 @@ void convertValueToDigits(int32_t n, int32_t value, int32_t *outCount, int32_t *
 void swapByte(uint8_t *a, uint8_t *b);
 void addObject(int32_t objectId, int32_t instanceId, void *tick, void *render);
 void removeObject(int32_t objectId, int32_t instanceId);
-int32_t VS_renderCommandMenu__garbage__(int32_t i);
 void VS_renderMoveName(int32_t i);
 void VS_setCommandIconUV(DigimonEntity *digimon, POLY_FT4 *prim, uint8_t index);
 void damageTick(FighterData *fighter, Stats *stats);
-int32_t VS_addResultModelScene__garbage__(int32_t i);
 
 static void *vs_hud_functions[] = {
 	VS_setVersusModelSceneTimer,
@@ -410,47 +409,7 @@ void VS_tickCommandMenu(uint8_t i)
 	}
 }
 
-int32_t VS_renderCommandMenu__garbage__(int32_t i)
-{
-	int32_t v0;
-	int32_t v1;
-	int32_t v2;
-	int32_t v3;
-	int32_t v4;
-	int32_t v5;
-	int32_t v6;
-	int32_t v7;
-	int32_t v8;
-	int32_t v9;
-	int32_t v10;
-	int32_t v11;
-	int32_t v12;
-	int32_t v13;
-	int32_t v14;
-	int32_t v15;
-	int32_t v16;
-	int32_t v17;
-
-	v0 = i + 0;
-	v1 = i + 1;
-	v2 = i + 2;
-	v3 = i + 3;
-	v4 = i + 4;
-	v5 = i + 5;
-	v6 = i + 6;
-	v7 = i + 7;
-	v8 = i + 8;
-	v9 = i + 9;
-	v10 = i + 10;
-	v11 = i + 11;
-	v12 = i + 12;
-	v13 = i + 13;
-	v14 = i + 14;
-	v15 = i + 15;
-	v16 = i + 16;
-	v17 = i + 17;
-	return v0 + v1 + v2 + v3 + v4 + v5 + v6 + v7 + v8 + v9 + v10 + v11 + v12 + v13 + v14 + v15 + v16 + v17;
-}
+GARBAGE(VS_renderCommandMenu, 17);
 
 void VS_renderCommandMenu(uint8_t id)
 {
@@ -1345,60 +1304,6 @@ void VS_loadStageModels(void)
 		VS_D_80072A50[i].data.obj.attribute = 0;
 		VS_D_80072A50[i].data.obj.coord2 = &VS_D_80072A50[i].data.posMatrix;
 	}
-}
-
-int32_t VS_addResultModelScene__garbage__(int32_t i)
-{
-	int32_t v0;
-	int32_t v1;
-	int32_t v2;
-	int32_t v3;
-	int32_t v4;
-	int32_t v5;
-	int32_t v6;
-	int32_t v7;
-	int32_t v8;
-	int32_t v9;
-	int32_t v10;
-	int32_t v11;
-	int32_t v12;
-	int32_t v13;
-	int32_t v14;
-	int32_t v15;
-	int32_t v16;
-	int32_t v17;
-	int32_t v18;
-	int32_t v19;
-	int32_t v20;
-	int32_t v21;
-	int32_t v22;
-	int32_t v23;
-
-	v0 = i + 0;
-	v1 = i + 1;
-	v2 = i + 2;
-	v3 = i + 3;
-	v4 = i + 4;
-	v5 = i + 5;
-	v6 = i + 6;
-	v7 = i + 7;
-	v8 = i + 8;
-	v9 = i + 9;
-	v10 = i + 10;
-	v11 = i + 11;
-	v12 = i + 12;
-	v13 = i + 13;
-	v14 = i + 14;
-	v15 = i + 15;
-	v16 = i + 16;
-	v17 = i + 17;
-	v18 = i + 18;
-	v19 = i + 19;
-	v20 = i + 20;
-	v21 = i + 21;
-	v22 = i + 22;
-	v23 = i + 23;
-	return v0 + v1 + v2 + v3 + v4 + v5 + v6 + v7 + v8 + v9 + v10 + v11 + v12 + v13 + v14 + v15 + v16 + v17 + v18 + v19 + v20 + v21 + v22 + v23;
 }
 
 void VS_addResultModelScene(Entity *entity)

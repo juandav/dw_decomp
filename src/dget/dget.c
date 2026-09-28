@@ -6,6 +6,7 @@
 #include <dw/clock.h>
 #include <dw/entity.h>
 #include <dw/font.h>
+#include <dw/garbage.h>
 #include <dw/input.h>
 #include <dw/pstat.h>
 #include <dw/script.h>
@@ -255,34 +256,8 @@ void buildScheduleEntries(void)
 
 extern void MAIN_func_80101EF8(int32_t, int32_t);
 
-static void initTournamentInfo__garbage__(void)
-{
-	int32_t v0;
-	int32_t v1;
-	int32_t v2;
-	int32_t v3;
-	int32_t v4;
-	int32_t v5;
-	int32_t v6;
-	int32_t v7;
+GARBAGE_ARRAY(initTournamentInfo, TOURNAMENT_ARRAY, 3, 9);
 
-	v0 = TOURNAMENT_ARRAY[0] + 0;
-	v1 = TOURNAMENT_ARRAY[1] + 1;
-	v2 = TOURNAMENT_ARRAY[2] + 2;
-	v3 = TOURNAMENT_ARRAY[0] + 3;
-	v4 = TOURNAMENT_ARRAY[1] + 4;
-	v5 = TOURNAMENT_ARRAY[2] + 5;
-	v6 = TOURNAMENT_ARRAY[0] + 6;
-	v7 = TOURNAMENT_ARRAY[1] + 7;
-	TOURNAMENT_ARRAY[0] = (uint8_t)((v0 * v1) + v2);
-	TOURNAMENT_ARRAY[1] = (uint8_t)((v1 * v2) + v3);
-	TOURNAMENT_ARRAY[2] = (uint8_t)((v2 * v3) + v4);
-	TOURNAMENT_ARRAY[0] = (uint8_t)((v3 * v4) + v5);
-	TOURNAMENT_ARRAY[1] = (uint8_t)((v4 * v5) + v6);
-	TOURNAMENT_ARRAY[2] = (uint8_t)((v5 * v6) + v7);
-	TOURNAMENT_ARRAY[0] = (uint8_t)((v6 * v7) + v0);
-	TOURNAMENT_ARRAY[1] = (uint8_t)((v7 * v0) + v1);
-}
 void initTournamentInfo(int32_t arg)
 {
 	RECT rect1;

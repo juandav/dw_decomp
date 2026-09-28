@@ -12,6 +12,7 @@
 #include <dw/evolution.h>
 #include <dw/file.h>
 #include <dw/font.h>
+#include <dw/garbage.h>
 #include <dw/item.h>
 #include <dw/map_object.h>
 #include <dw/math.h>
@@ -361,16 +362,7 @@ void initializePoop(void)
 	POOP_OBJECT.coord2 = &POOP_COORDINATES;
 }
 
-static uint32_t primeInitializePartnerScheduler(uint32_t a, uint32_t b,
-						uint32_t c, uint32_t d)
-{
-	uint32_t value = a;
-
-	value += RAISE_DATA[value & 7].defaultWeight;
-	value += (uint32_t)(uint16_t)RAISE_DATA[value & 7].poopTimer;
-
-	return value + a + b + c + d;
-}
+GARBAGE(initializePartner, 14);
 
 void initializePartner(int32_t type, int32_t posX, int32_t posY,
 		       int32_t posZ, int32_t rotX, int32_t rotY,
@@ -507,28 +499,6 @@ void initializeEvolvedPartner(int32_t type, int32_t posX, int32_t posY,
 
 	HAS_IMMORTAL_HOUR = 0;
 	IMMORTAL_HOUR = -1;
-}
-
-/* CodeWarrior retains scheduler state between functions. This unused function
- * reproduces the state required by resetPartnerPara and setSleepTimes and is
- * linker-GC'd. */
-static uint32_t primeResetPartnerParaScheduler(uint32_t a, uint32_t b,
-					       uint32_t c, uint32_t d)
-{
-	uint32_t value = a;
-
-	value ^= a;
-	value = value * 5 + d;
-	value += a;
-	value = value * 3 + c;
-	value = (value << 1) + a;
-	value += (uint32_t)(uint16_t)RAISE_DATA[value & 7].poopTimer;
-	value += RAISE_DATA[value & 7].defaultWeight;
-	value ^= d;
-	value += a;
-	value += (uint32_t)(uint16_t)RAISE_DATA[value & 7].poopTimer;
-
-	return value + a + b + c + d;
 }
 
 void resetPartnerPara(PartnerPara *para, int32_t type)

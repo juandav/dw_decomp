@@ -11,6 +11,7 @@
 #include <dw/entity.h>
 #include <dw/file.h>
 #include <dw/font.h>
+#include <dw/garbage.h>
 #include <dw/kar.h>
 #include <dw/script.h>
 #include <dw/sound.h>
@@ -743,14 +744,7 @@ GsRVIEW2 KAR_D_8005B580 = {
 };
 // clang-format on
 
-static void kar__garbage__(void)
-{
-	int32_t t0 = KAR_D_800638CC[0].length;
-	int32_t t1 = KAR_D_800638CC[0].offset;
-	int32_t t2 = KAR_D_800638CC[0].point;
-
-	KAR_D_800638CC[0].length = t0 + t1 + t2;
-}
+GARBAGE(KAR_initializeOrderingTables, 6);
 
 void KAR_initializeOrderingTables(void)
 {

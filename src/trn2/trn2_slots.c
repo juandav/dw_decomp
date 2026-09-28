@@ -3,6 +3,7 @@
 #include <libgpu.h>
 #include <libgs.h>
 
+#include <dw/garbage.h>
 #include <dw/input.h>
 #include <dw/script.h>
 #include <dw/sound.h>
@@ -88,70 +89,7 @@ GsSPRITE TRN2_SLOT_SPRITE2 = {
 };
 // clang-format on
 
-static void trn2_slots__garbage__(void)
-{
-	int32_t v0;
-	int32_t v1;
-	int32_t v2;
-	int32_t v3;
-	int32_t v4;
-	int32_t v5;
-	int32_t v6;
-	int32_t v7;
-	int32_t v8;
-	int32_t v9;
-	int32_t v10;
-	int32_t v11;
-	int32_t v12;
-	int32_t v13;
-	int32_t v14;
-	int32_t v15;
-	int32_t v16;
-	int32_t v17;
-	int32_t v18;
-	int32_t v19;
-
-	v0 = TRN2_D_8008DC54[0] + 0;
-	v1 = TRN2_D_8008DC54[1] + 1;
-	v2 = TRN2_D_8008DC54[2] + 2;
-	v3 = TRN2_D_8008DC54[3] + 3;
-	v4 = TRN2_D_8008DC54[4] + 4;
-	v5 = TRN2_D_8008DC54[5] + 5;
-	v6 = TRN2_D_8008DC54[6] + 6;
-	v7 = TRN2_D_8008DC54[7] + 7;
-	v8 = TRN2_D_8008DC54[0] + 8;
-	v9 = TRN2_D_8008DC54[1] + 9;
-	v10 = TRN2_D_8008DC54[2] + 10;
-	v11 = TRN2_D_8008DC54[3] + 11;
-	v12 = TRN2_D_8008DC54[4] + 12;
-	v13 = TRN2_D_8008DC54[5] + 13;
-	v14 = TRN2_D_8008DC54[6] + 14;
-	v15 = TRN2_D_8008DC54[7] + 15;
-	v16 = TRN2_D_8008DC54[0] + 16;
-	v17 = TRN2_D_8008DC54[1] + 17;
-	v18 = TRN2_D_8008DC54[2] + 18;
-	v19 = TRN2_D_8008DC54[3] + 19;
-	TRN2_D_8008DC54[0] = (v0 * v1) + v2;
-	TRN2_D_8008DC54[1] = (v1 * v2) + v3;
-	TRN2_D_8008DC54[2] = (v2 * v3) + v4;
-	TRN2_D_8008DC54[3] = (v3 * v4) + v5;
-	TRN2_D_8008DC54[4] = (v4 * v5) + v6;
-	TRN2_D_8008DC54[5] = (v5 * v6) + v7;
-	TRN2_D_8008DC54[6] = (v6 * v7) + v8;
-	TRN2_D_8008DC54[7] = (v7 * v8) + v9;
-	TRN2_D_8008DC54[0] = (v8 * v9) + v10;
-	TRN2_D_8008DC54[1] = (v9 * v10) + v11;
-	TRN2_D_8008DC54[2] = (v10 * v11) + v12;
-	TRN2_D_8008DC54[3] = (v11 * v12) + v13;
-	TRN2_D_8008DC54[4] = (v12 * v13) + v14;
-	TRN2_D_8008DC54[5] = (v13 * v14) + v15;
-	TRN2_D_8008DC54[6] = (v14 * v15) + v16;
-	TRN2_D_8008DC54[7] = (v15 * v16) + v17;
-	TRN2_D_8008DC54[0] = (v16 * v17) + v18;
-	TRN2_D_8008DC54[1] = (v17 * v18) + v19;
-	TRN2_D_8008DC54[2] = (v18 * v19) + v0;
-	TRN2_D_8008DC54[3] = (v19 * v0) + v1;
-}
+GARBAGE_ARRAY(TRN2_tickSlotMachine, TRN2_D_8008DC54, 8, 16);
 
 void TRN2_tickSlotMachine(arg)
 	int16_t arg;

@@ -772,27 +772,6 @@ void DOO2_openEggBox(void)
 	playSound(8, 4);
 }
 
-static int32_t doo2__garbage__(int32_t seed)
-{
-	int32_t t0 = 1;
-	int32_t t1 = 2;
-	int32_t t2 = 3;
-	int32_t t3 = 4;
-	int32_t t4 = 5;
-	int32_t t5 = 6;
-	int32_t t6 = 7;
-	int32_t t7 = 8;
-	int32_t t8 = 9;
-	int32_t t9 = 10;
-	int32_t t10 = 11;
-	int32_t t11 = 12;
-	int32_t t12 = 13;
-	int32_t t13 = 14;
-	int32_t t14 = 15;
-	int32_t t15 = 16;
-	return seed + t0 + t1 + t2 + t3 + t4 + t5 + t6 + t7 + t8 + t9 + t10 + t11 + t12 + t13 + t14 + t15;
-}
-
 int32_t DOO2_tickEggInput(void)
 {
 	DooaSequence *seq;

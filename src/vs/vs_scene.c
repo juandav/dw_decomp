@@ -7,6 +7,7 @@
 #include <dw/battle.h>
 #include <dw/clock.h>
 #include <dw/font.h>
+#include <dw/garbage.h>
 #include <dw/main.h>
 #include <dw/math.h>
 #include <dw/model.h>
@@ -148,7 +149,6 @@ void VS_initializeStunEffect(char *base);
 int32_t loadTIMFile(char *path, void *buffer);
 void renderNumber(int32_t a, int32_t x, int32_t y, int32_t digits, int32_t value, int32_t layer);
 void initStringFT4(POLY_FT4 *p);
-int32_t VS_initializeLighting__garbage__(int32_t i);
 void fadeFromBlack(int16_t frames);
 void fadeToBlack(int16_t frames);
 void VS_setVersusModelSceneTimer(int16_t value);
@@ -1638,31 +1638,7 @@ void VS_renderVersusText(void)
 	GsSetWorkBase((PACKET *)prim2);
 }
 
-int32_t VS_initializeLighting__garbage__(int32_t i)
-{
-	int32_t v0;
-	int32_t v1;
-	int32_t v2;
-	int32_t v3;
-	int32_t v4;
-	int32_t v5;
-	int32_t v6;
-	int32_t v7;
-	int32_t v8;
-	int32_t v9;
-
-	v0 = i + 0;
-	v1 = i + 1;
-	v2 = i + 2;
-	v3 = i + 3;
-	v4 = i + 4;
-	v5 = i + 5;
-	v6 = i + 6;
-	v7 = i + 7;
-	v8 = i + 8;
-	v9 = i + 9;
-	return v0 + v1 + v2 + v3 + v4 + v5 + v6 + v7 + v8 + v9;
-}
+GARBAGE(VS_initializeLighting, 1);
 
 void VS_initializeLighting(int32_t mode)
 {

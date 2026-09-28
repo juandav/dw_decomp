@@ -13,6 +13,7 @@
 #include <dw/combat.h>
 #include <dw/entity.h>
 #include <dw/font.h>
+#include <dw/garbage.h>
 #include <dw/item.h>
 #include <dw/main.h>
 #include <dw/fade.h>
@@ -3991,22 +3992,8 @@ void renderMainMenuBackground(void)
 	GsSetWorkBase((PACKET *)prim);
 }
 
-static void view_init__garbage__(void)
-{
-	int32_t v0;
-	int32_t v1;
-	int32_t v2;
-	int32_t v3;
+GARBAGE_ARRAY(view_init, MAIN_D_80155670, 1, 1);
 
-	v0 = MAIN_D_80155670[0] + 0;
-	v1 = MAIN_D_80155670[1] + 1;
-	v2 = MAIN_D_80155670[2] + 2;
-	v3 = MAIN_D_80155670[0] + 3;
-	MAIN_D_80155670[0] = ((v0 * v1) + v2);
-	MAIN_D_80155670[1] = ((v1 * v2) + v3);
-	MAIN_D_80155670[2] = ((v2 * v3) + v0);
-	MAIN_D_80155670[0] = ((v3 * v0) + v1);
-}
 void view_init(void)
 {
 	GsSetProjection(0x400);

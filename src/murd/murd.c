@@ -9,6 +9,7 @@
 #include <dw/entity.h>
 #include <dw/file.h>
 #include <dw/file_queue.h>
+#include <dw/garbage.h>
 #include <dw/main.h>
 #include <dw/model.h>
 #include <dw/murd.h>
@@ -170,22 +171,7 @@ MurdScene MURD_SCENE = {
 };
 // clang-format on
 
-static void murd__garbage__(void)
-{
-	int32_t v0;
-	int32_t v1;
-	int32_t v2;
-	int32_t v3;
-
-	v0 = MURD_TEXTURE_BUFFER[0] + 0;
-	v1 = MURD_TEXTURE_BUFFER[1] + 1;
-	v2 = MURD_TEXTURE_BUFFER[2] + 2;
-	v3 = MURD_TEXTURE_BUFFER[3] + 3;
-	MURD_TEXTURE_BUFFER[0] = (v0 * v1) + v2;
-	MURD_TEXTURE_BUFFER[1] = (v1 * v2) + v3;
-	MURD_TEXTURE_BUFFER[2] = (v2 * v3) + v0;
-	MURD_TEXTURE_BUFFER[3] = (v3 * v0) + v1;
-}
+GARBAGE(MURD_tickScene, 9);
 
 void MURD_tickScene(int32_t instanceId)
 {

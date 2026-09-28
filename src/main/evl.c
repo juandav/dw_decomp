@@ -2,6 +2,7 @@
 #include <dw/bubble.h>
 #include <dw/entity.h>
 #include <dw/evl.h>
+#include <dw/garbage.h>
 #include <dw/graphics.h>
 #include <dw/main.h>
 #include <dw/utils.h>
@@ -63,27 +64,7 @@ void renderEvoSequenceLoading(int32_t instanceId)
 	data = &EVO_SEQUENCE_DATA;
 }
 
-/* CodeWarrior retains scheduler state between functions. This unused function
- * reproduces the state required by getEvoSequenceState and is linker-GC'd. */
-static int32_t primeGetEvoSequenceStateScheduler(int32_t a, int32_t b,
-						 int32_t c, int32_t d)
-{
-	int32_t value = a;
-
-	value = (value << 1) + b;
-	value = value * 3 + c;
-	value ^= d;
-	value += EVO_GAINS_DATA[value & 7].targetDigimon;
-	value += DIGIMON_DATA[value & 7].height;
-	value = (value << 3) - value;
-	value -= b;
-	value += c + d;
-	value = (value << 1) + b;
-	value = value * 3 + c;
-	value ^= d;
-
-	return value;
-}
+GARBAGE(getEvoSequenceState, 20);
 
 int32_t getEvoSequenceState(partner, buffer, para, target, isInitialized)
 PartnerEntity *partner;

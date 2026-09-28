@@ -13,6 +13,7 @@
 #include <dw/battle.h>
 #include <dw/btl.h>
 #include <dw/efe.h>
+#include <dw/garbage.h>
 #include <dw/graphics.h>
 #include <dw/math.h>
 #include <dw/model.h>
@@ -3944,81 +3945,7 @@ void BTL_calculatePolarOffset(void)
 	out[0] = (r * _cos(0x80 - ang)) >> 12;
 }
 
-static int32_t BTL_renderProjectedSprite__garbage__(int32_t i)
-{
-	int16_t v0;
-	int16_t v1;
-	int16_t v2;
-	int16_t v3;
-	int16_t v4;
-	int16_t v5;
-	int16_t v6;
-	int16_t v7;
-	int16_t v8;
-	int16_t v9;
-	int16_t v10;
-	int16_t v11;
-	int16_t v12;
-	int16_t v13;
-	int16_t v14;
-	int16_t v15;
-	int16_t v16;
-	int16_t v17;
-	int16_t v18;
-	int16_t v19;
-	int16_t v20;
-	int16_t v21;
-	int16_t v22;
-	int16_t v23;
-	int16_t v24;
-	int16_t v25;
-	int16_t v26;
-	int16_t v27;
-	int16_t v28;
-	int16_t v29;
-	int16_t v30;
-	int16_t v31;
-	int16_t v32;
-	int16_t v33;
-	int16_t v34;
-
-	v0 = i + 0;
-	v1 = i + 1;
-	v2 = i + 2;
-	v3 = i + 3;
-	v4 = i + 4;
-	v5 = i + 5;
-	v6 = i + 6;
-	v7 = i + 7;
-	v8 = i + 8;
-	v9 = i + 9;
-	v10 = i + 10;
-	v11 = i + 11;
-	v12 = i + 12;
-	v13 = i + 13;
-	v14 = i + 14;
-	v15 = i + 15;
-	v16 = i + 16;
-	v17 = i + 17;
-	v18 = i + 18;
-	v19 = i + 19;
-	v20 = i + 20;
-	v21 = i + 21;
-	v22 = i + 22;
-	v23 = i + 23;
-	v24 = i + 24;
-	v25 = i + 25;
-	v26 = i + 26;
-	v27 = i + 27;
-	v28 = i + 28;
-	v29 = i + 29;
-	v30 = i + 30;
-	v31 = i + 31;
-	v32 = i + 32;
-	v33 = i + 33;
-	v34 = i + 34;
-	return v0 + v1 + v2 + v3 + v4 + v5 + v6 + v7 + v8 + v9 + v10 + v11 + v12 + v13 + v14 + v15 + v16 + v17 + v18 + v19 + v20 + v21 + v22 + v23 + v24 + v25 + v26 + v27 + v28 + v29 + v30 + v31 + v32 + v33 + v34;
-}
+GARBAGE(BTL_renderProjectedSprite, 69);
 
 void BTL_renderProjectedSprite(void)
 {

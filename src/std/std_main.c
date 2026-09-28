@@ -16,6 +16,7 @@
 #include <dw/entity.h>
 #include <dw/evl.h>
 #include <dw/font.h>
+#include <dw/garbage.h>
 #include <dw/item.h>
 #include <dw/math.h>
 #include <dw/model.h>
@@ -338,7 +339,6 @@ void STD_removeAllPoisonEffects(void);
 void STD_func_80079874(void);
 void STD_unloadAllEFESlots(void);
 void STD_removeEFEEngine(void);
-int32_t STD_renderCommandMenu__garbage__(int32_t i);
 int32_t loadSB(void);
 int32_t customRandom(int32_t lo, int32_t hi);
 void MAIN_func_800DA60C(int32_t count, int32_t arg1, int32_t arg2, int32_t *out);
@@ -1541,45 +1541,7 @@ void STD_func_80058958(int32_t idx, int32_t value)
 	GsSetWorkBase((PACKET *)prim);
 }
 
-int32_t STD_renderCommandMenu__garbage__(int32_t i)
-{
-	int32_t v0;
-	int32_t v1;
-	int32_t v2;
-	int32_t v3;
-	int32_t v4;
-	int32_t v5;
-	int32_t v6;
-	int32_t v7;
-	int32_t v8;
-	int32_t v9;
-	int32_t v10;
-	int32_t v11;
-	int32_t v12;
-	int32_t v13;
-	int32_t v14;
-	int32_t v15;
-	int32_t v16;
-
-	v0 = i + 0;
-	v1 = i + 1;
-	v2 = i + 2;
-	v3 = i + 3;
-	v4 = i + 4;
-	v5 = i + 5;
-	v6 = i + 6;
-	v7 = i + 7;
-	v8 = i + 8;
-	v9 = i + 9;
-	v10 = i + 10;
-	v11 = i + 11;
-	v12 = i + 12;
-	v13 = i + 13;
-	v14 = i + 14;
-	v15 = i + 15;
-	v16 = i + 16;
-	return v0 + v1 + v2 + v3 + v4 + v5 + v6 + v7 + v8 + v9 + v10 + v11 + v12 + v13 + v14 + v15 + v16;
-}
+GARBAGE(STD_renderCommandMenu, 17);
 
 void STD_renderCommandMenu(uint8_t id)
 {

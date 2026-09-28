@@ -6,6 +6,7 @@
 #include <dw/btl.h>
 #include <dw/combat.h>
 #include <dw/entity.h>
+#include <dw/garbage.h>
 #include <dw/graphics.h>
 #include <dw/item.h>
 #include <dw/main.h>
@@ -132,24 +133,7 @@ void handleBattleIdle(entity, stats, flags)
 	}
 }
 
-static void setFleeBubble__garbage__(void)
-{
-	int32_t t0;
-	int32_t t1;
-	int32_t t2;
-	int32_t t3;
-
-	t0 = (&FLEE_BUBBLE_DATA[0].frame)[0];
-	t1 = (&FLEE_BUBBLE_DATA[0].frame)[1];
-	t2 = (&FLEE_BUBBLE_DATA[0].frame)[2];
-	t3 = (&FLEE_BUBBLE_DATA[0].frame)[3];
-	removeFleeBubble(t0);
-	removeFleeBubble(t1);
-	(&FLEE_BUBBLE_DATA[0].frame)[0] = t0 + 1;
-	(&FLEE_BUBBLE_DATA[0].frame)[1] = t1 + 2;
-	(&FLEE_BUBBLE_DATA[0].frame)[2] = t2 + 3;
-	(&FLEE_BUBBLE_DATA[0].frame)[3] = t3 + 4;
-}
+GARBAGE(setFleeBubble, 9);
 
 void setFleeBubble(int16_t id, int16_t v)
 {
@@ -489,37 +473,7 @@ void loadBattleData(int32_t entityId, int32_t count)
 	GAME_STATE = 2;
 }
 
-static void renderFleeBubble__garbage(void)
-{
-	int32_t t0;
-	int32_t t1;
-	int32_t t2;
-	int32_t t3;
-	int32_t t4;
-	int32_t t5;
-	int32_t t6;
-	int32_t t7;
-	int32_t t8;
-
-	t0 = (&FLEE_BUBBLE_DATA[0].frame)[0];
-	t1 = (&FLEE_BUBBLE_DATA[0].frame)[1];
-	t2 = (&FLEE_BUBBLE_DATA[0].frame)[2];
-	t3 = (&FLEE_BUBBLE_DATA[0].frame)[3];
-	t4 = (&FLEE_BUBBLE_DATA[0].frame)[4];
-	t5 = (&FLEE_BUBBLE_DATA[0].frame)[5];
-	t6 = (&FLEE_BUBBLE_DATA[0].frame)[6];
-	t7 = (&FLEE_BUBBLE_DATA[0].frame)[7];
-	t8 = (&FLEE_BUBBLE_DATA[0].frame)[8];
-	(&FLEE_BUBBLE_DATA[0].frame)[0] = t0 + 1;
-	(&FLEE_BUBBLE_DATA[0].frame)[1] = t1 + 2;
-	(&FLEE_BUBBLE_DATA[0].frame)[2] = t2 + 3;
-	(&FLEE_BUBBLE_DATA[0].frame)[3] = t3 + 4;
-	(&FLEE_BUBBLE_DATA[0].frame)[4] = t4 + 5;
-	(&FLEE_BUBBLE_DATA[0].frame)[5] = t5 + 6;
-	(&FLEE_BUBBLE_DATA[0].frame)[6] = t6 + 7;
-	(&FLEE_BUBBLE_DATA[0].frame)[7] = t7 + 8;
-	(&FLEE_BUBBLE_DATA[0].frame)[8] = t8 + 9;
-}
+GARBAGE(renderFleeBubble, 23);
 
 void renderFleeBubble(int32_t instanceId)
 {

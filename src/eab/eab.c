@@ -187,23 +187,6 @@ void EAB_initializeRings(void)
 	}
 }
 
-static void eab__garbage__(void)
-{
-	int32_t v0;
-	int32_t v1;
-	int32_t v2;
-	int32_t v3;
-
-	v0 = EAB_D_800617D0[0].timer + 0;
-	v1 = EAB_D_800617D0[1].timer + 1;
-	v2 = EAB_D_800617D0[2].timer + 2;
-	v3 = EAB_D_800617D0[0].timer + 3;
-	EAB_D_800617D0[0].timer = (int16_t)((v0 * v1) + v2);
-	EAB_D_800617D0[1].timer = (int16_t)((v1 * v2) + v3);
-	EAB_D_800617D0[2].timer = (int16_t)((v2 * v3) + v0);
-	EAB_D_800617D0[0].timer = (int16_t)((v3 * v0) + v1);
-}
-
 int32_t EAB_addBuildupRing(Entity *entity)
 {
 	EabModelFX *fx;

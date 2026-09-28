@@ -1,6 +1,7 @@
 #include <libgs.h>
 #include <dw/combat.h>
 #include <dw/entity.h>
+#include <dw/garbage.h>
 #include <dw/params.h>
 #include <dw/types.h>
 #include <dw/world_object.h>
@@ -76,27 +77,7 @@ void initializeEntityText()
 	i = i;
 }
 
-/* CodeWarrior retains scheduler state between functions. This unused function
- * primes the state needed by addEntityText and is linker-GC'd. */
-static int32_t primeAddEntityTextScheduler(int32_t a, int32_t b, int32_t c,
-					   int32_t d)
-{
-	int32_t value = a;
-
-	value = (value << 1) + b;
-	value = value * 3 + c;
-	value ^= d;
-	value += ((uint8_t *)ENTITY_TEXT_DATA)[value & 7];
-	value += ((uint8_t *)ENTITY_TEXT_DATA)[(value & 7) + 8];
-	value = (value << 3) - value;
-	value -= b;
-	value += c + d;
-	value = (value << 1) + b;
-	value = value * 3 + c;
-	value ^= d;
-
-	return value;
-}
+GARBAGE(addEntityText, 10);
 
 /*
  * Shows value over entity, in the slot of that fighter (0 is the partner).

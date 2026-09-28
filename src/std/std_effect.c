@@ -16,6 +16,7 @@
 #include <dw/combat.h>
 #include <dw/efe.h>
 #include <dw/entity.h>
+#include <dw/garbage.h>
 #include <dw/graphics.h>
 #include <dw/math.h>
 #include <dw/model.h>
@@ -333,10 +334,8 @@ void STD_func_8006C6DC(void);
 void STD_func_8006CB10(void);
 void STD_func_8006CE68(void);
 void STD_tickRibbonPoints(void);
-int32_t STD_func_8006BFD4__garbage__(int32_t i);
 long RotTransPers4(SVECTOR *v0, SVECTOR *v1, SVECTOR *v2, SVECTOR *v3, long *sxy0, long *sxy1, long *sxy2, long *sxy3, long *p, long *flag);
 void setRotTransMatrix(MATRIX *m);
-int32_t STD_renderProjectedSprite__garbage__(int32_t i);
 long RotTransPers(SVECTOR *v0, long *sxy, long *p, long *flag);
 int32_t STD_func_800770C0(int32_t lo, int32_t hi, int32_t t, int32_t a, int32_t b);
 
@@ -1021,51 +1020,7 @@ void STD_func_8006BFB4(void)
 	addObject(0x19d, 0, (TickFunction)STD_func_8006BFD4, (RenderFunction)STD_renderVersusModelScene2);
 }
 
-int32_t STD_func_8006BFD4__garbage__(int32_t i)
-{
-	int32_t v0;
-	int32_t v1;
-	int32_t v2;
-	int32_t v3;
-	int32_t v4;
-	int32_t v5;
-	int32_t v6;
-	int32_t v7;
-	int32_t v8;
-	int32_t v9;
-	int32_t v10;
-	int32_t v11;
-	int32_t v12;
-	int32_t v13;
-	int32_t v14;
-	int32_t v15;
-	int32_t v16;
-	int32_t v17;
-	int32_t v18;
-	int32_t v19;
-
-	v0 = i + 0;
-	v1 = i + 1;
-	v2 = i + 2;
-	v3 = i + 3;
-	v4 = i + 4;
-	v5 = i + 5;
-	v6 = i + 6;
-	v7 = i + 7;
-	v8 = i + 8;
-	v9 = i + 9;
-	v10 = i + 10;
-	v11 = i + 11;
-	v12 = i + 12;
-	v13 = i + 13;
-	v14 = i + 14;
-	v15 = i + 15;
-	v16 = i + 16;
-	v17 = i + 17;
-	v18 = i + 18;
-	v19 = i + 19;
-	return v0 + v1 + v2 + v3 + v4 + v5 + v6 + v7 + v8 + v9 + v10 + v11 + v12 + v13 + v14 + v15 + v16 + v17 + v18 + v19;
-}
+GARBAGE(STD_func_8006BFD4, 20);
 
 void STD_func_8006BFD4(void)
 {
@@ -4124,81 +4079,7 @@ void STD_calculatePolarOffset(void)
 	out[0] = (r * _cos(0x80 - ang)) >> 12;
 }
 
-int32_t STD_renderProjectedSprite__garbage__(int32_t i)
-{
-	int16_t v0;
-	int16_t v1;
-	int16_t v2;
-	int16_t v3;
-	int16_t v4;
-	int16_t v5;
-	int16_t v6;
-	int16_t v7;
-	int16_t v8;
-	int16_t v9;
-	int16_t v10;
-	int16_t v11;
-	int16_t v12;
-	int16_t v13;
-	int16_t v14;
-	int16_t v15;
-	int16_t v16;
-	int16_t v17;
-	int16_t v18;
-	int16_t v19;
-	int16_t v20;
-	int16_t v21;
-	int16_t v22;
-	int16_t v23;
-	int16_t v24;
-	int16_t v25;
-	int16_t v26;
-	int16_t v27;
-	int16_t v28;
-	int16_t v29;
-	int16_t v30;
-	int16_t v31;
-	int16_t v32;
-	int16_t v33;
-	int16_t v34;
-
-	v0 = i + 0;
-	v1 = i + 1;
-	v2 = i + 2;
-	v3 = i + 3;
-	v4 = i + 4;
-	v5 = i + 5;
-	v6 = i + 6;
-	v7 = i + 7;
-	v8 = i + 8;
-	v9 = i + 9;
-	v10 = i + 10;
-	v11 = i + 11;
-	v12 = i + 12;
-	v13 = i + 13;
-	v14 = i + 14;
-	v15 = i + 15;
-	v16 = i + 16;
-	v17 = i + 17;
-	v18 = i + 18;
-	v19 = i + 19;
-	v20 = i + 20;
-	v21 = i + 21;
-	v22 = i + 22;
-	v23 = i + 23;
-	v24 = i + 24;
-	v25 = i + 25;
-	v26 = i + 26;
-	v27 = i + 27;
-	v28 = i + 28;
-	v29 = i + 29;
-	v30 = i + 30;
-	v31 = i + 31;
-	v32 = i + 32;
-	v33 = i + 33;
-	v34 = i + 34;
-	return v0 + v1 + v2 + v3 + v4 + v5 + v6 + v7 + v8 + v9 + v10 + v11 + v12 + v13 + v14 + v15 + v16 + v17 + v18 + v19 + v20 + v21 + v22 + v23 + v24 + v25 + v26 + v27 + v28 + v29 + v30 + v31 + v32 + v33 + v34;
-}
+GARBAGE(STD_renderProjectedSprite, 69);
 
 void STD_renderProjectedSprite(void)
 {

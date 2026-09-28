@@ -7,6 +7,7 @@
 
 #include <dw/efe.h>
 #include <dw/entity.h>
+#include <dw/garbage.h>
 #include <dw/math.h>
 #include <dw/params.h>
 #include <dw/types.h>
@@ -233,19 +234,7 @@ uint8_t MAIN_D_8013421C[4] = {
 char MAIN_D_80134220[] = ";1";
 // clang-format on
 
-static void createParticleFX__garbage__(void)
-{
-	int32_t t0;
-	int32_t t1;
-	int32_t t2;
-	int32_t t3;
-
-	t0 = MAIN_D_801387B8[0];
-	t1 = MAIN_D_801387B8[1];
-	t2 = MAIN_D_801387B8[2];
-	t3 = MAIN_D_801387B8[3];
-	MAIN_D_801387B8[0] = t0 + t1 + t2 + t3;
-}
+GARBAGE(initializeParticleFX, 8);
 
 void initializeParticleFX(void)
 {
@@ -360,27 +349,7 @@ void createParticleFX(int32_t kind, int32_t count, SVECTOR *pos, Entity *entity,
 	addObject(0x600, i, tickParticleFX, renderParticleFX);
 }
 
-static void tickParticleFX__garbage__(void)
-{
-	int32_t t0;
-	int32_t t1;
-	int32_t t2;
-	int32_t t3;
-	int32_t t4;
-	int32_t t5;
-	int32_t t6;
-	int32_t t7;
-
-	t0 = MAIN_D_801387B8[0];
-	t1 = MAIN_D_801387B8[1];
-	t2 = MAIN_D_801387B8[2];
-	t3 = MAIN_D_801387B8[3];
-	t4 = MAIN_D_801387B8[4];
-	t5 = MAIN_D_801387B8[5];
-	t6 = MAIN_D_801387B8[6];
-	t7 = MAIN_D_801387B8[7];
-	MAIN_D_801387B8[0] = t0 + t1 + t2 + t3 + t4 + t5 + t6 + t7;
-}
+GARBAGE(tickParticleFX, 14);
 
 void tickParticleFX(int32_t id)
 {
@@ -662,71 +631,6 @@ void renderCloudFX(int32_t id)
 	CLOUD_FX_SPRITE.r = CLOUD_FX_SPRITE.g = CLOUD_FX_SPRITE.b = MAIN_D_8012341C[cloud->state];
 	renderSprite(&CLOUD_FX_SPRITE, screenPos.vx, screenPos.vy, depth,
 	             MAIN_D_80123400[cloud->state], MAIN_D_80123400[cloud->state]);
-}
-
-static void rotateVector__garbage__(void)
-{
-	int32_t v0;
-	int32_t v1;
-	int32_t v2;
-	int32_t v3;
-	int32_t v4;
-	int32_t v5;
-	int32_t v6;
-	int32_t v7;
-	int32_t v8;
-	int32_t v9;
-	int32_t v10;
-	int32_t v11;
-	int32_t v12;
-	int32_t v13;
-	int32_t v14;
-	int32_t v15;
-	int32_t v16;
-	int32_t v17;
-	int32_t v18;
-	int32_t v19;
-
-	v0 = MAIN_D_80138AA4[0] + 0;
-	v1 = MAIN_D_80138AA4[1] + 1;
-	v2 = MAIN_D_80138AA4[2] + 2;
-	v3 = MAIN_D_80138AA4[0] + 3;
-	v4 = MAIN_D_80138AA4[1] + 4;
-	v5 = MAIN_D_80138AA4[2] + 5;
-	v6 = MAIN_D_80138AA4[0] + 6;
-	v7 = MAIN_D_80138AA4[1] + 7;
-	v8 = MAIN_D_80138AA4[2] + 8;
-	v9 = MAIN_D_80138AA4[0] + 9;
-	v10 = MAIN_D_80138AA4[1] + 10;
-	v11 = MAIN_D_80138AA4[2] + 11;
-	v12 = MAIN_D_80138AA4[0] + 12;
-	v13 = MAIN_D_80138AA4[1] + 13;
-	v14 = MAIN_D_80138AA4[2] + 14;
-	v15 = MAIN_D_80138AA4[0] + 15;
-	v16 = MAIN_D_80138AA4[1] + 16;
-	v17 = MAIN_D_80138AA4[2] + 17;
-	v18 = MAIN_D_80138AA4[0] + 18;
-	v19 = MAIN_D_80138AA4[1] + 19;
-	MAIN_D_80138AA4[0] = (v0 * v1) + v2;
-	MAIN_D_80138AA4[1] = (v1 * v2) + v3;
-	MAIN_D_80138AA4[2] = (v2 * v3) + v4;
-	MAIN_D_80138AA4[0] = (v3 * v4) + v5;
-	MAIN_D_80138AA4[1] = (v4 * v5) + v6;
-	MAIN_D_80138AA4[2] = (v5 * v6) + v7;
-	MAIN_D_80138AA4[0] = (v6 * v7) + v8;
-	MAIN_D_80138AA4[1] = (v7 * v8) + v9;
-	MAIN_D_80138AA4[2] = (v8 * v9) + v10;
-	MAIN_D_80138AA4[0] = (v9 * v10) + v11;
-	MAIN_D_80138AA4[1] = (v10 * v11) + v12;
-	MAIN_D_80138AA4[2] = (v11 * v12) + v13;
-	MAIN_D_80138AA4[0] = (v12 * v13) + v14;
-	MAIN_D_80138AA4[1] = (v13 * v14) + v15;
-	MAIN_D_80138AA4[2] = (v14 * v15) + v16;
-	MAIN_D_80138AA4[0] = (v15 * v16) + v17;
-	MAIN_D_80138AA4[1] = (v16 * v17) + v18;
-	MAIN_D_80138AA4[2] = (v17 * v18) + v19;
-	MAIN_D_80138AA4[0] = (v18 * v19) + v0;
-	MAIN_D_80138AA4[1] = (v19 * v0) + v1;
 }
 
 void rotateVector(void)

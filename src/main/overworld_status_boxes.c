@@ -1,6 +1,7 @@
 #include <libetc.h>
 
 #include <dw/font.h>
+#include <dw/garbage.h>
 #include <dw/graphics.h>
 #include <dw/map.h>
 #include <dw/model.h>
@@ -199,44 +200,7 @@ void renderCardsView(void)
 	}
 }
 
-static int32_t renderInsetBox__garbage__(int32_t seed)
-{
-	int32_t t0 = 1;
-	int32_t t1 = 2;
-	int32_t t2 = 3;
-	int32_t t3 = 4;
-	int32_t t4 = 5;
-	int32_t t5 = 6;
-	int32_t t6 = 7;
-	int32_t t7 = 8;
-	int32_t t8 = 9;
-	int32_t t9 = 10;
-	int32_t t10 = 11;
-	int32_t t11 = 12;
-	int32_t t12 = 13;
-	int32_t t13 = 14;
-	int32_t t14 = 15;
-	int32_t t15 = 16;
-	int32_t t16 = 17;
-	int32_t t17 = 18;
-	int32_t t18 = 19;
-	int32_t t19 = 20;
-	int32_t t20 = 21;
-	int32_t t21 = 22;
-	int32_t t22 = 23;
-	int32_t t23 = 24;
-	int32_t t24 = 25;
-	int32_t t25 = 26;
-	int32_t t26 = 27;
-	int32_t t27 = 28;
-	int32_t t28 = 29;
-	int32_t t29 = 30;
-	int32_t t30 = 31;
-	int32_t t31 = 32;
-	int32_t t32 = 33;
-
-	return seed + t0 + t1 + t2 + t3 + t4 + t5 + t6 + t7 + t8 + t9 + t10 + t11 + t12 + t13 + t14 + t15 + t16 + t17 + t18 + t19 + t20 + t21 + t22 + t23 + t24 + t25 + t26 + t27 + t28 + t29 + t30 + t31 + t32;
-}
+GARBAGE(renderInsetBox, 21);
 
 void renderInsetBox(int16_t x, int16_t y, int16_t w, int16_t h, int32_t otz)
 {
@@ -392,45 +356,7 @@ void renderDigimonStatusConditions(int32_t condition)
 	}
 }
 
-static int32_t renderDigiviceEntity__garbage__(int32_t seed)
-{
-	int32_t t0 = 1;
-	int32_t t1 = 2;
-	int32_t t2 = 3;
-	int32_t t3 = 4;
-	int32_t t4 = 5;
-	int32_t t5 = 6;
-	int32_t t6 = 7;
-	int32_t t7 = 8;
-	int32_t t8 = 9;
-	int32_t t9 = 10;
-	int32_t t10 = 11;
-	int32_t t11 = 12;
-	int32_t t12 = 13;
-	int32_t t13 = 14;
-	int32_t t14 = 15;
-	int32_t t15 = 16;
-	int32_t t16 = 17;
-	int32_t t17 = 18;
-	int32_t t18 = 19;
-	int32_t t19 = 20;
-	int32_t t20 = 21;
-	int32_t t21 = 22;
-	int32_t t22 = 23;
-	int32_t t23 = 24;
-	int32_t t24 = 25;
-	int32_t t25 = 26;
-	int32_t t26 = 27;
-	int32_t t27 = 28;
-	int32_t t28 = 29;
-	int32_t t29 = 30;
-	int32_t t30 = 31;
-	int32_t t31 = 32;
-	int32_t t32 = 33;
-	int32_t t33 = 34;
-
-	return seed + t0 + t1 + t2 + t3 + t4 + t5 + t6 + t7 + t8 + t9 + t10 + t11 + t12 + t13 + t14 + t15 + t16 + t17 + t18 + t19 + t20 + t21 + t22 + t23 + t24 + t25 + t26 + t27 + t28 + t29 + t30 + t31 + t32 + t33;
-}
+GARBAGE(renderDigiviceEntity, 18);
 
 void renderDigiviceEntity(entity, entityId)
 Entity *entity;

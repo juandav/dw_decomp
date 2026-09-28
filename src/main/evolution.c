@@ -3,6 +3,7 @@
 
 #include <dw/entity.h>
 #include <dw/evl.h>
+#include <dw/garbage.h>
 #include <dw/math.h>
 #include <dw/model.h>
 #include <dw/params.h>
@@ -666,16 +667,7 @@ EvolutionPath EVO_PATHS_DATA[62] = {
 };
 // clang-format on
 
-static void __garbage__(BaseStats* stats) { // NOLINT
-  int16_t statsArray[6];
-  int16_t statsArray2[6];
-  statsArray[0] = statsArray2[0] = stats->hp / 10;
-  statsArray[1] = statsArray2[1] = stats->mp / 10;
-  statsArray[2] = statsArray2[2] = stats->off;
-  statsArray[3] = statsArray2[3] = stats->def;
-  statsArray[4] = statsArray2[4] = stats->speed;
-  statsArray[5] = statsArray2[5] = stats->brain;
-}
+GARBAGE(getFreshEvolutionTarget, 10);
 
 int16_t getFreshEvolutionTarget(int32_t currentDigimon) {
   int32_t result;

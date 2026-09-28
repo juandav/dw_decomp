@@ -4,6 +4,7 @@
 
 #include <dw/file_queue.h>
 #include <dw/font.h>
+#include <dw/garbage.h>
 #include <dw/item.h>
 #include <dw/map.h>
 #include <dw/math.h>
@@ -2759,51 +2760,7 @@ void renderHorizontalLine(uint8_t boxId, int16_t x, int16_t y, int32_t w)
 	renderLinePrimitive(0x20202, x, y, (x + w) - 1, y, boxId, 0);
 }
 
-static int32_t MAIN_func_800FE150__garbage__(int32_t seed)
-{
-	int32_t t0 = 1;
-	int32_t t1 = 2;
-	int32_t t2 = 3;
-	int32_t t3 = 4;
-	int32_t t4 = 5;
-	int32_t t5 = 6;
-	int32_t t6 = 7;
-	int32_t t7 = 8;
-	int32_t t8 = 9;
-	int32_t t9 = 10;
-	int32_t t10 = 11;
-	int32_t t11 = 12;
-	int32_t t12 = 13;
-	int32_t t13 = 14;
-	int32_t t14 = 15;
-	int32_t t15 = 16;
-	int32_t t16 = 17;
-	int32_t t17 = 18;
-	int32_t t18 = 19;
-	int32_t t19 = 20;
-	int32_t t20 = 21;
-	int32_t t21 = 22;
-	int32_t t22 = 23;
-	int32_t t23 = 24;
-	int32_t t24 = 25;
-	int32_t t25 = 26;
-	int32_t t26 = 27;
-	int32_t t27 = 28;
-	int32_t t28 = 29;
-	int32_t t29 = 30;
-	int32_t t30 = 31;
-	int32_t t31 = 32;
-	int32_t t32 = 33;
-	int32_t t33 = 34;
-	int32_t t34 = 35;
-	int32_t t35 = 36;
-	int32_t t36 = 37;
-	int32_t t37 = 38;
-	int32_t t38 = 39;
-	int32_t t39 = 40;
-
-	return seed + t0 + t1 + t2 + t3 + t4 + t5 + t6 + t7 + t8 + t9 + t10 + t11 + t12 + t13 + t14 + t15 + t16 + t17 + t18 + t19 + t20 + t21 + t22 + t23 + t24 + t25 + t26 + t27 + t28 + t29 + t30 + t31 + t32 + t33 + t34 + t35 + t36 + t37 + t38 + t39;
-}
+GARBAGE(renderInsetWithoutBox, 1);
 
 void renderInsetWithoutBox(int32_t boxId, int16_t x, int16_t y, int32_t w, int16_t h)
 {
@@ -4289,31 +4246,7 @@ void scriptShowSelection(void)
 	ACTIVE_INSTRUCTION = SCRIPT_OP_SET_SELECTION;
 }
 
-static void showTextbox__garbage__(void)
-{
-	uint8_t moveSlot;
-	uint8_t objectId;
-	uint8_t speed;
-	uint8_t targetId;
-	uint8_t pad;
-	int16_t posX;
-	int16_t posY;
-	ScriptCameraMovement *slot;
-
-	MAIN_func_801062F8(0xff);
-	pollNextScriptUByte(&moveSlot);
-	pollNextTwoScriptBytes(&objectId, &speed);
-	pollNextTwoScriptBytes(&targetId, &pad);
-	pollNextTwoScriptShorts(&posX, &posY);
-	moveSlot += 0xc;
-	slot = &MAIN_D_801BE6B4[moveSlot];
-	slot->type = 0xd;
-	slot->entityId = objectId;
-	slot->speed = speed;
-	slot->target = targetId;
-	slot->targetX = posX;
-	slot->targetY = posY;
-}
+GARBAGE(showTextbox, 1);
 
 uint32_t showTextbox(int32_t boxId, uint32_t speakerId)
 {

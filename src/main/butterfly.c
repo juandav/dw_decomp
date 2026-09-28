@@ -2,6 +2,7 @@
 #include <libgs.h>
 
 #include <dw/butterfly.h>
+#include <dw/garbage.h>
 #include <dw/math.h>
 #include <dw/world_object.h>
 
@@ -54,16 +55,7 @@ void initializeButterfly(void)
 	}
 }
 
-static void setButterfly__garbage__(void)
-{
-	int32_t frame0;
-	int32_t frame1;
-
-	frame0 = BUTTERFLIES[0].frame;
-	frame1 = BUTTERFLIES[1].frame + 1;
-	BUTTERFLIES[0].frame = frame0;
-	BUTTERFLIES[1].frame = frame1;
-}
+GARBAGE(setButterfly, 5);
 
 int32_t setButterfly(Entity *entity)
 {

@@ -3,6 +3,7 @@
 #include <dw/anim.h>
 #include <dw/entity.h>
 #include <dw/font.h>
+#include <dw/garbage.h>
 #include <dw/item.h>
 #include <dw/params.h>
 #include <dw/types.h>
@@ -278,22 +279,7 @@ void initializeInventoryObject(void)
 	}
 }
 
-static void tickInventoryObject__garbage__(void)
-{
-	int32_t v0;
-	int32_t v1;
-	int32_t v2;
-	int32_t v3;
-
-	v0 = INVENTORY.amounts.array[0] + 0;
-	v1 = INVENTORY.amounts.array[1] + 1;
-	v2 = INVENTORY.amounts.array[2] + 2;
-	v3 = INVENTORY.amounts.array[3] + 3;
-	INVENTORY.amounts.array[0] = (uint8_t)((v0 * v1) + v2);
-	INVENTORY.amounts.array[1] = (uint8_t)((v1 * v2) + v3);
-	INVENTORY.amounts.array[2] = (uint8_t)((v2 * v3) + v0);
-	INVENTORY.amounts.array[3] = (uint8_t)((v3 * v0) + v1);
-}
+GARBAGE(tickInventoryObject, 1);
 
 void tickInventoryObject(int32_t instanceId)
 {
