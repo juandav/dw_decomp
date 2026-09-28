@@ -198,6 +198,7 @@ SECTIONS
 			BUILD_DIR/src/std/std_hud.c.o(.rodata .rodata.*);
 			BUILD_DIR/src/std/std_hud.c.o(.data .data.*);
 			KEEP(BUILD_DIR/asm/std/data/3264C.data.s.o(.data .data.*));
+			KEEP(BUILD_DIR/src/std/std_bss.c.o(.data .data.*));
 			LONG(0);
 		}
 	}
