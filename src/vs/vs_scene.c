@@ -1145,11 +1145,6 @@ int32_t VS_D_800706C8[22] = {
 	0x00000000, 0x00000000,
 };
 
-char VS_D_80070720[] = "Moderate";
-
-char VS_D_8007072C[] = "Distance";
-
-char VS_D_80070738[] = "Defensive";
 // clang-format on
 
 void VS_initializeVS(void)

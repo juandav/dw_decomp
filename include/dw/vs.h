@@ -154,9 +154,7 @@ int32_t VS_selectMoveTarget(Entity *entity, FighterData *fighter);
 void VS_selectPartnerMove(DigimonEntity *digimon, FighterData *fighter, int16_t index);
 void VS_selectRandomCamera(DigimonEntity *entity, int32_t mode, int32_t sub);
 void VS_setRandomViewpoint(Entity *entity, int32_t idx);
-void VS_setupQueuedMove(/* DigimonEntity *digimon, FighterData *fighter,
-                        int16_t arg2, int32_t moveIndex */
-);
+void VS_setupQueuedMove(DigimonEntity *digimon, FighterData *fighter, int16_t arg2, uint8_t moveIndex);
 void VS_startCameraChase(Entity *entity, int32_t dx, int32_t side);
 void VS_startFighterMove(DigimonEntity *digimon, DigimonEntity *target, FighterData *fighter);
 void VS_tickFrame(void);

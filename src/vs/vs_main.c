@@ -3,7 +3,6 @@
 #include <libgs.h>
 #include <libgte.h>
 
-#include <dw/anim.h>
 #include <dw/attack_object.h>
 #include <dw/combat.h>
 #include <dw/entity.h>
@@ -17,11 +16,6 @@
 #include <dw/world_object.h>
 
 #include "common.h"
-
-typedef struct {
-	int16_t score[5];
-	int16_t best;
-} MoveRanking;
 
 extern uint8_t MAIN_D_80125F70[][7];
 extern int16_t ENEMY_COUNT;
@@ -47,18 +41,16 @@ extern int32_t MAIN_D_80135268;
 extern char **MAIN_D_80135298;
 extern DigimonEntity *MAIN_D_80134EF4;
 extern DigimonEntity *MAIN_D_80134EF8;
-extern char VS_D_80070720[];
-extern char VS_D_8007072C[];
-extern char VS_D_80070738[];
 void renderString(int32_t a, int32_t b, int32_t c, int32_t d, int32_t e,
                   int32_t f, int32_t g, int32_t h, int32_t i);
 void createParticleFX();
-int16_t entityGetTechFromAnim(Entity *entity, int32_t anim);
+int32_t entityGetTechFromAnim(Entity *entity, int32_t anim);
 void renderObjects(void);
 void entityLookAtLocation(Entity *entity, VECTOR *pos);
 void swapInt(int32_t *a, int32_t *b);
+void startAnimation(Entity *entity, uint8_t animId);
 int16_t VS_getAttackTech(AttackObject *attack);
-int32_t VS_applyBuffMove(DigimonEntity *digimon, int32_t slot, int32_t anim);
+int32_t VS_applyBuffMove(DigimonEntity *digimon, int32_t slot, int16_t anim);
 
 int16_t VS_applyPartnerStatsToFighter(DigimonEntity *attacker, DigimonEntity *defender, FighterData *fighter, int16_t move);
 int32_t VS_rollAttackOutcome(DigimonEntity *attacker, DigimonEntity *defender, int16_t move);
@@ -66,15 +58,15 @@ void VS_handleHitReaction(Entity *entity, FighterData *fighter, AttackObject *at
 void VS_applyMoveStatus(DigimonEntity *digimon, FighterData *fighter, int32_t move);
 int16_t VS_getFighterSlot(int16_t entityId);
 int32_t VS_addBlockedAttack(FighterData *fighter, FighterData *other);
-void VS_buffStats(DigimonEntity *digimon, int32_t slot, int16_t value, int16_t *stat, int16_t color, uint8_t flag);
-void VS_startAttackAnimation(Entity *entity, AttackObject *attack, int32_t anim);
+void VS_buffStats(DigimonEntity *digimon, int32_t slot, int32_t value, int16_t *stat, int32_t color, int32_t flag);
+void VS_startAttackAnimation(Entity *entity, AttackObject *attack, uint8_t anim);
 void VS_updateFighterStatusVisuals(DigimonEntity *digimon, FighterData *fighter);
 void VS_clearStun(DigimonEntity *digimon, FighterData *fighter);
 void VS_applyFlattenScale(VECTOR *scale, int32_t t);
-void VS_addStatusEffectVisual(DigimonEntity *digimon, FighterData *fighter, int32_t kind);
+void VS_addStatusEffectVisual(DigimonEntity *digimon, FighterData *fighter, uint8_t kind);
 void VS_applyStretchScale(VECTOR *scale, int32_t angle);
 void VS_applySquashScale(VECTOR *scale, int32_t angle);
-void VS_removeStatusEffectVisual(DigimonEntity *digimon, FighterData *fighter, int32_t kind);
+void VS_removeStatusEffectVisual(DigimonEntity *digimon, FighterData *fighter, uint8_t kind);
 void VS_addPoisonStatusVisual(DigimonEntity *digimon, FighterData *fighter);
 void VS_addConfusionStatusVisual(DigimonEntity *digimon, FighterData *fighter);
 void VS_addStunStatusVisual(DigimonEntity *digimon, FighterData *fighter);
@@ -88,13 +80,13 @@ void VS_getHighestScoredMove(int16_t *values, int16_t *marks, int16_t *out, int1
 void VS_getLowestScoredMove(int16_t *values, int16_t *marks, int16_t *out, int16_t count);
 void VS_sortScoresDescending(int32_t *values, int32_t *keys, int32_t *groups, int32_t count);
 void VS_sortScoresAscending(int32_t *values, int32_t *keys, int32_t *groups, int32_t count);
-int32_t VS_calculateElementBonus(int32_t arg0, int32_t arg1);
+int16_t VS_calculateElementBonus(int16_t arg0, int16_t arg1);
 int32_t VS_countLivingEnemies(void);
 void VS_calculateScoreRanks(int32_t *values, int32_t *groups, int32_t count);
 uint8_t VS_isFighterDefeated(uint8_t index);
 void VS_renderMoveName(int32_t i);
 void VS_setCommandIconUV(DigimonEntity *digimon, POLY_FT4 *prim, int32_t index);
-void addEntityText(DigimonEntity *digimon, int32_t slot, int16_t color, int32_t value, uint8_t flag);
+void addEntityText(DigimonEntity *digimon, long slot, int32_t color, int32_t value, uint8_t flag);
 void addWithLimit(/* int16_t *value, int16_t amount, int16_t limit */);
 void VS_stopEFESubEffect(int32_t a, int32_t b);
 int32_t VS_addPoisonEffect(DigimonEntity *digimon);
@@ -168,10 +160,23 @@ uint8_t MAIN_D_80134ABC[4] = { 50, 20, 5, 0 };
 uint8_t MAIN_D_80134AC0[4] = { 50, 20, 10, 0 };
 uint8_t MAIN_D_80134AC4[4] = { 10, 5, 0, 0 };
 int8_t MAIN_D_80134AC8[2] = { -1, -1 };
+#if defined(VERSION_JP)
+char MAIN_D_80134ACC[] = "にげる";
+char MAIN_D_80134AD0[] = "おもいっきり";
+char MAIN_D_80134AD8[] = "おまかせ";
+char VS_D_80070720[] = "ほどほど";
+char VS_D_8007072C[] = "はなれる";
+char VS_D_80070738[] = "ガマンする";
+char MAIN_D_80134AE0[] = "ターゲットをかえる";
+#else
 char MAIN_D_80134ACC[] = "Run";
 char MAIN_D_80134AD0[] = "Attack";
 char MAIN_D_80134AD8[] = "Auto";
+char VS_D_80070720[] = "Moderate";
+char VS_D_8007072C[] = "Distance";
+char VS_D_80070738[] = "Defensive";
 char MAIN_D_80134AE0[] = "Change";
+#endif
 
 // clang-format off
 char *VS_D_80070744[8] = {
@@ -232,10 +237,9 @@ int32_t VS_hasAffordableMoves(int16_t *out, int16_t index)
 
 int16_t VS_getAttackTech(AttackObject *attack)
 {
-	DigimonEntity *digimon;
 	int16_t slot;
-	int16_t tech;
 	int32_t i;
+	int16_t tech;
 
 	if (attack->effectId != 0x179) {
 		slot = VS_getFighterSlot(attack->casterId);
@@ -244,8 +248,7 @@ int16_t VS_getAttackTech(AttackObject *attack)
 				break;
 			}
 		}
-		digimon = (DigimonEntity *)ENTITY_TABLE[attack->casterId];
-		tech = entityGetTechFromAnim(&digimon->entity, digimon->stats.base.moves[i]);
+		tech = entityGetTechFromAnim(ENTITY_TABLE[attack->casterId], ((DigimonEntity *)ENTITY_TABLE[attack->casterId])->stats.base.moves[i]);
 	} else {
 		tech = 0x79;
 	}
@@ -253,33 +256,33 @@ int16_t VS_getAttackTech(AttackObject *attack)
 	return tech;
 }
 
-int32_t VS_applyBuffMove(DigimonEntity *digimon, int32_t slot, int32_t anim)
+int32_t VS_applyBuffMove(DigimonEntity *digimon, int32_t slot, int16_t anim)
 {
 	Stats *stats;
 
 	stats = &digimon->stats;
 	switch (anim) {
 	case 0x29:
-		VS_buffStats(digimon, slot, stats->base.off * 3 / 10, &stats->base.off, 0xb, 3);
+		VS_buffStats(digimon, slot, (int16_t)(stats->base.off * 3 / 10), &stats->base.off, 0xb, 3);
 		break;
 	case 0x2a:
-		VS_buffStats(digimon, slot, stats->base.off / 10, &stats->base.off, 0xb, 3);
-		VS_buffStats(digimon, slot, stats->base.def * 5 / 100, &stats->base.def, 0xb, 4);
-		VS_buffStats(digimon, slot, stats->base.speed / 10, &stats->base.speed, 0xb, 5);
+		VS_buffStats(digimon, slot, (int16_t)(stats->base.off / 10), &stats->base.off, 0xb, 3);
+		VS_buffStats(digimon, slot, (int16_t)(stats->base.def * 5 / 100), &stats->base.def, 0xb, 4);
+		VS_buffStats(digimon, slot, (int16_t)(stats->base.speed / 10), &stats->base.speed, 0xb, 5);
 		break;
 	case 0x22:
-		VS_buffStats(digimon, slot, stats->base.def / 5, &stats->base.def, 0xb, 4);
-		VS_buffStats(digimon, slot, stats->base.speed / 10, &stats->base.speed, 0xb, 5);
+		VS_buffStats(digimon, slot, (int16_t)(stats->base.def / 5), &stats->base.def, 0xb, 4);
+		VS_buffStats(digimon, slot, (int16_t)(stats->base.speed / 10), &stats->base.speed, 0xb, 5);
 		break;
 	case 0x15:
-		VS_buffStats(digimon, slot, stats->base.off * 7 / 100, &stats->base.off, 0xb, 3);
-		VS_buffStats(digimon, slot, stats->base.def * 8 / 100, &stats->base.def, 0xb, 4);
-		VS_buffStats(digimon, slot, stats->base.speed * 7 / 100, &stats->base.speed, 0xb, 5);
+		VS_buffStats(digimon, slot, (int16_t)(stats->base.off * 7 / 100), &stats->base.off, 0xb, 3);
+		VS_buffStats(digimon, slot, (int16_t)(stats->base.def * 8 / 100), &stats->base.def, 0xb, 4);
+		VS_buffStats(digimon, slot, (int16_t)(stats->base.speed * 7 / 100), &stats->base.speed, 0xb, 5);
 		break;
 	case 0x1e:
-		VS_buffStats(digimon, slot, stats->base.off / 4, &stats->base.off, 0xb, 3);
-		VS_buffStats(digimon, slot, stats->base.def * 3 / 20, &stats->base.def, 0xb, 4);
-		VS_buffStats(digimon, slot, stats->base.speed * 3 / 20, &stats->base.speed, 0xb, 5);
+		VS_buffStats(digimon, slot, (int16_t)(stats->base.off / 4), &stats->base.off, 0xb, 3);
+		VS_buffStats(digimon, slot, (int16_t)(stats->base.def * 3 / 20), &stats->base.def, 0xb, 4);
+		VS_buffStats(digimon, slot, (int16_t)(stats->base.speed * 3 / 20), &stats->base.speed, 0xb, 5);
 		break;
 	default:
 		return 0;
@@ -290,9 +293,6 @@ int32_t VS_applyBuffMove(DigimonEntity *digimon, int32_t slot, int32_t anim)
 
 int16_t VS_applyPartnerStatsToFighter(DigimonEntity *attacker, DigimonEntity *defender, FighterData *fighter, int16_t move)
 {
-	uint32_t anim;
-	int32_t value;
-	int32_t half;
 	int32_t x;
 	int16_t result;
 
@@ -316,7 +316,6 @@ int16_t VS_applyPartnerStatsToFighter(DigimonEntity *attacker, DigimonEntity *de
 		return 100;
 	}
 
-	anim = defender->entity.anim.animId;
 	if ((move >= 0x3a) && (move < 0x71)) {
 		if (fighter->flags & 0x80) {
 			fighter->flags &= 0xff7f;
@@ -329,14 +328,12 @@ int16_t VS_applyPartnerStatsToFighter(DigimonEntity *attacker, DigimonEntity *de
 		return 0;
 	}
 
-	value = defender->stats.base.speed - (attacker->stats.base.speed / 10);
-	half = MOVE_DATA[move].accuracy / 2;
-	x = half * value / 999;
-	if ((anim == 0x21) || (anim == 0x22)) {
+	x = (MOVE_DATA[move].accuracy / 2) * (defender->stats.base.speed - (attacker->stats.base.speed / 10)) / 999;
+	if ((defender->entity.anim.animId == 0x21) || (defender->entity.anim.animId == 0x22)) {
 		x = x * 6 / 5;
 	}
 
-	result = MOVE_DATA[move].accuracy - x;
+	result = (int16_t)(MOVE_DATA[move].accuracy - x);
 	if (result < 0) {
 		result = 0;
 	}
@@ -350,19 +347,16 @@ int16_t VS_applyPartnerStatsToFighter(DigimonEntity *attacker, DigimonEntity *de
 
 int32_t VS_rollAttackOutcome(DigimonEntity *attacker, DigimonEntity *defender, int16_t move)
 {
+	int32_t diff;
 	uint8_t eff[3];
-	int32_t i;
-	int32_t dmg;
 	int16_t atk;
 	int16_t def;
-	int32_t r;
-	int32_t power;
-	int32_t sum;
+	long i;
+	int32_t dmg;
 
 	for (i = 0; i < 3; i++) {
 		if (DIGIMON_DATA[defender->entity.type].special[i] != 0xff) {
-			eff[i] = MAIN_D_80125F70[MOVE_DATA[move].special]
-						[DIGIMON_DATA[defender->entity.type].special[i]];
+			eff[i] = MAIN_D_80125F70[MOVE_DATA[move].special][DIGIMON_DATA[defender->entity.type].special[i]];
 		} else {
 			eff[i] = 10;
 		}
@@ -381,19 +375,14 @@ int32_t VS_rollAttackOutcome(DigimonEntity *attacker, DigimonEntity *defender, i
 		}
 		dmg = dmg * (random(0x15) + 0x5a) / 100;
 	} else {
-		dmg = atk - def;
-		if (dmg >= 0x1f5) {
-			dmg = 0x1f4;
+		diff = atk - def;
+		if (diff >= 0x1f5) {
+			diff = 0x1f4;
 		}
-		if (dmg < -0x1f4) {
-			dmg = -0x1f4;
+		if (diff < -0x1f4) {
+			diff = -0x1f4;
 		}
-		r = random(0x15) + 0x5a;
-		power = MOVE_DATA[move].power;
-		power = power + dmg * power / 500;
-		sum = eff[2] + (eff[0] + eff[1]);
-		sum = sum * power / 30;
-		dmg = sum * r / 100;
+		dmg = (eff[2] + (eff[0] + eff[1])) * (MOVE_DATA[move].power + diff * MOVE_DATA[move].power / 500) / 30 * (random(0x15) + 0x5a) / 100;
 	}
 
 	if (dmg <= 0) {
@@ -408,23 +397,27 @@ int32_t VS_rollAttackOutcome(DigimonEntity *attacker, DigimonEntity *defender, i
 
 void VS_handleHitReaction(Entity *entity, FighterData *fighter, AttackObject *attack, int16_t index)
 {
+	VECTOR d;
+	VECTOR n;
 	VECTOR *loc;
+	VECTOR a;
+	PositionData *posData;
 	int16_t *rotY;
-	int32_t ax;
-	int32_t az;
-	int32_t dx;
-	int32_t dz;
-	int32_t nx;
 	int16_t ang;
 
+	posData = entity->posData;
 	loc = &entity->posData->location;
-	rotY = &entity->posData->rotation.vy;
-	ax = ax = attack->position.vx;
-	az = az = attack->position.vz;
-	dx = loc->vx - ax;
-	dz = loc->vz - az;
-	nx = nx = -dx;
-	ang = _atan(-dz, nx);
+	rotY = &posData->rotation.vy;
+	a.vx = attack->position.vx;
+	a.vy = 0;
+	a.vz = attack->position.vz;
+	d.vx = loc->vx - a.vx;
+	d.vy = 0;
+	d.vz = loc->vz - a.vz;
+	n.vx = -d.vx;
+	n.vy = 0;
+	n.vz = -d.vz;
+	ang = _atan(n.vz, n.vx);
 	if (fighter->flags & 8) {
 		*rotY = ang;
 		entity->flatSprite = 3;
@@ -436,7 +429,7 @@ void VS_handleHitReaction(Entity *entity, FighterData *fighter, AttackObject *at
 			*rotY = ang;
 			VS_startAttackAnimation(entity, attack, 0x28);
 		} else {
-			*rotY = _atan(dz, dx);
+			*rotY = _atan(d.vz, d.vx);
 			VS_startAttackAnimation(entity, attack, 0x29);
 		}
 	} else if (!(0 > *rotY) && *rotY < 0x400) {
@@ -444,7 +437,7 @@ void VS_handleHitReaction(Entity *entity, FighterData *fighter, AttackObject *at
 			*rotY = ang;
 			VS_startAttackAnimation(entity, attack, 0x28);
 		} else {
-			*rotY = _atan(dz, dx);
+			*rotY = _atan(d.vz, d.vx);
 			VS_startAttackAnimation(entity, attack, 0x29);
 		}
 	} else {
@@ -452,7 +445,7 @@ void VS_handleHitReaction(Entity *entity, FighterData *fighter, AttackObject *at
 			*rotY = ang;
 			VS_startAttackAnimation(entity, attack, 0x28);
 		} else {
-			*rotY = _atan(dz, dx);
+			*rotY = _atan(d.vz, d.vx);
 			VS_startAttackAnimation(entity, attack, 0x29);
 		}
 	}
@@ -527,6 +520,9 @@ int32_t VS_addBlockedAttack(FighterData *fighter, FighterData *other)
 {
 	int32_t i;
 
+	if (0) {
+		i = 0;
+	}
 	for (i = 0; i < 0x95; i++) {
 		if (fighter->table1[i] == -1) {
 			break;
@@ -542,52 +538,59 @@ int32_t VS_addBlockedAttack(FighterData *fighter, FighterData *other)
 	return 1;
 }
 
-void VS_buffStats(DigimonEntity *digimon, int32_t slot, int16_t value, int16_t *stat, int16_t color, uint8_t flag)
+// clang-format off
+void VS_buffStats(digimon, slot, value, stat, color, flag)
+	DigimonEntity *digimon;
+	int16_t slot;
+	int16_t value;
+	int16_t *stat;
+	int16_t color;
+	uint8_t flag;
+// clang-format on
 {
 	addWithLimit(stat, value, 0x3e7);
 	addEntityText(digimon, slot, color, value, flag);
 }
 
-void VS_startAttackAnimation(Entity *entity, AttackObject *attack, int32_t anim)
+void VS_startAttackAnimation(Entity *entity, AttackObject *attack, uint8_t anim)
 {
-	VS_getAttackTech(attack);
+	int16_t tech;
+
+	tech = VS_getAttackTech(attack);
 	startAnimation(entity, anim);
 	createParticleFX(0, 1, &attack->position, entity, 0x11);
 }
 
 void VS_resolveAttack(void)
 {
-	SVECTOR *hitPos;
-	VECTOR loc;
-	AttackObject attack;
-	FighterData *fighter;
-	PlayerDataSub *sub;
-	Entity *attacker;
-	uint8_t *moves;
-	int32_t tech;
-	int32_t dmg;
-	int32_t handled;
-	int32_t id;
-	uint32_t moveIdx;
-	int32_t i;
 	int32_t j;
+	FighterData *fighter;
 	Entity *entity;
+	long i;
+	int32_t dmg;
+	int32_t chance;
+	int32_t tech;
+	uint8_t *moves;
+	VECTOR loc;
+	FighterData *fighters;
+	PlayerDataSub *sub;
+	AttackObject attack;
+	Entity *attacker;
+	int32_t handled;
 
 	fighter = COMBAT_DATA_PTR->fighter;
+	fighters = fighter;
 	sub = &COMBAT_DATA_PTR->player.unk1[0];
-	i = 0;
-	hitPos = &attack.position;
-	for (; ENEMY_COUNT >= i; i++, fighter++, sub++) {
+	for (i = 0; i <= ENEMY_COUNT; i++, fighter++, sub++) {
 		if (fighter->flags & 0x8000) {
 			continue;
 		}
 		if (popAttackObject(COMBAT_DATA_PTR->player.entityIds[i], &attack) == 0) {
 			continue;
 		}
-		entity = ENTITY_TABLE[((uint8_t *)((uint32_t)i + (uint32_t)COMBAT_DATA_PTR))[0x66c]];
+		entity = ENTITY_TABLE[COMBAT_DATA_PTR->player.entityIds[i]];
 		tech = VS_getAttackTech(&attack);
-		moveIdx = entity->anim.animId - 0x2e;
-		if (DIGIMON_DATA[entity->type].moves[moveIdx] == 0x2d) {
+		if (DIGIMON_DATA[entity->type].moves[(uint32_t)(entity->anim.animId - 0x2e)] == 0x2d) {
 			if (COMBAT_DATA_PTR->player.entityIds[fighter->targetId] == attack.casterId) {
 				((DigimonEntity *)entity)->stats.current.isHit = 0;
 				continue;
@@ -600,16 +603,16 @@ void VS_resolveAttack(void)
 		VS_removeMoveEffect((DigimonEntity *)entity, fighter);
 		fighter->flags &= 0xff8f;
 		attacker = ENTITY_TABLE[attack.casterId];
-		dmg = VS_applyPartnerStatsToFighter((DigimonEntity *)attacker, (DigimonEntity *)entity, fighter, tech);
+		chance = VS_applyPartnerStatsToFighter((DigimonEntity *)attacker, (DigimonEntity *)entity, fighter, tech);
 		if (entity == MAIN_D_80134D60) {
 			VS_removeTargetCursor(i);
-			if ((*(int32_t *)&MAIN_D_80134F4C) != -1) {
+			if (MAIN_D_80134F4C != -1L) {
 				VS_removeFinisherAura(MAIN_D_80134F4C);
 			}
 			MAIN_D_80134D74 = 0;
 			MAIN_D_80134D60 = NULL;
 		}
-		if (random(100) < dmg) {
+		if (random(100) < chance) {
 			if (MAIN_D_80135268 == 6 && MOVE_DATA[tech].range == 1) {
 				goto skipViewpoint;
 			}
@@ -654,7 +657,7 @@ skipViewpoint:
 			continue;
 		}
 		if (VS_addBlockedAttack(fighter, (FighterData *)&attack) != 0) {
-			createParticleFX(0, 2, hitPos, entity, 0x11);
+			createParticleFX(0, 2, &attack.position, entity, 0x11);
 		}
 		if ((fighter->flags & 0x80) && (fighter->invulnerableTimer > 0)) {
 			goto blocked;
@@ -697,15 +700,16 @@ blocked:
 
 int32_t VS_isMoveUsable(DigimonEntity *digimon, FighterData *fighter, int16_t slot)
 {
+	uint8_t move;
 	int16_t tech;
 	int16_t mp;
 
-	if (digimon->stats.base.moves[slot] == 0xff) {
+	move = digimon->stats.base.moves[slot];
+	if (move == 0xff) {
 		return 0;
 	}
 
-	mp = entityGetTechFromAnim(&digimon->entity, digimon->stats.base.moves[slot]);
-	tech = mp;
+	tech = entityGetTechFromAnim(&digimon->entity, move);
 	if (tech == 0x2d) {
 		return 0;
 	}
@@ -722,16 +726,16 @@ int32_t VS_isMoveUsable(DigimonEntity *digimon, FighterData *fighter, int16_t sl
 		return 0;
 	}
 
-	mp = MOVE_DATA[tech].mpCost * 3;
+	mp = (int16_t)(MOVE_DATA[tech].mpCost * 3);
 	if (digimon->stats.base.brain >= 700) {
 		if (digimon->stats.base.brain == 999) {
-			mp = mp - (int16_t)(mp / 5);
+			mp -= (int16_t)(mp / 5);
 		} else if (digimon->stats.base.brain >= 900) {
-			mp = mp - (int16_t)(mp * 15 / 100);
+			mp -= (int16_t)(mp * 15 / 100);
 		} else if (digimon->stats.base.brain >= 800) {
-			mp = mp - (int16_t)(mp / 10);
+			mp -= (int16_t)(mp / 10);
 		} else {
-			mp = mp - (int16_t)(mp / 20);
+			mp -= (int16_t)(mp / 20);
 		}
 	}
 
@@ -744,31 +748,27 @@ int32_t VS_isMoveUsable(DigimonEntity *digimon, FighterData *fighter, int16_t sl
 
 int32_t VS_getDistanceSquared(Entity *a, Entity *b)
 {
+	VECTOR d;
 	VECTOR *pa;
 	VECTOR *pb;
-	int32_t dx;
-	int32_t dz;
 
 	pa = &a->posData->location;
 	pb = &b->posData->location;
-	dx = pa->vx - pb->vx;
-	dz = pa->vz - pb->vz;
+	d.vx = pa->vx - pb->vx;
+	d.vy = 0;
+	d.vz = pa->vz - pb->vz;
 
-	return (dx * dx) + (dz * dz);
+	return (d.vx * d.vx) + (d.vz * d.vz);
 }
 
-// clang-format off
-void VS_setupQueuedMove(digimon, fighter, arg2, moveIndex)
-	DigimonEntity *digimon;
-	FighterData *fighter;
-	int16_t arg2;
-	int32_t moveIndex;
-// clang-format on
+void VS_setupQueuedMove(DigimonEntity *digimon, FighterData *fighter, int16_t arg2, uint8_t moveIndex)
 {
 	int16_t tech;
+	Stats *stats;
 
 	fighter->unk15 = 0;
-	fighter->queuedAnim = digimon->stats.base.moves[moveIndex];
+	stats = &digimon->stats;
+	fighter->queuedAnim = stats->base.moves[moveIndex];
 	tech = entityGetTechFromAnim(&digimon->entity, fighter->queuedAnim);
 	fighter->moveRange = MOVE_DATA[tech].range;
 	VS_applyChargeRequirement(digimon, fighter, tech);
@@ -799,8 +799,6 @@ void VS_applyChargeRequirement(DigimonEntity *digimon, FighterData *fighter, int
 void VS_startFighterMove(DigimonEntity *digimon, DigimonEntity *target, FighterData *fighter)
 {
 	int16_t tech;
-	int32_t anim;
-	uint32_t a2;
 
 	if (MAIN_D_80134D74 != 0) {
 		if (MAIN_D_80134D60 != &digimon->entity) {
@@ -831,12 +829,10 @@ void VS_startFighterMove(DigimonEntity *digimon, DigimonEntity *target, FighterD
 		return;
 	}
 	if (target != NULL) {
-		anim = target->entity.anim.animId;
-		a2 = anim;
-		if (anim == 0x28) {
+		if (target->entity.anim.animId == 0x28) {
 			return;
 		}
-		if (a2 == 0x29) {
+		if (target->entity.anim.animId == 0x29) {
 			return;
 		}
 		if (digimon != target) {
@@ -861,8 +857,9 @@ void VS_startFighterMove(DigimonEntity *digimon, DigimonEntity *target, FighterD
 
 int32_t VS_selectMoveTarget(Entity *entity, FighterData *fighter)
 {
-	int32_t i;
 	int16_t tech;
+	int16_t otherTech;
+	int32_t i;
 	Entity *e;
 	FighterData *f;
 
@@ -879,15 +876,15 @@ int32_t VS_selectMoveTarget(Entity *entity, FighterData *fighter)
 		}
 		for (i = 0; i <= ENEMY_COUNT; i++) {
 			e = ENTITY_TABLE[COMBAT_DATA_PTR->player.entityIds[i]];
-			f = (FighterData *)((uint8_t *)COMBAT_DATA_PTR + i * 0x168);
+			f = &COMBAT_DATA_PTR->fighter[i];
 			if (entity == e) {
 				continue;
 			}
 			if ((f->flags & 0x20) == 0) {
 				continue;
 			}
-			tech = entityGetTechFromAnim(e, e->anim.animId);
-			if ((MOVE_DATA[tech].unk3 & 2) == 0) {
+			otherTech = entityGetTechFromAnim(e, e->anim.animId);
+			if ((MOVE_DATA[otherTech].unk3 & 2) == 0) {
 				continue;
 			}
 			return 1;
@@ -899,11 +896,13 @@ int32_t VS_selectMoveTarget(Entity *entity, FighterData *fighter)
 
 void VS_playMoveEffect(DigimonEntity *digimon, DigimonEntity *target, FighterData *fighter)
 {
+#ifdef __MWERKS__
+	extern void VS_selectRandomCamera(DigimonEntity *, int32_t, uint8_t);
+#endif
 	int32_t tech;
 	int16_t cost;
 	int16_t brain;
 	int32_t i;
-	int32_t t;
 	int32_t n;
 
 	MAIN_D_80134EF8 = digimon;
@@ -969,8 +968,7 @@ void VS_playMoveEffect(DigimonEntity *digimon, DigimonEntity *target, FighterDat
 	}
 
 	if (MAIN_D_80135268 == 3) {
-		t = entityGetTechFromAnim((Entity *)MAIN_D_80135298, ((Entity *)MAIN_D_80135298)->anim.animId);
-		if (MOVE_DATA[t].range == 3) {
+		if (MOVE_DATA[entityGetTechFromAnim((Entity *)MAIN_D_80135298, ((Entity *)MAIN_D_80135298)->anim.animId)].range == 3) {
 			return;
 		}
 	}
@@ -990,14 +988,9 @@ void VS_playMoveEffect(DigimonEntity *digimon, DigimonEntity *target, FighterDat
 
 void VS_removeMoveEffect(DigimonEntity *digimon, FighterData *fighter)
 {
-	int32_t id;
-
-	id = fighter->unk11;
-	do {
-		if (id != -1) {
-			VS_stopEFESubEffect(id, digimon->stats.current.efeSubEffect);
-		}
-	} while (0);
+	if (fighter->unk11 != -1L) {
+		VS_stopEFESubEffect(fighter->unk11, digimon->stats.current.efeSubEffect);
+	}
 	digimon->stats.current.efeSubEffect = -1;
 	fighter->unk11 = -1;
 }
@@ -1023,14 +1016,12 @@ void VS_tickFrame(void)
 
 void VS_addFinisherProgress(FighterData *fighter, int16_t amount)
 {
-	DigimonEntity *digimon;
 	int16_t tech;
 	int32_t i;
 
 	for (i = 0; ENEMY_COUNT >= i; i++) {
 		if (&COMBAT_DATA_PTR->fighter[i] == fighter) {
-			digimon = (DigimonEntity *)ENTITY_TABLE[((uint8_t *)((uint32_t)COMBAT_DATA_PTR + (uint32_t)i))[0x66c]];
-			tech = entityGetTechFromAnim(&digimon->entity, digimon->stats.base.moves[3]);
+			tech = entityGetTechFromAnim(ENTITY_TABLE[COMBAT_DATA_PTR->player.entityIds[i]], ((DigimonEntity *)ENTITY_TABLE[COMBAT_DATA_PTR->player.entityIds[i]])->stats.base.moves[3]);
 			if ((tech < 0x3a) || (tech >= 0x71)) {
 				return;
 			}
@@ -1089,8 +1080,6 @@ void VS_clearStun(DigimonEntity *digimon, FighterData *fighter)
 
 void VS_applyFlattenScale(VECTOR *scale, int32_t t)
 {
-	int32_t value;
-
 	if (t < 0x40) {
 		if (t >= 0x30) {
 			VS_applyStretchScale(scale, (0x40 - t) << 4);
@@ -1107,20 +1096,14 @@ void VS_applyFlattenScale(VECTOR *scale, int32_t t)
 		} else if (t >= 6) {
 			VS_applyStretchScale(scale, (8 - t) << 7);
 		} else if (t >= 4) {
-			value = 0x1000 - ((6 - t) << 11);
-			scale->vx = value;
-			scale->vy = value;
-			scale->vz = value;
+			scale->vz = scale->vy = scale->vx = 0x1000 - ((6 - t) << 11);
 		} else if (0 <= t) {
-			value = (4 - t) << 10;
-			scale->vx = value;
-			scale->vy = value;
-			scale->vz = value;
+			scale->vz = scale->vy = scale->vx = (4 - t) << 10;
 		}
 	}
 }
 
-void VS_addStatusEffectVisual(DigimonEntity *digimon, FighterData *fighter, int32_t kind)
+void VS_addStatusEffectVisual(DigimonEntity *digimon, FighterData *fighter, uint8_t kind)
 {
 	if (fighter->statusFxId == -1) {
 		switch (kind) {
@@ -1139,62 +1122,49 @@ void VS_addStatusEffectVisual(DigimonEntity *digimon, FighterData *fighter, int3
 
 void VS_applyStretchScale(VECTOR *scale, int32_t angle)
 {
-	int32_t half;
-
 	scale->vy = _sin(angle) + 0x1000;
-	half = 0x1000 - (_sin(angle) / 2);
-	scale->vx = half;
-	scale->vz = half;
+	scale->vz = scale->vx = 0x1000 - (_sin(angle) / 2);
 }
 
 void VS_applySquashScale(VECTOR *scale, int32_t angle)
 {
-	int32_t half;
-
 	scale->vy = 0x1000 - (_sin(angle) / 2);
-	half = (_sin(angle) / 2) + 0x1000;
-	scale->vx = half;
-	scale->vz = half;
+	scale->vz = scale->vx = (_sin(angle) / 2) + 0x1000;
 }
 
-void VS_removeStatusEffectVisual(DigimonEntity *digimon, FighterData *fighter, int32_t kind)
+void VS_removeStatusEffectVisual(DigimonEntity *digimon, FighterData *fighter, uint8_t kind)
 {
-	int32_t id;
-
-	id = fighter->statusFxId;
-	do {
-		if (id != -1) {
-			switch (kind) {
-			case 1:
-				VS_removePoisonEffect(id, digimon);
-				break;
-			case 2:
-				VS_removeConfusionEffect(id, digimon);
-				break;
-			case 3:
-				VS_removeStunEffect(id, digimon);
-				break;
-			}
-			fighter->statusFxId = -1;
+	if (fighter->statusFxId != -1L) {
+		switch (kind) {
+		case 1:
+			VS_removePoisonEffect(fighter->statusFxId, digimon);
+			break;
+		case 2:
+			VS_removeConfusionEffect(fighter->statusFxId, digimon);
+			break;
+		case 3:
+			VS_removeStunEffect(fighter->statusFxId, digimon);
+			break;
 		}
-	} while (0);
+		fighter->statusFxId = -1;
+	}
 }
 
 void VS_applyMoveResult(void)
 {
+	long i;
+	int32_t dmg;
 	CombatData *combat;
 	PlayerDataSub *sub;
 	Entity *entity;
 	Stats *stats;
 	FighterData *fighter;
-	int32_t dmg;
-	int32_t i;
 
 	combat = COMBAT_DATA_PTR;
-	sub = combat->player.unk1;
+	sub = COMBAT_DATA_PTR->player.unk1;
 	i = 0;
 
-	for (; ENEMY_COUNT >= i; i++, sub++) {
+	for (; i <= ENEMY_COUNT; i++, sub++) {
 		fighter = &combat->fighter[i];
 		if (fighter->flags & 0x8000) {
 			continue;
@@ -1369,80 +1339,93 @@ int16_t VS_getRandomUsableMove(int16_t *flags)
 	return picked[random(count)];
 }
 
-int16_t VS_getStrongestMove(int32_t index, int16_t *flags)
+// clang-format off
+int16_t VS_getStrongestMove(index, flags)
+	int16_t index;
+	int16_t *flags;
+// clang-format on
 {
-	MoveRanking rank;
-	DigimonEntity *digimon;
-	uint8_t *moves;
+	int16_t score[3];
+	int16_t best;
 	int16_t tech;
+	uint8_t *moves;
+	DigimonEntity *digimon;
 	int32_t i;
 
-	digimon = (DigimonEntity *)ENTITY_TABLE[((uint8_t *)((uint32_t)index + (uint32_t)COMBAT_DATA_PTR))[0x66c]];
+	digimon = (DigimonEntity *)ENTITY_TABLE[COMBAT_DATA_PTR->player.entityIds[index]];
 	moves = digimon->stats.base.moves;
 	for (i = 0; i < 3; i++) {
 		if (flags[i] == 1) {
 			tech = entityGetTechFromAnim(&digimon->entity, moves[i]);
-			rank.score[i] = MOVE_DATA[tech].power;
+			score[i] = MOVE_DATA[tech].power;
 		} else {
-			rank.score[i] = -1;
+			score[i] = -1;
 		}
 	}
 
-	VS_getHighestScoredMove(rank.score, flags, &rank.best, 3);
+	VS_getHighestScoredMove(score, flags, &best, 3);
 
-	return rank.best;
+	return best;
 }
 
-int16_t VS_getMostEffectiveMove(int32_t index, int16_t *flags)
+// clang-format off
+int16_t VS_getMostEffectiveMove(index, flags)
+	int16_t index;
+	int16_t *flags;
+// clang-format on
 {
-	MoveRanking rank;
+	uint8_t *moves;
 	DigimonEntity *digimon;
+	int16_t score[3];
 	Entity *target;
-	uint8_t *moves;
-	int32_t idx;
+	int16_t best;
 	int16_t tech;
 	int32_t i;
 
-	idx = idx = index;
-	digimon = (DigimonEntity *)ENTITY_TABLE[((uint8_t *)((uint32_t)index + (uint32_t)COMBAT_DATA_PTR))[0x66c]];
+	digimon = (DigimonEntity *)ENTITY_TABLE[COMBAT_DATA_PTR->player.entityIds[index]];
 	moves = digimon->stats.base.moves;
-	target = ENTITY_TABLE[((uint8_t *)COMBAT_DATA_PTR + ((FighterData *)COMBAT_DATA_PTR)[idx].targetId)[0x66c]];
+	target = ENTITY_TABLE[COMBAT_DATA_PTR->player.entityIds[COMBAT_DATA_PTR->fighter[index].targetId]];
 	for (i = 0; i < 3; i++) {
 		if (flags[i] == 1) {
 			tech = entityGetTechFromAnim(&digimon->entity, moves[i]);
-			rank.score[i] = MAIN_D_80125F70[MOVE_DATA[tech].special][DIGIMON_DATA[target->type].special[0]];
+			score[i] = MAIN_D_80125F70[MOVE_DATA[tech].special][DIGIMON_DATA[target->type].special[0]];
 		} else {
-			rank.score[i] = -1;
+			score[i] = -1;
 		}
 	}
 
-	VS_getHighestScoredMove(rank.score, flags, &rank.best, 3);
+	VS_getHighestScoredMove(score, flags, &best, 3);
 
-	return rank.best;
+	return best;
 }
 
-int16_t VS_getCheapestMove(int32_t index, int16_t *flags)
+// clang-format off
+int16_t VS_getCheapestMove(index, flags)
+	int16_t index;
+	int16_t *flags;
+// clang-format on
 {
-	MoveRanking rank;
-	DigimonEntity *digimon;
-	uint8_t *moves;
+	int16_t score[3];
+	int16_t best;
 	int16_t tech;
+	uint8_t *moves;
+	DigimonEntity *digimon;
 	int32_t i;
 
-	digimon = (DigimonEntity *)ENTITY_TABLE[((uint8_t *)((uint32_t)index + (uint32_t)COMBAT_DATA_PTR))[0x66c]];
+	digimon = (DigimonEntity *)ENTITY_TABLE[COMBAT_DATA_PTR->player.entityIds[index]];
 	moves = digimon->stats.base.moves;
 	for (i = 0; i < 3; i++) {
 		if (flags[i] == 1) {
 			tech = entityGetTechFromAnim(&digimon->entity, moves[i]);
-			rank.score[i] = MOVE_DATA[tech].mpCost * 3;
+			score[i] = MOVE_DATA[tech].mpCost * 3;
 		} else {
-			rank.score[i] = 1000;
+			score[i] = 1000;
 		}
 	}
 
-	VS_getLowestScoredMove(rank.score, flags, &rank.best, 3);
+	VS_getLowestScoredMove(score, flags, &best, 3);
 
-	return rank.best;
+	return best;
 }
 
 void VS_getHighestScoredMove(int16_t *values, int16_t *marks, int16_t *out, int16_t count)
@@ -1461,8 +1444,8 @@ void VS_getHighestScoredMove(int16_t *values, int16_t *marks, int16_t *out, int1
 	hits = 0;
 	for (i = 0; i < count; i++) {
 		if (best == values[i]) {
-			*out = i;
 			hits++;
+			*out = i;
 			marks[i] = 1;
 		} else {
 			marks[i] = -1;
@@ -1482,7 +1465,7 @@ void VS_getLowestScoredMove(int16_t *values, int16_t *marks, int16_t *out, int16
 
 	best = values[0];
 	for (i = 1; i < count; i++) {
-		if (values[i] < best) {
+		if (best > values[i]) {
 			best = values[i];
 		}
 	}
@@ -1490,8 +1473,8 @@ void VS_getLowestScoredMove(int16_t *values, int16_t *marks, int16_t *out, int16
 	hits = 0;
 	for (i = 0; i < count; i++) {
 		if (best == values[i]) {
-			*out = i;
 			hits++;
+			*out = i;
 			marks[i] = 1;
 		} else {
 			marks[i] = -1;
@@ -1507,8 +1490,8 @@ void VS_sortScoresDescending(int32_t *values, int32_t *keys, int32_t *groups, in
 {
 	int32_t i;
 	int32_t j;
-	int32_t best;
 	int32_t bestValue;
+	int32_t best;
 
 	for (i = 0; i < count; i++) {
 		bestValue = values[i];
@@ -1537,7 +1520,7 @@ void VS_sortScoresAscending(int32_t *values, int32_t *keys, int32_t *groups, int
 		bestValue = values[i];
 		best = i;
 		for (j = i; j < count; j++) {
-			if (values[j] < bestValue) {
+			if (bestValue > values[j]) {
 				best = j;
 				bestValue = values[j];
 			}
@@ -1551,19 +1534,18 @@ void VS_sortScoresAscending(int32_t *values, int32_t *keys, int32_t *groups, int
 
 void VS_selectPartnerMove(DigimonEntity *digimon, FighterData *fighter, int16_t index)
 {
-	Stats *stats;
+	int32_t j;
+	int32_t pick;
+	int32_t total;
 	int32_t values[3];
 	int32_t keys[3];
 	int32_t groups[3];
 	int16_t flags[4];
 	int16_t weights[4];
-	int16_t tech;
-	int16_t bonus;
 	int32_t count;
-	int32_t total;
-	int32_t pick;
+	int16_t tech;
+	Stats *stats;
 	int32_t i;
-	int32_t j;
 
 	if (VS_hasAffordableMoves(flags, index) == 0) {
 		VS_setFighterCooldown(digimon, fighter);
@@ -1635,11 +1617,10 @@ void VS_selectPartnerMove(DigimonEntity *digimon, FighterData *fighter, int16_t 
 		}
 		tech = entityGetTechFromAnim(&digimon->entity, stats->base.moves[i]);
 		if (MOVE_DATA[tech].range == 4) {
-			bonus = fighter->buffPrioTimer + VS_calculateElementBonus(MOVE_DATA[tech].special, DIGIMON_DATA[digimon->entity.type].special[0]);
-			weights[i] += bonus;
+			weights[i] += fighter->buffPrioTimer + VS_calculateElementBonus(MOVE_DATA[tech].special, DIGIMON_DATA[digimon->entity.type].special[0]);
 			continue;
 		}
-		weights[i] = weights[i] + VS_calculateElementBonus(MOVE_DATA[tech].special, DIGIMON_DATA[ENTITY_TABLE[COMBAT_DATA_PTR->player.entityIds[fighter->targetId]]->type].special[0]);
+		weights[i] += VS_calculateElementBonus(MOVE_DATA[tech].special, DIGIMON_DATA[ENTITY_TABLE[COMBAT_DATA_PTR->player.entityIds[fighter->targetId]]->type].special[0]);
 		if (MOVE_DATA[tech].range != 3) {
 			continue;
 		}
@@ -1647,20 +1628,17 @@ void VS_selectPartnerMove(DigimonEntity *digimon, FighterData *fighter, int16_t 
 		switch (digimon->stats.current.chargeMode) {
 		case 0:
 			if ((stats->base.brain >= 0xc8) && (count >= 2)) {
-				bonus = count * 10;
-				weights[i] += bonus;
+				weights[i] += count * 10;
 			}
 			break;
 		case 1:
 			if ((stats->base.brain >= 0xc8) && (count >= 2)) {
-				bonus = count * 15;
-				weights[i] += bonus;
+				weights[i] += count * 15;
 			}
 			break;
 		case 2:
 			if ((stats->base.brain >= 0xc8) && (count >= 2)) {
-				bonus = count * 15;
-				weights[i] += bonus;
+				weights[i] += count * 15;
 			} else if ((stats->current.currentHP * 100 / stats->base.hp) < 0x1f) {
 				for (j = 0; j < 3; j++) {
 					if (flags[i] == 0) {
@@ -1702,36 +1680,27 @@ void VS_selectPartnerMove(DigimonEntity *digimon, FighterData *fighter, int16_t 
 	}
 
 	if (digimon->stats.base.moves[i] != 0xff) {
-		VS_setupQueuedMove(digimon, fighter, (int16_t)index, (int32_t)(uint8_t)i);
+		VS_setupQueuedMove(digimon, fighter, index, i);
 	} else {
 		fighter->cooldown = 0x50;
 		fighter->flags |= 0x800;
 	}
 }
 
-int32_t VS_calculateElementBonus(int32_t arg0, int32_t arg1)
+int16_t VS_calculateElementBonus(int16_t arg0, int16_t arg1)
 {
-	int32_t result;
-
 	switch (MAIN_D_80125F70[arg0][arg1]) {
 	case 20:
-		result = 10;
-		break;
+		return 10;
 	case 15:
-		result = 7;
-		break;
+		return 7;
 	case 10:
-		result = 5;
-		break;
+		return 5;
 	case 5:
-		result = 3;
-		break;
+		return 3;
 	case 2:
-		result = 1;
-		break;
+		return 1;
 	}
-
-	return result;
 }
 
 int32_t VS_countLivingEnemies(void)
@@ -1755,7 +1724,7 @@ void VS_calculateScoreRanks(int32_t *values, int32_t *groups, int32_t count)
 	int32_t group;
 
 	group = 0;
-	groups[0] = 0;
+	groups[0] = group;
 	for (i = 1; i < count; i++) {
 		if (values[i] == (values + i)[-1]) {
 			groups[i] = group;
@@ -1782,7 +1751,7 @@ void VS_queueRandomMove(DigimonEntity *digimon, FighterData *fighter, int32_t te
 	if (VS_hasAffordableMoves(flags, tech) == 0) {
 		VS_setFighterCooldown(digimon, fighter);
 	} else {
-		VS_setupQueuedMove(digimon, fighter, (int16_t)tech, (int32_t)(VS_getRandomUsableMove(flags) & 0xff));
+		VS_setupQueuedMove(digimon, fighter, tech, VS_getRandomUsableMove(flags));
 	}
 }
 
@@ -1840,33 +1809,30 @@ uint8_t VS_isFighterDefeated(uint8_t index)
 void VS_renderMoveName(int32_t i)
 {
 	RECT rect;
-	int32_t y;
 	uint8_t cmd;
-	uint32_t n;
-	int32_t len;
 	int16_t tech;
-	uint32_t y2;
+#if !defined(VERSION_JP)
+	uint32_t n;
 
 	n = i;
-	y = (i * 12) + 0xd8;
-	rect.x = 0;
-	y2 = y;
-	rect.y = y;
-	setWH(&rect, 0x90, 0xc);
+#endif
+	setRECT(&rect, 0, (i * 12) + 0xd8, 0x90, 0xc);
 	clearTextSubArea(&rect);
 	cmd = COMBAT_DATA_PTR->player.availableCommands[i][COMBAT_DATA_PTR->player.hoveredCommand[i]];
 
 	if ((cmd >= 8) && (cmd < 0xc)) {
 		tech = entityGetTechFromAnim(ENTITY_TABLE[COMBAT_DATA_PTR->player.entityIds[i]],
 		                             ((DigimonEntity *)ENTITY_TABLE[COMBAT_DATA_PTR->player.entityIds[i]])->stats.base.moves[cmd - 8]);
-		drawString(MOVE_NAMES[tech], 0, y2);
-		len = 0xc;
+		drawString(MOVE_NAMES[tech], 0, (i * 12) + 0xd8);
 	} else {
-		drawString(VS_D_80070744[cmd - 1], 0, y2);
-		len = 0xc;
+		drawString(VS_D_80070744[cmd - 1], 0, (i * 12) + 0xd8);
 	}
 
-	renderString(0, (int32_t)(n * 160) - 0x8c, MAIN_D_801352AC[i] - 0xe, 0x90, len, 0, y2, 7, 1);
+#if defined(VERSION_JP)
+	renderString(0, (i * 160) - 0x8c, MAIN_D_801352AC[i] - 0xe, 0x90, 0xc, 0, (i * 12) + 0xd8, 7, 1);
+#else
+	renderString(0, (int32_t)(n * 160) - 0x8c, MAIN_D_801352AC[i] - 0xe, 0x90, 0xc, 0, (i * 12) + 0xd8, 7, 1);
+#endif
 }
 
 void VS_setCommandIconUV(DigimonEntity *digimon, POLY_FT4 *prim, int32_t index)

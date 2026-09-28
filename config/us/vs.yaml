@@ -103,7 +103,7 @@ segments:
       - [0x1CEDC, .rodata, vs_scene]
       - [0x1CF20, .rodata, vs_hud]
       - [0x1CF48, .data, vs_scene]
-      - [0x1DC64, .data, vs_main]
+      - [0x1DC40, .data, vs_main]
       - [0x1DCF4, .data, vs_hud]
       - [0x1E064, .data, vs_effect]
       - [0x1EBB0, .data, vs_bss]

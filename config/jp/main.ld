@@ -227,6 +227,8 @@ SECTIONS
         BUILD_DIR/src/evl/evl.c.o(.sdata .sdata.*);
         . = ALIGN(., 4);
         KEEP(BUILD_DIR/asm/main/data/ADC14.sdata.s.o(.sdata .sdata.*));
+        BUILD_DIR/src/vs/vs_main.c.o(.sdata .sdata.*);
+        . = ALIGN(., 4);
         BUILD_DIR/src/vs/vs_hud.c.o(.sdata .sdata.*);
         . = ALIGN(., 4);
         KEEP(BUILD_DIR/asm/main/data/ADD7C.sdata.s.o(.sdata .sdata.*));
