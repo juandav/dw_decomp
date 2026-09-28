@@ -49,3 +49,5 @@ BTL_renderBattleEndText = 0x800665DC;
 BTL_isEndBoxTextFinished = 0x80066640;
 BTL_battleTickFrame = 0x8005FCE8;
 BTL_END_BOX_TEXTBUFFER = 0x8007C6D8; // size:0x400
+DOO2_openEggBox = 0x800724C4;
+DOO2_tickEggInput = 0x8007257C;

@@ -1,0 +1,12 @@
+DOO2_saveModelClut = 0x80070DC0;
+DOO2_saveClutTile = 0x80070E18;
+DOO2_fadeClut = 0x80070E90;
+DOO2_renderWireframeModel = 0x800710FC;
+DOO2_renderSparkStreak = 0x80071B10;
+DOO2_resetShardSets = 0x80071D3C;
+DOO2_buildShardSet = 0x80071DA8;
+DOO2_releaseAllShardSets = 0x8007247C;
+DOO2_D_80071B5C = 0x80072814; // size:0x84
+DOO2_D_80071BE0 = 0x80072898; // size:0x304
+DOO2_D_80071EE4 = 0x80072B9C; // size:0x9808
+DOOA_REINCARNATION_SEQ = 0x80089204; // size:0x40

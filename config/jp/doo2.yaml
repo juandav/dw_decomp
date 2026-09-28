@@ -25,6 +25,7 @@ options:
 
   symbol_addrs_path:
     - config/jp/symbols.txt
+    - config/jp/symbols_doo2.txt
 
   undefined_funcs_auto_path: build/jp/psx/generated/undefined_funcs_auto_doo2.txt
   undefined_syms_auto_path: build/jp/psx/generated/undefined_syms_auto_doo2.txt
@@ -58,7 +59,8 @@ segments:
     align: 4
     subalign: 4
     subsegments:
-      - [0x40, asm, doo2]
-      - [0x2738, data, doo2]
+      - [0x40, c, doo2]
+      - [0x2738, .data, doo2]
+      - [0x279C, .data, doo2_bss]
 
-  - [0xC3A0]
+  - [0xC3A4]

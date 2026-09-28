@@ -10,7 +10,7 @@ MAIN_SBSS := \
 	$(GEN_DIR)/unk_0x8013E228.sbss.s \
 	$(GEN_DIR)/unk_0x8013E310.sbss.s \
 	$(GEN_DIR)/unk_0x8013E37C.sbss.s \
-	$(GEN_DIR)/unk_0x8013E5C0.sbss.s
+	$(GEN_DIR)/unk_0x8013E5D4.sbss.s
 
 MAIN_BSS := \
 	$(GEN_DIR)/unk_0x8013E6A8.bss.s \
@@ -76,6 +76,10 @@ DGET_C_SRC := \
 	src/dget/dget.c
 
 $(eval $(call overlay,DGET,dget))
+DOO2_C_SRC := \
+	src/doo2/doo2.c \
+	src/doo2/doo2_bss.c
+
 $(eval $(call overlay,DOO2,doo2))
 $(eval $(call overlay,DOOA,dooa))
 EAB_C_SRC := \

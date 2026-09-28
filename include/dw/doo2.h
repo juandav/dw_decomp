@@ -24,6 +24,7 @@ typedef struct {
 	int32_t vertices;
 	int32_t primitives;
 	int16_t centerCount;
+	uint8_t pad12[2];
 } Doo2ShardSet;
 
 extern RECT MAIN_D_80134B90;
@@ -39,15 +40,15 @@ extern uint8_t *MAIN_D_80135314;
 extern Doo2ModelVertex *MAIN_D_80135318;
 extern int16_t MAIN_D_8013531C[3];
 
-int32_t DOO2_buildShardSet(VECTOR *offset, void *modelList, int32_t modelIndex);
+int32_t DOO2_buildShardSet(VECTOR *offset, u_long modelList, int32_t modelIndex);
 void DOO2_fadeClut(int16_t *srcClut, void *entity, int16_t *dstClut, int32_t startFrame, int32_t endFrame, int32_t frame);
 void DOO2_openEggBox(void);
 void DOO2_releaseAllShardSets(void);
 void DOO2_renderSparkStreak(int32_t *pos, SVECTOR *rot);
 void DOO2_renderWireframeModel(GsDOBJ2 *obj, int32_t wireThreshold);
 void DOO2_resetShardSets(int32_t size);
-void DOO2_saveClutTile(u_long *pixels, int32_t tile);
-void DOO2_saveModelClut(u_long *pixels);
+void DOO2_saveClutTile(u_long pixels, int32_t tile);
+void DOO2_saveModelClut(u_long pixels);
 int32_t DOO2_tickEggInput(void);
 
 #endif

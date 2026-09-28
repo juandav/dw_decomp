@@ -7,6 +7,7 @@
 #include <dw/btl.h>
 #include <dw/doo2.h>
 #include <dw/dooa.h>
+#include <dw/input.h>
 #include <dw/model.h>
 #include <dw/sound.h>
 #include <dw/types.h>
@@ -50,9 +51,9 @@ int32_t add3DSpritePrim(POLY_FT4 *poly, SVECTOR *v0, SVECTOR *v1, SVECTOR *v2, S
 void DOO2_setScratchTop(int32_t size);
 void DOO2_tickShardSet(int32_t slot);
 void DOO2_releaseShardSet(int32_t slot);
-void DOO2_renderTriShard(Doo2Shard *drift, int32_t unused1, int32_t speed, int32_t unused3, Doo2ShardParams *model);
-void DOO2_renderQuadShard(Doo2Shard *fragment, int32_t arg1, int32_t duration,
-                          int32_t arg3, Doo2ShardParams *sheet);
+void DOO2_renderTriShard(Doo2Shard *drift, int32_t unused1, int16_t speed, int16_t unused3, Doo2ShardParams *model);
+void DOO2_renderQuadShard(Doo2Shard *fragment, int32_t arg1, int16_t duration,
+                          int16_t arg3, Doo2ShardParams *sheet);
 void DOO2_tickEggBox(void);
 void DOO2_renderEggIcons(void);
 void DOO2_renderShardSet(int32_t index);
@@ -75,9 +76,15 @@ static void *doo2_functions[] = {
 	DOO2_tickEggBox,
 	DOO2_renderQuadShard,
 	DOO2_renderTriShard,
+#if defined(VERSION_JP)
+	DOO2_releaseShardSet,
+	DOO2_renderShardSet,
+	DOO2_tickShardSet,
+#else
 	DOO2_releaseShardSet,
 	DOO2_tickShardSet,
 	DOO2_renderShardSet,
+#endif
 	DOO2_setScratchTop,
 };
 
@@ -155,12 +162,18 @@ GsSPRITE DOO2_EGG_CURSOR_SPRITE = {
 
 void DOO2_setScratchTop(int32_t size)
 {
+#if defined(VERSION_JP)
+	if ((size & 3) != 0) {
+		size += 4 - (size & 3);
+	}
+#else
 	int32_t rem;
 
 	rem = size & 3;
 	if (rem != 0) {
 		size += 4 - rem;
 	}
+#endif
 	MAIN_D_80135310 = size;
 }
 
@@ -171,7 +184,6 @@ void DOO2_renderShardSet(int32_t index)
 	Doo2ShardSet *entry;
 	int32_t shards;
 	int32_t count;
-	int32_t code;
 
 	entry = &DOO2_SHARD_SETS[index];
 	shards = entry->centers;
@@ -180,18 +192,18 @@ void DOO2_renderShardSet(int32_t index)
 	count = entry->centerCount;
 	MAIN_D_80135314 = (uint8_t *)entry->primitives;
 	MAIN_D_80135318 = (Doo2ModelVertex *)entry->vertices;
-	params.modelData = DOOA_REINCARNATION_SEQ.modelData[0];
+	paramsPtr->modelData = DOOA_REINCARNATION_SEQ.modelData[0];
 	MAIN_D_8013531C[0] = ((((41 - entry->timer) * 74) / 40) + 54);
 	MAIN_D_8013531C[1] = MAIN_D_8013531C[0];
 	MAIN_D_8013531C[2] = MAIN_D_8013531C[0];
 
 	while (count-- > 0) {
-		if ((code = ((int8_t *)MAIN_D_80135314)[3]) == 0x34) {
+		if (((int8_t *)MAIN_D_80135314)[3] == 0x34) {
 			DOO2_renderTriShard((Doo2Shard *)shards, 0, 80, entry->timer,
 			                    paramsPtr);
 			shards += 14;
 			MAIN_D_80135314 += 0x1c;
-		} else if (code == 0x3c) {
+		} else if (((int8_t *)MAIN_D_80135314)[3] == 0x3c) {
 			DOO2_renderQuadShard((Doo2Shard *)shards, 0, 80, entry->timer,
 			                     paramsPtr);
 			shards += 14;
@@ -202,19 +214,25 @@ void DOO2_renderShardSet(int32_t index)
 
 void DOO2_tickShardSet(int32_t slot)
 {
-	DOO2_SHARD_SETS[slot].timer++;
-	if (DOO2_SHARD_SETS[slot].timer >= 41) {
+	Doo2ShardSet *entry;
+
+	entry = &DOO2_SHARD_SETS[slot];
+	entry->timer++;
+	if (entry->timer >= 41) {
 		DOO2_releaseShardSet(slot);
 	}
 }
 
 void DOO2_releaseShardSet(int32_t slot)
 {
-	DOO2_SHARD_SETS[slot].timer = -1;
+	Doo2ShardSet *entry;
+
+	entry = &DOO2_SHARD_SETS[slot];
+	entry->timer = -1;
 	removeObject(0x609, slot);
 }
 
-void DOO2_renderTriShard(Doo2Shard *drift, int32_t unused1, int32_t speed, int32_t unused3, Doo2ShardParams *model)
+void DOO2_renderTriShard(Doo2Shard *drift, int32_t unused1, int16_t speed, int16_t unused3, Doo2ShardParams *model)
 {
 	SVECTOR a;
 	SVECTOR b;
@@ -256,12 +274,12 @@ void DOO2_renderTriShard(Doo2Shard *drift, int32_t unused1, int32_t speed, int32
 	c.vx = vc->vx + drift->offsetX;
 	c.vy = vc->vy + drift->offsetY;
 	c.vz = vc->vz + drift->offsetZ;
-	setSemiTrans(prim, 1);
+	prim->code |= 2;
 	addScreenPolyFT3(prim, &a, &b, &c);
 }
 
-void DOO2_renderQuadShard(Doo2Shard *fragment, int32_t arg1, int32_t duration,
-                          int32_t arg3, Doo2ShardParams *sheet)
+void DOO2_renderQuadShard(Doo2Shard *fragment, int32_t arg1, int16_t duration,
+                          int16_t arg3, Doo2ShardParams *sheet)
 {
 	SVECTOR a;
 	SVECTOR b;
@@ -309,81 +327,81 @@ void DOO2_renderQuadShard(Doo2Shard *fragment, int32_t arg1, int32_t duration,
 	d.vx = pd->vx + fragment->offsetX;
 	d.vy = pd->vy + fragment->offsetY;
 	d.vz = pd->vz + fragment->offsetZ;
-	setSemiTrans(prim, 1);
+	prim->code |= 2;
 	add3DSpritePrim(prim, &a, &b, &c, &d);
 }
 
 void DOO2_tickEggBox(void)
 {
-	DOOA_REINCARNATION_SEQ.sparkleIndex = 0;
+	DooaSequence *seq;
+
+	seq = &DOOA_REINCARNATION_SEQ;
+	seq->sparkleIndex = 0;
 }
 
 void DOO2_renderEggIcons(void)
 {
 	DooaSequence *panel = &DOOA_REINCARNATION_SEQ;
+	int32_t pri = 1;
 	Doo2EggIcons icons;
-	int32_t i = 0;
+	int32_t i;
 
 	icons = EGG_ICONS;
-	for (; i < 4; i++) {
+	for (i = 0; i < 4; i++) {
 		DOO2_EGG_ICON_SPRITE.x = (i * 36) - 54;
 		DOO2_EGG_ICON_SPRITE.u = (icons.icon[i] * 32) + 96;
 		DOO2_EGG_ICON_SPRITE.cy = i + 492;
-		GsSortSprite(&DOO2_EGG_ICON_SPRITE, ACTIVE_ORDERING_TABLE, 1);
+		GsSortSprite(&DOO2_EGG_ICON_SPRITE, ACTIVE_ORDERING_TABLE, pri);
 	}
 
 	DOO2_EGG_CURSOR_SPRITE.x = (panel->eggSlot * 36) - 54;
-	GsSortSprite(&DOO2_EGG_CURSOR_SPRITE, ACTIVE_ORDERING_TABLE, 1);
+	GsSortSprite(&DOO2_EGG_CURSOR_SPRITE, ACTIVE_ORDERING_TABLE, pri);
 }
 
-void DOO2_saveModelClut(u_long *pixels)
+void DOO2_saveModelClut(u_long pixels)
 {
 	RECT rect;
 
 	setRECT(&rect, 32, 488, 16, 24);
-	StoreImage(&rect, pixels);
+	StoreImage(&rect, (u_long *)pixels);
 	DrawSync(0);
 }
 
-void DOO2_saveClutTile(u_long *pixels, int32_t tile)
+void DOO2_saveClutTile(u_long pixels, int32_t tile)
 {
 	RECT rect;
 
 	setRECT(&rect, (tile & 0x3f) * 16, tile >> 6, 16, 4);
-	StoreImage(&rect, pixels);
+	StoreImage(&rect, (u_long *)pixels);
 	DrawSync(0);
 }
 
 void DOO2_fadeClut(int16_t *srcClut, void *entity, int16_t *dstClut, int32_t startFrame, int32_t endFrame, int32_t frame)
 {
+	RECT rect;
 	int32_t i;
-	int16_t stp;
 	int16_t r;
 	int16_t g;
 	int16_t b;
+	int16_t stp;
+	int16_t *src;
 	int16_t *dst;
-	RECT rect;
 
+	src = srcClut;
 	dst = dstClut;
 	for (i = 0; i < 384; i++) {
-		int32_t den;
-		int32_t num;
-
-		num = endFrame - frame;
-		den = endFrame - startFrame;
-
-		r = *srcClut & 0x1f;
-		g = (*srcClut >> 5) & 0x1f;
-		b = (*srcClut >> 10) & 0x1f;
-		stp = (*srcClut++ >> 15) & 0x1;
+		r = *src & 0x1f;
+		g = (*src >> 5) & 0x1f;
+		b = (*src >> 10) & 0x1f;
+		stp = (*src++ >> 15) & 0x1;
 
 		if (frame != startFrame) {
 			stp = 1;
 		}
 
-		r = r * num / den;
-		g = g * num / den;
-		b = b * num / den;
+		r = (int16_t)r * (endFrame - frame) / (endFrame - startFrame);
+		g = (int16_t)g * (endFrame - frame) / (endFrame - startFrame);
+		b = (int16_t)b * (endFrame - frame) / (endFrame - startFrame);
 
 		*dst = r;
 		*dst += (g << 5);
@@ -398,26 +416,26 @@ void DOO2_fadeClut(int16_t *srcClut, void *entity, int16_t *dstClut, int32_t sta
 
 void DOO2_renderWireframeModel(GsDOBJ2 *obj, int32_t wireThreshold)
 {
+	u_long *tmd;
+	int32_t i;
+	uint8_t *tmdPrim;
 	int32_t primCount;
+	SVECTOR *verts;
+	SVECTOR *normals;
+	uint8_t *packet;
 	CVECTOR lightColor;
 	long p;
 	long flag;
 	long otz;
 	MATRIX lw;
 	GsCOORDINATE2 *coord;
-	u_long *tmd;
-	SVECTOR *verts;
-	SVECTOR *normals;
-	uint8_t *tmdPrim;
-	uint8_t *packet;
-	int32_t i;
-	int8_t color;
 	TMD_P_TG3 *tri;
-	TMD_P_TG4 *quad;
 	POLY_GT3 *poly3;
 	POLY_GT4 *poly4;
-	LINE_F4 *line;
 	LINE_F2 *close;
+	int8_t color;
+	TMD_P_TG4 *quad;
+	LINE_F4 *line;
 
 	color = WIREFRAME_COLOR_MIN + (rand() % (WIREFRAME_COLOR_MAX - WIREFRAME_COLOR_MIN));
 
@@ -450,8 +468,10 @@ void DOO2_renderWireframeModel(GsDOBJ2 *obj, int32_t wireThreshold)
 				if (0 < RotNclip3(&verts[tri->v0], &verts[tri->v1], &verts[tri->v2],
 				                  (long *)&poly3->x0, (long *)&poly3->x1, (long *)&poly3->x2,
 				                  &p, &otz, &flag)) {
+#if !defined(VERSION_JP)
 					otz >>= 2;
 					if ((otz > 32) && (otz < 4096)) {
+#endif
 						NormalColorCol3(&normals[tri->n0], &normals[tri->n1],
 						                &normals[tri->n2], &lightColor,
 						                (CVECTOR *)&poly3->r0, (CVECTOR *)&poly3->r1,
@@ -460,9 +480,14 @@ void DOO2_renderWireframeModel(GsDOBJ2 *obj, int32_t wireThreshold)
 						poly3->clut = tri->clut;
 						poly3->tpage = tri->tpage;
 						setPolyGT3(poly3);
+#if defined(VERSION_JP)
+						otz >>= 2;
+#endif
 						AddPrim(ACTIVE_ORDERING_TABLE->org + otz, poly3);
 						packet = (uint8_t *)++poly3;
+#if !defined(VERSION_JP)
 					}
+#endif
 				}
 			} else {
 				line = (LINE_F4 *)packet;
@@ -486,8 +511,10 @@ void DOO2_renderWireframeModel(GsDOBJ2 *obj, int32_t wireThreshold)
 				                  &verts[quad->v3], (long *)&poly4->x0, (long *)&poly4->x1,
 				                  (long *)&poly4->x2, (long *)&poly4->x3,
 				                  &p, &otz, &flag)) {
+#if !defined(VERSION_JP)
 					otz >>= 2;
 					if ((otz > 32) && (otz < 4096)) {
+#endif
 						NormalColorCol3(&normals[quad->n0], &normals[quad->n1],
 						                &normals[quad->n2], &lightColor,
 						                (CVECTOR *)&poly4->r0, (CVECTOR *)&poly4->r1,
@@ -498,9 +525,14 @@ void DOO2_renderWireframeModel(GsDOBJ2 *obj, int32_t wireThreshold)
 						poly4->clut = quad->clut;
 						poly4->tpage = quad->tpage;
 						setPolyGT4(poly4);
+#if defined(VERSION_JP)
+						otz >>= 2;
+#endif
 						AddPrim(ACTIVE_ORDERING_TABLE->org + otz, poly4);
 						packet = (uint8_t *)++poly4;
+#if !defined(VERSION_JP)
 					}
+#endif
 				}
 			} else {
 				line = (LINE_F4 *)packet;
@@ -518,7 +550,7 @@ void DOO2_renderWireframeModel(GsDOBJ2 *obj, int32_t wireThreshold)
 					packet = (uint8_t *)++close;
 				}
 			}
-			tmdPrim = (uint8_t *)(quad + 1);
+			tmdPrim += sizeof(TMD_P_TG4);
 		} else {
 			break;
 		}
@@ -543,9 +575,9 @@ void DOO2_renderSparkStreak(int32_t *pos, SVECTOR *rot)
 	a.vz = customRandom(400, 500);
 	RotMatrixZYX(rot, &m);
 	ApplyMatrixSV(&m, &a, &a);
-	a.vx = a.vx + origin.vx;
-	a.vy = a.vy + origin.vy;
-	a.vz = a.vz + origin.vz;
+	a.vx += origin.vx;
+	a.vy += origin.vy;
+	a.vz += origin.vz;
 	b.vx = a.vx + customRandom(-50, 50);
 	b.vy = a.vy + customRandom(-50, 50);
 	b.vz = a.vz + customRandom(-50, 50);
@@ -569,29 +601,43 @@ void DOO2_resetShardSets(int32_t size)
 	DOO2_setScratchTop(size);
 }
 
-int32_t DOO2_buildShardSet(VECTOR *offset, void *modelList, int32_t modelIndex)
+int32_t DOO2_buildShardSet(VECTOR *offset, u_long modelList, int32_t modelIndex)
 {
-	SVECTOR p0;
-	SVECTOR p1;
-	SVECTOR p2;
-	Doo2ModelDesc *model;
 	Doo2ShardSet *anim;
+	int32_t slot;
+	u_long tmd;
+	u_long header;
+	Doo2ModelDesc *objects;
+	int32_t outStart;
+	SVECTOR *src;
+	int32_t i;
+	uint8_t *prim;
+	int32_t j;
 	SVECTOR *va;
 	SVECTOR *vb;
 	SVECTOR *vc;
-	int32_t out;
-	int32_t outStart;
-	SVECTOR *src;
-	int32_t prim;
-	int32_t slot;
-	int32_t i;
-	int32_t j;
+	SVECTOR *vd;
+	SVECTOR p0;
+	SVECTOR p1;
+	SVECTOR p2;
+	SVECTOR p3;
+#if defined(VERSION_JP)
+	int16_t center[3];
+#else
 	int16_t cx;
 	int16_t cy;
 	int16_t cz;
+#endif
+	TMD_P_TG3 *tri;
+	TMD_P_TG4 *quad;
+	Doo2ModelDesc *model;
+	int32_t out;
 
-	model = &((Doo2ModelDesc *)((uint32_t)modelList + 12))[modelIndex];
 	out = MAIN_D_80135310;
+	tmd = modelList;
+	header = tmd;
+	objects = (Doo2ModelDesc *)(header + 12);
+	model = &objects[modelIndex];
 
 	for (slot = 0; slot < 6; slot++) {
 		if (DOO2_SHARD_SETS[slot].timer < 0) {
@@ -603,8 +649,8 @@ int32_t DOO2_buildShardSet(VECTOR *offset, void *modelList, int32_t modelIndex)
 	}
 
 	anim = &DOO2_SHARD_SETS[slot];
-	src = model->sourceVertices;
 	outStart = out;
+	src = model->sourceVertices;
 	for (i = 0; i < model->vertexCount; i++) {
 		((Doo2ModelVertex *)out)->vx = src->vx + offset->vx;
 		((Doo2ModelVertex *)out)->vy = src->vy + offset->vy;
@@ -621,54 +667,79 @@ int32_t DOO2_buildShardSet(VECTOR *offset, void *modelList, int32_t modelIndex)
 	anim->centerCount = model->primitiveCount;
 	addObject(0x609, slot, DOO2_tickShardSet, DOO2_renderShardSet);
 
-	prim = model->primitives;
+	prim = (uint8_t *)model->primitives;
 	for (j = 0; j < model->primitiveCount; j++) {
 		switch (((int8_t *)prim)[3]) {
 		case 0x34:
-			va = &model->worldVertices[((TMD_P_TG3 *)prim)->n0];
-			vb = &model->worldVertices[((TMD_P_TG3 *)prim)->n1];
-			vc = &model->worldVertices[((TMD_P_TG3 *)prim)->n2];
+			tri = (TMD_P_TG3 *)prim;
+			va = &model->worldVertices[tri->n0];
+			vb = &model->worldVertices[tri->n1];
+			vc = &model->worldVertices[tri->n2];
 			p0 = *va;
 			p1 = *vb;
 			p2 = *vc;
-			prim += sizeof(TMD_P_TG3);
+#if defined(VERSION_JP)
+			center[0] = (p0.vx + p1.vx + p2.vx) / 3;
+			center[1] = (p0.vy + p1.vy + p2.vy) / 3;
+			center[2] = (p0.vz + p1.vz + p2.vz) / 3;
+			((Doo2Shard *)out)->centerX = center[0];
+			((Doo2Shard *)out)->centerY = center[1];
+			((Doo2Shard *)out)->centerZ = center[2];
+#else
 			cx = (p0.vx + p1.vx + p2.vx) / 3;
 			cy = (p0.vy + p1.vy + p2.vy) / 3;
 			cz = (p0.vz + p1.vz + p2.vz) / 3;
 			((Doo2Shard *)out)->centerX = cx;
 			((Doo2Shard *)out)->centerY = cy;
 			((Doo2Shard *)out)->centerZ = cz;
+#endif
 			((Doo2Shard *)out)->offsetX = 0;
 			((Doo2Shard *)out)->offsetY = 0;
 			((Doo2Shard *)out)->offsetZ = 0;
 			((Doo2Shard *)out)->frame = 0;
 			out += sizeof(Doo2Shard);
+			prim = (uint8_t *)((int32_t)prim + (int32_t)sizeof(TMD_P_TG3));
 			break;
 		case 0x3c:
-			va = &model->worldVertices[((TMD_P_TG4 *)prim)->n0];
-			vb = &model->worldVertices[((TMD_P_TG4 *)prim)->n1];
-			vc = &model->worldVertices[((TMD_P_TG4 *)prim)->n2];
+			quad = (TMD_P_TG4 *)prim;
+			va = &model->worldVertices[quad->n0];
+			vb = &model->worldVertices[quad->n1];
+			vc = &model->worldVertices[quad->n2];
+			vd = &model->worldVertices[quad->n3];
 			p0 = *va;
 			p1 = *vb;
 			p2 = *vc;
-			prim += sizeof(TMD_P_TG4);
+			p3 = *vd;
+#if defined(VERSION_JP)
+			center[0] = (p0.vx + p1.vx + p2.vx) / 3;
+			center[1] = (p0.vy + p1.vy + p2.vy) / 3;
+			center[2] = (p0.vz + p1.vz + p2.vz) / 3;
+			((Doo2Shard *)out)->centerX = center[0];
+			((Doo2Shard *)out)->centerY = center[1];
+			((Doo2Shard *)out)->centerZ = center[2];
+#else
 			cx = (p0.vx + p1.vx + p2.vx) / 3;
 			cy = (p0.vy + p1.vy + p2.vy) / 3;
 			cz = (p0.vz + p1.vz + p2.vz) / 3;
 			((Doo2Shard *)out)->centerX = cx;
 			((Doo2Shard *)out)->centerY = cy;
 			((Doo2Shard *)out)->centerZ = cz;
+#endif
 			((Doo2Shard *)out)->offsetX = 0;
 			((Doo2Shard *)out)->offsetY = 0;
 			((Doo2Shard *)out)->offsetZ = 0;
 			((Doo2Shard *)out)->frame = 0;
 			out += sizeof(Doo2Shard);
+			prim = (uint8_t *)((int32_t)prim + (int32_t)sizeof(TMD_P_TG4));
 			break;
 		}
 	}
+
+#if !defined(VERSION_JP)
 	(void)cx;
 	(void)cy;
 	(void)cz;
+#endif
 
 	MAIN_D_80135310 = out;
 	return slot;
@@ -685,12 +756,16 @@ void DOO2_releaseAllShardSets(void)
 
 void DOO2_openEggBox(void)
 {
+	DooaSequence *seq;
+	int32_t boxId;
 	RECT startPos;
 
+	seq = &DOOA_REINCARNATION_SEQ;
+	boxId = 3;
 	startPos = MAIN_D_80134B98;
-	DOOA_REINCARNATION_SEQ.eggSlot = 0;
-	DOOA_REINCARNATION_SEQ.sparkleIndex = -1;
-	createAnimatedUIBox(3, 0, 2, &MAIN_D_80134B90, &startPos,
+	seq->eggSlot = 0;
+	seq->sparkleIndex = -1;
+	createAnimatedUIBox(boxId, 0, 2, &MAIN_D_80134B90, &startPos,
 	                    (TickFunction)DOO2_tickEggBox,
 	                    (RenderFunction)DOO2_renderEggIcons);
 	stopSound();
@@ -721,15 +796,17 @@ static int32_t doo2__garbage__(int32_t seed)
 int32_t DOO2_tickEggInput(void)
 {
 	DooaSequence *seq;
+	int32_t boxId;
 	RECT boxRect;
 
 	seq = &DOOA_REINCARNATION_SEQ;
+	boxId = 3;
 	boxRect = MAIN_D_80134BA4;
 
-	if (DOOA_REINCARNATION_SEQ.sparkleIndex != 0) {
+	if (seq->sparkleIndex != 0) {
 		return 0;
 	}
-	if (UI_BOX_DATA[3].state == 0) {
+	if (UI_BOX_DATA[boxId].state == 0) {
 		return 1;
 	}
 	if ((POLLED_INPUT & ~POLLED_INPUT_PREVIOUS) & 0x2000) {
@@ -740,8 +817,8 @@ int32_t DOO2_tickEggInput(void)
 		seq->eggSlot = (seq->eggSlot + 3) % 4;
 		playSound(0, 2);
 	}
-	if ((POLLED_INPUT & ~POLLED_INPUT_PREVIOUS) & 0x40) {
-		removeAnimatedUIBox(3, &boxRect);
+	if ((POLLED_INPUT & ~POLLED_INPUT_PREVIOUS) & CONFIRM_BUTTON) {
+		removeAnimatedUIBox(boxId, &boxRect);
 		playSound(0, 3);
 	}
 

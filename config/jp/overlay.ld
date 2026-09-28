@@ -45,9 +45,10 @@ SECTIONS
 			doo2_START = .;
 
 			KEEP(BUILD_DIR/asm/doo2/data/header.rodata.s.o(.rodata .rodata.*));
-			KEEP(BUILD_DIR/asm/doo2/doo2.s.o(.text .text.*));
-			KEEP(BUILD_DIR/asm/doo2/data/doo2.data.s.o(.data .data.*));
-			LONG(0);
+			BUILD_DIR/src/doo2/doo2.c.o(.text .text.*);
+			BUILD_DIR/src/doo2/doo2.c.o(.rodata .rodata.*);
+			BUILD_DIR/src/doo2/doo2.c.o(.data .data.*);
+			BUILD_DIR/src/doo2/doo2_bss.c.o(.data .data.*);
 		}
 	}
 

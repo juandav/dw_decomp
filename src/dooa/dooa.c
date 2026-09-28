@@ -518,10 +518,10 @@ void DOOA_tickDissolve(int32_t instanceId)
 				LoadImage(&rect, timInfo.clut);
 				MAIN_D_80135328 = GetClut(timInfo.cx, timInfo.cy);
 			}
-			DOO2_saveClutTile(DOO2_D_80071B5C, MAIN_D_80135328);
+			DOO2_saveClutTile((u_long)DOO2_D_80071B5C, MAIN_D_80135328);
 			readFile(DOOA_EGG_TMD_PATH, DOO2_D_80071EE4);
 			GsMapModelingData((unsigned long *)DOO2_D_80071EE4 + 1);
-			DOO2_saveModelClut(DOO2_D_80071BE0);
+			DOO2_saveModelClut((u_long)DOO2_D_80071BE0);
 		}
 		work = 0x2c4;
 		work -= seq->frame;
@@ -1078,7 +1078,7 @@ void DOOA_tickRebirth(int32_t instanceId)
 		if (seq->sparkleIndex < 47) {
 			sparkle.offset = DOOA_SPARKLE_OFFSET;
 			if ((sparkle.boneId = DOOA_SPARKLE_BONE_IDS[seq->sparkleIndex]) >= 0) {
-				DOO2_buildShardSet(&sparkle.offset, DOO2_D_80071EE4, (seq->eggSlot * 6) + sparkle.boneId);
+				DOO2_buildShardSet(&sparkle.offset, (u_long)DOO2_D_80071EE4, (seq->eggSlot * 6) + sparkle.boneId);
 				MAIN_D_80135364[DOOA_SPARKLE_BONE_IDS[seq->sparkleIndex]] = -1;
 				playSound(8, 7);
 			}
