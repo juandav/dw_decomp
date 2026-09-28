@@ -30,6 +30,7 @@ MAIN_C_SRC := \
 	src/main/file_queue.c \
 	src/main/fish.c \
 	src/main/kar.c \
+	src/main/map_collision.c \
 	src/main/math.c \
 	src/main/overworld_card_text.c \
 	src/main/overworld_evochart_text.c \

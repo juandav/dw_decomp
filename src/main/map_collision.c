@@ -5,7 +5,7 @@
 
 #include "common.h"
 
-extern int8_t MAP_COLLISION_DATA[];
+extern uint8_t MAP_COLLISION_DATA[];
 void getModelTile(VECTOR *pos, int16_t *outTileX, int16_t *outTileY);
 void loadMapCollisionData(int8_t *src);
 int32_t getTileTrigger(VECTOR *pos);
@@ -32,56 +32,51 @@ int32_t getTileTrigger(VECTOR *pos)
 {
 	int16_t tx;
 	int16_t tz;
-	int32_t idx;
 
 	tx = pos->vx / 100 + 0x32;
 	tz = 0x32 - pos->vz / 100;
 	if (pos->vx < 0) {
-		tx = tx - 1;
+		tx--;
 	}
 	if (pos->vz > 0) {
-		tz = tz - 1;
+		tz--;
 	}
-	idx = tx + tz * 0x64;
-	if ((((uint8_t *)MAP_COLLISION_DATA)[idx] != 0) &&
-	    (((uint8_t *)MAP_COLLISION_DATA)[idx] != 0x80) &&
-	    (((uint8_t *)MAP_COLLISION_DATA)[idx] != 0xFF80)) {
-		return (int8_t)((uint8_t *)MAP_COLLISION_DATA)[idx];
+	if ((MAP_COLLISION_DATA[tx + tz * 100] != 0) &&
+	    (MAP_COLLISION_DATA[tx + tz * 100] != 0x80) &&
+	    (MAP_COLLISION_DATA[tx + tz * 100] != 0xFF80)) {
+		return (int8_t)MAP_COLLISION_DATA[tx + tz * 100];
 	}
-	if (((uint8_t *)MAP_COLLISION_DATA)[idx] == 0) {
+	if (MAP_COLLISION_DATA[tx + tz * 100] == 0) {
 		return 0;
 	} else {
 		return -1;
 	}
 }
 
-int32_t checkMapCollisionX(Entity *entity, int32_t direction)
+int32_t checkMapCollisionX(entity, direction)
+Entity *entity;
+int8_t direction;
 {
 	VECTOR *position;
-	int16_t radius;
-	int32_t halfRadius;
-	int32_t rightRadius;
-	int16_t leftPos;
-	int16_t rightPos;
-	int16_t edgePos;
-	int16_t leftTile;
+	int16_t tile;
+	int16_t pos;
 	int16_t rightTile;
+	int16_t edgePos;
 	int16_t edgeTile;
+	int16_t radius;
 
 	position = &entity->posData->location;
 	radius = DIGIMON_DATA[entity->type].radius;
-	halfRadius = radius / 2;
-	rightRadius = copyValue(halfRadius);
 
-	leftPos = position->vx - halfRadius;
-	leftTile = leftPos / 100 + 0x32;
-	if (leftPos < 0) {
-		leftTile--;
+	pos = position->vx - radius / 2;
+	tile = pos / 100 + 0x32;
+	if (pos < 0) {
+		tile--;
 	}
 
-	rightPos = position->vx + rightRadius;
-	rightTile = rightPos / 100 + 0x32;
-	if (rightPos < 0) {
+	pos = position->vx + radius / 2;
+	rightTile = pos / 100 + 0x32;
+	if (pos < 0) {
 		rightTile--;
 	}
 
@@ -95,9 +90,8 @@ int32_t checkMapCollisionX(Entity *entity, int32_t direction)
 		edgeTile++;
 	}
 
-	for (; leftTile <= rightTile; leftTile++) {
-		if ((((uint8_t *)MAP_COLLISION_DATA)[leftTile + edgeTile * 100] &
-		     0x80) != 0) {
+	for (; tile <= rightTile; tile++) {
+		if ((MAP_COLLISION_DATA[tile + edgeTile * 100] & 0x80) != 0) {
 			return 1;
 		}
 	}
@@ -105,20 +99,17 @@ int32_t checkMapCollisionX(Entity *entity, int32_t direction)
 	return 0;
 }
 
-int32_t checkMapCollisionY(Entity *entity, int32_t direction)
+int32_t checkMapCollisionY(entity, direction)
+Entity *entity;
+int8_t direction;
 {
+	int16_t bottomTile;
 	int16_t edgePos;
+	int16_t edgeTile;
 	VECTOR *position;
 	int16_t radius;
-	int32_t halfRadius;
-	int32_t bottomRadius;
-	int32_t originalZ;
-	int32_t topValue;
-	int16_t topPos;
-	int16_t edgeTile;
-	int16_t topTile;
-	int16_t bottomTile;
-	int16_t bottomPos;
+	int16_t tile;
+	int16_t pos;
 
 	position = &entity->posData->location;
 	radius = DIGIMON_DATA[entity->type].radius;
@@ -132,25 +123,20 @@ int32_t checkMapCollisionY(Entity *entity, int32_t direction)
 		edgeTile--;
 	}
 
-	halfRadius = radius / 2;
-	bottomRadius = copyValue(halfRadius);
-	topValue = originalZ = position->vz;
-	topValue += halfRadius;
-	topPos = topValue;
-	topTile = 0x31 - topPos / 100;
-	if (topPos < 0) {
-		topTile++;
+	pos = position->vz + radius / 2;
+	tile = 0x31 - pos / 100;
+	if (pos < 0) {
+		tile++;
 	}
 
-	bottomPos = originalZ - bottomRadius;
-	bottomTile = 0x31 - bottomPos / 100;
-	if (bottomPos < 0) {
+	pos = position->vz - radius / 2;
+	bottomTile = 0x31 - pos / 100;
+	if (pos < 0) {
 		bottomTile++;
 	}
 
-	for (; topTile <= bottomTile; topTile++) {
-		if ((((uint8_t *)MAP_COLLISION_DATA)[edgeTile + topTile * 100] &
-		     0x80) != 0) {
+	for (; tile <= bottomTile; tile++) {
+		if ((MAP_COLLISION_DATA[edgeTile + tile * 100] & 0x80) != 0) {
 			return 1;
 		}
 	}
@@ -170,33 +156,48 @@ void getModelTile(VECTOR *pos, int16_t *outTileX, int16_t *outTileY)
 	}
 }
 
+#if defined(VERSION_JP)
+void setRectangleImpassable(x, y, radius)
+int16_t x;
+int16_t y;
+int32_t radius;
+#else
 void setRectangleImpassable(int32_t x, int32_t y, int32_t radius)
+#endif
 {
+#if !defined(VERSION_JP)
 	int32_t originalRadius;
 	int32_t originalY;
+#endif
 	int32_t tileX;
 	int32_t tileY;
 
+#if defined(VERSION_JP)
+	for (tileY = y - radius; tileY < y + radius; tileY++) {
+		for (tileX = x - radius; tileX < x + radius; tileX++) {
+#else
 	originalRadius = copyValue(radius);
 	originalY = copyValue(y);
-	for (tileY = y - radius;
-	     tileY < originalY + originalRadius;
-	     tileY++) {
+	for (tileY = y - radius; tileY < originalY + originalRadius; tileY++) {
 		for (tileX = x - originalRadius; tileX < x + radius; tileX++) {
-			((uint8_t *)MAP_COLLISION_DATA)[tileX + tileY * 100] = 0x80;
+#endif
+			MAP_COLLISION_DATA[tileX + tileY * 100] = 0x80;
 		}
 	}
 }
 
-void setRectImpassible(int32_t x, int32_t y, int32_t width, int32_t height)
+void setRectImpassible(x, y, width, height)
+int8_t x;
+int8_t y;
+int8_t width;
+int8_t height;
 {
-	int32_t originalY;
 	int32_t tileX;
+	int32_t tileY;
 
-	originalY = copyValue(y);
-	for (; y < originalY + height; y++) {
+	for (tileY = y; tileY < y + height; tileY++) {
 		for (tileX = x; tileX < x + width; tileX++) {
-			((uint8_t *)MAP_COLLISION_DATA)[tileX + y * 100] = 0x80;
+			MAP_COLLISION_DATA[tileX + tileY * 100] = 0x80;
 		}
 	}
 }
