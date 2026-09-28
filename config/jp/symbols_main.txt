@@ -11,3 +11,4 @@ TRN_setupOffenseTraining = 0x8008BD88;
 TRN2_setupOffenseTraining = 0x80089D38;
 TRN2_setupDefenseTraining = 0x8008A3B8;
 TRN_setupDefenseTraining = 0x8008C93C;
+ENDI_tickEnding = 0x80061208;

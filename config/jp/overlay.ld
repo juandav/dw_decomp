@@ -80,9 +80,8 @@ SECTIONS
 			endi_START = .;
 
 			KEEP(BUILD_DIR/asm/endi/data/header.rodata.s.o(.rodata .rodata.*));
-			KEEP(BUILD_DIR/asm/endi/endi.s.o(.text .text.*));
-			KEEP(BUILD_DIR/asm/endi/data/endi.data.s.o(.data .data.*));
-			LONG(0);
+			BUILD_DIR/src/endi/endi.c.o(.text .text.*);
+			BUILD_DIR/src/endi/endi.c.o(.data .data.*);
 		}
 	}
 

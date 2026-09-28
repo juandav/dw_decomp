@@ -77,6 +77,9 @@ EAB_C_SRC := \
 	src/eab/eab_bss.c
 
 $(eval $(call overlay,EAB,eab))
+ENDI_C_SRC := \
+	src/endi/endi.c
+
 $(eval $(call overlay,ENDI,endi))
 $(eval $(call overlay,EVL,evl))
 FISH_C_SRC := \

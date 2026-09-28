@@ -162,6 +162,9 @@ SECTIONS
         BUILD_DIR/src/trn2/trn2_slots.c.o(.sdata .sdata.*);
         . = ALIGN(., 4);
         KEEP(BUILD_DIR/asm/main/data/ADED0.sdata.s.o(.sdata .sdata.*));
+        BUILD_DIR/src/endi/endi.c.o(.sdata .sdata.*);
+        . = ALIGN(., 4);
+        KEEP(BUILD_DIR/asm/main/data/ADEF8.sdata.s.o(.sdata .sdata.*));
         main_SDATA_END = .;
         main_SDATA_SIZE = ABSOLUTE(main_SDATA_END - main_SDATA_START);
 
