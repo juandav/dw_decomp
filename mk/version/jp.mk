@@ -93,6 +93,9 @@ DOO2_C_SRC := \
 	src/doo2/doo2_bss.c
 
 $(eval $(call overlay,DOO2,doo2))
+DOOA_C_SRC := \
+	src/dooa/dooa_bss.c
+
 $(eval $(call overlay,DOOA,dooa))
 EAB_C_SRC := \
 	src/eab/eab.c \

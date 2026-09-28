@@ -65,6 +65,7 @@ SECTIONS
 			KEEP(BUILD_DIR/asm/dooa/data/header.rodata.s.o(.rodata .rodata.*));
 			KEEP(BUILD_DIR/asm/dooa/dooa.s.o(.text .text.*));
 			KEEP(BUILD_DIR/asm/dooa/data/dooa.data.s.o(.data .data.*));
+			BUILD_DIR/src/dooa/dooa_bss.c.o(.data .data.*);
 			LONG(0);
 		}
 	}
