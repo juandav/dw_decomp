@@ -40,6 +40,8 @@ SECTIONS
         BUILD_DIR/src/main/map_collision.c.o(.text .text.*);
         BUILD_DIR/src/main/particle.c.o(.text .text.*);
         KEEP(BUILD_DIR/asm/main/39950.s.o(.text .text.*));
+        BUILD_DIR/src/main/clock.c.o(.text .text.*);
+        KEEP(BUILD_DIR/asm/main/59A5C.s.o(.text .text.*));
         BUILD_DIR/src/main/entity_text.c.o(.text .text.*);
         KEEP(BUILD_DIR/asm/main/621F4.s.o(.text .text.*));
         BUILD_DIR/src/main/file_queue.c.o(.text .text.*);
@@ -80,6 +82,8 @@ SECTIONS
         BUILD_DIR/src/main/door_mapdata.c.o(.data .data.*);
         BUILD_DIR/src/main/efe.c.o(.data .data.*);
         KEEP(BUILD_DIR/asm/main/data/9F198.data.s.o(.data .data.*));
+        BUILD_DIR/src/main/clock.c.o(.data .data.*);
+        KEEP(BUILD_DIR/asm/main/data/A6B98.data.s.o(.data .data.*));
         BUILD_DIR/src/main/entity_text.c.o(.data .data.*);
         KEEP(BUILD_DIR/asm/main/data/A6BF4.data.s.o(.data .data.*));
         BUILD_DIR/src/main/utils.c.o(.data .data.*);
@@ -98,6 +102,9 @@ SECTIONS
         BUILD_DIR/src/main/efe.c.o(.sdata .sdata.*);
         . = ALIGN(., 4);
         KEEP(BUILD_DIR/asm/main/data/AD4F0.sdata.s.o(.sdata .sdata.*));
+        BUILD_DIR/src/main/clock.c.o(.sdata .sdata.*);
+        . = ALIGN(., 4);
+        KEEP(BUILD_DIR/asm/main/data/AD6B8.sdata.s.o(.sdata .sdata.*));
         BUILD_DIR/src/main/entity_text.c.o(.sdata .sdata.*);
         . = ALIGN(., 4);
         KEEP(BUILD_DIR/asm/main/data/AD6C4.sdata.s.o(.sdata .sdata.*));

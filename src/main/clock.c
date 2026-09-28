@@ -20,7 +20,7 @@ void updateBGM();
 void renderStatusBars(int32_t isGameTimeRunning);
 
 extern GsSPRITE CLOCK_SPRITE;
-extern int16_t LAST_HANDLED_FRAME;
+extern uint16_t LAST_HANDLED_FRAME;
 extern int8_t GAME_STATE;
 extern uint8_t MAP_LAYER_ENABLED;
 extern GsOT *ACTIVE_ORDERING_TABLE;
@@ -74,8 +74,6 @@ void tickGameClock(int32_t instanceId)
 {
 	uint8_t timeSpeed;
 
-	(void)instanceId;
-
 	LAST_HANDLED_FRAME = CURRENT_FRAME;
 
 	if ((GAME_STATE != 0) ||
@@ -96,91 +94,52 @@ void tickGameClock(int32_t instanceId)
 	}
 
 	if (timeSpeed == 0) {
-		++CURRENT_FRAME;
-	} else {
-		if (timeSpeed == 1) {
-			uint32_t even;
-			uint32_t frame;
+		CURRENT_FRAME++;
+	} else if (timeSpeed == 1) {
+		CURRENT_FRAME += 2;
+		if ((CURRENT_FRAME % 2) != 0) {
+			CURRENT_FRAME--;
+		}
+	} else if (timeSpeed == 2) {
+		SUBFRAME_COUNT++;
+		if ((SUBFRAME_COUNT % 2) == 0) {
+			CURRENT_FRAME++;
+		}
+	}
 
-			CURRENT_FRAME += 2U;
-			frame = CURRENT_FRAME;
-			even = frame & 1;
-			if (((int32_t)frame < 0)) {
-				if (even != 0) {
-					even -= 2;
+	if (((timeSpeed != 2) && ((CURRENT_FRAME % 20) == 0)) ||
+	    ((timeSpeed == 2) && ((SUBFRAME_COUNT % 2) == 0) &&
+	     ((CURRENT_FRAME % 20) == 0))) {
+		MINUTE++;
+		if (MINUTE == 60) {
+			HOUR++;
+			MINUTE = 0;
+			PARTNER_PARA.evoTimer++;
+			PARTNER_PARA.remainingLifetime--;
+			SUBFRAME_COUNT = 0;
+			if (HOUR == 24) {
+				PARTNER_PARA.age++;
+				DAY++;
+				HOUR = 0;
+				CURRENT_FRAME = 0;
+				dailyPStatTrigger();
+				if (PARTNER_PARA.remainingLifetime < 0) {
+					PARTNER_PARA.remainingLifetime = 0;
 				}
-			}
-			if (even != 0) {
-				--CURRENT_FRAME;
-			}
-		} else {
-			if (timeSpeed == 2) {
-				uint32_t even;
-				uint32_t subframeCount;
-				++SUBFRAME_COUNT;
-				subframeCount = SUBFRAME_COUNT;
-				even = subframeCount & 1;
-				if ((int32_t)subframeCount < 0) {
-					if (even != 0) {
-						even -= 2;
+				if (DAY >= 30) {
+					DAY = 0;
+					YEAR++;
+					if (PARTNER_PARA.happiness == 100) {
+						addTamerLevel(5, 1);
+					} else if (PARTNER_PARA.happiness < 0) {
+						addTamerLevel(10, -1);
 					}
 				}
-				if (even == 0) {
-					++CURRENT_FRAME;
-				}
 			}
 		}
 	}
 
-	if ((timeSpeed == 2) || ((CURRENT_FRAME % 20) != 0)) {
-		uint32_t even;
-		uint32_t subframeCount;
-
-		if (timeSpeed != 2) {
-			goto out;
-		}
-		subframeCount = SUBFRAME_COUNT;
-		even = subframeCount & 1;
-		if ((int32_t)subframeCount < 0) {
-			if ((even) != 0) {
-				even -= 2U;
-			}
-		}
-		if ((even != 0) || ((CURRENT_FRAME % 20) != 0)) {
-			goto out;
-		}
-	}
-
-	++MINUTE;
-	if (MINUTE == 60) {
-		++HOUR;
-		MINUTE = 0;
-		++PARTNER_PARA.evoTimer;
-		--PARTNER_PARA.remainingLifetime;
-		SUBFRAME_COUNT = 0;
-		if (HOUR == 24) {
-			HOUR = 0;
-			++PARTNER_PARA.age;
-			CURRENT_FRAME = 0;
-			++DAY;
-			dailyPStatTrigger();
-			if (PARTNER_PARA.remainingLifetime < 0) {
-				PARTNER_PARA.remainingLifetime = 0;
-			}
-			if (DAY > 29) {
-				++YEAR;
-				DAY = 0;
-				if (PARTNER_PARA.happiness == 100) {
-					addTamerLevel(5, 1);
-				}
-				else if (PARTNER_PARA.happiness < 0) {
-					addTamerLevel(10, -1);
-				}
-			}
-		}
-	}
-out:
-	if (YEAR > 99) {
+	if (YEAR >= 100) {
 		YEAR = 0;
 	}
 
@@ -191,14 +150,12 @@ out:
 
 void updatePlaytime(int32_t instanceId)
 {
-	(void)instanceId;
-
 	++PLAYTIME_FRAMES;
 	if ((PLAYTIME_FRAMES % 1200) == 0) {
 		++PLAYTIME_MINUTES;
 		if (PLAYTIME_MINUTES > 59) {
-			PLAYTIME_MINUTES = 0;
 			++PLAYTIME_HOURS;
+			PLAYTIME_MINUTES = 0;
 			PLAYTIME_FRAMES = 0;
 			if (PLAYTIME_HOURS > 999) {
 				PLAYTIME_HOURS = 999;
@@ -213,27 +170,20 @@ void updatePlaytime(int32_t instanceId)
 
 void advanceToTime(int32_t hour, int16_t minute)
 {
-  int32_t new_var;
-  int32_t frame;
-  int new_var2;
-  if ((hour < HOUR) || ((HOUR == hour) && (minute < MINUTE)))
-  {
-    DAY += 1;
-    PARTNER_PARA.age += 1;
-    dailyPStatTrigger();
-    if (DAY >= 30)
-    {
-      DAY = 0;
-      YEAR += 1;
-    }
-  }
-  HOUR = hour % 24;
-  MINUTE = minute;
-  frame = minute * 20;
-  new_var2 = HOUR * 1200;
-  CURRENT_FRAME = (new_var = frame) + new_var2;
-  CLOCK_SPRITE.rotate = minute * 0x6000;
-  updateTimeOfDay(frame, minute);
+	if ((hour < HOUR) || ((HOUR == hour) && (minute < MINUTE))) {
+		DAY += 1;
+		PARTNER_PARA.age += 1;
+		dailyPStatTrigger();
+		if (DAY >= 30) {
+			DAY = 0;
+			YEAR += 1;
+		}
+	}
+	HOUR = hour % 24;
+	MINUTE = minute;
+	CURRENT_FRAME = HOUR * 1200 + MINUTE * 20;
+	CLOCK_SPRITE.rotate = MINUTE * 0x6000;
+	updateTimeOfDay();
 }
 
 void initializeClockData(void)
@@ -249,7 +199,7 @@ void initializeClockData(void)
 	SUBFRAME_COUNT = 0;
 	CLOCK_OFFSET_X = -135;
 	CLOCK_SPRITE.attribute = 0;
-	CLOCK_SPRITE.x = -112;
+	CLOCK_SPRITE.x = CLOCK_OFFSET_X + 23;
 	CLOCK_SPRITE.y = -66;
 	setWH(&CLOCK_SPRITE, 8, 16);
 	CLOCK_SPRITE.tpage = GetTPage(0, 0, 896, 448);
@@ -267,11 +217,8 @@ void initializeClockData(void)
 
 void renderGameClock(int32_t instanceId)
 {
-	int32_t isNight;
+	uint8_t isNight;
 	uint8_t frame;
-	int32_t hour;
-
-	(void)instanceId;
 
 	if (HOUR >= 6 && HOUR < 17) {
 		isNight = 0;
@@ -312,20 +259,18 @@ void renderGameClock(int32_t instanceId)
 	CLOCK_SPRITE.x = CLOCK_OFFSET_X + 23;
 	GsSortSprite(&CLOCK_SPRITE, ACTIVE_ORDERING_TABLE, 9);
 
-	hour = HOUR;
-
-	renderRectPolyFT4(CLOCK_OFFSET_X + CLOCK_HOUR_X[hour],
-			  CLOCK_HOUR_Y[hour] - 88,
+	renderRectPolyFT4(CLOCK_OFFSET_X + CLOCK_HOUR_X[HOUR],
+			  CLOCK_HOUR_Y[HOUR] - 88,
 			  6, 6, 203, 216,
 			  GetTPage(0, 0, 896, 448), GetClut(256, 497), 9, 0);
 
 	renderStatusBars(IS_GAMETIME_RUNNING);
 }
 
-void updateMinuteHand(int32_t hour, int32_t minute)
+void updateMinuteHand(hour, minute)
+int32_t hour;
+int16_t minute;
 {
-	(void)hour;
-
 	CLOCK_SPRITE.rotate = minute * 0x6000;
 }
 
