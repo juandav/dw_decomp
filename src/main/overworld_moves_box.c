@@ -56,7 +56,7 @@ void renderRectPolyFT4(int16_t posX, int16_t posY, int32_t width,
 void renderBoxBar(int16_t x, int16_t y, int16_t w, int16_t h, uint8_t r,
 		  uint8_t g, uint8_t b, uint8_t flags, int32_t otz);
 int32_t hasMove(int32_t move);
-void sortArray(int16_t *arr, uint8_t count);
+void sortArray(int16_t *arr, int8_t count);
 void renderDigimonMoveBox(void);
 void renderDigimonMovesSelected(int16_t panel);
 int32_t drawMoveViewHelpStrings(void);
@@ -144,9 +144,11 @@ void renderDigimonMovesSelected(int16_t panel)
 	RECT rect;
 	Move *move;
 	int32_t i;
-	int32_t y;
 	uint8_t row;
 	uint8_t col;
+#if defined(VERSION_JP)
+	uint8_t status;
+#endif
 	uint8_t moveId;
 
 	if (panel == 0) {
@@ -172,8 +174,8 @@ void renderDigimonMovesSelected(int16_t panel)
 	renderRectPolyFT4((panel * 0xcb) - 0x8c, 0x3f, 0x13, 7, 0x4c, 0xa9, 5, 0x7b06, 3, 0);
 	renderRectPolyFT4((panel * 0xcb) - 0x8c, 0x50, 0x10, 7, 0, 0xb0, 5, 0x7b06, 3, 0);
 
-	for (i = 0, y = 0x1b; i < 4; i++, y += 0x11) {
-		renderRectPolyFT4((panel * 0xcb) - 0x71, y, 0xa, 0xa, 0x8a, 0x8c, 5, 0x7b06, 3, 0);
+	for (i = 0; i < 4; i++) {
+		renderRectPolyFT4((panel * 0xcb) - 0x71, i * 0x11 + 0x1b, 0xa, 0xa, 0x8a, 0x8c, 5, 0x7b06, 3, 0);
 	}
 
 	row = (MAIN_D_80134D3A - 0x73) / 18;
@@ -203,6 +205,16 @@ void renderDigimonMovesSelected(int16_t panel)
 		renderNumber(0, (panel * 0xcb) - 0x64, 0x1b, 3, move->power, 3);
 		renderNumber(0, (panel * 0xcb) - 0x64, 0x2c, 3, move->mpCost * 3, 3);
 		renderString(0, (panel * 0xcb) - 0x64, 0x3e, 0x24, 0xc, (move->range - 1) * 0x24, 0x78, 3, 1);
+#if defined(VERSION_JP)
+		status = move->status;
+		if (status == 1) {
+			renderString(0, (panel * 0xcb) - 0x64, 0x4f, 0xc, 0xc, 0x84, 0x6c, 3, 1);
+		} else if (status == 4) {
+			renderString(0, (panel * 0xcb) - 0x64, 0x4f, 0x24, 0xc, 0xc0, 0x6c, 3, 1);
+		} else if (status != 0) {
+			renderString(0, (panel * 0xcb) - 0x64, 0x4f, 0x18, 0xc, (status - 2) * 0x18 + 0x90, 0x6c, 3, 1);
+		}
+#else
 		switch (move->status) {
 		case 1:
 			renderString(0, (panel * 0xcb) - 0x64, 0x4f, 0x1a, 0xc, 0x84, 0x6c, 3, 1);
@@ -217,138 +229,140 @@ void renderDigimonMovesSelected(int16_t panel)
 			renderString(0, (panel * 0xcb) - 0x64, 0x4f, 0x1e, 0xc, 0xdb, 0x6c, 3, 1);
 			break;
 		}
+#endif
 	}
 }
 
 void renderDigimonMoveBox(void)
 {
-	uint8_t bVar1;
-	uint8_t uVar2;
-	uint8_t uVar3;
-	uint8_t uVar6;
-	uint8_t cVar4;
-	int16_t iVar5;
-	int32_t iVar6;
-	int16_t unaff_s2;
-	int32_t iVar10;
-	int32_t iVar11;
-	int32_t iVar12;
-	int32_t iVar13;
-	int16_t local_20[16];
-	for (iVar11 = 0; iVar11 < 3; iVar11++) {
-		uVar2 = (uVar6 = EQUIPPED_MOVES[iVar11]);
-		if (uVar2 < 0x3a) {
-			uVar3 = uVar6 % 8;
-			if (uVar6 < 8) {
-				iVar13 = 0;
-			} else if (uVar6 < 0x10) {
-				iVar13 = 2;
-			} else if (uVar6 < 0x18) {
-				iVar13 = 4;
-			} else if (uVar6 < 0x20) {
-				iVar13 = 5;
-			} else if (uVar6 < 0x28) {
-				iVar13 = 3;
-			} else if (uVar6 < 0x30) {
-				iVar13 = 1;
+	int16_t moveId;
+	int16_t moves[16];
+	int32_t col;
+	int32_t row;
+	int32_t j;
+	int16_t clut;
+	uint8_t x;
+	uint8_t special;
+	int8_t blink;
+	int32_t i;
+	uint8_t y;
+
+	for (i = 0; i < 3; i++) {
+		if (EQUIPPED_MOVES[i] < 0x3a) {
+			x = EQUIPPED_MOVES[i] % 8;
+			if (EQUIPPED_MOVES[i] < 8) {
+				y = 0;
+			} else if (EQUIPPED_MOVES[i] < 0x10) {
+				y = 2;
+			} else if (EQUIPPED_MOVES[i] < 0x18) {
+				y = 4;
+			} else if (EQUIPPED_MOVES[i] < 0x20) {
+				y = 5;
+			} else if (EQUIPPED_MOVES[i] < 0x28) {
+				y = 3;
+			} else if (EQUIPPED_MOVES[i] < 0x30) {
+				y = 1;
 			} else {
-				uVar3 = (uVar6 - 1) % 8;
-				iVar13 = 6;
+				x = (EQUIPPED_MOVES[i] - 1) % 8;
+				y = 6;
 			}
-			if (uVar6 == 0x30) {
-				uVar3 = 4;
-				iVar13 = 1;
+			if (EQUIPPED_MOVES[i] == 0x30) {
+				x = 4;
+				y = 1;
 			}
-			if (uVar6 == 0x39) {
-				iVar13 = uVar3 = 6;
+			if (EQUIPPED_MOVES[i] == 0x39) {
+				x = 6;
+				y = 6;
 			}
-			renderBoxBar(uVar3 * 0x12 - 0x2a, iVar13 * 0xf - 7, 0xc, 0xc, 200, 0, 0x28, 1, 4);
+			renderBoxBar(x * 0x12 - 0x2a, y * 0xf - 7, 0xc, 0xc, 200, 0, 0x28, 1, 4);
 		}
 	}
-	for (iVar11 = 0; iVar11 < 0x10; iVar11++) {
-		local_20[iVar11] = DIGIMON_DATA[ENTITY_TABLE[1]->type].moves[iVar11];
+
+	for (i = 0; i < 0x10; i++) {
+		moves[i] = DIGIMON_DATA[ENTITY_TABLE[1]->type].moves[i];
 	}
-	sortArray(local_20, 0x10);
-	for (iVar11 = 0, iVar12 = 0; iVar12 < 7; iVar12++) {
-		for (iVar10 = 0; iVar10 < 8; iVar10++) {
-			iVar5 = iVar12 * 8 + iVar10;
-			if (0x2f < iVar5) {
-				++iVar5;
+	sortArray(moves, 0x10);
+
+	i = 0;
+	for (row = 0; row < 7; row++) {
+		for (col = 0; col < 8; col++) {
+			moveId = row * 8 + col;
+			if (moveId >= 0x30) {
+				moveId++;
 			}
-			if (iVar5 == 0x2c) {
-				for (iVar6 = 0; iVar6 < 0x10; iVar6++) {
-					if (local_20[iVar6] == 0x2c || local_20[iVar6] == 0x30) {
+			j = 0;
+			if (moveId == 0x2c) {
+				for (j = 0; j < 0x10; j++) {
+					if (moves[j] == 0x2c || moves[j] == 0x30) {
 						break;
 					}
-					if (iVar6 == 0xf) {
+					if (j == 0xf) {
 						renderBoxBar(0x1e, 8, 0xc, 0xc, 0x68, 0x68, 0x68, 3, 4);
 					}
 				}
 			}
-			if (iVar5 == 0x37) {
-				for (iVar6 = 0; iVar6 < 0x10; iVar6++) {
-					if (local_20[iVar6] == 0x37 || local_20[iVar6] == 0x39) {
+			if (moveId == 0x37) {
+				for (j = 0; j < 0x10; j++) {
+					if (moves[j] == 0x37 || moves[j] == 0x39) {
 						break;
 					}
-					if (iVar6 == 0xf) {
+					if (j == 0xf) {
 						renderBoxBar(0x42, 0x53, 0xc, 0xc, 0x68, 0x68, 0x68, 3, 4);
 					}
 				}
 			}
-			if (iVar5 == local_20[iVar11]) {
-				++iVar11;
-			} else if (iVar5 != 0x2c && iVar5 != 0x37 && iVar5 != 0x30 &&
-				   iVar5 != 0x39) {
-				if (iVar5 < 8) {
-					iVar13 = 0;
-				} else if (iVar5 < 0x10) {
-					iVar13 = 2;
-				} else if (iVar5 < 0x18) {
-					iVar13 = 4;
-				} else if (iVar5 < 0x20) {
-					iVar13 = 5;
-				} else if (iVar5 < 0x28) {
-					iVar13 = 3;
-				} else if (iVar5 < 0x30) {
-					iVar13 = 1;
+			if (moveId == moves[i]) {
+				i++;
+			} else if (moveId != 0x2c && moveId != 0x37 && moveId != 0x30 &&
+				   moveId != 0x39) {
+				if (moveId < 8) {
+					y = 0;
+				} else if (moveId < 0x10) {
+					y = 2;
+				} else if (moveId < 0x18) {
+					y = 4;
+				} else if (moveId < 0x20) {
+					y = 5;
+				} else if (moveId < 0x28) {
+					y = 3;
+				} else if (moveId < 0x30) {
+					y = 1;
 				} else {
-					iVar13 = 6;
+					y = 6;
 				}
-				renderBoxBar(iVar10 * 0x12 - 0x2a, iVar13 * 0xf - 7, 0xc,
-					     0xc, 0x68, 0x68, 0x68, 3, 4);
+				renderBoxBar(col * 0x12 - 0x2a, y * 0xf - 7, 0xc, 0xc, 0x68, 0x68, 0x68, 3, 4);
 			}
-			if (hasMove(iVar5) == 1) {
-				bVar1 = MOVE_DATA[iVar5].special;
-				switch (bVar1) {
-					case 0:
-						unaff_s2 = 0x7a06;
-						break;
-					case 1:
-						unaff_s2 = 0x7a06;
-						break;
-					case 2:
-						unaff_s2 = 0x7a46;
-						break;
-					case 3:
-						unaff_s2 = 0x7a46;
-						break;
-					case 4:
-						unaff_s2 = 0x7a46;
-						break;
-					case 5:
-						unaff_s2 = 0x7a86;
-						break;
-					case 6:
-						unaff_s2 = 0x7a06;
+			if (hasMove(moveId) == 1) {
+				special = MOVE_DATA[moveId].special;
+				switch (special) {
+				case 0:
+					clut = 0x7a06;
+					break;
+				case 1:
+					clut = 0x7a06;
+					break;
+				case 2:
+					clut = 0x7a46;
+					break;
+				case 3:
+					clut = 0x7a46;
+					break;
+				case 4:
+					clut = 0x7a46;
+					break;
+				case 5:
+					clut = 0x7a86;
+					break;
+				case 6:
+					clut = 0x7a06;
 				}
 				if (PLAYTIME_FRAMES % 0x14 < 10) {
-					cVar4 = 0;
+					blink = 0;
 				} else {
-					cVar4 = 0xc;
+					blink = 0xc;
 				}
-				renderRectPolyFT4(iVar10 * 0x12 - 0x2a, bVar1 * 0xf - 7, 0xc,
-						  0xc, cVar4 + (bVar1 * 0x18 + 0x24), 0x80, 5,
-						  unaff_s2, 4, 0);
+				renderRectPolyFT4(col * 0x12 - 0x2a, special * 0xf - 7, 0xc, 0xc,
+						  blink + (special * 0x18 + 0x24), 0x80, 5, clut, 4, 0);
 			}
 		}
 	}
@@ -364,7 +378,7 @@ int32_t drawMoveViewHelpStrings(void)
 	}
 
 	drawString(STATUS_VIEW_LABELS[MENU_SUB_STATE + 9], 0, MENU_SUB_STATE * 0xc + 0x18);
-	MENU_SUB_STATE = MENU_SUB_STATE + 1;
+	MENU_SUB_STATE++;
 
 	if (MENU_SUB_STATE == 8) {
 		return 1;
@@ -375,6 +389,9 @@ int32_t drawMoveViewHelpStrings(void)
 
 void renderDigiviceMedals(void)
 {
+	MATRIX m;
+
+	m = GsWSMATRIX;
 	FRAMEBUFFER_OT[0]->length = 9;
 	FRAMEBUFFER_OT[0]->org = FRAMEBUFFER0_ORIGIN;
 	FRAMEBUFFER_OT[1]->length = 9;
@@ -394,7 +411,7 @@ void renderDigiviceMedals(void)
 	GsSetRefView2(&GS_VIEWPOINT);
 }
 
-void sortArray(int16_t *arr, uint8_t count)
+void sortArray(int16_t *arr, int8_t count)
 {
 	int32_t i;
 	int32_t j;

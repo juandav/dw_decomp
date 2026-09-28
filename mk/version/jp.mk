@@ -49,6 +49,7 @@ MAIN_C_SRC := \
 	src/main/overworld_evochart_text.c \
 	src/main/overworld_evochart_view.c \
 	src/main/overworld_medal_text.c \
+	src/main/overworld_moves_box.c \
 	src/main/overworld_moves_text.c \
 	src/main/overworld_playerinfo_text.c \
 	src/main/particle.c \
