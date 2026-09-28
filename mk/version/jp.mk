@@ -24,6 +24,7 @@ MAIN_C_SRC := \
 	src/main/door_mapdata.c \
 	src/main/efe.c \
 	src/main/efe_table.c \
+	src/main/entity_text.c \
 	src/main/evl.c \
 	src/main/fade.c \
 	src/main/file.c \

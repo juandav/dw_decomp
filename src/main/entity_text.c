@@ -38,13 +38,14 @@ void getEntityScreenPos(Entity *entity, int32_t mode, int16_t *out);
 void convertValueToDigits(int32_t n, int32_t value, int32_t *outCount,
 			  int32_t *digits);
 extern int8_t GAME_STATE;
+extern GsOT *ACTIVE_ORDERING_TABLE;
 
 void drawEntityText(int32_t color, int32_t n, int32_t x, int32_t y,
 			int32_t value, int32_t layer);
 void drawEntityTextIcon(int32_t x, int32_t y, int32_t u, int32_t layer);
 
 void initializeEntityText();
-void addEntityText(Entity *entity, int32_t slotId, int8_t color, int32_t value, uint8_t icon);
+void addEntityText(Entity *entity, int16_t slotId, int16_t color, int32_t value, uint8_t icon);
 void setCombatTextPosition(Entity *entity, EntityTextDataEntry *entry);
 void renderEntityText(int32_t instanceId);
 void removeEntityText(int32_t id);
@@ -61,28 +62,18 @@ void initializeEntityText()
 {
 	int32_t id;
 	int32_t i;
-	int32_t ofs;
-	uint8_t *p;
+	EntityTextData *data;
 
-	/*
-	 * The same as removeEntityText() for every slot. Written with the
-	 * fields of EntityTextData, the loops no longer match.
-	 */
-	id = 0;
-	p = (uint8_t *)&ENTITY_TEXT_DATA[id];
-	while (id < 4) {
-		i = 0;
-		ofs = 0;
-		while (i < 8) {
-			(&p[ofs])[0x10] = 0xFF;
-			(&p[i])[0x84] = 0xFF;
-			i += 1;
-			ofs += 0x10;
+	for (id = 0; id < 4; id++) {
+		data = &ENTITY_TEXT_DATA[id];
+		for (i = 0; i < 8; i++) {
+			data->entries[i].frameId = 0xFF;
+			data->activeList[i] = 0xFF;
 		}
-		*(int32_t *)p = 0;
-		id += 1;
-		p += 0x8C;
+		data->activeElements = 0;
 	}
+
+	i = i;
 }
 
 /* CodeWarrior retains scheduler state between functions. This unused function
@@ -112,14 +103,14 @@ static int32_t primeAddEntityTextScheduler(int32_t a, int32_t b, int32_t c,
  * Up to eight numbers per slot rise one after another; icon adds a small
  * sprite before the number.
  */
-void addEntityText(Entity *entity, int32_t slotId, int8_t color, int32_t value,
+void addEntityText(Entity *entity, int16_t slotId, int16_t color, int32_t value,
 		   uint8_t icon)
 {
+	int32_t i;
 	int32_t digits[4];
 	EntityTextData *slot;
 	EntityTextDataEntry *entry;
 	int32_t j;
-	int32_t i;
 
 	slot = &ENTITY_TEXT_DATA[slotId];
 	if (slot->activeElements == 8) {
@@ -155,6 +146,7 @@ void addEntityText(Entity *entity, int32_t slotId, int8_t color, int32_t value,
 			break;
 		}
 	}
+	j = j;
 
 	if (slot->activeElements == 0) {
 		addObject(0x192, slotId, 0, renderEntityText);
@@ -171,67 +163,60 @@ void setCombatTextPosition(Entity *entity, EntityTextDataEntry *entry)
 	entry->y = xy[1] - 8;
 }
 
-void renderEntityText(int32_t instanceId)
+void renderEntityText(instanceId)
+	int16_t instanceId;
 {
+	GsOT_TAG *ot;
 	int16_t screenPos[2];
+	uint8_t *frame;
 	EntityTextData *slot;
 	EntityTextDataEntry *entry;
-	uint8_t *frame;
-	uint8_t activeIndex;
-	int32_t i;
-	uint32_t combatId;
-	int32_t id;
-	int32_t index;
+	long i;
 
-	id = instanceId;
-	slot = &ENTITY_TEXT_DATA[id];
+	ot = ACTIVE_ORDERING_TABLE->org;
+	slot = &ENTITY_TEXT_DATA[instanceId];
 	i = 0;
-	combatId = id;
 	while (i < 8) {
-		activeIndex = slot->activeList[i];
-		index = activeIndex;
-		if (activeIndex == 0xFF) {
+		if (slot->activeList[i] == 0xFF) {
 			break;
 		}
-		entry = &slot->entries[index];
+		entry = &slot->entries[slot->activeList[i]];
 		frame = &entry->frameId;
-		activeIndex = *frame;
-		index = activeIndex;
-		if (activeIndex == 0xFF) {
+		if (*frame == 0xFF) {
 			break;
 		}
-		/* Each number waits for the one before it (order[i - 1]) to rise a bit. */
-		if (i != 0 && slot->entries[(&slot->activeList[i])[-1]].frameId < 11) {
+		/* Each number waits for the one before it to rise a bit. */
+		if (i != 0 && slot->entries[slot->activeList[i - 1]].frameId < 11) {
 			break;
 		}
-		if ((uint32_t)index < 21) {
-			entry->y += ENTITY_TEXT_Y_OFFSETS[index];
+		if (*frame < 21) {
+			entry->y += ENTITY_TEXT_Y_OFFSETS[*frame];
 		}
 
 		/* In battle, the number follows its fighter. */
 		if (GAME_STATE == 4) {
-			getEntityScreenPos(ENTITY_TABLE[COMBAT_DATA_PTR->player.entityIds[combatId]],
+			getEntityScreenPos(ENTITY_TABLE[COMBAT_DATA_PTR->player.entityIds[instanceId]],
 					   0, screenPos);
 			drawEntityText(entry->color, entry->numDigits,
-					     screenPos[0] + entry->x,
-					     screenPos[1] - 8 + entry->y,
-					     entry->value, 14 - i);
+				       screenPos[0] + entry->x,
+				       screenPos[1] - 8 + entry->y,
+				       entry->value, 14 - i);
 		} else {
 			drawEntityText(entry->color, entry->numDigits,
-					     entry->x, entry->y,
-					     entry->value, 14 - i);
+				       entry->x, entry->y,
+				       entry->value, 14 - i);
 		}
 
 		if (entry->icon != 0) {
 			if (GAME_STATE != 4) {
 				drawEntityTextIcon(entry->x - 8, entry->y,
-						     ENTITY_TEXT_ICON_U[entry->icon - 1],
-						     14 - i);
+						   ENTITY_TEXT_ICON_U[entry->icon - 1],
+						   14 - i);
 			} else {
 				drawEntityTextIcon(screenPos[0] + entry->x - 8,
-						     screenPos[1] - 8 + entry->y,
-						     ENTITY_TEXT_ICON_U[entry->icon - 1],
-						     14 - i);
+						   screenPos[1] - 8 + entry->y,
+						   ENTITY_TEXT_ICON_U[entry->icon - 1],
+						   14 - i);
 			}
 		}
 
@@ -240,35 +225,29 @@ void renderEntityText(int32_t instanceId)
 			entry->frameId = 0xFF;
 			slot->activeList[i] = 0xFF;
 		}
-		i += 1;
+		i++;
 	}
 
 	/* Once the first number is gone, move the others up. */
 	if (slot->activeList[0] == 0xFF) {
-		i = 1;
-		while (i < 8) {
-			activeIndex = slot->activeList[i];
-			index = activeIndex;
-			if (activeIndex != 0xFF) {
-				(&slot->activeList[i])[-1] = index;
+		for (i = 1; i < 8; i++) {
+			if (slot->activeList[i] != 0xFF) {
+				slot->activeList[i - 1] = slot->activeList[i];
 			} else {
-				(&slot->activeList[i])[-1] = 0xFF;
+				slot->activeList[i - 1] = 0xFF;
 				break;
 			}
-			i += 1;
 		}
 		slot->activeList[7] = 0xFF;
 	}
 
-	i = 0;
-	while (i < 8) {
+	for (i = 0; i < 8; i++) {
 		if (slot->activeList[i] != 0xFF) {
 			break;
 		}
-		i += 1;
 	}
 	if (i == 8) {
-		removeEntityText(id);
+		removeEntityText(instanceId);
 	}
 }
 
