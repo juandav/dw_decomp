@@ -61,11 +61,12 @@ segments:
     subsegments:
       - [0x40, c, trn2_hp_map99]
       - [0x560, asm, trn2]
+      - [0xBA4, c, trn2_hp_map107]
       - [0x1198, c, trn2_mp]
       - [0x1538, asm]
       - [0x1E88, c, trn2_def_map108]
       - [0x23F8, asm]
-      - [0x5F80, data, trn2]
+      - [0x5F80, .rodata, trn2_hp_map107]
       - [0x5F98, .rodata, trn2_hp_map99]
       - [0x5FB0, .rodata, trn2_mp]
       - [0x5FCC, data]

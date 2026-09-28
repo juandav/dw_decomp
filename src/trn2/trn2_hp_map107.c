@@ -1,10 +1,10 @@
 #include <dw/anim.h>
 #include <dw/clock.h>
 #include <dw/entity.h>
+#include <dw/input.h>
 #include <dw/partner.h>
 #include <dw/script.h>
 #include <dw/sound.h>
-#include <dw/tamer.h>
 #include <dw/trn2.h>
 #include <dw/types.h>
 #include <dw/world_object.h>
@@ -14,9 +14,11 @@ extern uint32_t POLLED_INPUT;
 
 void createCameraMovement(VECTOR *pos, int32_t speed);
 void removeAllCloudFX(void);
-void storeMapObjectPosition(int16_t *outX, int16_t *outY, int16_t a, int16_t count);
-void loadMapObjectPosition(int16_t *xData, int16_t *yData, int16_t startIndex, int16_t count);
-int32_t moveMapObjectsWithLimit(int16_t startIndex, int16_t count, int16_t dx, int16_t dy, int16_t limitX, int16_t limitY);
+void storeMapObjectPosition();
+void loadMapObjectPosition();
+int32_t moveMapObjectsWithLimit();
+void setTamerState(int8_t state);
+int32_t tickEntityWalkTo();
 void TRN2_func_8008AA84(int8_t arg);
 
 static void *trn2_hp_map107_functions[] = {
@@ -25,9 +27,11 @@ static void *trn2_hp_map107_functions[] = {
 	TRN2_tickHpTrainingMap107,
 };
 
-void TRN2_tickHpTrainingMap107(int32_t instanceId)
+void TRN2_tickHpTrainingMap107(instanceId)
+int16_t instanceId;
 {
 	int32_t r;
+	int32_t done;
 
 	switch (MAIN_D_801353BD) {
 	case 0:
@@ -72,10 +76,10 @@ void TRN2_tickHpTrainingMap107(int32_t instanceId)
 		if (MAIN_D_801353BC == 1) {
 			r = TRN2_getSlotSessionResult();
 		}
-		if ((((MAIN_D_801353C2 >= 0x4b0) || (POLLED_INPUT & 0x10)) && (MAIN_D_801353BC == 0)) || ((MAIN_D_801353BC == 1) && (0 <= r))) {
+		if ((((MAIN_D_801353C2 >= 0x4b0) || (POLLED_INPUT & CANCEL_BUTTON)) && (MAIN_D_801353BC == 0)) || ((MAIN_D_801353BC == 1) && (0 <= r))) {
 			MAIN_D_801353C2 %= 0x4b0;
 			playSound(8, 0xa);
-			MAIN_D_801353C2 = MAIN_D_801353C2 / 120;
+			MAIN_D_801353C2 /= 120;
 			startAnimation(&PARTNER_ENTITY.digimonEntity.entity, 0x12);
 			TRN2_awardHpTrainingGains(PARTNER_ENTITY.digimonEntity.entity.type, 1, r);
 			createCameraMovement(&TAMER_ENTITY.entity.posData->location, 10);
@@ -100,7 +104,8 @@ void TRN2_tickHpTrainingMap107(int32_t instanceId)
 		if (MAIN_D_801353C2 > 0) {
 			moveMapObjectsWithLimit(MAIN_D_801353B4, MAIN_D_801353B6, -1, 2, 0, 0);
 		}
-		if ((tickEntityWalkTo(0xfc, 0xfd, 0, 0, 0) == 1) && (MAIN_D_801353C2 <= 0)) {
+		done = tickEntityWalkTo(0xfc, 0xfd, 0, 0, 0);
+		if ((done == 1) && (MAIN_D_801353C2 <= 0)) {
 			TRN2_applyBaseStats();
 			TRN2_closeUIBox(1);
 			setPartnerState(1);
@@ -188,7 +193,8 @@ static void trn2_hp_map107__garbage__(void)
 	TRN2_D_8008DC54[3] = (v19 * v0) + v1;
 }
 
-void TRN2_setupMpTraining(int32_t arg)
+void TRN2_setupMpTraining(arg)
+int16_t arg;
 {
 	if (arg == 0xa5) {
 		TRN2_D_8008DC2C.vx = 0x3e5;

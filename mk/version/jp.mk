@@ -67,6 +67,7 @@ $(eval $(call overlay,SHOP,shop))
 $(eval $(call overlay,STD,std))
 TRN2_C_SRC := \
 	src/trn2/trn2_def_map108.c \
+	src/trn2/trn2_hp_map107.c \
 	src/trn2/trn2_hp_map99.c \
 	src/trn2/trn2_mp.c \
 	src/trn2/trn2_bss.c
