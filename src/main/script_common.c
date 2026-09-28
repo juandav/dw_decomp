@@ -3823,7 +3823,11 @@ void getVRAMModeCoords(int32_t mode, int32_t *outX, int32_t *outClut)
 		*outClut = 0x7f;
 	}
 }
-void closeTextbox(int32_t boxId, RECT *target)
+// clang-format off
+void closeTextbox(boxId, target)
+	int16_t boxId;
+	RECT *target;
+// clang-format on
 {
 	uint32_t b;
 

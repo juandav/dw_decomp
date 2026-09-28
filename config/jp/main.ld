@@ -44,6 +44,8 @@ SECTIONS
         BUILD_DIR/src/main/map_collision.c.o(.text .text.*);
         BUILD_DIR/src/main/particle.c.o(.text .text.*);
         KEEP(BUILD_DIR/asm/main/39950.s.o(.text .text.*));
+        BUILD_DIR/src/main/ui.c.o(.text .text.*);
+        KEEP(BUILD_DIR/asm/main/3C720.s.o(.text .text.*));
         BUILD_DIR/src/main/sound.c.o(.text .text.*);
         KEEP(BUILD_DIR/asm/main/3FEF4.s.o(.text .text.*));
         BUILD_DIR/src/main/clock.c.o(.text .text.*);
@@ -115,6 +117,9 @@ SECTIONS
         BUILD_DIR/src/main/efe.c.o(.sdata .sdata.*);
         . = ALIGN(., 4);
         KEEP(BUILD_DIR/asm/main/data/AD4F0.sdata.s.o(.sdata .sdata.*));
+        BUILD_DIR/src/main/ui.c.o(.sdata .sdata.*);
+        . = ALIGN(., 4);
+        KEEP(BUILD_DIR/asm/main/data/AD60C.sdata.s.o(.sdata .sdata.*));
         BUILD_DIR/src/main/sound.c.o(.sdata .sdata.*);
         . = ALIGN(., 4);
         KEEP(BUILD_DIR/asm/main/data/AD64C.sdata.s.o(.sdata .sdata.*));

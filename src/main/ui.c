@@ -46,6 +46,17 @@ uint8_t MAIN_D_80134334[4] = {
 	0x10, 0x10, 0x14, 0x14,
 };
 
+#if defined(VERSION_JP)
+char MAIN_D_80134338[] = "バグ";
+
+char MAIN_D_8013433C[] = "ウンチ";
+
+char MAIN_D_80134344[] = "覇王拳";
+
+char MAIN_D_8013434C[] = "獣王拳";
+
+char MAIN_D_80134354[] = "あわ";
+#else
 char MAIN_D_80134338[4] = "Bug";
 
 char MAIN_D_8013433C[] = "Tremar";
@@ -55,6 +66,7 @@ char MAIN_D_80134344[8] = "War Cry";
 char MAIN_D_8013434C[8] = "Counter";
 
 char MAIN_D_80134354[] = "Bubble";
+#endif
 // clang-format on
 
 void initializeUIBoxData(void)
@@ -76,61 +88,64 @@ void tickUIBox(int32_t instanceId)
 	}
 }
 
-void renderUIBoxStatic(int32_t instanceId)
+void renderUIBoxStatic(instanceId)
+	int16_t instanceId;
 {
-	UIBoxData *data;
-	int32_t id;
 	RECT *rect;
-	int32_t layer;
+	POLY_F4 *p;
+	int32_t color1;
+	int32_t color2;
+	UIBoxData *data;
+	GsBOXF box;
 	int16_t h25;
 	int16_t rowHeight;
 	int16_t barTop;
-	POLY_F4 *p;
-	GsBOXF box;
 
 	data = &UI_BOX_DATA[instanceId];
-	id = id = instanceId;
 	rect = &data->finalPos;
 	if (data->render != NULL) {
 		data->render(instanceId);
 	}
-	renderUIBoxBorder(rect, layer = 6 - instanceId);
-	renderLinePrimitive(0x20202, rect->x + 3, rect->y + 3, rect->x + 3, rect->y + rect->h - 3, layer, 0);
-	renderLinePrimitive(0x20202, rect->x + rect->w - 4, rect->y + 3, rect->x + rect->w - 4,
-			    rect->y + rect->h - 3, layer, 0);
+	renderUIBoxBorder(rect, 6 - instanceId);
+	color1 = 0x20202;
+	renderLinePrimitive(color1, rect->x + 3, rect->y + 3, rect->x + 3, rect->y + rect->h - 3, 6 - instanceId, 0);
+	renderLinePrimitive(color1, rect->x + rect->w - 4, rect->y + 3, rect->x + rect->w - 4,
+			    rect->y + rect->h - 3, 6 - instanceId, 0);
 	if (data->features & 1) {
-		renderLinePrimitive(0x20202, rect->x + 3, rect->y + 13, rect->x + rect->w - 3, rect->y + 13,
-				    layer, 0);
-		renderLinePrimitive(0xFAD990, rect->x + 3, rect->y + 14, rect->x + rect->w - 3, rect->y + 14,
-				    layer, 0);
-		renderLinePrimitive(0x20202, rect->x + 3, rect->y + 15, rect->x + rect->w - 3, rect->y + 15,
-				    layer, 0);
+		color2 = 0xFAD990;
+		renderLinePrimitive(color1, rect->x + 3, rect->y + 13, rect->x + rect->w - 3, rect->y + 13,
+				    6 - instanceId, 0);
+		renderLinePrimitive(color2, rect->x + 3, rect->y + 14, rect->x + rect->w - 3, rect->y + 14,
+				    6 - instanceId, 0);
+		renderLinePrimitive(color1, rect->x + 3, rect->y + 15, rect->x + rect->w - 3, rect->y + 15,
+				    6 - instanceId, 0);
 	}
 	if (data->features & 4) {
-		renderTrianglePrimitive(0x20202, rect->x + rect->w - 13, rect->y + rect->h - 10,
+		color2 = 0xA08769;
+		renderTrianglePrimitive(color1, rect->x + rect->w - 13, rect->y + rect->h - 10,
 					rect->x + rect->w - 13, rect->y + 13, rect->x + rect->w - 6, rect->y + 13,
-					layer, 0);
-		renderTrianglePrimitive(0xA08769, rect->x + rect->w - 6, rect->y + 14, rect->x + rect->w - 6,
-					rect->y + rect->h - 10, rect->x + rect->w - 12, rect->y + rect->h - 10, layer,
+					6 - instanceId, 0);
+		renderTrianglePrimitive(color2, rect->x + rect->w - 6, rect->y + 14, rect->x + rect->w - 6,
+					rect->y + rect->h - 10, rect->x + rect->w - 12, rect->y + rect->h - 10, 6 - instanceId,
 					0);
 		h25 = rect->h - 25;
 		rowHeight = h25 * UI_BOX_DATA[instanceId].visibleRows / UI_BOX_DATA[instanceId].totalRows;
 		barTop = rect->y + 14 +
 			 (h25 - rowHeight) * UI_BOX_DATA[instanceId].rowOffset /
 				 (UI_BOX_DATA[instanceId].totalRows - UI_BOX_DATA[instanceId].visibleRows);
-		renderTrianglePrimitive(0x20202, rect->x + rect->w - 7, barTop, rect->x + rect->w - 7, barTop + rowHeight,
-					rect->x + rect->w - 13, barTop + rowHeight, layer, 0);
-		renderTrianglePrimitive(0xA08769, rect->x + rect->w - 12, barTop + rowHeight, rect->x + rect->w - 12, barTop,
-					rect->x + rect->w - 6, barTop, layer, 0);
+		renderTrianglePrimitive(color1, rect->x + rect->w - 7, barTop, rect->x + rect->w - 7, barTop + rowHeight,
+					rect->x + rect->w - 13, barTop + rowHeight, 6 - instanceId, 0);
+		renderTrianglePrimitive(color2, rect->x + rect->w - 12, barTop + rowHeight, rect->x + rect->w - 12, barTop,
+					rect->x + rect->w - 6, barTop, 6 - instanceId, 0);
 		p = (POLY_F4 *)GsGetWorkBase();
 		SetPolyF4(p);
 		setRGB0(p, 0x5B, 0x70, 0x80);
 		setXYWH(p, rect->x + rect->w - 11, barTop + 1, 4, rowHeight - 1);
-		AddPrim(ACTIVE_ORDERING_TABLE->org + 6 - id, p++);
+		AddPrim(ACTIVE_ORDERING_TABLE->org + 6 - instanceId, p++);
 		SetPolyF4(p);
 		setRGB0(p, 0x35, 0x4B, 0x5C);
 		setXYWH(p, rect->x + rect->w - 12, rect->y + 14, 6, rect->h - 24);
-		AddPrim(ACTIVE_ORDERING_TABLE->org + 6 - id, p++);
+		AddPrim(ACTIVE_ORDERING_TABLE->org + 6 - instanceId, p++);
 		GsSetWorkBase((PACKET *)p);
 	}
 	if (data->features & 2) {
@@ -144,7 +159,7 @@ void renderUIBoxStatic(int32_t instanceId)
 	box.x = rect->x + 4;
 	box.y = rect->y + 3;
 	setWH(&box, rect->w - 8, rect->h - 3);
-	GsSortBoxFill(&box, ACTIVE_ORDERING_TABLE, (uint16_t)layer);
+	GsSortBoxFill(&box, ACTIVE_ORDERING_TABLE, 6 - instanceId);
 }
 
 void createStaticUIBox(int32_t id, uint8_t color, uint8_t features, RECT *pos,
@@ -162,14 +177,14 @@ void createStaticUIBox(int32_t id, uint8_t color, uint8_t features, RECT *pos,
 	addObject(0x1a4, id, tickUIBox, renderUIBoxStatic);
 }
 
-void removeStaticUIBox(int32_t id)
+void removeStaticUIBox(int16_t id)
 {
 	UI_BOX_DATA[id].state = 0;
 	UI_BOX_DATA[id].frame = 0;
 	removeObject(0x1a4, id);
 }
 
-void createAnimatedUIBox(int32_t instanceId, uint8_t color, uint8_t features,
+void createAnimatedUIBox(int16_t instanceId, uint8_t color, uint8_t features,
 			 RECT *finalPos, RECT *startPos,
 			 TickFunction tickFunc, RenderFunction renderFunc)
 {
@@ -187,18 +202,16 @@ void createAnimatedUIBox(int32_t instanceId, uint8_t color, uint8_t features,
 	addObject(0x1a4, instanceId, tickUIBox, renderUIBoxAnimated);
 }
 
-void renderUIBoxAnimated(int32_t instanceId)
+void renderUIBoxAnimated(instanceId)
+	int16_t instanceId;
 {
 	UIBoxData *data;
-	int16_t state;
 	int16_t currentFrame;
 
 	data = &UI_BOX_DATA[instanceId];
-	state = data->state;
-	if ((state == 2) || (data->state == 3)) {
+	if ((data->state == 2) || (data->state == 3)) {
 		if (data->state == 2) {
-			currentFrame = data->frame;
-			data->frame = currentFrame + 1;
+			currentFrame = data->frame++;
 		} else {
 			currentFrame = --data->frame;
 		}
@@ -214,7 +227,7 @@ void renderUIBoxAnimated(int32_t instanceId)
 	}
 }
 
-void removeAnimatedUIBox(int32_t id, RECT *target)
+void removeAnimatedUIBox(int16_t id, RECT *target)
 {
 	if (target != NULL) {
 		UI_BOX_DATA[id].startPos = *target;
@@ -226,6 +239,9 @@ void renderUIBoxBorder(RECT *rect, int32_t layer)
 {
 	POLY_FT4 *p;
 	int32_t i;
+	int32_t black;
+	int32_t gold;
+	int32_t brown;
 	int16_t x;
 	int16_t y;
 	int16_t x1;
@@ -243,41 +259,45 @@ void renderUIBoxBorder(RECT *rect, int32_t layer)
 		AddPrim(ACTIVE_ORDERING_TABLE->org + layer, p++);
 	}
 	GsSetWorkBase((PACKET *)p);
+	black = 0x20202;
+	gold = 0xFAD990;
+	brown = 0xC59F4A;
 	x = rect->x + 4;
 	x1 = rect->x + rect->w - 4;
 	y = rect->y;
-	renderLinePrimitive(0x20202, x, y, x1, y, layer, 0);
+	renderLinePrimitive(black, x, y, x1, y, layer, 0);
 	y++;
-	renderLinePrimitive(0xFAD990, x, y, x1, y, layer, 0);
+	renderLinePrimitive(gold, x, y, x1, y, layer, 0);
 	y++;
-	renderLinePrimitive(0x20202, x, y, x1, y, layer, 0);
+	renderLinePrimitive(black, x, y, x1, y, layer, 0);
 	y = rect->y + rect->h - 3;
-	renderLinePrimitive(0x20202, x, y, x1, y, layer, 0);
+	renderLinePrimitive(black, x, y, x1, y, layer, 0);
 	y++;
-	renderLinePrimitive(0xFAD990, x, y, x1, y, layer, 0);
+	renderLinePrimitive(gold, x, y, x1, y, layer, 0);
 	y++;
-	renderLinePrimitive(0x20202, x, y, x1, y, layer, 0);
+	renderLinePrimitive(black, x, y, x1, y, layer, 0);
 	x = rect->x;
 	y = rect->y + 4;
 	y1 = rect->y + rect->h - 3;
-	renderLinePrimitive(0x20202, x, y, x, y1, layer, 0);
+	renderLinePrimitive(black, x, y, x, y1, layer, 0);
 	x++;
-	renderLinePrimitive(0xC59F4A, x, y, x, y1, layer, 0);
+	renderLinePrimitive(brown, x, y, x, y1, layer, 0);
 	x++;
-	renderLinePrimitive(0xFAD990, x, y, x, y1, layer, 0);
+	renderLinePrimitive(gold, x, y, x, y1, layer, 0);
 	x = rect->x + rect->w - 3;
-	renderLinePrimitive(0xFAD990, x, y, x, y1, layer, 0);
+	renderLinePrimitive(gold, x, y, x, y1, layer, 0);
 	x++;
-	renderLinePrimitive(0xC59F4A, x, y, x, y1, layer, 0);
+	renderLinePrimitive(brown, x, y, x, y1, layer, 0);
 	x++;
-	renderLinePrimitive(0x20202, x, y, x, y1, layer, 0);
+	renderLinePrimitive(black, x, y, x, y1, layer, 0);
 }
 
 void renderUIBoxAnim(int32_t instanceId, int16_t frame)
 {
 	RECT *start;
 	RECT *final;
-	int32_t layer;
+	int16_t x0;
+	int16_t y0;
 	int16_t x1;
 	int16_t y1;
 	int16_t x2;
@@ -287,11 +307,13 @@ void renderUIBoxAnim(int32_t instanceId, int16_t frame)
 		playSound(0, 1);
 	}
 	start = &UI_BOX_DATA[instanceId].startPos;
-	final = final = &UI_BOX_DATA[instanceId].finalPos;
-	x1 = start->x + frame * (final->x - start->x) / 4;
-	y1 = start->y + frame * (final->y - start->y) / 4;
-	x2 = (start->x + start->w) + frame * ((final->x + final->w) - (start->x + start->w)) / 4;
+	final = &UI_BOX_DATA[instanceId].finalPos;
+	x0 = start->x + frame * (final->x - start->x) / 4;
+	y0 = start->y + frame * (final->y - start->y) / 4;
+	x1 = (start->x + start->w) + frame * ((final->x + final->w) - (start->x + start->w)) / 4;
+	y1 = y0;
+	x2 = x1;
 	y2 = (start->y + start->h) + frame * ((final->y + final->h) - (start->y + start->h)) / 4;
-	renderTrianglePrimitive(0x808080, x1, y1, x2, y1, x2, y2, layer = 6 - instanceId, 0);
-	renderTrianglePrimitive(0x808080, x2, y2, x1, y2, x1, y1, layer, 0);
+	renderTrianglePrimitive(0x808080, x0, y0, x1, y1, x2, y2, 6 - instanceId, 0);
+	renderTrianglePrimitive(0x808080, x2, y2, x0, y2, x0, y0, 6 - instanceId, 0);
 }

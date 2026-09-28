@@ -189,7 +189,7 @@ void renderMenuTab(int32_t a, int32_t b, int32_t c);
 
 void setCameraFollowPlayer(void);
 void handleGameMenuSelection(int32_t selection);
-int32_t createMenuBox(int32_t id, int16_t x, int16_t y, int16_t width,
+int32_t createMenuBox(int16_t id, int16_t x, int16_t y, int16_t width,
 		      int16_t height, int8_t features, void (*tick)(void),
 		      void (*render)(void));
 void closeUIBoxIfOpen(int32_t arg);
@@ -5631,7 +5631,8 @@ void closeTriangleMenu(void)
 	removeObject(0xfa4, 0);
 }
 
-void closeUIBoxIfOpen(int32_t id)
+void closeUIBoxIfOpen(id)
+	int16_t id;
 {
 	int16_t pos[2];
 
@@ -5917,7 +5918,7 @@ void tickGameMenu(void)
 	}
 }
 
-int32_t createMenuBox(int32_t id, int16_t x, int16_t y, int16_t width,
+int32_t createMenuBox(int16_t id, int16_t x, int16_t y, int16_t width,
 		      int16_t height, int8_t features, void (*tick)(void),
 		      void (*render)(void))
 {

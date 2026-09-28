@@ -47,11 +47,11 @@ extern TextBoxData TEXT_BOX_DATA[6];
 void initializeUIBoxData(void);
 void createStaticUIBox(int32_t id, uint8_t color, uint8_t features, RECT *pos,
 		       TickFunction tickFunc, RenderFunction renderFunc);
-void removeStaticUIBox(int32_t id);
-void createAnimatedUIBox(int32_t instanceId, uint8_t color, uint8_t features,
+void removeStaticUIBox(int16_t id);
+void createAnimatedUIBox(int16_t instanceId, uint8_t color, uint8_t features,
 			 RECT *finalPos, RECT *startPos,
 			 TickFunction tickFunc, RenderFunction renderFunc);
-void removeAnimatedUIBox(int32_t id, RECT *target);
+void removeAnimatedUIBox(int16_t id, RECT *target);
 void renderUIBoxBorder(RECT *size, int32_t layer);
 
 #endif

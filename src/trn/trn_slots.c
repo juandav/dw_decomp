@@ -152,7 +152,8 @@ static void trn_slots__garbage__(void)
 	TRN_D_8008F368[3] = (v19 * v0) + v1;
 }
 
-void TRN_tickSlotMachine(int32_t arg)
+void TRN_tickSlotMachine(arg)
+	int16_t arg;
 {
 	RECT rect;
 	SlotMachine *p;

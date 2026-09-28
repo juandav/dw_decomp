@@ -316,7 +316,8 @@ void TRN_renderPostTrainingStatsBox(int16_t depth)
 	}
 }
 
-void TRN_closeUIBox(int32_t id)
+void TRN_closeUIBox(id)
+	int16_t id;
 {
 	if (UI_BOX_DATA[id].state != 0) {
 		removeAnimatedUIBox(id, NULL);

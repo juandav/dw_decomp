@@ -63,7 +63,7 @@ int32_t drawMoveViewHelpStrings(void);
 void removeTriangleMenu(void);
 void removeUIBox1(void);
 int32_t random(int32_t max);
-void removeStaticUIBox(int32_t id);
+void removeStaticUIBox(int16_t id);
 void removeObject(int32_t objectId, int32_t arg1);
 
 void renderDigiviceMedals(void);

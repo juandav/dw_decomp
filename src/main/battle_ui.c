@@ -691,7 +691,8 @@ void renderPostBattleStatsBox(uint8_t depth)
 	}
 }
 
-void closeBattleEndBox(int32_t id)
+void closeBattleEndBox(id)
+	int16_t id;
 {
 	if (UI_BOX_DATA[id].state != 0) {
 		removeAnimatedUIBox(id, NULL);
