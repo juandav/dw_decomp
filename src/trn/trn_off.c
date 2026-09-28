@@ -1,10 +1,10 @@
 #include <dw/anim.h>
 #include <dw/entity.h>
+#include <dw/input.h>
 #include <dw/params.h>
 #include <dw/partner.h>
 #include <dw/script.h>
 #include <dw/sound.h>
-#include <dw/tamer.h>
 #include <dw/trn.h>
 #include <dw/types.h>
 #include <dw/world_object.h>
@@ -14,15 +14,17 @@ extern int32_t TRAINING_COMPLETE;
 extern int8_t TRAINING_ANIM_IDS[][2];
 
 void createCameraMovement(VECTOR *pos, int32_t speed);
-void storeMapObjectPosition(int16_t *outX, int16_t *outY, int16_t a, int16_t count);
-void loadMapObjectPosition(int16_t *xData, int16_t *yData, int16_t startIndex, int16_t count);
+void storeMapObjectPosition();
+void loadMapObjectPosition();
 int32_t moveMapObjectsWithLimit(int16_t startIndex, int16_t count, int16_t dx, int16_t dy, int16_t limitX, int16_t limitY);
 void setCameraFollowPlayer(void);
 void unsetCameraFollowPlayer(void);
 void setMapObjectsFlag(int16_t start, int16_t count, int32_t flag);
 void createParticleFX(uint8_t kind, int32_t count, void *arg2, Entity *entity, int32_t arg4);
-void resetMapObjectAnimation(int16_t startIndex, int32_t count);
+void resetMapObjectAnimation(int16_t startIndex, int16_t count);
 void TRN_func_800888A0(int8_t arg);
+void setTamerState(int8_t state);
+int32_t tickEntityWalkTo();
 void TRN_tickOffenseTraining(int32_t instanceId);
 
 static void *trn_off_functions[] = {
@@ -32,7 +34,8 @@ static void *trn_off_functions[] = {
 
 int16_t MAIN_D_8013537E;
 
-void TRN_setupOffenseTraining(int32_t arg)
+void TRN_setupOffenseTraining(arg)
+int16_t arg;
 {
 	switch (arg) {
 	case 0x70:
@@ -73,8 +76,8 @@ void TRN_setupOffenseTraining(int32_t arg)
 		TRN_D_8008F340[1].vz = 0xdac;
 		TRN_D_8008F340[2].vx = -0x578;
 		TRN_D_8008F340[2].vy = -0xc8;
-		MAIN_D_8013536C = 0x2b;
 		TRN_D_8008F340[2].vz = 0xdac;
+		MAIN_D_8013536C = 0x2b;
 		MAIN_D_8013536E = 0x1e;
 		addObject(0xfac, 6, (TickFunction)TRN_tickOffenseTraining, NULL);
 		break;
@@ -107,8 +110,8 @@ void TRN_tickOffenseTraining(int32_t instanceId)
 		TRN_func_800888A0(4);
 		if (tickEntityWalkTo(0xfc, 0xff, TRN_D_8008F320.vx, TRN_D_8008F320.vz, 0) == 1) {
 			startAnimation(ENTITY_TABLE[1], TRAINING_ANIM_IDS[PARTNER_ENTITY.digimonEntity.entity.type][0]);
-			MAIN_D_8013537E = 0;
 			PARTNER_ENTITY.digimonEntity.entity.anim.animFlag |= 2;
+			MAIN_D_8013537E = 0;
 			if (instanceId == 0) {
 				PARTNER_ENTITY.digimonEntity.entity.posData->rotation.vy = 0x200;
 				MAIN_D_80135371 = 2;
@@ -155,7 +158,7 @@ void TRN_tickOffenseTraining(int32_t instanceId)
 		if (MAIN_D_80135370 == 1) {
 			r = TRN_getSlotSessionResult();
 		}
-		if ((((MAIN_D_8013537A >= 0x4b0) || (POLLED_INPUT & 0x10)) && (MAIN_D_80135370 == 0)) || ((r >= 0) && (MAIN_D_80135370 == 1))) {
+		if ((((MAIN_D_8013537A >= 0x4b0) || (POLLED_INPUT & CANCEL_BUTTON)) && (MAIN_D_80135370 == 0)) || ((r >= 0) && (MAIN_D_80135370 == 1))) {
 			TRN_awardOffenseTrainingGains(PARTNER_ENTITY.digimonEntity.entity.type, 0, r);
 			startAnimation(ENTITY_TABLE[1], 0x12);
 			loadMapObjectPosition(TRN_D_8008F368, TRN_D_8008F388, MAIN_D_8013536C, MAIN_D_8013536E);
@@ -219,7 +222,7 @@ void TRN_tickOffenseTraining(int32_t instanceId)
 		if (MAIN_D_80135370 == 1) {
 			r = TRN_getSlotSessionResult();
 		}
-		if ((((MAIN_D_8013537A >= 0x4b0) || (POLLED_INPUT & 0x10)) && (MAIN_D_80135370 == 0)) || ((r >= 0) && (MAIN_D_80135370 == 1))) {
+		if ((((MAIN_D_8013537A >= 0x4b0) || (POLLED_INPUT & CANCEL_BUTTON)) && (MAIN_D_80135370 == 0)) || ((r >= 0) && (MAIN_D_80135370 == 1))) {
 			setMapObjectsFlag(0x27, 4, 0);
 			setMapObjectsFlag(MAIN_D_8013536C, MAIN_D_8013536E, 1);
 			TRN_awardOffenseTrainingGains(PARTNER_ENTITY.digimonEntity.entity.type, 6, r);

@@ -206,12 +206,13 @@ SECTIONS
 			KEEP(BUILD_DIR/asm/trn/trn.s.o(.text .text.*));
 			BUILD_DIR/src/trn/trn_hp.c.o(.text .text.*);
 			BUILD_DIR/src/trn/trn_mp.c.o(.text .text.*);
-			KEEP(BUILD_DIR/asm/trn/3588.s.o(.text .text.*));
+			BUILD_DIR/src/trn/trn_off.c.o(.text .text.*);
+			KEEP(BUILD_DIR/asm/trn/413C.s.o(.text .text.*));
 			BUILD_DIR/src/trn/trn_speed.c.o(.text .text.*);
 			BUILD_DIR/src/trn/trn_brain.c.o(.text .text.*);
 			KEEP(BUILD_DIR/asm/trn/58E4.s.o(.text .text.*));
 			BUILD_DIR/src/trn/trn_hp.c.o(.rodata .rodata.*);
-			KEEP(BUILD_DIR/asm/trn/data/79C0.data.s.o(.data .data.*));
+			BUILD_DIR/src/trn/trn_off.c.o(.rodata .rodata.*);
 			BUILD_DIR/src/trn/trn_speed.c.o(.rodata .rodata.*);
 			KEEP(BUILD_DIR/asm/trn/data/79FC.data.s.o(.data .data.*));
 			BUILD_DIR/src/trn/trn_mp.c.o(.rodata .rodata.*);
