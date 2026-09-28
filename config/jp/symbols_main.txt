@@ -8,3 +8,5 @@ TRN_setupHpTraining = 0x8008B0C8;
 TRN_setupBrainsTraining = 0x8008D9AC;
 MOV_playMovie = 0x800107A4;
 TRN_setupOffenseTraining = 0x8008BD88;
+TRN2_setupOffenseTraining = 0x80089D38;
+TRN2_setupDefenseTraining = 0x8008A3B8;

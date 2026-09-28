@@ -166,7 +166,8 @@ SECTIONS
         BUILD_DIR/generated/unk_0x8013E630.sbss.s.o(.sbss.*);
         BUILD_DIR/src/trn2/trn2_hp_map99.c.o(.sbss.*);
         BUILD_DIR/src/trn2/trn2_def_map99.c.o(.sbss.*);
-        BUILD_DIR/generated/unk_0x8013E676.sbss.s.o(.sbss.*);
+        BUILD_DIR/src/trn2/trn2_off.c.o(.sbss.*);
+        BUILD_DIR/generated/unk_0x8013E678.sbss.s.o(.sbss.*);
         . = ALIGN(., 4);
         main_SBSS_END = .;
         main_SBSS_SIZE = ABSOLUTE(main_SBSS_END - main_SBSS_START);

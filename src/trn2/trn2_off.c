@@ -1,10 +1,10 @@
 #include <dw/anim.h>
 #include <dw/entity.h>
+#include <dw/input.h>
 #include <dw/params.h>
 #include <dw/partner.h>
 #include <dw/script.h>
 #include <dw/sound.h>
-#include <dw/tamer.h>
 #include <dw/trn2.h>
 #include <dw/types.h>
 #include <dw/world_object.h>
@@ -13,7 +13,7 @@ extern int32_t TRAINING_COMPLETE;
 extern uint32_t POLLED_INPUT;
 
 void createCameraMovement(VECTOR *pos, int32_t speed);
-void storeMapObjectPosition(int16_t *outX, int16_t *outY, int16_t a, int16_t count);
+void storeMapObjectPosition();
 void setMapObjectsFlag(int16_t start, int16_t count, int32_t flag);
 void setCameraFollowPlayer(void);
 void unsetCameraFollowPlayer(void);
@@ -21,6 +21,8 @@ void createParticleFX(uint8_t kind, int32_t count, void *arg2, Entity *entity, i
 void resetMapObjectAnimation(int16_t startIndex, int16_t count);
 void TRN2_tickOffenseTraining(int32_t instanceId);
 void TRN2_func_8008AA84(int8_t arg);
+void setTamerState(int8_t state);
+int32_t tickEntityWalkTo();
 
 static void *trn2_off_functions[] = {
 	TRN2_setupDefenseTraining,
@@ -117,7 +119,8 @@ static void trn2_off__garbage__(void)
 	TRN2_D_8008DC54[3] = (v19 * v0) + v1;
 }
 
-void TRN2_setupOffenseTraining(int32_t arg)
+void TRN2_setupOffenseTraining(arg)
+int16_t arg;
 {
 	if (arg == 0x6b) {
 		TRN2_D_8008DC1C.vx = -0x586;
@@ -147,7 +150,8 @@ void TRN2_setupOffenseTraining(int32_t arg)
 	MAIN_D_801353BD = 0;
 }
 
-void TRN2_tickOffenseTraining(int32_t instanceId)
+void TRN2_tickOffenseTraining(instanceId)
+int16_t instanceId;
 {
 	int32_t r;
 
@@ -168,8 +172,8 @@ void TRN2_tickOffenseTraining(int32_t instanceId)
 		TRN2_func_8008AA84(4);
 		if (tickEntityWalkTo(0xfc, 0xff, TRN2_D_8008DC1C.vx, TRN2_D_8008DC1C.vz, 0) == 1) {
 			startAnimation(ENTITY_TABLE[1], TRN2_D_8008DA20[PARTNER_ENTITY.digimonEntity.entity.type][0]);
-			MAIN_D_801353C6 = 0;
 			PARTNER_ENTITY.digimonEntity.entity.anim.animFlag |= 2;
+			MAIN_D_801353C6 = 0;
 			PARTNER_ENTITY.digimonEntity.entity.posData->rotation.vy = 0x400;
 			if (MAIN_D_801353BC == 1) {
 				TRN2_startSlotSpin();
@@ -207,7 +211,7 @@ void TRN2_tickOffenseTraining(int32_t instanceId)
 		if (MAIN_D_801353BC == 1) {
 			r = TRN2_getSlotSessionResult();
 		}
-		if ((((MAIN_D_801353C2 >= 0x4b0) || (POLLED_INPUT & 0x10)) && (MAIN_D_801353BC == 0)) || ((r >= 0) && (MAIN_D_801353BC == 1))) {
+		if ((((MAIN_D_801353C2 >= 0x4b0) || (POLLED_INPUT & CANCEL_BUTTON)) && (MAIN_D_801353BC == 0)) || ((r >= 0) && (MAIN_D_801353BC == 1))) {
 			playSound(8, 0xa);
 			setMapObjectsFlag(0x27, 4, 0);
 			setMapObjectsFlag(MAIN_D_801353B4, MAIN_D_801353B6, 1);
@@ -246,7 +250,8 @@ void TRN2_tickOffenseTraining(int32_t instanceId)
 	}
 }
 
-void TRN2_setupDefenseTraining(int32_t arg)
+void TRN2_setupDefenseTraining(arg)
+int16_t arg;
 {
 	switch (arg) {
 	case 0x6c:
