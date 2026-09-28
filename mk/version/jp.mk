@@ -11,7 +11,7 @@ MAIN_SBSS := \
 	$(GEN_DIR)/unk_0x8013E310.sbss.s \
 	$(GEN_DIR)/unk_0x8013E5C0.sbss.s \
 	$(GEN_DIR)/unk_0x8013E658.sbss.s \
-	$(GEN_DIR)/unk_0x8013E67E.sbss.s
+	$(GEN_DIR)/unk_0x8013E698.sbss.s
 
 MAIN_BSS := \
 	$(GEN_DIR)/unk_0x8013E6A8.bss.s \
@@ -98,6 +98,7 @@ TRN2_C_SRC := \
 	src/trn2/trn2_def_map99.c \
 	src/trn2/trn2_hp_map107.c \
 	src/trn2/trn2_hp_map99.c \
+	src/trn2/trn2_hud.c \
 	src/trn2/trn2_mp.c \
 	src/trn2/trn2_off.c \
 	src/trn2/trn2_reward.c \

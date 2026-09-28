@@ -170,6 +170,7 @@ segments:
       - [0xADE28, .sdata, trn/trn_hud]
       - [0xADE38, .sdata, trn/trn_slots]
       - [0xADE50, sdata]
+      - [0xADEA8, .sdata, trn2/trn2_hud]
       - [0xADEB8, .sdata, trn2/trn2_slots]
       - [0xADED0, sdata]
 

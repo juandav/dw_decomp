@@ -157,6 +157,8 @@ SECTIONS
         BUILD_DIR/src/trn/trn_slots.c.o(.sdata .sdata.*);
         . = ALIGN(., 4);
         KEEP(BUILD_DIR/asm/main/data/ADE50.sdata.s.o(.sdata .sdata.*));
+        BUILD_DIR/src/trn2/trn2_hud.c.o(.sdata .sdata.*);
+        . = ALIGN(., 4);
         BUILD_DIR/src/trn2/trn2_slots.c.o(.sdata .sdata.*);
         . = ALIGN(., 4);
         KEEP(BUILD_DIR/asm/main/data/ADED0.sdata.s.o(.sdata .sdata.*));
@@ -216,7 +218,9 @@ SECTIONS
         BUILD_DIR/src/trn2/trn2_def_map99.c.o(.sbss.*);
         BUILD_DIR/src/trn2/trn2_off.c.o(.sbss.*);
         BUILD_DIR/src/trn2/trn2_reward.c.o(.sbss.*);
-        BUILD_DIR/generated/unk_0x8013E67E.sbss.s.o(.sbss.*);
+        BUILD_DIR/src/trn2/trn2_hud.c.o(.sbss.*);
+        . = ALIGN(., 4);
+        BUILD_DIR/generated/unk_0x8013E698.sbss.s.o(.sbss.*);
         . = ALIGN(., 4);
         main_SBSS_END = .;
         main_SBSS_SIZE = ABSOLUTE(main_SBSS_END - main_SBSS_START);
