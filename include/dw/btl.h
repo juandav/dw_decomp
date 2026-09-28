@@ -121,11 +121,19 @@ extern int8_t MAIN_D_801346F8;
 extern uint8_t MAIN_D_80134728[5];
 extern uint8_t MAIN_D_80134730[8];
 
+#if defined(VERSION_JP)
+extern int8_t BTL_SHOUT_HOP_OFFSETS[20];
+extern int8_t BTL_SHOUT_DROP_OFFSETS[20];
+extern uint8_t BTL_D_80072E7C[6][10];
+extern int16_t BTL_D_80072EB8[8];
+extern int16_t BTL_D_80072EC8[8];
+#else
 extern const int8_t BTL_SHOUT_HOP_OFFSETS[20];
 extern const int8_t BTL_SHOUT_DROP_OFFSETS[20];
 extern const uint8_t BTL_D_80072E7C[6][10];
 extern const int16_t BTL_D_80072EB8[8];
 extern const int16_t BTL_D_80072EC8[8];
+#endif
 extern const int16_t BTL_D_80073014[155][2];
 extern const int16_t BTL_D_80073280[8];
 extern const int32_t BTL_D_80073290[12];

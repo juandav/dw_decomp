@@ -10,7 +10,7 @@ MAIN_SBSS := \
 	$(GEN_DIR)/unk_0x8013E1B0.sbss.s \
 	$(GEN_DIR)/unk_0x8013E1FC.sbss.s \
 	$(GEN_DIR)/unk_0x8013E228.sbss.s \
-	$(GEN_DIR)/unk_0x8013E310.sbss.s \
+	$(GEN_DIR)/unk_0x8013E34C.sbss.s \
 	$(GEN_DIR)/unk_0x8013E37C.sbss.s \
 	$(GEN_DIR)/unk_0x8013E5D4.sbss.s
 
@@ -77,6 +77,7 @@ MAIN_C_SRC := \
 $(eval $(call unit,MAIN,main))
 
 BTL_C_SRC := \
+	src/btl/battle_hud.c \
 	src/btl/battle_setup.c \
 	src/btl/btl_bss.c \
 	src/btl/command_menu.c \

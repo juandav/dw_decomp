@@ -9,6 +9,7 @@
 #include <dw/btl.h>
 #include <dw/combat.h>
 #include <dw/font.h>
+#include <dw/input.h>
 #include <dw/item.h>
 #include <dw/math.h>
 #include <dw/model.h>
@@ -21,7 +22,11 @@ extern GsRVIEW2 GS_VIEWPOINT;
 extern int32_t VIEWPORT_DISTANCE;
 extern StatsGains STATS_GAINS;
 extern char BTL_STR_LISTENS_TO[];
+#if defined(VERSION_JP)
+extern char BTL_STR_WHITE_WAIT[];
+#else
 extern char BTL_STR_DROPPED[];
+#endif
 extern char BTL_STR_WAS_INJURED[];
 extern char BTL_STR_SET_TECHNIQUE[];
 extern char BTL_STR_PUT_UP_WITH_IT[];
@@ -29,18 +34,22 @@ extern char BTL_STR_MOVE_AWAY_CHANGE_TARGET[];
 extern char BTL_STR_KEEP_IT_DOWN[];
 extern char BTL_STR_GO_ALL_THE_WAY[];
 extern char BTL_STR_MP_CONSUMPTION_BONUS[];
+#if defined(VERSION_JP)
+extern char BTL_STR_MP_BONUS_PERCENT[];
+#else
 extern char BTL_STR_REDUCED_BY[];
+#endif
 extern char BTL_STR_LEARNED[];
 extern MATRIX BTL_D_80072FF4;
 
 void renderString(int32_t a, int32_t b, int32_t c, int32_t d, int32_t e, int32_t f, int32_t g, int32_t h, int32_t i);
-int16_t entityGetTechFromAnim(Entity *entity, int32_t anim);
+int32_t entityGetTechFromAnim(Entity *entity, int32_t anim);
 void BTL_tickDeathCountdown(void);
 void BTL_initializeFinisherChargeup(void);
 void BTL_renderFinisherChargeup(void);
 void BTL_tickFinisherChargeup(void);
 void BTL_renderDeathCountdown(void);
-void BTL_initializeBattleEndText(int16_t arg0, int16_t arg1, RECT *arg2);
+void BTL_initializeBattleEndText(uint16_t arg0, int16_t arg1, RECT *arg2);
 void BTL_renderBattleStartText(void);
 void convertValueToDigits(int32_t n, int32_t value, int32_t *outCount, int32_t *buf);
 void setEntityTextDigit(POLY_FT4 *poly, int32_t x, int32_t y);
@@ -58,12 +67,12 @@ void BTL_tickBattleEndText(void);
 void BTL_renderBattleEndText(int32_t n);
 int32_t BTL_isEndBoxTextFinished(void);
 void BTL_shuffleBattleStartTextPieces(void);
-void BTL_renderNumber(int32_t a, int32_t digits, int32_t x, int32_t y, int16_t value, int32_t layer);
+void BTL_renderNumber(int32_t a, int32_t digits, int16_t x, int16_t y, int16_t value, int32_t layer);
 void BTL_renderFinisherReadyIcon(void);
 void BTL_renderPartnerStatusBars(int16_t idx);
 void BTL_tickPartnerStatusBars(void);
-void BTL_renderFinisherGauge(int32_t idx);
-void BTL_renderFinisherGaugeSegment(int16_t i, int32_t idx);
+void BTL_renderFinisherGauge(int16_t idx);
+void BTL_renderFinisherGaugeSegment(int16_t i, int16_t idx);
 void damageTick(FighterData *fighter, Stats *stats);
 
 static void *battle_hud_functions[] = {
@@ -106,13 +115,23 @@ static void *battle_hud_functions[] = {
 	BTL_drawHoveredCommandName,
 };
 
+#if !defined(VERSION_JP)
 char BTL_STR_COMMAND_RUN[] = "Run";
 char BTL_STR_COMMAND_ATTACK[] = "Attack";
 char BTL_STR_COMMAND_CHANGE[] = "Change";
+#endif
 uint8_t MAIN_D_80134728[5] = { 0, 11, 25, 39, 50 };
 uint8_t MAIN_D_80134730[8] = { 11, 14, 14, 11, 11, 0, 0, 0 };
 uint8_t MAIN_D_80134738[4] = { 0x50, 0x68, 0x58, 0x68 };
 uint8_t MAIN_D_8013473C[4] = { 0xa8, 0x90, 0x90, 0x80 };
+#if defined(VERSION_JP)
+char BTL_STR_YELLOW[] = "C7";
+char BTL_STR_DROPPED[] = "C1はRC7";
+char BTL_STR_MP_BONUS_20[] = "２０";
+char BTL_STR_MP_BONUS_15[] = "１５";
+char BTL_STR_MP_BONUS_10[] = "１０";
+char BTL_STR_MP_BONUS_5[] = "５";
+#else
 char BTL_STR_YELLOW[] = "#C7";
 char BTL_STR_WHITE_WAIT[] = "#C1#W";
 char BTL_STR_MP_BONUS_20[] = "20";
@@ -120,6 +139,7 @@ char BTL_STR_MP_BONUS_15[] = "15";
 char BTL_STR_MP_BONUS_10[] = "10";
 char BTL_STR_MP_BONUS_5[] = "5";
 char BTL_STR_MP_BONUS_PERCENT[] = "%!#W";
+#endif
 uint8_t MAIN_D_80134764[8] = { 0, 6, 10, 18, 22, 30, 38, 43 };
 uint8_t MAIN_D_8013476C[8] = { 6, 4, 8, 4, 8, 8, 5, 5 };
 uint8_t MAIN_D_80134774[8] = { 0, 6, 10, 18, 22, 30, 38, 43 };
@@ -140,8 +160,8 @@ int16_t BATTLE_END_BOX_LINE_COUNT;
 int16_t BATTLE_END_ROWS_DRAWN;
 int16_t BATTLE_END_VISIBLE_ROWS;
 int16_t BATTLE_END_WAIT_FRAMES;
-int16_t BATTLE_END_WAIT_TIMER[2];
-uint8_t MAIN_D_801350BC;
+int16_t BATTLE_END_WAIT_TIMER;
+uint8_t MAIN_D_801350BC[4];
 int32_t MAIN_D_801350C0;
 uint8_t MAIN_D_801350C4;
 uint8_t MAIN_D_801350C5;
@@ -162,7 +182,19 @@ static void *battle_hud_sbss_order[] = {
 	&MAIN_D_801350C5,
 	&MAIN_D_801350C4,
 	&MAIN_D_801350C0,
-	&MAIN_D_801350BC,
+	MAIN_D_801350BC,
+#if defined(VERSION_JP)
+	&BATTLE_END_WAIT_TIMER,
+	&BATTLE_END_WAIT_FRAMES,
+	&BATTLE_END_VISIBLE_ROWS,
+	&BATTLE_END_ROWS_DRAWN,
+	&BATTLE_END_BOX_LINE_COUNT,
+	&BATTLE_END_ROWS_SHOWN,
+	&BATTLE_END_CURSOR,
+	&BATTLE_END_V,
+	&BATTLE_END_PEN_Y,
+	&BATTLE_END_PEN_X,
+#else
 	&BATTLE_END_WAIT_TIMER,
 	&BATTLE_END_WAIT_FRAMES,
 	&BATTLE_END_VISIBLE_ROWS,
@@ -173,6 +205,7 @@ static void *battle_hud_sbss_order[] = {
 	&BATTLE_END_PEN_Y,
 	&BATTLE_END_PEN_X,
 	&BATTLE_END_CURSOR,
+#endif
 	&BATTLE_END_HEIGHT,
 	&BATTLE_END_WIDTH,
 	&BATTLE_END_POS_Z,
@@ -183,12 +216,15 @@ static void *battle_hud_sbss_order[] = {
 };
 
 // clang-format off
+#if defined(VERSION_JP)
+extern char *BTL_COMMAND_NAMES[];
+#else
 const char BTL_STR_COMMAND_YOUR_CALL[] = "Your Call";
 const char BTL_STR_COMMAND_MODERATE[] = "Moderate";
 const char BTL_STR_COMMAND_DISTANCE[] = "Distance";
 const char BTL_STR_COMMAND_DEFENSIVE[] = "Defensive";
 
-const char *BTL_D_80072E34[8] = {
+const char *BTL_COMMAND_NAMES[8] = {
 	BTL_STR_COMMAND_RUN,
 	BTL_STR_COMMAND_ATTACK,
 	BTL_STR_COMMAND_YOUR_CALL,
@@ -198,7 +234,60 @@ const char *BTL_D_80072E34[8] = {
 	BTL_STR_COMMAND_CHANGE,
 	NULL,
 };
+#endif
 
+#if defined(VERSION_JP)
+int8_t BTL_SHOUT_HOP_OFFSETS[20] = {
+	0, -8, -14, -20, -25, -30, -34, -36,
+	-38, -39, -40, -39, -38, -36, -34, -30,
+	-34, -36, -38, -39,
+};
+
+int8_t BTL_SHOUT_DROP_OFFSETS[20] = {
+	0, 1, 2, 4, 6, 10, 15, 20,
+	26, 32, 40, 36, 34, 32, 31, 30,
+	31, 32, 34, 36,
+};
+
+uint8_t BTL_D_80072E7C[6][10] = {
+	{ 0x00, 0x01, 0x03, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff },
+	{ 0x00, 0x01, 0x02, 0x04, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff },
+	{ 0x00, 0x01, 0x02, 0x01, 0x03, 0xff, 0xff, 0xff, 0xff, 0xff },
+	{ 0x00, 0x01, 0x02, 0x01, 0x02, 0x01, 0x03, 0xff, 0xff, 0xff },
+	{ 0x00, 0x01, 0x02, 0x01, 0x02, 0x01, 0x02, 0x04, 0xff, 0xff },
+	{ 0x00, 0x01, 0x02, 0x01, 0x02, 0x01, 0x02, 0x01, 0x03, 0xff },
+};
+
+int16_t BTL_D_80072EB8[8] = {
+	0xff88, 0xff96, 0xffa2, 0xffac, 0xffb3, 0xffb8, 0xffbb, 0xffbc,
+};
+
+int16_t BTL_D_80072EC8[8] = {
+	0xff68, 0xff69, 0xff6c, 0xff71, 0xff78, 0xff82, 0xff8e, 0xff9c,
+};
+
+uint8_t BTL_D_80072ED8[8][2] = {
+	{ 0x00, 0xc0 },
+	{ 0x20, 0xc0 },
+	{ 0x40, 0xc0 },
+	{ 0x60, 0xc0 },
+	{ 0x80, 0xc0 },
+	{ 0xa0, 0xc0 },
+	{ 0xc0, 0xc0 },
+	{ 0x00, 0x00 },
+};
+
+uint8_t BTL_D_80072EE8[8][2] = {
+	{ 0x00, 0xd0 },
+	{ 0x20, 0xd0 },
+	{ 0x40, 0xd0 },
+	{ 0x60, 0xd0 },
+	{ 0x80, 0xd0 },
+	{ 0xa0, 0xd0 },
+	{ 0xc0, 0xd0 },
+	{ 0x00, 0x00 },
+};
+#else
 const int8_t BTL_SHOUT_HOP_OFFSETS[20] = {
 	0, -8, -14, -20, -25, -30, -34, -36,
 	-38, -39, -40, -39, -38, -36, -34, -30,
@@ -249,6 +338,7 @@ const uint8_t BTL_D_80072EE8[8][2] = {
 	{ 0xc0, 0xd0 },
 	{ 0x00, 0x00 },
 };
+#endif
 // clang-format on
 
 void BTL_drawHoveredCommandName(void)
@@ -264,7 +354,7 @@ void BTL_drawHoveredCommandName(void)
 		tech = entityGetTechFromAnim(ENTITY_TABLE[1], PARTNER_ENTITY.digimonEntity.stats.base.moves[cmd - 8]);
 		drawString(MOVE_NAMES[tech], 0, 0xd8);
 	} else {
-		drawString(BTL_D_80072E34[cmd - 1], 0, 0xd8);
+		drawString(BTL_COMMAND_NAMES[cmd - 1], 0, 0xd8);
 	}
 
 	renderString(0, -0x8c, -0x42, 0x90, 0xc, 0, 0xd8, 7, 1);
@@ -274,8 +364,6 @@ void BTL_initializeFinisherChargeup(void)
 {
 	SVECTOR v;
 	VECTOR *loc;
-	int32_t d;
-	int32_t c;
 
 	COMBAT_DATA_PTR->player.finisherChargeup[0] = 0;
 	COMBAT_DATA_PTR->player.remainingChargeupTime[0] = 0x50;
@@ -284,8 +372,7 @@ void BTL_initializeFinisherChargeup(void)
 		COMBAT_DATA_PTR->player.hoveredCommand[0] = COMBAT_DATA_PTR->player.numCommands[0] - 1;
 	}
 
-	COMBAT_DATA_PTR->player.currentCommand[0] = 3;
-	COMBAT_DATA_PTR->player.bufferedCommand[0] = 3;
+	COMBAT_DATA_PTR->player.bufferedCommand[0] = COMBAT_DATA_PTR->player.currentCommand[0] = 3;
 	GsSetLsMatrix(&GsWSMATRIX);
 	loc = &ENTITY_TABLE[1]->posData->location;
 	v.vx = loc->vx;
@@ -294,12 +381,8 @@ void BTL_initializeFinisherChargeup(void)
 	gte_ldv0(&v);
 	gte_rtps();
 	gte_stsxy((int32_t *)MAIN_D_80135090);
-	c = MAIN_D_80135090[0];
-	d = 0xb7 - DRAWING_OFFSET_X;
-	MAIN_D_80135090[0] = c - d;
-	c = MAIN_D_80135090[1];
-	d = 0x8c - DRAWING_OFFSET_Y;
-	MAIN_D_80135090[1] = c - d;
+	MAIN_D_80135090[0] = (int16_t)MAIN_D_80135090[0] - (0xb7 - DRAWING_OFFSET_X);
+	MAIN_D_80135090[1] = (int16_t)MAIN_D_80135090[1] - (0x8c - DRAWING_OFFSET_Y);
 	if (MAIN_D_80135090[0] >= 0x65) {
 		MAIN_D_80135090[0] = 0x64;
 	}
@@ -322,7 +405,6 @@ void BTL_initializeFinisherChargeup(void)
 void BTL_tickFinisherChargeup(void)
 {
 	int32_t up;
-	uint32_t charge;
 
 	COMBAT_DATA_PTR->player.remainingChargeupTime[0]--;
 	up = 0;
@@ -334,9 +416,8 @@ void BTL_tickFinisherChargeup(void)
 		up = 1;
 	}
 
-	charge = COMBAT_DATA_PTR->player.finisherChargeup[0];
-	if ((charge < 0x50) && (up != 0)) {
-		COMBAT_DATA_PTR->player.finisherChargeup[0] = charge + 2;
+	if ((COMBAT_DATA_PTR->player.finisherChargeup[0] < 0x50) && (up != 0)) {
+		COMBAT_DATA_PTR->player.finisherChargeup[0] += 2;
 	}
 }
 
@@ -344,7 +425,6 @@ void BTL_renderFinisherChargeup(void)
 {
 	POLY_FT4 prim;
 	int32_t i;
-	int32_t x;
 	int16_t bars;
 
 	SetPolyFT4(&prim);
@@ -356,8 +436,8 @@ void BTL_renderFinisherChargeup(void)
 	GsSortPoly(&prim, ACTIVE_ORDERING_TABLE, 7);
 	bars = COMBAT_DATA_PTR->player.finisherChargeup[0] / 8;
 	setUVWH(&prim, 0x88, 0xe0, 4, 6);
-	for (i = 0, x = 0; i < bars; i++, x += 4) {
-		setXYWH(&prim, (int32_t)(MAIN_D_80135090[0] + 3 + x), MAIN_D_80135090[1] + 3, 4, 6);
+	for (i = 0; i < bars; i++) {
+		setXYWH(&prim, (int32_t)(MAIN_D_80135090[0] + 3 + i * 4), MAIN_D_80135090[1] + 3, 4, 6);
 		GsSortPoly(&prim, ACTIVE_ORDERING_TABLE, 7);
 	}
 
@@ -378,17 +458,18 @@ void BTL_initializeDeathCountdown(void)
 {
 	GsSPRITE *sp;
 
-	BTL_D_80073E54.attribute = 0;
-	BTL_D_80073E54.tpage = getTPage(0, 0, 896, 256);
-	BTL_D_80073E54.u = 0x32;
-	BTL_D_80073E54.v = 0x80;
-	BTL_D_80073E54.mx = 0x14;
-	BTL_D_80073E54.my = 0x14;
-	BTL_D_80073E54.cx = 0x100;
-	BTL_D_80073E54.r = 0x80;
-	BTL_D_80073E54.g = 0x80;
-	BTL_D_80073E54.b = 0x80;
-	BTL_D_80073E78.data.sprite = BTL_D_80073E54;
+	sp = &BTL_D_80073E54;
+	sp->attribute = 0;
+	sp->tpage = getTPage(0, 0, 896, 256);
+	sp->u = 0x32;
+	sp->v = 0x80;
+	sp->mx = 0x14;
+	sp->my = 0x14;
+	sp->cx = 0x100;
+	sp->r = 0x80;
+	sp->g = 0x80;
+	sp->b = 0x80;
+	BTL_D_80073E78.data.sprite = *sp;
 	sp = &BTL_D_80073E78.data.sprite;
 	do {
 		sp->mx = 8;
@@ -401,48 +482,59 @@ void BTL_initializeDeathCountdown(void)
 void BTL_addDeathCountdown(Entity *entity)
 {
 	int16_t pos[2];
-	GsSPRITE *sp;
+	GsSPRITE *sprite;
+	GsSPRITE *shadow;
+#if !defined(VERSION_JP)
 	int16_t py;
 
-	if (BTL_D_80073E78.data.timer == -1) {
-		BTL_D_80073E78.data.timer = 0;
-		BTL_D_80073E78.data.step = 0;
-		getEntityScreenPos(entity, 1, pos);
-		if (pos[0] >= 0x8d) {
-			pos[0] = 0x8c;
-		}
-		if (pos[0] < -0x8c) {
-			pos[0] = -0x8c;
-		}
-		if (pos[1] >= 0x65) {
-			pos[1] = 0x64;
-		}
-		if (pos[1] < -0x64) {
-			pos[1] = -0x64;
-		}
-		sp = &BTL_D_80073E78.data.sprite;
-		do {
-			BTL_D_80073E54.cy = 0x1ed;
-			sp->cy = 0x1ed;
-			BTL_D_80073E54.rotate = 0;
-			sp->rotate = 0;
-			BTL_D_80073E54.x = pos[0];
-			sp->x = pos[0];
-			py = pos[1];
-			BTL_D_80073E54.y = py;
-			sp->y = py;
-		} while (0);
-		addObject(0x197, 0, (TickFunction)BTL_tickDeathCountdown, (RenderFunction)BTL_renderDeathCountdown);
+	if (BTL_D_80073E78.data.timer != -1) {
+		return;
 	}
+#endif
+	BTL_D_80073E78.data.timer = 0;
+	BTL_D_80073E78.data.step = 0;
+	getEntityScreenPos(entity, 1, pos);
+	if (pos[0] >= 0x8d) {
+		pos[0] = 0x8c;
+	}
+	if (pos[0] < -0x8c) {
+		pos[0] = -0x8c;
+	}
+	if (pos[1] >= 0x65) {
+		pos[1] = 0x64;
+	}
+	if (pos[1] < -0x64) {
+		pos[1] = -0x64;
+	}
+#if defined(VERSION_JP)
+	sprite = &BTL_D_80073E54;
+	shadow = &BTL_D_80073E78.data.sprite;
+	shadow->cy = sprite->cy = 0x1ed;
+	shadow->rotate = sprite->rotate = 0;
+	shadow->x = sprite->x = pos[0];
+	shadow->y = sprite->y = pos[1];
+#else
+	shadow = &BTL_D_80073E78.data.sprite;
+	do {
+		BTL_D_80073E54.cy = 0x1ed;
+		shadow->cy = 0x1ed;
+		BTL_D_80073E54.rotate = 0;
+		shadow->rotate = 0;
+		BTL_D_80073E54.x = pos[0];
+		shadow->x = pos[0];
+		py = pos[1];
+		BTL_D_80073E54.y = py;
+		shadow->y = py;
+	} while (0);
+#endif
+	addObject(0x197, 0, (TickFunction)BTL_tickDeathCountdown, (RenderFunction)BTL_renderDeathCountdown);
 }
 
 void BTL_tickDeathCountdown(void)
 {
 	GsSPRITE *base;
 	GsSPRITE *spin;
-	int32_t frame;
-	int32_t scale;
-	uint8_t vpos;
+	long frame;
 
 	if (TAMER_ITEM.worldItem.type == 0xff) {
 		base = &BTL_D_80073E54;
@@ -455,45 +547,33 @@ void BTL_tickDeathCountdown(void)
 			BTL_D_80073E78.data.step++;
 			frame = (BTL_D_80073E78.data.timer + 0x1d) / 30;
 			if (frame < 5) {
-				spin->u = (MAIN_D_80134738 - 1)[frame];
-				vpos = (MAIN_D_8013473C - 1)[frame];
+				spin->u = MAIN_D_80134738[frame - 1];
+				spin->v = MAIN_D_8013473C[frame - 1];
 			} else {
 				spin->u = 0x58;
-				vpos = 0x80;
+				spin->v = 0x80;
 			}
-			spin->v = vpos;
 			if ((BTL_D_80073E78.data.step > 0) && (BTL_D_80073E78.data.step < 0x15)) {
 				if (BTL_D_80073E78.data.step == 1) {
-					base->scaley = 0x1000;
-					base->scalex = 0x1000;
-					base->rotate = 0;
-					spin->rotate = 0;
+					base->scalex = base->scaley = 0x1000;
+					spin->rotate = base->rotate = 0;
 				}
 				if ((BTL_D_80073E78.data.step >= 2) && (BTL_D_80073E78.data.step < 5)) {
-					scale = spin->scalex + 0x199;
-					spin->scalex = scale;
-					spin->scaley = scale;
+					spin->scaley = spin->scalex += 0x199;
 				} else if ((BTL_D_80073E78.data.step >= 5) && (BTL_D_80073E78.data.step < 8)) {
-					scale = spin->scalex - 0x199;
-					spin->scalex = scale;
-					spin->scaley = scale;
+					spin->scaley = spin->scalex -= 0x199;
 				} else {
-					spin->scaley = 0x1000;
-					spin->scalex = 0x1000;
+					spin->scalex = spin->scaley = 0x1000;
 				}
 				if ((BTL_D_80073E78.data.step % 3) == 0) {
-					base->cy = base->cy + 1;
+					base->cy++;
 					if (base->cy >= 0x1f0) {
 						base->cy = 0x1ed;
 					}
 				}
 			} else {
-				scale = ((0x64 - ((BTL_D_80073E78.data.step - 0x14) * 5)) << 0xc) / 100;
-				base->scalex = scale;
-				base->scaley = scale;
-				spin->scaley = scale;
-				spin->scalex = scale;
-				base->rotate = base->rotate + 0x40000;
+				spin->scalex = spin->scaley = base->scaley = base->scalex = ((0x64 - ((BTL_D_80073E78.data.step - 0x14) * 5)) << 0xc) / 100;
+				base->rotate += 0x40000;
 				spin->rotate = base->rotate;
 			}
 			if ((spin->scalex >= 0x2000) || (spin->scaley >= 0x2000)) {
@@ -522,21 +602,20 @@ void BTL_removeDeathCountdown(void)
 	}
 }
 
-void BTL_initializeBattleEndText(int16_t arg0, int16_t arg1, RECT *arg2)
+void BTL_initializeBattleEndText(uint16_t arg0, int16_t arg1, RECT *arg2)
 {
 	BATTLE_END_TYPING = 0;
 	*(RECT *)&BATTLE_END_POS_X = *arg2;
-	BATTLE_END_CURSOR = (uint8_t *)BTL_END_BOX_TEXTBUFFER;
 	BATTLE_END_PEN_X = 0;
-	BATTLE_END_PEN_Y = arg0;
-	BATTLE_END_V = arg0;
+	BATTLE_END_V = BATTLE_END_PEN_Y = arg0;
+	BATTLE_END_CURSOR = (uint8_t *)BTL_END_BOX_TEXTBUFFER;
 	BATTLE_END_ROWS_SHOWN = 0;
 	BATTLE_END_BOX_LINE_COUNT = 0;
 	BATTLE_END_ROWS_DRAWN = 0;
 	BTL_END_BOX_TEXTBUFFER[0] = 0;
 	BATTLE_END_VISIBLE_ROWS = arg1;
 	BATTLE_END_WAIT_FRAMES = 0x3c;
-	BATTLE_END_WAIT_TIMER[0] = 0x3c;
+	BATTLE_END_WAIT_TIMER = BATTLE_END_WAIT_FRAMES;
 }
 
 void BTL_appendItemDroppedText(int32_t *p)
@@ -564,10 +643,10 @@ void BTL_appendCommandLearnedText(void)
 	int16_t total;
 
 	total = INITIAL_COMBAT_STATS[0].brains + STATS_GAINS.brains;
-	old = INITIAL_COMBAT_STATS[0].brains;
 	if (total < 0x64) {
 		return;
 	}
+	old = INITIAL_COMBAT_STATS[0].brains;
 
 	if (total >= 0x1f4) {
 		if (old < 0x1f4) {
@@ -609,12 +688,12 @@ void BTL_appendMPBonusText(void)
 	int16_t total;
 
 	total = INITIAL_COMBAT_STATS[0].brains + STATS_GAINS.brains;
-	old = INITIAL_COMBAT_STATS[0].brains;
 	if (total < 0x2bc) {
 		return;
 	}
 
 	buf[0] = 0;
+	old = INITIAL_COMBAT_STATS[0].brains;
 	if (total >= 0x3e7) {
 		if (old < 0x3e7) {
 			strcpy(buf, BTL_STR_MP_BONUS_20);
@@ -638,13 +717,18 @@ void BTL_appendMPBonusText(void)
 	}
 
 	strcat(BTL_END_BOX_TEXTBUFFER, BTL_STR_MP_CONSUMPTION_BONUS);
+#if !defined(VERSION_JP)
 	strcat(BTL_END_BOX_TEXTBUFFER, BTL_STR_REDUCED_BY);
+#endif
 	strcat(BTL_END_BOX_TEXTBUFFER, buf);
 	strcat(BTL_END_BOX_TEXTBUFFER, BTL_STR_MP_BONUS_PERCENT);
 	BATTLE_END_BOX_LINE_COUNT += 4;
 }
 
-void BTL_appendMoveLearnedText(int32_t move)
+// clang-format off
+void BTL_appendMoveLearnedText(move)
+	int16_t move;
+// clang-format on
 {
 	strcat(BTL_END_BOX_TEXTBUFFER, BTL_STR_YELLOW);
 	strcat(BTL_END_BOX_TEXTBUFFER, MOVE_NAMES[move]);
@@ -654,6 +738,40 @@ void BTL_appendMoveLearnedText(int32_t move)
 
 void BTL_drawBattleEndText(int32_t flag)
 {
+#if defined(VERSION_JP)
+#ifdef __MWERKS__
+	extern void drawGlyph(uint16_t codepoint, int32_t x, int32_t y);
+#endif
+	uint16_t glyph;
+
+	do {
+		switch (*BATTLE_END_CURSOR) {
+		case 'C':
+			BATTLE_END_CURSOR++;
+			setTextColor(*BATTLE_END_CURSOR);
+			BATTLE_END_CURSOR++;
+			break;
+		case 'W':
+			BATTLE_END_WAIT_TIMER = BATTLE_END_WAIT_FRAMES;
+			/* fall through */
+		case 'R':
+			BATTLE_END_CURSOR++;
+			BATTLE_END_PEN_X = 0;
+			BATTLE_END_PEN_Y += 0xc;
+			BATTLE_END_ROWS_SHOWN++;
+			BATTLE_END_ROWS_DRAWN++;
+			return;
+		case '0':
+			return;
+		default:
+			glyph = BATTLE_END_CURSOR[0] | (BATTLE_END_CURSOR[1] << 8);
+			drawGlyph(glyph, BATTLE_END_PEN_X, BATTLE_END_PEN_Y);
+			BATTLE_END_PEN_X += 0xc;
+			BATTLE_END_CURSOR += 2;
+			break;
+		}
+	} while (flag);
+#else
 	uint8_t c;
 	uint16_t glyph;
 	uint16_t w;
@@ -668,7 +786,7 @@ void BTL_drawBattleEndText(int32_t flag)
 				BATTLE_END_CURSOR++;
 				break;
 			case 'W':
-				BATTLE_END_WAIT_TIMER[0] = BATTLE_END_WAIT_FRAMES;
+				BATTLE_END_WAIT_TIMER = BATTLE_END_WAIT_FRAMES;
 				/* fall through */
 			case 'R':
 				BATTLE_END_PEN_X = 0;
@@ -690,6 +808,7 @@ void BTL_drawBattleEndText(int32_t flag)
 		BATTLE_END_CURSOR++;
 		return;
 	}
+#endif
 }
 
 void BTL_scrollBattleEndText(void)
@@ -700,45 +819,48 @@ void BTL_scrollBattleEndText(void)
 
 void BTL_tickBattleEndText(void)
 {
-	if (BATTLE_END_WAIT_TIMER[0] != 0) {
-		BATTLE_END_WAIT_TIMER[0] -= 1;
+	if (BATTLE_END_WAIT_TIMER != 0) {
+		BATTLE_END_WAIT_TIMER -= 1;
 	}
 
 	if (BTL_END_BOX_TEXTBUFFER[0] == 0) {
-		if (((POLLED_INPUT == 0x40) || (POLLED_INPUT == 0x10)) && (POLLED_INPUT != POLLED_INPUT_PREVIOUS)) {
-			BATTLE_END_WAIT_TIMER[0] = 0;
+		if (((POLLED_INPUT == CONFIRM_BUTTON) || (POLLED_INPUT == CANCEL_BUTTON)) && (POLLED_INPUT != POLLED_INPUT_PREVIOUS)) {
+			BATTLE_END_WAIT_TIMER = 0;
 		}
 		return;
 	}
 
 	if (BATTLE_END_ROWS_SHOWN == BATTLE_END_VISIBLE_ROWS) {
-		if (BATTLE_END_WAIT_TIMER[0] == 0) {
+		if (BATTLE_END_WAIT_TIMER == 0) {
 			BTL_scrollBattleEndText();
 		}
 	} else {
 		BTL_drawBattleEndText(BATTLE_END_TYPING);
-		if (BATTLE_END_WAIT_TIMER[0] != 0) {
+		if (BATTLE_END_WAIT_TIMER != 0) {
 			BATTLE_END_TYPING = 0;
 		}
 	}
 
-	if (((POLLED_INPUT == 0x40) || (POLLED_INPUT == 0x10)) && (POLLED_INPUT != POLLED_INPUT_PREVIOUS)) {
-		if (BATTLE_END_WAIT_TIMER[0] != 0) {
-			BATTLE_END_WAIT_TIMER[0] = 0;
+	if (((POLLED_INPUT == CONFIRM_BUTTON) || (POLLED_INPUT == CANCEL_BUTTON)) && (POLLED_INPUT != POLLED_INPUT_PREVIOUS)) {
+		if (BATTLE_END_WAIT_TIMER != 0) {
+			BATTLE_END_WAIT_TIMER = 0;
 		} else {
 			BATTLE_END_TYPING = 1;
 		}
 	}
 }
 
-void BTL_renderBattleEndText(int32_t n)
+// clang-format off
+void BTL_renderBattleEndText(n)
+	int16_t n;
+// clang-format on
 {
 	renderString(0, BATTLE_END_POS_X, BATTLE_END_POS_Z, BATTLE_END_WIDTH, BATTLE_END_HEIGHT, 0, BATTLE_END_V, 6 - n, 0);
 }
 
 int32_t BTL_isEndBoxTextFinished(void)
 {
-	if ((BATTLE_END_WAIT_TIMER[0] == 0) && (BATTLE_END_BOX_LINE_COUNT == BATTLE_END_ROWS_DRAWN)) {
+	if ((BATTLE_END_WAIT_TIMER == 0) && (BATTLE_END_BOX_LINE_COUNT == BATTLE_END_ROWS_DRAWN)) {
 		return 1;
 	}
 
@@ -748,9 +870,11 @@ int32_t BTL_isEndBoxTextFinished(void)
 void BTL_shuffleBattleStartTextPieces(void)
 {
 	int32_t i;
+	int32_t r;
 
 	for (i = 0; i < 0x9b; i++) {
-		swapByte(&BTL_D_800742A0[i][0x11], &BTL_D_800742A0[random(0x9b)][0x11]);
+		r = random(0x9b);
+		swapByte(&BTL_D_800742A0[i][0x11], &BTL_D_800742A0[r][0x11]);
 	}
 }
 
@@ -760,9 +884,11 @@ void BTL_initializeBattleStartText(void)
 	int32_t sgn;
 	int32_t i;
 	int32_t r;
+#if !defined(VERSION_JP)
 	int32_t t;
+#endif
 
-	MAIN_D_801350BC = 0;
+	MAIN_D_801350BC[0] = 0;
 	MAIN_D_801350C0 = 0;
 	p = BTL_D_800742A0;
 	for (i = 0; i < 0x9b; i++, p++) {
@@ -781,7 +907,7 @@ void BTL_initializeBattleStartText(void)
 			sgn = -1;
 		}
 		((int16_t *)*p)[5] = BTL_D_80073014[i][1];
-		(*p)[0x10] = -sgn * ((random(3) + 1) << 5);
+		((int8_t *)*p)[0x10] = -sgn * ((random(3) + 1) << 5);
 		if ((0 <= i) && (i < 0x33)) {
 			((int16_t *)*p)[4] = (sgn * 500) + random(100) - 50;
 		} else if ((0x33 <= i) && (i < 0x65)) {
@@ -790,10 +916,15 @@ void BTL_initializeBattleStartText(void)
 			((int16_t *)*p)[4] = (sgn * 700) + random(100) - 50;
 		}
 		r = random(5);
+#if defined(VERSION_JP)
+		((int16_t *)*p)[6] = (r + 8) * BTL_D_80073014[i][0] / 8;
+		((int16_t *)*p)[7] = (r + 8) * BTL_D_80073014[i][1] / 8;
+#else
 		t = BTL_D_80073014[i][0];
 		((int16_t *)*p)[6] = (r + 8) * t / 8;
 		t = BTL_D_80073014[i][1];
 		((int16_t *)*p)[7] = (r + 8) * t / 8;
+#endif
 		((int16_t *)*p)[0] = 0;
 		((int16_t *)*p)[1] = 0;
 		((int16_t *)*p)[2] = 0;
@@ -804,15 +935,12 @@ void BTL_initializeBattleStartText(void)
 
 void BTL_renderBattleStartText(void)
 {
-	POLY_FT4 *ft;
 	POLY_F4 *shadow;
 	uint8_t (*p)[20];
 	POLY_FT4 *prim;
-	GsOT_TAG *ot;
 	int32_t i;
 	int32_t n;
-	int32_t y;
-	uint16_t clut;
+	GsOT_TAG *ot;
 	int32_t otz;
 	SVECTOR p0;
 	SVECTOR p1;
@@ -822,6 +950,8 @@ void BTL_renderBattleStartText(void)
 	SVECTOR q1;
 	SVECTOR q2;
 	SVECTOR q3;
+	POLY_FT4 *ft;
+	uint16_t clut;
 
 	GsSetProjection(0x200);
 	GsSetLsMatrix(&BTL_D_80072FF4);
@@ -835,8 +965,7 @@ void BTL_renderBattleStartText(void)
 	}
 
 	if (n == 0x9b) {
-		y = MAIN_D_801350BC++;
-		clut = GetClut(256, (y % 6 / 2) + 488);
+		clut = GetClut(256, (MAIN_D_801350BC[0]++ % 6 / 2) + 488);
 		MAIN_D_801350C0 = 1;
 	} else {
 		clut = GetClut(256, 488);
@@ -953,21 +1082,21 @@ void BTL_initializeBattleStartTextBurst(void)
 
 void BTL_renderBattleStartTextBurst(void)
 {
-	POLY_FT4 *ft;
 	POLY_F4 *shadow;
 	uint8_t (*p)[20];
 	POLY_FT4 *prim;
-	GsOT_TAG *ot;
 	int32_t i;
-	int32_t dead;
 	int32_t j;
-	int16_t cx;
-	int16_t cy;
 	int32_t otz;
+	int32_t dead;
+	GsOT_TAG *ot;
 	SVECTOR corner[4];
 	SVECTOR pts[4];
 	SVECTOR out;
 	MATRIX m;
+	POLY_FT4 *ft;
+	int16_t cx;
+	int16_t cy;
 
 	GsSetProjection(0x200);
 	GsSetLsMatrix(&BTL_D_80072FF4);
@@ -985,9 +1114,9 @@ void BTL_renderBattleStartTextBurst(void)
 	corner[3].vy = 6;
 	corner[3].vz = 0;
 
-	ot = ACTIVE_ORDERING_TABLE->org;
 	dead = 0;
 	p = BTL_D_800742A0;
+	ot = ACTIVE_ORDERING_TABLE->org;
 	prim = (POLY_FT4 *)GsGetWorkBase();
 	for (i = 0; i < 0x9b; i++, p++) {
 		if ((((int16_t *)*p)[6] == 0) && (((int16_t *)*p)[7] == 0)) {
@@ -1047,8 +1176,8 @@ void BTL_renderBattleStartTextBurst(void)
 			((int16_t *)*p)[6] = 0;
 			((int16_t *)*p)[7] = 0;
 		}
-		((int16_t *)*p)[4] = ((int16_t *)*p)[4] + ((int16_t *)*p)[6];
-		((int16_t *)*p)[5] = ((int16_t *)*p)[5] + ((int16_t *)*p)[7];
+		((int16_t *)*p)[4] += ((int16_t *)*p)[6];
+		((int16_t *)*p)[5] += ((int16_t *)*p)[7];
 	}
 
 	GsSetWorkBase((PACKET *)prim);
@@ -1069,33 +1198,37 @@ int32_t BTL_isBattleStartTextFinished(void)
 	return MAIN_D_801350C0;
 }
 
-void BTL_renderNumber(int32_t a, int32_t digits, int32_t x, int32_t y, int16_t value, int32_t layer)
+void BTL_renderNumber(int32_t a, int32_t digits, int16_t x, int16_t y, int16_t value, int32_t layer)
 {
 	POLY_FT4 *prim;
 	int32_t i;
-	uint32_t width;
 	int32_t count;
 	int32_t buf[4];
+#if !defined(VERSION_JP)
+	uint32_t width;
+#endif
 
 	prim = (POLY_FT4 *)GsGetWorkBase();
-
+#if !defined(VERSION_JP)
 	width = digits;
+#endif
 	convertValueToDigits(digits, value, &count, buf);
-
 	for (i = count - 1; i >= 0; i--) {
 		setEntityTextDigit(prim, 256, 492);
 		setRGB0(prim, 0x80, 0x80, 0x80);
 		setUVDataPolyFT4(prim, buf[i] * 7, 172, 7, 11);
-		setPosDataPolyFT4(prim, x + ((((int32_t)width - 1) - i) * 7), y, 7, 11);
+#if defined(VERSION_JP)
+		setPosDataPolyFT4(prim, x + ((digits - 1) - i) * 7, y, 7, 11);
+#else
+		setPosDataPolyFT4(prim, x + (((int32_t)width - 1) - i) * 7, y, 7, 11);
+#endif
 		AddPrim(ACTIVE_ORDERING_TABLE->org + layer, prim++);
 	}
-
 	GsSetWorkBase((PACKET *)prim);
 }
 
-void BTL_renderFinisherGauge(int32_t idx)
+void BTL_renderFinisherGauge(int16_t idx)
 {
-	FighterData *f;
 	int32_t hp;
 	int32_t i;
 
@@ -1103,8 +1236,7 @@ void BTL_renderFinisherGauge(int32_t idx)
 		return;
 	}
 
-	f = COMBAT_DATA_PTR->fighter;
-	hp = f[idx].finisherProgress * 6 / f[idx].finisherGoal;
+	hp = COMBAT_DATA_PTR->fighter[idx].finisherProgress * 6 / COMBAT_DATA_PTR->fighter[idx].finisherGoal;
 
 	if (MAIN_D_801350C8 != hp) {
 		MAIN_D_801350C6 = 0;
@@ -1172,20 +1304,12 @@ void BTL_renderFinisherReadyIcon(void)
 	GsSortBoxFill(&box, ACTIVE_ORDERING_TABLE, 0xa);
 }
 
-void BTL_renderFinisherGaugeSegment(int16_t i, int32_t idx)
+void BTL_renderFinisherGaugeSegment(int16_t i, int16_t idx)
 {
-	struct EfeFighter {
-		int32_t unk0[6];
-		int16_t goal;
-		int16_t progress;
-		int8_t unk1C[0x14c];
-	};
 	POLY_FT4 *prim;
 	int32_t hp;
-	struct EfeFighter *f;
 
-	f = (struct EfeFighter *)COMBAT_DATA_PTR;
-	hp = f[idx].progress * 6 / f[idx].goal;
+	hp = COMBAT_DATA_PTR->fighter[idx].finisherProgress * 6 / COMBAT_DATA_PTR->fighter[idx].finisherGoal;
 	prim = (POLY_FT4 *)GsGetWorkBase();
 	setEntityTextDigit(prim, 256, 492);
 	if ((((hp - 1) == i) || (MAIN_D_801350C9 == 1)) && (((uint8_t *)COMBAT_DATA_PTR)[0x64e] != 0xb)) {
@@ -1208,8 +1332,7 @@ void BTL_initializePartnerStatusBars(void)
 	MAIN_D_801350C7 = 0;
 	MAIN_D_801350C8 = 0;
 	MAIN_D_801350C9 = 0;
-	MAIN_D_801350CA = 0;
-	MAIN_D_801350CB = 0;
+	MAIN_D_801350CB = MAIN_D_801350CA = 0;
 	addObject(0x19c, 0, (TickFunction)BTL_tickPartnerStatusBars, (RenderFunction)BTL_renderPartnerStatusBars);
 }
 
@@ -1252,20 +1375,16 @@ void BTL_renderPartnerStatusBars(int16_t idx)
 	POLY_FT4 *prim;
 	const BarSprite *p;
 	FighterData *fighter;
-	int16_t *hpPtr;
-	int16_t *mpPtr;
-	int32_t maxHp;
-	int32_t maxMp;
 	int32_t bar;
 	int32_t k;
+	int16_t *hpPtr;
+	int16_t *mpPtr;
+	int16_t cur;
+	int16_t fill;
+	int16_t maxHp;
+	int16_t maxMp;
 	int16_t x0;
 	int16_t y0;
-	int16_t fill;
-	int16_t cur;
-	int16_t nx;
-	int16_t ny;
-	int32_t w;
-	int32_t t;
 
 	fighter = &COMBAT_DATA_PTR->fighter[idx];
 	hpPtr = &PARTNER_ENTITY.digimonEntity.stats.current.currentHP;
@@ -1279,7 +1398,7 @@ void BTL_renderPartnerStatusBars(int16_t idx)
 	if (fighter->hpDamageBuffer != 0) {
 		damageTick(fighter, &PARTNER_ENTITY.digimonEntity.stats);
 	}
-	*mpPtr = *mpPtr - fighter->mpDamageBuffer;
+	*mpPtr -= fighter->mpDamageBuffer;
 	fighter->mpDamageBuffer = 0;
 	if (*mpPtr < 0) {
 		*mpPtr = 0;
@@ -1298,9 +1417,7 @@ void BTL_renderPartnerStatusBars(int16_t idx)
 			cur = PARTNER_ENTITY.digimonEntity.stats.current.currentMP;
 			fill = *mpPtr * 50 / maxMp;
 		}
-		nx = x0 + 0x49;
-		ny = y0 - 3;
-		BTL_renderNumber(0, 4, nx, ny, cur, 0xa);
+		BTL_renderNumber(0, 4, x0 + 0x49, y0 - 3, cur, 0xa);
 		prim = (POLY_FT4 *)GsGetWorkBase();
 		for (k = 0; k < 3; k++, p--) {
 			SetPolyFT4(prim);
@@ -1308,25 +1425,7 @@ void BTL_renderPartnerStatusBars(int16_t idx)
 			prim->tpage = getTPage(0, 0, 896, 256);
 			setRGB0(prim, 0x80, 0x80, 0x80);
 			setUVWH(prim, p->u, p->v, p->w, p->h);
-			setXY0(prim, x0 + p->x, y0 + p->y);
-			if (k == 0) {
-				w = fill;
-			} else {
-				w = p->w;
-			}
-			t = x0 + p->x;
-			prim->x1 = t + w;
-			prim->y1 = y0 + p->y;
-			prim->x2 = x0 + p->x;
-			prim->y2 = p->h + (y0 + p->y);
-			if (k == 0) {
-				w = fill;
-			} else {
-				w = p->w;
-			}
-			t = x0 + p->x;
-			prim->x3 = t + w;
-			prim->y3 = p->h + (y0 + p->y);
+			setXYWH(prim, x0 + p->x, y0 + p->y, (k == 0) ? fill : p->w, p->h);
 			AddPrim(ACTIVE_ORDERING_TABLE->org + 10, prim++);
 		}
 		GsSetWorkBase((PACKET *)prim);
