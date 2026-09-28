@@ -3995,7 +3995,7 @@ void showNewgameSelection(int32_t textId, int16_t nextState)
 void setupNameSelectorBox(void)
 {
 	int32_t i;
-	int32_t flags;
+	uint8_t flags;
 	RECT rect2;
 	RECT rect1;
 	int16_t screenPos[2];
@@ -4028,7 +4028,7 @@ void setupNameSelectorBox(void)
 void setupNameDisplayBox(void)
 {
 	int32_t i;
-	int32_t flags;
+	uint8_t flags;
 	RECT rect2;
 	RECT rect1;
 	int16_t screenPos[2];

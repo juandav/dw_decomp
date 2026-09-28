@@ -3862,7 +3862,7 @@ void MAIN_func_8010064C(void)
 	}
 }
 
-void createTextbox(int32_t boxId, int32_t flags, RECT *rect, RECT *origin,
+void createTextbox(int32_t boxId, uint8_t flags, RECT *rect, RECT *origin,
                    void *tick, void *render)
 {
 	TextBoxData *entry;

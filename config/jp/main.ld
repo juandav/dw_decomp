@@ -216,7 +216,7 @@ SECTIONS
         . = ALIGN(., 4);
         BUILD_DIR/src/trn/trn_hud.c.o(.sbss.*);
         . = ALIGN(., 4);
-        BUILD_DIR/generated/unk_0x8013E658.sbss.s.o(.sbss.*);
+        BUILD_DIR/src/dget/dget.c.o(.sbss.*);
         BUILD_DIR/src/trn2/trn2_hp_map99.c.o(.sbss.*);
         BUILD_DIR/src/trn2/trn2_def_map99.c.o(.sbss.*);
         BUILD_DIR/src/trn2/trn2_off.c.o(.sbss.*);

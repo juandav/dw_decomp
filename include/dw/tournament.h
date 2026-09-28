@@ -14,8 +14,8 @@ extern uint8_t *TOURNAMENT_ARRAY;
 extern uint8_t TOURNAMENT_SELECTED_COLUMN;
 extern uint8_t TOURNAMENT_SELECTED_ROW;
 
-int32_t minutesOfDay(void);
-uint8_t *getCupDataJumpTable(int32_t section, int32_t id);
+uint32_t minutesOfDay(void);
+uint8_t *getCupDataJumpTable(uint8_t section, uint8_t id);
 uint8_t *getCupDataJumpTableEntry(uint8_t *scriptPtr, uint8_t id);
 void updateTournamentRegistration(void);
 void scriptStartTournament(void);

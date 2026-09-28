@@ -6,6 +6,7 @@
 #include <dw/clock.h>
 #include <dw/entity.h>
 #include <dw/font.h>
+#include <dw/input.h>
 #include <dw/pstat.h>
 #include <dw/script.h>
 #include <dw/tournament.h>
@@ -24,7 +25,7 @@ extern uint8_t *MAIN_D_80134FDC;
 extern uint8_t ACTIVE_INSTRUCTION;
 
 
-void createTextbox(int32_t, int32_t, RECT *, RECT *, void *, void *);
+void createTextbox(int32_t, uint8_t, RECT *, RECT *, void *, void *);
 void registerTextbox(int32_t, int32_t, int32_t, int32_t, int32_t);
 void showMapHeadTextbox(int32_t, int32_t, int32_t, int32_t);
 uint8_t *intToStringSJIS(uint8_t *, int32_t, int32_t, int32_t);
@@ -52,9 +53,9 @@ void renderString(int32_t colorId,
 		  uint32_t uvX, uint32_t uvY,
 		  int32_t offset, int32_t hasShadow);
 
-void renderVerticalLine(int32_t, int32_t, int32_t, int32_t);
-void renderHorizontalLine(int32_t, int32_t, int32_t, int32_t);
-void renderSelectionCursor(int16_t, int16_t, int16_t, int16_t, uint16_t);
+void renderVerticalLine(int32_t boxId, int16_t x, int16_t y, int32_t h);
+void renderHorizontalLine(uint8_t boxId, int16_t x, int16_t y, int32_t w);
+void renderSelectionCursor(int32_t x, int32_t y, int16_t w, int16_t h, int32_t layer);
 
 static void *dget_functions[] = {
 	initTournamentSchedule,
@@ -87,75 +88,66 @@ static void *dget_sbss_order[] = {
 void fillEnabledTournamentTable(void)
 {
 	int32_t day;
-	int32_t tournamentOffset;
-	uint8_t *tournamentPtr;
-	int32_t tournamentIndex;
-	int32_t timeOfDay;
-	uint8_t *tournamentData;
-	uint8_t tournament;
+	uint8_t *data;
+	int32_t j;
+	uint8_t *ptr;
 	int32_t i;
+	uint8_t tournament;
 
 	day = DAY;
-	tournamentIndex = 0;
-	tournamentOffset = 0;
-
-	goto next;
-
-	while (1) {
-		tournamentData = &TOURNAMENT_DATA[(day % 30) * 6];
-		tournamentPtr = &TOURNAMENT_ARRAY[tournamentOffset];
-		for (i = 0; i < 6; ++i) {
-			tournament = *tournamentData++;
+	for (j = 0; j < 5; j++, day++) {
+		data = &TOURNAMENT_DATA[(day % 30) * 6];
+		ptr = &TOURNAMENT_ARRAY[j * 6];
+		for (i = 0; i < 6; i++) {
+			tournament = *data++;
 			if (tournament == 0xff) {
 				break;
 			}
 			if (isTournamentEnabled(tournament) != 0) {
-				*tournamentPtr++ = tournament;
+				*ptr++ = tournament;
 			}
 		}
+	}
 
-		++tournamentIndex;
-		tournamentOffset += 6;
-		++day;
-next:
-		if (tournamentIndex > 4) {
-			int32_t timeOfDay =
-				((uint32_t)minutesOfDay() <= 600U) ? 0U : 1U;
-			for (; timeOfDay < 2; ++timeOfDay) {
-				tournamentPtr = &TOURNAMENT_ARRAY[timeOfDay * 6];
-				for (i = 0; i < 6; ++i, ++tournamentPtr) {
-					tournament = *tournamentPtr;
-					if (tournament == 0xff) {
-						break;
-					}
-					if (tournamentCheckEligible(tournament) != 0) {
-						*tournamentPtr |= 0x80;
-					}
-					if (tournamentCheckFair(tournament) != 0) {
-						*tournamentPtr |= 0x40;
-					}
-				}
+	if (minutesOfDay() <= 600) {
+		j = 0;
+	} else {
+		j = 1;
+	}
+	for (; j < 2; j++) {
+		ptr = &TOURNAMENT_ARRAY[j * 6];
+		for (i = 0; i < 6; i++, ptr++) {
+			tournament = *ptr;
+			if (tournament == 0xff) {
+				break;
 			}
-			return;
+			if (tournamentCheckEligible(tournament) != 0) {
+				*ptr |= 0x80;
+			}
+			if (tournamentCheckFair(tournament) != 0) {
+				*ptr |= 0x40;
+			}
 		}
 	}
 }
 
 void buildScheduleLabels(void)
 {
-	int32_t stat;
 	uint8_t *str;
-	int32_t dayOfMonth;
 	int16_t i;
 	int16_t day;
 	RECT rect1;
 	RECT rect2;
+	uint8_t color;
+#if !defined(VERSION_JP)
+	int32_t dayOfMonth;
+#endif
 
-	stat = readPStat(PSTAT_254);
-	setupBoxOrigin(stat, &rect2);
+	color = 0xe1;
+	setupBoxOrigin(readPStat(PSTAT_254), &rect2);
 
 	setRECT(&rect1, -54, -98, 108, 20);
-	createTextbox(1, 0xe1, &rect1, &rect2, 0, renderTournamentTextbox);
+	createTextbox(1, color, &rect1, &rect2, 0, renderTournamentTextbox);
 	registerTextbox(1, 8, 2, 0, 0);
 	showMapHeadTextbox(1, 0xff, 1, 0x4d8);
 
@@ -166,12 +158,18 @@ void buildScheduleLabels(void)
 	*str++ = 0x01;
 	day = DAY;
 	for (i = 0; i < 5; ++i, ++day) {
+#if defined(VERSION_JP)
+		str = (uint8_t *)intToStringSJIS(str, day % 30 + 1, 2, 0);
+		*str++ = 0x93;
+		*str++ = 0xfa;
+#else
 		dayOfMonth = day % 30;
 		str = (uint8_t *)intToStringSJIS(str, dayOfMonth + 1, 2, 0);
 		if ((i == 0) && ((dayOfMonth + 1) < 10)) {
 			*str++ = 0x81;
 			*str++ = 0x40;
 		}
+#endif
 	}
 
 	terminateString((char *)str, 1);
@@ -180,27 +178,26 @@ void buildScheduleLabels(void)
 void buildScheduleEntries(void)
 {
 	TextBoxData *textBox;
-	uint8_t entry;
-	int32_t stat;
-	int32_t gradeLen;
-	uint8_t *textPtr;
-	char *grade;
-	int32_t col;
-	uint8_t *entryPtr;
-	int32_t i;
-	uint8_t *textStart;
 	RECT rect1;
 	RECT rect2;
+	int32_t col;
+	int32_t gradeLen;
+	uint8_t *textStart;
+	uint8_t *entryPtr;
+	char *grade;
+	uint8_t color;
+	uint8_t *textPtr;
+	uint8_t entry;
+	int32_t i;
 
-	TOURNAMENT_SELECTED_ROW = 0;
-	TOURNAMENT_SELECTED_COLUMN = 0;
+	color = 0xe1;
+	TOURNAMENT_SELECTED_COLUMN = TOURNAMENT_SELECTED_ROW = 0;
 
-	stat = readPStat(PSTAT_254);
-	setupBoxOrigin(stat, &rect2);
+	setupBoxOrigin(readPStat(PSTAT_254), &rect2);
 
 	setRECT(&rect1, -0x82, -0x3e, 0x104, 0x7c);
 
-	createTextbox(2, 0xe1, &rect1, &rect2, tickTournamentSchedule,
+	createTextbox(2, color, &rect1, &rect2, tickTournamentSchedule,
 		      renderTournamentSchedule);
 	registerTextbox(2, 10, 6, 0, 1);
 
@@ -237,6 +234,10 @@ void buildScheduleEntries(void)
 				*textPtr++ = '\x01';
 				*textPtr++ = '\x81';
 				*textPtr++ = '\x40';
+#if defined(VERSION_JP)
+				*textPtr++ = '\x81';
+				*textPtr++ = '\x40';
+#endif
 			}
 		}
 		if (i != 5) {
@@ -284,46 +285,43 @@ static void initTournamentInfo__garbage__(void)
 }
 void initTournamentInfo(int32_t arg)
 {
-	uint8_t *saved;
-	uint8_t *jumpTable;
-	uint8_t *entryPtr;
-	uint8_t entry;
-	int32_t boxId;
-	int32_t slot;
-	int32_t stat;
-	int16_t yOff;
-	int16_t x;
-	int16_t y;
 	RECT rect1;
 	RECT rect2;
+	uint8_t *saved;
+	uint8_t *jumpTable;
+	int16_t yOff;
+	uint8_t color;
+	uint8_t slot;
+	int16_t x;
+	int16_t y;
+	uint8_t entry;
 
 	MAIN_D_801353B0 = arg;
 	if (arg != 0) {
-		boxId = 0xe1;
-		stat = readPStat(PSTAT_254);
-		setupBoxOrigin(stat, &rect2);
+		color = 0xe1;
+		setupBoxOrigin(readPStat(PSTAT_254), &rect2);
 		yOff = -0x4f;
 		slot = 8;
 	} else {
+		color = 0xc1;
 		x = UI_BOX_DATA[2].finalPos.x + 4;
 		y = UI_BOX_DATA[2].finalPos.y + 3;
 		x = x + TOURNAMENT_SELECTED_COLUMN * 51 + 3;
 		y = y + TOURNAMENT_SELECTED_ROW * 16 + 0x16;
 		setRECT(&rect2, x, y, 0x2a, 0xd);
-		boxId = 0xc1;
 		yOff = -0x31;
 		slot = 0;
-
 	}
 	setRECT(&rect1, -0x7e, yOff, 0xfc, 0x63);
-	createTextbox(3, boxId, &rect1, &rect2, tickTournamentInfo,
+	createTextbox(3, color, &rect1, &rect2, tickTournamentInfo,
 		      renderTournamentInfo);
 	registerTextbox(3, slot, 7, 0, 0);
 
-	saved = MAIN_D_80134FDC;
-	entryPtr = TOURNAMENT_ARRAY + TOURNAMENT_SELECTED_COLUMN * 6;
-	entry = entryPtr[TOURNAMENT_SELECTED_ROW];
+	entry = *(uint8_t *)(TOURNAMENT_ARRAY +
+			     (uint32_t)TOURNAMENT_SELECTED_COLUMN * 6 +
+			     (uint32_t)TOURNAMENT_SELECTED_ROW);
 	entry &= 0x3f;
+	saved = MAIN_D_80134FDC;
 	jumpTable = getCupDataJumpTable(10, entry);
 	MAIN_D_80134FDC = getCupDataJumpTableEntry(jumpTable, 0) + 2;
 	MAIN_func_80101EF8(3, 0xff);
@@ -334,16 +332,15 @@ void initTournamentInfo(int32_t arg)
 int32_t tournamentCheckFair(uint8_t value)
 {
 	uint8_t *jumpTable;
-	uint8_t *sectionPtr;
 	uint8_t *typePtr;
 	uint8_t type;
+	uint8_t partnerType;
 
 	jumpTable = getCupDataJumpTable(10, value);
-	sectionPtr = getCupDataJumpTableEntry(jumpTable, 2);
-	typePtr = (uint8_t *)(sectionPtr + 2);
-
+	typePtr = getCupDataJumpTableEntry(jumpTable, 2) + 2;
+	partnerType = PARTNER_ENTITY.digimonEntity.entity.type;
 	while ((type = *typePtr++) < 0xfe) {
-		if (type == (PARTNER_ENTITY.digimonEntity.entity.type & 0xffU)) {
+		if (type == partnerType) {
 			return 1;
 		}
 	}
@@ -353,25 +350,22 @@ int32_t tournamentCheckFair(uint8_t value)
 
 int32_t isTournamentEnabled(uint8_t tournament)
 {
+	uint8_t trigger;
+	int32_t trigIdx;
+	uint8_t *scriptEntry;
+	uint8_t *reqSection;
+	uint8_t reqType;
+	uint8_t minTriggers;
+	uint8_t minWins;
 	uint8_t triggerCount;
 	uint8_t *triggerPtr;
-	uint8_t minWins;
-	uint8_t *scriptEntry;
-	uint32_t reqType;
-	uint8_t minTriggers;
-	uint8_t *reqSection;
-	uint8_t *entrySection;
-	int32_t triggered;
-	int32_t trigIdx;
-	uint8_t trigger;
 
 	scriptEntry = getCupDataJumpTable(10, tournament);
-	reqSection = (uint8_t *)getCupDataJumpTableEntry(scriptEntry, 1) + 2;
-	entrySection = (uint8_t *)getCupDataJumpTableEntry(scriptEntry, 4);
+	reqSection = getCupDataJumpTableEntry(scriptEntry, 1) + 2;
+	triggerPtr = getCupDataJumpTableEntry(scriptEntry, 4) + 2;
 	minTriggers = reqSection[0];
 	minWins = reqSection[1];
-	reqType = (uint32_t)reqSection[2];
-	triggerPtr = entrySection + 2;
+	reqType = reqSection[2];
 
 	if (minTriggers == 0) {
 		return 1;
@@ -379,20 +373,17 @@ int32_t isTournamentEnabled(uint8_t tournament)
 
 	triggerCount = 0;
 	trigger = *triggerPtr;
-	if (trigger < 0xfeu) {
+	if (trigger < 0xfe) {
 		while ((trigger = *triggerPtr++) < 0xfe) {
-			triggered = isTriggerSet(trigger + TRIGGER_OGRE_FORTRESS_OPENED);
-			if (triggered != 0) {
-				++triggerCount;
+			if (isTriggerSet(trigger + TRIGGER_OGRE_FORTRESS_OPENED)) {
+				triggerCount++;
 			}
 		}
 	} else {
 		for (trigIdx = TRIGGER_OGRE_FORTRESS_OPENED;
-		     trigIdx < TRIGGER_WARUSEADRAMON_BEATEN;
-		     ++trigIdx) {
-			triggered = isTriggerSet(trigIdx);
-			if (triggered != 0) {
-				++triggerCount;
+		     trigIdx < TRIGGER_WARUSEADRAMON_BEATEN; trigIdx++) {
+			if (isTriggerSet(trigIdx)) {
+				triggerCount++;
 			}
 		}
 	}
@@ -407,13 +398,12 @@ int32_t isTournamentEnabled(uint8_t tournament)
 	case 1:
 		return isTriggerSet(TRIGGER_GRADE_A_CUP_WON);
 	case 2:
-		scriptEntry = (uint8_t *)getScript(ACTIVE_MAP_SCRIPT);
-		triggerPtr = (uint8_t *)getScriptSection(scriptEntry, 0xb) + 2;
+		scriptEntry = getScript(ACTIVE_MAP_SCRIPT);
+		triggerPtr = getScriptSection(scriptEntry, 0xb) + 2;
 		triggerCount = 0;
 		while ((trigger = *triggerPtr++) < 0xfe) {
-			triggered = isTriggerSet(trigger + TRIGGER_OGRE_FORTRESS_OPENED);
-			if (triggered != 0) {
-				++triggerCount;
+			if (isTriggerSet(trigger + TRIGGER_OGRE_FORTRESS_OPENED)) {
+				triggerCount++;
 			}
 		}
 		if (minWins <= triggerCount) {
@@ -424,9 +414,8 @@ int32_t isTournamentEnabled(uint8_t tournament)
 		triggerPtr = getCupDataJumpTableEntry(scriptEntry, 4) + 2;
 		triggerCount = 0;
 		while ((trigger = *triggerPtr++) <= reqType) {
-			triggered = isTriggerSet(trigger + TRIGGER_OGRE_FORTRESS_OPENED);
-			if (triggered != 0) {
-				++triggerCount;
+			if (isTriggerSet(trigger + TRIGGER_OGRE_FORTRESS_OPENED)) {
+				triggerCount++;
 			}
 		}
 		if (minWins <= triggerCount) {
@@ -440,17 +429,16 @@ int32_t isTournamentEnabled(uint8_t tournament)
 
 int32_t tournamentCheckEligible(uint8_t tournament)
 {
-	uint8_t type;
 	uint8_t *jumpTable;
-	uint8_t *sectionPtr;
 	uint8_t *typePtr;
+	uint8_t type;
+	uint8_t partnerType;
 
 	jumpTable = getCupDataJumpTable(10, tournament);
-	sectionPtr = getCupDataJumpTableEntry(jumpTable, 3);
-	typePtr = (uint8_t *)(sectionPtr + 2);
-
+	typePtr = getCupDataJumpTableEntry(jumpTable, 3) + 2;
+	partnerType = PARTNER_ENTITY.digimonEntity.entity.type;
 	while ((type = *typePtr++) < 0xfe) {
-		if (type == (PARTNER_ENTITY.digimonEntity.entity.type & 0xffU)) {
+		if (type == partnerType) {
 			return 1;
 		}
 	}
@@ -468,8 +456,12 @@ void renderTournamentTextbox(void)
 	posX = UI_BOX_DATA[1].finalPos.x + 6;
 	posY = UI_BOX_DATA[1].finalPos.y + 3;
 
+#if defined(VERSION_JP)
+	renderString(0, posX, posY, 0x60, 0xc, 0, uvY, 5, 1);
+#else
 	drawString("Tournament", 0, (uint32_t)uvY);
 	renderString(0, posX, posY, 0x54, 0xc, 0, uvY, 5, 1);
+#endif
 }
 
 void tickTournamentSchedule(void)
@@ -482,13 +474,13 @@ void tickTournamentSchedule(void)
 		return;
 	}
 
-	if (isKeyDown(PADRup) != 0) {
+	if (isKeyDown(CANCEL_BUTTON) != 0) {
 		SELECTION_MENU_STATE = 3;
 		playSound(0, 4);
 		return;
 	}
 
-	if (isKeyDown(PADRdown) != 0) {
+	if (isKeyDown(CONFIRM_BUTTON) != 0) {
 		entry = *(uint8_t *)(TOURNAMENT_ARRAY +
 				     (uint32_t)TOURNAMENT_SELECTED_COLUMN * 6 +
 				     (uint32_t)TOURNAMENT_SELECTED_ROW);
@@ -546,9 +538,10 @@ void tickTournamentSchedule(void)
 	}
 
 	if (isKeyDown(PADstart) != 0) {
-		if (*(uint8_t *)(TOURNAMENT_ARRAY +
-				 (uint32_t)TOURNAMENT_SELECTED_COLUMN * 6 +
-				 (uint32_t)TOURNAMENT_SELECTED_ROW) != 0xff) {
+		entry = *(uint8_t *)(TOURNAMENT_ARRAY +
+				     (uint32_t)TOURNAMENT_SELECTED_COLUMN * 6 +
+				     (uint32_t)TOURNAMENT_SELECTED_ROW);
+		if (entry != 0xff) {
 			initTournamentInfo(0);
 			playSound(0, 3);
 		} else {
@@ -560,26 +553,20 @@ void tickTournamentSchedule(void)
 
 void renderTournamentSchedule(void)
 {
+	int32_t row;
+	int16_t textOff;
 	int16_t x;
 	int16_t y;
-	int16_t sx;
-	int16_t sy;
-	int16_t textOff;
 	int16_t cellOff;
-	int16_t cellY;
-	int32_t gridX;
+	int16_t sy;
+	int16_t sx;
 	int32_t i;
-	int32_t row;
 
 	x = UI_BOX_DATA[2].finalPos.x + 4;
 	y = UI_BOX_DATA[2].finalPos.y + 3;
-	i = 0;
-	sx = 0x34;
-	while (i < 5) {
-		renderVerticalLine(2, (uint32_t)sx, 2, 0x13);
+	for (i = 0, sx = 0x34; i < 5; i++, sx += 0x33) {
+		renderVerticalLine(2, sx, 2, 0x13);
 		renderVerticalLine(2, sx, 0x16, 0x64);
-		i++;
-		sx += 0x33;
 	}
 	renderHorizontalLine(2, 3, 0x14, 0xfe);
 
@@ -587,6 +574,15 @@ void renderTournamentSchedule(void)
 	sy = y + TOURNAMENT_SELECTED_ROW * 16 + 0x16;
 	renderSelectionCursor(sx, sy, 0x2a, 0xd, 4);
 
+#if defined(VERSION_JP)
+	cellOff = 0;
+	textOff = 0x6c;
+	sx = x + 6;
+	sy = y + 2;
+	for (i = 0; i < 5; i++, sx += 0x33, cellOff += 0x24) {
+		renderString(0, sx, sy, 0x24, 0xc, cellOff, textOff, 4, 1);
+	}
+#else
 	sx = x + 0xc;
 	sy = y + 2;
 	textOff = 0x6c;
@@ -595,20 +591,26 @@ void renderTournamentSchedule(void)
 	renderString(0, sx + 0x66, sy, 0x10, 0xc, 0x20, textOff, 4, 1);
 	renderString(0, sx + 0x99, sy, 0x10, 0xc, 0x30, textOff, 4, 1);
 	renderString(0, sx + 0xcc, sy, 0x10, 0xc, 0x40, textOff, 4, 1);
+#endif
 
 	textOff += 0xc;
+#if defined(VERSION_JP)
+	sy = y + 0x16;
+#else
 	sy = y + 0x18;
-	row = 0;
-	gridX = x + 0x14;
-	for (; row < 6; row++, sy += 0x10, textOff += 0xc) {
-		sx = gridX;
-		cellY = sy;
-		i = 0;
-		cellOff = 0;
-		for (; i < 5; i++, sx += 0x33, cellOff += 0xc) {
-
-			renderString(0, sx, cellY, 0xc, 0xc, cellOff, textOff, 4, 1);
+#endif
+	for (row = 0; row < 6; row++, sy += 0x10, textOff += 0xc) {
+#if defined(VERSION_JP)
+		sx = x + 0xc;
+		for (i = 0, cellOff = 0; i < 5; i++, sx += 0x33, cellOff += 0x18) {
+			renderString(0, sx, sy, 0x18, 0xc, cellOff, textOff, 4, 1);
 		}
+#else
+		sx = x + 0x14;
+		for (i = 0, cellOff = 0; i < 5; i++, sx += 0x33, cellOff += 0xc) {
+			renderString(0, sx, sy, 0xc, 0xc, cellOff, textOff, 4, 1);
+		}
+#endif
 	}
 }
 
@@ -617,7 +619,7 @@ void tickTournamentInfo(void)
 	if ((MAIN_D_801353B0 == 0) &&
 	    (UI_BOX_DATA[3].state == 1) &&
 	    (isXPressedAfterDialogue() != 0) &&
-	    (isKeyDown(0x850) != 0)) {
+	    (isKeyDown(PADstart | CONFIRM_BUTTON | CANCEL_BUTTON) != 0)) {
 		triggerBoxCloseFlag(3);
 		if (MAIN_D_801353B0 == 0) {
 			playSound(0, 3);
@@ -627,10 +629,10 @@ void tickTournamentInfo(void)
 
 void renderTournamentInfo(void)
 {
+	int32_t i;
 	int16_t uvY;
 	int16_t posX;
 	int16_t posY;
-	int32_t i;
 
 	uvY = TEXT_BOX_DATA[3].vramRow * 12;
 	posX = UI_BOX_DATA[3].finalPos.x + 6;
@@ -647,17 +649,14 @@ void renderTournamentInfo(void)
 
 void initTournamentSchedule(void)
 {
-	uint8_t value;
-	int32_t triggered;
-	uint32_t stat;
 	uint32_t selectionResult;
+	uint8_t value;
 
 	selectionResult = 0;
 
 	switch (SELECTION_MENU_STATE) {
 	case 0:
-		triggered = isTriggerSet(TRIGGER_TOURNAMENT_REGISTERED);
-		if (triggered != 0) {
+		if (isTriggerSet(TRIGGER_TOURNAMENT_REGISTERED) != 0) {
 			ACTIVE_INSTRUCTION = 0;
 		} else {
 			TOURNAMENT_ARRAY = allocateArray(TOURNAMENT_ARRAY_SIZE);
@@ -675,6 +674,8 @@ void initTournamentSchedule(void)
 		freeArray(TOURNAMENT_ARRAY);
 		ACTIVE_INSTRUCTION = 0;
 		break;
+	case 2:
+		break;
 	case 3:
 		setInputRepeatMask(0);
 		triggerBoxCloseFlag(2);
@@ -683,17 +684,13 @@ void initTournamentSchedule(void)
 		value = readPStat(PSTAT_TOURNAMENT_ID);
 		if (value == 0xff) {
 			SELECTION_MENU_STATE = 1;
-		}
-		else {
+		} else {
 			initTournamentInfo(1);
-			triggered = tournamentCheckFair(value);
-			if (triggered != 0) {
-				stat = readPStat(PSTAT_254);
-				showMapHeadTextbox(3, stat, 0, 0x4d8);
+			if (tournamentCheckFair(value) != 0) {
+				showMapHeadTextbox(3, readPStat(PSTAT_254), 0, 0x4d8);
 				setTrigger(TRIGGER_TOURNAMENT_OVERLEVELED);
 			} else {
-				stat = readPStat(PSTAT_254);
-				showMapHeadTextbox(2, stat, 0, 0x4d8);
+				showMapHeadTextbox(2, readPStat(PSTAT_254), 0, 0x4d8);
 				unsetTrigger(TRIGGER_TOURNAMENT_OVERLEVELED);
 			}
 			SELECTION_MENU_STATE = 2;
@@ -713,7 +710,7 @@ void initTournamentSchedule(void)
 		setTrigger(TRIGGER_38);
 		setTrigger(TRIGGER_39);
 		value = DAY;
-		if (TOURNAMENT_SELECTED_COLUMN != '\0') {
+		if (TOURNAMENT_SELECTED_COLUMN != 0) {
 			value = (value + 1) | 0x80;
 		}
 		writePStat(PSTAT_TOURNAMENT_DAY, value);

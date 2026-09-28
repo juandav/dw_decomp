@@ -31,8 +31,9 @@ SECTIONS
 			dget_START = .;
 
 			KEEP(BUILD_DIR/asm/dget/data/header.rodata.s.o(.rodata .rodata.*));
-			KEEP(BUILD_DIR/asm/dget/dget.s.o(.text .text.*));
-			KEEP(BUILD_DIR/asm/dget/data/dget.data.s.o(.data .data.*));
+			BUILD_DIR/src/dget/dget.c.o(.text .text.*);
+			BUILD_DIR/src/dget/dget.c.o(.rodata .rodata.*);
+			BUILD_DIR/src/dget/dget.c.o(.data .data.*);
 			LONG(0);
 		}
 	}

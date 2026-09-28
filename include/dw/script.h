@@ -310,7 +310,7 @@ void createMonochromonMoodBubble(void);
 void MAIN_func_800FF9AC(void);
 void MAIN_func_8010020C(void);
 void MAIN_func_8010064C(void);
-void createTextbox(int32_t boxId, int32_t flags, RECT *rect, RECT *origin,
+void createTextbox(int32_t boxId, uint8_t flags, RECT *rect, RECT *origin,
 		   void *tick, void *render);
 void triggerBoxCloseFlag(int32_t boxId);
 void registerTextbox(int32_t boxId, int32_t row, int32_t rows,

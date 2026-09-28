@@ -114,7 +114,7 @@ void updateTournamentRegistration(void)
 }
 
 
-int32_t minutesOfDay(void)
+uint32_t minutesOfDay(void)
 {
 	return MINUTE + HOUR * 60;
 }
@@ -137,9 +137,7 @@ void scriptStartTournament(void)
 	}
 }
 
-uint8_t *getCupDataJumpTable(section, id)
-uint8_t section;
-uint8_t id;
+uint8_t *getCupDataJumpTable(uint8_t section, uint8_t id)
 {
 	uint8_t *script;
 	uint8_t *sectionPtr;
