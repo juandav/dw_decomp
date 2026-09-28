@@ -1,10 +1,10 @@
 #include <dw/anim.h>
 #include <dw/entity.h>
+#include <dw/input.h>
 #include <dw/params.h>
 #include <dw/partner.h>
 #include <dw/script.h>
 #include <dw/sound.h>
-#include <dw/tamer.h>
 #include <dw/trn.h>
 #include <dw/types.h>
 #include <dw/world_object.h>
@@ -14,13 +14,15 @@ extern int32_t TRAINING_COMPLETE;
 
 void createCameraMovement(VECTOR *pos, int32_t speed);
 void createCloudFX(int16_t *pos);
-void storeMapObjectPosition(int16_t *outX, int16_t *outY, int16_t a, int16_t count);
-void loadMapObjectPosition(int16_t *xData, int16_t *yData, int16_t startIndex, int16_t count);
+void storeMapObjectPosition();
+void loadMapObjectPosition();
 int32_t moveMapObjectsWithLimit(int16_t startIndex, int16_t count, int16_t dx, int16_t dy, int16_t limitX, int16_t limitY);
 void setCameraFollowPlayer(void);
 void unsetCameraFollowPlayer(void);
 void createParticleFX(uint8_t kind, int32_t count, void *arg2, Entity *entity, int32_t arg4);
 void TRN_tickDefenseTraining(int32_t instanceId);
+void setTamerState(int8_t state);
+int32_t tickEntityWalkTo();
 
 static void *trn_def_functions[] = {
 	TRN_tickDefenseTraining,
@@ -110,7 +112,8 @@ static void trn_def__garbage__(void)
 	TRN_D_8008F368[3] = (v19 * v0) + v1;
 }
 
-void TRN_setupDefenseTraining(int32_t arg)
+void TRN_setupDefenseTraining(arg)
+int16_t arg;
 {
 	if (arg == 0x70) {
 		TRN_D_8008F330.vx = -0x26b;
@@ -142,11 +145,13 @@ void TRN_setupDefenseTraining(int32_t arg)
 	MAIN_D_80135371 = 0;
 }
 
-void TRN_tickDefenseTraining(int32_t instanceId)
+void TRN_tickDefenseTraining(instanceId)
+int16_t instanceId;
 {
 	int16_t pos[3];
 	VECTOR *loc;
 	int32_t r;
+	int32_t done;
 
 	loc = &PARTNER_ENTITY.digimonEntity.entity.posData->location;
 	switch (MAIN_D_80135371) {
@@ -166,8 +171,8 @@ void TRN_tickDefenseTraining(int32_t instanceId)
 		if (tickEntityWalkTo(0xfc, 0xff, TRN_D_8008F320.vx, TRN_D_8008F320.vz, 0) == 1) {
 			PARTNER_ENTITY.digimonEntity.entity.posData->rotation.vy = 0x400;
 			startAnimation(&PARTNER_ENTITY.digimonEntity.entity, 0x25);
-			MAIN_D_80135371 = 2;
 			MAIN_D_80135380 = 0;
+			MAIN_D_80135371 = 2;
 			if (MAIN_D_80135370 == 1) {
 				TRN_startSlotSpin();
 			}
@@ -175,10 +180,11 @@ void TRN_tickDefenseTraining(int32_t instanceId)
 		break;
 	case 2:
 		MAIN_D_8013537A++;
-		if (POLLED_INPUT & 0x10) {
+		if (POLLED_INPUT & CANCEL_BUTTON) {
 			MAIN_D_8013537A = 0x4b0;
 		}
-		if (moveMapObjectsWithLimit(MAIN_D_8013536C, MAIN_D_8013536E, 0x32, 0, TRN_D_8008F368[0] + 0x64, 0) == 1) {
+		done = moveMapObjectsWithLimit(MAIN_D_8013536C, MAIN_D_8013536E, 0x32, 0, TRN_D_8008F368[0] + 0x64, 0);
+		if (done == 1) {
 			createParticleFX(0, 0, &TRN_D_8008F340[0], NULL, 0);
 			createParticleFX(0, 0, &TRN_D_8008F340[1], NULL, 0);
 			createParticleFX(0, 0, &TRN_D_8008F340[2], NULL, 0);
@@ -188,7 +194,7 @@ void TRN_tickDefenseTraining(int32_t instanceId)
 		break;
 	case 3:
 		MAIN_D_8013537A++;
-		if (POLLED_INPUT & 0x10) {
+		if (POLLED_INPUT & CANCEL_BUTTON) {
 			MAIN_D_8013537A = 0x4b0;
 		}
 		loc->vx += 0x64;
@@ -198,13 +204,14 @@ void TRN_tickDefenseTraining(int32_t instanceId)
 		pos[1] = 0;
 		pos[2] = loc->vz - 0x64;
 		createCloudFX(pos);
-		if (moveMapObjectsWithLimit(MAIN_D_8013536C, MAIN_D_8013536E, -0x32, 0, TRN_D_8008F368[0] + 0x32, 0) == 1) {
+		done = moveMapObjectsWithLimit(MAIN_D_8013536C, MAIN_D_8013536E, -0x32, 0, TRN_D_8008F368[0] + 0x32, 0);
+		if (done == 1) {
 			MAIN_D_80135371 = 4;
 		}
 		break;
 	case 4:
 		MAIN_D_8013537A++;
-		if (POLLED_INPUT & 0x10) {
+		if (POLLED_INPUT & CANCEL_BUTTON) {
 			MAIN_D_8013537A = 0x4b0;
 		}
 		loc->vx += 0x64;
@@ -214,59 +221,65 @@ void TRN_tickDefenseTraining(int32_t instanceId)
 		pos[1] = 0;
 		pos[2] = loc->vz - 0x64;
 		createCloudFX(pos);
-		if (moveMapObjectsWithLimit(MAIN_D_8013536C, MAIN_D_8013536E, 0x32, 0, TRN_D_8008F368[0] + 0x5a, 0) == 1) {
+		done = moveMapObjectsWithLimit(MAIN_D_8013536C, MAIN_D_8013536E, 0x32, 0, TRN_D_8008F368[0] + 0x5a, 0);
+		if (done == 1) {
 			MAIN_D_80135371 = 5;
 		}
 		break;
 	case 5:
 		MAIN_D_8013537A++;
-		if (POLLED_INPUT & 0x10) {
+		if (POLLED_INPUT & CANCEL_BUTTON) {
 			MAIN_D_8013537A = 0x4b0;
 		}
-		if (moveMapObjectsWithLimit(MAIN_D_8013536C, MAIN_D_8013536E, -0x1e, 0, TRN_D_8008F368[0] + 0x3c, 0) == 1) {
+		done = moveMapObjectsWithLimit(MAIN_D_8013536C, MAIN_D_8013536E, -0x1e, 0, TRN_D_8008F368[0] + 0x3c, 0);
+		if (done == 1) {
 			MAIN_D_80135371 = 6;
 		}
 		break;
 	case 6:
 		MAIN_D_8013537A++;
-		if (POLLED_INPUT & 0x10) {
+		if (POLLED_INPUT & CANCEL_BUTTON) {
 			MAIN_D_8013537A = 0x4b0;
 		}
-		if (moveMapObjectsWithLimit(MAIN_D_8013536C, MAIN_D_8013536E, 0x14, 0, TRN_D_8008F368[0] + 0x5a, 0) == 1) {
+		done = moveMapObjectsWithLimit(MAIN_D_8013536C, MAIN_D_8013536E, 0x14, 0, TRN_D_8008F368[0] + 0x5a, 0);
+		if (done == 1) {
 			MAIN_D_80135371 = 7;
 		}
 		break;
 	case 7:
 		MAIN_D_8013537A++;
-		if (POLLED_INPUT & 0x10) {
+		if (POLLED_INPUT & CANCEL_BUTTON) {
 			MAIN_D_8013537A = 0x4b0;
 		}
-		if (moveMapObjectsWithLimit(MAIN_D_8013536C, MAIN_D_8013536E, -0xa, 0, TRN_D_8008F368[0] + 0x46, 0) == 1) {
+		done = moveMapObjectsWithLimit(MAIN_D_8013536C, MAIN_D_8013536E, -0xa, 0, TRN_D_8008F368[0] + 0x46, 0);
+		if (done == 1) {
 			MAIN_D_80135371 = 8;
 		}
 		break;
 	case 8:
 		MAIN_D_8013537A++;
-		if (POLLED_INPUT & 0x10) {
+		if (POLLED_INPUT & CANCEL_BUTTON) {
 			MAIN_D_8013537A = 0x4b0;
 		}
-		if (moveMapObjectsWithLimit(MAIN_D_8013536C, MAIN_D_8013536E, 5, 0, TRN_D_8008F368[0] + 0x5a, 0) == 1) {
+		done = moveMapObjectsWithLimit(MAIN_D_8013536C, MAIN_D_8013536E, 5, 0, TRN_D_8008F368[0] + 0x5a, 0);
+		if (done == 1) {
 			MAIN_D_80135371 = 9;
 		}
 		break;
 	case 9:
 		MAIN_D_8013537A++;
-		if (POLLED_INPUT & 0x10) {
+		if (POLLED_INPUT & CANCEL_BUTTON) {
 			MAIN_D_8013537A = 0x4b0;
 		}
-		if (moveMapObjectsWithLimit(MAIN_D_8013536C, MAIN_D_8013536E, -4, 0, TRN_D_8008F368[0], 0) == 1) {
+		done = moveMapObjectsWithLimit(MAIN_D_8013536C, MAIN_D_8013536E, -4, 0, TRN_D_8008F368[0], 0);
+		if (done == 1) {
 			loadMapObjectPosition(TRN_D_8008F368, TRN_D_8008F388, MAIN_D_8013536C, MAIN_D_8013536E);
 			startAnimation(&PARTNER_ENTITY.digimonEntity.entity, 4);
 			MAIN_D_80135371 = 0xa;
 		}
 		break;
 	case 10:
-		if (POLLED_INPUT & 0x10) {
+		if (POLLED_INPUT & CANCEL_BUTTON) {
 			MAIN_D_8013537A = 0x4b0;
 		}
 		if (tickEntityWalkTo(0xfc, 0xff, TRN_D_8008F320.vx, TRN_D_8008F320.vz, 0) == 1) {
