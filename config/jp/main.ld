@@ -124,6 +124,9 @@ SECTIONS
         BUILD_DIR/src/btl/command_shout.c.o(.sdata .sdata.*);
         . = ALIGN(., 4);
         KEEP(BUILD_DIR/asm/main/data/AD94C.sdata.s.o(.sdata .sdata.*));
+        BUILD_DIR/src/trn/trn_hud.c.o(.sdata .sdata.*);
+        . = ALIGN(., 4);
+        KEEP(BUILD_DIR/asm/main/data/ADE38.sdata.s.o(.sdata .sdata.*));
         main_SDATA_END = .;
         main_SDATA_SIZE = ABSOLUTE(main_SDATA_END - main_SDATA_START);
 
@@ -165,7 +168,9 @@ SECTIONS
         BUILD_DIR/src/trn/trn_off.c.o(.sbss.*);
         BUILD_DIR/src/trn/trn_def.c.o(.sbss.*);
         . = ALIGN(., 4);
-        BUILD_DIR/generated/unk_0x8013E644.sbss.s.o(.sbss.*);
+        BUILD_DIR/src/trn/trn_hud.c.o(.sbss.*);
+        . = ALIGN(., 4);
+        BUILD_DIR/generated/unk_0x8013E658.sbss.s.o(.sbss.*);
         BUILD_DIR/src/trn2/trn2_hp_map99.c.o(.sbss.*);
         BUILD_DIR/src/trn2/trn2_def_map99.c.o(.sbss.*);
         BUILD_DIR/src/trn2/trn2_off.c.o(.sbss.*);

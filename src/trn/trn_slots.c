@@ -18,7 +18,7 @@ extern int32_t DRAWING_OFFSET_X;
 extern int32_t DRAWING_OFFSET_Y;
 extern int8_t TRN_D_8008F1AC[3][13];
 
-int32_t TRN_getTrainingSpotScreenPos(int32_t key, int16_t sub, SVECTOR *out);
+int32_t TRN_getTrainingSpotScreenPos(int32_t key, int32_t sub, SVECTOR *out);
 void TRN_tickSlotMachine(int32_t arg);
 void TRN_renderSlotMachine(int32_t arg);
 void TRN_chooseReelStop(int16_t i, SlotMachine *p);
@@ -466,7 +466,7 @@ void TRN_createSlotMachineBox(int16_t arg)
 	createAnimatedUIBox(3, 0, 2, &MAIN_D_80134BC8, &startPos, (TickFunction)TRN_tickSlotMachine, (RenderFunction)TRN_renderSlotMachine);
 }
 
-int16_t TRN_getSlotMachineResult(void)
+int32_t TRN_getSlotMachineResult(void)
 {
 	return TRN_SLOT_MACHINE.result;
 }

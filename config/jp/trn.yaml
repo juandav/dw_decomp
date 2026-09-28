@@ -66,7 +66,8 @@ segments:
       - [0x413C, c, trn_def]
       - [0x4C68, c, trn_speed]
       - [0x51AC, c, trn_brain]
-      - [0x58E4, asm]
+      - [0x58E4, c, trn_hud]
+      - [0x67D8, asm]
       - [0x79A8, .rodata, trn_hp]
       - [0x79C0, .rodata, trn_off]
       - [0x79E4, .rodata, trn_speed]
@@ -74,6 +75,8 @@ segments:
       - [0x7A38, .rodata, trn_mp]
       - [0x7A54, .rodata, trn_brain]
       - [0x7A6C, data]
+      - [0x7C14, .data, trn_hud]
+      - [0x7D34, data]
       - [0x7D88, .data, trn_bss]
 
   - [0x7E3C]

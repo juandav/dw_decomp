@@ -3,6 +3,7 @@
 
 #include <dw/entity.h>
 #include <dw/font.h>
+#include <dw/input.h>
 #include <dw/script.h>
 #include <dw/sound.h>
 #include <dw/training.h>
@@ -27,8 +28,8 @@ void setPosDataPolyFT4(POLY_FT4 *prim, int32_t x, int32_t y, int32_t w, int32_t 
 void setUVDataPolyFT4(POLY_FT4 *p, int32_t u, int32_t v, int32_t w, int32_t h);
 void worldPosToScreenPos(TrainingSpot *item, SVECTOR *out);
 void TRN_tickPostTrainingStatsBox();
-void TRN_renderPostTrainingStatsBox(uint8_t depth);
-int32_t TRN_getTrainingSpotScreenPos(int32_t key, int16_t sub, SVECTOR *out);
+void TRN_renderPostTrainingStatsBox(int16_t depth);
+int32_t TRN_getTrainingSpotScreenPos(int32_t key, int32_t sub, SVECTOR *out);
 
 static void *trn_hud_functions[] = {
 	TRN_getTrainingSpotScreenPos,
@@ -43,7 +44,7 @@ static void *trn_hud_functions[] = {
 };
 
 /* "所持金" (money held) */
-char MAIN_D_80134BC0[] = "\x8f\x8a\x8e\x9d\x8b\xe0";
+static char MAIN_D_80134BC0[] = "\x8f\x8a\x8e\x9d\x8b\xe0";
 
 int32_t MAIN_D_80135394;
 int8_t MAIN_D_80135398[6];
@@ -143,8 +144,6 @@ void TRN_applyBaseStats(void)
 void TRN_createPostTrainingStatsBox(void)
 {
 	int32_t i;
-	int32_t row;
-	int32_t y;
 	int16_t screenPos[2];
 	RECT finalPos;
 	RECT startPos;
@@ -161,12 +160,9 @@ void TRN_createPostTrainingStatsBox(void)
 	}
 
 	for (i = 0; i < 4; i++) {
-		y = i * 12;
-		row = i * 2;
-
 		if (i < 3) {
-			drawString(&MAIN_D_80124C0C[row * 12], 0, y * 2);
-			drawString(&MAIN_D_80124C0C[(row + 1) * 12], 0, (row + 1) * 12);
+			drawString(&MAIN_D_80124C0C[(i * 2) * 12], 0, (i * 12) * 2);
+			drawString(&MAIN_D_80124C0C[((i * 2) + 1) * 12], 0, ((i * 2) + 1) * 12);
 		}
 		if (i == 3) {
 			drawString(MAIN_D_80134BC0, 0, 84);
@@ -188,7 +184,6 @@ void TRN_createPostTrainingStatsBox(void)
 void TRN_tickPostTrainingStatsBox(void)
 {
 	int32_t i;
-	int16_t gain;
 
 	if (MAIN_D_8013539E > 0) {
 		MAIN_D_8013539E--;
@@ -200,8 +195,8 @@ void TRN_tickPostTrainingStatsBox(void)
 		}
 	}
 
-	if ((POLLED_INPUT == 0x40) || (POLLED_INPUT == 0x10)) {
-		if (!(POLLED_INPUT_PREVIOUS & 0x40) && !(POLLED_INPUT_PREVIOUS & 0x10)) {
+	if ((POLLED_INPUT == CONFIRM_BUTTON) || (POLLED_INPUT == CANCEL_BUTTON)) {
+		if (!(POLLED_INPUT_PREVIOUS & CONFIRM_BUTTON) && !(POLLED_INPUT_PREVIOUS & CANCEL_BUTTON)) {
 			MAIN_D_80135394 = 1;
 		}
 	}
@@ -212,10 +207,9 @@ void TRN_tickPostTrainingStatsBox(void)
 
 	for (i = 0; i < 6; i++) {
 		if (STATS_GAINS[i] != 0) {
-			gain = STATS_GAINS[i];
-			INITIAL_COMBAT_STATS[0][i] += gain;
+			INITIAL_COMBAT_STATS[0][i] += STATS_GAINS[i];
 
-			if (gain > 0) {
+			if (STATS_GAINS[i] > 0) {
 				if (i < 2) {
 					if (INITIAL_COMBAT_STATS[0][i] >= 10000) {
 						INITIAL_COMBAT_STATS[0][i] = 9999;
@@ -233,14 +227,13 @@ void TRN_tickPostTrainingStatsBox(void)
 	MAIN_D_8013539E = 0;
 }
 
-void TRN_renderPostTrainingStatsBox(uint8_t depth)
+void TRN_renderPostTrainingStatsBox(int16_t depth)
 {
 	RECT *box = &UI_BOX_DATA[1].finalPos;
 	GsBOXF rect;
 	int32_t i;
 	int32_t first;
 	int16_t y;
-	int32_t hasStatGain;
 
 	first = 1;
 	for (i = 0; i < 6; i++) {
@@ -249,7 +242,7 @@ void TRN_renderPostTrainingStatsBox(uint8_t depth)
 		}
 		if ((MAIN_D_8013539E == 0) && (STATS_GAINS[i] > 0) && (first == 1)) {
 			playSound(0, 0x16);
-			STATS_GAINS[i] = STATS_GAINS[i] - 1;
+			STATS_GAINS[i] -= 1;
 			INITIAL_COMBAT_STATS[0][i] += 1;
 
 			if (i < 2) {
@@ -299,14 +292,13 @@ void TRN_renderPostTrainingStatsBox(uint8_t depth)
 		} else {
 			rect.w = (INITIAL_COMBAT_STATS[0][i] * 50) / 999;
 		}
-		hasStatGain = MAIN_D_80135398[i];
-		if (hasStatGain != 1) {
-			if (hasStatGain == 0) {
-				rect.r = rect.g = rect.b = 0x78;
-				GsSortBoxFill(&rect, ACTIVE_ORDERING_TABLE, (uint16_t)(6 - depth));
-				rect.r = rect.g = rect.b = 0x28;
-			}
-		} else {
+		switch (MAIN_D_80135398[i]) {
+		case 0:
+			rect.r = rect.g = rect.b = 0x78;
+			GsSortBoxFill(&rect, ACTIVE_ORDERING_TABLE, (uint16_t)(6 - depth));
+			rect.r = rect.g = rect.b = 0x28;
+			break;
+		case 1:
 			rect.r = 0x69;
 			rect.g = 0xc2;
 			rect.b = 0xff;
@@ -314,6 +306,7 @@ void TRN_renderPostTrainingStatsBox(uint8_t depth)
 			rect.r = 0;
 			rect.g = 0x5a;
 			rect.b = 0x96;
+			break;
 		}
 		rect.w = 50;
 
@@ -332,6 +325,9 @@ void TRN_closeUIBox(int32_t id)
 
 void TRN_tickSlotSession(void)
 {
+#if defined(VERSION_JP)
+	RECT rect = { -8, -8, 16, 16 };
+#endif
 	int16_t *p = MAIN_D_801353A0;
 
 	switch (p[1]) {
@@ -358,7 +354,7 @@ void TRN_renderSlotSession(void)
 {
 }
 
-int32_t TRN_getTrainingSpotScreenPos(int32_t key, int16_t sub, SVECTOR *out)
+int32_t TRN_getTrainingSpotScreenPos(int32_t key, int32_t sub, SVECTOR *out)
 {
 	int32_t i;
 	int32_t id;

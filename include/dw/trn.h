@@ -15,7 +15,6 @@ extern int16_t TRN_D_8008F368[];
 extern int16_t TRN_D_8008F388[];
 extern SlotMachine TRN_SLOT_MACHINE;
 
-extern char MAIN_D_80134BC0[7];
 extern RECT MAIN_D_80134BC8;
 extern RECT MAIN_D_80134BD0;
 extern RECT MAIN_D_80134BD8;
@@ -68,7 +67,7 @@ void TRN_renderSlotSession(void);
 int32_t TRN_startSlotSession(int32_t arg);
 int16_t TRN_getSlotSessionResult(void);
 void TRN_createSlotMachineBox(int16_t arg);
-int16_t TRN_getSlotMachineResult(void);
+int32_t TRN_getSlotMachineResult(void);
 void TRN_startSlotSpin(void);
 
 #endif

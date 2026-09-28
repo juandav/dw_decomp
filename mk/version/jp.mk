@@ -9,7 +9,7 @@ MAIN_SBSS := \
 	$(GEN_DIR)/unk_0x8013E228.sbss.s \
 	$(GEN_DIR)/unk_0x8013E310.sbss.s \
 	$(GEN_DIR)/unk_0x8013E5C0.sbss.s \
-	$(GEN_DIR)/unk_0x8013E644.sbss.s \
+	$(GEN_DIR)/unk_0x8013E658.sbss.s \
 	$(GEN_DIR)/unk_0x8013E678.sbss.s
 
 MAIN_BSS := \
@@ -93,6 +93,7 @@ TRN_C_SRC := \
 	src/trn/trn_brain.c \
 	src/trn/trn_def.c \
 	src/trn/trn_hp.c \
+	src/trn/trn_hud.c \
 	src/trn/trn_mp.c \
 	src/trn/trn_off.c \
 	src/trn/trn_speed.c \

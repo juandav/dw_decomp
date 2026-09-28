@@ -144,5 +144,7 @@ segments:
       - [0xAD8E4, sdata]
       - [0xAD938, .sdata, btl/command_shout]
       - [0xAD94C, sdata]
+      - [0xADE28, .sdata, trn/trn_hud]
+      - [0xADE38, sdata]
 
   - [0xADF1C]
