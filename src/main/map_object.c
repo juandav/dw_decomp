@@ -59,9 +59,12 @@ int16_t ANGEMON_PEDESTAL_PROGRESS_Z;
 char TMD_EXTENSION[] = ".TMD";
 SVECTOR DIRT_PILE_ROTATION = { 0, 0, 0, 0 };
 SVECTOR TRAINING_POOP_ROTATION = { 0, 0, 0, 0 };
+#if defined(VERSION_JP)
+SVECTOR DIRT_CART_ROTATION = { 0, 0, 0, 0 };
+#endif
 SVECTOR DIRT_PILE_SIZE_ROTATION = { 0, 0, 0, 0 };
 RECT MEDAL_RECT = { 582, 432, 6, 32 };
-int8_t BOX_CORNER_OFFSETS[8] = { -1, 1, 1, 1, -1, -1, 1, -1 };
+int8_t BOX_CORNER_OFFSETS[4][2] = { { -1, 1 }, { 1, 1 }, { -1, -1 }, { 1, -1 } };
 int8_t DIRT_PILE_SIZE_COUNTER = 15;
 
 char DOOR_PATH_PREFIX[] = "\\DOOR\\DOOR";
@@ -134,7 +137,7 @@ void renderGearbox(int32_t instanceId);
 void renderAngemonPedestal(int32_t instanceId);
 void renderTrainingPoop(int32_t instanceId);
 void emptyChests(void);
-int32_t isBoxOffScreen(VECTOR *position, int32_t width, int32_t height);
+int32_t isBoxOffScreen(VECTOR *position, int16_t width, int16_t height);
 
 static void *map_object_text_order[] = {
 	activateMedalTexture,
@@ -207,9 +210,15 @@ static void *map_object_bss_order[] = {
 	GENERAL_COORDS,
 	GENERAL_OBJECT,
 	MAP_3D_OBJECTS,
+#if defined(VERSION_JP)
+	DOOR_COORDS,
+	DOOR_OBJECTS,
+	GENERAL_MESH_BUFFER,
+#else
 	DOOR_OBJECTS,
 	GENERAL_MESH_BUFFER,
 	DOOR_COORDS,
+#endif
 	CHEST_ARRAY,
 };
 
@@ -239,43 +248,37 @@ void loadStaticTMD(char *path, char *buffer, GsDOBJ2 *obj,
 
 void loadDoors(int16_t doorEntryId)
 {
-	char *pathSrc = DOOR_PATH_PREFIX;
-	char *const digits = DIGIT_CHARS;
-	char *extensionSrc = TMD_EXTENSION;
-	char *pathPrefix;
-	char *extension;
-	char *dst;
 	char path[32];
+	char *pathSrc = DOOR_PATH_PREFIX;
+	char *pathPrefix;
+	char *digits = DIGIT_CHARS;
+	char *extensionSrc = TMD_EXTENSION;
+	char *extension;
 	int32_t i;
 	int32_t slot;
-	int8_t modelId;
-	int16_t rotation;
+	char *dst;
 
 	if (DOORS_DISABLED == 1) {
 		return;
 	}
 
-	for (slot = 0; slot < 4; ++slot) {
+	for (slot = 0; slot < 4; slot++) {
 		DOOR_MODEL_IDS[slot] = -1;
 	}
-	for (i = 0; i < NUM_MAP_3D_OBJECTS; ++i) {
-		modelId = DOOR_MAPDATA[doorEntryId].modelId[i];
-		for (slot = 0; slot < 4; ++slot) {
+	for (i = 0; i < NUM_MAP_3D_OBJECTS; i++) {
+		for (slot = 0; slot < 4; slot++) {
 			if (DOOR_MODEL_IDS[slot] == -1) {
-				/* MWCC requires this qualifier for the retail reload. */
-				DOOR_MODEL_IDS[slot] =
-					((volatile DoorStruct *)DOOR_MAPDATA)
-						[doorEntryId].modelId[i];
+				DOOR_MODEL_IDS[slot] = DOOR_MAPDATA[doorEntryId].modelId[i];
 				break;
 			}
-			if (DOOR_MODEL_IDS[slot] == modelId) {
+			if (DOOR_MODEL_IDS[slot] == DOOR_MAPDATA[doorEntryId].modelId[i]) {
 				break;
 			}
 		}
 	}
 	pathPrefix = pathSrc;
 	extension = extensionSrc;
-	for (slot = 0; slot < 4; ++slot) {
+	for (slot = 0; slot < 4; slot++) {
 		if (DOOR_MODEL_IDS[slot] != -1) {
 			pathSrc = pathPrefix;
 			extensionSrc = extension;
@@ -283,36 +286,25 @@ void loadDoors(int16_t doorEntryId)
 			while (*pathSrc != '\0') {
 				*dst++ = *pathSrc++;
 			}
-
 			*dst++ = digits[DOOR_MODEL_IDS[slot] / 10];
 			*dst++ = digits[DOOR_MODEL_IDS[slot] % 10];
-
 			while (*extensionSrc != '\0') {
 				*dst++ = *extensionSrc++;
 			}
 			*dst = '\0';
-
-			loadStaticTMD(path, GENERAL_MESH_BUFFER[slot],
-				      &DOOR_OBJECTS[slot], &DOOR_COORDS[slot]);
+			loadStaticTMD(path, GENERAL_MESH_BUFFER[slot], &DOOR_OBJECTS[slot], &DOOR_COORDS[slot]);
 		}
 	}
 
-	for (slot = 0; slot < NUM_MAP_3D_OBJECTS; ++slot) {
-		MAP_3D_OBJECTS[slot].modelId =
-			DOOR_MAPDATA[doorEntryId].modelId[slot];
-		MAP_3D_OBJECTS[slot].translation.vx =
-			DOOR_MAPDATA[doorEntryId].posX[slot];
-		MAP_3D_OBJECTS[slot].translation.vy =
-			DOOR_MAPDATA[doorEntryId].posY[slot];
-		MAP_3D_OBJECTS[slot].translation.vz =
-			DOOR_MAPDATA[doorEntryId].posZ[slot];
+	for (slot = 0; slot < NUM_MAP_3D_OBJECTS; slot++) {
+		MAP_3D_OBJECTS[slot].modelId = DOOR_MAPDATA[doorEntryId].modelId[slot];
+		MAP_3D_OBJECTS[slot].translation.vx = DOOR_MAPDATA[doorEntryId].posX[slot];
+		MAP_3D_OBJECTS[slot].translation.vy = DOOR_MAPDATA[doorEntryId].posY[slot];
+		MAP_3D_OBJECTS[slot].translation.vz = DOOR_MAPDATA[doorEntryId].posZ[slot];
 		MAP_3D_OBJECTS[slot].rotation.vx = 0;
-		rotation = DOOR_MAPDATA[doorEntryId].rotation[slot];
-		MAP_3D_OBJECTS[slot].rotation.vy = rotation;
-		/* Preserve the retail reload before storing the direction. */
-		rotation = DOOR_MAPDATA[doorEntryId].rotation[slot];
+		MAP_3D_OBJECTS[slot].rotation.vy = DOOR_MAPDATA[doorEntryId].rotation[slot];
 		MAP_3D_OBJECTS[slot].rotation.vz = 0;
-		MAP_3D_OBJECTS[slot].direction = rotation;
+		MAP_3D_OBJECTS[slot].direction = DOOR_MAPDATA[doorEntryId].rotation[slot];
 	}
 
 	DOOR_ROTATION_TIMER = 0;
@@ -325,7 +317,6 @@ void renderDoors(int32_t instanceId)
 	VECTOR scale;
 	int32_t i;
 	int32_t slot;
-	int16_t modelId;
 
 	scale = DOOR_SCALE;
 
@@ -338,9 +329,8 @@ void renderDoors(int32_t instanceId)
 			continue;
 		}
 
-		modelId = MAP_3D_OBJECTS[i].modelId;
 		for (slot = 0; slot < 4; slot++) {
-			if (DOOR_MODEL_IDS[slot] == modelId) {
+			if (DOOR_MODEL_IDS[slot] == MAP_3D_OBJECTS[i].modelId) {
 				break;
 			}
 		}
@@ -360,7 +350,7 @@ void renderDoors(int32_t instanceId)
 			doorCopy = MAP_3D_OBJECTS[i];
 			doorCopy.translation.vz -=
 				((doorCopy.rotation.vy < 0) ? 1 : -1) * 680;
-			doorCopy.rotation.vy = -doorCopy.rotation.vy;
+			doorCopy.rotation.vy *= -1;
 			projectPosition(&DOOR_COORDS[slot],
 					&doorCopy.translation,
 					&doorCopy.rotation, &scale);
@@ -417,8 +407,8 @@ void initializeChest(void)
 void renderChest(int32_t instanceId)
 {
 	VECTOR scale;
-	int32_t chestIdx;
 	int32_t i;
+	int32_t chestIdx;
 
 	scale = CHEST_SCALE;
 
@@ -502,8 +492,8 @@ void loadWarpCrystals(int32_t mapId)
 void renderWarpCrystals(int32_t instanceId)
 {
 	VECTOR scale;
-	int32_t crystalIdx;
 	int32_t i;
+	int32_t crystalIdx;
 
 	scale = WARP_CRYSTAL_SCALE;
 
@@ -532,7 +522,11 @@ void renderWarpCrystals(int32_t instanceId)
 	}
 }
 
-void addWarpCrystal(int32_t posX, int32_t posZ)
+// clang-format off
+void addWarpCrystal(posX, posZ)
+	int16_t posX;
+	int16_t posZ;
+// clang-format on
 {
 	int32_t idx;
 
@@ -616,10 +610,9 @@ void spawnToyTownBoxes(void)
 	bigBoxLocation = BIG_BOX_LOCATION;
 	smallBoxLocation = SMALL_BOX_LOCATION;
 	readFile(BIG_BOX_TMD, GENERAL_MESH_BUFFER[0]);
-	readFile(SMALL_BOX_TMD,
-		 (char *)(smallMeshData =
-			    (unsigned long *)GENERAL_MESH_BUFFER[1]));
+	readFile(SMALL_BOX_TMD, GENERAL_MESH_BUFFER[1]);
 	bigMeshData = (unsigned long *)GENERAL_MESH_BUFFER[0];
+	smallMeshData = (unsigned long *)GENERAL_MESH_BUFFER[1];
 
 	GsMapModelingData(bigMeshData + 1);
 	GsMapModelingData(smallMeshData + 1);
@@ -646,8 +639,7 @@ void spawnToyTownBoxes(void)
 	WARP_CRYSTAL_COORDS[0].flg = 0;
 	TransMatrix(&GENERAL_COORDS[0].coord, &smallBoxLocation);
 	GENERAL_COORDS[0].flg = 0;
-	TOY_TOWN_BOX_LID_PROGRESS.small = 0;
-	TOY_TOWN_BOX_LID_PROGRESS.big = 0;
+	TOY_TOWN_BOX_LID_PROGRESS.big = TOY_TOWN_BOX_LID_PROGRESS.small = 0;
 	TOY_TOWN_SELECTED_BOX = 0;
 
 	addObject(0xfbd, 0, NULL, renderToyTownBoxes);
@@ -786,7 +778,7 @@ void renderTrainingPoop(int32_t instanceId)
 	}
 }
 
-void spawnChest(int32_t posX, int32_t posY, int32_t posZ, int32_t rotation,
+void spawnChest(int16_t posX, int16_t posY, int16_t posZ, int16_t rotation,
 		uint8_t item, uint16_t trigger)
 {
 	int32_t idx;
@@ -990,31 +982,22 @@ int32_t tickRotateDoor(int16_t instance, int8_t target)
 	return 0;
 }
 
-int32_t isBoxOffScreen(VECTOR *position, int32_t width, int32_t height)
+int32_t isBoxOffScreen(VECTOR *position, int16_t width, int16_t height)
 {
 	SVECTOR corner;
 	DVECTOR screen;
-	int32_t i;
 	int32_t j;
-	int32_t tableIdx;
-	int32_t w;
-	int32_t base;
+	int32_t i;
 
 	GsSetLsMatrix(&GsWSMATRIX);
-
-	base = width;
 	for (i = 0; i < 2; i++) {
-		for (j = 0, tableIdx = 0, w = base, base = w;
-		     j < 4;
-		     j++, tableIdx += 2) {
-			corner.vx = (position->vx + (w * BOX_CORNER_OFFSETS[tableIdx]));
-			corner.vy = position->vy + (i * -height);
-			corner.vz = (position->vz + (w * (&BOX_CORNER_OFFSETS[1])[tableIdx]));
-
+		for (j = 0; j < 4; j++) {
+			corner.vx = position->vx + width * BOX_CORNER_OFFSETS[j][0];
+			corner.vy = position->vy + i * -height;
+			corner.vz = position->vz + width * BOX_CORNER_OFFSETS[j][1];
 			gte_ldv0(&corner);
 			gte_rtps();
 			gte_stsxy((long *)&screen);
-
 			if (isOffScreen(&screen, 320, 240) == 0) {
 				return 0;
 			}
@@ -1083,7 +1066,11 @@ void decreaseDirtPileSize(void)
 	GENERAL_COORDS3.flg = 0;
 }
 
-void moveBoulder(int32_t diffX, int32_t diffZ)
+// clang-format off
+void moveBoulder(diffX, diffZ)
+	int16_t diffX;
+	int16_t diffZ;
+// clang-format on
 {
 	VECTOR scale;
 
@@ -1097,12 +1084,18 @@ void moveBoulder(int32_t diffX, int32_t diffZ)
 			&MAP_3D_OBJECTS[0].rotation, &scale);
 }
 
-void openToyTownBox(int32_t boxId)
+// clang-format off
+void openToyTownBox(boxId)
+	int8_t boxId;
+// clang-format on
 {
 	TOY_TOWN_SELECTED_BOX = boxId;
 }
 
-void somethingToyTown(int32_t boxId)
+// clang-format off
+void somethingToyTown(boxId)
+	int8_t boxId;
+// clang-format on
 {
 	TOY_TOWN_SELECTED_BOX = boxId;
 
@@ -1113,12 +1106,9 @@ void somethingToyTown(int32_t boxId)
 
 int32_t moveAngemonPedestal(void)
 {
-	int32_t angle;
-
 	ANGEMON_PEDESTAL_PROGRESS_Z += 10;
-	angle = ANGEMON_PEDESTAL_PROGRESS_Z;
 
-	if ((angle % 20) == 0) {
+	if ((ANGEMON_PEDESTAL_PROGRESS_Z % 20) == 0) {
 		ANGEMON_PEDESTAL_PROGRESS_X = 5;
 	} else {
 		ANGEMON_PEDESTAL_PROGRESS_X = -5;
@@ -1132,7 +1122,10 @@ int32_t moveAngemonPedestal(void)
 	return 0;
 }
 
-void setDirtCartModel(int32_t model)
+// clang-format off
+void setDirtCartModel(model)
+	int8_t model;
+// clang-format on
 {
 	ACTIVE_DIRT_CART_MODEL = model;
 }
@@ -1181,8 +1174,12 @@ void renderDirtCartModel(int32_t instanceId)
 	MATRIX matrix;
 	VECTOR translation;
 	VECTOR worldPos;
+	SVECTOR rotation;
 	VECTOR *location;
 
+#if defined(VERSION_JP)
+	rotation = DIRT_CART_ROTATION;
+#endif
 	if (ACTIVE_DIRT_CART_MODEL == 2) {
 		return;
 	}

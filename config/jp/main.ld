@@ -54,6 +54,8 @@ SECTIONS
         KEEP(BUILD_DIR/asm/main/5C21C.s.o(.text .text.*));
         BUILD_DIR/src/main/entity_text.c.o(.text .text.*);
         KEEP(BUILD_DIR/asm/main/621F4.s.o(.text .text.*));
+        BUILD_DIR/src/main/map_object.c.o(.text .text.*);
+        KEEP(BUILD_DIR/asm/main/688E0.s.o(.text .text.*));
         BUILD_DIR/src/main/evolution.c.o(.text .text.*);
         BUILD_DIR/src/main/file_queue.c.o(.text .text.*);
         BUILD_DIR/src/main/graphics2.c.o(.text .text.*);
@@ -91,6 +93,8 @@ SECTIONS
         BUILD_DIR/src/main/inventory.c.o(.rodata .rodata.*);
         BUILD_DIR/src/main/partner.c.o(.rodata .rodata.*);
         KEEP(BUILD_DIR/asm/main/data/8B014.rodata.s.o(.rodata .rodata.*));
+        BUILD_DIR/src/main/map_object.c.o(.rodata .rodata.*);
+        KEEP(BUILD_DIR/asm/main/data/8B584.rodata.s.o(.rodata .rodata.*));
         BUILD_DIR/src/main/graphics2.c.o(.rodata .rodata.*);
         KEEP(BUILD_DIR/asm/main/data/8B6E0.rodata.s.o(.rodata .rodata.*));
         BUILD_DIR/src/main/battle_ui.c.o(.rodata .rodata.*);
@@ -144,6 +148,8 @@ SECTIONS
         KEEP(BUILD_DIR/asm/main/data/A6B98.data.s.o(.data .data.*));
         BUILD_DIR/src/main/entity_text.c.o(.data .data.*);
         KEEP(BUILD_DIR/asm/main/data/A6BF4.data.s.o(.data .data.*));
+        BUILD_DIR/src/main/map_object.c.o(.data .data.*);
+        KEEP(BUILD_DIR/asm/main/data/A6E38.data.s.o(.data .data.*));
         BUILD_DIR/src/main/evolution.c.o(.data .data.*);
         BUILD_DIR/src/main/utils.c.o(.data .data.*);
         BUILD_DIR/src/main/efe_table.c.o(.data .data.*);
@@ -180,6 +186,9 @@ SECTIONS
         BUILD_DIR/src/main/entity_text.c.o(.sdata .sdata.*);
         . = ALIGN(., 4);
         KEEP(BUILD_DIR/asm/main/data/AD6C4.sdata.s.o(.sdata .sdata.*));
+        BUILD_DIR/src/main/map_object.c.o(.sdata .sdata.*);
+        . = ALIGN(., 4);
+        KEEP(BUILD_DIR/asm/main/data/AD708.sdata.s.o(.sdata .sdata.*));
         BUILD_DIR/src/main/file_queue.c.o(.sdata .sdata.*);
         . = ALIGN(., 4);
         BUILD_DIR/src/main/graphics2.c.o(.sdata .sdata.*);
@@ -257,6 +266,10 @@ SECTIONS
         . = ALIGN(., 4);
         BUILD_DIR/generated/unk_0x8013E0EC.sbss.s.o(.sbss.*);
         . = ALIGN(., 4);
+        BUILD_DIR/src/main/map_object.c.o(.sbss.*);
+        . = ALIGN(., 4);
+        BUILD_DIR/generated/unk_0x8013E1B0.sbss.s.o(.sbss.*);
+        . = ALIGN(., 4);
         BUILD_DIR/src/main/file_queue.c.o(.sbss.*);
         . = ALIGN(., 4);
         BUILD_DIR/generated/unk_0x8013E1FC.sbss.s.o(.sbss.*);
@@ -326,6 +339,10 @@ SECTIONS
         BUILD_DIR/src/main/sound.c.o(.bss.*);
         . = ALIGN(., 4);
         BUILD_DIR/generated/unk_0x801566A4.bss.s.o(.bss.*);
+        . = ALIGN(., 4);
+        BUILD_DIR/src/main/map_object.c.o(.bss.*);
+        . = ALIGN(., 4);
+        BUILD_DIR/generated/unk_0x80167BCC.bss.s.o(.bss.*);
         . = ALIGN(., 4);
         BUILD_DIR/src/main/file_queue.c.o(.bss.*);
         . = ALIGN(., 4);

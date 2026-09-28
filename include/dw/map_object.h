@@ -49,7 +49,7 @@ void spawnToyTownBoxes(void);
 void spawnGearbox(void);
 void spawnAngemonPedestal(void);
 void loadTrainingPoop(void);
-void spawnChest(int32_t posX, int32_t posY, int32_t posZ, int32_t rotation,
+void spawnChest(int16_t posX, int16_t posY, int16_t posZ, int16_t rotation,
 		uint8_t item, uint16_t trigger);
 void unloadMapParts(void);
 int32_t tickRotateDoor(int16_t instance, int8_t target);

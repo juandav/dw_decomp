@@ -11,6 +11,8 @@ subsegments:
   - [0x80146048, unk_0x80146048]
   - [0x8014677C, sound]
   - [0x801566A4, unk_0x801566A4]
+  - [0x801643CC, map_object]
+  - [0x80167BCC, unk_0x80167BCC]
   - [0x80167BE0, file_queue]
   - [0x80168460, unk_0x80168460]
   - [0x80168910, butterfly]

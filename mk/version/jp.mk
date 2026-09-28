@@ -7,6 +7,7 @@ MAIN_SBSS := \
 	$(GEN_DIR)/unk_0x8013DF94.sbss.s \
 	$(GEN_DIR)/unk_0x8013E070.sbss.s \
 	$(GEN_DIR)/unk_0x8013E0EC.sbss.s \
+	$(GEN_DIR)/unk_0x8013E1B0.sbss.s \
 	$(GEN_DIR)/unk_0x8013E1FC.sbss.s \
 	$(GEN_DIR)/unk_0x8013E228.sbss.s \
 	$(GEN_DIR)/unk_0x8013E310.sbss.s \
@@ -19,6 +20,7 @@ MAIN_BSS := \
 	$(GEN_DIR)/unk_0x801414B8.bss.s \
 	$(GEN_DIR)/unk_0x80146048.bss.s \
 	$(GEN_DIR)/unk_0x801566A4.bss.s \
+	$(GEN_DIR)/unk_0x80167BCC.bss.s \
 	$(GEN_DIR)/unk_0x80168460.bss.s \
 	$(GEN_DIR)/unk_0x80168920.bss.s
 
@@ -49,6 +51,7 @@ MAIN_C_SRC := \
 	src/main/item.c \
 	src/main/kar.c \
 	src/main/map_collision.c \
+	src/main/map_object.c \
 	src/main/math.c \
 	src/main/overworld_card_text.c \
 	src/main/overworld_evochart_detail.c \
