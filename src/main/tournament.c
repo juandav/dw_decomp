@@ -28,7 +28,7 @@ int32_t isTriggerSet(uint16_t trigger);
 int32_t hasMedal(uint16_t medal);
 int32_t getCardAmount(uint8_t cardId);
 void unsetTrigger(uint16_t trigger);
-int32_t readPStat(int32_t id);
+uint8_t readPStat(int32_t id);
 void callScriptSection(int32_t, int32_t, int32_t);
 void updateMapLightState(void);
 extern int32_t IS_SCRIPT_PAUSED;
@@ -39,27 +39,25 @@ void updateTournamentRegistration(void)
 	uint8_t value;
 	int32_t flag;
 	uint32_t minutes;
-	uint8_t day;
 	uint8_t partnerType;
 
 	flag = 0;
 	if (isTriggerSet(TRIGGER_TOURNAMENT_REGISTERED)) {
 		minutes = minutesOfDay();
-		i = PARTNER_ENTITY.digimonEntity.entity.type;
-		partnerType = i;
+		partnerType = PARTNER_ENTITY.digimonEntity.entity.type;
 		value = readPStat(PSTAT_TOURNAMENT_DIGIMON);
 		if (partnerType != value) {
 			unsetTrigger(TRIGGER_TOURNAMENT_REGISTERED);
 			return;
 		}
 
-		day = DAY;
+		i = DAY;
 		value = readPStat(PSTAT_TOURNAMENT_DAY);
 		if (value & 0x80) {
 			return;
 		}
 
-		if (day != value) {
+		if (i != value) {
 			flag = 1;
 		}
 
@@ -123,31 +121,25 @@ int32_t minutesOfDay(void)
 
 void scriptStartTournament(void)
 {
-	if (SELECTION_MENU_STATE) {
-	}
-
-	if (SELECTION_MENU_STATE != 3) {
-		if (SELECTION_MENU_STATE != 2) {
-			if (SELECTION_MENU_STATE == 1) {
-				return;
-			}
-
-			if (SELECTION_MENU_STATE != 0) {
-				return;
-			}
-
-			SELECTION_MENU_STATE = 2;
-			return;
-		}
-
+	switch (SELECTION_MENU_STATE) {
+	case 0:
+		SELECTION_MENU_STATE = 2;
+		break;
+	case 1:
+		break;
+	case 2:
 		closeBox(0);
 		startTournament();
+		/* fall through */
+	case 3:
+		ACTIVE_INSTRUCTION = 0;
+		break;
 	}
-
-	ACTIVE_INSTRUCTION = 0;
 }
 
-uint8_t *getCupDataJumpTable(uint32_t section, uint32_t id)
+uint8_t *getCupDataJumpTable(section, id)
+uint8_t section;
+uint8_t id;
 {
 	uint8_t *script;
 	uint8_t *sectionPtr;
@@ -158,15 +150,13 @@ uint8_t *getCupDataJumpTable(uint32_t section, uint32_t id)
 	return getCupDataJumpTableEntry(sectionPtr, id);
 }
 
-uint8_t *getCupDataJumpTableEntry(uint8_t *scriptPtr, uint32_t id)
+uint8_t *getCupDataJumpTableEntry(uint8_t *scriptPtr, uint8_t id)
 {
 	uint8_t *script;
-	uint32_t offset;
 
 	script = getScript(ACTIVE_MAP_SCRIPT);
 	scriptPtr = scriptPtr + id * 4 + 2;
-	offset = *(uint16_t *)scriptPtr;
-	scriptPtr = script + offset;
+	scriptPtr = script + *(uint16_t *)scriptPtr;
 
 	return scriptPtr;
 }
@@ -175,62 +165,41 @@ int32_t checkTournamentMedalConditions(void)
 {
 	int32_t result;
 	uint16_t i;
-	int32_t trigger;
 
-	i = 0;
-	trigger = TRIGGER_D_RANK_CUP_WON;
-	while (i < 6) {
-		if (isTriggerSet(trigger) == 0) {
+	for (i = 0; i < 6; i++) {
+		if (isTriggerSet(TRIGGER_D_RANK_CUP_WON + i) == 0) {
 			goto loop2;
 		}
-
-		++i;
-		++trigger;
 	}
 
 	result = 0;
 	goto check_medal;
 
 loop2:
-	i = 0;
-	trigger = TRIGGER_VERSION_1_CUP_WON;
-	while (i < 5) {
-		if (isTriggerSet(trigger) == 0) {
+	for (i = 0; i < 5; i++) {
+		if (isTriggerSet(TRIGGER_VERSION_1_CUP_WON + i) == 0) {
 			goto loop3;
 		}
-
-		++i;
-		++trigger;
 	}
 
 	result = 1;
 	goto check_medal;
 
 loop3:
-	i = 0;
-	trigger = TRIGGER_FIRE_CUP_WON;
-	while (i < 7) {
-		if (isTriggerSet(trigger) == 0) {
+	for (i = 0; i < 7; i++) {
+		if (isTriggerSet(TRIGGER_FIRE_CUP_WON + i) == 0) {
 			goto loop4;
 		}
-
-		++i;
-		++trigger;
 	}
 
 	result = 2;
 	goto check_medal;
 
 loop4:
-	i = 0;
-	trigger = TRIGGER_DINO_CUP_WON;
-	while (i < 4) {
-		if (isTriggerSet(trigger) == 0) {
+	for (i = 0; i < 4; i++) {
+		if (isTriggerSet(TRIGGER_DINO_CUP_WON + i) == 0) {
 			goto level_check;
 		}
-
-		++i;
-		++trigger;
 	}
 
 	result = 3;
@@ -242,13 +211,10 @@ level_check:
 		goto check_medal;
 	}
 
-	i = 0;
-	while (i < 0x42) {
+	for (i = 0; i < 0x42; i++) {
 		if (getCardAmount(i) == 0) {
 			goto ret_neg1;
 		}
-
-		++i;
 	}
 
 	if (isTriggerSet(TRIGGER_BEATEN_GAME_ONCE) == 0) {
@@ -273,26 +239,21 @@ void scriptCheckTournamentMedal(void)
 {
 	int32_t result;
 
-	if (SELECTION_MENU_STATE == 1) {
-		return;
-
-		if (!result) {
+	switch (SELECTION_MENU_STATE) {
+	case 0:
+		result = checkTournamentMedalConditions();
+		if (result == -1) {
+			ACTIVE_INSTRUCTION = 0;
+			return;
 		}
-	}
 
-	if (SELECTION_MENU_STATE != 0) {
-		return;
+		unlockMedal(TOURNAMENT_MEDAL_IDS[result]);
+		showMapHeadTextbox(result, 0xff, 0, 0x4db);
+		SELECTION_MENU_STATE = 1;
+		SCRIPT_STATE_4 = 0;
+		SCRIPT_STATE_3 = 1;
+		break;
+	case 1:
+		break;
 	}
-
-	result = checkTournamentMedalConditions();
-	if (result == -1) {
-		ACTIVE_INSTRUCTION = 0;
-		return;
-	}
-
-	unlockMedal(TOURNAMENT_MEDAL_IDS[result]);
-	showMapHeadTextbox(result, 0xff, 0, 0x4db);
-	SELECTION_MENU_STATE = 1;
-	SCRIPT_STATE_4 = 0;
-	SCRIPT_STATE_3 = 1;
 }

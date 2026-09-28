@@ -78,6 +78,7 @@ segments:
       - [0x38758, asm]
       - [0x729B4, c, fish]
       - [0x72DFC, asm]
+      - [0x75268, c, tournament]
       - [0x7587C, c, evl]
       - [0x75B80, asm]
       - [0x78514, c, kar]
