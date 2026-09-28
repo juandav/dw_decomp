@@ -5,6 +5,7 @@ MWCC_OPT_LEVEL := 0
 MAIN_SBSS := \
 	$(GEN_DIR)/unk_0x8013DF20.sbss.s \
 	$(GEN_DIR)/unk_0x8013DF94.sbss.s \
+	$(GEN_DIR)/unk_0x8013E070.sbss.s \
 	$(GEN_DIR)/unk_0x8013E1FC.sbss.s \
 	$(GEN_DIR)/unk_0x8013E228.sbss.s \
 	$(GEN_DIR)/unk_0x8013E310.sbss.s \
@@ -16,6 +17,7 @@ MAIN_BSS := \
 	$(GEN_DIR)/unk_0x8013E6A8.bss.s \
 	$(GEN_DIR)/unk_0x80140CF4.bss.s \
 	$(GEN_DIR)/unk_0x801414B8.bss.s \
+	$(GEN_DIR)/unk_0x801566A4.bss.s \
 	$(GEN_DIR)/unk_0x80168460.bss.s \
 	$(GEN_DIR)/unk_0x80168920.bss.s
 
@@ -48,6 +50,7 @@ MAIN_C_SRC := \
 	src/main/overworld_moves_text.c \
 	src/main/overworld_playerinfo_text.c \
 	src/main/particle.c \
+	src/main/sound.c \
 	src/main/sound_async.c \
 	src/main/toilet_data.c \
 	src/main/tournament.c \

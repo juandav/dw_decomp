@@ -345,7 +345,7 @@ int32_t ACTIVE_MAP_SOUND_ID = -1;
 
 int32_t readVHBFile(int32_t vabId, char *filename, uint8_t *buffer);
 int32_t readVHBFileSectors(int32_t vabId, char *filename, uint8_t *buffer,
-			   uint32_t offset, int32_t sectors);
+			   int32_t offset, int32_t sectors);
 int32_t loadMusicFont(int32_t font);
 uint32_t getNextFreeChannel(int32_t arg);
 uint32_t startSound(int32_t vabId, char prog, char note);
@@ -378,14 +378,12 @@ static void *sound_bss[] = {
 
 int32_t readVHBFile(int32_t vabId, char *filename, uint8_t *buffer)
 {
-	uint32_t *words;
 	short vabid;
 	char *str;
 	char pathBuf[64];
+	unsigned long addr;
 
-	words = (uint32_t *)buffer;
-
-	if ((str = strrchr(filename, '\\')) == NULL) {
+	if (NULL == (str = strrchr(filename, '\\'))) {
 		str = filename;
 	} else {
 		++str;
@@ -393,8 +391,9 @@ int32_t readVHBFile(int32_t vabId, char *filename, uint8_t *buffer)
 
 	concatStrings3(pathBuf, str, VHB_EXT);
 	readFile(pathBuf, buffer);
-	memcpy(VHB_HEADER_ADDR[vabId], &buffer[(words[0] >> 2) << 2],
-	       words[1] - words[0]);
+	memcpy(VHB_HEADER_ADDR[vabId],
+	       &buffer[(((uint32_t *)buffer)[0] >> 2) << 2],
+	       ((uint32_t *)buffer)[1] - ((uint32_t *)buffer)[0]);
 
 	SsVabClose(vabId);
 	if ((vabid = SsVabOpenHeadSticky(VHB_HEADER_ADDR[vabId], vabId,
@@ -402,12 +401,12 @@ int32_t readVHBFile(int32_t vabId, char *filename, uint8_t *buffer)
 		return -1;
 	}
 
-	if (SsVabTransBody(&buffer[words[1]], vabid) != vabid) {
+	if (SsVabTransBody(&buffer[((uint32_t *)buffer)[1]], vabid) != vabid) {
 		return -1;
 	}
 
 	SsVabTransCompleted(SS_WAIT_COMPLETED);
-	SsUtGetVBaddrInSB(vabid);
+	addr = SsUtGetVBaddrInSB(vabid);
 
 	return vabid;
 }
@@ -432,16 +431,14 @@ void seqClose(void)
 }
 
 int32_t readVHBFileSectors(int32_t vabId, char *filename, uint8_t *buffer,
-			   uint32_t offset, int32_t sectors)
+			   int32_t offset, int32_t sectors)
 {
-	uint32_t *words;
 	short vabid;
 	char *str;
 	char pathBuf[64];
+	unsigned long addr;
 
-	words = (uint32_t *)buffer;
-
-	if ((str = strrchr(filename, '\\')) == NULL) {
+	if (NULL == (str = strrchr(filename, '\\'))) {
 		str = filename;
 	} else {
 		++str;
@@ -449,8 +446,9 @@ int32_t readVHBFileSectors(int32_t vabId, char *filename, uint8_t *buffer,
 
 	concatStrings3(pathBuf, str, VHB_EXT);
 	readFileSectors(pathBuf, buffer, offset, sectors);
-	memcpy(VHB_HEADER_ADDR[vabId], &buffer[(words[0] >> 2) << 2],
-	       words[1] - words[0]);
+	memcpy(VHB_HEADER_ADDR[vabId],
+	       &buffer[(((uint32_t *)buffer)[0] >> 2) << 2],
+	       ((uint32_t *)buffer)[1] - ((uint32_t *)buffer)[0]);
 
 	SsVabClose(vabId);
 	if ((vabid = SsVabOpenHeadSticky(VHB_HEADER_ADDR[vabId], vabId,
@@ -458,12 +456,12 @@ int32_t readVHBFileSectors(int32_t vabId, char *filename, uint8_t *buffer,
 		return -1;
 	}
 
-	if (SsVabTransBody(&buffer[words[1]], vabid) != vabid) {
+	if (SsVabTransBody(&buffer[((uint32_t *)buffer)[1]], vabid) != vabid) {
 		return -1;
 	}
 
 	SsVabTransCompleted(SS_WAIT_COMPLETED);
-	SsUtGetVBaddrInSB(vabid);
+	addr = SsUtGetVBaddrInSB(vabid);
 
 	return vabid;
 }
@@ -471,18 +469,14 @@ int32_t readVHBFileSectors(int32_t vabId, char *filename, uint8_t *buffer,
 void seqOpen(void)
 {
 	uint32_t *buf;
-	uint32_t trackCount;
-	int32_t trackOffset;
 
 	buf = (uint32_t *)SEQ_BUFFER;
-	trackCount = buf[0] >> 2;
-	if (trackCount <= CURRENT_SEQ_TRACK) {
+	if ((buf[0] >> 2) <= CURRENT_SEQ_TRACK) {
 		CURRENT_SEQ_TRACK = 0;
 	}
 
-	trackOffset = buf[CURRENT_SEQ_TRACK];
 	SEQ_ACCESS_NUM =
-		SsSeqOpen((unsigned long *)&((uint8_t *)buf)[trackOffset], 2);
+		SsSeqOpen((unsigned long *)((uint8_t *)buf + buf[CURRENT_SEQ_TRACK]), 2);
 }
 
 void seqPlay(void)
@@ -539,8 +533,7 @@ int32_t initializeMusic(void)
 
 	attr.mask = SPU_REV_MODE | SPU_REV_DEPTHL | SPU_REV_DEPTHR;
 	attr.mode = SPU_REV_MODE_CLEAR_WA | SPU_REV_MODE_STUDIO_B;
-	attr.depth.right = 0x7000;
-	attr.depth.left = 0x7000;
+	attr.depth.left = attr.depth.right = 0x7000;
 	SpuSetReverbModeParam(&attr);
 	SpuClearReverbWorkArea(SPU_REV_MODE_STUDIO_B);
 	SpuSetReverbDepth(&attr);
@@ -569,10 +562,12 @@ uint32_t getNextFreeChannel(int32_t arg)
 {
 	int32_t i;
 	int32_t val;
+	int32_t status;
 
 	for (i = 0; i < 14; ++i) {
 		val = (i + FREE_CHANNEL_INDEX) % 14 + 10;
-		if (SpuGetKeyStatus(1 << val) != SPU_ON) {
+		status = SpuGetKeyStatus(1 << val);
+		if (status != SPU_ON) {
 			break;
 		}
 	}
@@ -606,10 +601,9 @@ uint32_t startSound(int32_t vabId, char prog, char note)
 	uint32_t mask;
 	int32_t i;
 
-	vhb = (VhbFile *)VHB_HEADER_ADDR[vabId];
-	tones = vhb->tones[0];
-	tones = (VagAtr *)((int32_t)tones + (prog * (int32_t)sizeof(vhb->tones[0])));
 	mask = 0;
+	tones = ((VhbFile *)VHB_HEADER_ADDR[vabId])->tones[0];
+	tones += prog * VAB_TONES_PER_PROGRAM;
 	channel = 0x18;
 
 	for (i = 0; i < VAB_TONES_PER_PROGRAM; i++) {
@@ -650,11 +644,13 @@ uint32_t playSound(int32_t vabId, int32_t val)
 void stopSound(void)
 {
 	int32_t i;
+	int32_t status;
 
 	SsUtAllKeyOff(0);
 
 	for (i = 10; i < 0x18; ++i) {
-		if (SpuGetKeyStatus(1 << i) == SPU_ON) {
+		status = SpuGetKeyStatus(1 << i);
+		if (status == SPU_ON) {
 			SsUtAutoVol(i, 0x7f, 0, 6);
 			SsUtKeyOffV(i);
 		}
@@ -691,12 +687,14 @@ int32_t loadPartnerSounds(int32_t type)
 
 int32_t loadDigimonSounds(int32_t vabId, int32_t type)
 {
+	int32_t soundId;
+
 	if ((vabId < 4) || (7 < vabId)) {
 		return 0;
 	}
 
-	if (readVHBFileSectors(vabId, "VBALL", GENERAL_BUFFER,
-			       DIGIMON_VBALL_SOUND_ID[type] * 7, 7) == -1) {
+	soundId = DIGIMON_VBALL_SOUND_ID[type];
+	if (readVHBFileSectors(vabId, "VBALL", GENERAL_BUFFER, soundId * 7, 7) == -1) {
 		return 0;
 	}
 
@@ -733,18 +731,15 @@ int32_t loadMapSounds(int32_t mapSoundId)
 
 int32_t loadMusicFont(int32_t font)
 {
-	uint32_t start;
-	uint32_t end;
+	uint32_t *buf;
 
+	buf = (uint32_t *)GENERAL_BUFFER;
 	if (readVHBFileSectors(2, "FAALL", GENERAL_BUFFER,
 			       (font - 1) * 0x27, 0x27) == -1) {
 		return 0;
 	}
 
-	start = ((uint32_t *)GENERAL_BUFFER)[2];
-	end = ((uint32_t *)GENERAL_BUFFER)[3];
-	memcpy(SEQ_BUFFER, &((uint8_t *)GENERAL_BUFFER)[(start >> 2) << 2],
-	       end - start);
+	memcpy(SEQ_BUFFER, (uint8_t *)buf + ((buf[2] >> 2) << 2), buf[3] - buf[2]);
 
 	return 1;
 }
