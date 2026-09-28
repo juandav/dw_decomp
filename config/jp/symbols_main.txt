@@ -1,4 +1,8 @@
+KAR_start = 0x80053CAC;
 BTL_drawCommandShout = 0x80063B0C;
+STD_tickPartnerTournament = 0x8006E520;
+DOOA_tick = 0x80085F34;
+DOOA_getSequenceState = 0x80086164;
 TRN_setupSpeedTraining = 0x8008D468;
 TRN2_setupSpeedTraining = 0x8008AB38;
 TRN2_setupMpTraining = 0x800898E8;

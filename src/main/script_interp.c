@@ -107,6 +107,7 @@ extern uint8_t *CURRENT_SCRIPT_PTR;
 
 void unsetCameraFollowPlayer(void);
 int32_t MAIN_func_800D8E64(int32_t param_1, int32_t param_2, int32_t param_3);
+int32_t tickEntityWalkTo(uint8_t scriptId1, uint8_t scriptId2, int32_t targetX, int32_t targetZ, int8_t withCamera);
 int32_t tickRemoveMist(void);
 int32_t tickSaveMachine(void);
 int32_t tickGameClearSave(void);

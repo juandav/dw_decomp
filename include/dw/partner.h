@@ -33,7 +33,7 @@ extern PoopPile WORLD_POOP[];
 
 void tickPartner(int32_t instanceId);
 void updateConditionAnimation(void);
-void setPartnerState(int8_t state);
+void setPartnerState(int32_t state);
 void MAIN_func_800DF5A0(void);
 int32_t getPartnerState(void);
 void startPartnerAnimation(int32_t animId);

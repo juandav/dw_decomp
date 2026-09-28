@@ -31,9 +31,6 @@ int32_t tickEntityMoveToAxis(/* uint8_t scriptId, int32_t target,
 			     int32_t axis, int32_t speed,
 			     int8_t withCamera */);
 int32_t tickEntitySetRotation(uint32_t scriptId, int16_t rotationY);
-int32_t tickEntityWalkTo(uint8_t scriptId1, uint8_t scriptId2,
-			 int32_t targetX, int32_t targetZ,
-			 int8_t withCamera);
 int32_t tickLookAtEntity(uint8_t scriptId1, uint8_t scriptId2);
 
 void worldPosToScreenPos2(int16_t *x, int16_t *y, int16_t *z);

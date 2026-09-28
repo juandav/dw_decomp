@@ -30,7 +30,7 @@ extern int16_t EVOLUTION_TARGET;
 extern int8_t EMOTION_ANIM_TIMEOUT;
 extern int8_t STOP_DISTANCE_TIMER;
 extern uint8_t HEALTH_SHOE_FRAMES;
-extern uint16_t WILD_POOP_ID;
+extern int16_t WILD_POOP_ID;
 extern uint8_t POOP_TO_EAT;
 extern int32_t SOME_SCRIPT_SYNC_BIT;
 extern int16_t MAIN_D_80134E34;
@@ -71,8 +71,9 @@ void tickPartnerDying2(void);
 void tickPartnerWalking(void);
 void setPartnerSlowWalking(void);
 void setPartnerIdle(void);
-int32_t getPartnerTamerCloseness(void);
+int8_t getPartnerTamerCloseness(void);
 int32_t checkEatDistance(int32_t distance);
+int32_t tickEntityWalkTo();
 void tickPartnerBattle(int32_t instanceId);
 void handleConditionBubble();
 int32_t entityIsOffScreen(Entity *entity, int32_t width, int32_t height);
@@ -113,7 +114,7 @@ int16_t entityCheckCollision(Entity *source, Entity *entity, int32_t arg2,
 			     int32_t arg3);
 int32_t random(int32_t limit);
 void writePStat(int32_t id, int32_t value);
-int32_t readPStat(int32_t id);
+uint8_t readPStat(int32_t id);
 void addTamerLevel(int32_t chance, int32_t amount);
 int32_t getMapSoundId(int32_t mapId);
 void loadMapSounds(int32_t soundId);
@@ -175,8 +176,6 @@ void tickPartner(int32_t instanceId)
 
 void tickPartnerOverworld(int32_t instanceId)
 {
-	int32_t isOffScreen;
-
 	if (IS_IN_MENU == 1) {
 		tickAnimation(&PARTNER_ENTITY.digimonEntity.entity);
 	} else {
@@ -208,6 +207,7 @@ void tickPartnerOverworld(int32_t instanceId)
 			break;
 		case 10:
 			handleConditionBubble();
+		case 12:
 			break;
 		case 11:
 			tickPartnerIdle();
@@ -221,9 +221,8 @@ void tickPartnerOverworld(int32_t instanceId)
 			break;
 		}
 
-		isOffScreen = entityIsOffScreen(&PARTNER_ENTITY.digimonEntity.entity, 320, 240);
 		PARTNER_ENTITY.digimonEntity.entity.isOnScreen =
-			isOffScreen ^ 1;
+			entityIsOffScreen(&PARTNER_ENTITY.digimonEntity.entity, 320, 240) ^ 1;
 
 		tickConditionBoundaries();
 		tickAnimation(&PARTNER_ENTITY.digimonEntity.entity);
@@ -242,14 +241,11 @@ void tickNormal(void)
 
 void partnerSleep(void)
 {
-	int32_t closeness;
-
 	switch (PARTNER_SUB_STATE) {
 	case 0:
 		stopGameTime();
 		unsetCameraFollowPlayer();
-		closeness = getPartnerTamerCloseness();
-		if (closeness != 2) {
+		if (getPartnerTamerCloseness() != 2) {
 			startAnimation(&PARTNER_ENTITY.digimonEntity.entity, 2);
 		}
 		setTamerState(6);
@@ -261,8 +257,7 @@ void partnerSleep(void)
                                      &PARTNER_ENTITY.digimonEntity.entity.posData->location);
 		entityLookAtLocation(&PARTNER_ENTITY.digimonEntity.entity,
                                      &TAMER_ENTITY.entity.posData->location);
-		closeness = getPartnerTamerCloseness();
-		if (closeness == 2) {
+		if (getPartnerTamerCloseness() == 2) {
 			playSound(0, 15);
 			startAnimation(&TAMER_ENTITY.entity, 8);
 			startAnimation(&PARTNER_ENTITY.digimonEntity.entity, 0);
@@ -336,14 +331,11 @@ void partnerSleep(void)
 
 void partnerPraiseScold(int32_t partnerState)
 {
-	int32_t closeness;
-
 	switch (PARTNER_SUB_STATE) {
 	case 0:
 		unsetCameraFollowPlayer();
 		tickPartnerWaypoints();
-		closeness = getPartnerTamerCloseness();
-		if (closeness != 2) {
+		if (getPartnerTamerCloseness() != 2) {
 			startAnimation(&PARTNER_ENTITY.digimonEntity.entity, 2);
 		}
 		PARTNER_SUB_STATE = 1;
@@ -355,8 +347,7 @@ void partnerPraiseScold(int32_t partnerState)
                                      &PARTNER_ENTITY.digimonEntity.entity.posData->location);
 		entityLookAtLocation(&PARTNER_ENTITY.digimonEntity.entity,
                                      &TAMER_ENTITY.entity.posData->location);
-		closeness = getPartnerTamerCloseness();
-		if (closeness == 2) {
+		if (getPartnerTamerCloseness() == 2) {
 			startAnimation(&PARTNER_ENTITY.digimonEntity.entity, 0);
 			if (partnerState == 15) {
 				playSound(0, 14);
@@ -370,7 +361,11 @@ void partnerPraiseScold(int32_t partnerState)
 		break;
 	case 2:
 		if (TAMER_ENTITY.entity.anim.animId == 0) {
+#if defined(VERSION_JP)
+			handlePraiseScold(partnerState);
+#else
 			handlePraiseScold();
+#endif
 			PARTNER_SUB_STATE = 3;
 		}
 		break;
@@ -395,11 +390,12 @@ void partnerFeedItem(void)
 {
 	int32_t isClose;
 	int32_t type;
+	int16_t unused1 = 0;
+	int16_t unused2 = 0;
 
 	switch (PARTNER_SUB_STATE) {
 	case 0:
-		isClose = checkEatDistance(ITEM_TAKE_DISTANCE[PARTNER_ENTITY.digimonEntity.entity.type - 1]);
-		if (isClose == 1) {
+		if (checkEatDistance(ITEM_TAKE_DISTANCE[PARTNER_ENTITY.digimonEntity.entity.type - 1]) == 1) {
 			PARTNER_SUB_STATE = 1;
 		}
 		else {
@@ -412,8 +408,7 @@ void partnerFeedItem(void)
 	case 1:
 		entityLookAtLocation(&TAMER_ENTITY.entity,
                                      &PARTNER_ENTITY.digimonEntity.entity.posData->location);
-		isClose = checkEatDistance(ITEM_TAKE_DISTANCE[PARTNER_ENTITY.digimonEntity.entity.type - 1]);
-		if (isClose == 0) {
+		if (checkEatDistance(ITEM_TAKE_DISTANCE[PARTNER_ENTITY.digimonEntity.entity.type - 1]) == 0) {
 			PARTNER_SUB_STATE = 3;
 		}
 		break;
@@ -422,8 +417,7 @@ void partnerFeedItem(void)
                                      &PARTNER_ENTITY.digimonEntity.entity.posData->location);
 		entityLookAtLocation(&PARTNER_ENTITY.digimonEntity.entity,
                                      &TAMER_ENTITY.entity.posData->location);
-		isClose = checkEatDistance(ITEM_TAKE_DISTANCE[PARTNER_ENTITY.digimonEntity.entity.type - 1]);
-		if (isClose == 1) {
+		if (checkEatDistance(ITEM_TAKE_DISTANCE[PARTNER_ENTITY.digimonEntity.entity.type - 1]) == 1) {
 			PARTNER_SUB_STATE = 3;
 		}
 		break;
@@ -507,7 +501,6 @@ void tickPartnerToilet(void)
 {
 	VECTOR *location;
 	int16_t toiletId;
-	int32_t finished;
 
 	location = &PARTNER_ENTITY.digimonEntity.entity.posData->location;
 	toiletId = MAP_ENTRIES[CURRENT_SCREEN].toiletId - 1;
@@ -528,17 +521,15 @@ void tickPartnerToilet(void)
 		break;
 	case 1:
 		entityLookAtLocation(&TAMER_ENTITY.entity, location);
-		finished = tickEntityWalkTo(0xfc, 0xff, TOILET_POS1.vx,
-                                            TOILET_POS1.vz, 0);
-		if (finished == 1) {
+		if (tickEntityWalkTo(0xfc, 0xff, TOILET_POS1.vx,
+                                            TOILET_POS1.vz, 0) == 1) {
 			PARTNER_SUB_STATE = 2;
 		}
 		break;
 	case 2:
 		entityLookAtLocation(&TAMER_ENTITY.entity, location);
-		finished = tickEntityWalkTo(0xfc, 0xff, TOILET_POS2.vx,
-                                            TOILET_POS2.vz, 0);
-		if (finished == 1) {
+		if (tickEntityWalkTo(0xfc, 0xff, TOILET_POS2.vx,
+                                            TOILET_POS2.vz, 0) == 1) {
 			startAnimation(&PARTNER_ENTITY.digimonEntity.entity, 10);
 			PARTNER_SUB_STATE = 3;
 		}
@@ -554,9 +545,8 @@ void tickPartnerToilet(void)
 		break;
 	case 4:
 		entityLookAtLocation(&TAMER_ENTITY.entity, (VECTOR*)&location); // BUG: this shouldn't be a pointer?
-		finished = tickEntityWalkTo(0xfc, 0xff, TOILET_POS1.vx,
-                                            TOILET_POS1.vz, 0);
-		if (finished == 1) {
+		if (tickEntityWalkTo(0xfc, 0xff, TOILET_POS1.vx,
+                                            TOILET_POS1.vz, 0) == 1) {
 			SOME_SCRIPT_SYNC_BIT = 1;
 		}
 	default:
@@ -566,7 +556,6 @@ void tickPartnerToilet(void)
 
 void partnerWildPoop(void)
 {
-	int32_t closeness;
 	short tileX;
 	short tileY;
 
@@ -582,8 +571,7 @@ void partnerWildPoop(void)
 	case 1:
 		entityLookAtLocation(&PARTNER_ENTITY.digimonEntity.entity,
                                      &TAMER_ENTITY.entity.posData->location);
-		closeness = getPartnerTamerCloseness();
-		if (closeness > 0) {
+		if (getPartnerTamerCloseness() > 0) {
 			startAnimation(ENTITY_TABLE[1], 10);
 			PARTNER_SUB_STATE = 2;
 		}
@@ -615,7 +603,6 @@ void partnerWildPoop(void)
 
 void tickPartnerDying(void)
 {
-	int32_t closeness;
 	int32_t value;
 
 	switch (PARTNER_SUB_STATE) {
@@ -635,8 +622,7 @@ void tickPartnerDying(void)
 		break;
 	case 1:
 		entityLookAtLocation(&PARTNER_ENTITY.digimonEntity.entity, &(TAMER_ENTITY.entity.posData)->location);
-		closeness = getPartnerTamerCloseness();
-		if (closeness > 0) {
+		if (getPartnerTamerCloseness() > 0) {
 			isSoundLoaded(0, 8);
 			DOOA_tick((PartnerEntity*)ENTITY_TABLE[1], GENERAL_BUFFER_PTR + 0x4b000, 0);
 			setFishingDisabled();
@@ -665,11 +651,16 @@ void tickPartnerDying(void)
 void partnerEatShit(void)
 {
 	int16_t tileX;
+	int16_t posY;
 	int16_t tileY;
-	int32_t finished;
+	VECTOR target;
 
 	tileX = (WORLD_POOP[POOP_TO_EAT].x - 50) * 100 + 50;
+	posY = ENTITY_TABLE[1]->posData->location.vy;
 	tileY = (50 - WORLD_POOP[POOP_TO_EAT].y) * 100 - 50;
+	target.vx = tileX;
+	target.vy = posY;
+	target.vz = tileY;
 
 	switch (PARTNER_SUB_STATE) {
 	case 0:
@@ -683,8 +674,7 @@ void partnerEatShit(void)
 	case 1:
 		entityLookAtLocation(ENTITY_TABLE[0],
 				     &PARTNER_ENTITY.digimonEntity.entity.posData->location);
-		finished = tickEntityWalkTo(0xfc, 0xff, tileX, tileY, 0);
-		if (finished == 1) {
+		if (tickEntityWalkTo(0xfc, 0xff, target.vx, target.vz, 0) == 1) {
 			startAnimation(ENTITY_TABLE[1], 8);
 			PARTNER_SUB_STATE = 3;
 		}
@@ -714,8 +704,6 @@ void tickPartnerIdle(void)
 
 void tickPartnerEvolving(void)
 {
-	int32_t closeness;
-	int32_t soundId;
 	int32_t value;
 
 	switch (PARTNER_SUB_STATE) {
@@ -734,8 +722,7 @@ void tickPartnerEvolving(void)
 	case 1:
 		entityLookAtLocation(&PARTNER_ENTITY.digimonEntity.entity,
                                      &TAMER_ENTITY.entity.posData->location);
-		closeness = getPartnerTamerCloseness();
-		if (closeness > 0) {
+		if (getPartnerTamerCloseness() > 0) {
 			getEvoSequenceState((PartnerEntity*)ENTITY_TABLE[1],
                                             GENERAL_BUFFER_PTR, &PARTNER_PARA,
                                             EVOLUTION_TARGET, 0);
@@ -750,8 +737,7 @@ void tickPartnerEvolving(void)
 		if (value == -1) {
 			startGameTime();
 			EVOLUTION_TARGET = -1;
-			soundId = getMapSoundId(CURRENT_SCREEN);
-			loadMapSounds(soundId);
+			loadMapSounds(getMapSoundId(CURRENT_SCREEN));
 			checkShopMap(CURRENT_SCREEN);
 			checkArenaMap(CURRENT_SCREEN);
 			readMapTFS(CURRENT_SCREEN);
@@ -774,7 +760,6 @@ void tickPartnerEvolving(void)
 void tickPartnerDying2(void)
 {
 	int32_t value;
-	int32_t soundId;
 
 	switch (PARTNER_SUB_STATE) {
 	case 0:
@@ -784,8 +769,7 @@ void tickPartnerDying2(void)
 	case 1:
 		value = DOOA_getSequenceState(0, 1);
 		if (value == -1) {
-			soundId = getMapSoundId(CURRENT_SCREEN);
-			loadMapSounds(soundId);
+			loadMapSounds(getMapSoundId(CURRENT_SCREEN));
 			readMapTFS(CURRENT_SCREEN);
 			setFishingEnabled();
 			PARTNER_PARA.remainingLifetime = 360;
@@ -840,7 +824,9 @@ void tickPartnerWalking(void)
 					       (uint8_t)PARTNER_ANIMATION);
 			}
 		}
+#if !defined(VERSION_JP)
 		PARTNER_IS_STANDING_STILL = 1;
+#endif
 	}
 	else if (closeness == 1) {
 		if (anim->animId == 4) {
@@ -859,11 +845,17 @@ void tickPartnerWalking(void)
 		}
 
 		EMOTION_ANIM_TIMEOUT = -1;
+#if !defined(VERSION_JP)
 		PARTNER_IS_STANDING_STILL = 1;
+#endif
 	}
 	else if (closeness == 2) {
 		if ((anim->animId == 0) || (anim->animId == 1)) {
+#if defined(VERSION_JP)
+			if (PARTNER_IS_STANDING_STILL != 0) {
+#else
 			if (PARTNER_IS_STANDING_STILL != 2) {
+#endif
 				updateConditionAnimation();
 			}
 		}
@@ -878,6 +870,9 @@ void tickPartnerWalking(void)
 			if ((anim->loopCount == 0) || (collision == 0)) {
 				EMOTION_ANIM_TIMEOUT = random(5) + 1;
 				setPartnerIdle();
+#if defined(VERSION_JP)
+				PARTNER_IS_STANDING_STILL = 0;
+#endif
 				STOP_DISTANCE_TIMER = 0;
 			}
 		}
@@ -904,7 +899,9 @@ void tickPartnerWalking(void)
 		}
 
 		STOP_DISTANCE_TIMER++;
+#if !defined(VERSION_JP)
 		PARTNER_IS_STANDING_STILL = 2;
+#endif
 	}
 
 	if (PARTNER_ANIMATION != anim->animId) {
@@ -935,29 +932,25 @@ void tickPartnerWalking(void)
 	}
 }
 
-int32_t getPartnerTamerCloseness(void)
+int8_t getPartnerTamerCloseness(void)
 {
-	int32_t distanceZ;
 	VECTOR *tamerLocation;
 	VECTOR *partnerLocation;
 	int32_t distance;
-	int32_t distanceX;
 	int32_t sprintDistanceSquared;
 	int32_t walkDistance;
-	int32_t sprintDistance;
+	int16_t radius;
 
 	tamerLocation = &TAMER_ENTITY.entity.posData->location;
 	partnerLocation = &PARTNER_ENTITY.digimonEntity.entity.posData->location;
-	distanceZ = (tamerLocation->vz - partnerLocation->vz) * (tamerLocation->vz - partnerLocation->vz);
-	distanceX = (tamerLocation->vx - partnerLocation->vx) * (tamerLocation->vx - partnerLocation->vx);
-	distance = distanceX + distanceZ;
+	distance = (tamerLocation->vx - partnerLocation->vx) * (tamerLocation->vx - partnerLocation->vx) +
+		   (tamerLocation->vz - partnerLocation->vz) * (tamerLocation->vz - partnerLocation->vz);
 
-	walkDistance = DIGIMON_DATA[PARTNER_ENTITY.digimonEntity.entity.type].radius;
-	sprintDistance = walkDistance;
-	walkDistance = (walkDistance * 5 / 2) * (walkDistance * 5 / 2);
-	sprintDistanceSquared = (sprintDistance * 7 / 2) * (sprintDistance * 7 / 2);
+	radius = DIGIMON_DATA[PARTNER_ENTITY.digimonEntity.entity.type].radius;
+	walkDistance = (radius * 5 / 2) * (radius * 5 / 2);
+	sprintDistanceSquared = (radius * 7 / 2) * (radius * 7 / 2);
 
-	if (sprintDistanceSquared < distance) {
+	if (distance > sprintDistanceSquared) {
 		return 0;
 	}
 	if (distance >= walkDistance) {
@@ -983,12 +976,20 @@ void setPartnerSlowWalking(void)
 void updateConditionAnimation(void)
 {
 	int32_t cond;
-	int32_t anim;
+	uint8_t anim;
+#if !defined(VERSION_JP)
 	int32_t v;
+#endif
 
+#if defined(VERSION_JP)
+	cond = PARTNER_PARA.condition;
+	anim = PARTNER_ENTITY.digimonEntity.entity.anim.animId;
+	if (PARTNER_PARA.condition == 0) {
+#else
 	v = (cond = PARTNER_PARA.condition);
 	anim = PARTNER_ENTITY.digimonEntity.entity.anim.animId;
 	if (v == 0) {
+#endif
 		if (PARTNER_PARA.happiness < -0x1E) {
 			PARTNER_ANIMATION = 7;
 		} else if (PARTNER_PARA.happiness >= 0x1F) {
@@ -1028,8 +1029,11 @@ void updateConditionAnimation(void)
 void setPartnerIdle(void)
 {
 	if (((PARTNER_ANIMATION != 1) &&
-	     (PARTNER_ANIMATION != 0)) ||
-	    (PARTNER_IS_STANDING_STILL != 2)) {
+	     (PARTNER_ANIMATION != 0))
+#if !defined(VERSION_JP)
+	    || (PARTNER_IS_STANDING_STILL != 2)
+#endif
+	) {
 		if ((((PARTNER_PARA.condition & 0x1) != 0) ||
 		     ((PARTNER_PARA.condition & 0x2) != 0)) ||
 		    (((PARTNER_PARA.condition & 0x20) != 0 ||
@@ -1044,18 +1048,20 @@ void setPartnerIdle(void)
 	}
 }
 
-void setPartnerState(int8_t state)
+void setPartnerState(state)
+int16_t state;
 {
 	PARTNER_STATE = state;
 	PARTNER_SUB_STATE = 0;
 }
 
-int32_t checkEatDistance(int32_t distance)
+int32_t checkEatDistance(distance)
+int8_t distance;
 {
-	int32_t tamerX;
-	int32_t tamerZ;
-	int32_t partnerX;
-	int32_t partnerZ;
+	int16_t tamerX;
+	int16_t tamerZ;
+	int16_t partnerX;
+	int16_t partnerZ;
 	int32_t targetDistance;
 	int32_t partnerDistance;
 
@@ -1088,12 +1094,14 @@ int32_t getPartnerState(void)
 	return PARTNER_STATE;
 }
 
-void startPartnerAnimation(int32_t animId)
+void startPartnerAnimation(animId)
+int16_t animId;
 {
 	startAnimation(&PARTNER_ENTITY.digimonEntity.entity, (uint8_t)animId);
 }
 
-void callDigimonRoutine(int32_t routine)
+void callDigimonRoutine(routine)
+uint8_t routine;
 {
 	switch (routine) {
 	case 0:

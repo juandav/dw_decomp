@@ -49,7 +49,8 @@ SECTIONS
         BUILD_DIR/src/main/sound.c.o(.text .text.*);
         KEEP(BUILD_DIR/asm/main/3FEF4.s.o(.text .text.*));
         BUILD_DIR/src/main/clock.c.o(.text .text.*);
-        KEEP(BUILD_DIR/asm/main/59A5C.s.o(.text .text.*));
+        BUILD_DIR/src/main/partner.c.o(.text .text.*);
+        KEEP(BUILD_DIR/asm/main/5C21C.s.o(.text .text.*));
         BUILD_DIR/src/main/entity_text.c.o(.text .text.*);
         KEEP(BUILD_DIR/asm/main/621F4.s.o(.text .text.*));
         BUILD_DIR/src/main/evolution.c.o(.text .text.*);
@@ -84,6 +85,8 @@ SECTIONS
         BUILD_DIR/src/main/overworld_playerinfo_text.c.o(.rodata .rodata.*);
         BUILD_DIR/src/main/overworld_medal_text.c.o(.rodata .rodata.*);
         KEEP(BUILD_DIR/asm/main/data/8AD50.rodata.s.o(.rodata .rodata.*));
+        BUILD_DIR/src/main/partner.c.o(.rodata .rodata.*);
+        KEEP(BUILD_DIR/asm/main/data/8B014.rodata.s.o(.rodata .rodata.*));
         BUILD_DIR/src/main/graphics2.c.o(.rodata .rodata.*);
         KEEP(BUILD_DIR/asm/main/data/8B6E0.rodata.s.o(.rodata .rodata.*));
         BUILD_DIR/src/main/battle_ui.c.o(.rodata .rodata.*);

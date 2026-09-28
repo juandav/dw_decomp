@@ -56,6 +56,7 @@ MAIN_C_SRC := \
 	src/main/overworld_playerinfo_text.c \
 	src/main/overworld_status_boxes.c \
 	src/main/particle.c \
+	src/main/partner.c \
 	src/main/sound.c \
 	src/main/sound_async.c \
 	src/main/toilet_data.c \
