@@ -199,6 +199,7 @@ SECTIONS
         BUILD_DIR/src/doo2/doo2.c.o(.sdata .sdata.*);
         . = ALIGN(., 4);
         KEEP(BUILD_DIR/asm/main/data/ADE0C.sdata.s.o(.sdata .sdata.*));
+        BUILD_DIR/src/trn/trn_reward.c.o(.sdata .sdata.*);
         BUILD_DIR/src/trn/trn_hud.c.o(.sdata .sdata.*);
         . = ALIGN(., 4);
         BUILD_DIR/src/trn/trn_slots.c.o(.sdata .sdata.*);

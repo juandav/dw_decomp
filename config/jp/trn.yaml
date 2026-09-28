@@ -59,7 +59,7 @@ segments:
     align: 4
     subalign: 4
     subsegments:
-      - [0x40, asm, trn]
+      - [0x40, c, trn_reward]
       - [0x28C8, c, trn_hp]
       - [0x2F74, c, trn_mp]
       - [0x3588, c, trn_off]
@@ -74,9 +74,9 @@ segments:
       - [0x79FC, .rodata, trn_def]
       - [0x7A38, .rodata, trn_mp]
       - [0x7A54, .rodata, trn_brain]
-      - [0x7A6C, rodata]
+      - [0x7A6C, .rodata, trn_reward]
       - [0x7A84, .rodata, trn_slots]
-      - [0x7AA0, data]
+      - [0x7AA0, .data, trn_reward]
       - [0x7C14, .data, trn_hud]
       - [0x7D34, .data, trn_slots]
       - [0x7D88, .data, trn_bss]

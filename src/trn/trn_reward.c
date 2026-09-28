@@ -24,7 +24,7 @@ int32_t hasMove(int32_t moveId);
 void learnMove(int32_t moveId);
 void createMenuBox(int32_t a, int32_t b, int32_t c, int32_t d, int32_t e, int32_t f, void (*tick)(void), void (*render)(void));
 void TRN_func_800888A0(int8_t arg);
-int16_t TRN_calculateTrainingMultiplier(int32_t type, int32_t mode, int32_t flag);
+int16_t TRN_calculateTrainingMultiplier(int32_t type, int16_t mode, int16_t flag);
 void TRN_advanceTrainingTime(int16_t tiredGain, int16_t energyLoss, int16_t happyLoss);
 void TRN_renderNewOrdersBox(void);
 int32_t TRN_tryLearnMove(int32_t type);
@@ -70,6 +70,21 @@ int8_t TRAINING_ANIM_IDS[67][2] = {
 	{ 0x2e, 0xa }, { 0x2e, 0xa }, { 0x2e, 0xa },
 };
 
+#if defined(VERSION_JP)
+char TRN_D_8008F0D8[] = "「思いっきり！」";
+
+char TRN_D_8008F0F0[] = "「ほどほど！」";
+
+char TRN_D_8008F100[] = "「はなれろ！」";
+
+char TRN_D_8008F10C[] = "「ターゲット変更！」";
+
+char TRN_D_8008F11C[] = "「ガマンだ！」";
+
+char TRN_D_8008F12C[] = "「そうびした技」";
+
+char TRN_D_8008F140[] = "の命令を聞くようになった！";
+#else
 char TRN_D_8008F0D8[] = "Give it all you got!";
 
 char TRN_D_8008F0F0[] = "Take it easy!";
@@ -83,6 +98,7 @@ char TRN_D_8008F11C[] = "Hang in there!";
 char TRN_D_8008F12C[20] = "Technique mastered.";
 
 char TRN_D_8008F140[12] = "New orders!";
+#endif
 
 uint8_t TRN_D_8008F14C[56] = {
 	0x2, 0x5, 0x0, 0x4, 0x3, 0x1, 0x6, 0x7,
@@ -105,7 +121,11 @@ int8_t TRN_D_8008F184[8][3] = {
 	{ 0xa, 0x5, 0x0 },
 };
 
+#if defined(VERSION_JP)
+char TRN_D_8008F19C[] = "をおぼえた。";
+#else
 char TRN_D_8008F19C[] = "was mastered!";
+#endif
 // clang-format on
 
 void TRN_saveTrainingStartTime(void)
@@ -158,25 +178,34 @@ void TRN_createCloudFXLine(int16_t a, int16_t b, int16_t x, int16_t z, int16_t d
 	}
 }
 
-void TRN_awardHpTrainingGains(int32_t a, int16_t b, int32_t c)
+void TRN_awardHpTrainingGains(a, b, c)
+int32_t a;
+int16_t b;
+int32_t c;
 {
-	int16_t v;
 	int16_t x;
 	int16_t y;
-	int16_t flag;
+	int16_t v;
+	int16_t tired;
+	int16_t energy;
+	int16_t happy;
 
+	x = 80;
+	y = 2;
+	tired = 10;
+	energy = 1;
+	happy = 1;
 	v = TRN_calculateTrainingMultiplier(a, 0, b);
-	flag = PARTNER_PARA.trainBoostFlag;
-	if (flag & 0x10) {
-		x = ((v * PARTNER_PARA.trainBoostValue) * 80) / 100;
+	if (PARTNER_PARA.trainBoostFlag & 0x10) {
+		x = (x * (v * PARTNER_PARA.trainBoostValue)) / 100;
 	} else {
-		x = (v * 80) / 10;
+		x = (x * v) / 10;
 	}
 
-	if (flag & 0x1) {
-		y = ((v * PARTNER_PARA.trainBoostValue) * 2) / 100;
+	if (PARTNER_PARA.trainBoostFlag & 0x1) {
+		y = (y * (v * PARTNER_PARA.trainBoostValue)) / 100;
 	} else {
-		y = (v * 2) / 10;
+		y = (y * v) / 10;
 	}
 
 	x = (x * c) / 10;
@@ -198,7 +227,7 @@ void TRN_awardHpTrainingGains(int32_t a, int16_t b, int32_t c)
 	STATS_GAINS[4] = 0;
 	STATS_GAINS[5] = 0;
 	TRN_createPostTrainingStatsBox();
-	TRN_advanceTrainingTime(10, 1, 1);
+	TRN_advanceTrainingTime(tired, energy, happy);
 }
 
 int32_t TRN_statGainsAreZero(void)
@@ -232,16 +261,18 @@ no:
 	return 0;
 }
 
-void TRN_awardOffenseTrainingGains(int32_t a, int32_t b, int32_t c)
+void TRN_awardOffenseTrainingGains(a, b, c)
+int32_t a;
+int16_t b;
+int32_t c;
 {
 	int16_t off;
 	int16_t hp;
 	int16_t spd;
-	int16_t energy;
 	int16_t tired;
+	int16_t energy;
 	int16_t happy;
 	int16_t v;
-	int16_t flag;
 
 	hp = off = spd = 0;
 	tired = energy = happy = 0;
@@ -263,20 +294,19 @@ void TRN_awardOffenseTrainingGains(int32_t a, int32_t b, int32_t c)
 	}
 
 	v = TRN_calculateTrainingMultiplier(a, 2, b);
-	flag = PARTNER_PARA.trainBoostFlag;
-	if (flag & 0x10) {
+	if (PARTNER_PARA.trainBoostFlag & 0x10) {
 		hp = (hp * (v * PARTNER_PARA.trainBoostValue)) / 100;
 	} else {
 		hp = (hp * v) / 10;
 	}
 
-	if (flag & 1) {
+	if (PARTNER_PARA.trainBoostFlag & 1) {
 		off = (off * (v * PARTNER_PARA.trainBoostValue)) / 100;
 	} else {
 		off = (off * v) / 10;
 	}
 
-	if (flag & 4) {
+	if (PARTNER_PARA.trainBoostFlag & 4) {
 		spd = (spd * (v * PARTNER_PARA.trainBoostValue)) / 100;
 	} else {
 		spd = (spd * v) / 10;
@@ -305,15 +335,17 @@ void TRN_awardOffenseTrainingGains(int32_t a, int32_t b, int32_t c)
 	TRN_advanceTrainingTime(tired, energy, happy);
 }
 
-void TRN_awardSpeedTrainingGains(int32_t a, int32_t b, int32_t c)
+void TRN_awardSpeedTrainingGains(a, b, c)
+int32_t a;
+int16_t b;
+int32_t c;
 {
 	int16_t x;
 	int16_t y;
-	int16_t energy;
 	int16_t tired;
+	int16_t energy;
 	int16_t happy;
 	int16_t v;
-	int16_t flag;
 
 	x = y = 0;
 	tired = energy = happy = 0;
@@ -335,14 +367,13 @@ void TRN_awardSpeedTrainingGains(int32_t a, int32_t b, int32_t c)
 	}
 
 	v = TRN_calculateTrainingMultiplier(a, 4, b);
-	flag = PARTNER_PARA.trainBoostFlag;
-	if (flag & 0x10) {
+	if (PARTNER_PARA.trainBoostFlag & 0x10) {
 		x = (x * (v * PARTNER_PARA.trainBoostValue)) / 100;
 	} else {
 		x = (x * v) / 10;
 	}
 
-	if (flag & 4) {
+	if (PARTNER_PARA.trainBoostFlag & 4) {
 		y = (y * (v * PARTNER_PARA.trainBoostValue)) / 100;
 	} else {
 		y = (y * v) / 10;
@@ -370,25 +401,34 @@ void TRN_awardSpeedTrainingGains(int32_t a, int32_t b, int32_t c)
 	TRN_advanceTrainingTime(tired, energy, happy);
 }
 
-void TRN_awardDefenseTrainingGains(int32_t a, int16_t b, int32_t c)
+void TRN_awardDefenseTrainingGains(a, b, c)
+int32_t a;
+int16_t b;
+int32_t c;
 {
-	int16_t v;
 	int16_t x;
 	int16_t y;
-	int16_t flag;
+	int16_t v;
+	int16_t tired;
+	int16_t energy;
+	int16_t happy;
 
+	x = 8;
+	y = 2;
+	tired = 9;
+	energy = 1;
+	happy = 1;
 	v = TRN_calculateTrainingMultiplier(a, 3, b);
-	flag = PARTNER_PARA.trainBoostFlag;
-	if (flag & 2) {
-		x = ((v * PARTNER_PARA.trainBoostValue) * 8) / 100;
+	if (PARTNER_PARA.trainBoostFlag & 2) {
+		x = (x * (v * PARTNER_PARA.trainBoostValue)) / 100;
 	} else {
-		x = (v * 8) / 10;
+		x = (x * v) / 10;
 	}
 
-	if (flag & 8) {
-		y = ((v * PARTNER_PARA.trainBoostValue) * 2) / 100;
+	if (PARTNER_PARA.trainBoostFlag & 8) {
+		y = (y * (v * PARTNER_PARA.trainBoostValue)) / 100;
 	} else {
-		y = (v * 2) / 10;
+		y = (y * v) / 10;
 	}
 
 	x = (x * c) / 10;
@@ -406,28 +446,37 @@ void TRN_awardDefenseTrainingGains(int32_t a, int16_t b, int32_t c)
 	STATS_GAINS[4] = 0;
 	STATS_GAINS[5] = y;
 	TRN_createPostTrainingStatsBox();
-	TRN_advanceTrainingTime(9, 1, 1);
+	TRN_advanceTrainingTime(tired, energy, happy);
 }
 
-void TRN_awardMpTrainingGains(int32_t a, int16_t b, int32_t c)
+void TRN_awardMpTrainingGains(a, b, c)
+int32_t a;
+int16_t b;
+int32_t c;
 {
-	int16_t v;
 	int16_t x;
 	int16_t y;
-	int16_t flag;
+	int16_t v;
+	int16_t tired;
+	int16_t energy;
+	int16_t happy;
 
+	x = 80;
+	y = 2;
+	tired = 7;
+	energy = 1;
+	happy = 1;
 	v = TRN_calculateTrainingMultiplier(a, 1, b);
-	flag = PARTNER_PARA.trainBoostFlag;
-	if (flag & 0x20) {
-		x = ((v * PARTNER_PARA.trainBoostValue) * 80) / 100;
+	if (PARTNER_PARA.trainBoostFlag & 0x20) {
+		x = (x * (v * PARTNER_PARA.trainBoostValue)) / 100;
 	} else {
-		x = (v * 80) / 10;
+		x = (x * v) / 10;
 	}
 
-	if (flag & 0x2) {
-		y = ((v * PARTNER_PARA.trainBoostValue) * 2) / 100;
+	if (PARTNER_PARA.trainBoostFlag & 0x2) {
+		y = (y * (v * PARTNER_PARA.trainBoostValue)) / 100;
 	} else {
-		y = (v * 2) / 10;
+		y = (y * v) / 10;
 	}
 
 	x = (x * c) / 10;
@@ -449,26 +498,29 @@ void TRN_awardMpTrainingGains(int32_t a, int16_t b, int32_t c)
 	STATS_GAINS[4] = 0;
 	STATS_GAINS[5] = 0;
 	TRN_createPostTrainingStatsBox();
-	TRN_advanceTrainingTime(7, 1, 1);
+	TRN_advanceTrainingTime(tired, energy, happy);
 }
 
-void TRN_awardBrainsTrainingGains(int32_t a, int32_t b, int32_t c)
+void TRN_awardBrainsTrainingGains(a, b, c)
+int32_t a;
+int16_t b;
+int32_t c;
 {
 	int16_t brains;
 	int16_t mp;
 	int16_t base;
-	int16_t energy;
+	int16_t total;
 	int16_t tired;
+	int16_t energy;
 	int16_t happy;
 	int16_t v;
-	int16_t flag;
-	int32_t y;
-	int32_t shown;
+	uint8_t shown;
+	uint8_t y;
 
-	base = PARTNER_ENTITY.digimonEntity.stats.base.brain;
 	MAIN_D_80135388 = 0;
 	mp = brains = 0;
 	tired = energy = happy = 0;
+	base = PARTNER_ENTITY.digimonEntity.stats.base.brain;
 	switch (b) {
 	case 0:
 		mp = 10;
@@ -486,14 +538,13 @@ void TRN_awardBrainsTrainingGains(int32_t a, int32_t b, int32_t c)
 	}
 
 	v = TRN_calculateTrainingMultiplier(a, 1, b);
-	flag = PARTNER_PARA.trainBoostFlag;
-	if (flag & 0x20) {
+	if (PARTNER_PARA.trainBoostFlag & 0x20) {
 		mp = (mp * (v * PARTNER_PARA.trainBoostValue)) / 100;
 	} else {
 		mp = (mp * v) / 10;
 	}
 
-	if (flag & 8) {
+	if (PARTNER_PARA.trainBoostFlag & 8) {
 		brains = (brains * (v * PARTNER_PARA.trainBoostValue)) / 100;
 	} else {
 		brains = (brains * v) / 10;
@@ -525,22 +576,22 @@ void TRN_awardBrainsTrainingGains(int32_t a, int32_t b, int32_t c)
 	STATS_GAINS[5] = brains;
 	TRN_createPostTrainingStatsBox();
 	TRN_advanceTrainingTime(tired, energy, happy);
-	brains = base + brains;
+	total = base + brains;
 	shown = 0;
 	y = 0x84;
-	if ((base < 0x64) && (brains >= 0x64)) {
+	if ((base < 0x64) && (total >= 0x64)) {
 		setTextColor(7);
 		drawString(TRN_D_8008F0D8, 0, 0x78);
 		shown = 1;
 	}
 
-	if ((base < 0xc8) && (brains >= 0xc8)) {
+	if ((base < 0xc8) && (total >= 0xc8)) {
 		setTextColor(7);
 		drawString(TRN_D_8008F0F0, 0, 0x78);
 		shown = 1;
 	}
 
-	if ((base < 0x12c) && (brains >= 0x12c)) {
+	if ((base < 0x12c) && (total >= 0x12c)) {
 		setTextColor(7);
 		drawString(TRN_D_8008F100, 0, 0x78);
 		drawString(TRN_D_8008F10C, 0, 0x84);
@@ -548,13 +599,13 @@ void TRN_awardBrainsTrainingGains(int32_t a, int32_t b, int32_t c)
 		y = 0x94;
 	}
 
-	if ((base < 0x190) && (brains >= 0x190)) {
+	if ((base < 0x190) && (total >= 0x190)) {
 		setTextColor(7);
 		drawString(TRN_D_8008F11C, 0, 0x78);
 		shown = 1;
 	}
 
-	if ((base < 0x1f4) && (brains >= 0x1f4)) {
+	if ((base < 0x1f4) && (total >= 0x1f4)) {
 		setTextColor(7);
 		drawString(TRN_D_8008F12C, 0, 0x78);
 		shown = 1;
@@ -565,21 +616,21 @@ void TRN_awardBrainsTrainingGains(int32_t a, int32_t b, int32_t c)
 		drawString(TRN_D_8008F140, 0, y);
 		createMenuBox(2, -0x58, 0x12, 0xb0, 0x30, 2, 0, TRN_renderNewOrdersBox);
 		MAIN_D_80135388 = 1;
-	} else if (((base < 0x96) && (brains >= 0x96)) || ((base < 0xfa) && (brains >= 0xfa)) || ((base < 0x15e) && (brains >= 0x15e)) || ((base < 0x1c2) && (brains >= 0x1c2)) || ((base < 0x226) && (brains >= 0x226)) || ((base < 0x28a) && (brains >= 0x28a)) || ((base < 0x2ee) && (brains >= 0x2ee)) || ((base < 0x320) && (brains >= 0x320)) || ((base < 0x352) && (brains >= 0x352)) || ((base < 0x384) && (brains >= 0x384)) || ((base < 0x3b6) && (brains >= 0x3b6)) || (brains == 999)) {
+	} else if (((base < 0x96) && (total >= 0x96)) || ((base < 0xfa) && (total >= 0xfa)) || ((base < 0x15e) && (total >= 0x15e)) || ((base < 0x1c2) && (total >= 0x1c2)) || ((base < 0x226) && (total >= 0x226)) || ((base < 0x28a) && (total >= 0x28a)) || ((base < 0x2ee) && (total >= 0x2ee)) || ((base < 0x320) && (total >= 0x320)) || ((base < 0x352) && (total >= 0x352)) || ((base < 0x384) && (total >= 0x384)) || ((base < 0x3b6) && (total >= 0x3b6)) || (total == 999)) {
 		TRN_tryLearnMove(a);
 	}
 }
 
-int16_t TRN_calculateTrainingMultiplier(int32_t type, int32_t mode, int32_t flag)
+int16_t TRN_calculateTrainingMultiplier(int32_t type, int16_t mode, int16_t flag)
 {
 	uint32_t num;
 	uint32_t den;
-	uint32_t counterIndex;
 	uint8_t tt;
+	int16_t result;
 
-	tt = RAISE_DATA[type].trainingType;
 	num = 0;
-	counterIndex = mode;
+	den = 0;
+	tt = RAISE_DATA[type].trainingType;
 	switch (mode) {
 	case 0:
 		if ((tt == 0) || (tt == 1)) {
@@ -681,7 +732,7 @@ int16_t TRN_calculateTrainingMultiplier(int32_t type, int32_t mode, int32_t flag
 			}
 		}
 		if ((mode == 3) || (mode == 4) || (mode == 5)) {
-			if ((&PARTNER_PARA.upgradeDefenseCounter)[(int32_t)counterIndex - 3] >= 10) {
+			if ((&PARTNER_PARA.upgradeDefenseCounter)[mode - 3] >= 10) {
 				num = num * 6;
 				den = den * 5;
 			}
@@ -693,11 +744,14 @@ int16_t TRN_calculateTrainingMultiplier(int32_t type, int32_t mode, int32_t flag
 		den = den * 10;
 	}
 
-	return (num * 10) / den;
+	result = (num * 10) / den;
+	return result;
 }
 
 void TRN_advanceTrainingTime(int16_t tiredGain, int16_t energyLoss, int16_t happyLoss)
 {
+	int16_t clockHour;
+
 	PARTNER_PARA.tiredness += tiredGain;
 	PARTNER_PARA.energyLevel -= energyLoss;
 	PARTNER_PARA.happiness -= happyLoss;
@@ -723,6 +777,7 @@ void TRN_advanceTrainingTime(int16_t tiredGain, int16_t energyLoss, int16_t happ
 		}
 	}
 
+	clockHour = HOUR % 12;
 	updateMinuteHand(HOUR, MINUTE);
 	if ((HOUR % 4) == 0) {
 		if (PARTNER_PARA.happiness < 0x50) {
@@ -786,20 +841,25 @@ void TRN_renderNewOrdersBox(void)
 int32_t TRN_tryLearnMove(int32_t type)
 {
 	uint8_t special[3];
+#if defined(VERSION_JP)
+	int8_t unused[7] = { 0, 5, 2, 4, 2, 3, 6 };
+#endif
 	int8_t moveId[3];
 	int8_t weight[3];
+	int8_t move;
 	int32_t n;
-	int32_t i;
+	int32_t r;
 	int32_t j;
+	int32_t i;
 	int32_t k;
 	int8_t best;
-	int8_t move;
 
 	for (n = 0; n < 3; n++) {
 		special[n] = DIGIMON_DATA[type].special[n];
 	}
 
-	weight[0] = moveId[0] = weight[1] = moveId[1] = weight[2] = moveId[2] = -1;
+	moveId[0] = moveId[1] = moveId[2] = -1;
+	weight[0] = weight[1] = weight[2] = -1;
 	for (i = 0; i < 3; i++) {
 		if (special[i] == 0xff) {
 			continue;
@@ -820,19 +880,20 @@ int32_t TRN_tryLearnMove(int32_t type)
 		}
 	}
 
-	best = weight[0];
 	move = moveId[0];
-	if (weight[0] < weight[1]) {
-		best = weight[1];
+	best = weight[0];
+	if (best < weight[1]) {
 		move = moveId[1];
+		best = weight[1];
 	}
 
 	if (best < weight[2]) {
-		best = weight[2];
 		move = moveId[2];
+		best = weight[2];
 	}
 
-	if (random(100) < best) {
+	r = random(100);
+	if (best > r) {
 		learnMove(move);
 		drawString(MOVE_NAMES[move], 0, 0x78);
 		MAIN_D_80135392 = strlen(MOVE_NAMES[move]);

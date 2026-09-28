@@ -137,6 +137,7 @@ TRN_C_SRC := \
 	src/trn/trn_hud.c \
 	src/trn/trn_mp.c \
 	src/trn/trn_off.c \
+	src/trn/trn_reward.c \
 	src/trn/trn_slots.c \
 	src/trn/trn_speed.c \
 	src/trn/trn_bss.c
