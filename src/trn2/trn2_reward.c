@@ -1,9 +1,9 @@
 #include <dw/anim.h>
 #include <dw/entity.h>
+#include <dw/input.h>
 #include <dw/params.h>
 #include <dw/partner.h>
 #include <dw/sound.h>
-#include <dw/tamer.h>
 #include <dw/trn2.h>
 #include <dw/types.h>
 #include <dw/world_object.h>
@@ -18,6 +18,8 @@ void setCameraFollowPlayer(void);
 void unsetCameraFollowPlayer(void);
 void TRN2_awardSpeedTrainingGains(int32_t a, int32_t b, int32_t c);
 void TRN2_func_8008AA84(int8_t arg);
+void setTamerState(int8_t state);
+int32_t tickEntityWalkTo();
 
 static void *trn2_reward_functions[] = {
 	TRN2_awardDefenseTrainingGains,
@@ -75,7 +77,7 @@ void TRN2_tickSpeedTraining(int32_t instanceId)
 		if (MAIN_D_801353BC == 1) {
 			r = TRN2_getSlotSessionResult();
 		}
-		if ((((MAIN_D_801353C2 >= 0x4b0) || (POLLED_INPUT & 0x10)) && (MAIN_D_801353BC == 0)) || ((MAIN_D_801353BC == 1) && (r >= 0))) {
+		if ((((MAIN_D_801353C2 >= 0x4b0) || (POLLED_INPUT & CANCEL_BUTTON)) && (MAIN_D_801353BC == 0)) || ((MAIN_D_801353BC == 1) && (r >= 0))) {
 			setMapObjectsFlag(MAIN_D_801353B8, MAIN_D_801353BA, 1);
 			TRN2_awardSpeedTrainingGains(PARTNER_ENTITY.digimonEntity.entity.type, instanceId, r);
 			startAnimation(&PARTNER_ENTITY.digimonEntity.entity, 0x12);
@@ -132,17 +134,20 @@ void TRN2_func_8008AA84(int8_t arg)
 	}
 }
 
-void TRN2_awardHpTrainingGains(int32_t a, int32_t b, int32_t c)
+void TRN2_awardHpTrainingGains(a, b, c)
+int32_t a;
+int16_t b;
+int32_t c;
 {
 	int16_t x;
 	int16_t y;
-	int16_t energy;
-	int16_t tired;
-	int16_t happy;
 	int16_t v;
 	int16_t flag;
+	int16_t tired;
+	int16_t energy;
+	int16_t happy;
 
-	x = y = 0;
+	x = flag = y = 0;
 	tired = energy = happy = 0;
 	switch (b) {
 	case 1:
@@ -161,14 +166,13 @@ void TRN2_awardHpTrainingGains(int32_t a, int32_t b, int32_t c)
 	}
 
 	v = TRN2_calculateTrainingMultiplier(a, 0);
-	flag = PARTNER_PARA.trainBoostFlag;
-	if (flag & 0x10) {
+	if (PARTNER_PARA.trainBoostFlag & 0x10) {
 		x = (x * (v * PARTNER_PARA.trainBoostValue)) / 100;
 	} else {
 		x = (x * v) / 10;
 	}
 
-	if (flag & 0x10) {
+	if (PARTNER_PARA.trainBoostFlag & 0x10) {
 		y = (y * (v * PARTNER_PARA.trainBoostValue)) / 100;
 	} else {
 		y = (y * v) / 10;
@@ -231,13 +235,13 @@ no:
 
 void TRN2_awardMpTrainingGains(int32_t a, int16_t b, int32_t c)
 {
+	int16_t flag;
 	int16_t x;
 	int16_t y;
 	int16_t tired;
 	int16_t energy;
 	int16_t happy;
 	int16_t v;
-	int16_t flag;
 
 	x = y = 0;
 	tired = energy = happy = 0;
@@ -249,8 +253,7 @@ void TRN2_awardMpTrainingGains(int32_t a, int16_t b, int32_t c)
 	}
 
 	v = TRN2_calculateTrainingMultiplier(a, 1);
-	flag = PARTNER_PARA.trainBoostFlag;
-	if (flag & 0x20) {
+	if (PARTNER_PARA.trainBoostFlag & 0x20) {
 		x = (x * (v * PARTNER_PARA.trainBoostValue)) / 100;
 	} else {
 		x = (x * v) / 10;
@@ -278,14 +281,15 @@ void TRN2_awardMpTrainingGains(int32_t a, int16_t b, int32_t c)
 
 void TRN2_awardOffenseTrainingGains(int32_t a, int16_t b, int32_t c)
 {
+	int16_t flag;
 	int16_t x;
+	int16_t y;
 	int16_t tired;
 	int16_t energy;
 	int16_t happy;
 	int16_t v;
-	int16_t flag;
 
-	x = happy = 0;
+	flag = x = y = 0;
 	tired = energy = happy = 0;
 	if (b == 1) {
 		x = 12;
@@ -295,8 +299,7 @@ void TRN2_awardOffenseTrainingGains(int32_t a, int16_t b, int32_t c)
 	}
 
 	v = TRN2_calculateTrainingMultiplier(a, 2);
-	flag = PARTNER_PARA.trainBoostFlag;
-	if (flag & 1) {
+	if (PARTNER_PARA.trainBoostFlag & 1) {
 		x = (x * (v * PARTNER_PARA.trainBoostValue)) / 100;
 	} else {
 		x = (x * v) / 10;
@@ -322,16 +325,20 @@ void TRN2_awardOffenseTrainingGains(int32_t a, int16_t b, int32_t c)
 	TRN2_advanceTrainingTime(tired, energy, happy);
 }
 
-void TRN2_awardSpeedTrainingGains(int32_t a, int32_t b, int32_t c)
+void TRN2_awardSpeedTrainingGains(a, b, c)
+int32_t a;
+int16_t b;
+int32_t c;
 {
+	int16_t flag;
 	int16_t x;
+	int16_t y;
 	int16_t tired;
 	int16_t energy;
 	int16_t happy;
 	int16_t v;
-	int16_t flag;
 
-	x = 0;
+	y = x = 0;
 	tired = energy = happy = 0;
 	if (b == 1) {
 		x = 12;
@@ -341,8 +348,7 @@ void TRN2_awardSpeedTrainingGains(int32_t a, int32_t b, int32_t c)
 	}
 
 	v = TRN2_calculateTrainingMultiplier(a, 4);
-	flag = PARTNER_PARA.trainBoostFlag;
-	if (flag & 4) {
+	if (PARTNER_PARA.trainBoostFlag & 4) {
 		x = (x * (v * PARTNER_PARA.trainBoostValue)) / 100;
 	} else {
 		x = (x * v) / 10;
@@ -368,17 +374,24 @@ void TRN2_awardSpeedTrainingGains(int32_t a, int32_t b, int32_t c)
 	TRN2_advanceTrainingTime(tired, energy, happy);
 }
 
-void TRN2_awardDefenseTrainingGains(int32_t a, int32_t b, int32_t c)
+void TRN2_awardDefenseTrainingGains(a, b, c)
+int32_t a;
+int16_t b;
+int32_t c;
 {
 	int16_t x;
 	int16_t y;
-	int16_t energy;
-	int16_t tired;
-	int16_t happy;
 	int16_t v;
+	int16_t unused1;
+	int16_t unused2;
+	int16_t unused3;
 	int16_t flag;
+	int16_t z;
+	int16_t tired;
+	int16_t energy;
+	int16_t happy;
 
-	x = y = happy = 0;
+	flag = x = y = z = 0;
 	tired = energy = happy = 0;
 	switch (b) {
 	case 1:
@@ -397,14 +410,13 @@ void TRN2_awardDefenseTrainingGains(int32_t a, int32_t b, int32_t c)
 	}
 
 	v = TRN2_calculateTrainingMultiplier(a, 3);
-	flag = PARTNER_PARA.trainBoostFlag;
-	if (flag & 2) {
+	if (PARTNER_PARA.trainBoostFlag & 2) {
 		x = (x * (v * PARTNER_PARA.trainBoostValue)) / 100;
 	} else {
 		x = (x * v) / 10;
 	}
 
-	if (flag & 2) {
+	if (PARTNER_PARA.trainBoostFlag & 2) {
 		y = (y * (v * PARTNER_PARA.trainBoostValue)) / 100;
 	} else {
 		y = (y * v) / 10;
