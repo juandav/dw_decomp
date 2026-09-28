@@ -56,6 +56,9 @@ $(eval $(call overlay,BTL,btl))
 $(eval $(call overlay,DGET,dget))
 $(eval $(call overlay,DOO2,doo2))
 $(eval $(call overlay,DOOA,dooa))
+EAB_C_SRC := \
+	src/eab/eab_bss.c
+
 $(eval $(call overlay,EAB,eab))
 $(eval $(call overlay,ENDI,endi))
 $(eval $(call overlay,EVL,evl))

@@ -25,6 +25,7 @@ options:
 
   symbol_addrs_path:
     - config/jp/symbols.txt
+    - config/jp/symbols_eab.txt
 
   undefined_funcs_auto_path: build/jp/psx/generated/undefined_funcs_auto_eab.txt
   undefined_syms_auto_path: build/jp/psx/generated/undefined_syms_auto_eab.txt
@@ -60,5 +61,6 @@ segments:
     subsegments:
       - [0x40, asm, eab]
       - [0x1D7C, data, eab]
+      - [0x1E70, .data, eab_bss]
 
   - [0x26F0]
