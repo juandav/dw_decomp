@@ -21,10 +21,10 @@ extern int16_t EVOLUTION_TARGET;
 
 extern Stats DEATH_STATS;
 
-int32_t calculateRequirementScore(int32_t current, int16_t target,
-                                  int8_t isMaxCM, int8_t isMaxBattles,
-                                  int8_t currentBest);
-int32_t getNumMasteredMoves(void);
+int8_t calculateRequirementScore(int32_t current, int8_t target,
+                                 int8_t isMaxCM, int8_t isMaxBattles,
+                                 int8_t currentBest);
+int8_t getNumMasteredMoves(void);
 
 // clang-format off
 EvoRequirements EVO_REQ_DATA[63] = {
@@ -694,9 +694,12 @@ int16_t getFreshEvolutionTarget(int32_t currentDigimon) {
 }
 
 int16_t getInTrainingEvolutionTarget(int32_t currentDigimon) {
-  int32_t i;
   int8_t *targetPtr;
+  int8_t requirementScore;
   int32_t currentBest;
+  int32_t i;
+  int8_t isMaxCM;
+  int8_t isMaxBattles;
   int8_t bestScore;
 
   currentBest = -1;
@@ -704,18 +707,15 @@ int16_t getInTrainingEvolutionTarget(int32_t currentDigimon) {
   targetPtr = EVO_PATHS_DATA[currentDigimon - 1].to;
 
   for (i = 0; i < 6; i++) {
-    int32_t flag;
-    int8_t requirementScore;
-
     if (*targetPtr == -1) {
       targetPtr++;
       continue;
     }
 
-    flag = EVO_REQ_DATA[(int32_t)*targetPtr].flags;
-    requirementScore = calculateRequirementScore(currentDigimon, *targetPtr,
-                                                 ((flag & 0x10) >> 4),
-                                                 (flag & 1), currentBest);
+    isMaxCM = (EVO_REQ_DATA[*targetPtr].flags & 0x10) >> 4;
+    isMaxBattles = EVO_REQ_DATA[*targetPtr].flags & 1;
+    requirementScore = calculateRequirementScore(
+        currentDigimon, *targetPtr, isMaxCM, isMaxBattles, currentBest);
 
     if (bestScore < requirementScore && requirementScore >= 3) {
       currentBest = *targetPtr;
@@ -728,55 +728,50 @@ int16_t getInTrainingEvolutionTarget(int32_t currentDigimon) {
 }
 
 int16_t getRookieEvolutionTarget(int32_t currentDigimon) {
-  int32_t i;
   int8_t *targetPtr;
   int32_t currentBestDigimon;
+  int32_t i;
   int16_t bestScore;
   int16_t statCount;
   int16_t statTotal;
+  int8_t isMaxCM;
+  int8_t isMaxBattles;
 
   targetPtr = EVO_PATHS_DATA[currentDigimon - 1].to;
   currentBestDigimon = -1;
   bestScore = statTotal = statCount = 0U;
 
   for (i = 0; i < 6; i++) {
-    int32_t requirementScore;
-    int32_t flag;
-
     if (*targetPtr == -1) {
       targetPtr++;
       continue;
     }
 
-    flag = EVO_REQ_DATA[(int32_t)*targetPtr].flags;
-    requirementScore = calculateRequirementScore(
-        currentDigimon, *targetPtr, ((flag & 0x10) >> 4), (flag & 1),
-        currentBestDigimon);
-
-    if (requirementScore >= 3) {
-      int32_t targetId = *targetPtr;
-
-      if (EVO_REQ_DATA[targetId].hp != -1) {
+    isMaxCM = (EVO_REQ_DATA[*targetPtr].flags & 0x10) >> 4;
+    isMaxBattles = EVO_REQ_DATA[*targetPtr].flags & 1;
+    if (calculateRequirementScore(currentDigimon, *targetPtr, isMaxCM,
+                                  isMaxBattles, currentBestDigimon) >= 3) {
+      if (EVO_REQ_DATA[(int32_t)*targetPtr].hp != -1) {
         statTotal += PARTNER_ENTITY.digimonEntity.stats.base.hp / 10;
         statCount++;
       }
-      if (EVO_REQ_DATA[targetId].mp != -1) {
+      if (EVO_REQ_DATA[(int32_t)*targetPtr].mp != -1) {
         statTotal += PARTNER_ENTITY.digimonEntity.stats.base.mp / 10;
         statCount++;
       }
-      if (EVO_REQ_DATA[targetId].offense != -1) {
+      if (EVO_REQ_DATA[(int32_t)*targetPtr].offense != -1) {
         statTotal += PARTNER_ENTITY.digimonEntity.stats.base.off;
         statCount++;
       }
-      if (EVO_REQ_DATA[targetId].defense != -1) {
+      if (EVO_REQ_DATA[(int32_t)*targetPtr].defense != -1) {
         statTotal += PARTNER_ENTITY.digimonEntity.stats.base.def;
         statCount++;
       }
-      if (EVO_REQ_DATA[targetId].speed != -1) {
+      if (EVO_REQ_DATA[(int32_t)*targetPtr].speed != -1) {
         statTotal += PARTNER_ENTITY.digimonEntity.stats.base.speed;
         statCount++;
       }
-      if (EVO_REQ_DATA[targetId].brain != -1) {
+      if (EVO_REQ_DATA[(int32_t)*targetPtr].brain != -1) {
         statTotal += PARTNER_ENTITY.digimonEntity.stats.base.brain;
         statCount++;
       }
@@ -798,55 +793,50 @@ int16_t getRookieEvolutionTarget(int32_t currentDigimon) {
 }
 
 int16_t getChampionEvolutionTarget(int32_t currentDigimon) {
-  int32_t i;
   int8_t *targetPtr;
   int32_t currentBestDigimon;
+  int32_t i;
   int16_t bestScore;
   int16_t statCount;
   int16_t statTotal;
+  int8_t isMaxCM;
+  int8_t isMaxBattles;
 
   targetPtr = EVO_PATHS_DATA[currentDigimon - 1].to;
   currentBestDigimon = -1;
   bestScore = statTotal = statCount = 0U;
 
   for (i = 0; i < 6; i++) {
-    int32_t requirementScore;
-    int32_t flag;
-
     if (*targetPtr == -1) {
       targetPtr++;
       continue;
     }
 
-    flag = EVO_REQ_DATA[(int32_t)*targetPtr].flags;
-    requirementScore = calculateRequirementScore(
-        currentDigimon, *targetPtr, ((flag & 0x10) >> 4), (flag & 1),
-        currentBestDigimon);
-
-    if (requirementScore >= 3) {
-      int32_t targetId = *targetPtr;
-
-      if (EVO_REQ_DATA[targetId].hp != -1) {
+    isMaxCM = (EVO_REQ_DATA[*targetPtr].flags & 0x10) >> 4;
+    isMaxBattles = EVO_REQ_DATA[*targetPtr].flags & 1;
+    if (calculateRequirementScore(currentDigimon, *targetPtr, isMaxCM,
+                                  isMaxBattles, currentBestDigimon) >= 3) {
+      if (EVO_REQ_DATA[(int32_t)*targetPtr].hp != -1) {
         statTotal += PARTNER_ENTITY.digimonEntity.stats.base.hp / 10;
         statCount++;
       }
-      if (EVO_REQ_DATA[targetId].mp != -1) {
+      if (EVO_REQ_DATA[(int32_t)*targetPtr].mp != -1) {
         statTotal += PARTNER_ENTITY.digimonEntity.stats.base.mp / 10;
         statCount++;
       }
-      if (EVO_REQ_DATA[targetId].offense != -1) {
+      if (EVO_REQ_DATA[(int32_t)*targetPtr].offense != -1) {
         statTotal += PARTNER_ENTITY.digimonEntity.stats.base.off;
         statCount++;
       }
-      if (EVO_REQ_DATA[targetId].defense != -1) {
+      if (EVO_REQ_DATA[(int32_t)*targetPtr].defense != -1) {
         statTotal += PARTNER_ENTITY.digimonEntity.stats.base.def;
         statCount++;
       }
-      if (EVO_REQ_DATA[targetId].speed != -1) {
+      if (EVO_REQ_DATA[(int32_t)*targetPtr].speed != -1) {
         statTotal += PARTNER_ENTITY.digimonEntity.stats.base.speed;
         statCount++;
       }
-      if (EVO_REQ_DATA[targetId].brain != -1) {
+      if (EVO_REQ_DATA[(int32_t)*targetPtr].brain != -1) {
         statTotal += PARTNER_ENTITY.digimonEntity.stats.base.brain;
         statCount++;
       }
@@ -864,12 +854,17 @@ int16_t getChampionEvolutionTarget(int32_t currentDigimon) {
   return currentBestDigimon;
 }
 
-int32_t handleSpecialEvolutions(int32_t mode, Entity *entity) {
+// clang-format off
+int32_t handleSpecialEvolutions(mode, entity)
+  int8_t mode;
+  Entity *entity;
+// clang-format on
+{
   int32_t type;
   int16_t level;
   int16_t def;
-  int16_t happiness;
   int16_t discipline;
+  int16_t happiness;
   int16_t evotimer;
   int16_t battles;
   int16_t tiredness;
@@ -936,18 +931,24 @@ int32_t handleSpecialEvolutions(int32_t mode, Entity *entity) {
   return evoTarget;
 }
 
-int32_t calculateRequirementScore(int32_t current, int16_t target,
-                                  int8_t isMaxCM, int8_t isMaxBattles,
-                                  int8_t currentBest_) {
+int8_t calculateRequirementScore(int32_t current, int8_t target,
+                                 int8_t isMaxCM, int8_t isMaxBattles,
+                                 int8_t currentBest) {
   EvoRequirements *reqs;
   BaseStats *partnerEntity;
   PartnerPara *partner;
-  int8_t reqPoints;
-  int8_t isBonusFulfilled;
+  int32_t isTargetRaised;
+  int32_t isCurrentBestRaised;
   int16_t statsArray[6];
   int16_t statsArray2[6];
   int16_t reqArray[6];
-  int32_t currentBest = currentBest_;
+  int32_t i;
+  int32_t j;
+  int32_t isHighestStat;
+  int32_t highestStat;
+  int8_t reqPoints;
+  int8_t numMoves;
+  int8_t isBonusFulfilled;
 
   reqs = &EVO_REQ_DATA[target];
   partnerEntity = &PARTNER_ENTITY.digimonEntity.stats.base;
@@ -966,9 +967,6 @@ int32_t calculateRequirementScore(int32_t current, int16_t target,
     reqPoints += 1;
 
   if (DIGIMON_DATA[target].level == 3U) {
-    int32_t i;
-    int32_t highestStat;
-
     statsArray[0] = statsArray2[0] = partnerEntity->hp / 10;
     statsArray[1] = statsArray2[1] = partnerEntity->mp / 10;
     statsArray[2] = statsArray2[2] = partnerEntity->off;
@@ -983,9 +981,7 @@ int32_t calculateRequirementScore(int32_t current, int16_t target,
     reqArray[5] = reqs->brain;
 
     for (i = 0; i < 6; i++) {
-      int32_t j;
-      int8_t isHighestStat = 1;
-
+      isHighestStat = 1;
       for (j = 0; j < 6; j++) {
         if (statsArray[i] < statsArray[j])
           isHighestStat = 0;
@@ -1010,20 +1006,20 @@ int32_t calculateRequirementScore(int32_t current, int16_t target,
   isBonusFulfilled = 0;
   if (reqs->digimon != -1 && current == reqs->digimon)
     isBonusFulfilled = 1;
-  if (reqs->discipline != -1 && reqs->discipline <= partner->discipline)
+  if (reqs->discipline != -1 && partner->discipline >= reqs->discipline)
     isBonusFulfilled = 1;
-  if (reqs->happiness != -1 && reqs->happiness <= partner->happiness)
+  if (reqs->happiness != -1 && partner->happiness >= reqs->happiness)
     isBonusFulfilled = 1;
   if (reqs->battles != -1) {
     if (isMaxBattles == 0) {
-      if (reqs->battles <= partner->battles)
+      if (partner->battles >= reqs->battles)
         isBonusFulfilled = 1;
-    } else if (reqs->battles >= partner->battles) {
+    } else if (partner->battles <= reqs->battles) {
       isBonusFulfilled = 1;
     }
   }
   if (reqs->techs != -1) {
-    int8_t numMoves = getNumMasteredMoves();
+    numMoves = getNumMasteredMoves();
     if (numMoves >= reqs->techs)
       isBonusFulfilled = 1;
   }
@@ -1031,9 +1027,6 @@ int32_t calculateRequirementScore(int32_t current, int16_t target,
   reqPoints += isBonusFulfilled;
 
   if (reqPoints >= 3 && currentBest != -1) {
-    int32_t isTargetRaised;
-    int32_t isCurrentBestRaised;
-
     isTargetRaised = hasDigimonRaised(EVO_GAINS_DATA[target].targetDigimon);
     isCurrentBestRaised =
         hasDigimonRaised(EVO_GAINS_DATA[currentBest].targetDigimon);
@@ -1048,7 +1041,7 @@ int32_t calculateRequirementScore(int32_t current, int16_t target,
   return reqPoints;
 }
 
-int32_t getNumMasteredMoves(void) {
+int8_t getNumMasteredMoves(void) {
   int8_t moveCount = 0;
   int32_t i;
   int32_t j;
@@ -1063,10 +1056,16 @@ int32_t getNumMasteredMoves(void) {
   return moveCount;
 }
 
-void reincarnatePartner(int32_t unused, Stats *stats, PartnerPara *partner,
-                        int32_t digimonId) {
-  int32_t id;
+// clang-format off
+void reincarnatePartner(unused, stats, partner, digimonId)
+  int32_t unused;
+  Stats *stats;
+  PartnerPara *partner;
+  int16_t digimonId;
+// clang-format on
+{
   EvoStatsGains *ptr;
+  int32_t id;
   int32_t previousId;
 
   DEATH_STATS = *stats;
@@ -1078,7 +1077,7 @@ void reincarnatePartner(int32_t unused, Stats *stats, PartnerPara *partner,
   PARTNER_ENTITY.digimonEntity.stats.base.moves[2] = 0xff;
   PARTNER_ENTITY.digimonEntity.stats.base.moves[3] = 0xff;
   previousId = PARTNER_ENTITY.digimonEntity.entity.type;
-  removeEntity(previousId, 1);
+  removeEntity(PARTNER_ENTITY.digimonEntity.entity.type, 1);
   ENTITY_TABLE[1] = NULL;
   thunkUnloadModel(previousId, 3);
   initializeReincarnatedPartner(id, 0, 0, 0, 0, 0, 0);

@@ -52,6 +52,7 @@ SECTIONS
         KEEP(BUILD_DIR/asm/main/59A5C.s.o(.text .text.*));
         BUILD_DIR/src/main/entity_text.c.o(.text .text.*);
         KEEP(BUILD_DIR/asm/main/621F4.s.o(.text .text.*));
+        BUILD_DIR/src/main/evolution.c.o(.text .text.*);
         BUILD_DIR/src/main/file_queue.c.o(.text .text.*);
         BUILD_DIR/src/main/graphics2.c.o(.text .text.*);
         BUILD_DIR/src/main/fish.c.o(.text .text.*);
@@ -106,6 +107,7 @@ SECTIONS
         BUILD_DIR/src/main/sound.c.o(.rodata .rodata.*);
         BUILD_DIR/src/main/clock.c.o(.rodata .rodata.*);
         BUILD_DIR/src/main/entity_text.c.o(.rodata .rodata.*);
+        BUILD_DIR/src/main/evolution.c.o(.rodata .rodata.*);
         BUILD_DIR/src/main/file_queue.c.o(.rodata .rodata.*);
         BUILD_DIR/src/main/fish.c.o(.rodata .rodata.*);
         BUILD_DIR/src/main/utils.c.o(.rodata .rodata.*);
@@ -134,6 +136,7 @@ SECTIONS
         KEEP(BUILD_DIR/asm/main/data/A6B98.data.s.o(.data .data.*));
         BUILD_DIR/src/main/entity_text.c.o(.data .data.*);
         KEEP(BUILD_DIR/asm/main/data/A6BF4.data.s.o(.data .data.*));
+        BUILD_DIR/src/main/evolution.c.o(.data .data.*);
         BUILD_DIR/src/main/utils.c.o(.data .data.*);
         BUILD_DIR/src/main/efe_table.c.o(.data .data.*);
         BUILD_DIR/src/main/sound_async.c.o(.data .data.*);

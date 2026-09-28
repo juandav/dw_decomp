@@ -36,6 +36,7 @@ MAIN_C_SRC := \
 	src/main/efe_table.c \
 	src/main/entity_text.c \
 	src/main/evl.c \
+	src/main/evolution.c \
 	src/main/fade.c \
 	src/main/file.c \
 	src/main/file_queue.c \
