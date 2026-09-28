@@ -2,11 +2,11 @@
 
 #include <dw/anim.h>
 #include <dw/entity.h>
+#include <dw/input.h>
 #include <dw/params.h>
 #include <dw/partner.h>
 #include <dw/script.h>
 #include <dw/sound.h>
-#include <dw/tamer.h>
 #include <dw/trn.h>
 #include <dw/types.h>
 #include <dw/ui.h>
@@ -16,6 +16,8 @@ extern int32_t TRAINING_COMPLETE;
 
 void createCameraMovement(VECTOR *pos, int32_t speed);
 void entityLookAtLocation(Entity *entity, VECTOR *pos);
+void setTamerState(int8_t state);
+int32_t tickEntityWalkTo();
 void TRN_tickBrainsTraining(int32_t instanceId);
 
 static void *trn_brain_functions[] = {
@@ -88,7 +90,8 @@ static void trn_brain__garbage__(void)
 	TRN_D_8008F368[3] = (v19 * v0) + v1;
 }
 
-void TRN_setupBrainsTraining(int32_t arg)
+void TRN_setupBrainsTraining(arg)
+int16_t arg;
 {
 	switch (arg) {
 	case 0x70:
@@ -192,7 +195,7 @@ void TRN_tickBrainsTraining(int32_t instanceId)
 		if (MAIN_D_80135370 == 1) {
 			r = TRN_getSlotSessionResult();
 		}
-		if ((((MAIN_D_8013537A >= 0x4b0) || (POLLED_INPUT & 0x10)) && (MAIN_D_80135370 == 0)) || ((MAIN_D_80135370 == 1) && (r >= 0))) {
+		if ((((MAIN_D_8013537A >= 0x4b0) || (POLLED_INPUT & CANCEL_BUTTON)) && (MAIN_D_80135370 == 0)) || ((MAIN_D_80135370 == 1) && (r >= 0))) {
 			TRN_awardBrainsTrainingGains(PARTNER_ENTITY.digimonEntity.entity.type, 0, r);
 			startAnimation(&PARTNER_ENTITY.digimonEntity.entity, 0x12);
 			createCameraMovement(&TAMER_ENTITY.entity.posData->location, 10);

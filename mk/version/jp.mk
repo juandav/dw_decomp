@@ -81,6 +81,7 @@ TRN2_C_SRC := \
 
 $(eval $(call overlay,TRN2,trn2))
 TRN_C_SRC := \
+	src/trn/trn_brain.c \
 	src/trn/trn_hp.c \
 	src/trn/trn_mp.c \
 	src/trn/trn_speed.c \
