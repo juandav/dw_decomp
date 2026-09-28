@@ -37,6 +37,6 @@ void renderHealingParticles(int32_t instance);
 
 void initializeHealingParticles();
 
-int32_t addHealingParticleEffect(Entity *entity, int16_t hasParticle2);
+int32_t addHealingParticleEffect(Entity *entity, int32_t hasParticle2);
 
 #endif

@@ -16,14 +16,17 @@ int32_t _sin(int32_t);
 
 void tickHealingParticles(int32_t instance) {
     int32_t i;
-    int32_t angle;
     HealingParticle *particle;
 
     ParticleObjEntry *entries1;
     ParticleObjEntry *entries2;
+    ParticleObjEntry *entry2;
+    ParticleObjEntry *entries3;
+    ParticleObjEntry *entries4;
+    ParticleObjEntry *entries5;
+    int32_t angle;
 
     ParticleObjEntry *entry1;
-    ParticleObjEntry *entry2;
 
     MATRIX rotMat;
     SVECTOR rotateVec;
@@ -33,6 +36,9 @@ void tickHealingParticles(int32_t instance) {
 
     entries1 = particle->entries1;
     entries2 = particle->entries2;
+    entries3 = &particle->entries2[5];
+    entries4 = &particle->entries2[10];
+    entries5 = &particle->entries2[15];
 
     particle->frameId++;
     if (particle->frameId >= 44) {
@@ -51,8 +57,7 @@ void tickHealingParticles(int32_t instance) {
         RotMatrixZYX(&rotateVec, &rotMat);
 
         radiusVec.vx = particle->radius;
-        radiusVec.vz = 0;
-        radiusVec.vy = 0;
+        radiusVec.vy = radiusVec.vz = 0;
         ApplyMatrixSV(&rotMat, &radiusVec, &entry1->pos);
 
         entry1->pos.vx += particle->off.vx;
@@ -94,10 +99,19 @@ void tickHealingParticles(int32_t instance) {
 
 void renderHealingParticles(int32_t instance) {
     int32_t i;
+    HealingParticle *particle;
+    ParticleObjEntry *obj1;
+    ParticleObjEntry *obj2;
+    ParticleObjEntry *obj3;
+    ParticleObjEntry *obj4;
+    ParticleObjEntry *obj5;
 
-    HealingParticle *particle = &HEALING_PARTICLES[instance];
-    ParticleObjEntry *obj1 = particle->entries1;
-    ParticleObjEntry *obj2 = particle->entries2;
+    particle = &HEALING_PARTICLES[instance];
+    obj1 = particle->entries1;
+    obj2 = particle->entries2;
+    obj3 = &particle->entries2[5];
+    obj4 = &particle->entries2[10];
+    obj5 = &particle->entries2[15];
 
     for (i = 0; i < NUM_HEALING_PARTICLES; i++) {
         // long cast needed for match
@@ -127,13 +141,12 @@ void initializeHealingParticles() {
     }
 }
 
-int32_t addHealingParticleEffect(Entity *entity, int16_t hasParticle2) {
+int32_t addHealingParticleEffect(Entity *entity, int32_t hasParticle2) {
     int32_t instance;
     int32_t i;
-    PositionData *posData;
     HealingParticle *particle;
-    ParticleObjEntry *entry;
     MATRIX *mat;
+    ParticleObjEntry *entry;
 
     for (instance = 0; instance < NUM_HEALING_INSTANCES; instance++) {
         if (HEALING_PARTICLES[instance].frameId == (-1)) {
@@ -147,8 +160,7 @@ int32_t addHealingParticleEffect(Entity *entity, int16_t hasParticle2) {
 
     particle = &HEALING_PARTICLES[instance];
     particle->frameId = 0;
-    posData = entity->posData;
-    mat = &posData->posMatrix.workm;
+    mat = &entity->posData->posMatrix.workm;
     particle->off.vx = mat->t[0];
     particle->off.vy = -DIGIMON_DATA[entity->type].height - 70;
     particle->off.pad = -particle->off.vy / 10;

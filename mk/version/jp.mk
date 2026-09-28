@@ -38,6 +38,7 @@ MAIN_C_SRC := \
 	src/main/overworld_medal_text.c \
 	src/main/overworld_moves_text.c \
 	src/main/overworld_playerinfo_text.c \
+	src/main/particle.c \
 	src/main/toilet_data.c \
 	src/main/tournament.c \
 	src/main/world_object.c
