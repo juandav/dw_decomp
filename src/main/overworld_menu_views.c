@@ -1,5 +1,6 @@
 #include <string.h>
 
+#include <dw/clock.h>
 #include <dw/entity.h>
 #include <dw/graphics.h>
 #include <dw/main.h>
@@ -53,7 +54,7 @@ extern char MAIN_D_80123E78[];
 int32_t drawDigimonMovesText(void);
 u_short GetTPage(int32_t tp, int32_t abr, int32_t x, int32_t y);
 u_short GetClut(int32_t x, int32_t y);
-void renderRectPolyFT4(int16_t posX, int16_t posY, int32_t width,
+void renderRectPolyFT4(int16_t posX, int16_t posY, uint8_t width,
 		       uint8_t height, uint8_t texX, uint8_t texY,
 		       int16_t texturePage, int16_t clut, int32_t zIndex,
 		       int8_t flag);
@@ -64,7 +65,7 @@ void renderDigimonMoveBox(void);
 void renderLinePrimitive(int32_t color, int32_t x0, int32_t y0, int32_t x1,
 			 int32_t y1, int32_t otz, int32_t flag);
 int32_t getCardAmount(uint8_t card);
-int32_t loadStackedTIMEntry(char *path, void *buffer, int32_t offset,
+int32_t loadStackedTIMEntry(char *path, u_long buffer, int32_t offset,
 			     int32_t sectors);
 void renderNumber(int32_t a, int32_t b, int32_t c, int32_t d, int32_t e,
 		  int32_t f);
@@ -76,7 +77,7 @@ int32_t loadCardImage(int32_t id);
 void renderCardImage(void);
 void renderCardCount(void);
 void renderDigimonStatsView(void);
-void renderMenuTab(int16_t x, int16_t w, int8_t layer);
+void renderMenuTab(int16_t x, int8_t w, int8_t layer);
 void renderPlayerInfoView(void);
 
 static void *overworld_menu_views_functions[] = {
@@ -89,20 +90,16 @@ static void *overworld_menu_views_functions[] = {
 	loadCardImage,
 };
 
-int32_t loadCardImage(int32_t id)
+int32_t loadCardImage(id)
+int8_t id;
 {
-	return loadStackedTIMEntry(MAIN_D_80123E78, TEXTURE_BUFFER,
+	return loadStackedTIMEntry(MAIN_D_80123E78, (u_long)TEXTURE_BUFFER,
 				    id * 0xe, 0xe);
 }
 
 void renderCardImage(void)
 {
-	int16_t tpage;
-	int16_t clut;
-
-	tpage = GetTPage(1, 0, 576, 256);
-	clut = GetClut(448, 511);
-	renderRectPolyFT4(-0x4b, -0x54, 0x96, 0xb4, 0, 0, tpage, clut, 4, 0);
+	renderRectPolyFT4(-0x4b, -0x54, 0x96, 0xb4, 0, 0, GetTPage(1, 0, 576, 256), GetClut(448, 511), 4, 0);
 }
 
 void renderCardCount(void)
@@ -126,18 +123,17 @@ extern uint16_t PLAYTIME_FRAMES;
 
 void renderDigimonStatsView(void)
 {
-	StatsIconClutTable cluts;
-	StringRect *sr;
-	IconRect *icon;
 	RECT *r;
+	StringRect *sr;
+	StatsIconClutTable cluts;
+	IconRect *icon;
 	int32_t i;
 	int32_t j;
+	int16_t w;
 	int16_t k;
-	int32_t x;
 	int16_t special;
 	int16_t clut;
-	int16_t w;
-	int32_t frame;
+	uint8_t frame;
 
 	cluts = MAIN_D_80123DB8;
 	switch (MENU_STATE) {
@@ -154,17 +150,34 @@ void renderDigimonStatsView(void)
 		}
 		for (j = 0; j < 0x15; j++) {
 			icon = &MAIN_D_8012437C[j];
-			renderRectPolyFT4((int16_t)icon->posX, (int16_t)icon->posY, icon->width, icon->height, icon->texX,
+			renderRectPolyFT4(icon->posX, icon->posY, icon->width, icon->height, icon->texX,
 					  icon->texY + 0x80, 5, GetClut(0x60, cluts.v[j] + 0x1e8), 5, 0);
 		}
 		renderString(0, -0x6d, -0x42, 0x48, 0xc, 0, 0x3c, 5, 0);
 		w = strlen(DIGIMON_DATA[ENTITY_TABLE[1]->type].name);
+#if defined(VERSION_JP)
+		renderString(0, -0x6d, -0x33, (w / 2) * 12, 0xc, 0x9c, 0x24, 5, 0);
+#else
 		w = w * 10;
 		if (w >= 0x79) {
 			w = 0x78;
 		}
 		renderString(0, -0x6c, -0x32, w, 0xc, 0, 0x48, 5, 0);
+#endif
 		renderNumber(0, -0x6d, -0x22, 2, PARTNER_PARA.age, 5);
+#if defined(VERSION_JP)
+		renderNumber(0, -0x26, -0x22, 2, PARTNER_PARA.weight, 5);
+		renderNumber(0, 0x23, 3, 4, PARTNER_ENTITY.digimonEntity.stats.current.currentHP, 5);
+		renderString(0, 0x53, 4, 0xc, 0xc, 0x3c, 0x30, 5, 0);
+		renderNumber(0, 0x5f, 3, 4, PARTNER_ENTITY.digimonEntity.stats.base.hp, 5);
+		renderNumber(0, 0x23, 0x12, 4, PARTNER_ENTITY.digimonEntity.stats.current.currentMP, 5);
+		renderString(0, 0x53, 0x13, 0xc, 0xc, 0x3c, 0x30, 5, 0);
+		renderNumber(0, 0x5f, 0x12, 4, PARTNER_ENTITY.digimonEntity.stats.base.mp, 5);
+		renderNumber(0, 0x23, 0x20, 4, PARTNER_ENTITY.digimonEntity.stats.base.off, 5);
+		renderNumber(0, 0x23, 0x30, 4, PARTNER_ENTITY.digimonEntity.stats.base.def, 5);
+		renderNumber(0, 0x23, 0x3f, 4, PARTNER_ENTITY.digimonEntity.stats.base.speed, 5);
+		renderNumber(0, 0x23, 0x4e, 4, PARTNER_ENTITY.digimonEntity.stats.base.brain, 5);
+#else
 		renderNumber(0, -0x23, -0x22, 2, PARTNER_PARA.weight, 5);
 		renderNumber(0, 0x23, 1, 4, PARTNER_ENTITY.digimonEntity.stats.current.currentHP, 5);
 		renderNumber(0, 0x5f, 1, 4, PARTNER_ENTITY.digimonEntity.stats.base.hp, 5);
@@ -174,13 +187,14 @@ void renderDigimonStatsView(void)
 		renderNumber(0, 0x23, 0x2e, 4, PARTNER_ENTITY.digimonEntity.stats.base.def, 5);
 		renderNumber(0, 0x23, 0x3d, 4, PARTNER_ENTITY.digimonEntity.stats.base.speed, 5);
 		renderNumber(0, 0x23, 0x4c, 4, PARTNER_ENTITY.digimonEntity.stats.base.brain, 5);
+#endif
 		renderDigimonStatsBar(PARTNER_ENTITY.digimonEntity.stats.base.hp, 0x270f, 0x64, 0x24, 0xc);
 		renderDigimonStatsBar(PARTNER_ENTITY.digimonEntity.stats.base.mp, 0x270f, 0x64, 0x24, 0x1b);
 		renderDigimonStatsBar(PARTNER_ENTITY.digimonEntity.stats.base.off, 0x3e7, 0x32, 0x24, 0x2a);
 		renderDigimonStatsBar(PARTNER_ENTITY.digimonEntity.stats.base.def, 0x3e7, 0x32, 0x24, 0x39);
 		renderDigimonStatsBar(PARTNER_ENTITY.digimonEntity.stats.base.speed, 0x3e7, 0x32, 0x24, 0x48);
 		renderDigimonStatsBar(PARTNER_ENTITY.digimonEntity.stats.base.brain, 0x3e7, 0x32, 0x24, 0x57);
-		for (i = 0, k = 0, x = 9; i < 3; i++) {
+		for (i = 0, k = 0; i < 3; i++) {
 			special = DIGIMON_DATA[ENTITY_TABLE[1]->type].special[i];
 			if (special != 0xff) {
 				clut = 0x7a06;
@@ -194,9 +208,8 @@ void renderDigimonStatsView(void)
 				} else {
 					frame = 0xc;
 				}
-				renderRectPolyFT4(x, -0x33, 0xc, 0xc, frame + (special * 0x18 + 0x24), 0x80, 5, clut, 5, 0);
+				renderRectPolyFT4(k + 9, -0x33, 0xc, 0xc, frame + (special * 0x18 + 0x24), 0x80, 5, clut, 5, 0);
 				k += 0xc;
-				x += 0xc;
 			}
 		}
 		if (DIGIMON_DATA[ENTITY_TABLE[1]->type].type != 0) {
@@ -250,21 +263,17 @@ void renderDigimonStatsView(void)
 void renderDigimonMovesView(void)
 {
 	extern uint8_t MAIN_D_80134237;
-	uint8_t uVar1;
-	uint16_t clut;
-	int32_t i;
-	int32_t iVar3;
-	int32_t iVar6;
-	int32_t j;
-	int32_t iVar7;
 	Move *mv;
-	IconRect *icon;
 	StringRect *sr;
+	int32_t row;
+	IconRect *icon;
+	int32_t i;
+	int32_t j;
 	if (MENU_STATE > 0 && MENU_STATE < 7) {
 		for (i = 0; i < 0xd; i++) {
 			icon = &MAIN_D_801241CC[i];
-			renderRectPolyFT4((int16_t)icon->posX,
-					  (int16_t)icon->posY,
+			renderRectPolyFT4(icon->posX,
+					  icon->posY,
 					  icon->width,
 					  icon->height,
 					  icon->texX,
@@ -273,15 +282,19 @@ void renderDigimonMovesView(void)
 		renderString(3, -0x8e, -0x57, 0x3c, 0xc, 0, 0x48, 5, 1);
 		j = 0;
 		while (j < 3) {
-			uVar1 = EQUIPPED_MOVES[j];
-			if (uVar1 != 0xff) {
+			if (EQUIPPED_MOVES[j] != 0xff) {
 				mv = &MOVE_DATA[EQUIPPED_MOVES[j]];
 				renderString(0, -0x7c, j * 0xf - 0x42, 0x78, 0xc, 0, j * 0xc + 0x18, 5, 1);
 				renderNumber(0, 0x10, j * 0xf - 0x43, 3, mv->power, 5);
 				renderNumber(0, 0x39, j * 0xf - 0x43, 3, mv->mpCost * 3, 5);
 				if (mv->range != 0) {
+#if defined(VERSION_JP)
+					renderString(0, 0x65, j * 0xf - 0x42, 0xc, 0xc,
+						     (mv->range - 1) * 0xc + 0x48, 0x6c, 5, 1);
+#else
 					renderString(0, 0x65, j * 0xf - 0x42, 0xc, 0xc,
 						     (mv->range - 1) * 0x24, 0x78, 5, 1);
+#endif
 				}
 				if (mv->status != 0) {
 					renderRectPolyFT4(0x7d, j * 0xf - 0x43, 0xc, 0xc,
@@ -302,7 +315,7 @@ void renderDigimonMovesView(void)
 		renderString(3, -0x8e, -0xf, 0x24, 0xc, 0x3c, 0x48, 5, 1);
 		for (i = 0; i < 3; i++) {
 			icon = &MAIN_D_801241CC[i];
-			renderRectPolyFT4((int16_t)icon->posX, -9,
+			renderRectPolyFT4(icon->posX, -9,
 					  icon->width,
 					  icon->height,
 					  icon->texX,
@@ -322,22 +335,29 @@ void renderDigimonMovesView(void)
 						  0x7a06, 5, 0);
 			}
 		}
+#if defined(VERSION_JP)
+		renderString(0xe, -0x82, 0x19, 0xc, 0xc, 0, 0x54, 5, 1);
+		renderString(0, -0x76, 0x19, 0xa8, 0xc, 0xc, 0x54, 5, 1);
+		renderString(0, -0x82, 0x27, 0x84, 0xc, 0, 0x60, 5, 1);
+		renderString(0xf, 2, 0x27, 0xc, 0xc, 0x84, 0x60, 5, 1);
+#else
 		renderString(0xf, -0x82, 0x19, 0xc, 0xc, 0, 0x54, 5, 1);
 		renderString(0, -0x76, 0x19, 0xa8, 0xc, 0xc, 0x54, 5, 1);
 		renderString(0, -0x76, 0x27, 0x84, 0xc, 0xc, 0x60, 5, 1);
 		renderString(7, -0x82, 0x27, 0xc, 0xc, 0, 0x60, 5, 1);
+#endif
 		renderString(0, 0xe, 0x27, 0x18, 0xc, 0x90, 0x60, 5, 1);
 		break;
 	case 2:
 	case 4:
-		UI_BOX_DATA[1].finalPos.h = UI_BOX_DATA[1].finalPos.h - 0x27;
+		UI_BOX_DATA[1].finalPos.h -= 0x27;
 		if (UI_BOX_DATA[1].finalPos.h < 0x4a) {
 			++MENU_STATE;
 		}
 		break;
 	case 3:
 	case 5:
-		UI_BOX_DATA[1].finalPos.h = UI_BOX_DATA[1].finalPos.h + 0x27;
+		UI_BOX_DATA[1].finalPos.h += 0x27;
 		if (0xbd < UI_BOX_DATA[1].finalPos.h) {
 			MENU_STATE = (MENU_STATE == 3) ? 6 : 1;
 		}
@@ -347,8 +367,8 @@ void renderDigimonMovesView(void)
 		renderSeperatorLines(TECH_VIEW_LINES3, 0xc, 5);
 		for (i = 0; i < 4; i++) {
 			icon = &MAIN_D_80124044[i];
-			renderRectPolyFT4((int16_t)icon->posX,
-					  (int16_t)icon->posY,
+			renderRectPolyFT4(icon->posX,
+					  icon->posY,
 					  icon->width,
 					  icon->height,
 					  icon->texX,
@@ -356,7 +376,12 @@ void renderDigimonMovesView(void)
 		}
 		renderString(0, -0x87, 0x20, 0x30, 0xc, 0x3c, 0, 5, 1);
 		renderString(0, -0x81, 0x2e, 0x24, 0xc, 0, 0x6c, 5, 1);
+#if defined(VERSION_JP)
+		renderString(0x10, -0x80, 0x4c, 0xc, 0xc, 0x24, 0x6c, 5, 1);
+		renderString(0, -0x74, 0x4c, 0x18, 0xc, 0x30, 0x6c, 5, 1);
+#else
 		renderString(0xc, -0x74, 0x4c, 0x18, 0xc, 0x30, 0x6c, 5, 1);
+#endif
 		renderRectPolyFT4(-0x74, 0x3c, 10, 10, 0x80, 0x8c, 5, 0x7b06, 5, 0);
 		j = 0;
 		while (j < 7) {
@@ -371,18 +396,11 @@ void renderDigimonMovesView(void)
 		}
 		renderRectPolyFT4(MAIN_D_80134D3A - 0xa0,
 				  MAIN_D_80134D38 - 0x78, 0x12, 0x10, 0xc0, 0x8c, 5, 0x7b06, 5, 0);
-		iVar3 = 0;
-		iVar6 = 0;
-		while (iVar3 < 7) {
-			j = 0;
-			while (j < 8) {
-				iVar7 = iVar6 - 7;
-				renderBoxBar((int16_t)(j * 0x12 - 0x2a), (int16_t)iVar7, 0xc, 0xc,
+		for (row = 0; row < 7; row++) {
+			for (j = 0; j < 8; j++) {
+				renderBoxBar(j * 0x12 - 0x2a, row * 0xf - 7, 0xc, 0xc,
 					     0x4e, 0x60, 0x6e, 0x80, 5);
-				j++;
 			}
-			iVar3++;
-			iVar6 += 0xf;
 		}
 		if (0xa8 < MAIN_D_80134D3A) {
 			renderDigimonMovesSelected(0);
@@ -400,9 +418,12 @@ void renderDigimonMovesView(void)
 		renderLinePrimitive(0x20202, -0x92, -4, 0x92, -4, 5, 0);
 		renderLinePrimitive(0xfad990, -0x93, -3, 0x93, -3, 5, 0);
 		renderLinePrimitive(0x20202, -0x92, -2, 0x92, -2, 5, 0);
-		iVar7 = 1;
-		renderString(3, -0x8e, -0x52, 0xa0, 0xc, 0, 0x30, 5, iVar7);
-		renderString(0xe, -0x72, -0x32, 0xc, 0xc, 0xcc, 0x30, 5, iVar7);
+#if defined(VERSION_JP)
+		renderString(3, -0x8e, -0x52, 0x54, 0xc, 0, 0x30, 5, 1);
+#else
+		renderString(3, -0x8e, -0x52, 0xa0, 0xc, 0, 0x30, 5, 1);
+#endif
+		renderString(0xe, -0x72, -0x32, 0xc, 0xc, 0xcc, 0x30, 5, 1);
 		renderString(0xe, 6, -0x21, 0xc, 0xc, 0xcc, 0x30, 5, 1);
 		renderString(0xe, -0x2a, -0x13, 0xc, 0xc, 0xcc, 0x30, 5, 1);
 		for (i = 0; i < 0xc; i++) {
@@ -411,30 +432,30 @@ void renderDigimonMovesView(void)
 				     sr->posY + 1,
 				     sr->uvWidth, 0xc,
 				     sr->uvX,
-				     sr->uvY, 5, iVar7);
+				     sr->uvY, 5, 1);
 		}
 		renderString(0, 0x42, 0x33, 0x3c, 0xc, 0x78, 0x48, 5, 1);
-		renderString(0, 0x42, 0x43, 0x3c, 0xc, 0x84, 0x54, 5, iVar7);
+		renderString(0, 0x42, 0x43, 0x3c, 0xc, 0x84, 0x54, 5, 1);
 		renderRectPolyFT4(-0x81, -0x41, 0xc, 0xc, 0xb4, 0x8c, 5, 0x7b06, 5, 0);
 		renderRectPolyFT4(-0x81, -0x22, 0xc, 0xc, 0xb4, 0x8c, 5, 0x7b06, 5, 0);
 		renderRectPolyFT4(-0x7b, 0x50, 0x12, 0x10, 0xc0, 0x8c, 5, 0x7b06, 5, 0);
 		for (i = 0; i < 7; i++) {
 			icon = &MAIN_D_80124294[i];
+#if !defined(VERSION_JP)
 			if (i != 2) {
-				if (i == 5) {
-					clut = getClut(96, 489);
-				} else {
-					clut = getClut(96, 488);
-				}
-				renderRectPolyFT4((int16_t)icon->posX,
-						  (int16_t)icon->posY,
-						  icon->width,
-						  icon->height,
-						  icon->texX,
-						  icon->texY + 0x80, 5, clut, 5, 0x80);
+#endif
+				renderRectPolyFT4(icon->posX, icon->posY, icon->width, icon->height,
+						  icon->texX, icon->texY + 0x80, 5,
+						  (i == 5) ? getClut(96, 489) : getClut(96, 488), 5, 0x80);
+#if !defined(VERSION_JP)
 			}
+#endif
 		}
+#if defined(VERSION_JP)
+		renderBoxBar(-0x18, -0x22, 0xc, 0xc, 200, 0, 0x28, 0x81, 4);
+#else
 		renderBoxBar(0x52, -0x22, 0xc, 0xc, 200, 0, 0x28, 0x81, 4);
+#endif
 		renderBoxBar(-0x78, 2, 0xc, 0xc, 200, 0, 0x28, 0x81, 4);
 		renderBoxBar(-0x78, 0x22, 0xc, 0xc, 0x4e, 0x60, 0x6e, 0x80, 4);
 		renderBoxBar(-0x78, 0x32, 0xc, 0xc, 0x68, 0x68, 0x68, 0x83, 4);
@@ -447,7 +468,7 @@ void renderDigimonMovesView(void)
 	}
 }
 
-void renderMenuTab(int16_t x, int16_t w, int8_t layer)
+void renderMenuTab(int16_t x, int8_t w, int8_t layer)
 {
 	int32_t i;
 	int8_t h;
@@ -466,80 +487,74 @@ void renderMenuTab(int16_t x, int16_t w, int8_t layer)
 void renderPlayerInfoView(void)
 {
 	int32_t i;
-	int32_t state;
 	StringRect *e;
 	RECT *r;
-	int32_t count;
 	int32_t j;
 	int32_t k;
 	int32_t n;
-	int32_t x;
-	int32_t trigger;
-	int32_t texX;
+	int8_t count;
 
-	state = MENU_STATE;
-
-	if (state == 1) {
-		goto grid;
-	}
-
-	if (state != 0) {
-		return;
-	}
-
-	if (drawPlayerInfoStrings() == 1) {
-		MENU_STATE = 1;
-	}
-
-	return;
-
-grid:
-	renderSeperatorLines(MAIN_D_80124424, 0xb, 5);
-
-	for (i = 0; i < 0xb; i++) {
-		e = &MAIN_D_801244EC[i];
-		renderString(3 - ((i / 7) * 3), e->posX, e->posY + 1, e->uvWidth, 0xc, e->uvX,
-			     e->uvY, 5, 1);
-	}
-
-	renderString(0, -0x54, -0x50, 0x48, 0xc, 0, 0x30, 5, 1);
-	renderNumber(0, 0x35, -0x36, 2, TAMER_ENTITY.tamerLevel, 5);
-	renderString(0, 0x28, -0x24, 0x64, 0xc, 0, (TAMER_ENTITY.tamerLevel * 12) + 0x40, 5, 1);
-	n = strlen(TAMER_LEVEL_TITLES[TAMER_ENTITY.tamerLevel]) / 2;
-	renderString(0, (n * 12) + 0x28, -0x25, 0x30, 0xc, 0xb4, 0x18, 5, 1);
-	renderNumber(0, 0x35, -0x11, 2, TAMER_ENTITY.raisedCount, 5);
-	renderNumber(0, 0x29, 2, 6, MONEY, 5);
-	renderString(0, 0x32, 0x16, 0x4c, 0xc, 0, 0xe4, 5, 1);
-
-	for (i = 0, trigger = 0x2d, texX = 0, x = 0x34; i < 2; i++, x += 0x15, texX += 0x10, trigger++) {
-		texX = texX;
-
-		if (isTriggerSet(trigger) == 1) {
-			renderRectPolyFT4(x, 0x37, 0x10, 0x10, texX + 0xb0, 0xa0, 5, 0x7bc6, 5, 0);
+	switch (MENU_STATE) {
+	case 0:
+		if (drawPlayerInfoStrings() == 1) {
+			MENU_STATE = 1;
 		}
-	}
+		break;
+	case 1:
+		renderSeperatorLines(MAIN_D_80124424, 0xb, 5);
 
-	if (isTriggerSet(0x2f) == 1) {
-		renderRectPolyFT4(0x5e, 0x37, 0x10, 0x10, 0xe0, 0xa0, 5, 0x7bc6, 5, 0);
-	}
-
-	if (isTriggerSet(0x30) == 1) {
-		renderRectPolyFT4(0x73, 0x37, 0x10, 0x10, 0xd0, 0xa0, 5, 0x7bc6, 5, 0);
-	}
-
-	count = 0;
-
-	for (j = 0; j < 0x12; j++) {
-		if (hasMedal(j) != 0) {
-			count = (int8_t)(count + 1);
+		for (i = 0; i < 0xb; i++) {
+			e = &MAIN_D_801244EC[i];
+			renderString(3 - ((i / 7) * 3), e->posX, e->posY + 1, e->uvWidth, 0xc, e->uvX,
+				     e->uvY, 5, 1);
 		}
-	}
 
-	renderNumber(0, 0x35, 0x4d, 2, count, 5);
-	renderDigiviceEntity(ENTITY_TABLE[0], 0);
+		renderString(0, -0x54, -0x50, 0x48, 0xc, 0, 0x30, 5, 1);
+		renderNumber(0, 0x35, -0x36, 2, TAMER_ENTITY.tamerLevel, 5);
+#if defined(VERSION_JP)
+		renderString(0, 0x28, -0x25, 0x30, 0xc, 0, (TAMER_ENTITY.tamerLevel * 12) + 0x40, 5, 1);
+#else
+		renderString(0, 0x28, -0x24, 0x64, 0xc, 0, (TAMER_ENTITY.tamerLevel * 12) + 0x40, 5, 1);
+#endif
+		n = strlen(TAMER_LEVEL_TITLES[TAMER_ENTITY.tamerLevel]) / 2;
+		renderString(0, (n * 12) + 0x28, -0x25, 0x30, 0xc, 0xb4, 0x18, 5, 1);
+		renderNumber(0, 0x35, -0x11, 2, TAMER_ENTITY.raisedCount, 5);
+		renderNumber(0, 0x29, 2, 6, MONEY, 5);
+#if defined(VERSION_JP)
+		renderNumber(0, 0x29, 0x16, 3, PLAYTIME_HOURS, 5);
+		renderNumber(0, 0x59, 0x16, 2, PLAYTIME_MINUTES, 5);
+#else
+		renderString(0, 0x32, 0x16, 0x4c, 0xc, 0, 0xe4, 5, 1);
+#endif
 
-	for (k = 0; k < 0xb; k++) {
-		r = &MAIN_D_80124494[k];
-		renderInsetBox(r->x, r->y, r->w, r->h, 5);
+		for (i = 0; i < 2; i++) {
+			if (isTriggerSet(i + 0x2d) == 1) {
+				renderRectPolyFT4(i * 0x15 + 0x34, 0x37, 0x10, 0x10, i * 0x10 + 0xb0, 0xa0, 5, 0x7bc6, 5, 0);
+			}
+		}
+
+		if (isTriggerSet(0x2f) == 1) {
+			renderRectPolyFT4(0x5e, 0x37, 0x10, 0x10, 0xe0, 0xa0, 5, 0x7bc6, 5, 0);
+		}
+
+		if (isTriggerSet(0x30) == 1) {
+			renderRectPolyFT4(0x73, 0x37, 0x10, 0x10, 0xd0, 0xa0, 5, 0x7bc6, 5, 0);
+		}
+
+		count = 0;
+		for (j = 0; j < 0x12; j++) {
+			if (hasMedal(j) != 0) {
+				count++;
+			}
+		}
+
+		renderNumber(0, 0x35, 0x4d, 2, count, 5);
+		renderDigiviceEntity(ENTITY_TABLE[0], 0);
+
+		for (k = 0; k < 0xb; k++) {
+			r = &MAIN_D_80124494[k];
+			renderInsetBox(r->x, r->y, r->w, r->h, 5);
+		}
+		break;
 	}
 }
