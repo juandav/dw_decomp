@@ -50,8 +50,6 @@ typedef struct {
 } VsUISprite;
 
 extern int16_t MAIN_D_8013527C[2];
-extern char MAIN_D_80134500[5];
-extern char MAIN_D_80134508[5];
 extern char MAIN_D_80124C24[];
 extern char MAIN_D_80124C54[];
 extern int16_t MAIN_D_80134F24;
@@ -70,15 +68,12 @@ extern int16_t MAIN_D_801B1C7A[];
 extern uint8_t MAIN_D_80135274;
 extern int32_t VIEWPORT_DISTANCE;
 extern uint8_t MAIN_D_80134F2E;
-extern uint8_t MAIN_D_801344F8[4];
-extern uint8_t MAIN_D_801344FC[4];
 extern int16_t MAIN_D_80135280[2];
 extern int32_t MAIN_D_80134D84;
 extern int32_t MAIN_D_80134F40;
 extern int32_t MAIN_D_80134F4C;
 extern int32_t MAIN_D_8013528C;
 extern int32_t MAIN_D_80135290;
-extern uint8_t MAIN_D_80134520[8];
 extern uint8_t MAIN_D_80134F3C;
 extern int16_t MAIN_D_80135294;
 extern int32_t MAIN_D_80135268;
@@ -94,23 +89,15 @@ extern uint8_t MAIN_D_80134F44;
 extern int16_t MAIN_D_80135264;
 extern char *MAIN_D_8013526C;
 extern char *MAIN_D_80135270;
-extern char MAIN_D_80134518[7];
 extern int32_t MAIN_D_80134F48;
-extern int16_t MAIN_D_80134510[4];
 extern int32_t COMBAT_AREA_CENTER_Y;
 extern int32_t COMBAT_AREA_CENTER_X;
 extern uint8_t MAIN_D_801B1C7C[];
-extern int16_t MAIN_D_80134528[4];
-extern int16_t MAIN_D_80134530[4];
-extern int16_t MAIN_D_80134538[4];
-extern int16_t MAIN_D_80134540[4];
-extern uint8_t MAIN_D_80134548[6];
 extern int8_t MAIN_D_80134F52[2];
 extern int32_t MAIN_D_80134F54;
 extern int16_t MAIN_D_80134F50;
 extern uint8_t MAIN_D_801B1CB2[];
 extern uint8_t MAIN_D_801B1D02[];
-extern uint8_t MAIN_D_80134550[4];
 extern uint8_t MAIN_D_80134F58;
 extern uint8_t MAIN_D_80134F59;
 extern uint8_t MAIN_D_80134F5A;
@@ -325,6 +312,52 @@ static void *vs_functions[] = {
 };
 
 // clang-format off
+uint8_t MAIN_D_801344F8[4] = {
+	0x40, 0x2c, 0x26, 0x20,
+};
+
+uint8_t MAIN_D_801344FC[4] = {
+	0x10, 0x07, 0x03, 0x00,
+};
+
+char MAIN_D_80134500[] = "ＨＰ";
+
+char MAIN_D_80134508[] = "ＭＰ";
+
+int16_t MAIN_D_80134510[4] = {
+	0x0000, 0x0400, 0x0800, 0x0c00,
+};
+
+char MAIN_D_80134518[] = "与えた";
+
+uint8_t MAIN_D_80134520[8] = {
+	0x02, 0x03, 0x04, 0x05, 0x06, 0x00, 0x00, 0x00,
+};
+
+int16_t MAIN_D_80134528[4] = {
+	0x0036, 0x0036, 0x0050, 0x0050,
+};
+
+int16_t MAIN_D_80134530[4] = {
+	0x0020, 0x0055, 0x0020, 0x0055,
+};
+
+int16_t MAIN_D_80134538[4] = {
+	0x0009, 0x0009, 0x005c, 0x005c,
+};
+
+int16_t MAIN_D_80134540[4] = {
+	0x0036, 0x0047, 0x0036, 0x0047,
+};
+
+uint8_t MAIN_D_80134548[6] = {
+	0x00, 0x0c, 0x18, 0x24, 0x30, 0x3c,
+};
+
+uint8_t MAIN_D_80134550[4] = {
+	0x01, 0x03, 0x05, 0x00,
+};
+
 int16_t MAIN_D_8012F42C[6] = {
 	0x270f, 0x270f, 0x03e7, 0x03e7, 0x03e7, 0x03e7,
 };

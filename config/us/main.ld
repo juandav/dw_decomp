@@ -593,6 +593,12 @@ SECTIONS
         . = ALIGN(., 4);
         BUILD_DIR/src/main/main.c.o(.sdata.*);
         . = ALIGN(., 4);
+        BUILD_DIR/src/main/vs.c.o(.sdata.*);
+        . = ALIGN(., 4);
+        BUILD_DIR/src/main/script_common.c.o(.sdata.*);
+        . = ALIGN(., 4);
+        BUILD_DIR/src/main/script_interp.c.o(.sdata.*);
+        . = ALIGN(., 4);
         BUILD_DIR/src/main/font.c.o(.sdata.*);
         . = ALIGN(., 4);
         BUILD_DIR/src/main/main_menu.c.o(.sdata.*);

@@ -6,6 +6,7 @@
 #include <dw/font.h>
 #include <dw/garbage.h>
 #include <dw/item.h>
+#include <dw/main.h>
 #include <dw/map.h>
 #include <dw/math.h>
 #include <dw/params.h>
@@ -47,9 +48,6 @@ extern uint8_t TEXTBOX_OPEN_TIMER;
 extern uint32_t MAIN_D_8013501C;
 extern int32_t MAIN_D_80135028;
 extern uint32_t MAIN_D_80134F64;
-extern uint8_t *MAIN_D_801345B0;
-extern int16_t MAIN_D_801345C0[1];
-extern uint16_t MAIN_D_801345C2;
 extern int16_t MAIN_D_80134F60;
 extern int32_t MAIN_D_80135024;
 extern int32_t MAIN_D_80135020;
@@ -60,9 +58,7 @@ extern int32_t MAIN_D_80134F94;
 extern uint16_t MAIN_D_801BE952[];
 extern uint16_t MAIN_D_801BE954[];
 extern uint16_t MAIN_D_801BE956[];
-extern BabyTypeTable MAIN_D_801345B4;
 extern int32_t BIT_BOX_SHOW_BITS;
-extern int16_t MAIN_D_801345BC[2];
 extern uint32_t POLLED_INPUT_PREVIOUS;
 extern uint16_t MAIN_D_801BE950[];
 extern int32_t MAIN_D_801BE948[];
@@ -77,29 +73,6 @@ extern char *MAP_NAME_PTR[];
 extern char *ITEM_DESC_PTR[];
 extern int8_t MAIN_D_80134F98;
 extern int32_t MAIN_D_80134FA8;
-extern char MAIN_D_801345F0[3];
-extern char MAIN_D_80134554[];
-extern char MAIN_D_8013455C[];
-extern char MAIN_D_80134564[];
-extern char MAIN_D_8013456C[];
-extern char MAIN_D_80134574[];
-extern char MAIN_D_8013457C[];
-extern char MAIN_D_80134584[2][2];
-extern char MAIN_D_80134588[2][2];
-extern char MAIN_D_8013458C[2][2];
-extern char MAIN_D_80134590[2][2];
-extern char MAIN_D_80134594[2][2];
-extern char MAIN_D_80134598[2][2];
-extern char MAIN_D_8013459C[2][2];
-extern char MAIN_D_801345A0[2][2];
-extern char MAIN_D_801345A4[2][2];
-extern char MAIN_D_801345A8[2][2];
-extern char MAIN_D_801345AC[2][2];
-extern char MAIN_D_801345CC[];
-extern char MAIN_D_801345D4[];
-extern char MAIN_D_801345D8[];
-extern char MAIN_D_801345E0[];
-extern char MAIN_D_801345E8[];
 extern int32_t CURRENT_SCRIPT_PTR;
 
 void renderSelectionCursor(int32_t a0, int32_t a1, int32_t a2, int32_t a3, int32_t a4);
@@ -325,6 +298,72 @@ static void *script_common_text_order[] = {
 };
 
 // clang-format off
+char MAIN_D_80134554[8] = "Grade D";
+
+char MAIN_D_8013455C[8] = "Grade C";
+
+char MAIN_D_80134564[8] = "Grade B";
+
+char MAIN_D_8013456C[8] = "Grade A";
+
+char MAIN_D_80134574[8] = "Grade S";
+
+char MAIN_D_8013457C[8] = "Grade R";
+
+char MAIN_D_80134584[2][2] = { "D", "C" };
+
+char MAIN_D_80134588[2][2] = { "B", "A" };
+
+char MAIN_D_8013458C[2][2] = { "S", "R" };
+
+char MAIN_D_80134590[2][2] = { "H", "I" };
+
+char MAIN_D_80134594[2][2] = { "J", "K" };
+
+char MAIN_D_80134598[2][2] = { "L", "F" };
+
+char MAIN_D_8013459C[2][2] = { "G", "W" };
+
+char MAIN_D_801345A0[2][2] = { "O", "N" };
+
+char MAIN_D_801345A4[2][2] = { "M", "T" };
+
+char MAIN_D_801345A8[2][2] = { "Y", "Z" };
+
+char MAIN_D_801345AC[2][2] = { "X", "Q" };
+
+uint8_t *MAIN_D_801345B0 = TEXTURE_BUFFER;
+
+BabyTypeTable MAIN_D_801345B4 = { {
+	0x01, 0x02, 0x0f, 0x10, 0x1d, 0x1e, 0x2b, 0x2c,
+} };
+
+int16_t MAIN_D_801345BC[2] = {
+	0x00d0, 0x00df,
+};
+
+int16_t MAIN_D_801345C0[1] = {
+	0x0083,
+};
+
+uint16_t MAIN_D_801345C2 = 0x1700;
+
+int32_t MAP_LIGHT_UPDATE_DATA[2] = {
+	0x003101b7, 0xffff0002,
+};
+
+char MAIN_D_801345CC[] = "Sign";
+
+char MAIN_D_801345D4[4] = "Box";
+
+char MAIN_D_801345D8[8] = "Betamon";
+
+char MAIN_D_801345E0[8] = "Tanemon";
+
+char MAIN_D_801345E8[] = "Palmon";
+
+char MAIN_D_801345F0[] = ";1";
+
 char MAIN_D_8012F6D0[] = "Non Bewildering Forest Theme";
 char MAIN_D_8012F6F0[] = "Non Bewildering Forest Night Theme";
 char MAIN_D_8012F714[] = "Tropical Theme";

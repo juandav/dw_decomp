@@ -56,28 +56,16 @@ extern int8_t MAIN_STATE;
 extern int16_t SCRIPT_MAP_CHANGE_STATE;
 extern uint8_t MAIN_D_801BE6B4[];
 extern GsOT *ACTIVE_ORDERING_TABLE;
-extern SelectionBoxUVData MAIN_D_8013460C;
-extern SelectionBoxUVData MAIN_D_80134614;
-extern SelectionBoxUVData MAIN_D_8013461C;
-extern SelectionBoxUVData MAIN_D_80134624;
-extern SelectionBoxOffsetData MAIN_D_8013462C;
-extern SelectionBoxOffsetData MAIN_D_80134634;
-extern SelectionBoxOffsetData MAIN_D_8013463C;
-extern SelectionBoxOffsetData MAIN_D_80134644;
-extern SelectionBoxOffsetData MAIN_D_8013464C;
-extern SelectionBoxOffsetData MAIN_D_80134654;
 extern int16_t MAIN_D_8013078C[];
 extern uint8_t MAIN_D_80135007;
 extern uint8_t MAIN_D_80134F82;
 extern uint16_t MAIN_D_801307A0[10];
-extern char MAIN_D_801345F4[4];
 extern uint8_t MAIN_D_80130438[];
 extern uint8_t MAIN_D_80130444[];
 extern uint8_t MAIN_D_801303B8[];
 extern uint8_t MAIN_D_80134F8F;
 extern uint8_t MAIN_D_80134F90;
 extern int32_t MAIN_D_8012FFC4[];
-extern uint16_t MAIN_D_80134608[2];
 extern uint8_t SHOP_AMOUNT;
 extern uint32_t POLLED_INPUT;
 extern RECT ITEM_MENU_DESCRIPTION_RECTS[];
@@ -100,8 +88,6 @@ extern TextBoxTable MAIN_D_801BE80C;
 extern char MAIN_D_801307CC[];
 extern char **MAIN_D_80130774[];
 extern char MAIN_D_801B1D26[];
-extern char MAIN_D_801345F8[5];
-extern char MAIN_D_80134600[8];
 extern int16_t SELECTION_CURSOR_WIDTHS[];
 extern uint8_t *CURRENT_SCRIPT_PTR;
 
@@ -327,6 +313,58 @@ static void *script_interp_text_order[] = {
 	scriptInstruction28to3F,
 	scriptInstruction10to27,
 };
+
+// clang-format off
+char MAIN_D_801345F4[4] = "";
+
+char MAIN_D_801345F8[] = "Name";
+
+char MAIN_D_80134600[8] = "BackOK";
+
+uint16_t MAIN_D_80134608[2] = {
+	0x0019, 0x0019,
+};
+
+SelectionBoxUVData MAIN_D_8013460C = { {
+	0x00, 0x04, 0x00, 0x04, 0x04, 0x04, 0x08, 0x08,
+} };
+
+SelectionBoxUVData MAIN_D_80134614 = { {
+	0x04, 0x00, 0x04, 0x00, 0x08, 0x08, 0x0c, 0x0c,
+} };
+
+SelectionBoxUVData MAIN_D_8013461C = { {
+	0xfb, 0xfb, 0xff, 0xff, 0xfb, 0xfb, 0xfb, 0xfb,
+} };
+
+SelectionBoxUVData MAIN_D_80134624 = { {
+	0xff, 0xff, 0xfb, 0xfb, 0xff, 0xff, 0xff, 0xff,
+} };
+
+SelectionBoxOffsetData MAIN_D_8013462C = { {
+	0x00, 0x10, 0x00, 0x10, 0x04, 0x04, 0x00, 0x11,
+} };
+
+SelectionBoxOffsetData MAIN_D_80134634 = { {
+	0x00, 0x00, 0x0e, 0x0e, 0x00, 0x0e, 0x00, 0x00,
+} };
+
+SelectionBoxOffsetData MAIN_D_8013463C = { {
+	0x04, 0x04, 0x04, 0x04, 0x10, 0x10, 0x04, 0x04,
+} };
+
+SelectionBoxOffsetData MAIN_D_80134644 = { {
+	0x04, 0x04, 0x04, 0x04, 0x04, 0x04, 0x0e, 0x0e,
+} };
+
+SelectionBoxOffsetData MAIN_D_8013464C = { {
+	0x00, 0x2d, 0x00, 0x2d, 0x04, 0x04, 0x00, 0x2e,
+} };
+
+SelectionBoxOffsetData MAIN_D_80134654 = { {
+	0x04, 0x04, 0x04, 0x04, 0x2e, 0x2e, 0x04, 0x04,
+} };
+// clang-format on
 
 int32_t tickScript(void)
 {
