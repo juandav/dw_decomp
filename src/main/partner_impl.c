@@ -38,7 +38,11 @@ extern int32_t IS_NATURAL_DEATH;
 extern int8_t ITEM_SCOLD_FLAG;
 extern int16_t STATUS_UI_OFFSET_X;
 
+#if defined(VERSION_JP)
+char MAIN_D_801225A0[] = "は病気になってしまった！";
+#else
 char MAIN_D_801225A0[] = "is Sick!";
+#endif
 char MAIN_D_801225AC[16] = "\\ETCNA\\UNTI.TMD";
 RaiseData RAISE_DATA[66] = {
 	{ { -1, -1, -1, -1, -1, -1, -1, -1 },
@@ -204,8 +208,10 @@ int8_t ITEM_TAKE_DISTANCE[66] = {
 
 extern uint8_t MAIN_D_80137C00[2048];
 extern uint8_t MAIN_D_80127BDC[];
+extern uint8_t EVOLUTION_ITEM_TARGET[];
 extern GsDOBJ2 POOP_OBJECT;
 extern GsCOORDINATE2 POOP_COORDINATES;
+extern GsOT *ACTIVE_ORDERING_TABLE;
 
 extern int8_t GAME_STATE;
 extern int32_t FADE_PROTECTION;
@@ -285,7 +291,11 @@ void handleWildPoop(void);
 void handleEatingPoop(void);
 void tickSicknessMechanics(void);
 void tickDeathCondition(void);
+#if defined(VERSION_JP)
+void skipHours(int16_t hours);
+#else
 void skipHours(int32_t hours);
+#endif
 void handlePostBattleTiredness(void);
 void tickPartnerNormal(void);
 void renderStatusBars(int32_t state);
@@ -339,8 +349,8 @@ void initializeStatusObjects(void)
 
 	initializePoop();
 
-	EVOLUTION_TARGET = -1;
 	CURRENT_POOP_ID = 0;
+	EVOLUTION_TARGET = -1;
 	HAS_USED_EVOITEM = 0;
 	IS_NATURAL_DEATH = 0;
 	ITEM_SCOLD_FLAG = 0;
@@ -383,14 +393,18 @@ void initializePartner(int32_t type, int32_t posX, int32_t posY,
 	loadPartnerSounds(type);
 	PARTNER_ENTITY.digimonEntity.entity.isOnMap = 1;
 	PARTNER_ENTITY.digimonEntity.entity.isOnScreen = 1;
+#if !defined(VERSION_JP)
 	PARTNER_PARA.condition = 0;
+#endif
 	setSleepTimes(&PARTNER_PARA, type);
 
 	PARTNER_PARA.missedSleepHours = 0;
 	PARTNER_PARA.poopLevel = RAISE_DATA[type].poopTimer;
 	PARTNER_PARA.poopingTimer = -1;
+#if !defined(VERSION_JP)
 	PARTNER_PARA.virusBar = 0;
 	PARTNER_PARA.tiredness = 0;
+#endif
 	PARTNER_PARA.discipline = 50;
 	PARTNER_PARA.happiness = 50;
 	PARTNER_PARA.unused3 = 50;
@@ -399,6 +413,7 @@ void initializePartner(int32_t type, int32_t posX, int32_t posY,
 	PARTNER_PARA.energyLevel = RAISE_DATA[type].energyThreshold;
 	PARTNER_PARA.remainingLifetime = 360;
 	PARTNER_PARA.weight = RAISE_DATA[type].defaultWeight;
+#if !defined(VERSION_JP)
 	PARTNER_PARA.trainBoostTimer = 0;
 	PARTNER_PARA.trainBoostValue = 0;
 	PARTNER_PARA.trainBoostFlag = 0;
@@ -409,6 +424,7 @@ void initializePartner(int32_t type, int32_t posX, int32_t posY,
 	PARTNER_PARA.sicknessTimer = 0;
 	PARTNER_PARA.areaEffectTimer = 0;
 	PARTNER_PARA.timesBeingSick = 0;
+#endif
 
 	PARTNER_ENTITY.lives = 3;
 	if (type == 3) {
@@ -446,24 +462,28 @@ void renderPoop(int32_t instanceId)
 	VECTOR pos;
 	VECTOR scale;
 	SVECTOR rotation = POOP_ROTATION;
+	GsOT_TAG *ot;
 	int32_t i;
+	int16_t x;
 	int16_t scaleValue;
 	int16_t height;
-	int8_t size;
+	int16_t z;
 
 	if (!MAP_LAYER_ENABLED)
 		return;
 
 	SetRotMatrix(&GsWSMATRIX);
 	SetTransMatrix(&GsWSMATRIX);
+	ot = ACTIVE_ORDERING_TABLE->org;
 	for (i = 0; i < 100; i++) {
-		if (((size = WORLD_POOP[i].size) != 0) &&
-		    (CURRENT_SCREEN == WORLD_POOP[i].map)) {
+		if ((WORLD_POOP[i].size != 0) && (CURRENT_SCREEN == WORLD_POOP[i].map)) {
+			x = (WORLD_POOP[i].x - 50) * 100 + 50;
 			height = PARTNER_ENTITY.digimonEntity.entity.posData->location.vy;
-			scaleValue = size * 4096 / 10;
-			pos.vx = (int16_t)((WORLD_POOP[i].x - 50) * 100 + 50);
+			z = (50 - WORLD_POOP[i].y) * 100 - 50;
+			scaleValue = WORLD_POOP[i].size * 4096 / 10;
+			pos.vx = x;
 			pos.vy = height;
-			pos.vz = (int16_t)((50 - WORLD_POOP[i].y) * 100 - 50);
+			pos.vz = z;
 			scale.vx = scaleValue;
 			scale.vy = scaleValue;
 			scale.vz = scaleValue;
@@ -490,8 +510,8 @@ void initializeEvolvedPartner(int32_t type, int32_t posX, int32_t posY,
 
 	startAnimation(ENTITY_TABLE[1], 0);
 
-	PARTNER_ENTITY.digimonEntity.stats.current.vabId = 4;
 	STOP_DISTANCE_TIMER = 0;
+	PARTNER_ENTITY.digimonEntity.stats.current.vabId = 4;
 	PARTNER_PARA.condition = 0;
 
 	setSleepTimes(&PARTNER_PARA, type);
@@ -529,8 +549,8 @@ void resetPartnerPara(PartnerPara *para, int32_t type)
 void setSleepTimes(PartnerPara *para, int32_t type)
 {
 	int16_t level;
+	int16_t roll;
 	int16_t awakeTimeBase;
-	int32_t hoursAwake;
 
 	level = DIGIMON_DATA[type].level;
 
@@ -541,16 +561,15 @@ void setSleepTimes(PartnerPara *para, int32_t type)
 			awakeTimeBase = 7;
 		}
 
-		para->sleepyHour =
-			(HOUR +
-			 (hoursAwake = awakeTimeBase + (int16_t)random(1))) % 24;
+		roll = random(1);
+		para->sleepyHour = (HOUR + (awakeTimeBase + roll)) % 24;
 		para->sleepyMinute = 0;
 		para->wakeupHour =
 			(para->sleepyHour +
 			 SLEEP_PATTERN[RAISE_DATA[type].sleepCycle].sleepyHours);
 		para->wakeupMinute = para->sleepyMinute;
 		para->wakeupHour %= 24;
-		para->hoursAwakeDefault = hoursAwake;
+		para->hoursAwakeDefault = awakeTimeBase + roll;
 		para->hoursAsleepDefault =
 			SLEEP_PATTERN[RAISE_DATA[type].sleepCycle].sleepyHours;
 	} else {
@@ -576,7 +595,9 @@ void setSleepTimes(PartnerPara *para, int32_t type)
 void setFoodTimer(int16_t type)
 {
 	int32_t i;
+#if !defined(VERSION_JP)
 	int32_t nextIndex;
+#endif
 	uint8_t level;
 
 	level = DIGIMON_DATA[type].level;
@@ -586,12 +607,29 @@ void setFoodTimer(int16_t type)
 		if (PARTNER_PARA.nextHungerHour >= 24) {
 			PARTNER_PARA.nextHungerHour -= 24;
 		}
-	} else if (level == 2) {
+	}
+#if !defined(VERSION_JP)
+	else
+#endif
+	if (level == 2) {
 		PARTNER_PARA.nextHungerHour = HOUR / 3 * 3 + 3;
 		if (PARTNER_PARA.nextHungerHour >= 24) {
 			PARTNER_PARA.nextHungerHour -= 24;
 		}
 	} else {
+#if defined(VERSION_JP)
+		for (i = 0; i < 8; i++) {
+			if (HOUR < RAISE_DATA[type].hungerTimes[i]) {
+				PARTNER_PARA.nextHungerHour =
+					RAISE_DATA[type].hungerTimes[i];
+				break;
+			}
+			if ((RAISE_DATA[type].hungerTimes[i + 1] == -1) ||
+			    (i == 7))
+				PARTNER_PARA.nextHungerHour =
+					RAISE_DATA[type].hungerTimes[0];
+		}
+#else
 		for (i = 0, nextIndex = 1; i < 8; i++, nextIndex++) {
 			if (HOUR <= PARTNER_PARA.nextHungerHour) {
 				if (PARTNER_PARA.nextHungerHour <
@@ -631,9 +669,12 @@ void setFoodTimer(int16_t type)
 				goto calculateTimer;
 			}
 		}
+#endif
 	}
 
+#if !defined(VERSION_JP)
 calculateTimer:
+#endif
 	if (HOUR <= PARTNER_PARA.nextHungerHour) {
 		PARTNER_PARA.foodLevel =
 			(PARTNER_PARA.nextHungerHour - HOUR) * 60;
@@ -664,8 +705,8 @@ void initializeReincarnatedPartner(int32_t type, int32_t posX, int32_t posY,
 	setupEntityMatrix(1);
 	startAnimation(ENTITY_TABLE[1], 0);
 
-	PARTNER_ENTITY.digimonEntity.stats.current.vabId = 4;
 	STOP_DISTANCE_TIMER = 0;
+	PARTNER_ENTITY.digimonEntity.stats.current.vabId = 4;
 
 	if (type == 1)
 		setReincarnateStats(90, 110, 10, 11, 9, 10);
@@ -688,8 +729,8 @@ void initializeReincarnatedPartner(int32_t type, int32_t posX, int32_t posY,
 	PARTNER_PARA.timesBeingSick = 0;
 	PARTNER_PARA.remainingLifetime = 360;
 	PARTNER_PARA.age = 0;
-	EVOLUTION_TARGET = -1;
 	PARTNER_PARA.evoTimer = 0;
+	EVOLUTION_TARGET = -1;
 	PARTNER_PARA.careMistakes = 0;
 	PARTNER_PARA.battles = 0;
 	PARTNER_PARA.weight = RAISE_DATA[type].defaultWeight;
@@ -707,12 +748,12 @@ void setReincarnateStats(int16_t hp, int16_t mp, int16_t offense,
 {
 	int16_t percentage;
 	Stats *stats;
+	int16_t inheritedHp;
 	int16_t inheritedMp;
 	int16_t inheritedOffense;
 	int16_t inheritedDefense;
 	int16_t inheritedSpeed;
 	int16_t inheritedBrains;
-	int16_t inheritedHp;
 
 	if (IS_NATURAL_DEATH == 1) {
 		percentage = TAMER_ENTITY.tamerLevel;
@@ -720,12 +761,12 @@ void setReincarnateStats(int16_t hp, int16_t mp, int16_t offense,
 		percentage = 0;
 	}
 
+	inheritedHp = DEATH_STATS.base.hp * percentage / 100;
 	inheritedMp = DEATH_STATS.base.mp * percentage / 100;
 	inheritedOffense = DEATH_STATS.base.off * percentage / 100;
 	inheritedDefense = DEATH_STATS.base.def * percentage / 100;
 	inheritedSpeed = DEATH_STATS.base.speed * percentage / 100;
 	inheritedBrains = DEATH_STATS.base.brain * percentage / 100;
-	inheritedHp = DEATH_STATS.base.hp * percentage / 100;
 	stats = &PARTNER_ENTITY.digimonEntity.stats;
 
 	stats->current.currentHP = stats->base.hp = hp + inheritedHp;
@@ -738,8 +779,13 @@ void setReincarnateStats(int16_t hp, int16_t mp, int16_t offense,
 	IS_NATURAL_DEATH = 0;
 }
 
-void setupPartnerOnWarp(int32_t posX, int32_t posY, int32_t posZ,
-			int32_t rotation)
+// clang-format off
+void setupPartnerOnWarp(posX, posY, posZ, rotation)
+	int16_t posX;
+	int16_t posY;
+	int16_t posZ;
+	int16_t rotation;
+// clang-format on
 {
 	setEntityPosition(1, posX, posY, posZ);
 	setEntityRotation(1, PARTNER_ENTITY.digimonEntity.entity.posData->rotation.vx,
@@ -802,12 +848,10 @@ void tickConditionBoundaries(void)
 void tickSleepMechanics(void)
 {
 	int32_t wasSleepy;
-	int32_t delta;
 	int32_t type;
 	int16_t level;
 	int8_t hoursLate;
 	int8_t minutePart;
-	int32_t sleepCycle;
 
 	wasSleepy = PARTNER_PARA.condition & 1;
 
@@ -824,10 +868,10 @@ void tickSleepMechanics(void)
 		PARTNER_PARA.timeAwakeToday--;
 		PARTNER_PARA.tirednessSleepTimer = 0;
 
-		hoursLate =
-			(delta = PARTNER_PARA.hoursAwakeDefault * 6 -
-				 PARTNER_PARA.timeAwakeToday) / 6;
-		if ((delta % 6) != 0)
+		hoursLate = (PARTNER_PARA.hoursAwakeDefault * 6 -
+			     PARTNER_PARA.timeAwakeToday) / 6;
+		if (((PARTNER_PARA.hoursAwakeDefault * 6 -
+		      PARTNER_PARA.timeAwakeToday) % 6) != 0)
 			hoursLate++;
 
 		minutePart = PARTNER_PARA.timeAwakeToday % 6;
@@ -871,7 +915,7 @@ void tickSleepMechanics(void)
 	if ((PARTNER_PARA.condition & 1) &&
 	    (((PARTNER_PARA.sleepyHour < PARTNER_PARA.wakeupHour) &&
 	      (PARTNER_PARA.sleepyHour < HOUR) &&
-	      (HOUR >= PARTNER_PARA.wakeupHour)) ||
+	      (PARTNER_PARA.wakeupHour <= HOUR)) ||
 	     ((PARTNER_PARA.wakeupHour < PARTNER_PARA.sleepyHour) &&
 	      (HOUR < PARTNER_PARA.sleepyHour) &&
 	      (PARTNER_PARA.wakeupHour <= HOUR)))) {
@@ -890,15 +934,14 @@ void tickSleepMechanics(void)
 				PARTNER_PARA.wakeupHour -= 24;
 			PARTNER_PARA.wakeupMinute = 0;
 		} else {
-			sleepCycle = RAISE_DATA[type].sleepCycle;
 			PARTNER_PARA.sleepyHour =
-				SLEEP_PATTERN[sleepCycle].sleepyHour;
+				SLEEP_PATTERN[RAISE_DATA[type].sleepCycle].sleepyHour;
 			PARTNER_PARA.sleepyMinute =
-				SLEEP_PATTERN[sleepCycle].sleepyMinute;
+				SLEEP_PATTERN[RAISE_DATA[type].sleepCycle].sleepyMinute;
 			PARTNER_PARA.wakeupHour =
-				SLEEP_PATTERN[sleepCycle].wakeupHour;
+				SLEEP_PATTERN[RAISE_DATA[type].sleepCycle].wakeupHour;
 			PARTNER_PARA.wakeupMinute =
-				SLEEP_PATTERN[sleepCycle].wakeupMinute;
+				SLEEP_PATTERN[RAISE_DATA[type].sleepCycle].wakeupMinute;
 		}
 
 		PARTNER_PARA.timeAwakeToday =
@@ -916,8 +959,8 @@ void tickSleepMechanics(void)
 			    (HOUR < PARTNER_PARA.wakeupHour)) {
 				PARTNER_PARA.condition |= 1;
 			}
-		} else if (PARTNER_PARA.sleepyHour <
-			   PARTNER_PARA.wakeupHour) {
+		} else if (PARTNER_PARA.wakeupHour >
+			   PARTNER_PARA.sleepyHour) {
 			if ((HOUR >= PARTNER_PARA.sleepyHour) &&
 			    (HOUR < PARTNER_PARA.wakeupHour)) {
 				PARTNER_PARA.condition |= 1;
@@ -942,8 +985,8 @@ void tickUnhappinessMechanics(void)
 	    ((CURRENT_FRAME % 200) == 0) &&
 	    (CURRENT_FRAME != LAST_HANDLED_FRAME)) {
 		happiness = PARTNER_PARA.happiness;
-		if (happiness < 0)
-			happiness = -happiness;
+		if (PARTNER_PARA.happiness < 0)
+			happiness = -PARTNER_PARA.happiness;
 
 		randomValue = random(100);
 		if (randomValue < happiness - PARTNER_PARA.discipline)
@@ -1001,18 +1044,18 @@ void tickUnhappinessMechanics(void)
 	}
 }
 
-void handlePraiseScold(int32_t state)
+// clang-format off
+void handlePraiseScold(state)
+	int16_t state;
+// clang-format on
 {
 	int16_t oldDiscipline;
-	int32_t oldDiscipline2;
 	int16_t oldHappiness;
 	int16_t disciplineDelta;
 	int16_t happinessDelta;
-	uint8_t level;
 
 	oldDiscipline = PARTNER_PARA.discipline;
 	oldHappiness = PARTNER_PARA.happiness;
-	oldDiscipline2 = oldDiscipline;
 
 	if (state == 4) {
 		if (ITEM_SCOLD_FLAG == 1) {
@@ -1032,17 +1075,15 @@ void handlePraiseScold(int32_t state)
 		}
 	} else {
 		disciplineDelta = -5;
-		happinessDelta = (oldDiscipline / 10) + 2;
+		happinessDelta = (PARTNER_PARA.discipline / 10) + 2;
 	}
 
 	PARTNER_PARA.discipline += disciplineDelta;
 	PARTNER_PARA.happiness += happinessDelta;
 
 	if (state == 4) {
-		level = DIGIMON_DATA[PARTNER_ENTITY.digimonEntity.entity.type].level;
 		NANIMON_TRIGGER = 0;
-		if ((level == 3) &&
-		    (oldDiscipline2 == 0) &&
+		if ((DIGIMON_DATA[PARTNER_ENTITY.digimonEntity.entity.type].level == 3) && (oldDiscipline == 0) &&
 		    (oldHappiness == -100)) {
 			NANIMON_TRIGGER = 1;
 		}
@@ -1055,7 +1096,6 @@ void handleSleeping(void)
 	int16_t tileY;
 	int16_t hoursSlept;
 	int32_t type;
-	int32_t sleepCycle;
 
 	if (HOUR < PARTNER_PARA.wakeupHour)
 		hoursSlept = PARTNER_PARA.wakeupHour - HOUR;
@@ -1084,15 +1124,14 @@ void handleSleeping(void)
 			PARTNER_PARA.wakeupHour -= 24;
 		PARTNER_PARA.wakeupMinute = 0;
 	} else {
-		sleepCycle = RAISE_DATA[type].sleepCycle;
 		PARTNER_PARA.sleepyHour =
-			SLEEP_PATTERN[sleepCycle].sleepyHour;
+			SLEEP_PATTERN[RAISE_DATA[type].sleepCycle].sleepyHour;
 		PARTNER_PARA.sleepyMinute =
-			SLEEP_PATTERN[sleepCycle].sleepyMinute;
+			SLEEP_PATTERN[RAISE_DATA[type].sleepCycle].sleepyMinute;
 		PARTNER_PARA.wakeupHour =
-			SLEEP_PATTERN[sleepCycle].wakeupHour;
+			SLEEP_PATTERN[RAISE_DATA[type].sleepCycle].wakeupHour;
 		PARTNER_PARA.wakeupMinute =
-			SLEEP_PATTERN[sleepCycle].wakeupMinute;
+			SLEEP_PATTERN[RAISE_DATA[type].sleepCycle].wakeupMinute;
 	}
 
 	setFoodTimer((int16_t)type);
@@ -1140,8 +1179,8 @@ int32_t createPoopPile(int16_t tileX, int16_t tileY)
 	int16_t rotation;
 	int16_t i;
 	int16_t count;
-	int32_t direction;
 	int16_t pos[3];
+	int32_t direction;
 
 	rotation = PARTNER_ENTITY.digimonEntity.entity.posData->rotation.vy;
 	if (((0 <= rotation) && (rotation <= 0x300)) || (rotation >= 0xD00))
@@ -1227,12 +1266,11 @@ int32_t createPoopPile(int16_t tileX, int16_t tileY)
 void sleepRegen(void)
 {
 	int16_t hoursSlept;
-	int16_t hoursAsleepDefault;
 	int16_t sleepFactor;
+	int16_t healRoll;
 	int16_t maxHP;
 	int16_t maxMP;
-	int16_t healRoll;
-	int32_t tiredPercent;
+	int16_t hoursAsleepDefault;
 
 	hoursAsleepDefault = PARTNER_PARA.hoursAsleepDefault;
 	if (HOUR < PARTNER_PARA.wakeupHour)
@@ -1263,10 +1301,10 @@ void sleepRegen(void)
 		(int16_t)(sleepFactor * (maxMP * (healRoll + 70) / 100) /
 			  100);
 
-	tiredPercent = (int16_t)random(20) + 80;
+	healRoll = random(20);
 	PARTNER_PARA.tiredness -=
 		(int16_t)(sleepFactor *
-			  (PARTNER_PARA.tiredness * tiredPercent / 100) /
+			  (PARTNER_PARA.tiredness * (healRoll + 80) / 100) /
 			  100);
 
 	if (PARTNER_ENTITY.digimonEntity.stats.current.currentHP >= maxHP)
@@ -1284,37 +1322,46 @@ void sleepRegen(void)
 
 void tickTirednessMechanics(void)
 {
+	uint8_t animId;
+
+	animId = PARTNER_ENTITY.digimonEntity.entity.anim.animId;
 	if (((PARTNER_PARA.areaEffectTimer % 1200) == 0) && (PARTNER_PARA.areaEffectTimer > 0)) {
 		if (PARTNER_AREA_RESPONSE[0] == 1) {
-			PARTNER_PARA.happiness = PARTNER_PARA.happiness + 1;
-			PARTNER_PARA.tiredness = PARTNER_PARA.tiredness - 2;
+			PARTNER_PARA.happiness += 1;
+			PARTNER_PARA.tiredness -= 2;
 		}
 		if (PARTNER_AREA_RESPONSE[0] == 2) {
-			PARTNER_PARA.happiness = PARTNER_PARA.happiness - 1;
-			PARTNER_PARA.tiredness = PARTNER_PARA.tiredness + 1;
+			PARTNER_PARA.happiness -= 1;
+			PARTNER_PARA.tiredness += 1;
 		}
 	}
 	if (PARTNER_PARA.subTiredness >= 0x3C) {
-		PARTNER_PARA.tiredness = PARTNER_PARA.tiredness + 1;
+		PARTNER_PARA.tiredness += 1;
 		if (PARTNER_PARA.tiredness >= 0x64) {
 			PARTNER_PARA.tiredness = 0x64;
 		}
 		PARTNER_PARA.subTiredness = 0;
 	}
 	if (PARTNER_PARA.tiredness >= 0x32) {
-		PARTNER_PARA.tirednessHungerTimer = PARTNER_PARA.tirednessHungerTimer + 1;
+		PARTNER_PARA.tirednessHungerTimer += 1;
 	} else {
 		PARTNER_PARA.tirednessHungerTimer = 0;
 	}
 	if (PARTNER_PARA.tiredness >= 0x50) {
 		PARTNER_PARA.condition |= 2;
 		if (((CURRENT_FRAME % 100) == 0) && (CURRENT_FRAME != LAST_HANDLED_FRAME)) {
-			PARTNER_PARA.happiness = PARTNER_PARA.happiness - 2;
+			PARTNER_PARA.happiness -= 2;
 		}
 	} else {
 		PARTNER_PARA.condition &= ~2;
 	}
 }
+
+#if defined(VERSION_JP)
+#define ITEM_EVOLUTION_TARGET(item) EVOLUTION_ITEM_TARGET[(item) - 0x47]
+#else
+#define ITEM_EVOLUTION_TARGET(item) (&MAIN_D_80127BDC[0x39])[item]
+#endif
 
 int32_t partnerWillRefuseItem(void)
 {
@@ -1323,8 +1370,7 @@ int32_t partnerWillRefuseItem(void)
 	int16_t chance;
 	int32_t item;
 	int16_t disciplineChance;
-	uint8_t level;
-	uint8_t targetLevel;
+	uint32_t isHungry;
 
 	PARTNER_PARA.refusedFavFood = 0;
 	type = PARTNER_ENTITY.digimonEntity.entity.type;
@@ -1346,12 +1392,13 @@ int32_t partnerWillRefuseItem(void)
 		} else if ((item == 0x7D) || (item == 0x7F)) {
 			if (DIGIMON_DATA[PARTNER_ENTITY.digimonEntity.entity.type].level != 4)
 				return 1;
-		} else {
-			if (((level = DIGIMON_DATA[PARTNER_ENTITY.digimonEntity.entity.type].level) ==
-			     (targetLevel = DIGIMON_DATA[(&MAIN_D_80127BDC[0x39])[item]].level)) ||
-			    (level + 2 == targetLevel) ||
-			    (level - 1 == targetLevel))
-				return 1;
+		} else if ((DIGIMON_DATA[PARTNER_ENTITY.digimonEntity.entity.type].level ==
+			    DIGIMON_DATA[ITEM_EVOLUTION_TARGET(item)].level) ||
+			   (DIGIMON_DATA[PARTNER_ENTITY.digimonEntity.entity.type].level + 2 ==
+			    DIGIMON_DATA[ITEM_EVOLUTION_TARGET(item)].level) ||
+			   (DIGIMON_DATA[PARTNER_ENTITY.digimonEntity.entity.type].level - 1 ==
+			    DIGIMON_DATA[ITEM_EVOLUTION_TARGET(item)].level)) {
+			return 1;
 		}
 	}
 
@@ -1367,7 +1414,7 @@ int32_t partnerWillRefuseItem(void)
 			return 1;
 		}
 	}
-	if (((condition & 4) == 0) &&
+	if (((isHungry = condition & 4) == 0) &&
 	    (item == RAISE_DATA[type].favoriteFood) && (chance < 2))
 		PARTNER_PARA.refusedFavFood = 2;
 
@@ -1382,6 +1429,7 @@ int32_t partnerWillRefuseItem(void)
 void tickHungerMechanics(void)
 {
 	int32_t type = PARTNER_ENTITY.digimonEntity.entity.type;
+	uint32_t isHungry;
 
 	if ((PARTNER_PARA.condition & 4) != 0) {
 		if (((CURRENT_FRAME % 10) == 0) &&
@@ -1399,8 +1447,8 @@ void tickHungerMechanics(void)
 			PARTNER_PARA.energyLevel = 0;
 	}
 
-	if (((PARTNER_PARA.condition & 4) == 0) &&
-	    (PARTNER_PARA.foodLevel <= 0)) {
+	isHungry = PARTNER_PARA.condition & 4;
+	if (!isHungry && (PARTNER_PARA.foodLevel <= 0)) {
 		PARTNER_PARA.starvationTimer = 180;
 		PARTNER_PARA.condition |= 4;
 		handleConditionBubble();
@@ -1501,15 +1549,13 @@ void handleConditionBubble(void)
 
 void partnerHandleFoodFeed(int32_t itemType)
 {
-	int32_t type;
-
 	if (PARTNER_PARA.condition & 4) {
+#if !defined(VERSION_JP)
 		if (((itemType < 0x26) || (itemType >= 0x47)) &&
 		    (itemType != 0x79) && (itemType != 0x7a)) {
 			return;
 		}
-
-		type = PARTNER_ENTITY.digimonEntity.entity.type;
+#endif
 
 		if (!(RAISE_DATA[PARTNER_ENTITY.digimonEntity.entity.type].energyThreshold >
 		      PARTNER_PARA.energyLevel)) {
@@ -1524,7 +1570,9 @@ void partnerHandleFoodFeed(int32_t itemType)
 		     RAISE_DATA[PARTNER_ENTITY.digimonEntity.entity.type].favoriteFood) ||
 		    !(PARTNER_PARA.energyLevel <
 		      RAISE_DATA[PARTNER_ENTITY.digimonEntity.entity.type].energyThreshold)) {
+#if !defined(VERSION_JP)
 			PARTNER_ANIMATION = 0xb;
+#endif
 			startAnimation(&PARTNER_ENTITY.digimonEntity.entity, 0xb);
 		}
 
@@ -1558,7 +1606,7 @@ void tickPartnerPoopingMechanic(void)
 	if (!isPoopy && (PARTNER_PARA.poopLevel <= 0)) {
 		PARTNER_PARA.condition |= 8;
 		PARTNER_PARA.poopingTimer =
-			((PARTNER_PARA.discipline + 20) * 20 * 60) / 100;
+			((PARTNER_PARA.discipline + 20) * 1200) / 100;
 	}
 
 	if (isPoopy && (CURRENT_FRAME != LAST_HANDLED_FRAME)) {
@@ -1604,8 +1652,8 @@ void detectEdiblePoop(void)
 		posX = TAMER_ENTITY.entity.posData->location.vx;
 		posZ = TAMER_ENTITY.entity.posData->location.vz;
 
-		if (((tileX - radius) < posX) && ((tileX + radius) > posX) &&
-		    ((tileZ - radius) < posZ) && ((tileZ + radius) > posZ)) {
+		if (((tileX - radius) < posX) && (posX < (tileX + radius)) &&
+		    ((tileZ - radius) < posZ) && (posZ < (tileZ + radius))) {
 			POOP_TO_EAT = i;
 			PARTNER_STATE = 9;
 			PARTNER_SUB_STATE = 0;
@@ -1618,9 +1666,13 @@ void handleToilet(void)
 {
 	PARTNER_PARA.happiness += 2;
 	PARTNER_PARA.discipline += 2;
+#if defined(VERSION_JP)
+	PARTNER_PARA.poopLevel = RAISE_DATA[PARTNER_ENTITY.digimonEntity.entity.type].poopTimer;
+#else
 	PARTNER_PARA.poopLevel =
 		(RAISE_DATA[PARTNER_ENTITY.digimonEntity.entity.type].poopTimer +
 		 RAISE_DATA[PARTNER_ENTITY.digimonEntity.entity.type].poopTimer);
+#endif
 	PARTNER_PARA.condition &= ~8;
 	handlePoopWeightLoss(ENTITY_TABLE[1]->type);
 }
@@ -1643,9 +1695,13 @@ void handleWildPoop(void)
 	PARTNER_PARA.careMistakes += 1;
 	PARTNER_PARA.happiness -= 10;
 	PARTNER_PARA.discipline -= 5;
+#if defined(VERSION_JP)
+	PARTNER_PARA.poopLevel = RAISE_DATA[PARTNER_ENTITY.digimonEntity.entity.type].poopTimer;
+#else
 	PARTNER_PARA.poopLevel =
 		(RAISE_DATA[PARTNER_ENTITY.digimonEntity.entity.type].poopTimer +
 		 RAISE_DATA[PARTNER_ENTITY.digimonEntity.entity.type].poopTimer);
+#endif
 
 	handlePoopWeightLoss(ENTITY_TABLE[1]->type);
 }
@@ -1654,7 +1710,6 @@ void handleEatingPoop(void)
 {
 	Stats *stats;
 	int16_t healingChance;
-	int16_t stat;
 	int16_t r;
 
 	stats = &PARTNER_ENTITY.digimonEntity.stats;
@@ -1677,18 +1732,15 @@ void handleEatingPoop(void)
 		healingChance = 20;
 	}
 
-	stat = stats->current.currentHP;
-	if (stats->base.hp < stat) {
+	if (stats->current.currentHP > stats->base.hp) {
 		stats->current.currentHP = stats->base.hp;
 	}
 
-	stat = stats->current.currentMP;
-	if (stats->base.mp < stat) {
+	if (stats->current.currentMP > stats->base.mp) {
 		stats->current.currentMP = stats->base.mp;
 	}
 
-	stat = PARTNER_PARA.weight;
-	if (stat > 99) {
+	if (PARTNER_PARA.weight > 99) {
 		PARTNER_PARA.weight = 99;
 	}
 
@@ -1715,8 +1767,8 @@ void handleEatingPoop(void)
 void tickSicknessMechanics(void)
 {
 	int32_t wasSick;
-	uint8_t chance;
 	int16_t roll;
+	uint8_t chance;
 	int32_t nameLength;
 
 	wasSick = PARTNER_PARA.condition & 0x40;
@@ -1732,7 +1784,9 @@ void tickSicknessMechanics(void)
 			PARTNER_PARA.timesBeingSick++;
 			PARTNER_PARA.sicknessTimer = 1;
 			PARTNER_PARA.happiness -= 20;
+#if !defined(VERSION_JP)
 			PARTNER_PARA.sicknessCounter = 0;
+#endif
 		}
 	}
 
@@ -1772,8 +1826,10 @@ void tickSicknessMechanics(void)
 		PARTNER_PARA.sicknessTimer = 1;
 		PARTNER_PARA.condition &= ~0x20;
 		PARTNER_PARA.injuryTimer = 0;
+#if !defined(VERSION_JP)
 	}
 	if (!wasSick && ((PARTNER_PARA.condition & 0x40) != 0)) {
+#endif
 		setTamerState(0x14);
 		clearTextArea();
 		setTextColor(10);
@@ -1822,6 +1878,50 @@ void tickDeathCondition(void)
 	callScriptSection(0, 0x4de, 0);
 }
 
+#if defined(VERSION_JP)
+void skipHours(int16_t hours)
+{
+	PARTNER_PARA.evoTimer += hours;
+	PARTNER_PARA.remainingLifetime -= hours;
+	if (HOUR + hours >= 24) {
+		PARTNER_PARA.age += (HOUR + hours) / 24;
+	}
+	updateTimeOfDay();
+
+	if ((HOUR + (hours % 4) == 0) && (PARTNER_PARA.happiness < 80))
+		PARTNER_PARA.remainingLifetime = PARTNER_PARA.remainingLifetime -
+			((PARTNER_PARA.happiness - 80) / -50 + 1);
+	if (PARTNER_PARA.remainingLifetime < 0)
+		PARTNER_PARA.remainingLifetime = 0;
+
+	if ((PARTNER_PARA.condition & 1) != 0) {
+		PARTNER_PARA.sicknessCounter += hours;
+		PARTNER_PARA.missedSleepHours += hours;
+	}
+	if ((PARTNER_PARA.condition & 4) != 0) {
+		PARTNER_PARA.starvationTimer -= (int16_t)(hours * 120);
+		if ((PARTNER_PARA.starvationTimer <= 0) &&
+		    (PARTNER_PARA.energyLevel <
+		     RAISE_DATA[PARTNER_ENTITY.digimonEntity.entity.type].energyThreshold))
+			PARTNER_PARA.careMistakes++;
+	} else {
+		PARTNER_PARA.foodLevel -= (int16_t)(hours * 60);
+	}
+	PARTNER_PARA.energyLevel -=
+		RAISE_DATA[PARTNER_ENTITY.digimonEntity.entity.type].energyUsage;
+	if ((PARTNER_PARA.condition & 8) != 0)
+		PARTNER_PARA.poopingTimer -= 1200;
+	else
+		PARTNER_PARA.poopLevel -= (int16_t)(hours * 6);
+
+	if ((PARTNER_PARA.condition & 0x40) != 0)
+		PARTNER_PARA.sicknessTries += hours;
+	if ((PARTNER_PARA.condition & 0x20) != 0)
+		PARTNER_PARA.injuryTimer += hours;
+	if ((PARTNER_PARA.condition & 0x40) != 0)
+		PARTNER_PARA.sicknessTimer += hours;
+}
+#else
 void skipHours(int32_t hours)
 {
 	int16_t shortHours;
@@ -1870,28 +1970,22 @@ void skipHours(int32_t hours)
 	if ((PARTNER_PARA.condition & 0x40) != 0)
 		PARTNER_PARA.sicknessTimer += shortHours;
 }
+#endif
 
 void handlePostBattleTiredness(void)
 {
-	int16_t maxMP;
-	int16_t currentMP;
 	int16_t diff;
-	int16_t diff2;
 
 	PARTNER_PARA.tiredness += 5;
 
-	maxMP = PARTNER_ENTITY.digimonEntity.stats.base.mp;
-	diff = (maxMP * 2) / 10;
-	currentMP = PARTNER_ENTITY.digimonEntity.stats.current.currentMP;
-
-	diff2 = diff;
-	if (currentMP < (maxMP - diff)) {
-		diff = maxMP - currentMP;
+	diff = (PARTNER_ENTITY.digimonEntity.stats.base.mp * 2) / 10;
+	if (PARTNER_ENTITY.digimonEntity.stats.current.currentMP < (PARTNER_ENTITY.digimonEntity.stats.base.mp - diff)) {
+		diff = PARTNER_ENTITY.digimonEntity.stats.base.mp - PARTNER_ENTITY.digimonEntity.stats.current.currentMP;
 		/*
 		 * NOTE: Vanilla MP factor calculation is broken.
-		 * The factor should be ((diff * 10) / maxMP).
+		 * The factor should be ((diff * 10) / base.mp).
 		 */
-		PARTNER_PARA.tiredness += (diff / maxMP) * 10;
+		PARTNER_PARA.tiredness += (diff / PARTNER_ENTITY.digimonEntity.stats.base.mp) * 10;
 	}
 
 	PARTNER_PARA.foodLevel -= 15;
@@ -1899,6 +1993,13 @@ void handlePostBattleTiredness(void)
 
 void tickPartnerNormal(void)
 {
+#ifdef __MWERKS__
+	extern int32_t getFreshEvolutionTarget(int32_t currentDigimon);
+	extern int32_t getInTrainingEvolutionTarget(int32_t currentDigimon);
+	extern int32_t getRookieEvolutionTarget(int32_t currentDigimon);
+	extern int32_t getChampionEvolutionTarget(int32_t currentDigimon);
+	extern int16_t getTamerState(void);
+#endif
 	int16_t evoTimer;
 	uint8_t level;
 	int16_t tamerState;
@@ -1914,8 +2015,10 @@ void tickPartnerNormal(void)
 	tickUnhappinessMechanics();
 	tickConditionBoundaries();
 	PARTNER_PARA.areaEffectTimer++;
+#if !defined(VERSION_JP)
 	if (PARTNER_PARA.areaEffectTimer > 28800)
 		PARTNER_PARA.areaEffectTimer = 0;
+#endif
 	PARTNER_PARA.trainBoostTimer--;
 	if (PARTNER_PARA.trainBoostTimer <= 0) {
 		PARTNER_PARA.trainBoostFlag = 0;
@@ -1957,12 +2060,9 @@ void tickPartnerNormal(void)
 				3, ENTITY_TABLE[1]);
 	}
 	if (PARTNER_PARA.virusBar >= 16) {
-		/* MWCC requires this qualifier for the retail load/register sequence. */
-		int32_t type = *(volatile int32_t *)
-			&PARTNER_ENTITY.digimonEntity.entity.type;
-		if (type != 0x27) {
+		if (PARTNER_ENTITY.digimonEntity.entity.type != 0x27L) {
 			EVOLUTION_TARGET = 0x27;
-			writePStat(5, type);
+			writePStat(5, PARTNER_ENTITY.digimonEntity.entity.type);
 			PARTNER_PARA.sukaBackupHP =
 				PARTNER_ENTITY.digimonEntity.stats.base.hp;
 			PARTNER_PARA.sukaBackupMP =
@@ -1984,12 +2084,18 @@ void tickPartnerNormal(void)
 	}
 }
 
-void renderStatusBars(int32_t state)
+// clang-format off
+void renderStatusBars(state)
+	int8_t state;
+// clang-format on
 {
-	uint8_t texX;
-	uint8_t texY;
-	int32_t count;
 	int32_t i;
+	uint8_t happinessTexX;
+	uint8_t happinessTexY;
+	int32_t happinessCount;
+	int32_t disciplineCount;
+	uint8_t disciplineTexX;
+	uint8_t disciplineTexY;
 
 	if (state == 0)
 		STATUS_UI_OFFSET_X += 50;
@@ -2002,43 +2108,43 @@ void renderStatusBars(int32_t state)
 	renderRectPolyFT4(STATUS_UI_OFFSET_X, 85, 75, 8, 0, 236, 5, 0x7D06, 15, 0);
 	renderRectPolyFT4(STATUS_UI_OFFSET_X, 97, 75, 8, 0, 236, 5, 0x7D06, 15, 0);
 	if (PARTNER_PARA.happiness >= 0)
-		texX = 64;
+		happinessTexX = 64;
 	else
-		texX = 97;
+		happinessTexX = 97;
 	if (PLAYTIME_FRAMES % 10 < 5) {
 		if (PARTNER_AREA_RESPONSE[0] == 2)
-			texX += 11;
+			happinessTexX += 11;
 		else if (PARTNER_AREA_RESPONSE[0] == 1)
-			texX -= 11;
+			happinessTexX -= 11;
 	}
-	renderRectPolyFT4(STATUS_UI_OFFSET_X + 3, 83, 11, 11, texX, 244, 5, GetClut(96, 503), 14, 0);
+	renderRectPolyFT4(STATUS_UI_OFFSET_X + 3, 83, 11, 11, happinessTexX, 244, 5, GetClut(96, 503), 14, 0);
 	if (PARTNER_PARA.discipline >= 50)
-		texX = 22;
+		disciplineTexX = 22;
 	else
-		texX = 33;
-	renderRectPolyFT4(STATUS_UI_OFFSET_X + 3, 95, 11, 11, texX, 244, 5, GetClut(96, 498), 14, 0);
+		disciplineTexX = 33;
+	renderRectPolyFT4(STATUS_UI_OFFSET_X + 3, 95, 11, 11, disciplineTexX, 244, 5, GetClut(96, 498), 14, 0);
 	if (PARTNER_PARA.happiness >= 0) {
-		texY = 153;
-		count = PARTNER_PARA.happiness / 4;
+		happinessTexY = 153;
+		happinessCount = PARTNER_PARA.happiness / 4;
 		for (i = 0; i < 25; i++)
 			renderRectPolyFT4(STATUS_UI_OFFSET_X + 18 + i * 2, 88, 2, 2, 232, 151, 5, GetClut(96, 503), 14, 0);
 	} else {
-		texY = 151;
-		count = (PARTNER_PARA.happiness + 100) / 4;
+		happinessTexY = 151;
+		happinessCount = (PARTNER_PARA.happiness + 100) / 4;
 	}
-	for (i = 0; i < count; i++)
-		renderRectPolyFT4(STATUS_UI_OFFSET_X + 18 + i * 2, 88, 2, 2, 232, texY, 5, GetClut(96, 503), 13, 0);
+	for (i = 0; i < happinessCount; i++)
+		renderRectPolyFT4(STATUS_UI_OFFSET_X + 18 + i * 2, 88, 2, 2, 232, happinessTexY, 5, GetClut(96, 503), 13, 0);
 	if (PARTNER_PARA.discipline >= 50) {
-		texY = 153;
-		count = (PARTNER_PARA.discipline - 50) / 2;
+		disciplineTexY = 153;
+		disciplineCount = (PARTNER_PARA.discipline - 50) / 2;
 		for (i = 0; i < 25; i++)
 			renderRectPolyFT4(STATUS_UI_OFFSET_X + 18 + i * 2, 100, 2, 2, 232, 151, 5, GetClut(96, 503), 14, 0);
 	} else {
-		texY = 151;
-		count = PARTNER_PARA.discipline / 2;
+		disciplineTexY = 151;
+		disciplineCount = PARTNER_PARA.discipline / 2;
 	}
-	for (i = 0; i < count; i++)
-		renderRectPolyFT4(STATUS_UI_OFFSET_X + 18 + i * 2, 100, 4, 2, 232, texY, 5, GetClut(96, 503), 13, 0);
+	for (i = 0; i < disciplineCount; i++)
+		renderRectPolyFT4(STATUS_UI_OFFSET_X + 18 + i * 2, 100, 4, 2, 232, disciplineTexY, 5, GetClut(96, 503), 13, 0);
 }
 
 void setImmortalHour(void)

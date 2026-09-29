@@ -69,6 +69,7 @@ MAIN_C_SRC := \
 	src/main/overworld_status_boxes.c \
 	src/main/particle.c \
 	src/main/partner.c \
+	src/main/partner_impl.c \
 	src/main/sound.c \
 	src/main/sound_async.c \
 	src/main/tamer.c \
