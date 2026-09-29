@@ -51,26 +51,18 @@ extern uint8_t MAIN_D_801BE6B5[];
 extern uint8_t MAIN_D_801BE6B6[];
 extern uint8_t *SCRIPT_HEADER_PTR;
 extern uint8_t *SCRIPT_DATA_PTR;
-extern char MAIN_D_80130388[];
 extern int8_t MAIN_STATE;
 extern int16_t SCRIPT_MAP_CHANGE_STATE;
 extern uint8_t MAIN_D_801BE6B4[];
 extern GsOT *ACTIVE_ORDERING_TABLE;
-extern int16_t MAIN_D_8013078C[];
 extern uint8_t MAIN_D_80135007;
 extern uint8_t MAIN_D_80134F82;
-extern uint16_t MAIN_D_801307A0[10];
-extern uint8_t MAIN_D_80130438[];
-extern uint8_t MAIN_D_80130444[];
-extern uint8_t MAIN_D_801303B8[];
 extern uint8_t MAIN_D_80134F8F;
 extern uint8_t MAIN_D_80134F90;
 extern int32_t MAIN_D_8012FFC4[];
 extern uint8_t SHOP_AMOUNT;
 extern uint32_t POLLED_INPUT;
 extern RECT ITEM_MENU_DESCRIPTION_RECTS[];
-extern char MAIN_D_80130394[];
-extern char MAIN_D_801303A8[];
 extern uint8_t PREVIOUS_SCREEN;
 extern uint8_t PREVIOUS_EXIT;
 extern uint8_t CURRENT_EXIT;
@@ -81,12 +73,7 @@ extern uint8_t SCRIPT_HEADER[];
 extern uint8_t SCRIPT_DATA[];
 extern ScriptState SCRIPT_STATE;
 extern uint8_t TEXT_BUFFERS[];
-extern char MAIN_D_80130374[];
-extern BoxLabel MAIN_D_801307B4;
-extern BoxLabel MAIN_D_801307C0;
 extern TextBoxTable MAIN_D_801BE80C;
-extern char MAIN_D_801307CC[];
-extern char **MAIN_D_80130774[];
 extern char MAIN_D_801B1D26[];
 extern int16_t SELECTION_CURSOR_WIDTHS[];
 extern uint8_t *CURRENT_SCRIPT_PTR;
@@ -315,6 +302,235 @@ static void *script_interp_text_order[] = {
 };
 
 // clang-format off
+char MAIN_D_80130374[] = "\\SCN\\MAPHEAD.SCN";
+char MAIN_D_80130388[12] = "\\SCN\\DG.SCN";
+char MAIN_D_80130394[20] = "\\ETCHI\\BOSS_EFE.TMD";
+char MAIN_D_801303A8[] = "\\ETCHI\\OP.TIM";
+
+uint8_t MAIN_D_801303B8[128] = {
+	0x01, 0x00, 0x01, 0x01, 0x02, 0x00, 0x02, 0x01,
+	0x03, 0x00, 0x03, 0x01, 0x04, 0x00, 0x04, 0x01,
+	0x05, 0x00, 0x06, 0x00, 0x06, 0x01, 0x07, 0x00,
+	0x08, 0x00, 0x09, 0x00, 0x0a, 0x00, 0x0a, 0x01,
+	0x0b, 0x00, 0x0b, 0x01, 0x0b, 0x02, 0x0c, 0x00,
+	0x0c, 0x01, 0x0d, 0x00, 0x0d, 0x01, 0x0e, 0x00,
+	0x0e, 0x01, 0x0f, 0x00, 0x0f, 0x01, 0x0f, 0x02,
+	0x10, 0x00, 0x11, 0x00, 0x12, 0x00, 0x13, 0x00,
+	0x13, 0x01, 0x14, 0x00, 0x14, 0x01, 0x15, 0x00,
+	0x15, 0x01, 0x16, 0x00, 0x16, 0x01, 0x17, 0x00,
+	0x18, 0x00, 0x18, 0x01, 0x19, 0x00, 0x19, 0x01,
+	0x1a, 0x00, 0x1b, 0x00, 0x1b, 0x01, 0x1c, 0x00,
+	0x1c, 0x01, 0x1d, 0x00, 0x1d, 0x01, 0x1d, 0x02,
+	0x1e, 0x00, 0x1e, 0x01, 0x1e, 0x02, 0x1e, 0x03,
+	0x1e, 0x04, 0x1f, 0x02, 0x20, 0x02, 0x21, 0x00,
+	0x21, 0x01, 0x21, 0x02, 0x21, 0x03, 0x00, 0x00,
+};
+
+uint8_t MAIN_D_80130438[12] = {
+	0x2c, 0x29, 0x45, 0x27, 0x41, 0x11, 0x09, 0x01,
+	0x3e, 0x00, 0x00, 0x00,
+};
+
+uint8_t MAIN_D_80130444[12] = {
+	0x01, 0x09, 0x61, 0x16, 0x0b, 0x0e, 0x13, 0x14,
+	0x15, 0x00, 0x00, 0x00,
+};
+
+char MAIN_D_80130450[] = "あいうえお";
+
+char MAIN_D_8013045C[] = "かきくけと";
+
+char MAIN_D_80130468[] = "さしすせそ";
+
+char MAIN_D_80130474[] = "たちつてと";
+
+char MAIN_D_80130480[] = "なにぬねの";
+
+char MAIN_D_8013048C[] = "はひふへほ";
+
+char MAIN_D_80130498[] = "まみむめも";
+
+char MAIN_D_801304A4[] = "や　ゆ　よ";
+
+char MAIN_D_801304B0[] = "らりるれろ";
+
+char *MAIN_D_801304BC[9] = {
+	MAIN_D_80130450,
+	MAIN_D_8013045C,
+	MAIN_D_80130468,
+	MAIN_D_80130474,
+	MAIN_D_80130480,
+	MAIN_D_8013048C,
+	MAIN_D_80130498,
+	MAIN_D_801304A4,
+	MAIN_D_801304B0,
+};
+
+char MAIN_D_801304E0[] = "わ　を　ん";
+
+char MAIN_D_801304EC[] = "がぎぐげご";
+
+char MAIN_D_801304F8[] = "ざじずぜぞ";
+
+char MAIN_D_80130504[] = "だぢづでど";
+
+char MAIN_D_80130510[] = "ばびぶべぼ";
+
+char MAIN_D_8013051C[] = "ぱぴぷぺぽ";
+
+char MAIN_D_80130528[] = "ぁぃぅぇぉ";
+
+char MAIN_D_80130534[] = "っゃゅょー";
+
+char MAIN_D_80130540[] = "　　　　　";
+
+char *MAIN_D_8013054C[9] = {
+	MAIN_D_801304E0,
+	MAIN_D_801304EC,
+	MAIN_D_801304F8,
+	MAIN_D_80130504,
+	MAIN_D_80130510,
+	MAIN_D_8013051C,
+	MAIN_D_80130528,
+	MAIN_D_80130534,
+	MAIN_D_80130540,
+};
+
+char MAIN_D_80130570[] = "アイウエオ";
+
+char MAIN_D_8013057C[] = "カキクケコ";
+
+char MAIN_D_80130588[] = "サシスセソ";
+
+char MAIN_D_80130594[] = "タチツテト";
+
+char MAIN_D_801305A0[] = "ナニヌネノ";
+
+char MAIN_D_801305AC[] = "ハヒフヘホ";
+
+char MAIN_D_801305B8[] = "マミムメモ";
+
+char MAIN_D_801305C4[] = "ヤ　ユ　ヨ";
+
+char MAIN_D_801305D0[] = "ラリルレロ";
+
+char *MAIN_D_801305DC[9] = {
+	MAIN_D_80130570,
+	MAIN_D_8013057C,
+	MAIN_D_80130588,
+	MAIN_D_80130594,
+	MAIN_D_801305A0,
+	MAIN_D_801305AC,
+	MAIN_D_801305B8,
+	MAIN_D_801305C4,
+	MAIN_D_801305D0,
+};
+
+char MAIN_D_80130600[] = "ワ　ヲ　ン";
+
+char MAIN_D_8013060C[] = "ガギグゲゴ";
+
+char MAIN_D_80130618[] = "ザジズゼゾ";
+
+char MAIN_D_80130624[] = "ダヂヅデド";
+
+char MAIN_D_80130630[] = "バビブベボ";
+
+char MAIN_D_8013063C[] = "パピプペポ";
+
+char MAIN_D_80130648[] = "ァィゥェォ";
+
+char MAIN_D_80130654[] = "ッャュョー";
+
+char *MAIN_D_80130660[9] = {
+	MAIN_D_80130600,
+	MAIN_D_8013060C,
+	MAIN_D_80130618,
+	MAIN_D_80130624,
+	MAIN_D_80130630,
+	MAIN_D_8013063C,
+	MAIN_D_80130648,
+	MAIN_D_80130654,
+	MAIN_D_80130540,
+};
+
+char MAIN_D_80130684[] = "ＡＢＣＤＥ";
+
+char MAIN_D_80130690[] = "ＦＧＨＩＪ";
+
+char MAIN_D_8013069C[] = "ＫＬＭＮＯ";
+
+char MAIN_D_801306A8[] = "ＰＱＲＳＴ";
+
+char MAIN_D_801306B4[] = "ＵＶＷＸＹ";
+
+char MAIN_D_801306C0[] = "Ｚ　　　　";
+
+char *MAIN_D_801306CC[9] = {
+	MAIN_D_80130684,
+	MAIN_D_80130690,
+	MAIN_D_8013069C,
+	MAIN_D_801306A8,
+	MAIN_D_801306B4,
+	MAIN_D_801306C0,
+	MAIN_D_80130540,
+	MAIN_D_80130540,
+	MAIN_D_80130540,
+};
+
+char MAIN_D_801306F0[] = "ａｂｃｄｅ";
+
+char MAIN_D_801306FC[] = "ｆｇｈｉｊ";
+
+char MAIN_D_80130708[] = "ｋｌｍｎｏ";
+
+char MAIN_D_80130714[] = "ｐｑｒｓｔ";
+
+char MAIN_D_80130720[] = "ｕｖｗｘｙ";
+
+char MAIN_D_8013072C[] = "ｚ　　　　";
+
+char MAIN_D_80130738[] = "０１２３４";
+
+char MAIN_D_80130744[] = "５６７８９";
+
+char *MAIN_D_80130750[9] = {
+	MAIN_D_801306F0,
+	MAIN_D_801306FC,
+	MAIN_D_80130708,
+	MAIN_D_80130714,
+	MAIN_D_80130720,
+	MAIN_D_8013072C,
+	MAIN_D_80130738,
+	MAIN_D_80130744,
+	MAIN_D_80130540,
+};
+
+char **MAIN_D_80130774[6] = {
+	MAIN_D_801306CC,
+	MAIN_D_80130750,
+	MAIN_D_801305DC,
+	MAIN_D_80130660,
+	MAIN_D_801304BC,
+	MAIN_D_8013054C,
+};
+
+int16_t MAIN_D_8013078C[10] = {
+	0x000e, 0x0006, 0x0030, 0x000e, 0x005a, 0x0030, 0x000e, 0x0076,
+	0x0018, 0x0000,
+};
+
+uint16_t MAIN_D_801307A0[10] = {
+	0x8000, 0x8000, 0x8000, 0x8000, 0x8000, 0x8000, 0x8000, 0x8000,
+	0x8000, 0x0000,
+};
+
+BoxLabel MAIN_D_801307B4 = { "In hand" };
+
+BoxLabel MAIN_D_801307C0 = { "Keeping" };
+
+char MAIN_D_801307CC[20] = "You have Will trade";
+
 char MAIN_D_801345F4[4] = "";
 
 char MAIN_D_801345F8[] = "Name";
