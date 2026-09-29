@@ -67,7 +67,7 @@ SECTIONS
         BUILD_DIR/src/main/tournament.c.o(.text .text.*);
         BUILD_DIR/src/main/evl.c.o(.text .text.*);
         BUILD_DIR/src/main/btl.c.o(.text .text.*);
-        KEEP(BUILD_DIR/asm/main/77970.s.o(.text .text.*));
+        BUILD_DIR/src/main/battle_tick.c.o(.text .text.*);
         BUILD_DIR/src/main/kar.c.o(.text .text.*);
         BUILD_DIR/src/main/efe_table.c.o(.text .text.*);
         BUILD_DIR/src/main/sound_async.c.o(.text .text.*);
@@ -136,6 +136,7 @@ SECTIONS
         BUILD_DIR/src/main/tournament.c.o(.rodata .rodata.*);
         BUILD_DIR/src/main/evl.c.o(.rodata .rodata.*);
         BUILD_DIR/src/main/btl.c.o(.rodata .rodata.*);
+        BUILD_DIR/src/main/battle_tick.c.o(.rodata .rodata.*);
         BUILD_DIR/src/main/kar.c.o(.rodata .rodata.*);
         BUILD_DIR/src/main/efe_table.c.o(.rodata .rodata.*);
         BUILD_DIR/src/main/sound_async.c.o(.rodata .rodata.*);

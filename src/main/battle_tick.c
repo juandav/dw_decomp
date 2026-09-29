@@ -5,6 +5,7 @@
 #include <dw/combat.h>
 #include <dw/entity.h>
 #include <dw/fade.h>
+#include <dw/input.h>
 #include <dw/params.h>
 #include <dw/sound.h>
 #include <dw/ui.h>
@@ -59,7 +60,6 @@ void handleBattleCommandInput(void)
 	int16_t tileX;
 	int16_t tileY;
 	int16_t count;
-	int32_t cmd;
 
 	if (MAIN_D_80134D78 == 1) {
 		return;
@@ -77,7 +77,7 @@ void handleBattleCommandInput(void)
 		}
 
 		tickTamerFlee();
-		MAIN_D_80134D68 = MAIN_D_80134D68 + 1;
+		MAIN_D_80134D68++;
 
 		return;
 	}
@@ -91,8 +91,8 @@ void handleBattleCommandInput(void)
 			COMBAT_DATA_PTR->player.hoveredCommand[0]++;
 		}
 
-		if ((COMBAT_DATA_PTR->player.numCommands[0] - 1) <
-		    COMBAT_DATA_PTR->player.hoveredCommand[0]) {
+		if (COMBAT_DATA_PTR->player.hoveredCommand[0] >
+		    (COMBAT_DATA_PTR->player.numCommands[0] - 1)) {
 			if (MAIN_D_80134D7C[0] != 0) {
 				COMBAT_DATA_PTR->player.hoveredCommand[0] = 2;
 			} else {
@@ -116,7 +116,7 @@ void handleBattleCommandInput(void)
 		}
 	}
 
-	if ((POLLED_INPUT & ~POLLED_INPUT_PREVIOUS) & 0x40) {
+	if ((POLLED_INPUT & ~POLLED_INPUT_PREVIOUS) & CONFIRM_BUTTON) {
 		playSound(0, 3);
 		BTL_getRemainingEnemies(ENTITY_TABLE[1], enemies, &count);
 
@@ -138,13 +138,8 @@ void handleBattleCommandInput(void)
 		}
 
 		COMBAT_DATA_PTR->player.commandDelay[0] = 0;
-		cmd = COMBAT_DATA_PTR->player.bufferedCommand[0];
-
-		if (cmd == 7) {
-			goto changeTarget;
-		}
-
-		if (cmd == 1) {
+		switch (COMBAT_DATA_PTR->player.bufferedCommand[0]) {
+		case 1:
 			COMBAT_DATA_PTR->player.commandDelay[0] = 0;
 			COMBAT_DATA_PTR->player.currentCommand[0] = 1;
 			getModelTile(&ENTITY_TABLE[0]->posData->location, &tileX, &tileY);
@@ -167,14 +162,13 @@ void handleBattleCommandInput(void)
 			}
 
 			startAnimation(ENTITY_TABLE[0], 3);
+			break;
+
+		case 7:
+			COMBAT_DATA_PTR->player.changeTarget = 1;
+			break;
 		}
 
-		goto shout;
-
-	changeTarget:
-		COMBAT_DATA_PTR->player.changeTarget = 1;
-
-	shout:
 		BTL_drawCommandShout(COMBAT_DATA_PTR->player.bufferedCommand[0]);
 	}
 
@@ -208,7 +202,7 @@ void tickTamerFlee(void)
 		entityLookAtTile(ENTITY_TABLE[0], TAMER_WAYPOINT_X[i], TAMER_WAYPOINT_Y[i]);
 
 		if ((tileX == TAMER_WAYPOINT_X[i]) && (tileY == TAMER_WAYPOINT_Y[i])) {
-			TAMER_WAYPOINT_COUNT = TAMER_WAYPOINT_COUNT - 1;
+			TAMER_WAYPOINT_COUNT--;
 		}
 
 		return;
@@ -235,11 +229,14 @@ void tickTamerFlee(void)
 	}
 }
 
-void tickTamerBattle(int32_t instanceId)
+// clang-format off
+void tickTamerBattle(instanceId)
+	int16_t instanceId;
+// clang-format on
 {
 	Entity *tamer;
 	Entity *partner;
-	int32_t anim;
+	VECTOR target;
 
 	tamer = ENTITY_TABLE[instanceId];
 
@@ -253,11 +250,14 @@ void tickTamerBattle(int32_t instanceId)
 				}
 			}
 
+			target.vx = partner->posData->location.vx;
+			target.vy = 0;
+			target.vz = partner->posData->location.vz;
 			entityLookAtLocation(tamer, &partner->posData->location);
 
 			if (UI_BOX_DATA[0].state == 0) {
 				if ((MAIN_D_80134D74 == 0) || (MAIN_D_80134D60 != ENTITY_TABLE[1])) {
-					if ((tamer->anim.animId == 6) || ((anim = tamer->anim.animId) == 0xe)) {
+					if ((tamer->anim.animId == 6) || (tamer->anim.animId == 0xe)) {
 						if ((tamer->anim.animFlag & 1) == 0) {
 							startAnimation(tamer, 1);
 						}
@@ -291,18 +291,18 @@ void tickTamerBattle(int32_t instanceId)
 	tickAnimation(tamer);
 }
 
-void tickPartnerBattle(int32_t instanceId)
+// clang-format off
+void tickPartnerBattle(instanceId)
+	int16_t instanceId;
+// clang-format on
 {
 	tickAnimation(ENTITY_TABLE[instanceId]);
 }
 
 void tickNPCBattle(int32_t instanceId)
 {
-	Entity *entity;
-
 	tickAnimation(ENTITY_TABLE[instanceId]);
-	entity = ENTITY_TABLE[instanceId];
-	if (entity->anim.animFlag & 4) {
-		tickAnimation(entity);
+	if (ENTITY_TABLE[instanceId]->anim.animFlag & 4) {
+		tickAnimation(ENTITY_TABLE[instanceId]);
 	}
 }

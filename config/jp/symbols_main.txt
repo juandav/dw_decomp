@@ -3,6 +3,7 @@ KAR_tick = 0x800547EC;
 BTL_battleMain = 0x8005CA7C;
 BTL_buffStats = 0x8005E934;
 BTL_healStatusEffect = 0x80060E70;
+BTL_getRemainingEnemies = 0x800622D8;
 BTL_drawCommandShout = 0x80063B0C;
 BTL_removeDeathCountdown = 0x80065C7C;
 STD_tickTamerTournament = 0x8006E4B4;

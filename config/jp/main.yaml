@@ -109,7 +109,7 @@ segments:
       - [0x75268, c, tournament]
       - [0x7587C, c, evl]
       - [0x75B80, c, btl]
-      - [0x77970, asm]
+      - [0x77970, c, battle_tick]
       - [0x78514, c, kar]
       - [0x7855C, c, efe_table]
       - [0x78668, c, sound_async]
