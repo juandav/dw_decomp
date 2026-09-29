@@ -106,6 +106,6 @@ segments:
       - [0x1DC40, .data, vs_main]
       - [0x1DCF4, .data, vs_hud]
       - [0x1E064, .data, vs_effect]
-      - [0x1EBB0, .data, vs_bss]
+      - [0x1EBB0, .data, vs_bss_us]
 
   - [0x20788]

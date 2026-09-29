@@ -79,6 +79,6 @@ segments:
       - [0x7AA0, .data, trn_reward]
       - [0x7C14, .data, trn_hud]
       - [0x7D34, .data, trn_slots]
-      - [0x7D88, .data, trn_bss]
+      - [0x7D88, .data, trn_bss_jp]
 
   - [0x7E3C]

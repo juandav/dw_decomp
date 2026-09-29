@@ -63,6 +63,6 @@ segments:
       - [0xDD2C, c, fish_model]
       - [0xE034, .rodata, fish]
       - [0xE0C8, .data, fish]
-      - [0xEA68, .data, fish_bss]
+      - [0xEA68, .data, fish_bss_jp]
 
   - [0x11890]

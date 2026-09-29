@@ -26,7 +26,7 @@ SECTIONS
 			KEEP(BUILD_DIR/asm/btl/data/28B68.data.s.o(.data .data.*));
 			BUILD_DIR/src/btl/battle_hud.c.o(.data .data.*);
 			KEEP(BUILD_DIR/asm/btl/data/28C10.data.s.o(.data .data.*));
-			BUILD_DIR/src/btl/btl_bss.c.o(.data .data.*);
+			BUILD_DIR/src/btl/btl_bss_jp.c.o(.data .data.*);
 			LONG(0);
 		}
 	}
@@ -53,7 +53,7 @@ SECTIONS
 			BUILD_DIR/src/doo2/doo2.c.o(.text .text.*);
 			BUILD_DIR/src/doo2/doo2.c.o(.rodata .rodata.*);
 			BUILD_DIR/src/doo2/doo2.c.o(.data .data.*);
-			BUILD_DIR/src/doo2/doo2_bss.c.o(.data .data.*);
+			BUILD_DIR/src/doo2/doo2_bss_jp.c.o(.data .data.*);
 		}
 	}
 
@@ -66,7 +66,7 @@ SECTIONS
 			BUILD_DIR/src/dooa/dooa.c.o(.text .text.*);
 			BUILD_DIR/src/dooa/dooa.c.o(.rodata .rodata.*);
 			BUILD_DIR/src/dooa/dooa.c.o(.data .data.*);
-			BUILD_DIR/src/dooa/dooa_bss.c.o(.data .data.*);
+			BUILD_DIR/src/dooa/dooa_bss_jp.c.o(.data .data.*);
 			LONG(0);
 		}
 	}
@@ -80,7 +80,7 @@ SECTIONS
 			BUILD_DIR/src/eab/eab.c.o(.text .text.*);
 			BUILD_DIR/src/eab/eab.c.o(.rodata .rodata.*);
 			BUILD_DIR/src/eab/eab.c.o(.data .data.*);
-			BUILD_DIR/src/eab/eab_bss.c.o(.data .data.*);
+			BUILD_DIR/src/eab/eab_bss_jp.c.o(.data .data.*);
 			LONG(0);
 		}
 	}
@@ -106,7 +106,7 @@ SECTIONS
 			BUILD_DIR/src/evl/evl.c.o(.text .text.*);
 			BUILD_DIR/src/evl/evl.c.o(.rodata .rodata.*);
 			BUILD_DIR/src/evl/evl.c.o(.data .data.*);
-			BUILD_DIR/src/evl/evl_bss.c.o(.data .data.*);
+			BUILD_DIR/src/evl/evl_bss_jp.c.o(.data .data.*);
 			LONG(0);
 		}
 	}
@@ -122,7 +122,7 @@ SECTIONS
 			BUILD_DIR/src/fish/fish.c.o(.rodata .rodata.*);
 			BUILD_DIR/src/fish/fish_model.c.o(.rodata .rodata.*);
 			BUILD_DIR/src/fish/fish.c.o(.data .data.*);
-			BUILD_DIR/src/fish/fish_bss.c.o(.data .data.*);
+			BUILD_DIR/src/fish/fish_bss_jp.c.o(.data .data.*);
 			LONG(0);
 		}
 	}
@@ -136,7 +136,7 @@ SECTIONS
 			BUILD_DIR/src/kar/kar.c.o(.text .text.*);
 			BUILD_DIR/src/kar/kar.c.o(.rodata .rodata.*);
 			BUILD_DIR/src/kar/kar.c.o(.data .data.*);
-			BUILD_DIR/src/kar/kar_bss.c.o(.data .data.*);
+			BUILD_DIR/src/kar/kar_bss_jp.c.o(.data .data.*);
 			LONG(0);
 		}
 	}
@@ -164,7 +164,7 @@ SECTIONS
 			BUILD_DIR/src/murd/murd.c.o(.text .text.*);
 			BUILD_DIR/src/murd/murd.c.o(.rodata .rodata.*);
 			BUILD_DIR/src/murd/murd.c.o(.data .data.*);
-			BUILD_DIR/src/murd/murd_bss.c.o(.data .data.*);
+			BUILD_DIR/src/murd/murd_bss_jp.c.o(.data .data.*);
 		}
 	}
 
@@ -202,7 +202,7 @@ SECTIONS
 			BUILD_DIR/src/std/std_hud.c.o(.rodata .rodata.*);
 			BUILD_DIR/src/std/std_hud.c.o(.data .data.*);
 			KEEP(BUILD_DIR/asm/std/data/3264C.data.s.o(.data .data.*));
-			KEEP(BUILD_DIR/src/std/std_bss.c.o(.data .data.*));
+			KEEP(BUILD_DIR/src/std/std_bss_jp.c.o(.data .data.*));
 			LONG(0);
 		}
 	}
@@ -234,7 +234,7 @@ SECTIONS
 			BUILD_DIR/src/trn2/trn2_off.c.o(.data .data.*);
 			BUILD_DIR/src/trn2/trn2_hud.c.o(.data .data.*);
 			BUILD_DIR/src/trn2/trn2_slots.c.o(.data .data.*);
-			BUILD_DIR/src/trn2/trn2_bss.c.o(.data .data.*);
+			BUILD_DIR/src/trn2/trn2_bss_jp.c.o(.data .data.*);
 		}
 	}
 
@@ -265,7 +265,7 @@ SECTIONS
 			BUILD_DIR/src/trn/trn_reward.c.o(.data .data.*);
 			BUILD_DIR/src/trn/trn_hud.c.o(.data .data.*);
 			BUILD_DIR/src/trn/trn_slots.c.o(.data .data.*);
-			BUILD_DIR/src/trn/trn_bss.c.o(.data .data.*);
+			BUILD_DIR/src/trn/trn_bss_jp.c.o(.data .data.*);
 		}
 	}
 

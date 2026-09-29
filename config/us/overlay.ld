@@ -59,7 +59,7 @@ SECTIONS
 			. = ALIGN(., 4);
 			BUILD_DIR/src/btl/battle_effect.c.o(.data.*);
 			. = ALIGN(., 4);
-			KEEP(BUILD_DIR/src/btl/btl_bss.c.o(.data.*));
+			KEEP(BUILD_DIR/src/btl/btl_bss_us.c.o(.data.*));
 			. = ALIGN(., 4);
 
 			BUILD_DIR/src/btl/battle_setup.c.o(.bss.*);
@@ -123,7 +123,7 @@ SECTIONS
 			BUILD_DIR/src/doo2/doo2.c.o(.data.*);
 			. = ALIGN(., 4);
 
-			BUILD_DIR/src/doo2/doo2_bss.c.o(.data.*);
+			BUILD_DIR/src/doo2/doo2_bss_us.c.o(.data.*);
 			. = ALIGN(., 4);
 
 			BUILD_DIR/src/doo2/doo2.c.o(.bss.*);
@@ -152,7 +152,7 @@ SECTIONS
 			BUILD_DIR/src/dooa/dooa.c.o(.bss.*);
 			. = ALIGN(., 4);
 
-			BUILD_DIR/src/dooa/dooa_bss.c.o(.data.*);
+			BUILD_DIR/src/dooa/dooa_bss_us.c.o(.data.*);
 			. = ALIGN(., 4);
 
 			/* Trailer */
@@ -179,7 +179,7 @@ SECTIONS
 
 			BUILD_DIR/src/eab/eab.c.o(.data.*);
 			. = ALIGN(., 4);
-			BUILD_DIR/src/eab/eab_bss.c.o(.data.*);
+			BUILD_DIR/src/eab/eab_bss_us.c.o(.data.*);
 			. = ALIGN(., 4);
 
 			/* Trailer */
@@ -231,7 +231,7 @@ SECTIONS
 
 			BUILD_DIR/src/evl/evl.c.o(.data.*);
 			. = ALIGN(., 4);
-			BUILD_DIR/src/evl/evl_bss.c.o(.data.*);
+			BUILD_DIR/src/evl/evl_bss_us.c.o(.data.*);
 			. = ALIGN(., 4);
 
 			/* Trailer */
@@ -263,7 +263,7 @@ SECTIONS
 			BUILD_DIR/src/fish/fish.c.o(.data.*);
 			BUILD_DIR/src/fish/fish_model.c.o(.data.*);
 			. = ALIGN(., 4);
-			BUILD_DIR/src/fish/fish_bss.c.o(.data.*);
+			BUILD_DIR/src/fish/fish_bss_us.c.o(.data.*);
 			. = ALIGN(., 4);
 
 			/* Trailer */
@@ -293,7 +293,7 @@ SECTIONS
 
 			BUILD_DIR/src/kar/kar.c.o(.data.*);
 			. = ALIGN(., 4);
-			KEEP(BUILD_DIR/src/kar/kar_bss.c.o(.data.*));
+			KEEP(BUILD_DIR/src/kar/kar_bss_us.c.o(.data.*));
 			. = ALIGN(., 4);
 
 			BUILD_DIR/src/kar/kar.c.o(.bss.*);
@@ -319,7 +319,7 @@ SECTIONS
 			BUILD_DIR/src/mov/mov.c.o(.data.*);
 			. = ALIGN(., 4);
 
-			BUILD_DIR/src/mov/mov_bss.c.o(.data.*);
+			BUILD_DIR/src/mov/mov_bss_us.c.o(.data.*);
 			. = ALIGN(., 4);
 
 			BUILD_DIR/src/mov/mov.c.o(.bss.*);
@@ -344,7 +344,7 @@ SECTIONS
 
 			BUILD_DIR/src/murd/murd.c.o(.data.*);
 			. = ALIGN(., 4);
-			BUILD_DIR/src/murd/murd_bss.c.o(.data.*);
+			BUILD_DIR/src/murd/murd_bss_us.c.o(.data.*);
 			. = ALIGN(., 4);
 
 			BUILD_DIR/src/murd/murd.c.o(.bss.*);
@@ -398,7 +398,7 @@ SECTIONS
 			. = ALIGN(., 4);
 			BUILD_DIR/src/std/std_effect.c.o(.data.*);
 			. = ALIGN(., 4);
-			KEEP(BUILD_DIR/src/std/std_bss.c.o(.data.*));
+			KEEP(BUILD_DIR/src/std/std_bss_us.c.o(.data.*));
 			. = ALIGN(., 4);
 
 			BUILD_DIR/src/std/std_setup.c.o(.bss.*);
@@ -482,7 +482,7 @@ SECTIONS
 			. = ALIGN(., 4);
 			BUILD_DIR/src/trn2/trn2_slots.c.o(.data.*);
 			. = ALIGN(., 4);
-			KEEP(BUILD_DIR/src/trn2/trn2_bss.c.o(.data.*));
+			KEEP(BUILD_DIR/src/trn2/trn2_bss_us.c.o(.data.*));
 			. = ALIGN(., 4);
 			BUILD_DIR/src/trn2/trn2_hp_map99.c.o(.bss.*);
 			. = ALIGN(., 4);
@@ -570,7 +570,7 @@ SECTIONS
 			. = ALIGN(., 4);
 			BUILD_DIR/src/trn/trn_slots.c.o(.data.*);
 			. = ALIGN(., 4);
-			KEEP(BUILD_DIR/src/trn/trn_bss.c.o(.data.*));
+			KEEP(BUILD_DIR/src/trn/trn_bss_us.c.o(.data.*));
 			. = ALIGN(., 4);
 			BUILD_DIR/src/trn/trn_reward.c.o(.bss.*);
 			. = ALIGN(., 4);
@@ -639,7 +639,7 @@ SECTIONS
 			. = ALIGN(., 4);
 			BUILD_DIR/src/vs/vs_effect.c.o(.data.*);
 			. = ALIGN(., 4);
-			KEEP(BUILD_DIR/src/vs/vs_bss.c.o(.data.*));
+			KEEP(BUILD_DIR/src/vs/vs_bss_us.c.o(.data.*));
 			. = ALIGN(., 4);
 			. = ALIGN(., 4);
 

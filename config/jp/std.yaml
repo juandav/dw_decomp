@@ -105,6 +105,6 @@ segments:
       - [0x317C0, data]
       - [0x3224C, .data, std_hud]
       - [0x3264C, data]
-      - [0x331A8, .data, std_bss]
+      - [0x331A8, .data, std_bss_jp]
 
   - [0x379E8]

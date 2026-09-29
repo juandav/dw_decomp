@@ -107,6 +107,6 @@ segments:
       - [0x28B68, data]
       - [0x28B6C, .data, battle_hud]
       - [0x28C10, data]
-      - [0x29BAC, .data, btl_bss]
+      - [0x29BAC, .data, btl_bss_jp]
 
   - [0x2BCD0]

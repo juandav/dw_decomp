@@ -61,6 +61,6 @@ segments:
     subsegments:
       - [0x40, c, doo2]
       - [0x2738, .data, doo2]
-      - [0x279C, .data, doo2_bss]
+      - [0x279C, .data, doo2_bss_jp]
 
   - [0xC3A4]

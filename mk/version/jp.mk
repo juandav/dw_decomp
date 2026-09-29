@@ -91,7 +91,7 @@ BTL_C_SRC := \
 	src/btl/battle_hud.c \
 	src/btl/battle_main.c \
 	src/btl/battle_setup.c \
-	src/btl/btl_bss.c \
+	src/btl/btl_bss_jp.c \
 	src/btl/command_menu.c \
 	src/btl/command_shout.c
 
@@ -102,17 +102,17 @@ DGET_C_SRC := \
 $(eval $(call overlay,DGET,dget))
 DOO2_C_SRC := \
 	src/doo2/doo2.c \
-	src/doo2/doo2_bss.c
+	src/doo2/doo2_bss_jp.c
 
 $(eval $(call overlay,DOO2,doo2))
 DOOA_C_SRC := \
 	src/dooa/dooa.c \
-	src/dooa/dooa_bss.c
+	src/dooa/dooa_bss_jp.c
 
 $(eval $(call overlay,DOOA,dooa))
 EAB_C_SRC := \
 	src/eab/eab.c \
-	src/eab/eab_bss.c
+	src/eab/eab_bss_jp.c
 
 $(eval $(call overlay,EAB,eab))
 ENDI_C_SRC := \
@@ -121,18 +121,18 @@ ENDI_C_SRC := \
 $(eval $(call overlay,ENDI,endi))
 EVL_C_SRC := \
 	src/evl/evl.c \
-	src/evl/evl_bss.c
+	src/evl/evl_bss_jp.c
 
 $(eval $(call overlay,EVL,evl))
 FISH_C_SRC := \
 	src/fish/fish.c \
-	src/fish/fish_bss.c \
+	src/fish/fish_bss_jp.c \
 	src/fish/fish_model.c
 
 $(eval $(call overlay,FISH,fish))
 KAR_C_SRC := \
 	src/kar/kar.c \
-	src/kar/kar_bss.c
+	src/kar/kar_bss_jp.c
 
 $(eval $(call overlay,KAR,kar))
 MOV_C_SRC := \
@@ -141,7 +141,7 @@ MOV_C_SRC := \
 $(eval $(call overlay,MOV,mov))
 MURD_C_SRC := \
 	src/murd/murd.c \
-	src/murd/murd_bss.c
+	src/murd/murd_bss_jp.c
 
 $(eval $(call overlay,MURD,murd))
 SHOP_C_SRC := \
@@ -151,7 +151,7 @@ $(eval $(call overlay,SHOP,shop))
 STD_C_SRC := \
 	src/std/std_hud.c \
 	src/std/std_setup.c \
-	src/std/std_bss.c
+	src/std/std_bss_jp.c
 
 $(eval $(call overlay,STD,std))
 TRN2_C_SRC := \
@@ -164,7 +164,7 @@ TRN2_C_SRC := \
 	src/trn2/trn2_off.c \
 	src/trn2/trn2_reward.c \
 	src/trn2/trn2_slots.c \
-	src/trn2/trn2_bss.c
+	src/trn2/trn2_bss_jp.c
 
 $(eval $(call overlay,TRN2,trn2))
 TRN_C_SRC := \
@@ -177,7 +177,7 @@ TRN_C_SRC := \
 	src/trn/trn_reward.c \
 	src/trn/trn_slots.c \
 	src/trn/trn_speed.c \
-	src/trn/trn_bss.c
+	src/trn/trn_bss_jp.c
 
 $(eval $(call overlay,TRN,trn))
 VS_C_SRC := \

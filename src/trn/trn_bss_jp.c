@@ -13,7 +13,6 @@ VECTOR TRN_D_8008F358 = { 0 };
 
 int16_t TRN_D_8008F368[16] = { 0 };
 
-#if defined(VERSION_JP)
 // clang-format off
 int16_t TRN_D_8008F388[16] = {
 	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
@@ -35,8 +34,3 @@ SlotMachine TRN_SLOT_MACHINE = {
 	{ 0xe1, 0xc8, 0x00, 0x00, 0x00, 0x00 },
 };
 // clang-format on
-#else
-int16_t TRN_D_8008F388[16] = { 0 };
-
-SlotMachine TRN_SLOT_MACHINE = { 0 };
-#endif

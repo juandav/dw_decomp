@@ -105,6 +105,6 @@ segments:
       - [0x271DC, .data, std_main]
       - [0x27C38, .data, std_hud]
       - [0x28038, .data, std_effect]
-      - [0x28B84, .data, std_bss]
+      - [0x28B84, .data, std_bss_us]
 
   - [0x2D3E8]

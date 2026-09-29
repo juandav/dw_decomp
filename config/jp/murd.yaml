@@ -61,6 +61,6 @@ segments:
     subsegments:
       - [0x40, c, murd]
       - [0x21C0, .data, murd]
-      - [0x2298, .data, murd_bss]
+      - [0x2298, .data, murd_bss_jp]
 
   - [0x33D8]
