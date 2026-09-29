@@ -210,6 +210,7 @@ segments:
       - [0xADA28, sdata]
       - [0xADAD4, .sdata, std/std_hud]
       - [0xADAF8, sdata]
+      - [0xADB6C, .sdata, fish/fish]
       - [0xADBF0, .sdata, evl/evl]
       - [0xADC14, .sdata, kar/kar]
       - [0xADC6C, sdata]

@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 
 #include <inline_n.h>
 #include <libetc.h>
@@ -13,6 +14,7 @@
 #include <dw/file.h>
 #include <dw/fish.h>
 #include <dw/font.h>
+#include <dw/input.h>
 #include <dw/item.h>
 #include <dw/params.h>
 #include <dw/script.h>
@@ -28,10 +30,10 @@ typedef struct {
 	int32_t sz;
 	uint32_t flag;
 	int32_t otz;
-	int32_t unk18;
+	long unk18;
 	uint32_t unk1C[3];
-	int32_t x;
-	int32_t y;
+	long x;
+	long y;
 	uint32_t unk30[4];
 	uint32_t unk40;
 	SVECTOR rot;
@@ -53,6 +55,7 @@ extern int32_t FISH_D_8007A4F8[];
 extern int32_t FISH_D_8007A540[];
 extern int32_t FISH_D_8007A554[];
 extern int16_t MAIN_D_80154F80[];
+extern char MAIN_D_80124C54[];
 extern VECTOR FISH_REEL_TARGET;
 extern char FISH_MSG_TOOK_BAIT[];
 extern char FISH_MSG_TOO_LATE[];
@@ -70,8 +73,12 @@ extern char FISH_MSG_BE_CALM[];
 extern char FISH_MSG_HOOK_LOST[];
 extern char FISH_MSG_STUCK_LINE1[];
 extern char FISH_MSG_STUCK_LINE2[];
+#if defined(VERSION_JP)
+extern char FISH_MSG_BAG_FULL[];
+#else
 extern char FISH_MSG_BAG_FULL_LINE1[];
 extern char FISH_MSG_BAG_FULL_LINE2[];
+#endif
 extern char FISH_MSG_IT_GOT_STUCK[];
 extern int16_t DRAW_OFFSET_LIMIT_Y_MIN;
 extern int16_t DRAW_OFFSET_LIMIT_Y_MAX;
@@ -89,7 +96,6 @@ extern int8_t PARTNER_STATE;
 extern uint8_t TEXTBOX_OPEN_TIMER;
 extern int32_t VIEWPORT_DISTANCE;
 extern int8_t FISH_D_8007A4B4[];
-extern FishSprite FISH_D_8007A340[];
 extern uint8_t MAIN_D_80127BDC[];
 extern int8_t FISH_BITE_CHANCE[];
 extern SVECTOR FISH_D_8007A5BC[];
@@ -100,14 +106,14 @@ extern char FISH_PATH_ROD_MODEL[];
 extern int16_t CAMERA_X[];
 extern int16_t CAMERA_Y[];
 
-int32_t getDistance(int32_t x, int32_t y, int32_t z);
-int32_t customRandom(int32_t a, int32_t b);
+int32_t getDistance(long x, long y, long z);
+int32_t customRandom(long a, long b);
 void renderSelectionCursor(int32_t a0, int32_t a1, int32_t a2, int32_t a3, int32_t a4);
 void renderSmallNumber(int32_t color, int32_t n, int32_t x, int32_t y, int32_t value, int32_t layer);
 void renderLinePrimitive(uint32_t color, int32_t x0, int32_t y0, int32_t x1, int32_t y1, int32_t layer, int32_t semiTrans);
 void setCameraFollowPlayer(void);
 void unsetCameraFollowPlayer(void);
-void toEulerAngles(SVECTOR *out, int32_t x, int32_t y, int32_t z);
+void toEulerAngles(SVECTOR *out, long x, long y, long z);
 void rotateVectorYXZ(SVECTOR *rotation, VECTOR *input, VECTOR *output);
 void MAIN_func_800E4038(VECTOR *out, int32_t x, int32_t z, int32_t *f);
 void renderString(int32_t a, int32_t b, int32_t c, int32_t d, int32_t e, int32_t f, int32_t g, int32_t h, int32_t i);
@@ -120,7 +126,7 @@ int32_t FISH_panCameraTo(int32_t radius, VECTOR *pos, int32_t maxDX, int32_t max
 int32_t FISH_panCameraToTamer(int32_t radius);
 int32_t FISH_panCameraWithDPad(void);
 int32_t FISH_isScreenPointVisible(int32_t x, int32_t y);
-int32_t FISH_projectPoint(VECTOR *point, int32_t *outX, int32_t *outY);
+int32_t FISH_projectPoint(VECTOR *point, long *outX, long *outY);
 int32_t FISH_isWithinCastRange(VECTOR *pos, int32_t extra);
 int32_t FISH_isBaitMenuVisible(void);
 void FISH_closeBaitMenu(void);
@@ -344,7 +350,9 @@ uint8_t MAIN_D_801349B8[6] = { 34, 36, 34, 35, 37, 35 };
 SVECTOR MAIN_D_801349C0 = { 1024, 1024, 0, 0 };
 SVECTOR MAIN_D_801349C8 = { 1, 19, -48, 0 };
 SVECTOR MAIN_D_801349D0 = { 0 };
+#if !defined(VERSION_JP)
 char MAIN_D_801349D8[] = "Hooked!";
+#endif
 int32_t MAIN_D_801349E0 = 2;
 
 int32_t MAIN_D_801351D8;
@@ -360,7 +368,7 @@ FishBaitChance FISH_BAIT_CHANCES[6] = {
 	{ 0x71, 0x63 },
 };
 
-FishSprite FISH_SPRITES[32] = {
+FishSprite FISH_SPRITES[49] = {
 	{ 0x0017, 0x601c, 0xd0, 0xb4, 0xdf, 0xc3, 0x08, 0x0a },
 	{ 0x0017, 0x601c, 0x80, 0xd4, 0x9f, 0xe3, 0x10, 0x08 },
 	{ 0x0017, 0x601c, 0xa0, 0xd4, 0xbf, 0xe3, 0x10, 0x08 },
@@ -393,9 +401,6 @@ FishSprite FISH_SPRITES[32] = {
 	{ 0x0017, 0x609c, 0xd0, 0x9c, 0xdf, 0xb3, 0x08, 0x12 },
 	{ 0x0017, 0x609c, 0xe0, 0x9c, 0xef, 0xb3, 0x08, 0x12 },
 	{ 0x0017, 0x605c, 0x10, 0x8c, 0x58, 0xab, 0x22, 0x13 },
-};
-
-FishSprite FISH_D_8007A340[17] = {
 	{ 0x0017, 0x605c, 0x00, 0x9c, 0x03, 0xa1, 0x00, 0x00 },
 	{ 0x0017, 0x609c, 0x00, 0xac, 0x0f, 0xc3, 0x08, 0x05 },
 	{ 0x0017, 0x609c, 0x10, 0xac, 0x1f, 0xc3, 0x08, 0x05 },
@@ -504,6 +509,45 @@ SVECTOR FISH_D_8007A5BC[5] = {
 
 char FISH_PATH_ROD_MODEL[16] = "\\ETCDAT\\SAO.TMD";
 
+#if defined(VERSION_JP)
+char FISH_MSG_TOOK_BAIT[] = "エサを取られてしまった…";
+
+char FISH_MSG_TOO_LATE[] = "残念、おそすぎた…";
+
+char FISH_MSG_GOT_BAIT[] = "エサを取られてしまった。";
+
+char FISH_MSG_TOO_FAST[] = "残念、はやすぎた…";
+
+char FISH_MSG_STILL_HAVE_BAIT[] = "でもまだエサは残っているぞ。";
+
+char MAIN_D_801349D8[] = "かかった！";
+
+char FISH_MSG_LENGTH_GREAT[] = "すごい！全長　メートル　　センチ！";
+
+char FISH_MSG_LENGTH_M_CM[] = "全長　メートル　　センチ";
+
+char FISH_MSG_LENGTH_CM[] = "全長　　　センチメートル";
+
+char FISH_MSG_GOT_ONE[] = "をつりあげた！";
+
+char FISH_MSG_LET_IT_GO[] = "でもかわいそうだから逃がしてあげよう。";
+
+char FISH_MSG_LINE_CUT[] = "イトが切れてしまった！";
+
+char FISH_MSG_WATCH_TENSION[] = "…次はテンションゲージをよく見て、";
+
+char FISH_MSG_BE_CALM[] = "もっと落ち着いて行こう。";
+
+char FISH_MSG_HOOK_LOST[] = "ハリが外れてしまった！";
+
+char FISH_MSG_STUCK_LINE1[] = "んっ！？";
+
+char FISH_MSG_STUCK_LINE2[] = "何かひっかかったかな？";
+
+char FISH_MSG_IT_GOT_STUCK[] = "が引っかかった！";
+
+char FISH_MSG_BAG_FULL[] = "…しかし、かばんがいっぱいで持てなかった。";
+#else
 char FISH_MSG_TOOK_BAIT[] = "They took my bait!";
 
 char FISH_MSG_TOO_LATE[] = "Too late!";
@@ -541,6 +585,7 @@ char FISH_MSG_BAG_FULL_LINE1[28] = "My bag was so full, I could";
 char FISH_MSG_BAG_FULL_LINE2[] = "not carry it.";
 
 char FISH_MSG_IT_GOT_STUCK[] = "It got stuck!";
+#endif
 
 DVECTOR FISH_D_8007A794[9] = {
 	{ 0xfeca, 0xfff3 },
@@ -953,15 +998,40 @@ FishingMapData FISHING_MAP_DATA[2] = {
 };
 // clang-format on
 
+static inline int32_t FISH_screenLeft(int32_t x)
+{
+	return -DRAW_OFFSET_LIMIT_X_MAX + x;
+}
+
+static inline int32_t FISH_screenRight(int32_t x)
+{
+	return -DRAW_OFFSET_LIMIT_X_MIN + x;
+}
+
+static inline int32_t FISH_screenTop(int32_t y)
+{
+	return -DRAW_OFFSET_LIMIT_Y_MAX + y;
+}
+
+static inline int32_t FISH_screenBottom(int32_t y)
+{
+	return -DRAW_OFFSET_LIMIT_Y_MIN + y;
+}
+
+static inline int32_t FISH_viewX(int32_t x)
+{
+	return -DRAWING_OFFSET_X + x;
+}
+
+static inline long FISH_viewY(int32_t y)
+{
+	return -DRAWING_OFFSET_Y + y;
+}
+
 int32_t FISH_panCameraTo(int32_t radius, VECTOR *pos, int32_t maxDX, int32_t maxDY)
 {
 	SVECTOR v;
-	int32_t cx;
-	int32_t cy;
-	int32_t dx;
-	int32_t dy;
 	int32_t ang;
-	int32_t ox;
 
 	SetRotMatrix(&GsWSMATRIX);
 	SetTransMatrix(&GsWSMATRIX);
@@ -970,41 +1040,30 @@ int32_t FISH_panCameraTo(int32_t radius, VECTOR *pos, int32_t maxDX, int32_t max
 	gte_rtps();
 	gte_stsxy(&v);
 
-	cx = -DRAWING_OFFSET_X + 0xa0;
-	dx = v.vx - cx;
-	if (maxDX >= ((dx > 0) ? dx : -dx)) {
-		v.vx = -DRAWING_OFFSET_X + 0xa0;
+	if ((((v.vx - (int32_t)FISH_viewX(0xa0)) > 0) ? (v.vx - FISH_viewX(0xa0)) : -(v.vx - FISH_viewX(0xa0))) <= maxDX) {
+		v.vx = FISH_viewX(0xa0);
 	} else {
-		cx = -DRAWING_OFFSET_X + 0xa0;
-		maxDX = (cx < v.vx) ? -maxDX : maxDX;
-		v.vx += maxDX;
+		v.vx += (v.vx > FISH_viewX(0xa0)) ? -maxDX : maxDX;
 	}
 
-	cy = -DRAWING_OFFSET_Y + 0x78;
-	dy = v.vy - cy;
-	if (maxDY >= ((dy > 0) ? dy : -dy)) {
-		v.vy = -DRAWING_OFFSET_Y + 0x78;
+	if ((((v.vy - FISH_viewY(0x78)) > 0) ? (v.vy - FISH_viewY(0x78)) : -(v.vy - FISH_viewY(0x78))) <= maxDY) {
+		v.vy = FISH_viewY(0x78);
 	} else {
-		maxDY = ((-DRAWING_OFFSET_Y + 0x78) < v.vy) ? -maxDY : maxDY;
-		v.vy += maxDY;
+		v.vy += (v.vy > FISH_viewY(0x78)) ? -maxDY : maxDY;
 	}
 
-	v.vx = (v.vx < (-DRAW_OFFSET_LIMIT_X_MAX + 0xa0)) ? -DRAW_OFFSET_LIMIT_X_MAX + 0xa0 : (((-DRAW_OFFSET_LIMIT_X_MIN + 0xa0) < v.vx) ? -DRAW_OFFSET_LIMIT_X_MIN + 0xa0 : v.vx);
-	v.vy = (v.vy < (-DRAW_OFFSET_LIMIT_Y_MAX + 0x78)) ? -DRAW_OFFSET_LIMIT_Y_MAX + 0x78 : (((-DRAW_OFFSET_LIMIT_Y_MIN + 0x78) < v.vy) ? -DRAW_OFFSET_LIMIT_Y_MIN + 0x78 : v.vy);
+	v.vx = (v.vx < FISH_screenLeft(0xa0)) ? FISH_screenLeft(0xa0) : ((v.vx > FISH_screenRight(0xa0)) ? FISH_screenRight(0xa0) : v.vx);
+	v.vy = (v.vy < FISH_screenTop(0x78)) ? FISH_screenTop(0x78) : ((v.vy > FISH_screenBottom(0x78)) ? FISH_screenBottom(0x78) : v.vy);
 
-	if (((v.vx - (-DRAWING_OFFSET_X + 0xa0)) == 0) && ((v.vy - (-DRAWING_OFFSET_Y + 0x78)) == 0)) {
+	if (((v.vx - FISH_viewX(0xa0)) == 0) && ((v.vy - FISH_viewY(0x78)) == 0)) {
 		return 0;
 	}
 
-	ox = v.vx;
-
 	if (radius > 0) {
-		if (getDistance(ox - (-DRAWING_OFFSET_X + 0xa0),
-		                v.vy - (-DRAWING_OFFSET_Y + 0x78), 0) >= radius) {
-			ang = ratan2(v.vy - (-DRAWING_OFFSET_Y + 0x78),
-			             v.vx - (-DRAWING_OFFSET_X + 0xa0));
-			v.vx = (-DRAWING_OFFSET_X + 0xa0) + ((radius * rcos(ang)) >> 12);
-			v.vy = (-DRAWING_OFFSET_Y + 0x78) + ((radius * rsin(ang)) >> 12);
+		if (getDistance(v.vx - (int32_t)FISH_viewX(0xa0), v.vy - FISH_viewY(0x78), 0) >= radius) {
+			ang = ratan2(v.vy - FISH_viewY(0x78), v.vx - FISH_viewX(0xa0));
+			v.vx = FISH_viewX(0xa0) + ((radius * rcos(ang)) >> 12);
+			v.vy = FISH_viewY(0x78) + ((radius * rsin(ang)) >> 12);
 		}
 	}
 
@@ -1020,54 +1079,37 @@ int32_t FISH_panCameraToTamer(int32_t radius)
 
 int32_t FISH_panCameraWithDPad(void)
 {
-	int32_t cx;
-	int32_t ylo;
-	int32_t cy;
-	int16_t x;
-	int16_t y;
-	int32_t d;
+	SVECTOR pos;
 
-	x = -DRAWING_OFFSET_X + 0xa0;
-	cx = -DRAWING_OFFSET_X + 0xa0;
-	y = -DRAWING_OFFSET_Y + 0x78;
-	cy = -DRAWING_OFFSET_Y + 0x78;
+	pos.vx = FISH_viewX(0xa0);
+	pos.vy = FISH_viewY(0x78);
+	pos.vz = 0;
 
 	if ((POLLED_INPUT & 0x1000) != 0) {
-		y -= 5;
+		pos.vy -= 5;
 	}
 
 	if ((POLLED_INPUT & 0x4000) != 0) {
-		y += 5;
+		pos.vy += 5;
 	}
 
 	if ((POLLED_INPUT & 0x8000) != 0) {
-		x -= 5;
+		pos.vx -= 5;
 	}
 
 	if ((POLLED_INPUT & 0x2000) != 0) {
-		x += 5;
+		pos.vx += 5;
 	}
 
-	x = (x < (-DRAW_OFFSET_LIMIT_X_MAX + 0xa0)) ? -DRAW_OFFSET_LIMIT_X_MAX + 0xa0 : (((-DRAW_OFFSET_LIMIT_X_MIN + 0xa0) < x) ? -DRAW_OFFSET_LIMIT_X_MIN + 0xa0 : x);
-	ylo = -DRAW_OFFSET_LIMIT_Y_MAX;
-	y = (y < (ylo + 0x78)) ? ylo + 0x78 : (((-DRAW_OFFSET_LIMIT_Y_MIN + 0x78) < y) ? -DRAW_OFFSET_LIMIT_Y_MIN + 0x78 : y);
+	pos.vx = (pos.vx < FISH_screenLeft(0xa0)) ? FISH_screenLeft(0xa0) : ((pos.vx > FISH_screenRight(0xa0)) ? FISH_screenRight(0xa0) : pos.vx);
+	pos.vy = (pos.vy < FISH_screenTop(0x78)) ? FISH_screenTop(0x78) : ((pos.vy > FISH_screenBottom(0x78)) ? FISH_screenBottom(0x78) : pos.vy);
 
-	cx = x - cx;
-	d = cx;
-	d = (d > 0) ? d : -d;
-	if (d > 0) {
-		goto move;
+	if (((((pos.vx - (int32_t)FISH_viewX(0xa0)) > 0) ? (pos.vx - FISH_viewX(0xa0)) : -(pos.vx - FISH_viewX(0xa0))) <= 0) &&
+	    ((((pos.vy - FISH_viewY(0x78)) > 0) ? (pos.vy - FISH_viewY(0x78)) : -(pos.vy - FISH_viewY(0x78))) <= 0)) {
+		return 0;
 	}
 
-	d = y - cy;
-	d = (d > 0) ? d : -d;
-	if (d > 0) {
-		goto move;
-	}
-
-	return 0;
-move:
-	FISH_scrollCameraTo(x, y);
+	FISH_scrollCameraTo(pos.vx, pos.vy);
 
 	return 1;
 }
@@ -1077,27 +1119,25 @@ int32_t FISH_isScreenPointVisible(int32_t x, int32_t y)
 	int32_t ret;
 	int32_t okY;
 	int32_t okX;
-	int32_t origin;
 
-	origin = 0;
 	ret = 0;
 	okY = 0;
 	okX = 0;
 
-	if (!(x < (-DRAW_OFFSET_LIMIT_X_MAX + origin))) {
-		if (!((-DRAW_OFFSET_LIMIT_X_MIN + 0x140) < x)) {
+	if (!(x < FISH_screenLeft(0))) {
+		if (!(x > FISH_screenRight(0x140))) {
 			okX = 1;
 		}
 	}
 
 	if (okX != 0) {
-		if (!(y < (-DRAW_OFFSET_LIMIT_Y_MAX + origin))) {
+		if (!(y < FISH_screenTop(0))) {
 			okY = 1;
 		}
 	}
 
 	if (okY != 0) {
-		if (!((-DRAW_OFFSET_LIMIT_Y_MIN + 0xf0) < y)) {
+		if (!(y > FISH_screenBottom(0xf0))) {
 			ret = 1;
 		}
 	}
@@ -1105,27 +1145,24 @@ int32_t FISH_isScreenPointVisible(int32_t x, int32_t y)
 	return ret;
 }
 
-int32_t FISH_projectPoint(VECTOR *point, int32_t *outX, int32_t *outY)
+int32_t FISH_projectPoint(VECTOR *point, long *outX, long *outY)
 {
-	MATRIX *in = &FISH_SCRATCH->m[1];
-	MATRIX *out = &FISH_SCRATCH->m[0];
+	FISH_SCRATCH->m[1].t[0] = point->vx;
+	FISH_SCRATCH->m[1].t[1] = point->vy;
+	FISH_SCRATCH->m[1].t[2] = point->vz;
 
-	in->t[0] = point->vx;
-	in->t[1] = point->vy;
-	in->t[2] = point->vz;
+	GsMulCoord0(&GsWSMATRIX, &FISH_SCRATCH->m[1], &FISH_SCRATCH->m[0]);
 
-	GsMulCoord0(&GsWSMATRIX, in, out);
-
-	if ((out->t[2] <= 0) || (out->t[2] >= 0x10000)) {
+	if ((FISH_SCRATCH->m[0].t[2] <= 0) || (FISH_SCRATCH->m[0].t[2] >= 0x10000)) {
 		return 0;
 	}
 
 	if (outX != NULL) {
-		*outX = out->t[0] * VIEWPORT_DISTANCE / out->t[2];
+		*outX = FISH_SCRATCH->m[0].t[0] * VIEWPORT_DISTANCE / FISH_SCRATCH->m[0].t[2];
 	}
 
 	if (outY != NULL) {
-		*outY = out->t[1] * VIEWPORT_DISTANCE / out->t[2];
+		*outY = FISH_SCRATCH->m[0].t[1] * VIEWPORT_DISTANCE / FISH_SCRATCH->m[0].t[2];
 	}
 
 	return 1;
@@ -1144,15 +1181,15 @@ int32_t FISH_isWithinCastRange(VECTOR *pos, int32_t extra)
 int32_t FISH_isBaitMenuVisible(void)
 {
 	FishingBaitMenu *menu = &FISHING_DATA_PTR->baitMenu;
-	int32_t isOpen;
 	int32_t ret;
+	int32_t isOpen;
 
 	if (menu->boxId <= 0) {
 		return 0;
 	}
 
 	ret = 1;
-	isOpen = ret;
+	isOpen = 1;
 	if ((UI_BOX_DATA[menu->boxId].state != 2) && (UI_BOX_DATA[menu->boxId].state != 3)) {
 		isOpen = 0;
 	}
@@ -1179,9 +1216,6 @@ void FISH_closeBaitMenu(void)
 void FISH_tickBaitMenu(void)
 {
 	FishingBaitMenu *menu = &FISHING_DATA_PTR->baitMenu;
-	int32_t v;
-	int32_t n;
-	int32_t w;
 
 	if (POLLED_INPUT == POLLED_INPUT_PREVIOUS) {
 		MAIN_D_801351D8++;
@@ -1198,10 +1232,7 @@ void FISH_tickBaitMenu(void)
 	if (((POLLED_INPUT & ~POLLED_INPUT_PREVIOUS & 0x1000) != 0) ||
 	    ((MAIN_D_801351D8 >= 0xb) && ((POLLED_INPUT & 0x1000) != 0))) {
 		playSound(0, 2);
-		v = menu->cursorRow;
-		v--;
-		menu->cursorRow = v;
-		if (v < 0) {
+		if (--menu->cursorRow < 0) {
 			menu->cursorRow = 0;
 		}
 		if (menu->cursorRow < menu->rowOffset) {
@@ -1213,11 +1244,8 @@ void FISH_tickBaitMenu(void)
 	if (((POLLED_INPUT & ~POLLED_INPUT_PREVIOUS & 0x4000) != 0) ||
 	    ((MAIN_D_801351D8 >= 0xb) && ((POLLED_INPUT & 0x4000) != 0))) {
 		playSound(0, 2);
-		w = menu->cursorRow + 1;
-		menu->cursorRow = w;
-		n = menu->totalRows;
-		if (w >= n) {
-			menu->cursorRow = n - 1;
+		if (++menu->cursorRow >= menu->totalRows) {
+			menu->cursorRow = menu->totalRows - 1;
 		}
 		if (menu->cursorRow >= (menu->rowOffset + menu->visibleRows)) {
 			menu->rowOffset = menu->cursorRow - menu->visibleRows + 1;
@@ -1228,10 +1256,7 @@ void FISH_tickBaitMenu(void)
 	if (((POLLED_INPUT & ~POLLED_INPUT_PREVIOUS & 0x8000) != 0) ||
 	    ((MAIN_D_801351D8 >= 0xb) && ((POLLED_INPUT & 0x8000) != 0))) {
 		playSound(0, 2);
-		v = menu->column;
-		v--;
-		menu->column = v;
-		if (v < 0) {
+		if (--menu->column < 0) {
 			menu->column = 1;
 		}
 	}
@@ -1239,15 +1264,12 @@ void FISH_tickBaitMenu(void)
 	if (((POLLED_INPUT & ~POLLED_INPUT_PREVIOUS & 0x2000) != 0) ||
 	    ((MAIN_D_801351D8 >= 0xb) && ((POLLED_INPUT & 0x2000) != 0))) {
 		playSound(0, 2);
-		v = menu->column;
-		v++;
-		menu->column = v;
-		if (v >= 2) {
+		if (++menu->column >= 2) {
 			menu->column = 0;
 		}
 	}
 
-	if ((POLLED_INPUT & ~POLLED_INPUT_PREVIOUS & 0x40) != 0) {
+	if ((POLLED_INPUT & ~POLLED_INPUT_PREVIOUS & CONFIRM_BUTTON) != 0) {
 		playSound(0, 2);
 		if (menu->items[menu->column + (menu->cursorRow * 2)] != -1) {
 			menu->selectedItem = menu->items[menu->column + (menu->cursorRow * 2)];
@@ -1255,7 +1277,7 @@ void FISH_tickBaitMenu(void)
 		}
 	}
 
-	if ((POLLED_INPUT & ~POLLED_INPUT_PREVIOUS & 0x10) != 0) {
+	if ((POLLED_INPUT & ~POLLED_INPUT_PREVIOUS & CANCEL_BUTTON) != 0) {
 		playSound(0, 2);
 		menu->selectedItem = -1;
 		FISH_closeBaitMenu();
@@ -1267,8 +1289,8 @@ void FISH_drawBaitMenuRow(int32_t row)
 	FishingBaitMenu *menu = &FISHING_DATA_PTR->baitMenu;
 	RECT rect;
 	RECT area;
-	int32_t i;
 	int32_t item;
+	int32_t i;
 
 	for (i = 0; i < 2; i++) {
 		item = menu->items[(row * 2) + i];
@@ -1288,16 +1310,16 @@ void FISH_drawBaitMenuRow(int32_t row)
 void FISH_renderBaitMenu(int32_t boxId)
 {
 	FishingBaitMenu *menu = &FISHING_DATA_PTR->baitMenu;
-	UIBoxData *b;
 	POLY_FT4 *prim;
+	int32_t col;
 	int32_t layer;
+	UIBoxData *b;
+	int32_t row;
 	int32_t x;
 	int32_t y;
-	int32_t row;
-	int32_t col;
+	int32_t r;
 	int32_t item;
 	int32_t q;
-	int32_t r;
 
 	layer = 6 - boxId;
 	b = &UI_BOX_DATA[boxId];
@@ -1305,8 +1327,8 @@ void FISH_renderBaitMenu(int32_t boxId)
 		return;
 	}
 
-	y = b->finalPos.y;
 	x = b->finalPos.x;
+	y = b->finalPos.y;
 
 	for (row = 0; row < menu->visibleRows; row++) {
 		for (col = 0; col < 2; col++) {
@@ -1337,13 +1359,14 @@ void FISH_renderBaitMenu(int32_t boxId)
 			GsSetWorkBase((PACKET *)(prim + 1));
 
 			renderSmallNumber(0, 2, x + ((col != 0) ? 0x116 : 0x86),
-			                   y + 0x12 + row * 0x12,
-			                   (INVENTORY.types.array + item)[0x1e], layer);
+			                  y + 0x12 + row * 0x12,
+			                  (INVENTORY.types.array + item)[0x1e], layer);
 		}
 	}
 
-	renderSelectionCursor(x + 6 + menu->column * 144, y + 0xd + (menu->cursorRow - menu->rowOffset) * 18,
-	                      0x8e, 0x12, layer);
+	col = x + 6 + menu->column * 144;
+	row = y + 0xd + (menu->cursorRow - menu->rowOffset) * 18;
+	renderSelectionCursor(col, row, 0x8e, 0x12, layer);
 
 	if (menu->totalRows > menu->visibleRows) {
 		UI_BOX_DATA[menu->boxId].rowOffset = menu->rowOffset;
@@ -1357,12 +1380,12 @@ void FISH_renderBaitMenu(int32_t boxId)
 int32_t FISH_openBaitMenu(void)
 {
 	FishingBaitMenu *menu = &FISHING_DATA_PTR->baitMenu;
-	DVECTOR pos;
 	int32_t n;
 	int32_t i;
+	int32_t k;
+	DVECTOR pos;
 	int32_t flag;
 	int32_t features;
-	int32_t k;
 
 	menu->lastRow = -1;
 	menu->column = 0;
@@ -1412,7 +1435,12 @@ int32_t FISH_openBaitMenu(void)
 		flag = 1;
 	}
 
-	features = flag ? 6 : 2;
+	if (flag) {
+		features = 6;
+	} else {
+		features = 2;
+	}
+
 	createAnimatedUIBox(menu->boxId, 0, features, &menu->finalPos, &menu->startPos,
 	                    (TickFunction)FISH_tickBaitMenu, (RenderFunction)FISH_renderBaitMenu);
 	menu->shown = 1;
@@ -1430,7 +1458,9 @@ void FISH_initBaitMenu(void)
 
 void FISH_closeBaitMenuIfOpen(void)
 {
-	if (FISHING_DATA_PTR->baitMenu.shown != 0) {
+	FishingBaitMenu *menu = &FISHING_DATA_PTR->baitMenu;
+
+	if (menu->shown != 0) {
 		FISH_closeBaitMenu();
 	}
 }
@@ -1448,15 +1478,15 @@ void FISH_scrollViewToTarget(int32_t unused)
 int32_t FISH_isTextBoxVisible(void)
 {
 	FishingBox *box = &FISHING_DATA_PTR->view.box;
-	int32_t isOpen;
 	int32_t ret;
+	int32_t isOpen;
 
 	if (box->boxId <= 0) {
 		return 0;
 	}
 
 	ret = 1;
-	isOpen = ret;
+	isOpen = 1;
 	if ((UI_BOX_DATA[box->boxId].state != 2) && (UI_BOX_DATA[box->boxId].state != 3)) {
 		isOpen = 0;
 	}
@@ -1491,8 +1521,8 @@ void FISH_tickTextBox(void)
 
 	view->isScrolling = 1;
 
-	if (((view->framesOpen >= 10) && ((POLLED_INPUT & ~POLLED_INPUT_PREVIOUS & 0x40) != 0)) ||
-	    ((POLLED_INPUT & ~POLLED_INPUT_PREVIOUS & 0x10) != 0)) {
+	if (((view->framesOpen >= 10) && ((POLLED_INPUT & ~POLLED_INPUT_PREVIOUS & CONFIRM_BUTTON) != 0)) ||
+	    ((POLLED_INPUT & ~POLLED_INPUT_PREVIOUS & CANCEL_BUTTON) != 0)) {
 		POLLED_INPUT = 0;
 		FISH_closeTextBox();
 		playSound(0, 3);
@@ -1502,7 +1532,7 @@ void FISH_tickTextBox(void)
 		view->framesOpen++;
 	}
 
-	TEXTBOX_OPEN_TIMER = (uint32_t)TEXTBOX_OPEN_TIMER + 1;
+	TEXTBOX_OPEN_TIMER++;
 }
 
 void FISH_renderTextBox(int32_t boxId)
@@ -1510,9 +1540,9 @@ void FISH_renderTextBox(int32_t boxId)
 	FishingView *v = &FISHING_DATA_PTR->view;
 	UIBoxData *b;
 	int32_t i;
+	int32_t layer;
 	int32_t x;
 	int32_t y;
-	int32_t layer;
 
 	layer = 6 - boxId;
 	b = &UI_BOX_DATA[boxId];
@@ -1592,12 +1622,10 @@ void FISH_randomPointInSpot(int32_t index, VECTOR *out)
 {
 	int32_t t;
 	DVECTOR *pts[3];
+	SVECTOR pos;
 	FishingSpot *spot;
 	int32_t j;
 	int32_t dup;
-	int16_t x;
-	int16_t y;
-	int32_t lo;
 
 	spot = &FISHING_DATA_PTR->mapData->fishingSpots[index];
 	if ((index < 0) || (index >= 6)) {
@@ -1620,28 +1648,27 @@ retry:
 		} while (dup);
 	}
 
-	lo = 0;
 	for (t = 0; t < 3U; t++) {
-		pts[t]->vx = (pts[t]->vx < (-DRAW_OFFSET_LIMIT_X_MAX + lo)) ? -DRAW_OFFSET_LIMIT_X_MAX + lo : (((-DRAW_OFFSET_LIMIT_X_MIN + 0x140) < pts[t]->vx) ? -DRAW_OFFSET_LIMIT_X_MIN + 0x140 : pts[t]->vx);
-		pts[t]->vy = (pts[t]->vy < (-DRAW_OFFSET_LIMIT_Y_MAX + lo)) ? -DRAW_OFFSET_LIMIT_Y_MAX + lo : (((-DRAW_OFFSET_LIMIT_Y_MIN + 0xf0) < pts[t]->vy) ? -DRAW_OFFSET_LIMIT_Y_MIN + 0xf0 : pts[t]->vy);
+		pts[t]->vx = (pts[t]->vx < FISH_screenLeft(0)) ? FISH_screenLeft(0) : ((pts[t]->vx > FISH_screenRight(0x140)) ? FISH_screenRight(0x140) : pts[t]->vx);
+		pts[t]->vy = (pts[t]->vy < FISH_screenTop(0)) ? FISH_screenTop(0) : ((pts[t]->vy > FISH_screenBottom(0xf0)) ? FISH_screenBottom(0xf0) : pts[t]->vy);
 	}
 
 	t = customRandom(0, 0x1000);
-	x = ((pts[0]->vx * t) + (pts[1]->vx * (0x1000 - t))) >> 12;
-	y = ((pts[0]->vy * t) + (pts[1]->vy * (0x1000 - t))) >> 12;
+	pos.vx = ((pts[0]->vx * t) + (pts[1]->vx * (0x1000 - t))) >> 12;
+	pos.vy = ((pts[0]->vy * t) + (pts[1]->vy * (0x1000 - t))) >> 12;
 	t = customRandom(0, 0x1000);
-	x = ((pts[2]->vx * t) + (x * (0x1000 - t))) >> 12;
-	y = ((pts[2]->vy * t) + (y * (0x1000 - t))) >> 12;
+	pos.vx = ((pts[2]->vx * t) + (pos.vx * (0x1000 - t))) >> 12;
+	pos.vy = ((pts[2]->vy * t) + (pos.vy * (0x1000 - t))) >> 12;
 
-	if (FISH_isScreenPointVisible(x, y) == 0) {
+	if (FISH_isScreenPointVisible(pos.vx, pos.vy) == 0) {
 		goto retry;
 	}
 
-	if (FISHING_DATA_PTR->mapData->isWater(x, y) == 0) {
+	if (FISHING_DATA_PTR->mapData->isWater(pos.vx, pos.vy) == 0) {
 		goto retry;
 	}
 
-	MAIN_func_800E4038(out, x, y, &t);
+	MAIN_func_800E4038(out, pos.vx, pos.vy, &t);
 }
 
 void FISH_drawStub(void)
@@ -1651,8 +1678,6 @@ void FISH_drawStub(void)
 void FISH_drawSprite2D(int32_t x, int32_t y, int32_t order, FishSprite *desc, int32_t sx, int32_t sy, int32_t rot, int32_t color, int32_t flags)
 {
 	POLY_FT4 *prim;
-	int32_t t;
-	int32_t extent;
 	int32_t i;
 
 	prim = (POLY_FT4 *)GsGetWorkBase();
@@ -1662,23 +1687,12 @@ void FISH_drawSprite2D(int32_t x, int32_t y, int32_t order, FishSprite *desc, in
 	prim->v0 = prim->v1 = desc->v0;
 	prim->v2 = prim->v3 = desc->v1;
 
-	t = (-desc->ox * sx) >> 12;
-	FISH_SCRATCH->pts[2].vx = t;
-	FISH_SCRATCH->pts[0].vx = t;
-
-	extent = ((desc->u1 - desc->u0) > 0) ? (desc->u1 - desc->u0) : -(desc->u1 - desc->u0);
-	t = (sx * (-desc->ox + extent)) >> 12;
-	FISH_SCRATCH->pts[3].vx = t;
-	FISH_SCRATCH->pts[1].vx = t;
-
-	t = (-desc->oy * sy) >> 12;
-	FISH_SCRATCH->pts[1].vy = t;
-	FISH_SCRATCH->pts[0].vy = t;
-
-	extent = ((desc->v1 - desc->v0) > 0) ? (desc->v1 - desc->v0) : -(desc->v1 - desc->v0);
-	t = (sy * (-desc->oy + extent)) >> 12;
-	FISH_SCRATCH->pts[3].vy = t;
-	FISH_SCRATCH->pts[2].vy = t;
+	FISH_SCRATCH->pts[0].vx = FISH_SCRATCH->pts[2].vx = (-desc->ox * sx) >> 12;
+	FISH_SCRATCH->pts[1].vx = FISH_SCRATCH->pts[3].vx =
+		(sx * (-desc->ox + (((desc->u1 - desc->u0) > 0) ? (desc->u1 - desc->u0) : -(desc->u1 - desc->u0)))) >> 12;
+	FISH_SCRATCH->pts[0].vy = FISH_SCRATCH->pts[1].vy = (-desc->oy * sy) >> 12;
+	FISH_SCRATCH->pts[2].vy = FISH_SCRATCH->pts[3].vy =
+		(sy * (-desc->oy + (((desc->v1 - desc->v0) > 0) ? (desc->v1 - desc->v0) : -(desc->v1 - desc->v0)))) >> 12;
 
 	FISH_SCRATCH->rot.vx = 0;
 	FISH_SCRATCH->rot.vy = 0;
@@ -1708,10 +1722,7 @@ void FISH_drawSprite2D(int32_t x, int32_t y, int32_t order, FishSprite *desc, in
 void FISH_drawSprite3D(VECTOR *pos, SVECTOR *rot, VECTOR *scale, FishSprite *desc, int32_t color, int32_t flags, int32_t depth)
 {
 	POLY_FT4 *prim;
-	int32_t t;
-	int32_t extent;
 	int32_t i;
-	int32_t j;
 
 	RotMatrixYXZ(rot, &FISH_SCRATCH->m[1]);
 	FISH_SCRATCH->m[1].t[0] = pos->vx;
@@ -1721,25 +1732,12 @@ void FISH_drawSprite3D(VECTOR *pos, SVECTOR *rot, VECTOR *scale, FishSprite *des
 	GsSetLsMatrix(&FISH_SCRATCH->m[0]);
 	prim = (POLY_FT4 *)GsGetWorkBase();
 
-	t = (-desc->ox * scale->vx) >> 12;
-	FISH_SCRATCH->pts[2].vx = t;
-	FISH_SCRATCH->pts[0].vx = t;
-
-	extent = desc->u1 - desc->u0;
-	extent = (extent > 0) ? extent : -extent;
-	t = (scale->vx * (-desc->ox + extent)) >> 12;
-	FISH_SCRATCH->pts[3].vx = t;
-	FISH_SCRATCH->pts[1].vx = t;
-
-	t = (-desc->oy * scale->vy) >> 12;
-	FISH_SCRATCH->pts[1].vy = t;
-	FISH_SCRATCH->pts[0].vy = t;
-
-	extent = desc->v1 - desc->v0;
-	extent = (extent > 0) ? extent : -extent;
-	t = (scale->vy * (-desc->oy + extent)) >> 12;
-	FISH_SCRATCH->pts[3].vy = t;
-	FISH_SCRATCH->pts[2].vy = t;
+	FISH_SCRATCH->pts[0].vx = FISH_SCRATCH->pts[2].vx = (-desc->ox * scale->vx) >> 12;
+	FISH_SCRATCH->pts[1].vx = FISH_SCRATCH->pts[3].vx =
+		(scale->vx * (-desc->ox + (((desc->u1 - desc->u0) > 0L) ? (desc->u1 - desc->u0) : -(desc->u1 - desc->u0)))) >> 12;
+	FISH_SCRATCH->pts[0].vy = FISH_SCRATCH->pts[1].vy = (-desc->oy * scale->vy) >> 12;
+	FISH_SCRATCH->pts[2].vy = FISH_SCRATCH->pts[3].vy =
+		(scale->vy * (-desc->oy + (((desc->v1 - desc->v0) > 0L) ? (desc->v1 - desc->v0) : -(desc->v1 - desc->v0)))) >> 12;
 
 	for (i = 0; i < 4; i++) {
 		FISH_SCRATCH->pts[i].vz = 0;
@@ -1780,7 +1778,7 @@ void FISH_freeMarker(FishMarker *s)
 void FISH_tickMarker(FishMarker *s)
 {
 	if (s->active != 0) {
-		if ((s->lifetime = s->lifetime - 1) == 0) {
+		if (--s->lifetime == 0) {
 			FISH_freeMarker(s);
 		}
 	}
@@ -1788,8 +1786,6 @@ void FISH_tickMarker(FishMarker *s)
 
 void FISH_drawMarker(FishMarker *s)
 {
-	FishSprite *p;
-
 	if (s->active == 0) {
 		return;
 	}
@@ -1798,9 +1794,7 @@ void FISH_drawMarker(FishMarker *s)
 		return;
 	}
 
-	p = FISH_SPRITES + s->sprite;
-
-	FISH_drawSprite2D(FISH_SCRATCH->x, FISH_SCRATCH->y, 0x42, p,
+	FISH_drawSprite2D(FISH_SCRATCH->x, FISH_SCRATCH->y, 0x42, &FISH_SPRITES[s->sprite],
 	                  0x1000, 0x1000, 0, 0x808080, 0);
 }
 
@@ -1820,17 +1814,13 @@ void FISH_initMarkerPool(void)
 FishMarker *FISH_allocMarker(void)
 {
 	FishMarkerPool *pool = &FISHING_DATA_PTR->markerPool;
-	FishMarker *end;
-	FishMarker *start;
 	FishMarker *p;
 
 	if (pool->count >= 16U) {
 		return NULL;
 	}
 
-	end = &pool->items[16];
 	p = pool->next;
-	start = p;
 
 	do {
 		if (p->active == 0) {
@@ -1839,10 +1829,10 @@ FishMarker *FISH_allocMarker(void)
 		}
 
 		p++;
-		if (p >= end) {
+		if (p >= &pool->items[16]) {
 			p = pool->items;
 		}
-	} while (p != start);
+	} while (p != pool->next);
 
 	pool->count = 16;
 
@@ -1990,17 +1980,13 @@ void FISH_initRipplePool(void)
 FishRipple *FISH_allocRipple(void)
 {
 	FishRipplePool *pool = &FISHING_DATA_PTR->ripplePool;
-	FishRipple *end;
-	FishRipple *start;
 	FishRipple *p;
 
 	if (pool->count >= 16U) {
 		return NULL;
 	}
 
-	end = &pool->items[16];
 	p = pool->next;
-	start = p;
 
 	do {
 		if (p->active == 0) {
@@ -2009,10 +1995,10 @@ FishRipple *FISH_allocRipple(void)
 		}
 
 		p++;
-		if (p >= end) {
+		if (p >= &pool->items[16]) {
 			p = pool->items;
 		}
-	} while (p != start);
+	} while (p != pool->next);
 
 	pool->count = 16;
 
@@ -2049,7 +2035,6 @@ void FISH_spawnRipple(int32_t kind, VECTOR *pos, int32_t attractRadius, int32_t 
 void FISH_tickRipples(void)
 {
 	FishRipplePool *pool = &FISHING_DATA_PTR->ripplePool;
-	FishRipple *p;
 	int32_t i;
 
 	for (i = 0; i < 16U; i++) {
@@ -2059,8 +2044,7 @@ void FISH_tickRipples(void)
 	}
 
 	if (pool->attractor != NULL) {
-		p = pool->attractor;
-		if (p->active == 0) {
+		if (pool->attractor->active == 0) {
 			pool->attractor = NULL;
 		}
 	}
@@ -2082,12 +2066,10 @@ void FISH_loadSpritesAndSeadramon(TMDFileLoadingData *model)
 {
 	uint32_t tpage;
 	uint32_t clut;
-	FishingData *d;
 
 	loadTextureFile(FISHING_DATA_PTR->mapData->spriteFilePath, &tpage, &clut);
-
-	d = FISHING_DATA_PTR;
-	FISH_loadTMDModel(&d->seadramonModel, FISH_PATH_SEADRAMON_MODEL, d->seadramonModelBuffer, 0x1000);
+	FISH_loadTMDModel(&FISHING_DATA_PTR->seadramonModel, FISH_PATH_SEADRAMON_MODEL,
+	                  FISHING_DATA_PTR->seadramonModelBuffer, 0x1000);
 }
 
 void FISH_onRodModelLoaded(TMDFileLoadingData *model)
@@ -2111,11 +2093,6 @@ void FISH_beginTension(void)
 	FISH_resetTension();
 	t->display = 1;
 	t->limit = (FISHING_DATA_PTR->rod.swimmerType == 1) ? 0x1388 : 0x2710;
-}
-
-static inline int32_t FISH_tensionOverLimit(FishingTension *t, int32_t level)
-{
-	return t->limit < level;
 }
 
 int32_t FISH_updateTension(void)
@@ -2147,7 +2124,7 @@ int32_t FISH_updateTension(void)
 		break;
 	}
 
-	t->level = (t->level < -t->limit) ? -t->limit : (FISH_tensionOverLimit(t, t->level) ? t->limit : t->level);
+	t->level = (t->level < -t->limit) ? -t->limit : ((t->level > t->limit) ? t->limit : t->level);
 
 	if (t->level >= (t->limit / 2)) {
 		t->color.rgb[0] = FISH_remapClamped(t->level, t->limit / 2, t->limit, 0xff, 0xff);
@@ -2173,9 +2150,7 @@ int32_t FISH_updateTension(void)
 
 	if (t->level == t->limit) {
 		snapSteps = 4 - FISH_remapClamped(FISHING_DATA_PTR->hooked.fish.size, 0x32, 0x12c, 1, 3);
-		n = t->framesAtLimit + 1;
-		t->framesAtLimit = n;
-		if (n == (snapSteps * 5)) {
+		if (++t->framesAtLimit == (snapSteps * 5)) {
 			return 1;
 		}
 	} else {
@@ -2188,10 +2163,8 @@ int32_t FISH_updateTension(void)
 void FISH_drawTensionGauge(void)
 {
 	FishingTension *t = &FISHING_DATA_PTR->tension;
-	int32_t *colorp;
-	int32_t n;
 	int32_t i;
-	int32_t off;
+	int32_t n;
 
 	if (t->display == 0) {
 		return;
@@ -2199,16 +2172,17 @@ void FISH_drawTensionGauge(void)
 	FISH_drawSprite2D(MAIN_D_80134974[0], MAIN_D_80134974[1], 0xa,
 	                  &FISH_SPRITES[31], 0x1000, 0x1000, 0, 0x808080, 0);
 	n = FISH_remapClamped(t->level, -t->limit, t->limit, 0, 9);
-	colorp = &t->color.word;
-	for (i = 0, off = 0, t = (FishingTension *)FISH_D_8007A340; i < n; i++, off += 3) {
-		FISH_drawSprite2D(MAIN_D_80134974[0] + off, MAIN_D_80134974[1], 9, (FishSprite *)t,
-		                  0x1000, 0x1000, 0, *colorp, 0);
+	for (i = 0; i < n; i++) {
+		FISH_drawSprite2D(MAIN_D_80134974[0] + i * 3, MAIN_D_80134974[1], 9, &FISH_SPRITES[32],
+		                  0x1000, 0x1000, 0, *(int32_t *)&t->color, 0);
 	}
 }
 
 void FISH_hideBaitSprite(void)
 {
-	FISHING_DATA_PTR->item.shown = 0;
+	FishingItem *item = &FISHING_DATA_PTR->item;
+
+	item->shown = 0;
 }
 
 void FISH_initBaitSprite(void)
@@ -2277,7 +2251,6 @@ void FISH_tickBaitSprite(void)
 	VECTOR step;
 	SVECTOR rot;
 	VECTOR probe;
-	VECTOR *ip;
 	int32_t blocked;
 
 	if (item->shown == 0) {
@@ -2295,7 +2268,7 @@ void FISH_tickBaitSprite(void)
 	step.vy = 0;
 	step.vz = 0x64;
 
-	rotateVectorYXZ(&rot, &step, ip = &item->pos);
+	rotateVectorYXZ(&rot, &step, &item->pos);
 
 	addVector(&item->pos, &FISHING_DATA_PTR->swimmer.pos);
 
@@ -2327,7 +2300,7 @@ void FISH_tickBaitSprite(void)
 		return;
 	}
 
-	FISH_spawnRipple(0, ip, 0x64, 0, FISHING_DATA_PTR->mapData->unk8 * 75);
+	FISH_spawnRipple(0, &item->pos, 0x64, 0, FISHING_DATA_PTR->mapData->unk8 * 75);
 }
 
 void FISH_drawBaitSprite(void)
@@ -2409,223 +2382,154 @@ void FISH_getRodTipPos(VECTOR *out)
 
 void FISH_bobberCommand(FishingSwimmer *s, int32_t command)
 {
+	FishSprite *desc;
 	VECTOR scale;
 	SVECTOR rot;
-	FishSprite *desc;
-	int32_t t;
-	int32_t k;
 
 	switch (command) {
-	case 0:
-		goto stateDispatch;
-	case 1:
-		goto drawSwimmer;
 	case 2:
 		goto snap2;
-	case 4:
-		goto start4;
-	case 5:
-		goto start5;
-	case 6:
-		goto start6;
-	case 7:
-		goto start7;
 	case 11:
 		goto snap11;
 	case 12:
 		goto snap12;
-	case 3:
-	case 8:
-	case 9:
-	case 10:
-	case 13:
-		goto end;
+	case 4:
+		goto start4;
+	case 6:
+		goto start6;
+	case 5:
+		goto start5;
+	case 7:
+		goto start7;
 	case 14:
 		goto start14;
-	default:
-		goto end;
-	}
-
-stateDispatch:
-	switch (s->state) {
-	case 3:
-		goto clearSprite;
-	case 7:
-		goto state7;
-	case 8:
-		goto state8;
-	case 9:
-		goto state9;
-	case 10:
-		goto state10;
-	case 11:
-		goto state11;
-	case 12:
-		goto state12;
-	case 4:
-	case 5:
-	case 6:
-	case 13:
-		goto tick;
-	case 14:
-		goto state14;
-	default:
-		goto tick;
-	}
-
-clearSprite:
-	s->sprite = 0;
-	goto tick;
-
+	case 0:
+		switch (s->state) {
+		case 3:
+			s->sprite = 0;
+			goto tick;
 start4:
-	FISH_getRodTipPos(&s->pos);
-	s->sprite = 1;
-	s->state = 4;
-	s->timer = -1;
-	goto tick;
-
+			FISH_getRodTipPos(&s->pos);
+			s->sprite = 1;
+			s->state = 4;
+			s->timer = -1;
+			goto tick;
+		case 4:
+			goto tick;
 start5:
-	s->sprite = 1;
-	s->state = 5;
-	s->timer = -1;
-	goto tick;
-
+			s->sprite = 1;
+			s->state = 5;
+			s->timer = -1;
+			goto tick;
+		case 5:
+			goto tick;
 start6:
-	s->sprite = 1;
-	s->state = 6;
-	s->timer = -1;
-	goto tick;
-
+			s->sprite = 1;
+			s->state = 6;
+			s->timer = -1;
+			goto tick;
+		case 6:
+			goto tick;
 start7:
-	FISH_spawnRipple(-1, &s->pos, 0x64, 0, 0x1000);
-	s->state = 7;
-	s->timer = -1;
-	goto tick;
-
-state7:
-	t = (s->timer < 0) ? 0 : ((s->timer >= 8U) ? 7 : s->timer);
-	s->sprite = MAIN_D_8013499C[t];
-	if (s->sprite > -1) {
-		goto tick;
-	}
-
+			FISH_spawnRipple(-1, &s->pos, 0x64, 0, 0x1000);
+			s->state = 7;
+			s->timer = -1;
+			goto tick;
+		case 7:
+			s->sprite = MAIN_D_8013499C[(s->timer < 0) ? 0 : ((s->timer >= 8U) ? 7 : s->timer)];
+			if (s->sprite > -1) {
+				goto tick;
+			}
 setSprite3:
-	k = 3;
-setSpriteAdvance:
-	s->sprite = k;
-	s->state = 8;
-	s->timer = -1;
-	goto tick;
-
-state8:
-	if (customRandom(1, 2) == 1) {
-		s->pos.vx += customRandom(-1, 1);
-		s->pos.vz += customRandom(-1, 1);
-	}
-
-	if (customRandom(1, 0x3c) != 1) {
-		goto tick;
-	}
-
-	FISH_spawnRipple(-2, &s->pos, 0, 0, 0x1000);
-	s->state = 9;
-	s->timer = -1;
-	goto tick;
-
-state9:
-	t = ((s->timer / 3) < 0) ? 0 : (((s->timer / 3) >= 3U) ? 2 : s->timer / 3);
-	s->sprite = FISH_D_8007A4D8[t];
-	if (s->sprite != -1) {
-		goto tick;
-	}
-
-	k = 3;
-	goto setSpriteAdvance;
-
+			s->sprite = 3;
+			s->state = 8;
+			s->timer = -1;
+			goto tick;
+		case 8:
+			if (customRandom(1, 2) == 1) {
+				s->pos.vx += customRandom(-1, 1);
+				s->pos.vz += customRandom(-1, 1);
+			}
+			if (customRandom(1, 0x3c) != 1) {
+				goto tick;
+			}
+			FISH_spawnRipple(-2, &s->pos, 0, 0, 0x1000);
+			s->state = 9;
+			s->timer = -1;
+			goto tick;
+		case 9:
+			s->sprite = FISH_D_8007A4D8[((s->timer / 3) < 0) ? 0 : (((s->timer / 3) >= 3U) ? 2 : s->timer / 3)];
+			if (s->sprite == -1) {
+				goto setSprite3;
+			}
+			goto tick;
 snap2:
-	playSound(8, 3);
-	FISH_spawnRipple(-3, &s->pos, 0, 0, 0x1000);
-	s->state = 0xa;
-	s->timer = -1;
-	goto tick;
-
-state10:
-	t = (s->timer < 0) ? 0 : ((s->timer >= 5U) ? 4 : s->timer);
-	s->sprite = FISH_D_8007A4E4[t];
-	if (s->sprite != -1) {
-		goto tick;
-	}
-
-	k = 3;
-	goto setSpriteAdvance;
-
+			playSound(8, 3);
+			FISH_spawnRipple(-3, &s->pos, 0, 0, 0x1000);
+			s->state = 0xa;
+			s->timer = -1;
+			goto tick;
+		case 10:
+			s->sprite = FISH_D_8007A4E4[(s->timer < 0) ? 0 : ((s->timer >= 5U) ? 4 : s->timer)];
+			if (s->sprite == -1) {
+				goto setSprite3;
+			}
+			goto tick;
 snap12:
-	playSound(8, 4);
-	FISH_spawnRipple(-4, &s->pos, 0, 0, 0x1000);
-	s->state = 0xb;
-	s->timer = -1;
-	goto tick;
-
-state12:
-	t = (s->timer < 0) ? 0 : ((s->timer >= 0x12U) ? 0x11 : s->timer);
-	s->sprite = FISH_D_8007A4F8[t];
-	if (s->sprite != -1) {
-		goto tick;
-	}
-
-	k = 3;
-	goto setSpriteAdvance;
-
+			playSound(8, 4);
+			FISH_spawnRipple(-4, &s->pos, 0, 0, 0x1000);
+			s->state = 0xb;
+			s->timer = -1;
+			goto tick;
+		case 12:
+			s->sprite = FISH_D_8007A4F8[(s->timer < 0) ? 0 : ((s->timer >= 0x12U) ? 0x11 : s->timer)];
+			if (s->sprite == -1) {
+				goto setSprite3;
+			}
+			goto tick;
 snap11:
-	playSound(8, 4);
-	FISH_spawnRipple(-4, &s->pos, 0, 0, 0x1000);
-	s->state = 0xb;
-	s->timer = -1;
-	goto tick;
-
-state11:
-	t = (s->timer < 0) ? 0 : ((s->timer >= 5U) ? 4 : s->timer);
-	s->sprite = FISH_D_8007A540[t];
-	if (s->sprite != -1) {
-		goto tick;
-	}
-
-	s->state = 0xd;
-	s->timer = -1;
-	goto tick;
-
+			playSound(8, 4);
+			FISH_spawnRipple(-4, &s->pos, 0, 0, 0x1000);
+			s->state = 0xb;
+			s->timer = -1;
+			goto tick;
+		case 11:
+			s->sprite = FISH_D_8007A540[(s->timer < 0) ? 0 : ((s->timer >= 5U) ? 4 : s->timer)];
+			if (s->sprite != -1) {
+				goto tick;
+			}
+			s->state = 0xd;
+			s->timer = -1;
+			goto tick;
+		case 13:
+			goto tick;
 start14:
-	s->state = 0xe;
-	s->timer = -1;
-	goto tick;
-
-state14:
-	t = (s->timer < 0) ? 0 : ((s->timer >= 6U) ? 5 : s->timer);
-	s->sprite = FISH_D_8007A554[t];
-	if (s->sprite == -1) {
-		goto setSprite3;
-	}
-
+			s->state = 0xe;
+			s->timer = -1;
+			goto tick;
+		case 14:
+			s->sprite = FISH_D_8007A554[(s->timer < 0) ? 0 : ((s->timer >= 6U) ? 5 : s->timer)];
+			if (s->sprite == -1) {
+				goto setSprite3;
+			}
+		default:
 tick:
-	s->timer++;
-	goto end;
-
-drawSwimmer:
-	if (s->sprite <= 0) {
-		goto end;
+			s->timer++;
+			return;
+		}
+	case 1:
+		if (s->sprite <= 0) {
+			return;
+		}
+		desc = &FISH_SPRITES[s->sprite - 1 + ((FISHING_DATA_PTR->rod.swimmerType == 1) ? 0x11 : 0x18)];
+		rot.vx = 0;
+		rot.vy = 0;
+		rot.vz = 0;
+		scale.vx = FISHING_DATA_PTR->mapData->scale;
+		scale.vy = FISHING_DATA_PTR->mapData->scale;
+		scale.vz = FISHING_DATA_PTR->mapData->scale;
+		FISH_drawSprite3D(&s->pos, &rot, &scale, desc, 0x808080, 0, -10);
 	}
-
-	t = (FISHING_DATA_PTR->rod.swimmerType == 1) ? 0x11 : 0x18;
-	desc = FISH_SPRITES + (s->sprite - 1 + t);
-	rot.vx = 0;
-	rot.vy = 0;
-	rot.vz = 0;
-	scale.vx = FISHING_DATA_PTR->mapData->scale;
-	scale.vy = FISHING_DATA_PTR->mapData->scale;
-	scale.vz = FISHING_DATA_PTR->mapData->scale;
-	FISH_drawSprite3D(&s->pos, &rot, &scale, desc, 0x808080, 0, -10);
-
-end:;
 }
 
 void FISH_tickBobberPhysics(void)
@@ -2638,91 +2542,78 @@ void FISH_tickBobberPhysics(void)
 
 	switch (FISHING_DATA_PTR->swimmer.mode) {
 	case 0:
-		goto end;
+		break;
 	case 1:
-		goto rodTip;
+		FISH_getRodTipPos(&FISHING_DATA_PTR->swimmer.pos);
+		break;
 	case 2:
 	case 3:
 	case 4:
-		goto physics;
-	}
-	goto end;
+		s = &FISHING_DATA_PTR->swimmer;
+		old = s->pos;
 
-rodTip:
-	FISH_getRodTipPos(&FISHING_DATA_PTR->swimmer.pos);
-	return;
+		s->vel.vx -= ((d = (s->vel.vx * 300) >> 12) != 0) ? d : ((s->vel.vx > 0) ? 1 : ((s->vel.vx < 0) ? -1 : 0));
+		s->vel.vy -= ((d = (s->vel.vy * 300) >> 12) != 0) ? d : ((s->vel.vy > 0) ? 1 : ((s->vel.vy < 0) ? -1 : 0));
+		s->vel.vz -= ((d = (s->vel.vz * 300) >> 12) != 0) ? d : ((s->vel.vz > 0) ? 1 : ((s->vel.vz < 0) ? -1 : 0));
 
-physics:
-	s = &FISHING_DATA_PTR->swimmer;
-	old = s->pos;
+		s->vel.vy += s->gravity;
 
-	d = (s->vel.vx * 300) >> 12;
-	s->vel.vx -= ((((s->vel.vx * 300) >> 12) != 0) ? d : ((s->vel.vx > 0) ? 1 : ((s->vel.vx < 0) ? -1 : 0)));
-	d = (s->vel.vy * 300) >> 12;
-	s->vel.vy -= ((((s->vel.vy * 300) >> 12) != 0) ? d : ((s->vel.vy > 0) ? 1 : ((s->vel.vy < 0) ? -1 : 0)));
-	d = (s->vel.vz * 300) >> 12;
-	s->vel.vz -= ((((s->vel.vz * 300) >> 12) != 0) ? d : ((s->vel.vz > 0) ? 1 : ((s->vel.vz < 0) ? -1 : 0)));
-
-	s->vel.vy += s->gravity;
-
-	if (s->dist != 0) {
-		d = getDistance(s->pos.vx - FISHING_DATA_PTR->rod.lineStart.vx,
-		                s->pos.vy - FISHING_DATA_PTR->rod.lineStart.vy,
-		                s->pos.vz - FISHING_DATA_PTR->rod.lineStart.vz);
-		if (s->dist < d) {
-			toEulerAngles(&FISH_SCRATCH->rot,
-			              s->pos.vx - FISHING_DATA_PTR->rod.lineStart.vx,
-			              s->pos.vy - FISHING_DATA_PTR->rod.lineStart.vy,
-			              s->pos.vz - FISHING_DATA_PTR->rod.lineStart.vz);
-			FISH_SCRATCH->v0.vx = 0;
-			FISH_SCRATCH->v0.vy = 0;
-			FISH_SCRATCH->v0.vz = s->dist;
-			rotateVectorYXZ(&FISH_SCRATCH->rot, &FISH_SCRATCH->v0, (VECTOR *)s);
-			addVector(&s->pos, &FISHING_DATA_PTR->rod.lineStart);
-			FISH_SCRATCH->v0.vx = s->pos.vx - old.vx;
-			FISH_SCRATCH->v0.vy = s->pos.vy - old.vy;
-			FISH_SCRATCH->v0.vz = s->pos.vz - old.vz;
-			addVector(&s->vel, &FISH_SCRATCH->v0);
+		if (s->dist != 0) {
+			d = getDistance(s->pos.vx - FISHING_DATA_PTR->rod.lineStart.vx,
+			                s->pos.vy - FISHING_DATA_PTR->rod.lineStart.vy,
+			                s->pos.vz - FISHING_DATA_PTR->rod.lineStart.vz);
+			if (s->dist < d) {
+				toEulerAngles(&FISH_SCRATCH->rot,
+				              s->pos.vx - FISHING_DATA_PTR->rod.lineStart.vx,
+				              s->pos.vy - FISHING_DATA_PTR->rod.lineStart.vy,
+				              s->pos.vz - FISHING_DATA_PTR->rod.lineStart.vz);
+				FISH_SCRATCH->v0.vx = 0;
+				FISH_SCRATCH->v0.vy = 0;
+				FISH_SCRATCH->v0.vz = s->dist;
+				rotateVectorYXZ(&FISH_SCRATCH->rot, &FISH_SCRATCH->v0, (VECTOR *)s);
+				addVector(&s->pos, &FISHING_DATA_PTR->rod.lineStart);
+				FISH_SCRATCH->v0.vx = s->pos.vx - old.vx;
+				FISH_SCRATCH->v0.vy = s->pos.vy - old.vy;
+				FISH_SCRATCH->v0.vz = s->pos.vz - old.vz;
+				addVector(&s->vel, &FISH_SCRATCH->v0);
+			}
 		}
-	}
 
-	FISHING_DATA_PTR->swimmer.pos.vx =
-		FISHING_DATA_PTR->swimmer.pos.vx + FISHING_DATA_PTR->swimmer.vel.vx;
-	FISHING_DATA_PTR->swimmer.pos.vy =
-		FISHING_DATA_PTR->swimmer.pos.vy + FISHING_DATA_PTR->swimmer.vel.vy;
-	FISHING_DATA_PTR->swimmer.pos.vz =
-		FISHING_DATA_PTR->swimmer.pos.vz + FISHING_DATA_PTR->swimmer.vel.vz;
+		FISHING_DATA_PTR->swimmer.pos.vx += FISHING_DATA_PTR->swimmer.vel.vx;
+		FISHING_DATA_PTR->swimmer.pos.vy += FISHING_DATA_PTR->swimmer.vel.vy;
+		FISHING_DATA_PTR->swimmer.pos.vz += FISHING_DATA_PTR->swimmer.vel.vz;
 
-	if (s->dist != 0) {
-		d = getDistance(s->pos.vx - FISHING_DATA_PTR->rod.lineStart.vx,
-		                s->pos.vy - FISHING_DATA_PTR->rod.lineStart.vy,
-		                s->pos.vz - FISHING_DATA_PTR->rod.lineStart.vz);
-		if (s->dist < d) {
-			toEulerAngles(&FISH_SCRATCH->rot,
-			              s->pos.vx - FISHING_DATA_PTR->rod.lineStart.vx,
-			              s->pos.vy - FISHING_DATA_PTR->rod.lineStart.vy,
-			              s->pos.vz - FISHING_DATA_PTR->rod.lineStart.vz);
-			FISH_SCRATCH->v0.vx = 0;
-			FISH_SCRATCH->v0.vy = 0;
-			FISH_SCRATCH->v0.vz = s->dist;
-			rotateVectorYXZ(&FISH_SCRATCH->rot, &FISH_SCRATCH->v0, (VECTOR *)s);
-			addVector(&s->pos, &FISHING_DATA_PTR->rod.lineStart);
+		if (s->dist != 0) {
+			d = getDistance(s->pos.vx - FISHING_DATA_PTR->rod.lineStart.vx,
+			                s->pos.vy - FISHING_DATA_PTR->rod.lineStart.vy,
+			                s->pos.vz - FISHING_DATA_PTR->rod.lineStart.vz);
+			if (s->dist < d) {
+				toEulerAngles(&FISH_SCRATCH->rot,
+				              s->pos.vx - FISHING_DATA_PTR->rod.lineStart.vx,
+				              s->pos.vy - FISHING_DATA_PTR->rod.lineStart.vy,
+				              s->pos.vz - FISHING_DATA_PTR->rod.lineStart.vz);
+				FISH_SCRATCH->v0.vx = 0;
+				FISH_SCRATCH->v0.vy = 0;
+				FISH_SCRATCH->v0.vz = s->dist;
+				rotateVectorYXZ(&FISH_SCRATCH->rot, &FISH_SCRATCH->v0, (VECTOR *)s);
+				addVector(&s->pos, &FISHING_DATA_PTR->rod.lineStart);
+			}
 		}
-	}
 
-	FISH_SCRATCH->v0.vx = FISHING_DATA_PTR->swimmer.pos.vx;
-	FISH_SCRATCH->v0.vy = 0;
-	FISH_SCRATCH->v0.vz = FISHING_DATA_PTR->swimmer.pos.vz;
-	if ((FISH_projectPoint(&FISH_SCRATCH->v0, &FISH_SCRATCH->x, &FISH_SCRATCH->y) == 0) ||
-	    (FISH_isScreenPointVisible(FISH_SCRATCH->x, FISH_SCRATCH->y) == 0)) {
-		s->pos.vx = old.vx;
-		s->pos.vz = old.vz;
-		s->vel.vx = 0;
-		s->vel.vz = 0;
-	}
+		FISH_SCRATCH->v0.vx = FISHING_DATA_PTR->swimmer.pos.vx;
+		FISH_SCRATCH->v0.vy = 0;
+		FISH_SCRATCH->v0.vz = FISHING_DATA_PTR->swimmer.pos.vz;
+		if ((FISH_projectPoint(&FISH_SCRATCH->v0, &FISH_SCRATCH->x, &FISH_SCRATCH->y) == 0) ||
+		    (FISH_isScreenPointVisible(FISH_SCRATCH->x, FISH_SCRATCH->y) == 0)) {
+			s->pos.vx = old.vx;
+			s->pos.vz = old.vz;
+			s->vel.vx = 0;
+			s->vel.vz = 0;
+		}
 
-	FISH_tickBaitSprite();
-end:;
+		FISH_tickBaitSprite();
+		break;
+	}
 }
 
 void FISH_pushSeadramonSegment(VECTOR *unused, SVECTOR *src)
@@ -2814,8 +2705,6 @@ void FISH_tickSeadramon(Fish *f)
 {
 	FishSeadramon *sea = &FISHING_DATA_PTR->seadramon;
 	VECTOR target;
-	int32_t d;
-	int32_t n;
 
 	if (f->state >= sea->pathLength) {
 		f->timeThisMove += 0xa;
@@ -2840,17 +2729,12 @@ void FISH_tickSeadramon(Fish *f)
 		              target.vz - f->pos.vz);
 		FISH_SCRATCH->unk18 = FISH_SCRATCH->rot.vy - f->rotation.vy;
 		FISH_SCRATCH->unk18 &= 0xfff;
-		n = FISH_SCRATCH->unk18;
-		if (n >= 0x800) {
-			FISH_SCRATCH->unk18 = n - 0x1000;
+		if (FISH_SCRATCH->unk18 >= 0x800) {
+			FISH_SCRATCH->unk18 -= 0x1000;
 		}
-		n = FISH_SCRATCH->unk18;
-		n = (n > 0) ? n : -n;
-		f->timeThisMove += ((n != 0) ? -0xa : 0xa);
+		f->timeThisMove += (((FISH_SCRATCH->unk18 > 0) ? FISH_SCRATCH->unk18 : -FISH_SCRATCH->unk18) != 0) ? -0xa : 0xa;
 		f->timeThisMove = (f->timeThisMove < 0) ? 0 : ((f->timeThisMove > 0x32) ? 0x32 : f->timeThisMove);
-		d = FISH_SCRATCH->unk18;
-		d = (d < -0x80) ? -0x80 : ((FISH_SCRATCH->unk18 > 0x80) ? 0x80 : d);
-		f->rotation.vy += d;
+		f->rotation.vy += (FISH_SCRATCH->unk18 < -0x80) ? -0x80 : ((FISH_SCRATCH->unk18 > 0x80) ? 0x80 : FISH_SCRATCH->unk18);
 		FISH_SCRATCH->v0.vx = 0;
 		FISH_SCRATCH->v0.vy = 0;
 		FISH_SCRATCH->v0.vz = f->timeThisMove;
@@ -2858,11 +2742,10 @@ void FISH_tickSeadramon(Fish *f)
 		addVector(&f->pos, &FISH_SCRATCH->v1);
 		FISH_SCRATCH->unk18 = getDistance(target.vx - f->pos.vx, 0,
 		                                  target.vz - f->pos.vz);
-		n = (f->timeThisMove > 0xa) ? f->timeThisMove : 0xa;
-		if (n >= FISH_SCRATCH->unk18) {
+		if (FISH_SCRATCH->unk18 <= ((f->timeThisMove > 0xa) ? f->timeThisMove : 0xa)) {
 			f->state++;
 		}
-		f->timeThisMove = ((FISH_SCRATCH->unk18 / 10) > 1) ? ((long)FISH_SCRATCH->unk18 / 10) : 1;
+		f->timeThisMove = ((FISH_SCRATCH->unk18 / 10) > 1) ? (FISH_SCRATCH->unk18 / 10) : 1;
 	}
 
 	f->framesOnState++;
@@ -2887,13 +2770,10 @@ void FISH_spawnFish(Fish *f, int32_t kind)
 
 void FISH_tickFish(Fish *f)
 {
-	int32_t e;
 	VECTOR step;
 	VECTOR out;
 	VECTOR target;
 	VECTOR sw2;
-	FishRipple *p;
-	PositionData *pd;
 	int32_t d;
 
 	if (f->kind == 6) {
@@ -2921,22 +2801,17 @@ pickNextMove:
 		break;
 
 	case 0xa:
-		d = f->lifetime;
-		d--;
-		f->lifetime = d;
-		if (d == 0) {
+		if (--f->lifetime == 0) {
 			goto faceTamer;
 		}
-		d = f->timeNextMove;
-		d--;
-		f->timeNextMove = d;
-		if (d == 0) {
+		if (--f->timeNextMove == 0) {
 			goto newTarget;
 		}
 checkAttractor:
 		if (FISHING_DATA_PTR->ripplePool.attractor != NULL) {
-			p = FISHING_DATA_PTR->ripplePool.attractor;
-			if (getDistance(p->pos.vx - f->pos.vx, 0, p->pos.vz - f->pos.vz) <= FISHING_DATA_PTR->ripplePool.attractRadius) {
+			if (getDistance(FISHING_DATA_PTR->ripplePool.attractor->pos.vx - f->pos.vx, 0,
+			                FISHING_DATA_PTR->ripplePool.attractor->pos.vz - f->pos.vz) <=
+			    FISHING_DATA_PTR->ripplePool.attractRadius) {
 				FISHING_DATA_PTR->fishPool.escapeTimer = 0x1e;
 				goto faceAttractor;
 			}
@@ -2954,9 +2829,8 @@ checkAttractor:
 		}
 		break;
 faceAttractor:
-		p = FISHING_DATA_PTR->ripplePool.attractor;
-		toEulerAngles(&f->rotation, p->pos.vx - f->pos.vx, 0,
-		              p->pos.vz - f->pos.vz);
+		toEulerAngles(&f->rotation, FISHING_DATA_PTR->ripplePool.attractor->pos.vx - f->pos.vx, 0,
+		              FISHING_DATA_PTR->ripplePool.attractor->pos.vz - f->pos.vz);
 		f->rotation.vy += 0x800;
 		f->state = 0x1e;
 		f->framesOnState = -1;
@@ -2969,7 +2843,7 @@ newTarget:
 		                              target.vz - f->pos.vz) /
 		                  8;
 		f->timeThisMove = (f->timeThisMove < 0) ? 0 : ((f->timeThisMove > 0x32) ? 0x32 : f->timeThisMove);
-		f->timeThisMove = (f->timeThisMove < 0) ? 0 : ((f->size < f->timeThisMove) ? f->size : f->timeThisMove);
+		f->timeThisMove = (f->timeThisMove < 0) ? 0 : ((f->timeThisMove > f->size) ? f->size : f->timeThisMove);
 		f->state = 0x14;
 		f->framesOnState = -1;
 		break;
@@ -2978,7 +2852,7 @@ approachBobber:
 		toEulerAngles(&f->rotation, sw2.vx - f->pos.vx, 0, sw2.vz - f->pos.vz);
 		f->timeThisMove = getDistance(sw2.vx - f->pos.vx, 0, sw2.vz - f->pos.vz) / 8;
 		f->timeThisMove = (f->timeThisMove < 3) ? 3 : ((f->timeThisMove > 0x32) ? 0x32 : f->timeThisMove);
-		f->timeThisMove = (f->timeThisMove < 3) ? 3 : ((f->size < f->timeThisMove) ? f->size : f->timeThisMove);
+		f->timeThisMove = (f->timeThisMove < 3) ? 3 : ((f->timeThisMove > f->size) ? f->size : f->timeThisMove);
 		f->state = 0x14;
 		f->framesOnState = -1;
 		break;
@@ -2989,19 +2863,15 @@ approachBobber:
 		step.vz = f->timeThisMove;
 		rotateVectorYXZ(&f->rotation, &step, &out);
 		addVector(&f->pos, &out);
-		e = f->timeThisMove;
-		d = e;
-		e >>= 3;
-		f->timeThisMove = d - e;
+		f->timeThisMove -= f->timeThisMove >> 3;
 		if (f->timeThisMove < 8) {
 			goto pickNextMove;
 		}
 		goto checkAttractor;
 
 faceTamer:
-		pd = TAMER_ENTITY.entity.posData;
-		toEulerAngles(&f->rotation, pd->location.vx - f->pos.vx, 0,
-		              pd->location.vz - f->pos.vz);
+		toEulerAngles(&f->rotation, TAMER_ENTITY.entity.posData->location.vx - f->pos.vx, 0,
+		              TAMER_ENTITY.entity.posData->location.vz - f->pos.vz);
 		f->rotation.vy += 0x800;
 		f->state = 0x1e;
 		f->framesOnState = -1;
@@ -3030,8 +2900,8 @@ void FISH_drawFishSprite(int32_t kind, VECTOR *pos, SVECTOR *rot, int32_t size, 
 {
 	SVECTOR r;
 	VECTOR scale;
+	int32_t color;
 	FishSprite *desc;
-	int32_t t;
 	int32_t shade;
 
 	if (kind == 6) {
@@ -3042,41 +2912,29 @@ void FISH_drawFishSprite(int32_t kind, VECTOR *pos, SVECTOR *rot, int32_t size, 
 	if (flag == 0) {
 		if (size >= 0x64) {
 			desc = FISH_SPRITES + MAIN_D_801349A4[(phase / 3) & 7];
-			t = size * FISHING_DATA_PTR->mapData->fishScaleLarge;
-			scale.vz = t;
-			scale.vy = t;
-			scale.vx = t;
+			scale.vx = scale.vy = scale.vz = size * FISHING_DATA_PTR->mapData->fishScaleLarge;
 		} else {
 			desc = FISH_SPRITES + MAIN_D_801349AC[(phase / 4) & 3];
-			t = size * FISHING_DATA_PTR->mapData->fishScaleSmall;
-			scale.vz = t;
-			scale.vy = t;
-			scale.vx = t;
+			scale.vx = scale.vy = scale.vz = size * FISHING_DATA_PTR->mapData->fishScaleSmall;
 		}
 	} else {
 		if (size >= 0x64) {
 			desc = FISH_SPRITES + MAIN_D_801349B0[(uint32_t)phase % 6];
-			t = size * 170;
-			scale.vz = t;
-			scale.vy = t;
-			scale.vx = t;
+			scale.vx = scale.vy = scale.vz = size * 170;
 		} else {
 			desc = FISH_SPRITES + MAIN_D_801349B8[(uint32_t)phase % 6];
-			t = size * 0x155;
-			scale.vz = t;
-			scale.vy = t;
-			scale.vx = t;
+			scale.vx = scale.vy = scale.vz = size * 0x155;
 		}
 	}
 
 	shade = transparency * 30 / 128;
+	color = (shade & 0xff) | ((shade & 0xff) << 8) | ((shade & 0xff) << 16);
 
 	r.vx = -0x400;
 	r.vy = rot->vy;
 	r.vz = 0;
 
-	FISH_drawSprite3D(pos, &r, &scale, desc,
-	                  (shade & 0xff) | ((shade & 0xff) << 8) | ((shade & 0xff) << 16), 6, 0x64);
+	FISH_drawSprite3D(pos, &r, &scale, desc, color, 6, 0x64);
 }
 
 void FISH_drawFish(Fish *f)
@@ -3087,17 +2945,13 @@ void FISH_drawFish(Fish *f)
 Fish *FISH_allocFish(void)
 {
 	FishPool *pool = &FISHING_DATA_PTR->fishPool;
-	Fish *end;
-	Fish *start;
 	Fish *p;
 
 	if (pool->count >= 33U) {
 		return NULL;
 	}
 
-	end = &pool->items[33];
 	p = pool->next;
-	start = p;
 
 	do {
 		if (p->active == 0) {
@@ -3106,27 +2960,25 @@ Fish *FISH_allocFish(void)
 		}
 
 		p++;
-		if (p >= end) {
+		if (p >= &pool->items[33]) {
 			p = pool->items;
 		}
-	} while (p != start);
+	} while (p != pool->next);
 
 	return NULL;
 }
 
 int32_t FISH_isSeadramonSpawned(void)
 {
-	FishingData *d = FISHING_DATA_PTR;
-	Fish *f = d->fishPool.items;
-	Fish *end = &d->fishPool.items[33];
+	FishPool *pool = &FISHING_DATA_PTR->fishPool;
+	Fish *f;
 
-	while (f < end) {
+	for (f = FISHING_DATA_PTR->fishPool.items; f < &FISHING_DATA_PTR->fishPool.items[33]; f++) {
 		if (f->active != 0) {
 			if (f->kind == 6) {
 				return 1;
 			}
 		}
-		f++;
 	}
 
 	return 0;
@@ -3135,15 +2987,14 @@ int32_t FISH_isSeadramonSpawned(void)
 void FISH_tickFishPopulation(void)
 {
 	FishPool *pool = &FISHING_DATA_PTR->fishPool;
-	int32_t counts[6];
-	Fish *f;
-	Fish *g;
-	FishingMapData *map;
-	uint8_t kind;
 	int32_t i;
+	Fish *f;
+	int32_t counts[6];
 	int32_t total;
-	int32_t best;
 	int32_t bestIdx;
+	int32_t best;
+	int32_t now;
+	Fish *sea;
 
 	pool->frameCount++;
 	if (pool->escapeTimer > 0) {
@@ -3154,15 +3005,15 @@ void FISH_tickFishPopulation(void)
 				counts[i] = 0;
 			}
 			total = 0;
-			f = FISHING_DATA_PTR->fishPool.items;
-			for (g = f; g < &FISHING_DATA_PTR->fishPool.items[33]; g++) {
-				if (g->active) {
-					kind = g->kind;
-					if (kind < 6U) {
-						total++;
-						counts[kind]++;
-					}
+			for (f = FISHING_DATA_PTR->fishPool.items; f < &FISHING_DATA_PTR->fishPool.items[33]; f++) {
+				if (!f->active) {
+					continue;
 				}
+				if ((f->kind < 0) || (f->kind >= 6U)) {
+					continue;
+				}
+				counts[f->kind]++;
+				total++;
 			}
 			for (i = 0; i < 6U; i++) {
 				counts[i] = counts[i] * 10000 /
@@ -3184,17 +3035,18 @@ void FISH_tickFishPopulation(void)
 			}
 		}
 		if ((VSync(-1) / 3 % 20) == 0) {
-			map = FISHING_DATA_PTR->mapData;
-			if ((map->seadramonTime1 != 0x270f) || (map->seadramonTime2 != 0x270f)) {
-				if (((map->seadramonTime1 / 100) == HOUR) ||
-				    ((map->seadramonTime2 / 100) == HOUR)) {
+			if ((FISHING_DATA_PTR->mapData->seadramonTime1 != 0x270f) ||
+			    (FISHING_DATA_PTR->mapData->seadramonTime2 != 0x270f)) {
+				now = MINUTE + HOUR * 100;
+				if (((FISHING_DATA_PTR->mapData->seadramonTime1 / 100) == HOUR) ||
+				    ((FISHING_DATA_PTR->mapData->seadramonTime2 / 100) == HOUR)) {
 					if (FISH_isSeadramonSpawned() == 0) {
 						if (!FISHING_DATA_PTR->hooked.fish.active) {
-							f = FISH_allocFish();
-							if (f != NULL) {
-								f->active = 1;
+							sea = FISH_allocFish();
+							if (sea != NULL) {
+								sea->active = 1;
 								pool->count++;
-								FISH_spawnSeadramon(f);
+								FISH_spawnSeadramon(sea);
 							}
 						}
 					}
@@ -3240,6 +3092,7 @@ void FISH_initFishPool(void)
 
 void FISH_fishPoolStub(void)
 {
+	FishPool *pool = &FISHING_DATA_PTR->fishPool;
 }
 
 Fish *FISH_findFishToBite(Fish *pool, VECTOR *loc, int32_t depth)
@@ -3247,20 +3100,29 @@ Fish *FISH_findFishToBite(Fish *pool, VECTOR *loc, int32_t depth)
 	Fish *f;
 	int32_t i;
 	int32_t chance;
+	int32_t dist;
+#if !defined(VERSION_JP)
 	int32_t rowOff;
+#endif
 
 	if (FISHING_DATA_PTR->hooked.fish.active) {
 		return NULL;
 	}
 
+#if defined(VERSION_JP)
+	for (i = 0; i < 0x21U; i++) {
+		f = &pool[i];
+#else
 	i = 0;
 	f = pool;
 	rowOff = (depth - 0x26) * 6;
 	for (; i < 0x21U; i++, f = (Fish *)((int32_t)f + 56)) {
+#endif
 		if (!f->active) {
 			continue;
 		}
-		if (getDistance(f->pos.vx - loc->vx, 0, f->pos.vz - loc->vz) >= 0xc9) {
+		dist = getDistance(f->pos.vx - loc->vx, 0, f->pos.vz - loc->vz);
+		if (dist >= 0xc9) {
 			continue;
 		}
 		if (f->kind == 6) {
@@ -3278,7 +3140,11 @@ Fish *FISH_findFishToBite(Fish *pool, VECTOR *loc, int32_t depth)
 			}
 			chance = 0;
 			if ((depth >= 0x26) && (depth < 0x47)) {
+#if defined(VERSION_JP)
+				chance = (FISH_BITE_CHANCE + (depth - 0x26) * 6)[f->kind];
+#else
 				chance = (FISH_BITE_CHANCE + rowOff)[f->kind];
+#endif
 			}
 		}
 		FISH_spawnMarker((chance == 0) ? 0x30 : 0x2f, &f->pos);
@@ -3293,7 +3159,9 @@ Fish *FISH_findFishToBite(Fish *pool, VECTOR *loc, int32_t depth)
 
 void FISH_clearHookedFish(void)
 {
-	FISHING_DATA_PTR->hooked.fish.active = 0;
+	Fish *fish = &FISHING_DATA_PTR->hooked.fish;
+
+	fish->active = 0;
 }
 
 void FISH_hookFish(Fish *f)
@@ -3347,369 +3215,292 @@ void FISH_tickHookedFish(int32_t mode)
 	HookedFish *h = &FISHING_DATA_PTR->hooked;
 	VECTOR step;
 	VECTOR probe;
+	VECTOR origin;
+	VECTOR origin2;
 	int32_t i;
-	int32_t k;
-	int32_t t;
+	int32_t j;
 
 	if (!h->fish.active) {
-		goto ret;
+		return;
 	}
 
 	if (FISH_isTextBoxVisible() != 0) {
-		goto ret;
+		return;
 	}
 
-	if (mode == 0) {
-		goto stateDispatch;
-	}
-
-	if (mode == 0x11) {
-		goto caught;
-	}
-
-	if (mode == 0x12) {
-		goto snapped;
-	}
-
-	if (mode == 0xf) {
+	switch (mode) {
+	case 0x10:
+		goto grabbed;
+	case 0xf:
 		goto escape;
-	}
+	case 0x12:
+		goto snapped;
+	case 0x11:
+		h->fish.active = 0;
+		break;
+	case 0:
+		switch (h->fish.state) {
+		case 0xa:
+			if (h->fish.framesOnState != h->nibbleTime) {
+				if (h->fish.size < 0x96) {
+					if (customRandom(1, 0x14) == 1) {
+						if ((h->nibbleTime - h->fish.framesOnState) >= 0x14) {
+							FISH_bobberCommand(&FISHING_DATA_PTR->swimmer, 2);
+						}
+					}
+				} else {
+					if (customRandom(1, 0x14) == 1) {
+						FISH_bobberCommand(&FISHING_DATA_PTR->swimmer, 0xc);
+					}
+				}
 
-	if (mode != 0x10) {
-		goto checkKind;
-	}
-
-	goto grabbed;
-
-caught:
-	h->fish.active = 0;
-	goto checkKind;
-
-stateDispatch:
-	t = h->fish.state;
-	if (t == 0x64) {
-		goto seadraChase;
-	}
-
-	if (t == 0x5a) {
-		goto sinking;
-	}
-
-	if (t == 0x32) {
-		goto fighting;
-	}
-
-	if (t == 0x28) {
-		goto struggling;
-	}
-
-	if (t == 0x14) {
-		goto approaching;
-	}
-
-	if (t != 0xa) {
-		goto tick;
-	}
-
-	if (h->fish.framesOnState == h->nibbleTime) {
-		goto biteTaken;
-	}
-
-	if (h->fish.size < 0x96) {
-		if (customRandom(1, 0x14) == 1) {
-			if ((h->nibbleTime - h->fish.framesOnState) >= 0x14) {
-				FISH_bobberCommand(&FISHING_DATA_PTR->swimmer, 2);
+				FISH_SCRATCH->v0.vx = FISHING_DATA_PTR->swimmer.pos.vx - h->fish.pos.vx;
+				FISH_SCRATCH->v0.vy = 0;
+				FISH_SCRATCH->v0.vz = FISHING_DATA_PTR->swimmer.pos.vz - h->fish.pos.vz;
+				FISH_SCRATCH->unk18 = getDistance(FISH_SCRATCH->v0.vx, FISH_SCRATCH->v0.vy,
+				                                  FISH_SCRATCH->v0.vz);
+				if (FISH_SCRATCH->unk18 >= 4) {
+					toEulerAngles(&FISHING_DATA_PTR->hooked.fish.rotation, FISH_SCRATCH->v0.vx,
+					              FISH_SCRATCH->v0.vy, FISH_SCRATCH->v0.vz);
+					FISH_SCRATCH->unk18 = (FISH_SCRATCH->unk18 <= 0)
+					                              ? 1
+					                              : ((FISH_SCRATCH->unk18 >= 0xb) ? 0xa : FISH_SCRATCH->unk18);
+					FISH_SCRATCH->v0.vx = 0;
+					FISH_SCRATCH->v0.vy = 0;
+					FISH_SCRATCH->v0.vz = FISH_SCRATCH->unk18;
+					rotateVectorYXZ(&FISHING_DATA_PTR->hooked.fish.rotation, &FISH_SCRATCH->v0,
+					                &FISH_SCRATCH->v1);
+					addVector(&h->fish.pos, &FISH_SCRATCH->v1);
+				}
+			} else {
+				FISH_bobberCommand(&FISHING_DATA_PTR->swimmer, 0xb);
+				FISHING_DATA_PTR->rod.itemTaken = 1;
+				removeItem(INVENTORY.types.array[FISHING_DATA_PTR->rod.itemSlot], 1);
+				h->fish.state = 0x14;
+				h->fish.framesOnState = -1;
 			}
-		}
-	} else {
-		if (customRandom(1, 0x14) == 1) {
-			FISH_bobberCommand(&FISHING_DATA_PTR->swimmer, 0xc);
-		}
-	}
+			break;
+		case 0x14:
+			FISH_SCRATCH->v0.vx = FISHING_DATA_PTR->swimmer.pos.vx - h->fish.pos.vx;
+			FISH_SCRATCH->v0.vy = 0;
+			FISH_SCRATCH->v0.vz = FISHING_DATA_PTR->swimmer.pos.vz - h->fish.pos.vz;
+			FISH_SCRATCH->unk18 = getDistance(FISH_SCRATCH->v0.vx, FISH_SCRATCH->v0.vy,
+			                                  FISH_SCRATCH->v0.vz);
+			if (FISH_SCRATCH->unk18 >= 4) {
+				toEulerAngles(&FISHING_DATA_PTR->hooked.fish.rotation, FISH_SCRATCH->v0.vx,
+				              FISH_SCRATCH->v0.vy, FISH_SCRATCH->v0.vz);
+				FISH_SCRATCH->unk18 = (FISH_SCRATCH->unk18 <= 0)
+				                              ? 1
+				                              : ((FISH_SCRATCH->unk18 >= 0xb) ? 0xa : FISH_SCRATCH->unk18);
+				FISH_SCRATCH->v0.vx = 0;
+				FISH_SCRATCH->v0.vy = 0;
+				FISH_SCRATCH->v0.vz = FISH_SCRATCH->unk18;
+				rotateVectorYXZ(&FISHING_DATA_PTR->hooked.fish.rotation, &FISH_SCRATCH->v0,
+				                &FISH_SCRATCH->v1);
+				addVector(&h->fish.pos, &FISH_SCRATCH->v1);
+			}
 
-	FISH_SCRATCH->v0.vx = FISHING_DATA_PTR->swimmer.pos.vx - h->fish.pos.vx;
-	FISH_SCRATCH->v0.vy = 0;
-	FISH_SCRATCH->v0.vz = FISHING_DATA_PTR->swimmer.pos.vz - h->fish.pos.vz;
-	FISH_SCRATCH->unk18 = getDistance(FISH_SCRATCH->v0.vx, FISH_SCRATCH->v0.vy,
-	                                  FISH_SCRATCH->v0.vz);
-	if (FISH_SCRATCH->unk18 < 4) {
-		goto tick;
-	}
+			if (h->fish.framesOnState >= h->catchingTime) {
+				goto escape;
+			}
 
-	toEulerAngles(&FISHING_DATA_PTR->hooked.fish.rotation, FISH_SCRATCH->v0.vx,
-	              FISH_SCRATCH->v0.vy, FISH_SCRATCH->v0.vz);
-	k = FISH_SCRATCH->unk18;
-	k = (k <= 0) ? 1 : ((FISH_SCRATCH->unk18 >= 0xb) ? 0xa : k);
-	FISH_SCRATCH->unk18 = k;
-	FISH_SCRATCH->v0.vx = 0;
-	FISH_SCRATCH->v0.vy = 0;
-	FISH_SCRATCH->v0.vz = FISH_SCRATCH->unk18;
-	rotateVectorYXZ(&FISHING_DATA_PTR->hooked.fish.rotation, &FISH_SCRATCH->v0,
-	                &FISH_SCRATCH->v1);
-	addVector(&h->fish.pos, &FISH_SCRATCH->v1);
-	goto tick;
-
-biteTaken:
-	FISH_bobberCommand(&FISHING_DATA_PTR->swimmer, 0xb);
-	FISHING_DATA_PTR->rod.itemTaken = 1;
-	removeItem(INVENTORY.types.array[FISHING_DATA_PTR->rod.itemSlot], 1);
-	h->fish.state = 0x14;
-	h->fish.framesOnState = -1;
-	goto tick;
-
-approaching:
-	FISH_SCRATCH->v0.vx = FISHING_DATA_PTR->swimmer.pos.vx - h->fish.pos.vx;
-	FISH_SCRATCH->v0.vy = 0;
-	FISH_SCRATCH->v0.vz = FISHING_DATA_PTR->swimmer.pos.vz - h->fish.pos.vz;
-	FISH_SCRATCH->unk18 = getDistance(FISH_SCRATCH->v0.vx, FISH_SCRATCH->v0.vy,
-	                                  FISH_SCRATCH->v0.vz);
-	if (FISH_SCRATCH->unk18 >= 4) {
-		toEulerAngles(&FISHING_DATA_PTR->hooked.fish.rotation, FISH_SCRATCH->v0.vx,
-		              FISH_SCRATCH->v0.vy, FISH_SCRATCH->v0.vz);
-		k = FISH_SCRATCH->unk18;
-		k = (k <= 0) ? 1 : ((FISH_SCRATCH->unk18 >= 0xb) ? 0xa : k);
-		FISH_SCRATCH->unk18 = k;
-		FISH_SCRATCH->v0.vx = 0;
-		FISH_SCRATCH->v0.vy = 0;
-		FISH_SCRATCH->v0.vz = FISH_SCRATCH->unk18;
-		rotateVectorYXZ(&FISHING_DATA_PTR->hooked.fish.rotation, &FISH_SCRATCH->v0,
-		                &FISH_SCRATCH->v1);
-		addVector(&h->fish.pos, &FISH_SCRATCH->v1);
-	}
-
-	if (h->fish.framesOnState < h->catchingTime) {
-		goto tick;
-	}
-
-	k = 1;
-	goto setEscaped;
-
+			break;
 grabbed:
-	k = 1;
-setAnim:
-	h->animMode = k;
-	h->fish.state = 0x28;
-	h->fish.framesOnState = -1;
-	goto tick;
-
-struggling:
-	if (customRandom(0, 0xa) == 0) {
-		playSound(8, 5);
-	}
-
-	if (customRandom(1, 0xa) == 1) {
-		toEulerAngles(&h->fish.rotation,
-		              TAMER_ENTITY.entity.posData->location.vx - h->fish.pos.vx, 0,
-		              TAMER_ENTITY.entity.posData->location.vz - h->fish.pos.vz);
-		h->fish.rotation.vy = h->fish.rotation.vy +
-		                      (int16_t)(customRandom(-0x384, 0x384) + 0x800);
-	}
-
-	if (customRandom(1, 4) == 1) {
-		FISH_spawnRipple(0, &h->fish.pos, 0x2bc, h->fish.size / 2,
-		                 (h->fish.size << 12) / 120);
-		FISH_SCRATCH->v0.vx = 0;
-		FISH_SCRATCH->v0.vy = 0;
-		FISH_SCRATCH->v0.vz = h->fish.size;
-		rotateVectorYXZ(&h->fish.rotation, &FISH_SCRATCH->v0, &FISH_SCRATCH->v1);
-		addVector(&FISH_SCRATCH->v1, &h->fish.pos);
-		FISH_spawnRipple(0, &h->fish.pos, 0x2bc, 0, h->fish.size / 2);
-	}
-
-	i = 0;
-	goto probeTest;
-probeStep:
-	step.vx = 0;
-	step.vy = 0;
-	step.vz = 0x12c;
-	rotateVectorYXZ(&h->fish.rotation, &step, &probe);
-	addVector(&probe, &FISHING_DATA_PTR->swimmer.pos);
-	if (FISH_projectPoint(&probe, &FISH_SCRATCH->x, &FISH_SCRATCH->y) != 0) {
-		if (FISH_isScreenPointVisible(FISH_SCRATCH->x, FISH_SCRATCH->y) != 0) {
-			if (FISHING_DATA_PTR->mapData->isWater(FISH_SCRATCH->x,
-			                                       FISH_SCRATCH->y) != 0) {
-				goto probeNext;
+			h->animMode = 1;
+			h->fish.state = 0x28;
+			h->fish.framesOnState = -1;
+			break;
+		case 0x28:
+			if (customRandom(0, 0xa) == 0) {
+				playSound(8, 5);
 			}
-		}
-	}
 
-	FISH_randomPointInSpot(h->fish.kind, &FISH_SCRATCH->v0);
-	toEulerAngles(&h->fish.rotation, FISH_SCRATCH->v0.vx - h->fish.pos.vx, 0,
-	              FISH_SCRATCH->v0.vz - h->fish.pos.vz);
-probeNext:
-	i++;
-probeTest:
-	if (i < 0x1e) {
-		goto probeStep;
-	}
+			if (customRandom(1, 0xa) == 1) {
+				toEulerAngles(&h->fish.rotation,
+				              TAMER_ENTITY.entity.posData->location.vx - h->fish.pos.vx, 0,
+				              TAMER_ENTITY.entity.posData->location.vz - h->fish.pos.vz);
+				h->fish.rotation.vy += customRandom(-0x384, 0x384) + 0x800;
+			}
 
-	step.vx = 0;
-	step.vy = 0;
-	t = (h->powerLeft <= (h->powerMax / 10)) ? 0xf : 8;
-	step.vz = h->fish.timeThisMove / t;
-	rotateVectorYXZ(&h->fish.rotation, &step, &probe);
-	addVector(&probe, &FISHING_DATA_PTR->swimmer.pos);
-	h->fish.pos = FISHING_DATA_PTR->swimmer.pos = probe;
-	h->fish.pos = FISHING_DATA_PTR->swimmer.pos;
-	if (FISHING_DATA_PTR->rod.pressedFrames == -1) {
-		goto powerCheck;
-	}
+			if (customRandom(1, 4) == 1) {
+				FISH_spawnRipple(0, &h->fish.pos, 0x2bc, h->fish.size / 2,
+				                 (h->fish.size << 12) / 120);
+				FISH_SCRATCH->v0.vx = 0;
+				FISH_SCRATCH->v0.vy = 0;
+				FISH_SCRATCH->v0.vz = h->fish.size;
+				rotateVectorYXZ(&h->fish.rotation, &FISH_SCRATCH->v0, &FISH_SCRATCH->v1);
+				addVector(&FISH_SCRATCH->v1, &h->fish.pos);
+				FISH_spawnRipple(0, &h->fish.pos, 0x2bc, 0, h->fish.size / 2);
+			}
 
-	if (FISHING_DATA_PTR->rod.pressedFrames >= 0x3d) {
-		if ((FISHING_DATA_PTR->rod.pressedFrames % 3) == 0) {
-			goto powerCheck;
-		}
-	}
+			for (i = 0; i < 0x1e; i++) {
+				origin = FISHING_DATA_PTR->swimmer.pos;
+				step.vx = 0;
+				step.vy = 0;
+				step.vz = 0x12c;
+				rotateVectorYXZ(&h->fish.rotation, &step, &probe);
+				addVector(&probe, &FISHING_DATA_PTR->swimmer.pos);
+				if (FISH_projectPoint(&probe, &FISH_SCRATCH->x, &FISH_SCRATCH->y) != 0) {
+					if (FISH_isScreenPointVisible(FISH_SCRATCH->x, FISH_SCRATCH->y) != 0) {
+						if (FISHING_DATA_PTR->mapData->isWater(FISH_SCRATCH->x,
+						                                       FISH_SCRATCH->y) != 0) {
+							continue;
+						}
+					}
+				}
 
-	if (customRandom(1, 0x14) >= 3) {
-		goto stayStruggling;
-	}
+				FISH_randomPointInSpot(h->fish.kind, &FISH_SCRATCH->v0);
+				toEulerAngles(&h->fish.rotation, FISH_SCRATCH->v0.vx - h->fish.pos.vx, 0,
+				              FISH_SCRATCH->v0.vz - h->fish.pos.vz);
+			}
+
+			step.vx = 0;
+			step.vy = 0;
+			step.vz = h->fish.timeThisMove / ((h->powerLeft <= (h->powerMax / 10)) ? 0xf : 8);
+			rotateVectorYXZ(&h->fish.rotation, &step, &probe);
+			addVector(&probe, &FISHING_DATA_PTR->swimmer.pos);
+			h->fish.pos = FISHING_DATA_PTR->swimmer.pos = probe;
+			h->fish.pos = FISHING_DATA_PTR->swimmer.pos;
+			if (FISHING_DATA_PTR->rod.pressedFrames == -1) {
+				goto powerCheck;
+			}
+
+			if (FISHING_DATA_PTR->rod.pressedFrames >= 0x3d) {
+				if ((FISHING_DATA_PTR->rod.pressedFrames % 3) == 0) {
+					goto powerCheck;
+				}
+			}
+
+			if (customRandom(1, 0x14) >= 3) {
+				goto stayStruggling;
+			}
 
 powerCheck:
-	if (customRandom(1, 0x1000) <= ((h->powerLeft << 12) / h->powerMax)) {
-		goto nextMove;
-	}
+			if (customRandom(1, 0x1000) <= ((h->powerLeft << 12) / h->powerMax)) {
+				goto nextMove;
+			}
 
 stayStruggling:
-	if (FISHING_DATA_PTR->rod.fishingState == 0xb) {
-		goto tick;
-	}
-
-	k = 1;
-	goto setEscaped;
-
-nextMove:
-	toEulerAngles(&h->fish.rotation,
-	              TAMER_ENTITY.entity.posData->location.vx - h->fish.pos.vx, 0,
-	              TAMER_ENTITY.entity.posData->location.vz - h->fish.pos.vz);
-	h->fish.rotation.vy = h->fish.rotation.vy +
-	                      (int16_t)(customRandom(-0x384, 0x384) + 0x800);
-	h->fish.timeThisMove = customRandom(0x14, 0x32);
-	h->nibbleTime = customRandom(9, 0x13);
-	h->fish.state = 0x32;
-	h->fish.framesOnState = -1;
-	goto tick;
-
-fighting:
-	t = h->fish.framesOnState % 2;
-	if (t == 0) {
-		h->powerLeft--;
-		h->powerLeft = (h->powerLeft < 0) ? 0 : ((h->powerMax < h->powerLeft) ? h->powerMax : h->powerLeft);
-	}
-
-	if (customRandom(0, 0xa) == 0) {
-		playSound(8, 6);
-	}
-
-	FISH_spawnRipple(0, &h->fish.pos, 0x2bc, 1, (h->fish.size << 12) / 120);
-	i = 0;
-	goto probeTest2;
-probeStep2:
-	step.vx = 0;
-	step.vy = 0;
-	step.vz = 0x12c;
-	rotateVectorYXZ(&h->fish.rotation, &step, &probe);
-	addVector(&probe, &FISHING_DATA_PTR->swimmer.pos);
-	if (FISH_projectPoint(&probe, &FISH_SCRATCH->x, &FISH_SCRATCH->y) != 0) {
-		if (FISH_isScreenPointVisible(FISH_SCRATCH->x, FISH_SCRATCH->y) != 0) {
-			if (FISHING_DATA_PTR->mapData->isWater(FISH_SCRATCH->x,
-			                                       FISH_SCRATCH->y) != 0) {
-				goto probeNext2;
+			if (FISHING_DATA_PTR->rod.fishingState != 0xb) {
+				goto escape;
 			}
+
+			break;
+nextMove:
+			toEulerAngles(&h->fish.rotation,
+			              TAMER_ENTITY.entity.posData->location.vx - h->fish.pos.vx, 0,
+			              TAMER_ENTITY.entity.posData->location.vz - h->fish.pos.vz);
+			h->fish.rotation.vy += customRandom(-0x384, 0x384) + 0x800;
+			h->fish.timeThisMove = customRandom(0x14, 0x32);
+			h->nibbleTime = customRandom(9, 0x13);
+			h->fish.state = 0x32;
+			h->fish.framesOnState = -1;
+			break;
+		case 0x32:
+			if ((h->fish.framesOnState % 2) == 0) {
+				h->powerLeft--;
+				h->powerLeft = (h->powerLeft < 0) ? 0 : ((h->powerLeft > h->powerMax) ? h->powerMax : h->powerLeft);
+			}
+
+			if (customRandom(0, 0xa) == 0) {
+				playSound(8, 6);
+			}
+
+			FISH_spawnRipple(0, &h->fish.pos, 0x2bc, 1, (h->fish.size << 12) / 120);
+			for (j = 0; j < 0x1e; j++) {
+				origin2 = FISHING_DATA_PTR->swimmer.pos;
+				step.vx = 0;
+				step.vy = 0;
+				step.vz = 0x12c;
+				rotateVectorYXZ(&h->fish.rotation, &step, &probe);
+				addVector(&probe, &FISHING_DATA_PTR->swimmer.pos);
+				if (FISH_projectPoint(&probe, &FISH_SCRATCH->x, &FISH_SCRATCH->y) != 0) {
+					if (FISH_isScreenPointVisible(FISH_SCRATCH->x, FISH_SCRATCH->y) != 0) {
+						if (FISHING_DATA_PTR->mapData->isWater(FISH_SCRATCH->x,
+						                                       FISH_SCRATCH->y) != 0) {
+							continue;
+						}
+					}
+				}
+
+				FISH_randomPointInSpot(h->fish.kind, &FISH_SCRATCH->v0);
+				toEulerAngles(&h->fish.rotation, FISH_SCRATCH->v0.vx - h->fish.pos.vx, 0,
+				              FISH_SCRATCH->v0.vz - h->fish.pos.vz);
+			}
+
+			step.vx = 0;
+			step.vy = 0;
+			step.vz = h->fish.timeThisMove;
+			rotateVectorYXZ(&h->fish.rotation, &step, &probe);
+			addVector(&probe, &FISHING_DATA_PTR->swimmer.pos);
+			h->fish.pos = FISHING_DATA_PTR->swimmer.pos = probe;
+			if (FISHING_DATA_PTR->rod.fishingState != 0xb) {
+				goto escape;
+			}
+
+			if (h->fish.framesOnState >= h->nibbleTime) {
+				goto grabbed;
+			}
+
+			break;
+escape:
+			h->escaped = 1;
+			FISH_bobberCommand(&FISHING_DATA_PTR->swimmer, 7);
+			toEulerAngles(&h->fish.rotation,
+			              TAMER_ENTITY.entity.posData->location.vx - h->fish.pos.vx, 0,
+			              TAMER_ENTITY.entity.posData->location.vz - h->fish.pos.vz);
+			h->fish.rotation.vy += 0x800;
+			h->fish.state = 0x5a;
+			h->fish.framesOnState = -1;
+			break;
+		case 0x5a:
+			step.vx = 0;
+			step.vy = 0;
+			step.vz = 0x28;
+			rotateVectorYXZ(&h->fish.rotation, &step, &probe);
+			addVector(&h->fish.pos, &probe);
+			h->fish.transparency -= 8;
+			h->fish.transparency = (h->fish.transparency < 0) ? 0 : ((h->fish.transparency >= 0x81) ? 0x80 : h->fish.transparency);
+			if (h->fish.transparency != 0) {
+				break;
+			}
+
+			h->fish.active = 0;
+			break;
+snapped:
+			h->fish.state = 0x64;
+			h->fish.framesOnState = -1;
+			break;
+		case 0x64:
+			FISH_SCRATCH->unk18 = getDistance(
+				FISH_REEL_TARGET.vx - FISHING_DATA_PTR->hooked.fish.pos.vx, 0,
+				FISH_REEL_TARGET.vz - FISHING_DATA_PTR->hooked.fish.pos.vz);
+			FISH_SCRATCH->unk18 = (FISH_SCRATCH->unk18 < 0)
+			                              ? 0
+			                              : ((FISH_SCRATCH->unk18 >= 0x33) ? 0x32 : FISH_SCRATCH->unk18);
+			toEulerAngles(&h->fish.rotation, FISH_REEL_TARGET.vx - h->fish.pos.vx, 0,
+			              FISH_REEL_TARGET.vz - h->fish.pos.vz);
+			FISH_SCRATCH->v0.vx = 0;
+			FISH_SCRATCH->v0.vy = 0;
+			FISH_SCRATCH->v0.vz = FISH_SCRATCH->unk18;
+			rotateVectorYXZ(&h->fish.rotation, &FISH_SCRATCH->v0, &FISH_SCRATCH->v1);
+			addVector(&h->fish.pos, &FISH_SCRATCH->v1);
+			FISH_spawnRipple(0, &h->fish.pos, 0x2bc, 1, (h->fish.size << 12) / 120);
+			if (customRandom(1, 0xa) < 6) {
+				playSound(8, 6);
+			}
+		}
+
+		h->fish.framesOnState++;
+		h->fish.animPhase++;
+		if (h->strikeTimer != 0) {
+			h->strikeTimer--;
 		}
 	}
 
-	FISH_randomPointInSpot(h->fish.kind, &FISH_SCRATCH->v0);
-	toEulerAngles(&h->fish.rotation, FISH_SCRATCH->v0.vx - h->fish.pos.vx, 0,
-	              FISH_SCRATCH->v0.vz - h->fish.pos.vz);
-probeNext2:
-	i++;
-probeTest2:
-	if (i < 0x1e) {
-		goto probeStep2;
-	}
-
-	step.vx = 0;
-	step.vy = 0;
-	step.vz = h->fish.timeThisMove;
-	rotateVectorYXZ(&h->fish.rotation, &step, &probe);
-	addVector(&probe, &FISHING_DATA_PTR->swimmer.pos);
-	h->fish.pos = FISHING_DATA_PTR->swimmer.pos = probe;
-	if (FISHING_DATA_PTR->rod.fishingState != 0xb) {
-		goto escape;
-	}
-
-	if (h->fish.framesOnState >= h->nibbleTime) {
-		goto grabbed;
-	}
-
-	goto tick;
-
-escape:
-	k = 1;
-setEscaped:
-	h->escaped = k;
-	FISH_bobberCommand(&FISHING_DATA_PTR->swimmer, 7);
-	toEulerAngles(&h->fish.rotation,
-	              TAMER_ENTITY.entity.posData->location.vx - h->fish.pos.vx, 0,
-	              TAMER_ENTITY.entity.posData->location.vz - h->fish.pos.vz);
-	h->fish.rotation.vy += 0x800;
-	h->fish.state = 0x5a;
-	h->fish.framesOnState = -1;
-	goto tick;
-
-sinking:
-	step.vx = 0;
-	step.vy = 0;
-	step.vz = 0x28;
-	rotateVectorYXZ(&h->fish.rotation, &step, &probe);
-	addVector(&h->fish.pos, &probe);
-	h->fish.transparency -= 8;
-	h->fish.transparency = (h->fish.transparency < 0) ? 0 : ((h->fish.transparency >= 0x81) ? 0x80 : h->fish.transparency);
-	if (h->fish.transparency != 0) {
-		goto tick;
-	}
-
-	h->fish.active = 0;
-	goto tick;
-
-snapped:
-	h->fish.state = 0x64;
-	h->fish.framesOnState = -1;
-	goto tick;
-
-seadraChase:
-	FISH_SCRATCH->unk18 = getDistance(
-		FISH_REEL_TARGET.vx - FISHING_DATA_PTR->hooked.fish.pos.vx, 0,
-		FISH_REEL_TARGET.vz - FISHING_DATA_PTR->hooked.fish.pos.vz);
-	k = FISH_SCRATCH->unk18;
-	k = (k < 0) ? 0 : ((FISH_SCRATCH->unk18 >= 0x33) ? 0x32 : k);
-	FISH_SCRATCH->unk18 = k;
-	toEulerAngles(&h->fish.rotation, FISH_REEL_TARGET.vx - h->fish.pos.vx, 0,
-	              FISH_REEL_TARGET.vz - h->fish.pos.vz);
-	FISH_SCRATCH->v0.vx = 0;
-	FISH_SCRATCH->v0.vy = 0;
-	FISH_SCRATCH->v0.vz = FISH_SCRATCH->unk18;
-	rotateVectorYXZ(&h->fish.rotation, &FISH_SCRATCH->v0, &FISH_SCRATCH->v1);
-	addVector(&h->fish.pos, &FISH_SCRATCH->v1);
-	FISH_spawnRipple(0, &h->fish.pos, 0x2bc, 1, (h->fish.size << 12) / 120);
-	if (customRandom(1, 0xa) < 6) {
-		playSound(8, 6);
-	}
-
-tick:
-	h->fish.framesOnState++;
-	h->fish.animPhase++;
-	if (h->strikeTimer != 0) {
-		h->strikeTimer--;
-	}
-
-checkKind:
 	if (h->fish.kind == 6) {
 		FISH_pushSeadramonSegment(&h->fish.pos, &h->fish.rotation);
 	}
-
-ret:;
 }
 
 int32_t FISH_tryStrike(void)
@@ -3746,10 +3537,9 @@ void FISH_updateRodPose(FishingRod *rod)
 	VECTOR d;
 	VECTOR lv;
 	SVECTOR e;
+	SVECTOR lim;
 	int32_t len;
 	int32_t ang;
-	int32_t sx;
-	int32_t sy;
 
 	FISH_getBoneTransform(&TAMER_ENTITY.entity, 9, &FISH_SCRATCH->v0,
 	                      &FISH_SCRATCH->rot);
@@ -3768,20 +3558,24 @@ void FISH_updateRodPose(FishingRod *rod)
 	ApplyMatrix(&FISH_SCRATCH->m[2], &MAIN_D_801349C8, &FISH_SCRATCH->v1);
 	addVector(&FISH_SCRATCH->v0, &FISH_SCRATCH->v1);
 
-	len = (FISHING_DATA_PTR->tension.display != 0) ? (((FISHING_DATA_PTR->tension.level + FISHING_DATA_PTR->tension.limit) << 9) / (FISHING_DATA_PTR->tension.limit * 2)) : 0x80;
+	if (FISHING_DATA_PTR->tension.display != 0) {
+		len = ((FISHING_DATA_PTR->tension.level + FISHING_DATA_PTR->tension.limit) << 9) /
+		      (FISHING_DATA_PTR->tension.limit * 2);
+	} else {
+		len = 0x80;
+	}
 
 	d.vx = FISHING_DATA_PTR->swimmer.pos.vx - FISH_SCRATCH->v0.vx;
 	d.vy = FISHING_DATA_PTR->swimmer.pos.vy - FISH_SCRATCH->v0.vy;
 	d.vz = FISHING_DATA_PTR->swimmer.pos.vz - FISH_SCRATCH->v0.vz;
 	ApplyTransposeMatrixLV(&FISH_SCRATCH->m[2], &d, &lv);
 	toEulerAngles(&e, lv.vx, lv.vy, lv.vz);
-	sx = lv.vy;
-	ang = ratan2(sx, lv.vx);
-	sy = (int16_t)((-(len * rsin(ang))) >> 12);
-	sx = (int16_t)((len * rcos(ang)) >> 12);
+	ang = ratan2(lv.vy, lv.vx);
+	lim.vx = (-(len * rsin(ang))) >> 12;
+	lim.vy = (len * rcos(ang)) >> 12;
 
-	e.vx = ((e.vx > 0) ? ((e.vx < sy) ? e.vx : (int16_t)sy) : ((sy < e.vx) ? e.vx : (int16_t)sy));
-	e.vy = ((e.vy > 0) ? ((e.vy < sx) ? e.vy : (int16_t)sx) : ((sx < e.vy) ? e.vy : (int16_t)sx));
+	e.vx = (e.vx > 0) ? ((e.vx < lim.vx) ? e.vx : lim.vx) : ((e.vx > lim.vx) ? e.vx : lim.vx);
+	e.vy = (e.vy > 0) ? ((e.vy < lim.vy) ? e.vy : lim.vy) : ((e.vy > lim.vy) ? e.vy : lim.vy);
 
 	for (ang = 1; ang < 4U; ang++) {
 		FISH_D_8007A5BC[ang].vx = (uint32_t)e.vx >> 2;
@@ -3844,7 +3638,7 @@ int32_t FISH_clipLineToRect(SVECTOR *pts, int32_t xMin, int32_t xMax, int32_t yM
 	int32_t i;
 
 	for (i = 0; i < 2; i++) {
-		code[i] = ((pts[i].vx < xMin) ? 1 : 0) | ((xMax < pts[i].vx) ? 2 : 0);
+		code[i] = ((pts[i].vx < xMin) ? 1 : 0) | ((pts[i].vx > xMax) ? 2 : 0);
 	}
 
 	if ((code[0] & code[1]) != 0) {
@@ -3865,7 +3659,7 @@ int32_t FISH_clipLineToRect(SVECTOR *pts, int32_t xMin, int32_t xMax, int32_t yM
 	}
 
 	for (i = 0; i < 2; i++) {
-		code[i] = ((pts[i].vy < yMin) ? 1 : 0) | ((yMax < pts[i].vy) ? 2 : 0);
+		code[i] = ((pts[i].vy < yMin) ? 1 : 0) | ((pts[i].vy > yMax) ? 2 : 0);
 	}
 
 	if ((code[0] & code[1]) != 0) {
@@ -3897,8 +3691,6 @@ void FISH_drawFishingLine(FishingRod *rod)
 	int32_t i;
 	int32_t j;
 	int32_t n;
-	int32_t k;
-	int32_t lo;
 
 	ends[0] = &rod->lineStart;
 	ends[1] = &FISHING_DATA_PTR->swimmer.pos;
@@ -3928,9 +3720,8 @@ void FISH_drawFishingLine(FishingRod *rod)
 		return;
 	}
 
-	lo = 0;
-	if (FISH_clipLineToRect(pts, -DRAWING_OFFSET_X + lo, -DRAWING_OFFSET_X + 0x140,
-	                        -DRAWING_OFFSET_Y + lo, -DRAWING_OFFSET_Y + 0xf0) == 0) {
+	if (FISH_clipLineToRect(pts, FISH_viewX(0), FISH_viewX(0x140), FISH_viewY(0),
+	                        FISH_viewY(0xf0)) == 0) {
 		return;
 	}
 
@@ -3958,27 +3749,30 @@ void FISH_resetRodState(FishingRod *rod)
 
 void FISH_tickRod(FishingRod *rod)
 {
+	int32_t n;
+	int32_t moving;
+	int32_t panning;
 	SVECTOR rot;
 	MATRIX m;
 	SVECTOR rot2;
 	VECTOR d;
 	VECTOR lv;
 	MATRIX m2;
+	Fish *f;
 	SVECTOR rot3;
 	VECTOR d2;
 	VECTOR lv2;
 	MATRIX m3;
-	int32_t n;
-	int32_t k;
-	int32_t p;
+	int32_t newRecord;
+	uint8_t r;
+#if !defined(VERSION_JP)
+	int32_t metres;
+	int32_t centimetres;
 	int32_t t;
 	int32_t w;
 	int32_t j;
-	uint32_t r;
-	int32_t moving;
-	int32_t metres;
-	int32_t centimetres;
-	Fish *f;
+	int32_t p;
+#endif
 
 	if (FISH_isTextBoxVisible()) {
 		FISH_scrollViewToTarget(0x40);
@@ -4066,15 +3860,12 @@ state3:
 
 state1:
 	if (POLLED_INPUT & 0x8000) {
-		TAMER_ENTITY.entity.posData->rotation.vy =
-			TAMER_ENTITY.entity.posData->rotation.vy - 0x40;
+		TAMER_ENTITY.entity.posData->rotation.vy -= 0x40;
 	}
 	if (POLLED_INPUT & 0x2000) {
-		TAMER_ENTITY.entity.posData->rotation.vy =
-			TAMER_ENTITY.entity.posData->rotation.vy + 0x40;
+		TAMER_ENTITY.entity.posData->rotation.vy += 0x40;
 	}
-	TAMER_ENTITY.entity.posData->rotation.vy =
-		TAMER_ENTITY.entity.posData->rotation.vy & 0xfff;
+	TAMER_ENTITY.entity.posData->rotation.vy &= 0xfff;
 	if (TAMER_ENTITY.entity.anim.animFlag & 1) {
 		goto tick;
 	}
@@ -4105,27 +3896,24 @@ stateE96:
 
 state6:
 	FISH_moveBaitToRodTip(0);
-	if (POLLED_INPUT & 0x20) {
+	if (POLLED_INPUT & ALT_BUTTON) {
 		FISH_panCameraWithDPad();
 		goto tick;
 	}
-	if ((POLLED_INPUT & ~POLLED_INPUT_PREVIOUS) & 0x40) {
+	if ((POLLED_INPUT & ~POLLED_INPUT_PREVIOUS) & CONFIRM_BUTTON) {
 		goto throwRod;
 	}
-	if ((POLLED_INPUT & ~POLLED_INPUT_PREVIOUS) & 0x10) {
+	if ((POLLED_INPUT & ~POLLED_INPUT_PREVIOUS) & CANCEL_BUTTON) {
 		FISH_clearBaitSprite();
 		goto toStateE;
 	}
 	if (POLLED_INPUT & 0x8000) {
-		TAMER_ENTITY.entity.posData->rotation.vy =
-			TAMER_ENTITY.entity.posData->rotation.vy - 0x40;
+		TAMER_ENTITY.entity.posData->rotation.vy -= 0x40;
 	}
 	if (POLLED_INPUT & 0x2000) {
-		TAMER_ENTITY.entity.posData->rotation.vy =
-			TAMER_ENTITY.entity.posData->rotation.vy + 0x40;
+		TAMER_ENTITY.entity.posData->rotation.vy += 0x40;
 	}
-	TAMER_ENTITY.entity.posData->rotation.vy =
-		TAMER_ENTITY.entity.posData->rotation.vy & 0xfff;
+	TAMER_ENTITY.entity.posData->rotation.vy &= 0xfff;
 	FISH_panCameraTo(0x10, &FISHING_DATA_PTR->swimmer.pos, 0x28, 0x1e);
 	goto tick;
 
@@ -4145,10 +3933,10 @@ throwRod:
 	goto tick;
 
 state7:
-	if ((POLLED_INPUT & ~POLLED_INPUT_PREVIOUS) & 0x40) {
+	if ((POLLED_INPUT & ~POLLED_INPUT_PREVIOUS) & CONFIRM_BUTTON) {
 		goto release;
 	}
-	if ((POLLED_INPUT & ~POLLED_INPUT_PREVIOUS) & 0x20) {
+	if ((POLLED_INPUT & ~POLLED_INPUT_PREVIOUS) & ALT_BUTTON) {
 		rod->framesOnState = 0x14;
 		goto release;
 	}
@@ -4166,8 +3954,8 @@ release:
 	copyVector(&FISHING_DATA_PTR->swimmer.pos, &rod->lineStart);
 	FISHING_DATA_PTR->swimmer.dist = 0;
 	FISHING_DATA_PTR->swimmer.gravity = 3;
-	n = (rod->swimmerType == 1) ? 0xc8 : 0x190;
-	MAIN_D_801349D0.vz = FISH_remapClamped(rod->throwPower, 0, 0x14, 0x64, n);
+	MAIN_D_801349D0.vz = FISH_remapClamped(rod->throwPower, 0, 0x14, 0x64,
+	                                       (rod->swimmerType == 1) ? 0xc8 : 0x190);
 	rot.vx = 0;
 	rot.vy = TAMER_ENTITY.entity.posData->rotation.vy + 0x800;
 	rot.vz = -0xc8;
@@ -4181,17 +3969,17 @@ release:
 
 state8:
 	FISH_panCameraTo(0, &FISHING_DATA_PTR->swimmer.pos, 0x28, 0x1e);
-	if (POLLED_INPUT & 0x20) {
+	if (POLLED_INPUT & ALT_BUTTON) {
 		FISH_panCameraWithDPad();
 	} else {
 		FISH_panCameraTo(0x10, &FISHING_DATA_PTR->swimmer.pos, 0x28, 0x1e);
 	}
-	if ((POLLED_INPUT & ~POLLED_INPUT_PREVIOUS) & 0x40) {
+	if ((POLLED_INPUT & ~POLLED_INPUT_PREVIOUS) & CONFIRM_BUTTON) {
 		FISHING_DATA_PTR->swimmer.vel.vx = 0;
 		FISHING_DATA_PTR->swimmer.vel.vz = 0;
 	}
 	if (FISHING_DATA_PTR->swimmer.pos.vy < 0) {
-		if ((POLLED_INPUT & ~POLLED_INPUT_PREVIOUS) & 0x10) {
+		if ((POLLED_INPUT & ~POLLED_INPUT_PREVIOUS) & CANCEL_BUTTON) {
 			goto cast;
 		}
 		goto tick;
@@ -4204,6 +3992,14 @@ splash:
 	                      &FISH_SCRATCH->y) == 0) {
 		goto cast;
 	}
+#if defined(VERSION_JP)
+	if (FISH_isScreenPointVisible(FISH_SCRATCH->x, FISH_SCRATCH->y) == 0) {
+		goto cast;
+	}
+	if (FISHING_DATA_PTR->mapData->isWater(FISH_SCRATCH->x, FISH_SCRATCH->y) == 0) {
+		goto cast;
+	}
+#else
 	t = FISH_SCRATCH->x;
 	w = FISH_SCRATCH->y;
 	if (FISH_isScreenPointVisible(t, w) == 0) {
@@ -4214,6 +4010,7 @@ splash:
 	if (FISHING_DATA_PTR->mapData->isWater(t, w) == 0) {
 		goto cast;
 	}
+#endif
 	playSound(8, 2);
 	getDistance(FISHING_DATA_PTR->swimmer.pos.vx - rod->lineStart.vx, 0,
 	            FISHING_DATA_PTR->swimmer.pos.vz - rod->lineStart.vz);
@@ -4225,8 +4022,8 @@ splash:
 	goto tick;
 
 state9:
-	if (POLLED_INPUT & 0x40) {
-		if (((POLLED_INPUT & ~POLLED_INPUT_PREVIOUS) & 0x40) ||
+	if (POLLED_INPUT & CONFIRM_BUTTON) {
+		if (((POLLED_INPUT & ~POLLED_INPUT_PREVIOUS) & CONFIRM_BUTTON) ||
 		    ((TAMER_ENTITY.entity.anim.animFlag & 1) == 0)) {
 			startAnimation(&TAMER_ENTITY.entity, 0x20);
 		}
@@ -4241,12 +4038,9 @@ state9:
 		lv.vy = 0;
 		if (lv.vz > 0) {
 			ApplyMatrixLV(&m2, &lv, &d);
-			FISHING_DATA_PTR->swimmer.pos.vx =
-				FISHING_DATA_PTR->swimmer.pos.vx + d.vx;
-			FISHING_DATA_PTR->swimmer.pos.vy =
-				FISHING_DATA_PTR->swimmer.pos.vy + d.vy;
-			FISHING_DATA_PTR->swimmer.pos.vz =
-				FISHING_DATA_PTR->swimmer.pos.vz + d.vz;
+			FISHING_DATA_PTR->swimmer.pos.vx += d.vx;
+			FISHING_DATA_PTR->swimmer.pos.vy += d.vy;
+			FISHING_DATA_PTR->swimmer.pos.vz += d.vz;
 		}
 		goto nibbleCheck;
 	}
@@ -4256,9 +4050,9 @@ nibbleCheck:
 	if (rod->itemTaken != 0) {
 		if ((rod->framesOnState >= 0x1f) && ((rod->framesOnState % 20) == 0) &&
 		    (customRandom(1, 0x2710) < 0x3e9)) {
-			r = customRandom(0, 0x63) & 0xff;
+			r = customRandom(0, 0x63);
 			for (n = 0; n < 6U; n++) {
-				if (FISH_BAIT_CHANCES[n].threshold >= r) {
+				if (r <= FISH_BAIT_CHANCES[n].threshold) {
 					break;
 				}
 			}
@@ -4272,14 +4066,19 @@ nibbleCheck:
 	goto visibleCheck;
 
 releasedPath:
-	if (((POLLED_INPUT_PREVIOUS & ~POLLED_INPUT) & 0x40) ||
+	if (((POLLED_INPUT_PREVIOUS & ~POLLED_INPUT) & CONFIRM_BUTTON) ||
 	    ((TAMER_ENTITY.entity.anim.animFlag & 1) == 0)) {
 		startAnimation(&TAMER_ENTITY.entity, 0x1f);
 	}
 	if (rod->itemTaken == 0) {
+#if defined(VERSION_JP)
+		f = FISH_findFishToBite(FISHING_DATA_PTR->fishPool.items,
+		                        &FISHING_DATA_PTR->swimmer.pos, rod->bait);
+#else
 		j = rod->bait;
 		f = FISH_findFishToBite(FISHING_DATA_PTR->fishPool.items,
 		                        &FISHING_DATA_PTR->swimmer.pos, j);
+#endif
 		if (f != NULL) {
 			FISH_hookFish(f);
 			goto hooked;
@@ -4292,25 +4091,21 @@ visibleCheck:
 	                      &FISH_SCRATCH->y) == 0) {
 		goto cast;
 	}
-	t = FISH_SCRATCH->x;
-	w = FISH_SCRATCH->y;
-	if (FISH_isScreenPointVisible(t, w) == 0) {
+	if (FISH_isScreenPointVisible(FISH_SCRATCH->x, FISH_SCRATCH->y) == 0) {
 		goto cast;
 	}
-	t = FISH_SCRATCH->x;
-	w = FISH_SCRATCH->y;
-	if (FISHING_DATA_PTR->mapData->isWater(t, w) == 0) {
+	if (FISHING_DATA_PTR->mapData->isWater(FISH_SCRATCH->x, FISH_SCRATCH->y) == 0) {
 		goto cast;
 	}
 	if (FISH_isWithinCastRange(&FISHING_DATA_PTR->swimmer.pos, 0)) {
 		goto cast;
 	}
-	if (POLLED_INPUT & 0x20) {
+	if (POLLED_INPUT & ALT_BUTTON) {
 		FISH_panCameraWithDPad();
 		goto tick;
 	}
 	FISH_panCameraTo(0x10, &FISHING_DATA_PTR->swimmer.pos, 0x28, 0x1e);
-	if ((POLLED_INPUT & ~POLLED_INPUT_PREVIOUS) & 0x10) {
+	if ((POLLED_INPUT & ~POLLED_INPUT_PREVIOUS) & CANCEL_BUTTON) {
 		goto cast;
 	}
 	goto tick;
@@ -4328,11 +4123,15 @@ stateA:
 		                 &FISHING_DATA_PTR->swimmer.pos);
 		goto splash;
 	}
+#if defined(VERSION_JP)
+	if ((POLLED_INPUT & ~POLLED_INPUT_PREVIOUS) & CONFIRM_BUTTON) {
+#else
 	j = POLLED_INPUT_PREVIOUS;
 	t = POLLED_INPUT;
 	w = ~j;
 	p = t & w;
-	if (p & 0x40) {
+	if (p & CONFIRM_BUTTON) {
+#endif
 		if (FISH_tryStrike() == 0) {
 			if (rod->itemTaken != 0) {
 				FISH_showTextBox(FISH_MSG_TOO_LATE,
@@ -4349,7 +4148,11 @@ stateA:
 		                 &FISHING_DATA_PTR->swimmer.pos);
 		goto beginTension;
 	}
-	if ((p & 0x10) == 0) {
+#if defined(VERSION_JP)
+	if (((POLLED_INPUT & ~POLLED_INPUT_PREVIOUS) & CANCEL_BUTTON) == 0) {
+#else
+	if ((p & CANCEL_BUTTON) == 0) {
+#endif
 		goto tick;
 	}
 	FISH_tickHookedFish(0xf);
@@ -4363,12 +4166,12 @@ beginTension:
 	goto tick;
 
 stateB:
-	if (POLLED_INPUT & 0x40) {
+	if (POLLED_INPUT & CONFIRM_BUTTON) {
 		if (rod->pressedFrames < 0) {
 			rod->pressedFrames = 0;
 		}
 		rod->pressedFrames++;
-		if (((POLLED_INPUT & ~POLLED_INPUT_PREVIOUS) & 0x40) ||
+		if (((POLLED_INPUT & ~POLLED_INPUT_PREVIOUS) & CONFIRM_BUTTON) ||
 		    ((TAMER_ENTITY.entity.anim.animFlag & 1) == 0)) {
 			startAnimation(&TAMER_ENTITY.entity, 0x22);
 		}
@@ -4382,26 +4185,27 @@ stateB:
 		lv2.vx = 0;
 		lv2.vy = 0;
 		lv2.vz = (lv2.vz * 200) / 100;
+#if defined(VERSION_JP)
+		lv2.vz -= FISH_remapClamped(FISHING_DATA_PTR->hooked.fish.size, 0x32, 0x12c, 1, 0xa);
+#else
 		w = FISHING_DATA_PTR->hooked.fish.size;
 		lv2.vz -= FISH_remapClamped(w, 0x32, 0x12c, 1, 0xa);
+#endif
 		if (lv2.vz > 0) {
 			ApplyMatrixLV(&m3, &lv2, &d2);
 			d2.vx /= 2;
 			d2.vy /= 2;
 			d2.vz /= 2;
-			FISHING_DATA_PTR->swimmer.pos.vx =
-				FISHING_DATA_PTR->swimmer.pos.vx + d2.vx;
-			FISHING_DATA_PTR->swimmer.pos.vy =
-				FISHING_DATA_PTR->swimmer.pos.vy + d2.vy;
-			FISHING_DATA_PTR->swimmer.pos.vz =
-				FISHING_DATA_PTR->swimmer.pos.vz + d2.vz;
+			FISHING_DATA_PTR->swimmer.pos.vx += d2.vx;
+			FISHING_DATA_PTR->swimmer.pos.vy += d2.vy;
+			FISHING_DATA_PTR->swimmer.pos.vz += d2.vz;
 		}
 	} else {
 		if (rod->pressedFrames > 0) {
 			rod->pressedFrames = 0;
 		}
 		rod->pressedFrames--;
-		if ((POLLED_INPUT_PREVIOUS & ~POLLED_INPUT) & 0x40) {
+		if ((POLLED_INPUT_PREVIOUS & ~POLLED_INPUT) & CONFIRM_BUTTON) {
 			startAnimation(&TAMER_ENTITY.entity, 0x21);
 		}
 	}
@@ -4413,33 +4217,31 @@ stateB:
 	    (FISHING_DATA_PTR->mapData->isWater(FISH_SCRATCH->x, FISH_SCRATCH->y) == 0)) {
 		goto landed;
 	}
+#if defined(VERSION_JP)
+	if (FISH_isWithinCastRange(&FISHING_DATA_PTR->swimmer.pos, FISHING_DATA_PTR->hooked.fish.size)) {
+#else
 	t = FISHING_DATA_PTR->hooked.fish.size;
 	if (FISH_isWithinCastRange(&FISHING_DATA_PTR->swimmer.pos, t)) {
+#endif
 		goto landed;
 	}
-	k = FISH_updateTension();
-	if (k == 2) {
-		goto tensionBroke;
-	}
-	if (k == 1) {
+	switch (FISH_updateTension()) {
+	case 1:
 		FISH_tickHookedFish(0xf);
 		FISH_resetTension();
 		goto lineSnap;
+	case 2:
+		FISH_tickHookedFish(0xf);
+		FISH_resetTension();
+		goto fishEscaped;
 	}
-	goto noTension;
 
-tensionBroke:
-	FISH_tickHookedFish(0xf);
-	FISH_resetTension();
-	goto fishEscaped;
-
-noTension:
-	if ((POLLED_INPUT & ~POLLED_INPUT_PREVIOUS) & 0x10) {
+	if ((POLLED_INPUT & ~POLLED_INPUT_PREVIOUS) & CANCEL_BUTTON) {
 		FISH_tickHookedFish(0xf);
 		FISH_resetTension();
 		goto splash;
 	}
-	if (POLLED_INPUT & 0x20) {
+	if (POLLED_INPUT & ALT_BUTTON) {
 		FISH_panCameraWithDPad();
 		goto tick;
 	}
@@ -4466,16 +4268,48 @@ landed:
 stateD:
 	moving = FISH_moveBaitToRodTip(0x28);
 	FISHING_DATA_PTR->swimmer.pos = FISHING_DATA_PTR->item.pos;
-	k = FISH_panCameraTo(0x20, &FISHING_DATA_PTR->swimmer.pos, 0x28, 0x1e);
+	panning = FISH_panCameraTo(0x20, &FISHING_DATA_PTR->swimmer.pos, 0x28, 0x1e);
+	if (moving) {
+	}
 	if (moving != 0) {
 		goto tick;
 	}
-	if (k != 0) {
+	if (panning != 0) {
 		goto tick;
 	}
+	newRecord = 0;
+#if defined(VERSION_JP)
+	FISH_showBaitSprite(NULL, rod->bait);
+#else
 	j = rod->bait;
 	FISH_showBaitSprite(NULL, j);
+#endif
 	FISH_moveBaitToRodTip(0);
+#if defined(VERSION_JP)
+	if (FISHING_DATA_PTR->hooked.fish.size >= 0xc8) {
+		sprintf(FISHING_DATA_PTR->messageBuffer, FISH_MSG_LENGTH_GREAT);
+		memcpy(&FISHING_DATA_PTR->messageBuffer[0x18],
+		       &MAIN_D_80124C54[(FISHING_DATA_PTR->hooked.fish.size % 10) * 2], 2);
+		memcpy(&FISHING_DATA_PTR->messageBuffer[0x16],
+		       &MAIN_D_80124C54[((FISHING_DATA_PTR->hooked.fish.size / 10) % 10) * 2], 2);
+		memcpy(&FISHING_DATA_PTR->messageBuffer[0xc],
+		       &MAIN_D_80124C54[((FISHING_DATA_PTR->hooked.fish.size / 100) % 10) * 2], 2);
+	} else if (FISHING_DATA_PTR->hooked.fish.size >= 0x64) {
+		sprintf(FISHING_DATA_PTR->messageBuffer, FISH_MSG_LENGTH_M_CM);
+		memcpy(&FISHING_DATA_PTR->messageBuffer[0x10],
+		       &MAIN_D_80124C54[(FISHING_DATA_PTR->hooked.fish.size % 10) * 2], 2);
+		memcpy(&FISHING_DATA_PTR->messageBuffer[0xe],
+		       &MAIN_D_80124C54[((FISHING_DATA_PTR->hooked.fish.size / 10) % 10) * 2], 2);
+		memcpy(&FISHING_DATA_PTR->messageBuffer[4],
+		       &MAIN_D_80124C54[((FISHING_DATA_PTR->hooked.fish.size / 100) % 10) * 2], 2);
+	} else {
+		sprintf(FISHING_DATA_PTR->messageBuffer, FISH_MSG_LENGTH_CM);
+		memcpy(&FISHING_DATA_PTR->messageBuffer[8],
+		       &MAIN_D_80124C54[(FISHING_DATA_PTR->hooked.fish.size % 10) * 2], 2);
+		memcpy(&FISHING_DATA_PTR->messageBuffer[6],
+		       &MAIN_D_80124C54[((FISHING_DATA_PTR->hooked.fish.size / 10) % 10) * 2], 2);
+	}
+#else
 	if (FISHING_DATA_PTR->hooked.fish.size >= 0xc8) {
 		metres = FISHING_DATA_PTR->hooked.fish.size / 200;
 		centimetres = FISHING_DATA_PTR->hooked.fish.size % 200;
@@ -4490,10 +4324,10 @@ stateD:
 		centimetres = FISHING_DATA_PTR->hooked.fish.size % 100;
 		sprintf(FISHING_DATA_PTR->messageBuffer, FISH_MSG_LENGTH_CM, centimetres);
 	}
-	if (MAIN_D_80154F80[FISHING_DATA_PTR->hooked.fish.kind] <
-	    FISHING_DATA_PTR->hooked.fish.size) {
-		MAIN_D_80154F80[FISHING_DATA_PTR->hooked.fish.kind] =
-			FISHING_DATA_PTR->hooked.fish.size;
+#endif
+	if (FISHING_DATA_PTR->hooked.fish.size > MAIN_D_80154F80[FISHING_DATA_PTR->hooked.fish.kind]) {
+		MAIN_D_80154F80[FISHING_DATA_PTR->hooked.fish.kind] = FISHING_DATA_PTR->hooked.fish.size;
+		newRecord = 1;
 	}
 	PARTNER_PARA.fishCaught++;
 	playSound(8, 8);
@@ -4514,14 +4348,8 @@ finish:
 	FISH_bobberCommand(&FISHING_DATA_PTR->swimmer, 4);
 	FISHING_DATA_PTR->swimmer.mode = 1;
 	rod->displayLine = 1;
-	if (FISHING_DATA_PTR->mapId == 8) {
-		n = 0;
-	} else if (FISHING_DATA_PTR->mapId == 0xa) {
-		n = 0;
-	} else {
-		n = 0;
-	}
-	TAMER_ENTITY.entity.posData->rotation.vy = n;
+	TAMER_ENTITY.entity.posData->rotation.vy =
+		(FISHING_DATA_PTR->mapId == 8) ? 0 : ((FISHING_DATA_PTR->mapId == 0xa) ? 0 : 0);
 	FISH_showBaitSprite(NULL, rod->bait);
 	FISH_moveBaitToRodTip(0);
 
@@ -4584,9 +4412,15 @@ state44C:
 	FISH_moveBaitToRodTip(0);
 	playSound(8, 8);
 	if (giveItem(rod->bait & 0xff, 1) == 0) {
+#if defined(VERSION_JP)
+		FISH_showTextBox(ITEM_PARA[rod->bait].name,
+		                 FISH_MSG_IT_GOT_STUCK, FISH_MSG_BAG_FULL, 0,
+		                 &FISHING_DATA_PTR->item.pos);
+#else
 		FISH_showTextBox(ITEM_PARA[rod->bait].name,
 		                 FISH_MSG_BAG_FULL_LINE1, FISH_MSG_BAG_FULL_LINE2, 0,
 		                 &FISHING_DATA_PTR->item.pos);
+#endif
 	} else {
 		FISH_showTextBox(ITEM_PARA[rod->bait].name,
 		                 FISH_MSG_IT_GOT_STUCK, 0, 0,
@@ -4675,38 +4509,38 @@ void FISH_renderFishingWorld(int32_t instanceId)
 
 int32_t FISH_lerpTableByX(int32_t x, int32_t base, DVECTOR *tbl, int32_t n)
 {
+	int32_t i;
+	int32_t y;
+
 	if ((x < tbl[0].vx) || (tbl[n - 1].vx < x)) {
 		return 0;
 	}
-	for (n = n - 2; n >= 0; n--) {
-		if (x >= tbl[n].vx) {
+	for (i = n - 2; i >= 0; i--) {
+		if (x >= tbl[i].vx) {
 			break;
 		}
 	}
 
-	{
-		int32_t y0 = tbl[n].vy;
-		int32_t x0 = tbl[n].vx;
-		return base - (y0 + (((x - tbl[n].vx) * (tbl[n + 1].vy - y0)) / (tbl[n + 1].vx - x0)));
-	}
+	y = tbl[i].vy + (((x - tbl[i].vx) * (tbl[i + 1].vy - tbl[i].vy)) / (tbl[i + 1].vx - tbl[i].vx));
+	return base - y;
 }
 
 int32_t FISH_lerpTableByY(int32_t base, int32_t y, DVECTOR *tbl, int32_t n)
 {
+	int32_t i;
+	int32_t x;
+
 	if ((y < tbl[0].vy) || (tbl[n - 1].vy < y)) {
 		return 0;
 	}
-	for (n = n - 2; n >= 0; n--) {
-		if (y >= tbl[n].vy) {
+	for (i = n - 2; i >= 0; i--) {
+		if (y >= tbl[i].vy) {
 			break;
 		}
 	}
 
-	{
-		int32_t x0 = tbl[n].vx;
-		int32_t y0 = tbl[n].vy;
-		return base - (x0 + (((y - tbl[n].vy) * (tbl[n + 1].vx - x0)) / (tbl[n + 1].vy - y0)));
-	}
+	x = tbl[i].vx + (((y - tbl[i].vy) * (tbl[i + 1].vx - tbl[i].vx)) / (tbl[i + 1].vy - tbl[i].vy));
+	return base - x;
 }
 
 int32_t FISH_isFishableWater1(int32_t x, int32_t y)
@@ -4742,7 +4576,6 @@ void FISH_waterTestStub2(void)
 void FISH_getBoneTransform(Entity *e, int32_t bone, VECTOR *outPos, SVECTOR *outRot)
 {
 	MATRIX m;
-	long *t;
 
 	if (!(bone < DIGIMON_DATA[e->type].boneCount)) {
 		bone = 0;
@@ -4759,10 +4592,7 @@ void FISH_getBoneTransform(Entity *e, int32_t bone, VECTOR *outPos, SVECTOR *out
 	}
 
 	if (outPos != NULL) {
-		t = m.t;
-		outPos->vx = t[0];
-		outPos->vy = t[1];
-		outPos->vz = t[2];
+		copyVector(outPos, (VECTOR *)m.t);
 	}
 }
 
@@ -4793,7 +4623,6 @@ void FISH_endFishing(FishingRod *rod)
 void FISH_loadFishing(FishingRod *rod)
 {
 	RECT rect;
-	int32_t t;
 
 	if (rod->displayRod != 0) {
 		FISH_endFishing(rod);
@@ -4810,13 +4639,15 @@ void FISH_loadFishing(FishingRod *rod)
 	FISH_loadTMDModel(&FISHING_DATA_PTR->rodModel, FISH_PATH_ROD_MODEL,
 	                  FISHING_DATA_PTR->rodModelBuffer, 0x1000);
 	rod->swimmerType = getBestFishingRod();
-	t = rod->swimmerType;
-	if (t != 1) {
-		if (t != 2) {
-			rod->swimmerType = 2;
-		}
+	switch (rod->swimmerType) {
+	default:
+		rod->swimmerType = 2;
+	case 2:
 		setRECT(&rect, 0x1c0, 0x1e4, 0x1c, 8);
 		MoveImage(&rect, 0x1c0, 0x1dc);
+		break;
+	case 1:
+		break;
 	}
 }
 
@@ -4876,35 +4707,24 @@ int32_t FISH_tamerTick(void)
 
 void FISH_scrollCameraTo(int32_t x, int32_t y)
 {
-	int32_t dx;
-	int32_t dy;
-	int32_t near;
-
 	if (MAIN_D_801351DC[2] == 0) {
 		return;
 	}
 
-	x = (x < (-DRAW_OFFSET_LIMIT_X_MAX + 0xa0)) ? -DRAW_OFFSET_LIMIT_X_MAX + 0xa0 : (((-DRAW_OFFSET_LIMIT_X_MIN + 0xa0) < x) ? -DRAW_OFFSET_LIMIT_X_MIN + 0xa0 : x);
-	y = (y < (-DRAW_OFFSET_LIMIT_Y_MAX + 0x78)) ? -DRAW_OFFSET_LIMIT_Y_MAX + 0x78 : (((-DRAW_OFFSET_LIMIT_Y_MIN + 0x78) < y) ? -DRAW_OFFSET_LIMIT_Y_MIN + 0x78 : y);
+	x = (x < FISH_screenLeft(0xa0)) ? FISH_screenLeft(0xa0) : ((x > FISH_screenRight(0xa0)) ? FISH_screenRight(0xa0) : x);
+	y = (y < FISH_screenTop(0x78)) ? FISH_screenTop(0x78) : ((y > FISH_screenBottom(0x78)) ? FISH_screenBottom(0x78) : y);
 
-	x -= (-DRAWING_OFFSET_X + 0xa0);
-	y -= (-DRAWING_OFFSET_Y + 0x78);
+	x -= FISH_viewX(0xa0);
+	y -= FISH_viewY(0x78);
 	DRAWING_OFFSET_X -= x;
 	DRAWING_OFFSET_Y -= y;
 	CAMERA_X[0] += (int16_t)x;
 	CAMERA_Y[0] += (int16_t)y;
 
-	near = 0;
-	if (((x > 0) ? x : -x) < 0x7f) {
-		if (((y > 0) ? y : -y) < 0x7f) {
-			near = 1;
-		}
-	}
-
-	handleTileUpdate(((x < 0) ? 0x8000U : 0) |
+	handleTileUpdate(((x < 0) ? 0x8000 : 0) |
 	                         ((x > 0) ? 0x2000 : 0) |
 	                         ((y < 0) ? 0x1000 : 0) | ((y > 0) ? 0x4000 : 0),
-	                 (near != 0) ? 0 : 1);
+	                 ((((x > 0) ? x : -x) < 0x7f) && (((y > 0) ? y : -y) < 0x7f)) ? 0 : 1);
 }
 
 void FISH_applySavedCameraScroll(void)

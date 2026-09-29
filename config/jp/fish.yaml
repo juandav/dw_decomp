@@ -59,9 +59,10 @@ segments:
     align: 4
     subalign: 4
     subsegments:
-      - [0x40, asm, fish]
+      - [0x40, c, fish]
       - [0xDD2C, c, fish_model]
-      - [0xE034, data, fish]
+      - [0xE034, .rodata, fish]
+      - [0xE0C8, .data, fish]
       - [0xEA68, .data, fish_bss]
 
   - [0x11890]

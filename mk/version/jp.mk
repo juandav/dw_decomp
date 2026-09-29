@@ -122,6 +122,7 @@ EVL_C_SRC := \
 
 $(eval $(call overlay,EVL,evl))
 FISH_C_SRC := \
+	src/fish/fish.c \
 	src/fish/fish_bss.c \
 	src/fish/fish_model.c
 
