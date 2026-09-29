@@ -6,7 +6,6 @@
 #include <dw/entity.h>
 #include <dw/evl.h>
 #include <dw/types.h>
-#include <dw/world_object.h>
 
 typedef struct {
 	int8_t objIndex;
@@ -37,7 +36,7 @@ typedef struct {
 ModelComponent *applyMMD(int32_t digimonType, int32_t entityType, EvoModelData *modelData);
 ModelComponent *getEntityModelComponent(int32_t instance, int32_t type);
 int32_t getEntityType(Entity *entity);
-void initializeDigimonObject(int32_t type, int32_t instanceId, TickFunction tick);
+void initializeDigimonObject(int32_t type, int32_t instanceId, void (*tick)(int32_t));
 void initializeModelComponents(void);
 int32_t loadMMDAsync(int32_t digimonType, int32_t entityType, int32_t buffer, EvoModelData *modelData,
                      uint8_t *readComplete);

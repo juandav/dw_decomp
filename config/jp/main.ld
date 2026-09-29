@@ -49,6 +49,7 @@ SECTIONS
         BUILD_DIR/src/main/item.c.o(.text .text.*);
         BUILD_DIR/src/main/sound.c.o(.text .text.*);
         KEEP(BUILD_DIR/asm/main/3FEF4.s.o(.text .text.*));
+        BUILD_DIR/src/main/map.c.o(.text .text.*);
         BUILD_DIR/src/main/inventory.c.o(.text .text.*);
         BUILD_DIR/src/main/clock.c.o(.text .text.*);
         BUILD_DIR/src/main/partner.c.o(.text .text.*);
@@ -93,6 +94,7 @@ SECTIONS
         BUILD_DIR/src/main/overworld_medal_text.c.o(.rodata .rodata.*);
         BUILD_DIR/src/main/item.c.o(.rodata .rodata.*);
         KEEP(BUILD_DIR/asm/main/data/8AD98.rodata.s.o(.rodata .rodata.*));
+        BUILD_DIR/src/main/map.c.o(.rodata .rodata.*);
         BUILD_DIR/src/main/inventory.c.o(.rodata .rodata.*);
         BUILD_DIR/src/main/partner.c.o(.rodata .rodata.*);
         KEEP(BUILD_DIR/asm/main/data/8B014.rodata.s.o(.rodata .rodata.*));
@@ -152,6 +154,7 @@ SECTIONS
         KEEP(BUILD_DIR/asm/main/data/9F198.data.s.o(.data .data.*));
         BUILD_DIR/src/main/sound.c.o(.data .data.*);
         KEEP(BUILD_DIR/asm/main/data/A43D0.data.s.o(.data .data.*));
+        BUILD_DIR/src/main/map.c.o(.data .data.*);
         BUILD_DIR/src/main/inventory.c.o(.data .data.*);
         BUILD_DIR/src/main/clock.c.o(.data .data.*);
         KEEP(BUILD_DIR/asm/main/data/A6B98.data.s.o(.data .data.*));
@@ -191,7 +194,7 @@ SECTIONS
         . = ALIGN(., 4);
         BUILD_DIR/src/main/sound.c.o(.sdata .sdata.*);
         . = ALIGN(., 4);
-        KEEP(BUILD_DIR/asm/main/data/AD64C.sdata.s.o(.sdata .sdata.*));
+        BUILD_DIR/src/main/map.c.o(.sdata .sdata.*);
         BUILD_DIR/src/main/inventory.c.o(.sdata .sdata.*);
         . = ALIGN(., 4);
         BUILD_DIR/src/main/clock.c.o(.sdata .sdata.*);

@@ -21,6 +21,7 @@
 #include <dw/sound.h>
 #include <dw/std.h>
 #include <dw/types.h>
+#include <dw/world_object.h>
 
 #include "common.h"
 

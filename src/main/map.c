@@ -10,6 +10,7 @@
 #include <dw/fade.h>
 #include <dw/file.h>
 #include <dw/font.h>
+#include <dw/input.h>
 #include <dw/item.h>
 #include <dw/map.h>
 #include <dw/math.h>
@@ -20,7 +21,6 @@
 #include <dw/tamer.h>
 #include <dw/types.h>
 #include <dw/utils.h>
-#include <dw/world_object.h>
 
 typedef struct {
 	uint8_t *imagePtr;
@@ -55,6 +55,7 @@ typedef struct {
 
 long RotTransPers3(SVECTOR *v0, SVECTOR *v1, SVECTOR *v2, long *sxy0, long *sxy1, long *sxy2, long *p, long *flag);
 int abs(int x);
+int32_t addObject(int32_t objectId, int16_t instanceId, void (*tick)(int32_t), void (*render)(int32_t));
 void calcMapObjectOrder(LocalMapObjectInstance *instances);
 void calculatePosition(GsCOORDINATE2 *coord, MATRIX *matrix);
 void checkArenaMap(uint8_t mapId);
@@ -80,14 +81,16 @@ void loadTrainingPoop(void);
 void loadWarpCrystals(int32_t mapId);
 int32_t readFile(char *path, void *dest);
 void removeMapEntities(void);
-void renderMapOverlays(int8_t *instances, int32_t screenX, int16_t screenY);
+int32_t removeObject(int32_t objectId, int16_t instanceId);
+void renderMapOverlays(int8_t *instances, int16_t screenX, int16_t screenY);
 void renderPoop(int32_t instanceId);
 void renderString(int32_t a, int32_t b, int32_t c, int32_t d, int32_t e, int32_t f, int32_t g, int32_t h, int32_t i);
 void runMapHeadScript(int32_t section);
-void setPosDataPolyFT4(POLY_FT4 *prim, int16_t posX, int16_t posY, int16_t width, int16_t height);
+void setPosDataPolyFT4(POLY_FT4 *prim, int32_t posX, int32_t posY, int32_t width, int32_t height);
 void setUVDataPolyFT4(POLY_FT4 *prim, int32_t uPos, int32_t vPos, int32_t width, int32_t height);
 void startBattleIdleAnimation(DigimonEntity *entity, Stats *stats, int32_t flags);
 void tickFileReadQueue(int32_t instanceId);
+void tickPartnerNormal();
 void unloadMapParts(void);
 
 void MAIN_func_800D3174(void);
@@ -108,9 +111,9 @@ void MAIN_func_800D92EC(void);
 void MAIN_func_800D9360(int32_t mapId);
 void MAIN_func_800D9660(GsRVIEW2 *out);
 void MAIN_func_800D9B60(uint32_t *src);
-void MAIN_func_800D9BA8(int32_t level, int16_t *src);
+void MAIN_func_800D9BA8(long level, int16_t *clut);
 void MAIN_func_800D9E68(u_long *buffer);
-void MAIN_func_800D9F14(int32_t fade, int16_t *src);
+void MAIN_func_800D9F14(long fade, int16_t *clut);
 int32_t MAIN_func_800DA0F4(POLY_FT3 *prim, int32_t order);
 void addScreenPolyFT3(void *prim, SVECTOR *v0, SVECTOR *v1, SVECTOR *v2);
 void renderTMDModel(uint8_t *buffer, int32_t id, GsCOORDINATE2 *coord, GsCOORDINATE2 *super, VECTOR *trans, SVECTOR *rot, VECTOR *scale);
@@ -120,11 +123,11 @@ int32_t MAIN_func_800DA740(int16_t *rect, DVECTOR *line);
 int16_t MAIN_func_800DA9C8(void);
 int16_t MAIN_func_800DA9F4(void);
 int32_t add3DSpritePrim(POLY_FT4 *poly, SVECTOR *v0, SVECTOR *v1, SVECTOR *v2, SVECTOR *v3);
-void addFXPrim(POLY_FT4 *prim, int32_t x, int32_t y, int16_t width, int16_t height, int32_t depth);
+void addFXPrim(POLY_FT4 *prim, int16_t x, int16_t y, int16_t width, int16_t height, int32_t depth);
 void addMapNameObject(int32_t mapId);
-void addPartnerWaypoint(int16_t index, int8_t x, int8_t y);
-void addTamerWaypoint(int16_t index, int8_t x, int8_t y);
-void buildMapPath(char *out, MapEntry *entry, int8_t *suffix, int32_t mapId);
+void addPartnerWaypoint(int16_t index, int16_t x, int16_t y);
+void addTamerWaypoint(int16_t index, int16_t x, int16_t y);
+void buildMapPath(char *out, char *name, int8_t *suffix, int32_t mapId);
 void calculateBoneMatrix(Entity *entity, int32_t boneId, MATRIX *out);
 void cameraIsAtEdge(int32_t *atEdgeX, int32_t *atEdgeY);
 void changeMap(int16_t a, int16_t b);
@@ -141,7 +144,7 @@ int32_t entityIsInEntity(Entity *a, Entity *b);
 int32_t entityIsOffScreen(Entity *entity, int32_t width, int32_t height);
 void entityLookAtLocation(Entity *entity, VECTOR *location);
 void entityMoveForward(Entity *entity);
-void fillTileData(MapTileData *tile, uint8_t *imagePtr, int32_t texU, int32_t texV, int16_t posX, int16_t posY);
+void fillTileData(MapTileData *tile, uint8_t *imagePtr, int16_t texU, int16_t texV, int16_t posX, int16_t posY);
 void getDrawingOffsetCopy(int32_t *x, int32_t *y);
 void getEntityTileFromModel(Entity *entity, int8_t *outTileX, int8_t *outTileY);
 int32_t getFileCityTopMap(void);
@@ -151,12 +154,12 @@ void getViewportDistanceCopy(int32_t *out);
 void handleTileUpdate(int32_t input, int32_t force);
 int32_t hasMovedOutsideCombatArea(DVECTOR *a, DVECTOR *b, int16_t w, int16_t h);
 void initializeDaytimeTransition(int32_t timeOfDay);
-int32_t isFiveTileWidePathOpen(int32_t x1, int32_t y1, int32_t x2, int32_t y2);
+int32_t isFiveTileWidePathOpen(int8_t x1, int8_t y1, int8_t x2, int8_t y2);
 int32_t isInDaytimeTransition(void);
-int32_t isLinearPathBlocked(int32_t x1, int32_t y1, int32_t x2, int32_t y2);
+int32_t isLinearPathBlocked(int8_t x1, int8_t y1, int8_t x2, int8_t y2);
 int32_t isOffScreen(DVECTOR *xy, int16_t w, int16_t h);
 int32_t isRectInRect(RECT *rect, int32_t x1, int32_t y1, int32_t x2, int32_t y2);
-int32_t isTileWithinScreenArea(int16_t tileX, int16_t tileZ);
+int32_t isTileWithinScreenArea(int8_t tileX, int8_t tileZ);
 int32_t lerp(int32_t start, int32_t end, int32_t t0, int32_t t1, int32_t t);
 void loadMap(int32_t mapId);
 int32_t loadMapSetup(int32_t *data);
@@ -167,22 +170,22 @@ void renderMap(int32_t arg0);
 void renderMapName(int32_t instanceId);
 void renderSprite(GsSPRITE *sprite, int16_t x, int16_t y, int32_t distance, int32_t width, int32_t height);
 void setCameraFollowPlayer(void);
-void setPosDataMapTile(MapTileData *tile, int32_t camX, int32_t camY, POLY_FT4 *prim);
-void setShortWithStride(int16_t *dest, int16_t value, int32_t count, int32_t stride);
-void storeEntityLocation(uint32_t scriptId, VECTOR *out);
+void setPosDataMapTile(MapTileData *tile, int16_t camX, int16_t camY, POLY_FT4 *prim);
+void setShortWithStride(int16_t *dest, int16_t value, int16_t count, int16_t stride);
+void storeEntityLocation(int32_t scriptId, VECTOR *out);
 void tickCameraFollowPlayer(void);
-void tickCameraMovement(int16_t instanceId);
+void tickCameraMovement(int32_t instanceId);
 void tickDaytimeTransition(int32_t instanceId);
 void tickMeramonShake(int32_t arg0);
 void tickMoveCameraTo(int32_t x, int32_t z, int32_t arg2);
-int32_t tickMoveCameraToEntity(uint32_t scriptId, int32_t speed);
+int32_t tickMoveCameraToEntity(int32_t scriptId, int32_t speed);
 void tickPartnerCollision(void);
 void tickPartnerWaypoints(void);
 void tickTamerWaypoints(void);
 void translateConditionFXToEntity(Entity *entity, SVECTOR *out);
 void unloadMap(void);
 void unsetCameraFollowPlayer(void);
-void updateTileColumn(int32_t arg0);
+void updateTileColumn(int32_t right);
 void updateTileRow(int32_t bottom);
 void updateTimeOfDay(void);
 void uploadMapTileImages(MapTileData *tiles, int16_t index);
@@ -215,9 +218,9 @@ extern int8_t CURRENT_TIME_OF_DAY;
 extern int8_t DAYTIME_TRANSITION_ACTIVE;
 extern int8_t DAYTIME_TRANSITION_FRAME;
 extern int16_t DAYTIME_TRANSITION_TARGET;
-extern int32_t DRAWING_OFFSET_X;
+extern long DRAWING_OFFSET_X;
 extern int32_t DRAWING_OFFSET_X_COPY;
-extern int32_t DRAWING_OFFSET_Y;
+extern long DRAWING_OFFSET_Y;
 extern int32_t DRAWING_OFFSET_Y_COPY;
 extern int16_t DRAW_OFFSET_LIMIT_X_MAX;
 extern int16_t DRAW_OFFSET_LIMIT_X_MIN;
@@ -226,7 +229,7 @@ extern int16_t DRAW_OFFSET_LIMIT_Y_MIN;
 extern Entity *ENTITY_TABLE[];
 extern int16_t FADE_OUT_CURRENT;
 extern int8_t GAME_STATE;
-extern void *GENERAL_BUFFER_PTR;
+extern uint8_t *GENERAL_BUFFER_PTR;
 extern GsRVIEW2 GS_VIEWPOINT;
 extern GsRVIEW2 GS_VIEWPOINT_COPY;
 extern MATRIX GsWSMATRIX;
@@ -265,7 +268,7 @@ extern int16_t PLAYER_OFFSET_X;
 extern int16_t PLAYER_OFFSET_Y;
 extern int32_t POLLED_INPUT;
 extern int32_t POLLED_INPUT_PREVIOUS;
-extern int8_t PREVIOUS_EXIT;
+extern uint8_t PREVIOUS_EXIT;
 extern uint8_t PREVIOUS_SCREEN;
 extern int8_t PREV_TILE_X;
 extern int8_t PREV_TILE_Y;
@@ -391,25 +394,6 @@ int8_t COMBAT_AREA_CORNER_OFFSETS[8] = {
 	0xff, 0x01, 0x01, 0x01, 0xff, 0xff, 0x01, 0xff,
 };
 
-int8_t MAP_FILE_EXT_MAP[] = ".MAP";
-
-int8_t MAP_FILE_EXT_TFS[] = ".TFS";
-
-// mwcc aligns every array to four, so the two-byte separator can only be a scalar
-int16_t MAP_PATH_SEPARATOR = '\\';
-
-int16_t MAIN_D_801343B0 = 0xffff;
-
-int16_t MAIN_D_801343B2 = 0xffff;
-
-int8_t MAIN_D_801343B4 = 0x01;
-
-uint8_t MERAMON_SHAKE_COLOR_G = 0xff;
-
-uint8_t MERAMON_SHAKE_COLOR_B = 0xff;
-
-int16_t MERAMON_SHAKE_STEP = 0x0020;
-
 int16_t COLLISION_GRACE_ROTATION[8][4] = {
 	{ 0x0000, 0x0400, 0x0c00, 0x0800 },
 	{ 0x0400, 0x0000, 0x0800, 0x0c00 },
@@ -421,6 +405,146 @@ int16_t COLLISION_GRACE_ROTATION[8][4] = {
 	{ 0x0000, 0x0c00, 0x0400, 0x0800 },
 };
 
+#if defined(VERSION_JP)
+char MAIN_D_80128A34[] = "迷わずの森";
+
+char MAIN_D_80128A50[] = "シーラ岬";
+
+char MAIN_D_80128A6C[] = "竜の目の湖ほとり";
+
+char MAIN_D_80128A88[] = "ドリルトンネル入り口";
+
+char MAIN_D_80128AA4[] = "デジブリッジ";
+
+char MAIN_D_80128AC0[] = "トロピカジャングル";
+
+char MAIN_D_80128ADC[] = "マングローブ域";
+
+char MAIN_D_80128AF8[] = "ミハラシ山道";
+
+char MAIN_D_80128B14[] = "はじまりの街入り口";
+
+char MAIN_D_80128B30[] = "ミハラシ台";
+
+char MAIN_D_80128B4C[] = "ミハラシすそ野";
+
+char MAIN_D_80128B68[] = "ミハラシ山・ホウシ域";
+
+char MAIN_D_80128B84[] = "ドリルトンネル";
+
+char MAIN_D_80128BA0[] = "ドリルトンネル地下２階";
+
+char MAIN_D_80128BBC[] = "ドリルトンネル地下３階";
+
+char MAIN_D_80128BD8[] = "ドリモゲモン居住区";
+
+char MAIN_D_80128BF4[] = "地底湖";
+
+char MAIN_D_80128C10[] = "溶岩洞";
+
+char MAIN_D_80128C2C[] = "オーバーデル";
+
+char MAIN_D_80128C48[] = "オーバーデル墓地";
+
+char MAIN_D_80128C64[] = "グレートキャニオン入り口";
+
+char MAIN_D_80128C80[] = "グレートキャニオン上層";
+
+char MAIN_D_80128C9C[] = "グレ大橋";
+
+char MAIN_D_80128CB8[] = "トリデ入り口";
+
+char MAIN_D_80128CD4[] = "グレートキャニオン下層";
+
+char MAIN_D_80128CF0[] = "オーガトリデ";
+
+char MAIN_D_80128D0C[] = "モノクロ店";
+
+char MAIN_D_80128D28[] = "闇貴族の館";
+
+char MAIN_D_80128D44[] = "闇貴族の館地下";
+
+char MAIN_D_80128D60[] = "地下実験場";
+
+char MAIN_D_80128D7C[] = "ギアサバンナ";
+
+char MAIN_D_80128D98[] = "ダイノ古代境入り口";
+
+char MAIN_D_80128DB4[] = "ダイノ古代境時静域";
+
+char MAIN_D_80128DD0[] = "ダイノ古代境時急域";
+
+char MAIN_D_80128DEC[] = "フリーズランド";
+
+char MAIN_D_80128E08[] = "アイスサンクチュアリ";
+
+char MAIN_D_80128E24[] = "グリーンジム";
+
+char MAIN_D_80128E40[] = "レオモン先祖の洞くつ";
+
+char MAIN_D_80128E5C[] = "ミスティツリーズ";
+
+char MAIN_D_80128E78[] = "グレートキャニオン";
+
+char MAIN_D_80128E94[] = "ゲッコー湿地";
+
+char MAIN_D_80128EB0[] = "ダイオン郷";
+
+char MAIN_D_80128ECC[] = "はじまりの街";
+
+char MAIN_D_80128EE8[] = "預り屋";
+
+char MAIN_D_80128F04[] = "ケンタル医院";
+
+char MAIN_D_80128F20[] = "レストラン";
+
+char MAIN_D_80128F3C[] = "アイテムショップ";
+
+char MAIN_D_80128F58[] = "ジジモンの家";
+
+char MAIN_D_80128F74[] = "ひみつアイテムショップ";
+
+char MAIN_D_80128F90[] = "おもちゃのまち";
+
+char MAIN_D_80128FAC[] = "ひみつの海岸洞";
+
+char MAIN_D_80128FC8[] = "ファクトリアルタウン";
+
+char MAIN_D_80128FE4[] = "バードラ運送";
+
+char MAIN_D_80129000[] = "闘技場ロビー";
+
+char MAIN_D_8012901C[] = "宝探し屋";
+
+char MAIN_D_80129038[] = "ゴミの山";
+
+char MAIN_D_80129054[] = "下水道";
+
+char MAIN_D_80129070[] = "ビートランド";
+
+char MAIN_D_8012908C[] = "ムゲンマウンテン";
+
+char MAIN_D_801290A8[] = "デジモンカーリング場";
+
+char MAIN_D_801290C4[] = "おもちゃ館";
+
+char MAIN_D_801290E0[] = "ぬいぐるみハウス";
+
+char MAIN_D_801290FC[] = "ロボットハウス";
+
+char MAIN_D_80129118[] = "闇貴族の館・２階";
+
+char MAIN_D_80129134[] = "闇貴族の館・てんじょう裏";
+
+/* Grey Lord's Mansion, basement */
+char STR_MAP_NAME_YAMI_KIZOKU_NO_YAKATA_CHIKA[] = "闇貴族の館・地下";
+
+char MAIN_D_80129150[] = "裏次元";
+
+char MAIN_D_8012916C[] = "クネモンのねどこ";
+
+char MAIN_D_80129188[] = "あみだ森";
+#else
 char MAIN_D_80128A34[] = "      Native Forest     ";
 
 char MAIN_D_80128A50[] = "       Coela Point      ";
@@ -556,6 +680,26 @@ char MAIN_D_80129150[] = "     Back Dimension     ";
 char MAIN_D_8012916C[] = "      Kunemon's Bed     ";
 
 char MAIN_D_80129188[] = "      Amida Forest      ";
+#endif
+
+int8_t MAP_FILE_EXT_MAP[] = ".MAP";
+
+int8_t MAP_FILE_EXT_TFS[] = ".TFS";
+
+// mwcc aligns every array to four, so the two-byte separator can only be a scalar
+int16_t MAP_PATH_SEPARATOR = '\\';
+
+int16_t MAIN_D_801343B0 = 0xffff;
+
+int16_t MAIN_D_801343B2 = 0xffff;
+
+int8_t MAIN_D_801343B4 = 0x01;
+
+uint8_t MERAMON_SHAKE_COLOR_G = 0xff;
+
+uint8_t MERAMON_SHAKE_COLOR_B = 0xff;
+
+int16_t MERAMON_SHAKE_STEP = 0x0020;
 
 char MAP_PATH_PREFIX[] = "\\MAP\\MAP";
 
@@ -628,7 +772,11 @@ char *MAP_NAME_PTR[70] = {
 	MAIN_D_801290FC,
 	MAIN_D_80129118,
 	MAIN_D_80129134,
+#if defined(VERSION_JP)
+	STR_MAP_NAME_YAMI_KIZOKU_NO_YAKATA_CHIKA,
+#else
 	MAIN_D_80128D44,
+#endif
 	MAIN_D_80129150,
 	MAIN_D_8012916C,
 	MAIN_D_80129188,
@@ -3162,7 +3310,7 @@ void MAIN_func_800D3174(void)
 	PARTNER_WAYPOINT_CURRENT = PARTNER_WAYPOINT_CURRENT % 30;
 }
 
-void addTamerWaypoint(int16_t index, int8_t x, int8_t y)
+void addTamerWaypoint(int16_t index, int16_t x, int16_t y)
 {
 	TAMER_WAYPOINT_X[index] = x;
 	TAMER_WAYPOINT_Y[index] = y;
@@ -3172,17 +3320,16 @@ void addTamerWaypoint(int16_t index, int8_t x, int8_t y)
 void MAIN_func_800D32E0(int8_t *outX, int8_t *outY, int8_t *targetX,
 			int8_t *targetY)
 {
+	int16_t rem;
+	int32_t i;
+	int16_t quot;
+	int16_t dist;
+	int16_t acc;
+	int16_t sign;
 	int16_t dx;
 	int16_t dy;
 	int8_t x;
 	int8_t y;
-	int16_t dist;
-	int16_t acc;
-	int16_t rem;
-	int16_t quot;
-	int16_t sign;
-	int32_t i;
-	int8_t step;
 
 	dy = *targetY - *outY;
 	dx = *targetX - *outX;
@@ -3203,18 +3350,16 @@ void MAIN_func_800D32E0(int8_t *outX, int8_t *outY, int8_t *targetX,
 			if (rem != 0) {
 				acc -= rem;
 				if (acc <= 0) {
-					step = sign;
-					y += step;
+					y += sign;
 					acc += dist;
 				}
 			} else {
-				step = quot;
-				y += step;
+				y += quot;
 			}
 			if (dx > 0) {
-				x = x + 1;
+				x++;
 			} else {
-				x = x - 1;
+				x--;
 			}
 			if (isTileWithinScreenArea(x, y) != 0) {
 				*outX = x;
@@ -3236,18 +3381,16 @@ void MAIN_func_800D32E0(int8_t *outX, int8_t *outY, int8_t *targetX,
 			if (rem != 0) {
 				acc -= rem;
 				if (acc <= 0) {
-					step = sign;
-					x += step;
+					x += sign;
 					acc += dist;
 				}
 			} else {
-				step = quot;
-				x += step;
+				x += quot;
 			}
 			if (dy > 0) {
-				y = y + 1;
+				y++;
 			} else {
-				y = y - 1;
+				y--;
 			}
 			if (isTileWithinScreenArea(x, y) != 0) {
 				*outX = x;
@@ -3263,14 +3406,13 @@ void MAIN_func_800D32E0(int8_t *outX, int8_t *outY, int8_t *targetX,
 int32_t entityCheckCombatArea(Entity *entity, VECTOR *target, int32_t w,
 			      int32_t h)
 {
+	int32_t j;
 	DVECTOR screen2;
 	DVECTOR screen1;
 	SVECTOR corner;
+	int16_t radius;
 	VECTOR *loc;
-	int32_t radius;
-	int32_t base;
 	int32_t i;
-	int32_t j;
 
 	if (GAME_STATE == 4) {
 		return 0;
@@ -3279,12 +3421,9 @@ int32_t entityCheckCombatArea(Entity *entity, VECTOR *target, int32_t w,
 	GsSetLsMatrix(&GsWSMATRIX);
 
 	loc = &entity->posData->location;
-	base = DIGIMON_DATA[entity->type].radius;
+	radius = DIGIMON_DATA[entity->type].radius;
 
 	for (i = 0; i < 2; i++) {
-		radius = base;
-		base = radius;
-
 		for (j = 0; j < 4; j++) {
 			corner.vx = loc->vx + radius * COMBAT_AREA_CORNER_OFFSETS[i * 2];
 			corner.vy = loc->vy + (i * -200);
@@ -3318,16 +3457,16 @@ int32_t hasMovedOutsideCombatArea(DVECTOR *previousv, DVECTOR *currentv,
 	    (currentv->vx < previousv->vx)) {
 		return 1;
 	}
-	if (((width / 2) < (currentv->vx - COMBAT_AREA_CENTER_X)) &&
-	    (previousv->vx < currentv->vx)) {
+	if (((currentv->vx - COMBAT_AREA_CENTER_X) > (width / 2)) &&
+	    (currentv->vx > previousv->vx)) {
 		return 1;
 	}
 	if (((currentv->vy - COMBAT_AREA_CENTER_Y) < (-height / 2)) &&
 	    (currentv->vy < previousv->vy)) {
 		return 1;
 	}
-	if (((height / 2) < (currentv->vy - COMBAT_AREA_CENTER_Y)) &&
-	    (previousv->vy < currentv->vy)) {
+	if (((currentv->vy - COMBAT_AREA_CENTER_Y) > (height / 2)) &&
+	    (currentv->vy > previousv->vy)) {
 		return 1;
 	}
 	return 0;
@@ -3355,23 +3494,19 @@ void MAIN_func_800D3ADC(void)
 	TAMER_WAYPOINT_ACTIVE = 0;
 }
 
-int32_t isFiveTileWidePathOpen(int32_t x1, int32_t y1, int32_t x2, int32_t y2)
+int32_t isFiveTileWidePathOpen(int8_t x1, int8_t y1, int8_t x2, int8_t y2)
 {
-	int32_t i;
-	int32_t start;
-	int32_t end;
+	long i;
 
 	if (abs(x2 - x1) >= abs(y2 - y1)) {
-		for (i = -2, end = y2 - 2, start = y1 - 2; i < 3;
-		     i++, start++, end++) {
-			if (isLinearPathBlocked(x1, (int8_t)start, x2, (int8_t)end) != 0) {
+		for (i = -2; i < 3; i++) {
+			if (isLinearPathBlocked(x1, y1 + i, x2, y2 + i) != 0) {
 				break;
 			}
 		}
 	} else {
-		for (i = -2, end = x2 - 2, start = x1 - 2; i < 3;
-		     i++, start++, end++) {
-			if (isLinearPathBlocked((int8_t)start, y1, (int8_t)end, y2) != 0) {
+		for (i = -2; i < 3; i++) {
+			if (isLinearPathBlocked(x1 + i, y1, x2 + i, y2) != 0) {
 				break;
 			}
 		}
@@ -3383,20 +3518,18 @@ int32_t isFiveTileWidePathOpen(int32_t x1, int32_t y1, int32_t x2, int32_t y2)
 	}
 }
 
-int32_t isLinearPathBlocked(int32_t x1, int32_t y1, int32_t x2, int32_t y2)
+int32_t isLinearPathBlocked(int8_t x1, int8_t y1, int8_t x2, int8_t y2)
 {
+	int16_t rem;
+	int32_t i;
+	int16_t quot;
+	int16_t dist;
+	int16_t acc;
+	int16_t sign;
 	int16_t dx;
 	int16_t dy;
 	int8_t x;
 	int8_t y;
-	int16_t steps;
-	int16_t err;
-	int16_t stepMain;
-	int16_t dir;
-	int16_t rem;
-	int32_t t;
-	int32_t i;
-	int16_t count;
 
 	if (x1 < 0) {
 		x1 = 0;
@@ -3433,75 +3566,59 @@ int32_t isLinearPathBlocked(int32_t x1, int32_t y1, int32_t x2, int32_t y2)
 	y = y1;
 
 	if (abs(dx) >= abs(dy)) {
-		t = abs(dx);
-		steps = t;
-		err = t;
-		stepMain = dy / steps;
-		rem = dy % steps;
-
+		acc = dist = abs(dx);
+		quot = dy / dist;
+		rem = dy % dist;
 		if (rem < 0) {
-			dir = -1;
+			sign = -1;
 		} else {
-			dir = 1;
+			sign = 1;
 		}
-
 		rem = abs(rem);
-		count = steps;
-
-		for (i = 0; i < count; i++) {
+		for (i = 0; i < dist; i++) {
 			if (rem != 0) {
-				err -= rem;
-				if (err <= 0) {
-					y += (int8_t)dir;
-					err += steps;
+				acc -= rem;
+				if (acc <= 0) {
+					y += sign;
+					acc += dist;
 				}
 			} else {
-				y += (int8_t)stepMain;
+				y += quot;
 			}
-
 			if (dx > 0) {
-				x = x + 1;
+				x++;
 			} else {
-				x = x - 1;
+				x--;
 			}
-
 			if ((((uint8_t *)MAP_COLLISION_DATA)[x + (y * 100)] & 0x80) != 0) {
 				return 1;
 			}
 		}
 	} else {
-		t = abs(dy);
-		steps = t;
-		err = t;
-		stepMain = dx / steps;
-		rem = dx % steps;
-
+		acc = dist = abs(dy);
+		quot = dx / dist;
+		rem = dx % dist;
 		if (rem < 0) {
-			dir = -1;
+			sign = -1;
 		} else {
-			dir = 1;
+			sign = 1;
 		}
-
 		rem = abs(rem);
-		count = steps;
-
-		for (i = 0; i < count; i++) {
+		for (i = 0; i < dist; i++) {
 			if (rem != 0) {
-				err -= rem;
-				if (err <= 0) {
-					x += (int8_t)dir;
-					err += steps;
+				acc -= rem;
+				if (acc <= 0) {
+					x += sign;
+					acc += dist;
 				}
 			} else {
-				x += (int8_t)stepMain;
+				x += quot;
 			}
-
 			if (dy > 0) {
-				y = y + 1;
+				y++;
 			} else {
-				y = y - 1;
+				y--;
 			}
-
 			if ((((uint8_t *)MAP_COLLISION_DATA)[x + (y * 100)] & 0x80) != 0) {
 				return 1;
 			}
@@ -3517,13 +3634,13 @@ void tickPartnerCollision(void)
 	int32_t isFiveTileWidePathOpen(int8_t x1, int8_t y1, int8_t x2, int8_t y2);
 	int32_t isTileWithinScreenArea(int8_t tileX, int8_t tileZ);
 #endif
+	int16_t last;
 	int16_t modelTileX;
 	int16_t modelTileY;
 	int8_t tamerTileX;
 	int8_t tamerTileY;
 	int8_t partnerTileX;
 	int8_t partnerTileY;
-	int16_t last;
 	int16_t index;
 	int32_t i;
 	int16_t rotationY;
@@ -3619,7 +3736,7 @@ void tickPartnerCollision(void)
 	PARTNER_TAMER_PREVIOUS_TILE_Y = tamerTileY;
 }
 
-void addPartnerWaypoint(int16_t index, int8_t tileX, int8_t tileY)
+void addPartnerWaypoint(int16_t index, int16_t tileX, int16_t tileY)
 {
 	PARTNER_WAYPOINT_X[index] = tileX;
 	PARTNER_WAYPOINT_Y[index] = tileY;
@@ -3628,33 +3745,32 @@ void addPartnerWaypoint(int16_t index, int8_t tileX, int8_t tileY)
 
 void entityLookAtLocation(Entity *entity, VECTOR *target)
 {
-	PositionData *posData;
+	VECTOR diff;
 	VECTOR *loc;
-	int32_t tmp;
-	int32_t dx;
-	int32_t dz;
+	SVECTOR *rot;
+	PositionData *posData;
 
 	if (target != NULL) {
 		posData = entity->posData;
 		loc = &posData->location;
-		tmp = target->vx;
-		dx = tmp - loc->vx;
-		tmp = target->vz;
-		dz = tmp - loc->vz;
-		posData->rotation.vy = _atan(dz, dx);
+		rot = &posData->rotation;
+		diff.vx = target->vx - loc->vx;
+		diff.vy = target->vy - loc->vy;
+		diff.vz = target->vz - loc->vz;
+		rot->vy = _atan(diff.vz, diff.vx);
 	}
 }
 
 int16_t entityCheckCollision(Entity *source, Entity *entity, int32_t arg2,
 			     int32_t arg3)
 {
+	int32_t i;
 	VECTOR *loc;
-	Entity *other;
 	int32_t dx;
 	int32_t dz;
-	int16_t direction;
-	int32_t i;
+	Entity *other;
 	VECTOR saved;
+	int16_t direction;
 
 	loc = &entity->posData->location;
 	saved = *loc;
@@ -3714,11 +3830,12 @@ int16_t entityCheckCollision(Entity *source, Entity *entity, int32_t arg2,
 void collisionGrace(Entity *target, Entity *entity, int32_t dx, int32_t dy)
 {
 	int16_t *rotY;
-	int16_t startRot;
-	int16_t dir;
 	int16_t clockwise;
-	int16_t counter;
 	int32_t i;
+	int16_t dir;
+	int16_t diff;
+	int16_t startRot;
+	int16_t counter;
 	uint8_t flags;
 
 	entity->anim.animFlag &= 5;
@@ -3743,8 +3860,9 @@ void collisionGrace(Entity *target, Entity *entity, int32_t dx, int32_t dy)
 				counter = (counter + 0x1000) & 0xFFF;
 			}
 
+			diff = clockwise - counter;
 			*rotY = startRot;
-			if ((int16_t)(clockwise - counter) < 0) {
+			if (diff < 0) {
 				if (clockwise >= 0x51) {
 					*rotY = (*rotY + 0xfb0) & 0xFFF;
 				} else {
@@ -3787,9 +3905,7 @@ void tickTamerWaypoints(void)
 				index = (TAMER_WAYPOINT_CURRENT + TAMER_WAYPOINT_COUNT - 1)
 					% 30;
 				if (isLinearPathBlocked(tileX, tileY, TAMER_WAYPOINT_X[index], TAMER_WAYPOINT_Y[index]) != 0) {
-					index = (TAMER_WAYPOINT_CURRENT +
-						 TAMER_WAYPOINT_COUNT) % 30;
-					addTamerWaypoint(index,
+					addTamerWaypoint((TAMER_WAYPOINT_CURRENT + TAMER_WAYPOINT_COUNT) % 30,
 							 TAMER_PREVIOUS_TILE_X,
 							 TAMER_PREVIOUS_TILE_Y);
 				}
@@ -3848,8 +3964,8 @@ void tickPartnerWaypoints(void)
 	int8_t toY;
 	int32_t count;
 	int16_t index;
-	int32_t posX;
-	int32_t posZ;
+	int16_t posX;
+	int16_t posZ;
 
 	if (ENTITY_TABLE[1]->isOnScreen == 1) {
 		return;
@@ -3885,8 +4001,8 @@ void tickPartnerWaypoints(void)
 	MAIN_func_800D32E0(&fromX, &fromY, &toX, &toY);
 
 	if (fromX != -1) {
-		posX = (int16_t)(((fromX - 50) * 100) + 50);
-		posZ = (int16_t)(((50 - fromY) * 100) - 50);
+		posX = ((fromX - 50) * 100) + 50;
+		posZ = ((50 - fromY) * 100) - 50;
 		ENTITY_TABLE[1]->posData->location.vx = posX;
 		ENTITY_TABLE[1]->posData->location.vz = posZ;
 		ENTITY_TABLE[1]->anim.locX = posX << 15;
@@ -3894,21 +4010,25 @@ void tickPartnerWaypoints(void)
 	}
 }
 
-int32_t isTileWithinScreenArea(int16_t tileX, int16_t tileZ)
+int32_t isTileWithinScreenArea(int8_t tileX, int8_t tileZ)
 {
 	DVECTOR screen;
 	SVECTOR world;
+	int16_t x;
+	int16_t z;
 
-	world.vx = ((tileX - 50) * 100) + 50;
+	x = ((tileX - 50) * 100) + 50;
+	z = ((50 - tileZ) * 100) - 50;
+	world.vx = x;
 	world.vy = 0;
-	world.vz = ((50 - tileZ) * 100) - 50;
+	world.vz = z;
 
 	gte_ldv0(&world);
 	gte_rtps();
 	gte_stsxy((long *)&screen);
 
-	screen.vx = screen.vx - (int16_t)(160 - DRAWING_OFFSET_X);
-	screen.vy = screen.vy - (int16_t)(120 - DRAWING_OFFSET_Y);
+	screen.vx -= 160 - DRAWING_OFFSET_X;
+	screen.vy -= 120 - DRAWING_OFFSET_Y;
 
 	if ((screen.vx < -200) || (screen.vx > 200) || (screen.vy < -160) ||
 	    (screen.vy > 160)) {
@@ -3920,15 +4040,15 @@ int32_t isTileWithinScreenArea(int16_t tileX, int16_t tileZ)
 
 void entityMoveForward(Entity *entity)
 {
+	PositionData *posData;
+	int16_t *delta;
+	EntityAnim *anim;
+	int32_t vz;
 	VECTOR dir;
 	VECTOR out;
 	MomentumData momentum;
 	MATRIX m;
-	PositionData *posData;
 	int16_t *subDelta;
-	int16_t *delta;
-	int32_t vz;
-	EntityAnim *anim;
 
 	momentum = *entity->anim.momentum;
 
@@ -3984,16 +4104,16 @@ int32_t checkMapCollision(Entity *entity, int32_t diffY, int32_t diffX)
 int32_t entityCheckEntityCollision(Entity *entity, Entity *other,
 				   int32_t diffX, int32_t diffZ)
 {
-	RECT rect;
-	int32_t radius;
-	int32_t myRadius;
 	int32_t left;
-	int32_t right;
 	int32_t bottom;
+	long myRadius;
+	long radius;
+	int32_t right;
 	int32_t top;
-	int16_t rotation;
+	RECT rect;
 	VECTOR *myLoc;
 	VECTOR *loc;
+	int16_t rotation;
 
 	myLoc = &entity->posData->location;
 	myRadius = DIGIMON_DATA[entity->type].radius;
@@ -4005,7 +4125,7 @@ int32_t entityCheckEntityCollision(Entity *entity, Entity *other,
 	bottom = myLoc->vz + myRadius;
 	top = myLoc->vz - myRadius;
 	if ((GAME_STATE == 0) && (entity == ENTITY_TABLE[0])) {
-		if (((POLLED_INPUT & ~POLLED_INPUT_PREVIOUS & 0x40) != 0) &&
+		if (((POLLED_INPUT & ~POLLED_INPUT_PREVIOUS & CONFIRM_BUTTON) != 0) &&
 		    (entity->anim.animId == 0)) {
 			rotation = entity->posData->rotation.vy;
 			if ((0 < rotation) && (rotation < 0x800)) {
@@ -4037,6 +4157,7 @@ int32_t entityCheckEntityCollision(Entity *entity, Entity *other,
 			return 1;
 		}
 	} else {
+		rotation = entity->posData->rotation.vy;
 		if ((diffX < 0) &&
 		    (isRectInRect(&rect, left, bottom, left, top) != 0)) {
 			return 1;
@@ -4060,23 +4181,24 @@ int32_t entityCheckEntityCollision(Entity *entity, Entity *other,
 int32_t isRectInRect(RECT *rect, int32_t left, int32_t top, int32_t right,
 		     int32_t bottom)
 {
-	int32_t rectBottom = rect->y - rect->h;
-	int32_t rectRight = rect->x + rect->w;
-	int32_t result;
+	int32_t rectRight;
+	int32_t rectBottom;
 
+	rectRight = rect->x + rect->w;
+	rectBottom = rect->y - rect->h;
 	if (rectRight < left) {
-		result = 0;
-	} else if (right < rect->x) {
-		result = 0;
-	} else if (top < rectBottom) {
-		result = 0;
-	} else if (rect->y < bottom) {
-		result = 0;
-	} else {
-		result = 1;
+		return 0;
 	}
-
-	return result;
+	if (right < rect->x) {
+		return 0;
+	}
+	if (top < rectBottom) {
+		return 0;
+	}
+	if (bottom > rect->y) {
+		return 0;
+	}
+	return 1;
 }
 
 int32_t entityIsInEntity(Entity *entityA, Entity *entityB)
@@ -4112,13 +4234,12 @@ int32_t entityIsInEntity(Entity *entityA, Entity *entityB)
 
 int32_t entityIsOffScreen(Entity *entity, int32_t width, int32_t height)
 {
+	int32_t i;
 	DVECTOR screen;
 	SVECTOR corner;
-	VECTOR *loc;
 	int16_t radius;
-	int32_t i;
+	VECTOR *loc;
 	int32_t j;
-	int32_t index;
 
 	if ((entity->type == 0x98) && (entity->anim.animId == 0x1C)) {
 		return 0;
@@ -4129,10 +4250,10 @@ int32_t entityIsOffScreen(Entity *entity, int32_t width, int32_t height)
 	radius = DIGIMON_DATA[entity->type].radius;
 
 	for (i = 0; i < 2; i++) {
-		for (j = 0, index = 0; j < 4; j++, index += 2) {
-			corner.vx = loc->vx + radius * COMBAT_AREA_CORNER_OFFSETS[index];
+		for (j = 0; j < 4; j++) {
+			corner.vx = loc->vx + radius * COMBAT_AREA_CORNER_OFFSETS[j * 2];
 			corner.vy = loc->vy + i * -DIGIMON_DATA[entity->type].height;
-			corner.vz = loc->vz + radius * (&COMBAT_AREA_CORNER_OFFSETS[1])[index];
+			corner.vz = loc->vz + radius * (&COMBAT_AREA_CORNER_OFFSETS[1])[j * 2];
 			gte_ldv0(&corner);
 			gte_rtps();
 			gte_stsxy((long *)&screen);
@@ -4147,21 +4268,19 @@ int32_t entityIsOffScreen(Entity *entity, int32_t width, int32_t height)
 
 int32_t isOffScreen(DVECTOR *pos, int16_t width, int16_t height)
 {
-	int32_t result;
-
 	if ((pos->vx - (160 - DRAWING_OFFSET_X)) < (-width / 2)) {
-		result = 1;
-	} else if ((width / 2) < (pos->vx - (160 - DRAWING_OFFSET_X))) {
-		result = 1;
-	} else if ((pos->vy - (120 - DRAWING_OFFSET_Y)) < (-height / 2)) {
-		result = 1;
-	} else if ((height / 2) < (pos->vy - (120 - DRAWING_OFFSET_Y))) {
-		result = 1;
-	} else {
-		result = 0;
+		return 1;
 	}
-
-	return result;
+	if ((pos->vx - (160 - DRAWING_OFFSET_X)) > (width / 2)) {
+		return 1;
+	}
+	if ((pos->vy - (120 - DRAWING_OFFSET_Y)) < (-height / 2)) {
+		return 1;
+	}
+	if ((pos->vy - (120 - DRAWING_OFFSET_Y)) > (height / 2)) {
+		return 1;
+	}
+	return 0;
 }
 
 void MAIN_func_800D56E0(void)
@@ -4174,16 +4293,12 @@ void MAIN_func_800D56E0(void)
 
 	for (i = 0; i < 35; i++) {
 		MAP_TILE_DATA[i].imagePtr = 0;
-		MAP_TILE_DATA[i].posY = 0;
-		MAP_TILE_DATA[i].posX = 0;
-		MAP_TILE_DATA[i].texV = 0;
-		MAP_TILE_DATA[i].texU = 0;
+		MAP_TILE_DATA[i].posX = MAP_TILE_DATA[i].posY = 0;
+		MAP_TILE_DATA[i].texU = MAP_TILE_DATA[i].texV = 0;
 	}
 
-	CURRENT_SCREEN = 0xcc;
-	PREVIOUS_SCREEN = 0xcc;
-	CURRENT_EXIT = 9;
-	PREVIOUS_EXIT = 9;
+	PREVIOUS_SCREEN = CURRENT_SCREEN = 0xcc;
+	PREVIOUS_EXIT = CURRENT_EXIT = 9;
 	CAMERA_REACHED_TARGET = -1;
 	CAMERA_HAS_TARGET = 0;
 	DAYTIME_TRANSITION_FRAME = 25;
@@ -4199,23 +4314,23 @@ void renderMap(int32_t arg0)
 {
 	POLY_FT4 *prim;
 	GsOT_TAG *ot;
-	int32_t startTile;
+	int16_t startTile;
 	int16_t stride;
 	int16_t columns;
-	int32_t row;
+	int8_t skipTimeOfDay;
 	int32_t col;
+	int32_t row;
 
 	tickCameraFollowPlayer();
 
-	startTile = (int16_t)(MAP_TILE_X + (MAP_TILE_Y * MAP_WIDTH[0]));
-	columns = MAP_WIDTH[0];
-	stride = MAP_WIDTH[0];
+	startTile = MAP_TILE_X + ((long)MAP_TILE_Y * MAP_WIDTH[0]);
+	columns = stride = MAP_WIDTH[0];
 	if (stride > 3) {
 		columns = 4;
 	}
 
-	if (((int8_t)(MAP_ENTRIES[CURRENT_SCREEN].flags & 0x40) == 0) &&
-	    ((CURRENT_FRAME % 1200) == 0)) {
+	skipTimeOfDay = MAP_ENTRIES[CURRENT_SCREEN].flags & 0x40;
+	if ((skipTimeOfDay == 0) && ((CURRENT_FRAME % 1200) == 0)) {
 		if (HOUR == 16) {
 			initializeDaytimeTransition(0);
 		}
@@ -4236,21 +4351,21 @@ void renderMap(int32_t arg0)
 			prim = (POLY_FT4 *)GsGetWorkBase();
 			SetPolyFT4(prim);
 
-			if (MAP_TILES[startTile + (stride * row) + col] == -1) {
+			if (MAP_TILES[col + (startTile + stride * row)] == -1) {
 				setRGB0(prim, 0, 0, 0);
 			} else {
 				setRGB0(prim, 0x80, 0x80, 0x80);
 			}
 
-			if ((MAP_TILE_DATA[startTile + (stride * row) + col].texV % 256) != 0) {
-				setUVDataPolyFT4(prim, 0, MAP_TILE_DATA[startTile + stride * row + col].texV % 256, 0x80, 0x7F);
+			if ((MAP_TILE_DATA[col + (startTile + stride * row)].texV % 256) != 0) {
+				setUVDataPolyFT4(prim, 0, MAP_TILE_DATA[col + (startTile + stride * row)].texV % 256, 0x80, 0x7F);
 			} else {
-				setUVDataPolyFT4(prim, 0, MAP_TILE_DATA[startTile + stride * row + col].texV % 256, 0x80, 0x80);
+				setUVDataPolyFT4(prim, 0, MAP_TILE_DATA[col + (startTile + stride * row)].texV % 256, 0x80, 0x80);
 			}
 
-			prim->tpage = MAP_TILE_DATA[startTile + stride * row + col].tpage;
-			prim->clut = MAP_TILE_DATA[startTile + stride * row + col].clut;
-			setPosDataMapTile(&MAP_TILE_DATA[startTile + stride * row + col],
+			prim->tpage = MAP_TILE_DATA[col + (startTile + stride * row)].tpage;
+			prim->clut = MAP_TILE_DATA[col + (startTile + stride * row)].clut;
+			setPosDataMapTile(&MAP_TILE_DATA[col + (startTile + stride * row)],
 					  CAMERA_X[0], CAMERA_Y[0], prim);
 			AddPrim(&ot[0xfff], prim);
 			++prim;
@@ -4269,19 +4384,52 @@ void renderMap(int32_t arg0)
 void loadMap(int32_t mapId)
 {
 	int32_t *offsets;
-	int32_t offset;
+	long entityOffset;
+	long collisionOffset;
+	long objectOffset;
+	long image8Offset;
+	long image4Offset;
+	long setupOffset;
 	int32_t i;
+	char path[32];
+	int32_t result;
+#if !defined(VERSION_JP)
 	uint32_t idx;
 	uint8_t *objects;
-	char path[32];
+#endif
 
 	offsets = (int32_t *)GENERAL_BUFFER_PTR;
 	if (SKIP_MAP_FILE_READ == 0) {
-		buildMapPath(path, &MAP_ENTRIES[mapId], MAP_FILE_EXT_MAP, mapId);
+		buildMapPath(path, MAP_ENTRIES[mapId].filename, MAP_FILE_EXT_MAP, mapId);
 		readFile(path, (void *)offsets);
 	}
 
-	loadMapSetup((int32_t *)((uint8_t *)GENERAL_BUFFER_PTR + *offsets++));
+	setupOffset = *offsets++;
+	result = loadMapSetup((int32_t *)(GENERAL_BUFFER_PTR + setupOffset));
+#if defined(VERSION_JP)
+	clearMapObjects((uint8_t *)LOCAL_MAP_OBJECT_INSTANCE);
+
+	if ((MAP_ENTRIES[mapId].num8bppImages != 0) ||
+	    (MAP_ENTRIES[mapId].num4bppImages != 0)) {
+		if (MAP_ENTRIES[mapId].num8bppImages != 0) {
+			for (i = 0; i < MAP_ENTRIES[mapId].num8bppImages; i++) {
+				image8Offset = *offsets++;
+				loadMapImage1(GENERAL_BUFFER_PTR + image8Offset);
+			}
+		}
+
+		if (MAP_ENTRIES[mapId].num4bppImages != 0) {
+			for (i = 0; i < MAP_ENTRIES[mapId].num4bppImages; i++) {
+				image4Offset = *offsets++;
+				loadMapImage2(GENERAL_BUFFER_PTR + image4Offset, i);
+			}
+		}
+
+		objectOffset = *offsets++;
+		loadMapObjects((uint8_t *)LOCAL_MAP_OBJECT_INSTANCE,
+			       GENERAL_BUFFER_PTR + objectOffset, mapId);
+	}
+#else
 	clearMapObjects(objects = (uint8_t *)LOCAL_MAP_OBJECT_INSTANCE);
 
 	idx = mapId;
@@ -4289,25 +4437,28 @@ void loadMap(int32_t mapId)
 	    (MAP_ENTRIES[mapId].num4bppImages != 0)) {
 		if (MAP_ENTRIES[mapId].num8bppImages != 0) {
 			for (i = 0; i < MAP_ENTRIES[idx].num8bppImages; i++) {
-				loadMapImage1((uint8_t *)GENERAL_BUFFER_PTR + *offsets++);
+				image8Offset = *offsets++;
+				loadMapImage1(GENERAL_BUFFER_PTR + image8Offset);
 			}
 		}
 
 		if (MAP_ENTRIES[mapId].num4bppImages != 0) {
 			for (i = 0; i < MAP_ENTRIES[idx].num4bppImages; i++) {
-				loadMapImage2((uint8_t *)GENERAL_BUFFER_PTR + *offsets++, i);
+				image4Offset = *offsets++;
+				loadMapImage2(GENERAL_BUFFER_PTR + image4Offset, i);
 			}
 		}
 
-		loadMapObjects(objects,
-			       (uint8_t *)GENERAL_BUFFER_PTR + *offsets++,
+		objectOffset = *offsets++;
+		loadMapObjects(objects, GENERAL_BUFFER_PTR + objectOffset,
 			       mapId);
 	}
+#endif
 
-	offset = *offsets++;
+	entityOffset = *offsets++;
 
 	clearMapDigimon();
-	loadMapEntities((uint8_t *)GENERAL_BUFFER_PTR + offset, mapId,
+	loadMapEntities(GENERAL_BUFFER_PTR + entityOffset, mapId,
 			CURRENT_EXIT);
 
 	if (MAP_ENTRIES[mapId].doorsId != 0) {
@@ -4320,10 +4471,12 @@ void loadMap(int32_t mapId)
 		loadTrainingPoop();
 	}
 
-	loadMapCollisionData((uint8_t *)GENERAL_BUFFER_PTR + *offsets);
+	collisionOffset = *offsets;
+	loadMapCollisionData(GENERAL_BUFFER_PTR + collisionOffset);
 
 	if (SKIP_MAP_FILE_READ == 0) {
-		loadMapSounds(getMapSoundId(mapId));
+		result = getMapSoundId(mapId);
+		loadMapSounds(result);
 	}
 
 	CURRENT_SCREEN = mapId;
@@ -4338,12 +4491,17 @@ void loadMap(int32_t mapId)
 	SKIP_MAP_FILE_READ = 0;
 }
 
-void buildMapPath(char *out, MapEntry *entry, int8_t *suffix, int32_t mapId)
+// clang-format off
+void buildMapPath(out, name, suffix, mapId)
+	char *out;
+	char *name;
+	int8_t *suffix;
+	int16_t mapId;
+// clang-format on
 {
 	char *prefix;
 	char *digits;
 	char *separator;
-	char *name;
 	uint8_t index;
 
 	prefix = MAP_PATH_PREFIX;
@@ -4365,7 +4523,6 @@ void buildMapPath(char *out, MapEntry *entry, int8_t *suffix, int32_t mapId)
 		*out++ = *separator++;
 	}
 
-	name = entry->filename;
 	while (*name != '\0') {
 		*out++ = *name++;
 	}
@@ -4379,12 +4536,14 @@ void buildMapPath(char *out, MapEntry *entry, int8_t *suffix, int32_t mapId)
 
 int32_t loadMapSetup(int32_t *data)
 {
+	int32_t ambientR;
+	int32_t ambientG;
+	int32_t ambientB;
 	int8_t regionA[4];
 	int8_t regionB[4];
 	int32_t i;
 	int32_t j;
 	int16_t favoredRegion;
-	int32_t distance;
 
 	GS_VIEWPOINT.vpx = *data++ << 1;
 	GS_VIEWPOINT.vpy = *data++ << 1;
@@ -4405,13 +4564,11 @@ int32_t loadMapSetup(int32_t *data)
 		MAP_LIGHT[i] = LIGHT_DATA[i];
 	}
 
-	data++;
-	data++;
-	data++;
+	ambientR = *data++;
+	ambientG = *data++;
+	ambientB = *data++;
 	GsSetAmbient(0x800, 0x800, 0x800);
-	distance = *data++;
-	VIEWPORT_DISTANCE = distance;
-	GsSetProjection(distance);
+	GsSetProjection(VIEWPORT_DISTANCE = *data++);
 
 	for (j = 0; j < 4; j++) {
 		regionA[j] = *data++;
@@ -4446,7 +4603,10 @@ int32_t loadMapSetup(int32_t *data)
 	return *data;
 }
 
-int32_t getMapSoundId(int32_t mapId)
+// clang-format off
+int32_t getMapSoundId(mapId)
+	int16_t mapId;
+// clang-format on
 {
 	return MAP_ENTRIES[mapId].flags & 0x1f;
 }
@@ -4455,18 +4615,18 @@ void readMapTFS(int32_t mapId)
 {
 	char path[32];
 
-	buildMapPath(path, &MAP_ENTRIES[mapId], MAP_FILE_EXT_TFS, mapId);
+	buildMapPath(path, MAP_ENTRIES[mapId].filename, MAP_FILE_EXT_TFS, mapId);
 	readFile(path, GENERAL_BUFFER_PTR);
 }
 
 void MAIN_func_800D634C(void)
 {
 	u_long *data;
-	int16_t numCluts;
-	int32_t i;
 	MapTileData *tile;
 	int32_t x;
 	int32_t y;
+	int32_t i;
+	int16_t numCluts;
 
 	data = (u_long *)GENERAL_BUFFER_PTR;
 	data++;
@@ -4481,20 +4641,18 @@ void MAIN_func_800D634C(void)
 	updateTimeOfDay();
 
 	tile = MAP_TILE_DATA;
-	for (y = 0; x = 0, y < MAP_HEIGHT[0]; y++) {
-		for (; x < MAP_WIDTH[0]; x++) {
+	for (y = 0; y < MAP_HEIGHT[0]; y++) {
+		for (x = 0; x < MAP_WIDTH[0]; x++) {
 			tile->tileId = MAP_TILES[x + (y * MAP_WIDTH[0])];
 			if (tile->tileId == -1) {
 				fillTileData(tile, (uint8_t *)NULL,
-					     (int16_t)(x % 4 * 64 + 768),
-					     (int16_t)(y % 3 * 128), x * 128,
-					     y * 128);
+					     x % 4 * 64 + 768, y % 3 * 128,
+					     x * 128, y * 128);
 			} else {
 				data++;
 				fillTileData(tile, (uint8_t *)data,
-					     (int16_t)(x % 4 * 64 + 768),
-					     (int16_t)(y % 3 * 128), x * 128,
-					     y * 128);
+					     x % 4 * 64 + 768, y % 3 * 128,
+					     x * 128, y * 128);
 				data += 4096;
 			}
 			tile++;
@@ -4507,18 +4665,16 @@ void MAIN_func_800D634C(void)
 	DRAW_OFFSET_LIMIT_X_MIN = -(*(int8_t *)MAP_WIDTH * 128 - 320 - DRAW_OFFSET_LIMIT_X_MAX);
 	DRAW_OFFSET_LIMIT_Y_MAX = CAMERA_Y[0] + 120;
 	DRAW_OFFSET_LIMIT_Y_MIN = -(*(int8_t *)&MAP_HEIGHT[0] * 128 - 240 - DRAW_OFFSET_LIMIT_Y_MAX);
-	DRAWING_OFFSET_X = 160;
-	PLAYER_OFFSET_X = 160;
-	DRAWING_OFFSET_Y = 120;
-	PLAYER_OFFSET_Y = 120;
+	PLAYER_OFFSET_X = DRAWING_OFFSET_X = 160;
+	PLAYER_OFFSET_Y = DRAWING_OFFSET_Y = 120;
 
 	MAIN_func_800D6A4C(MAP_TILE_DATA);
 
 	MAP_TILE_X = CAMERA_X[0] / 128;
 	if (MAP_WIDTH[0] < 5) {
 		MAP_TILE_X = 0;
-	} else if (MAP_WIDTH[0] < (MAP_TILE_X + 4)) {
-		MAP_TILE_X -= (int8_t)((MAP_TILE_X + 4) - MAP_WIDTH[0]);
+	} else if ((MAP_TILE_X + 4) > MAP_WIDTH[0]) {
+		MAP_TILE_X -= (MAP_TILE_X + 4) - MAP_WIDTH[0];
 	}
 
 	PREV_TILE_X = MAP_TILE_X;
@@ -4526,14 +4682,14 @@ void MAIN_func_800D634C(void)
 	MAP_TILE_Y = CAMERA_Y[0] / 128;
 	if (MAP_HEIGHT[0] < 4) {
 		MAP_TILE_Y = 0;
-	} else if (MAP_HEIGHT[0] < (MAP_TILE_Y + 3)) {
-		MAP_TILE_Y -= (int8_t)((MAP_TILE_Y + 3) - MAP_HEIGHT[0]);
+	} else if ((MAP_TILE_Y + 3) > MAP_HEIGHT[0]) {
+		MAP_TILE_Y -= (MAP_TILE_Y + 3) - MAP_HEIGHT[0];
 	}
 
 	PREV_TILE_Y = MAP_TILE_Y;
 
 	uploadMapTileImages(MAP_TILE_DATA,
-			    MAP_TILE_X + MAP_TILE_Y * MAP_WIDTH[0]);
+			    MAP_TILE_X + ((long)MAP_TILE_Y * MAP_WIDTH[0]));
 	calcMapObjectOrder((LocalMapObjectInstance *)LOCAL_MAP_OBJECT_INSTANCE);
 
 	CAMERA_FOLLOW_PLAYER = 1;
@@ -4542,8 +4698,8 @@ void MAIN_func_800D634C(void)
 void updateTimeOfDay(void)
 {
 	int32_t i;
-	int32_t red;
-	int32_t green;
+	uint8_t red;
+	uint8_t green;
 
 	if (DAYTIME_TRANSITION_ACTIVE == 1) {
 		removeObject(0xfbe, DAYTIME_TRANSITION_TARGET);
@@ -4581,7 +4737,7 @@ void updateTimeOfDay(void)
 }
 
 void fillTileData(MapTileData *tile, uint8_t *imagePtr,
-		  int32_t texU, int32_t texV,
+		  int16_t texU, int16_t texV,
 		  int16_t posX, int16_t posY)
 {
 	tile->tpage = GetTPage(1, 0, texU, texV);
@@ -4612,17 +4768,17 @@ void MAIN_func_800D6A4C(MapTileData *tiles)
 	gte_ldv0(&tamerPos);
 	gte_rtps();
 	gte_stsxy(&tamerScreen);
-	CAMERA_X[0] = CAMERA_X[0] + (int16_t)(tamerScreen.vx - viewScreen.vx);
-	CAMERA_Y[0] = CAMERA_Y[0] + (int16_t)(tamerScreen.vy - viewScreen.vy);
-	DRAWING_OFFSET_X = DRAWING_OFFSET_X + (viewScreen.vx - tamerScreen.vx);
-	DRAWING_OFFSET_Y = DRAWING_OFFSET_Y + (viewScreen.vy - tamerScreen.vy);
-	PLAYER_OFFSET_X = PLAYER_OFFSET_X + (int16_t)(viewScreen.vx - tamerScreen.vx);
-	PLAYER_OFFSET_Y = PLAYER_OFFSET_Y + (int16_t)(viewScreen.vy - tamerScreen.vy);
+	CAMERA_X[0] += tamerScreen.vx - viewScreen.vx;
+	CAMERA_Y[0] += tamerScreen.vy - viewScreen.vy;
+	DRAWING_OFFSET_X += viewScreen.vx - tamerScreen.vx;
+	DRAWING_OFFSET_Y += viewScreen.vy - tamerScreen.vy;
+	PLAYER_OFFSET_X += viewScreen.vx - tamerScreen.vx;
+	PLAYER_OFFSET_Y += viewScreen.vy - tamerScreen.vy;
 
 	if (CAMERA_X[0] < 0) {
 		CAMERA_X[0] = 0;
 		DRAWING_OFFSET_X = DRAW_OFFSET_LIMIT_X_MAX;
-	} else if (((MAP_WIDTH[0] * 128) - 320) < CAMERA_X[0]) {
+	} else if (CAMERA_X[0] > ((MAP_WIDTH[0] * 128) - 320)) {
 		CAMERA_X[0] = (MAP_WIDTH[0] * 128) - 320;
 		DRAWING_OFFSET_X = DRAW_OFFSET_LIMIT_X_MIN;
 	}
@@ -4630,7 +4786,7 @@ void MAIN_func_800D6A4C(MapTileData *tiles)
 	if (CAMERA_Y[0] < 0) {
 		CAMERA_Y[0] = 0;
 		DRAWING_OFFSET_Y = DRAW_OFFSET_LIMIT_Y_MAX;
-	} else if (((MAP_HEIGHT[0] * 128) - 240) < CAMERA_Y[0]) {
+	} else if (CAMERA_Y[0] > ((MAP_HEIGHT[0] * 128) - 240)) {
 		CAMERA_Y[0] = (MAP_HEIGHT[0] * 128) - 240;
 		DRAWING_OFFSET_Y = DRAW_OFFSET_LIMIT_Y_MIN;
 	}
@@ -4639,8 +4795,8 @@ void MAIN_func_800D6A4C(MapTileData *tiles)
 void uploadMapTileImages(MapTileData *tiles, int16_t index)
 {
 	RECT rect;
-	int16_t count;
 	int16_t stride;
+	int16_t count;
 	int32_t i;
 
 	count = stride = *(int8_t *)((int8_t *)tiles + 0x1bb8);
@@ -4690,17 +4846,13 @@ void unloadMap(void)
 
 	for (i = 0; i < 35; i++) {
 		MAP_TILE_DATA[i].imagePtr = 0;
-		MAP_TILE_DATA[i].posY = 0;
-		MAP_TILE_DATA[i].posX = 0;
-		MAP_TILE_DATA[i].texV = 0;
-		MAP_TILE_DATA[i].texU = 0;
+		MAP_TILE_DATA[i].posX = MAP_TILE_DATA[i].posY = 0;
+		MAP_TILE_DATA[i].texU = MAP_TILE_DATA[i].texV = 0;
 	}
 
-	MAP_HEIGHT[0] = 0;
-	MAP_WIDTH[0] = 0;
-	CAMERA_Y[0] = 0;
+	MAP_WIDTH[0] = MAP_HEIGHT[0] = 0;
+	CAMERA_X[0] = CAMERA_Y[0] = 0;
 	DRAWING_OFFSET_X = 160;
-	CAMERA_X[0] = 0;
 	DRAWING_OFFSET_Y = 120;
 
 	unloadMapParts();
@@ -4708,10 +4860,11 @@ void unloadMap(void)
 
 void tickCameraFollowPlayer(void)
 {
-	PositionData *posData;
 	SVECTOR worldPos;
 	SVECTOR screenStart;
 	SVECTOR screenEnd;
+	int16_t oldCameraX;
+	int16_t oldCameraY;
 
 	if ((GAME_STATE == 0) &&
 	    (CAMERA_FOLLOW_PLAYER == 1) &&
@@ -4726,11 +4879,12 @@ void tickCameraFollowPlayer(void)
 		gte_ldv0(&worldPos);
 		gte_rtps();
 		gte_stsxy(&screenStart);
-		posData = TAMER_ENTITY.entity.posData;
-		copyVector(&worldPos, &posData->location);
+		copyVector(&worldPos, &TAMER_ENTITY.entity.posData->location);
 		gte_ldv0(&worldPos);
 		gte_rtps();
 		gte_stsxy(&screenEnd);
+		oldCameraX = CAMERA_X[0];
+		oldCameraY = CAMERA_Y[0];
 		CAMERA_X[0] += screenEnd.vx - screenStart.vx;
 		CAMERA_Y[0] += screenEnd.vy - screenStart.vy;
 		MAIN_func_800D763C((DVECTOR *)&screenStart,
@@ -4739,7 +4893,10 @@ void tickCameraFollowPlayer(void)
 	}
 }
 
-void initializeDaytimeTransition(int32_t timeOfDay)
+// clang-format off
+void initializeDaytimeTransition(timeOfDay)
+	int16_t timeOfDay;
+// clang-format on
 {
 	if ((PARTNER_STATE != 8) && (PARTNER_STATE != 0xd) &&
 	    (getTamerState() != 0x11) && (getTamerState() != 0x13) &&
@@ -4750,16 +4907,21 @@ void initializeDaytimeTransition(int32_t timeOfDay)
 	}
 }
 
-void setPosDataMapTile(MapTileData *tile, int32_t camX, int32_t camY,
+void setPosDataMapTile(MapTileData *tile, int16_t camX, int16_t camY,
 		       POLY_FT4 *prim)
 {
-	setPosDataPolyFT4(prim,
-			  (tile->posX - 160) - (camX - (160 - DRAWING_OFFSET_X)),
-			  (tile->posY - 120) - (camY - (120 - DRAWING_OFFSET_Y)),
-			  128, 128);
+	int16_t x;
+	int16_t y;
+
+	x = (tile->posX - 160) - (camX - (160 - DRAWING_OFFSET_X));
+	y = (tile->posY - 120) - (camY - (120 - DRAWING_OFFSET_Y));
+	setPosDataPolyFT4(prim, x, y, 128, 128);
 }
 
-void tickDaytimeTransition(int32_t transition)
+// clang-format off
+void tickDaytimeTransition(transition)
+	int16_t transition;
+// clang-format on
 {
 	int16_t *clutA;
 	int16_t *clutB;
@@ -4771,11 +4933,11 @@ void tickDaytimeTransition(int32_t transition)
 	uint8_t blueB;
 	int8_t steps;
 	int32_t i;
+	int16_t clut[256];
 	int32_t j;
-	uint16_t clut[256];
 
-	DAYTIME_TRANSITION_ACTIVE = 1;
 	DAYTIME_TRANSITION_TARGET = transition;
+	DAYTIME_TRANSITION_ACTIVE = 1;
 
 	if ((GAME_STATE == 0) && (SKIP_DAYTIME_TRANSITION != 1) &&
 	    (PARTNER_STATE != 8) && (PARTNER_STATE != 0xd) &&
@@ -4817,15 +4979,15 @@ void tickDaytimeTransition(int32_t transition)
 
 			for (j = 0; j < 256; j++) {
 				red = clutA[0] & 0x1f;
-				redB = clutB[0] & 0x1f;
 				green = (clutA[0] >> 5) & 0x1f;
 				blue = (clutA[0] >> 10) & 0x1f;
+				redB = clutB[0] & 0x1f;
 				greenB = (clutB[0] >> 5) & 0x1f;
 				blueB = (clutB[0] >> 10) & 0x1f;
 
-				red -= (uint8_t)((red - redB) / steps);
-				green -= (uint8_t)((green - greenB) / steps);
-				blue -= (uint8_t)((blue - blueB) / steps);
+				red -= (red - redB) / steps;
+				green -= (green - greenB) / steps;
+				blue -= (blue - blueB) / steps;
 
 				clut[j] = (clutA[0] & 0x8000) | red | (green << 5) | (blue << 10);
 				clutA++;
@@ -4948,7 +5110,7 @@ void handleTileUpdate(int32_t input, int32_t force)
 				MAP_TILE_Y = 1;
 			}
 
-			if (((MAP_HEIGHT[0] * 128) - 240) <= CAMERA_Y[0]) {
+			if (CAMERA_Y[0] >= ((MAP_HEIGHT[0] * 128) - 240)) {
 				MAP_TILE_Y = MAP_HEIGHT[0] - 3;
 				if (MAP_TILE_Y < 0) {
 					MAP_TILE_Y = 0;
@@ -5032,7 +5194,7 @@ void handleTileUpdate(int32_t input, int32_t force)
 				MAP_TILE_X = 1;
 			}
 
-			if (((MAP_WIDTH[0] * 128) - 320) <= CAMERA_X[0]) {
+			if (CAMERA_X[0] >= ((MAP_WIDTH[0] * 128) - 320)) {
 				MAP_TILE_X = MAP_WIDTH[0] - 4;
 				if (MAP_TILE_X < 0) {
 					MAP_TILE_X = 0;
@@ -5045,55 +5207,51 @@ void handleTileUpdate(int32_t input, int32_t force)
 		}
 	}
 	if (force == 1) {
-		int32_t tmp;
-		int32_t width;
-
-		tmp = MAP_WIDTH[0];
-		width = tmp;
-		tmp = MAP_TILE_Y;
-		uploadMapTileImages(MAP_TILE_DATA, MAP_TILE_X + tmp * width);
+		uploadMapTileImages(MAP_TILE_DATA,
+				    MAP_TILE_X + ((long)MAP_TILE_Y * MAP_WIDTH[0]));
 	}
 }
 
 void cameraIsAtEdge(int32_t *outX, int32_t *outY)
 {
-	int32_t cameraX;
-	int32_t limitX;
-	int32_t cameraY;
-	int32_t limitY;
+	*outX = *outY = 1;
 
-	*outY = 1;
-	*outX = 1;
-
-	if ((cameraX = CAMERA_X[0]) < 0) {
+	if (CAMERA_X[0] < 0) {
 		CAMERA_X[0] = 0;
 		DRAWING_OFFSET_X = DRAW_OFFSET_LIMIT_X_MAX;
 		*outX = 0;
-	} else if ((limitX = MAP_WIDTH[0] * 128 - 320) < cameraX) {
-		CAMERA_X[0] = limitX;
+	} else if (CAMERA_X[0] > (MAP_WIDTH[0] * 128 - 320)) {
+		CAMERA_X[0] = MAP_WIDTH[0] * 128 - 320;
 		DRAWING_OFFSET_X = DRAW_OFFSET_LIMIT_X_MIN;
 		*outX = 0;
 	}
 
-	if ((cameraY = CAMERA_Y[0]) < 0) {
+	if (CAMERA_Y[0] < 0) {
 		CAMERA_Y[0] = 0;
 		DRAWING_OFFSET_Y = DRAW_OFFSET_LIMIT_Y_MAX;
 		*outY = 0;
-	} else if ((limitY = MAP_HEIGHT[0] * 128 - 240) < cameraY) {
-		CAMERA_Y[0] = limitY;
+	} else if (CAMERA_Y[0] > (MAP_HEIGHT[0] * 128 - 240)) {
+		CAMERA_Y[0] = MAP_HEIGHT[0] * 128 - 240;
 		DRAWING_OFFSET_Y = DRAW_OFFSET_LIMIT_Y_MIN;
 		*outY = 0;
 	}
 }
 
-void createCameraMovement(VECTOR *target, int32_t instanceId)
+// clang-format off
+void createCameraMovement(target, instanceId)
+	VECTOR *target;
+	int16_t instanceId;
+// clang-format on
 {
 	CAMERA_TARGET = *target;
-	addObject(0xfb1, instanceId, (TickFunction)tickCameraMovement, 0);
+	addObject(0xfb1, instanceId, tickCameraMovement, 0);
 	CAMERA_REACHED_TARGET = -1;
 }
 
-void tickCameraMovement(int16_t instanceId)
+// clang-format off
+void tickCameraMovement(instanceId)
+	int16_t instanceId;
+// clang-format on
 {
 	SVECTOR target;
 	SVECTOR view;
@@ -5101,14 +5259,17 @@ void tickCameraMovement(int16_t instanceId)
 	SVECTOR screenView;
 	int32_t atEdgeX;
 	int32_t atEdgeY;
-	int32_t stepX;
-	int32_t stepY;
+	int16_t stepX;
+	int16_t qx;
+	int16_t qy;
+	int16_t stepY;
+	int16_t oldCameraX;
+	int16_t oldCameraY;
 	uint32_t flags;
-	int32_t id;
-	int32_t qx;
-	int32_t qy;
+#if !defined(VERSION_JP)
 	int32_t remX;
 	int32_t remY;
+#endif
 
 	if (CAMERA_HAS_TARGET == 0) {
 		SetRotMatrix(&GsWSMATRIX);
@@ -5127,8 +5288,8 @@ void tickCameraMovement(int16_t instanceId)
 		CAMERA_MOVE_DRAW_OFFSET_Y = DRAWING_OFFSET_Y;
 		CAMERA_MOVE_DIFF_X = (screenView.vx - screenTarget.vx) + 160;
 		CAMERA_MOVE_DIFF_Y = (screenView.vy - screenTarget.vy) + 120;
-		PLAYER_OFFSET_X = PLAYER_OFFSET_X + (int16_t)(CAMERA_MOVE_DIFF_X - PLAYER_OFFSET_X);
-		PLAYER_OFFSET_Y = PLAYER_OFFSET_Y + (int16_t)(CAMERA_MOVE_DIFF_Y - PLAYER_OFFSET_Y);
+		PLAYER_OFFSET_X += CAMERA_MOVE_DIFF_X - PLAYER_OFFSET_X;
+		PLAYER_OFFSET_Y += CAMERA_MOVE_DIFF_Y - PLAYER_OFFSET_Y;
 
 		if (CAMERA_MOVE_DIFF_X < DRAW_OFFSET_LIMIT_X_MIN) {
 			CAMERA_MOVE_DIFF_X = DRAW_OFFSET_LIMIT_X_MIN;
@@ -5151,6 +5312,15 @@ void tickCameraMovement(int16_t instanceId)
 		CAMERA_MOVE_DELTA_X = (CAMERA_MOVE_DIFF_X - CAMERA_MOVE_DRAW_OFFSET_X) % instanceId;
 		CAMERA_MOVE_DELTA_Y = (CAMERA_MOVE_DIFF_Y - CAMERA_MOVE_DRAW_OFFSET_Y) % instanceId;
 
+#if defined(VERSION_JP)
+		if (CAMERA_MOVE_DELTA_X < 0) {
+			CAMERA_MOVE_DELTA_X = -CAMERA_MOVE_DELTA_X;
+		}
+
+		if (CAMERA_MOVE_DELTA_Y < 0) {
+			CAMERA_MOVE_DELTA_Y = -CAMERA_MOVE_DELTA_Y;
+		}
+#else
 		remX = CAMERA_MOVE_DELTA_X;
 		if (remX < 0) {
 			CAMERA_MOVE_DELTA_X = -remX;
@@ -5160,32 +5330,34 @@ void tickCameraMovement(int16_t instanceId)
 		if (remY < 0) {
 			CAMERA_MOVE_DELTA_Y = -remY;
 		}
+#endif
 
 		unsetCameraFollowPlayer();
 		CAMERA_HAS_TARGET = 1;
 	}
 
-	id = instanceId;
-	stepX = (int16_t)((CAMERA_MOVE_DIFF_X - CAMERA_MOVE_DRAW_OFFSET_X) / id);
-	stepY = (int16_t)((CAMERA_MOVE_DIFF_Y - CAMERA_MOVE_DRAW_OFFSET_Y) / instanceId);
-	qx = (int16_t)((CAMERA_MOVE_DRAW_OFFSET_X - CAMERA_MOVE_DIFF_X) / instanceId);
-	CAMERA_X[0] = CAMERA_X[0] + qx;
-	qy = (int16_t)((CAMERA_MOVE_DRAW_OFFSET_Y - CAMERA_MOVE_DIFF_Y) / instanceId);
-	CAMERA_Y[0] = CAMERA_Y[0] + qy;
-	DRAWING_OFFSET_X = DRAWING_OFFSET_X + stepX;
-	DRAWING_OFFSET_Y = DRAWING_OFFSET_Y + stepY;
+	qx = (CAMERA_MOVE_DRAW_OFFSET_X - CAMERA_MOVE_DIFF_X) / instanceId;
+	qy = (CAMERA_MOVE_DRAW_OFFSET_Y - CAMERA_MOVE_DIFF_Y) / instanceId;
+	stepX = (CAMERA_MOVE_DIFF_X - CAMERA_MOVE_DRAW_OFFSET_X) / instanceId;
+	stepY = (CAMERA_MOVE_DIFF_Y - CAMERA_MOVE_DRAW_OFFSET_Y) / instanceId;
+	oldCameraX = CAMERA_X[0];
+	oldCameraY = CAMERA_Y[0];
+	CAMERA_X[0] += qx;
+	CAMERA_Y[0] += qy;
+	DRAWING_OFFSET_X += stepX;
+	DRAWING_OFFSET_Y += stepY;
 
 	if (CAMERA_MOVE_DELTA_X >= 0) {
 		if ((CAMERA_MOVE_DRAW_OFFSET_X - CAMERA_MOVE_DIFF_X) > 0) {
-			CAMERA_X[0] = CAMERA_X[0] + 1;
+			CAMERA_X[0]++;
 		} else {
-			CAMERA_X[0] = CAMERA_X[0] - 1;
+			CAMERA_X[0]--;
 		}
 
 		if ((CAMERA_MOVE_DIFF_X - CAMERA_MOVE_DRAW_OFFSET_X) > 0) {
-			DRAWING_OFFSET_X = DRAWING_OFFSET_X + 1;
+			DRAWING_OFFSET_X++;
 		} else {
-			DRAWING_OFFSET_X = DRAWING_OFFSET_X - 1;
+			DRAWING_OFFSET_X--;
 		}
 
 		CAMERA_MOVE_DELTA_X--;
@@ -5193,15 +5365,15 @@ void tickCameraMovement(int16_t instanceId)
 
 	if (CAMERA_MOVE_DELTA_Y >= 0) {
 		if ((CAMERA_MOVE_DRAW_OFFSET_Y - CAMERA_MOVE_DIFF_Y) > 0) {
-			CAMERA_Y[0] = CAMERA_Y[0] + 1;
+			CAMERA_Y[0]++;
 		} else {
-			CAMERA_Y[0] = CAMERA_Y[0] - 1;
+			CAMERA_Y[0]--;
 		}
 
 		if ((CAMERA_MOVE_DIFF_Y - CAMERA_MOVE_DRAW_OFFSET_Y) > 0) {
-			DRAWING_OFFSET_Y = DRAWING_OFFSET_Y + 1;
+			DRAWING_OFFSET_Y++;
 		} else {
-			DRAWING_OFFSET_Y = DRAWING_OFFSET_Y - 1;
+			DRAWING_OFFSET_Y--;
 		}
 
 		CAMERA_MOVE_DELTA_Y--;
@@ -5212,15 +5384,15 @@ void tickCameraMovement(int16_t instanceId)
 	if (atEdgeX == 1) {
 		if ((CAMERA_MOVE_DIFF_X - CAMERA_MOVE_DRAW_OFFSET_X) < 0) {
 			if (DRAWING_OFFSET_X < CAMERA_MOVE_DIFF_X) {
-				DRAWING_OFFSET_X = (int16_t)CAMERA_MOVE_DIFF_X;
+				DRAWING_OFFSET_X = CAMERA_MOVE_DIFF_X;
 			}
 		} else {
-			if (CAMERA_MOVE_DIFF_X < DRAWING_OFFSET_X) {
-				DRAWING_OFFSET_X = (int16_t)CAMERA_MOVE_DIFF_X;
+			if (DRAWING_OFFSET_X > CAMERA_MOVE_DIFF_X) {
+				DRAWING_OFFSET_X = CAMERA_MOVE_DIFF_X;
 			}
 
 			if (CAMERA_MOVE_DRAW_OFFSET_X == CAMERA_MOVE_DIFF_X) {
-				DRAWING_OFFSET_X = (int16_t)CAMERA_MOVE_DIFF_X;
+				DRAWING_OFFSET_X = CAMERA_MOVE_DIFF_X;
 			}
 		}
 
@@ -5233,15 +5405,15 @@ void tickCameraMovement(int16_t instanceId)
 	if (atEdgeY == 1) {
 		if ((CAMERA_MOVE_DIFF_Y - CAMERA_MOVE_DRAW_OFFSET_Y) < 0) {
 			if (DRAWING_OFFSET_Y < CAMERA_MOVE_DIFF_Y) {
-				DRAWING_OFFSET_Y = (int16_t)CAMERA_MOVE_DIFF_Y;
+				DRAWING_OFFSET_Y = CAMERA_MOVE_DIFF_Y;
 			}
 		} else {
-			if (CAMERA_MOVE_DIFF_Y < DRAWING_OFFSET_Y) {
-				DRAWING_OFFSET_Y = (int16_t)CAMERA_MOVE_DIFF_Y;
+			if (DRAWING_OFFSET_Y > CAMERA_MOVE_DIFF_Y) {
+				DRAWING_OFFSET_Y = CAMERA_MOVE_DIFF_Y;
 			}
 
 			if (CAMERA_MOVE_DRAW_OFFSET_Y == CAMERA_MOVE_DIFF_Y) {
-				DRAWING_OFFSET_Y = (int16_t)CAMERA_MOVE_DIFF_Y;
+				DRAWING_OFFSET_Y = CAMERA_MOVE_DIFF_Y;
 			}
 		}
 
@@ -5281,17 +5453,21 @@ void tickCameraMovement(int16_t instanceId)
 			CAMERA_REACHED_TARGET = 1;
 		}
 
-		removeObject(0xfb1, id);
+		removeObject(0xfb1, instanceId);
 
 		if (CAMERA_UPDATE_TILES == 1) {
 			uploadMapTileImages(MAP_TILE_DATA,
-					    MAP_TILE_X + MAP_TILE_Y * ((int8_t *)MAP_WIDTH)[0]);
+					    MAP_TILE_X + ((long)MAP_TILE_Y * MAP_WIDTH[0]));
 			CAMERA_UPDATE_TILES = 0;
 		}
 	}
 }
 
-void storeEntityLocation(uint32_t scriptId, VECTOR *out)
+// clang-format off
+void storeEntityLocation(scriptId, out)
+	uint8_t scriptId;
+	VECTOR *out;
+// clang-format on
 {
 	NPCEntity *npc;
 	int32_t i;
@@ -5313,12 +5489,15 @@ void storeEntityLocation(uint32_t scriptId, VECTOR *out)
 	}
 }
 
-int32_t checkCameraMovement(int32_t instanceId)
+// clang-format off
+int32_t checkCameraMovement(instanceId)
+	int16_t instanceId;
+// clang-format on
 {
 	if (CAMERA_REACHED_TARGET == -1) {
 		CAMERA_REACHED_TARGET = 0;
 		addObject(0xfb1, instanceId,
-			  (TickFunction)tickCameraMovement, NULL);
+			  tickCameraMovement, NULL);
 		goto out;
 	}
 
@@ -5330,7 +5509,12 @@ out:
 	return 0;
 }
 
-void tickMoveCameraTo(int32_t x, int32_t z, int32_t arg2)
+// clang-format off
+void tickMoveCameraTo(x, z, arg2)
+	int16_t x;
+	int16_t z;
+	int16_t arg2;
+// clang-format on
 {
 	CAMERA_TARGET.vx = x;
 	CAMERA_TARGET.vy = TAMER_ENTITY.entity.posData->location.vy;
@@ -5339,7 +5523,11 @@ void tickMoveCameraTo(int32_t x, int32_t z, int32_t arg2)
 	checkCameraMovement(arg2);
 }
 
-int32_t tickMoveCameraToEntity(uint32_t scriptId, int32_t speed)
+// clang-format off
+int32_t tickMoveCameraToEntity(scriptId, speed)
+	uint8_t scriptId;
+	int16_t speed;
+// clang-format on
 {
 	storeEntityLocation(scriptId, &CAMERA_TARGET);
 
@@ -5348,11 +5536,13 @@ int32_t tickMoveCameraToEntity(uint32_t scriptId, int32_t speed)
 
 void moveCameraByDiff(VECTOR *from, VECTOR *to)
 {
+	uint32_t flags;
 	SVECTOR fromPos;
 	SVECTOR toPos;
 	SVECTOR fromScreen;
 	SVECTOR toScreen;
-	uint32_t flags;
+	int16_t oldCameraX;
+	int16_t oldCameraY;
 
 	SetRotMatrix(&GsWSMATRIX);
 	SetTransMatrix(&GsWSMATRIX);
@@ -5365,8 +5555,10 @@ void moveCameraByDiff(VECTOR *from, VECTOR *to)
 	gte_ldv0(&toPos);
 	gte_rtps();
 	gte_stsxy(&toScreen);
-	CAMERA_X[0] = CAMERA_X[0] + (int16_t)(toScreen.vx - fromScreen.vx);
-	CAMERA_Y[0] = CAMERA_Y[0] + (int16_t)(toScreen.vy - fromScreen.vy);
+	oldCameraX = CAMERA_X[0];
+	oldCameraY = CAMERA_Y[0];
+	CAMERA_X[0] += toScreen.vx - fromScreen.vx;
+	CAMERA_Y[0] += toScreen.vy - fromScreen.vy;
 
 	flags = 0;
 	if (from->vx < to->vx) {
@@ -5385,15 +5577,19 @@ void moveCameraByDiff(VECTOR *from, VECTOR *to)
 	handleTileUpdate(flags, 0);
 }
 
-void MAIN_func_800D8AC8(int32_t diffX, int32_t diffY)
+// clang-format off
+void MAIN_func_800D8AC8(diffX, diffY)
+	int16_t diffX;
+	int16_t diffY;
+// clang-format on
 {
 	int32_t atEdgeX;
 	int32_t atEdgeY;
 
-	CAMERA_X[0] = CAMERA_X[0] + diffX;
-	CAMERA_Y[0] = CAMERA_Y[0] + diffY;
-	DRAWING_OFFSET_X = DRAWING_OFFSET_X - diffX;
-	DRAWING_OFFSET_Y = DRAWING_OFFSET_Y - diffY;
+	CAMERA_X[0] += diffX;
+	CAMERA_Y[0] += diffY;
+	DRAWING_OFFSET_X -= diffX;
+	DRAWING_OFFSET_Y -= diffY;
 	cameraIsAtEdge(&atEdgeX, &atEdgeY);
 	handleTileUpdate(POLLED_INPUT, 1);
 }
@@ -5408,16 +5604,19 @@ void setCameraFollowPlayer(void)
 	CAMERA_FOLLOW_PLAYER = 1;
 }
 
-void updateTileRow(int32_t bottom)
+// clang-format off
+void updateTileRow(bottom)
+	int8_t bottom;
+// clang-format on
 {
 	RECT rect;
 	int16_t base;
 	int16_t count;
-	int32_t start;
+	int16_t start;
 	int32_t i;
 
 	if (MAP_TILE_Y != PREV_TILE_Y) {
-		base = MAP_TILE_X + (MAP_TILE_Y * MAP_WIDTH[0]);
+		base = MAP_TILE_X + ((long)MAP_TILE_Y * MAP_WIDTH[0]);
 
 		if (MAP_WIDTH[0] >= 4) {
 			count = 4;
@@ -5431,15 +5630,13 @@ void updateTileRow(int32_t bottom)
 			start = (int16_t)(MAP_WIDTH[0] * 2);
 		}
 
-		start = base + start;
-
 		for (i = 0; i < count; i++) {
-			setRECT(&rect, MAP_TILE_DATA[i + start].texU, MAP_TILE_DATA[i + start].texV, 64, 128);
+			setRECT(&rect, MAP_TILE_DATA[i + (base + start)].texU, MAP_TILE_DATA[i + (base + start)].texV, 64, 128);
 
 			if (MAP_TILE_DATA[base + i].tileId == -1) {
 				ClearImage(&rect, 0, 0, 0);
 			} else {
-				LoadImage(&rect, (u_long *)MAP_TILE_DATA[i + start].imagePtr);
+				LoadImage(&rect, (u_long *)MAP_TILE_DATA[i + (base + start)].imagePtr);
 			}
 
 			DrawSync(0);
@@ -5449,44 +5646,38 @@ void updateTileRow(int32_t bottom)
 	}
 }
 
-void updateTileColumn(int32_t arg0)
+// clang-format off
+void updateTileColumn(right)
+	int8_t right;
+// clang-format on
 {
-	int32_t width;
-	int32_t widthCopy;
-	int32_t tileY;
-	int32_t stride;
-	int16_t tileIndex;
-	int16_t colOffset;
-	int32_t rowOffset;
-	int32_t i;
-	int32_t idx;
 	RECT rect;
+	int16_t base;
+	int16_t stride;
+	int16_t start;
+	int32_t i;
 
 	if (MAP_TILE_X != PREV_TILE_X) {
-		width = MAP_WIDTH[0];
-		tileY = MAP_TILE_Y;
-		tileIndex = MAP_TILE_X + (tileY * width);
-		widthCopy = MAP_WIDTH[0];
-		stride = (int16_t)widthCopy;
+		base = MAP_TILE_X + ((long)MAP_TILE_Y * MAP_WIDTH[0]);
+		stride = MAP_WIDTH[0];
 
-		if (arg0 == 0) {
-			colOffset = 0;
+		if (right == 0) {
+			start = 0;
 		} else {
-			colOffset = 3;
+			start = 3;
 		}
 
-		for (i = 0, rowOffset = 0; i < 3; i++, rowOffset += stride) {
+		for (i = 0; i < 3; i++) {
 			if ((MAP_HEIGHT[0] < 3) && (i == 2)) {
 				break;
 			}
 
-			idx = colOffset + (tileIndex + rowOffset);
-			setRECT(&rect, MAP_TILE_DATA[idx].texU, MAP_TILE_DATA[idx].texV, 64, 128);
+			setRECT(&rect, MAP_TILE_DATA[start + (base + stride * i)].texU, MAP_TILE_DATA[start + (base + stride * i)].texV, 64, 128);
 
-			if (MAP_TILE_DATA[idx].tileId == -1) {
+			if (MAP_TILE_DATA[start + (base + stride * i)].tileId == -1) {
 				ClearImage(&rect, 0, 0, 0);
 			} else {
-				LoadImage(&rect, (u_long *)MAP_TILE_DATA[idx].imagePtr);
+				LoadImage(&rect, (u_long *)MAP_TILE_DATA[start + (base + stride * i)].imagePtr);
 			}
 
 			DrawSync(0);
@@ -5540,7 +5731,10 @@ int32_t MAIN_func_800D8E64(int16_t mapId, int16_t exitId, int32_t showName)
 	return 0;
 }
 
-void addMapNameObject(int32_t mapId)
+// clang-format off
+void addMapNameObject(mapId)
+	int16_t mapId;
+// clang-format on
 {
 	clearTextArea();
 	drawString(MAP_NAME_PTR[MAP_ENTRIES[mapId].loadingName], 0, 0);
@@ -5641,19 +5835,30 @@ void MAIN_func_800D9248(void)
 	changeMap(MAIN_D_801343B0, MAIN_D_801343B2);
 }
 
-void renderMapName(int32_t mapId)
+// clang-format off
+void renderMapName(mapId)
+	int16_t mapId;
+// clang-format on
 {
 	int32_t length;
 
 	length = strlen(MAP_NAME_PTR[MAP_ENTRIES[mapId].loadingName]);
+#if defined(VERSION_JP)
+	renderString(0, -12 - (length / 2) * 6, -6, (length / 2) * 12, 12, 0,
+		     0, 0, 0);
+#else
 	renderString(0, 12 - (length / 2) * 8, -6, length * 8 + 4, 12, 0, 0,
 		     0, 0);
+#endif
 }
 
 void MAIN_func_800D92EC(void)
 {
 	addObject(0xfa2, 0, tickGameClock, renderGameClock);
 	addObject(0xfa0, 0, NULL, renderMap);
+#if defined(VERSION_JP)
+	addObject(0xfa6, 0, tickPartnerNormal, NULL);
+#endif
 	addObject(0xfa8, 0, NULL, renderPoop);
 	setTamerState(0);
 	setPartnerState(1);
@@ -5676,13 +5881,11 @@ void MAIN_func_800D9360(int32_t mapId)
 
 void createMeramonShake(void)
 {
-	MERAMON_SHAKE_BACKUP_OFFSET_X = DRAWING_OFFSET_X;
 	MERAMON_SHAKE_FRAME_COUNT = 0;
+	MERAMON_SHAKE_BACKUP_OFFSET_X = DRAWING_OFFSET_X;
 	MERAMON_SHAKE_BACKUP_OFFSET_Y = DRAWING_OFFSET_Y;
-	MERAMON_SHAKE_HEIGHT = 0;
-	MERAMON_SHAKE_WIDTH = 0;
-	MERAMON_SHAKE_POS_Y = 0;
-	MERAMON_SHAKE_POS_X = 0;
+	MERAMON_SHAKE_POS_X = MERAMON_SHAKE_POS_Y = MERAMON_SHAKE_WIDTH =
+		MERAMON_SHAKE_HEIGHT = 0;
 	addObject(0xfb8, 0, tickMeramonShake, 0);
 }
 
@@ -5690,6 +5893,7 @@ void tickMeramonShake(int32_t arg0)
 {
 	POLY_FT4 *prim;
 	int8_t offset;
+	GsOT_TAG *org;
 
 	if (MERAMON_SHAKE_FRAME_COUNT < 0x1f) {
 		offset = 1;
@@ -5732,7 +5936,8 @@ void tickMeramonShake(int32_t arg0)
 	setPosDataPolyFT4(prim, MERAMON_SHAKE_POS_X, MERAMON_SHAKE_POS_Y,
 			  MERAMON_SHAKE_WIDTH, MERAMON_SHAKE_HEIGHT);
 	setRGB0(prim, MERAMON_SHAKE_COLOR_R, MERAMON_SHAKE_COLOR_G, MERAMON_SHAKE_COLOR_B);
-	AddPrim(&ACTIVE_ORDERING_TABLE->org[9], prim);
+	org = ACTIVE_ORDERING_TABLE->org;
+	AddPrim(&org[9], prim);
 	prim++;
 
 	GsSetWorkBase((PACKET *)prim);
@@ -5765,7 +5970,6 @@ void getDrawingOffsetCopy(int32_t *x, int32_t *y)
 void cleanupGame(void)
 {
 	int32_t partnerType;
-	int32_t *models;
 	int32_t i;
 
 	removeObject(0xfa0, 0);
@@ -5787,8 +5991,8 @@ void cleanupGame(void)
 	thunkUnloadModel(partnerType, 3);
 
 	for (i = 0; i < 8; i++) {
-		if (LOADED_DIGIMON_MODELS[i] != -1) {
-			thunkUnloadModel((models = LOADED_DIGIMON_MODELS)[i], 0);
+		if (LOADED_DIGIMON_MODELS[i] != -1L) {
+			thunkUnloadModel(LOADED_DIGIMON_MODELS[i], 0);
 		}
 	}
 
@@ -5847,27 +6051,29 @@ int32_t getFileCityTopMap(void)
 int32_t lerp(int32_t start, int32_t end, int32_t t0, int32_t t1, int32_t t)
 {
 	int32_t result;
+	int32_t range;
+	int32_t duration;
 
 	if (t1 == t0) {
-		result = 0;
-	} else {
-		end -= start;
-		result = (end * (t - t0)) / (t1 - t0);
-		if (end >= 0) {
-			result = result % (end + 1);
-			if (result < 0) {
-				result += end;
-			}
-		} else {
-			result = result % (end - 1);
-			if (result > 0) {
-				result += end;
-			}
-		}
-
-		result += start;
+		return 0;
 	}
 
+	range = end - start;
+	duration = t1 - t0;
+	result = (range * (t - t0)) / duration;
+	if (range >= 0) {
+		result = result % (range + 1);
+		if (result < 0) {
+			result += range;
+		}
+	} else {
+		result = result % (range - 1);
+		if (result > 0) {
+			result += range;
+		}
+	}
+
+	result += start;
 	return result;
 }
 
@@ -5926,10 +6132,11 @@ void MAIN_func_800D9B60(uint32_t *buffer)
 	DrawSync(0);
 }
 
-void MAIN_func_800D9BA8(int32_t level, int16_t *src)
+void MAIN_func_800D9BA8(long level, int16_t *clut)
 {
 	int16_t buffer[1792];
 	RECT rect;
+	int16_t *src;
 	int16_t *dst;
 	int32_t i;
 	int16_t red;
@@ -5937,6 +6144,7 @@ void MAIN_func_800D9BA8(int32_t level, int16_t *src)
 	int16_t blue;
 	int16_t mask;
 
+	src = clut;
 	dst = buffer;
 	for (i = 0; i < 256; i++) {
 		red = *src & 0x1f;
@@ -5944,9 +6152,9 @@ void MAIN_func_800D9BA8(int32_t level, int16_t *src)
 		blue = (*src >> 10) & 0x1f;
 		mask = (*src++ >> 15) & 0x1;
 		*dst = red * (255 - level) / 255;
-		*dst += (int16_t)((green * (255 - level) / 255) << 5);
-		*dst += (int16_t)((blue * (255 - level) / 255) << 10);
-		*dst++ += (int16_t)(mask << 15);
+		*dst += (green * (255 - level) / 255) << 5;
+		*dst += (blue * (255 - level) / 255) << 10;
+		*dst++ += mask << 15;
 	}
 
 	src += 768;
@@ -5957,9 +6165,9 @@ void MAIN_func_800D9BA8(int32_t level, int16_t *src)
 		blue = (*src >> 10) & 0x1f;
 		mask = (*src++ >> 15) & 0x1;
 		*dst = red * (255 - level) / 255;
-		*dst += (int16_t)((green * (255 - level) / 255) << 5);
-		*dst += (int16_t)((blue * (255 - level) / 255) << 10);
-		*dst++ += (int16_t)(mask << 15);
+		*dst += (green * (255 - level) / 255) << 5;
+		*dst += (blue * (255 - level) / 255) << 10;
+		*dst++ += mask << 15;
 	}
 
 	setRECT(&rect, 0, 480, 256, 7);
@@ -5980,10 +6188,11 @@ void MAIN_func_800D9E68(u_long *buffer)
 	DrawSync(0);
 }
 
-void MAIN_func_800D9F14(int32_t fade, int16_t *src)
+void MAIN_func_800D9F14(long fade, int16_t *clut)
 {
 	int16_t pixels[416];
 	RECT rect;
+	int16_t *src;
 	int16_t *dst;
 	int32_t i;
 	int16_t red;
@@ -5991,6 +6200,7 @@ void MAIN_func_800D9F14(int32_t fade, int16_t *src)
 	int16_t blue;
 	int16_t mask;
 
+	src = clut;
 	dst = pixels;
 	for (i = 0; i < 416; i++) {
 		red = *src & 0x1f;
@@ -5998,9 +6208,9 @@ void MAIN_func_800D9F14(int32_t fade, int16_t *src)
 		blue = (*src >> 10) & 0x1f;
 		mask = (*src++ >> 15) & 0x1;
 		*dst = red * (255 - fade) / 255;
-		*dst += (int16_t)((green * (255 - fade) / 255) << 5);
-		*dst += (int16_t)((blue * (255 - fade) / 255) << 10);
-		*dst++ += (int16_t)(mask << 15);
+		*dst += (green * (255 - fade) / 255) << 5;
+		*dst += (blue * (255 - fade) / 255) << 10;
+		*dst++ += mask << 15;
 	}
 
 	setRECT(&rect, 272, 480, 16, 1);
@@ -6085,37 +6295,38 @@ void renderSprite(GsSPRITE *sprite, int16_t x, int16_t y, int32_t distance,
 			  (uint32_t)distance);
 	sprite->scaley = ((uint32_t)(height * VIEWPORT_DISTANCE) /
 			  (uint32_t)distance);
+#if defined(VERSION_JP)
+	GsSortSprite(sprite, ACTIVE_ORDERING_TABLE, distance >> 4);
+#else
 	distance = distance >> 4;
 	if ((distance >= 0) && (distance < 0x1000)) {
-		GsSortSprite(sprite, ACTIVE_ORDERING_TABLE,
-			     (uint16_t)distance);
+		GsSortSprite(sprite, ACTIVE_ORDERING_TABLE, distance);
 	}
+#endif
 }
 
-void addFXPrim(POLY_FT4 *prim, int32_t posX, int32_t posY, int16_t width,
+void addFXPrim(POLY_FT4 *prim, int16_t posX, int16_t posY, int16_t width,
 	       int16_t height, int32_t distance)
 {
 	int32_t scaledWidth;
-	int16_t x;
 	int32_t scaledHeight;
-	int16_t y;
 
 	scaledWidth = ((uint32_t)(width * VIEWPORT_DISTANCE) /
 		       (uint32_t)distance);
-	x = posX - (int16_t)(scaledWidth >> 1);
+	posX -= scaledWidth >> 1;
 	scaledHeight = ((uint32_t)(height * VIEWPORT_DISTANCE) /
 			(uint32_t)distance);
-	prim->x0 = x;
-	y = posY - (int16_t)(scaledHeight >> 1);
-	prim->y0 = y;
-	prim->x1 = x + scaledWidth;
-	prim->y1 = y;
+	posY -= scaledHeight >> 1;
+	prim->x0 = posX;
+	prim->y0 = posY;
+	prim->x1 = posX + scaledWidth;
+	prim->y1 = posY;
+	prim->x2 = posX;
+	prim->y2 = posY + scaledHeight;
+	prim->x3 = posX + scaledWidth;
+	prim->y3 = posY + scaledHeight;
 	distance >>= 4;
 	distance -= 0x37;
-	prim->x2 = x;
-	prim->y2 = y + scaledHeight;
-	prim->x3 = x + scaledWidth;
-	prim->y3 = y + scaledHeight;
 
 	if ((distance > 0x20) && (distance < 0x1000)) {
 		AddPrim(ACTIVE_ORDERING_TABLE->org + distance, prim);
@@ -6124,8 +6335,8 @@ void addFXPrim(POLY_FT4 *prim, int32_t posX, int32_t posY, int16_t width,
 	}
 }
 
-void setShortWithStride(int16_t *dest, int16_t value, int32_t count,
-			int32_t stride)
+void setShortWithStride(int16_t *dest, int16_t value, int16_t count,
+			int16_t stride)
 {
 	int16_t i;
 
@@ -6135,9 +6346,16 @@ void setShortWithStride(int16_t *dest, int16_t value, int32_t count,
 	}
 }
 
-void renderTMDModel(uint8_t *buffer, int32_t id, GsCOORDINATE2 *coord,
-			GsCOORDINATE2 *super, VECTOR *trans, SVECTOR *rot,
-			VECTOR *scale)
+// clang-format off
+void renderTMDModel(buffer, id, coord, super, trans, rot, scale)
+	uint8_t *buffer;
+	int16_t id;
+	GsCOORDINATE2 *coord;
+	GsCOORDINATE2 *super;
+	VECTOR *trans;
+	SVECTOR *rot;
+	VECTOR *scale;
+// clang-format on
 {
 	GsDOBJ2 obj;
 	MATRIX m;
@@ -6181,9 +6399,9 @@ int32_t MAIN_func_800DA63C(int32_t count, int32_t t, int32_t *keys,
 	int32_t hi;
 	int32_t mid;
 	int32_t x0;
+	int32_t dt;
 	int32_t dx;
 	int32_t *slope;
-	int32_t dt;
 	int32_t lo;
 	int32_t m0;
 	int32_t m1;
@@ -6203,6 +6421,16 @@ int32_t MAIN_func_800DA63C(int32_t count, int32_t t, int32_t *keys,
 		lo--;
 	}
 
+#if defined(VERSION_JP)
+	dx = keys[lo + 1] - keys[lo];
+	dt = t - keys[lo];
+
+	return values[lo] +
+	       dt * (((values[lo + 1] - values[lo]) / dx -
+		      dx * (slopes[lo + 1] + slopes[lo] * 2)) +
+		     dt * (slopes[lo] * 3 +
+			   (dt * (slopes[lo + 1] - slopes[lo])) / dx));
+#else
 	off = lo * 4;
 	key = (int32_t *)(off + (uint32_t)keys);
 	x0 = key[0];
@@ -6216,18 +6444,19 @@ int32_t MAIN_func_800DA63C(int32_t count, int32_t t, int32_t *keys,
 
 	return lo + dt * (((value[1] - lo) / dx - dx * (m1 + m0 * 2)) +
 			  dt * (m0 * 3 + (dt * (m1 - m0)) / dx));
+#endif
 }
 
 int32_t MAIN_func_800DA740(int16_t *rect, DVECTOR *line)
 {
-	int16_t code[2];
-	int32_t cx[4];
-	int32_t cy[4];
 	int16_t *c;
 	DVECTOR *p;
+	int16_t code[2];
 	int32_t i;
 	int32_t dx;
 	int32_t dy;
+	int32_t cx[4];
+	int32_t cy[4];
 	int32_t cross;
 
 	for (i = 0; i < 2; i++) {
@@ -6243,9 +6472,9 @@ int32_t MAIN_func_800DA740(int16_t *rect, DVECTOR *line)
 		}
 
 		if (rect[3] < p->vy) {
-			*c = *c + 3;
+			*c += 3;
 		} else if (p->vy < rect[1]) {
-			*c = *c - 3;
+			*c -= 3;
 		}
 
 		if (*c == 4) {
@@ -6274,8 +6503,8 @@ int32_t MAIN_func_800DA740(int16_t *rect, DVECTOR *line)
 	cy[1] = rect[1] - line[0].vy;
 	cx[2] = rect[0] - line[0].vx;
 	cy[2] = rect[3] - line[0].vy;
-	cy[3] = rect[3] - line[0].vy;
 	cx[3] = rect[2] - line[0].vx;
+	cy[3] = rect[3] - line[0].vy;
 
 	cross = (dx * cy[0]) - (dy * cx[0]);
 
@@ -6310,7 +6539,7 @@ void renderFXParticle(SVECTOR *pos, int32_t size, uint8_t *color)
 	depth = worldPosToScreenPos(pos, &screenPos);
 	SetPolyFT4(prim);
 	SetSemiTrans(prim, 1);
-	setSemiTrans(prim, 1);
+	prim->code |= 2;
 	setRGB0(prim, color[0], color[1], color[2]);
 	prim->tpage = getTPage(0, 1, 768, 256);
 	prim->clut = getClut(192, 489);

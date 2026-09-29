@@ -19,6 +19,7 @@
 #include <dw/model.h>
 #include <dw/params.h>
 #include <dw/sound.h>
+#include <dw/world_object.h>
 
 #include "common.h"
 

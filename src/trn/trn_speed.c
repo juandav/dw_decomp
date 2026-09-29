@@ -8,6 +8,7 @@
 #include <dw/sound.h>
 #include <dw/trn.h>
 #include <dw/types.h>
+#include <dw/world_object.h>
 
 extern uint32_t POLLED_INPUT;
 extern int32_t TRAINING_COMPLETE;

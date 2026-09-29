@@ -17,6 +17,7 @@
 #include <dw/script.h>
 #include <dw/sjis.h>
 #include <dw/swap.h>
+#include <dw/world_object.h>
 
 extern GsRVIEW2 GS_VIEWPOINT;
 extern int32_t VIEWPORT_DISTANCE;

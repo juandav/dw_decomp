@@ -55,6 +55,7 @@ MAIN_C_SRC := \
 	src/main/kar.c \
 	src/main/main.c \
 	src/main/main_menu.c \
+	src/main/map.c \
 	src/main/map_collision.c \
 	src/main/map_object.c \
 	src/main/math.c \
