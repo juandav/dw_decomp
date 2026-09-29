@@ -24,7 +24,7 @@ typedef struct {
 
 typedef struct {
 	WorldItem worldItem;
-	int32_t time;
+	long time;
 } TamerItem;
 
 typedef struct {

@@ -53,6 +53,7 @@ MAIN_C_SRC := \
 	src/main/inventory.c \
 	src/main/item.c \
 	src/main/kar.c \
+	src/main/main.c \
 	src/main/map_collision.c \
 	src/main/map_object.c \
 	src/main/math.c \

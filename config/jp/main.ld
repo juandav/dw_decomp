@@ -18,7 +18,7 @@ SECTIONS
     .main : AT(main_ROM_START)
     {
         main_TEXT_START = .;
-        KEEP(BUILD_DIR/asm/main/main.s.o(.text .text.*));
+        KEEP(BUILD_DIR/asm/main/800.s.o(.text .text.*));
         BUILD_DIR/src/main/world_object.c.o(.text .text.*);
         BUILD_DIR/src/main/file.c.o(.text .text.*);
         BUILD_DIR/src/main/math.c.o(.text .text.*);
@@ -75,12 +75,12 @@ SECTIONS
         KEEP(BUILD_DIR/asm/main/79D94.s.o(.text .text.*));
         BUILD_DIR/src/main/bubble.c.o(.text .text.*);
         BUILD_DIR/src/main/battle_ui.c.o(.text .text.*);
-        KEEP(BUILD_DIR/asm/main/86F48.s.o(.text .text.*));
+        BUILD_DIR/src/main/main.c.o(.text .text.*);
         main_TEXT_END = .;
         main_TEXT_SIZE = ABSOLUTE(main_TEXT_END - main_TEXT_START);
 
         main_RODATA_START = .;
-        KEEP(BUILD_DIR/asm/main/data/main.rodata.s.o(.rodata .rodata.*));
+        KEEP(BUILD_DIR/asm/main/data/89E64.rodata.s.o(.rodata .rodata.*));
         BUILD_DIR/src/main/tamer.c.o(.rodata .rodata.*);
         BUILD_DIR/src/main/efe.c.o(.rodata .rodata.*);
         KEEP(BUILD_DIR/asm/main/data/8A71C.rodata.s.o(.rodata .rodata.*));
@@ -100,7 +100,7 @@ SECTIONS
         BUILD_DIR/src/main/graphics2.c.o(.rodata .rodata.*);
         KEEP(BUILD_DIR/asm/main/data/8B6E0.rodata.s.o(.rodata .rodata.*));
         BUILD_DIR/src/main/battle_ui.c.o(.rodata .rodata.*);
-        KEEP(BUILD_DIR/asm/main/data/8B9B0.rodata.s.o(.rodata .rodata.*));
+        BUILD_DIR/src/main/main.c.o(.rodata .rodata.*);
         BUILD_DIR/src/main/bubble.c.o(.rodata .rodata.*);
         BUILD_DIR/src/main/world_object.c.o(.rodata .rodata.*);
         BUILD_DIR/src/main/file.c.o(.rodata .rodata.*);
@@ -137,7 +137,7 @@ SECTIONS
         main_RODATA_SIZE = ABSOLUTE(main_RODATA_END - main_RODATA_START);
 
         main_DATA_START = .;
-        KEEP(BUILD_DIR/asm/main/data/main.data.s.o(.data .data.*));
+        KEEP(BUILD_DIR/asm/main/data/8B9CC.data.s.o(.data .data.*));
         BUILD_DIR/src/main/file_table.c.o(.data .data.*);
         KEEP(BUILD_DIR/asm/main/data/9855C.data.s.o(.data .data.*));
         BUILD_DIR/src/main/font.c.o(.data .data.*);
@@ -164,12 +164,12 @@ SECTIONS
         BUILD_DIR/src/main/butterfly.c.o(.data .data.*);
         KEEP(BUILD_DIR/asm/main/data/A9A68.data.s.o(.data .data.*));
         BUILD_DIR/src/main/bubble.c.o(.data .data.*);
-        KEEP(BUILD_DIR/asm/main/data/AA8D4.data.s.o(.data .data.*));
+        BUILD_DIR/src/main/main.c.o(.data .data.*);
         main_DATA_END = .;
         main_DATA_SIZE = ABSOLUTE(main_DATA_END - main_DATA_START);
 
         main_SDATA_START = .;
-        KEEP(BUILD_DIR/asm/main/data/main.sdata.s.o(.sdata .sdata.*));
+        KEEP(BUILD_DIR/asm/main/data/ACE0C.sdata.s.o(.sdata .sdata.*));
         BUILD_DIR/src/main/file_table.c.o(.sdata .sdata.*);
         . = ALIGN(., 4);
         BUILD_DIR/src/main/font.c.o(.sdata .sdata.*);
@@ -214,7 +214,7 @@ SECTIONS
         . = ALIGN(., 4);
         BUILD_DIR/src/main/battle_ui.c.o(.sdata .sdata.*);
         . = ALIGN(., 4);
-        KEEP(BUILD_DIR/asm/main/data/AD900.sdata.s.o(.sdata .sdata.*));
+        BUILD_DIR/src/main/main.c.o(.sdata .sdata.*);
         BUILD_DIR/src/btl/battle_setup.c.o(.sdata .sdata.*);
         . = ALIGN(., 4);
         KEEP(BUILD_DIR/asm/main/data/AD924.sdata.s.o(.sdata .sdata.*));

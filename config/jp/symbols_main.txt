@@ -1,12 +1,15 @@
 KAR_start = 0x80053CAC;
 KAR_tick = 0x800547EC;
 BTL_battleMain = 0x8005CA7C;
+BTL_buffStats = 0x8005E934;
 BTL_healStatusEffect = 0x80060E70;
 BTL_drawCommandShout = 0x80063B0C;
 BTL_removeDeathCountdown = 0x80065C7C;
 STD_tickTamerTournament = 0x8006E4B4;
 STD_tickPartnerTournament = 0x8006E520;
 STD_tickNPCTournament = 0x8006E560;
+BTL_addItemParticles = 0x80079910;
+BTL_addBuffDiskEffect = 0x8007A758;
 DOOA_tick = 0x80085F34;
 DOOA_getSequenceState = 0x80086164;
 TRN_setupSpeedTraining = 0x8008D468;
