@@ -12,12 +12,12 @@ SECTIONS
 			KEEP(BUILD_DIR/asm/btl/data/model_3.rodata.s.o(.rodata .rodata.*));
 			KEEP(BUILD_DIR/asm/btl/data/header.rodata.s.o(.rodata .rodata.*));
 			BUILD_DIR/src/btl/battle_setup.c.o(.text .text.*);
-			KEEP(BUILD_DIR/asm/btl/5498.s.o(.text .text.*));
+			BUILD_DIR/src/btl/battle_main.c.o(.text .text.*);
 			BUILD_DIR/src/btl/command_shout.c.o(.text .text.*);
 			BUILD_DIR/src/btl/command_menu.c.o(.text .text.*);
 			BUILD_DIR/src/btl/battle_hud.c.o(.text .text.*);
 			KEEP(BUILD_DIR/asm/btl/15DD0.s.o(.text .text.*));
-			KEEP(BUILD_DIR/asm/btl/data/btl.data.s.o(.data .data.*));
+			BUILD_DIR/src/btl/battle_main.c.o(.rodata .rodata.*);
 			BUILD_DIR/src/btl/battle_setup.c.o(.rodata .rodata.*);
 			BUILD_DIR/src/btl/command_shout.c.o(.rodata .rodata.*);
 			BUILD_DIR/src/btl/command_menu.c.o(.rodata .rodata.*);

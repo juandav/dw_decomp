@@ -217,7 +217,7 @@ SECTIONS
         BUILD_DIR/src/main/main.c.o(.sdata .sdata.*);
         BUILD_DIR/src/btl/battle_setup.c.o(.sdata .sdata.*);
         . = ALIGN(., 4);
-        KEEP(BUILD_DIR/asm/main/data/AD924.sdata.s.o(.sdata .sdata.*));
+        BUILD_DIR/src/btl/battle_main.c.o(.sdata .sdata.*);
         BUILD_DIR/src/btl/command_shout.c.o(.sdata .sdata.*);
         . = ALIGN(., 4);
         BUILD_DIR/src/btl/battle_hud.c.o(.sdata .sdata.*);
