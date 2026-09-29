@@ -62,6 +62,6 @@ segments:
       - [0x40, c, evl]
       - [0x5730, .rodata, evl]
       - [0x5744, .data, evl]
-      - [0x5784, data]
+      - [0x5784, .data, evl_bss]
 
   - [0xA84C]

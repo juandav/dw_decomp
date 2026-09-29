@@ -112,7 +112,8 @@ ENDI_C_SRC := \
 
 $(eval $(call overlay,ENDI,endi))
 EVL_C_SRC := \
-	src/evl/evl.c
+	src/evl/evl.c \
+	src/evl/evl_bss.c
 
 $(eval $(call overlay,EVL,evl))
 FISH_C_SRC := \

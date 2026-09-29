@@ -106,7 +106,7 @@ SECTIONS
 			BUILD_DIR/src/evl/evl.c.o(.text .text.*);
 			BUILD_DIR/src/evl/evl.c.o(.rodata .rodata.*);
 			BUILD_DIR/src/evl/evl.c.o(.data .data.*);
-			KEEP(BUILD_DIR/asm/evl/data/5784.data.s.o(.data .data.*));
+			BUILD_DIR/src/evl/evl_bss.c.o(.data .data.*);
 			LONG(0);
 		}
 	}
