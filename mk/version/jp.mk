@@ -124,7 +124,8 @@ FISH_C_SRC := \
 
 $(eval $(call overlay,FISH,fish))
 KAR_C_SRC := \
-	src/kar/kar.c
+	src/kar/kar.c \
+	src/kar/kar_bss.c
 
 $(eval $(call overlay,KAR,kar))
 MOV_C_SRC := \

@@ -62,6 +62,6 @@ segments:
       - [0x40, c, kar]
       - [0x9728, .rodata, kar]
       - [0x9798, .data, kar]
-      - [0xA260, data]
+      - [0xA260, .data, kar_bss]
 
   - [0x126A8]
