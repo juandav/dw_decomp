@@ -25,6 +25,7 @@ options:
 
   symbol_addrs_path:
     - config/jp/symbols.txt
+    - config/jp/symbols_kar.txt
 
   undefined_funcs_auto_path: build/jp/psx/generated/undefined_funcs_auto_kar.txt
   undefined_syms_auto_path: build/jp/psx/generated/undefined_syms_auto_kar.txt
@@ -58,7 +59,9 @@ segments:
     align: 4
     subalign: 4
     subsegments:
-      - [0x40, asm, kar]
-      - [0x9728, data, kar]
+      - [0x40, c, kar]
+      - [0x9728, .rodata, kar]
+      - [0x9798, .data, kar]
+      - [0xA260, data]
 
   - [0x126A8]

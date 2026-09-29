@@ -132,8 +132,10 @@ SECTIONS
 			kar_START = .;
 
 			KEEP(BUILD_DIR/asm/kar/data/header.rodata.s.o(.rodata .rodata.*));
-			KEEP(BUILD_DIR/asm/kar/kar.s.o(.text .text.*));
-			KEEP(BUILD_DIR/asm/kar/data/kar.data.s.o(.data .data.*));
+			BUILD_DIR/src/kar/kar.c.o(.text .text.*);
+			BUILD_DIR/src/kar/kar.c.o(.rodata .rodata.*);
+			BUILD_DIR/src/kar/kar.c.o(.data .data.*);
+			KEEP(BUILD_DIR/asm/kar/data/A260.data.s.o(.data .data.*));
 			LONG(0);
 		}
 	}

@@ -13,7 +13,7 @@ MAIN_SBSS := \
 	$(GEN_DIR)/unk_0x8013E34C.sbss.s \
 	$(GEN_DIR)/unk_0x8013E37C.sbss.s \
 	$(GEN_DIR)/unk_0x8013E438.sbss.s \
-	$(GEN_DIR)/unk_0x8013E498.sbss.s \
+	$(GEN_DIR)/unk_0x8013E4D0.sbss.s \
 	$(GEN_DIR)/unk_0x8013E59C.sbss.s
 
 MAIN_BSS := \
@@ -123,6 +123,9 @@ FISH_C_SRC := \
 	src/fish/fish_model.c
 
 $(eval $(call overlay,FISH,fish))
+KAR_C_SRC := \
+	src/kar/kar.c
+
 $(eval $(call overlay,KAR,kar))
 MOV_C_SRC := \
 	src/mov/mov.c
