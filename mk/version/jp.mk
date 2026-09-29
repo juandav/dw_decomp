@@ -14,8 +14,7 @@ MAIN_SBSS := \
 	$(GEN_DIR)/unk_0x8013E37C.sbss.s \
 	$(GEN_DIR)/unk_0x8013E438.sbss.s \
 	$(GEN_DIR)/unk_0x8013E498.sbss.s \
-	$(GEN_DIR)/unk_0x8013E59C.sbss.s \
-	$(GEN_DIR)/unk_0x8013E5D4.sbss.s
+	$(GEN_DIR)/unk_0x8013E59C.sbss.s
 
 MAIN_BSS := \
 	$(GEN_DIR)/unk_0x8013E6A8.bss.s \
@@ -98,6 +97,7 @@ DOO2_C_SRC := \
 
 $(eval $(call overlay,DOO2,doo2))
 DOOA_C_SRC := \
+	src/dooa/dooa.c \
 	src/dooa/dooa_bss.c
 
 $(eval $(call overlay,DOOA,dooa))

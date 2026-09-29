@@ -63,8 +63,9 @@ SECTIONS
 			dooa_START = .;
 
 			KEEP(BUILD_DIR/asm/dooa/data/header.rodata.s.o(.rodata .rodata.*));
-			KEEP(BUILD_DIR/asm/dooa/dooa.s.o(.text .text.*));
-			KEEP(BUILD_DIR/asm/dooa/data/dooa.data.s.o(.data .data.*));
+			BUILD_DIR/src/dooa/dooa.c.o(.text .text.*);
+			BUILD_DIR/src/dooa/dooa.c.o(.rodata .rodata.*);
+			BUILD_DIR/src/dooa/dooa.c.o(.data .data.*);
 			BUILD_DIR/src/dooa/dooa_bss.c.o(.data .data.*);
 			LONG(0);
 		}

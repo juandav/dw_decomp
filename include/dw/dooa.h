@@ -15,7 +15,7 @@ typedef struct {
 } DooaFlash;
 
 typedef struct {
-	int32_t frame;
+	long frame;
 	Entity *entity;
 	int16_t phase;
 	int16_t phaseInitPending;

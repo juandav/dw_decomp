@@ -59,8 +59,8 @@ segments:
     align: 4
     subalign: 4
     subsegments:
-      - [0x40, asm, dooa]
-      - [0x6270, data, dooa]
+      - [0x40, c, dooa]
+      - [0x6270, .data, dooa]
       - [0x635C, .data, dooa_bss]
 
   - [0x9244]

@@ -30,7 +30,7 @@ subsegments:
   - [0x8013E59C, unk_0x8013E59C]
   - [0x8013E5B4, mov]
   - [0x8013E5C0, doo2]
-  - [0x8013E5D4, unk_0x8013E5D4]
+  - [0x8013E5D4, dooa]
   - [0x8013E61C, trn_hp]
   - [0x8013E622, trn_mp]
   - [0x8013E62E, trn_off]

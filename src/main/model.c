@@ -3444,8 +3444,8 @@ void uploadModelTexture(void *textureData, ModelComponent *component)
 	DrawSync(0);
 }
 
-uint8_t *loadMMDAsync(int32_t digimonType, int32_t entityType, uint8_t *buffer,
-                      EvoModelData *modelData, uint8_t *readComplete)
+int32_t loadMMDAsync(int32_t digimonType, int32_t entityType, int32_t buffer,
+                     EvoModelData *modelData, uint8_t *readComplete)
 {
 	ModelComponent *m;
 	char path[32];
@@ -3483,23 +3483,23 @@ uint8_t *loadMMDAsync(int32_t digimonType, int32_t entityType, uint8_t *buffer,
 	}
 	name = PTR_DIGIMON_FILE_NAMES[digimonType];
 	strcpy(tim, MAIN_D_8011D190);
-	align = (int32_t)buffer & 3;
+	align = buffer & 3;
 	if (align != 0) {
 		buffer += 4 - align;
 	}
-	readFileSectors(tim, buffer, digimonType * 9, 9);
-	modelData->imagePtr = buffer;
+	readFileSectors(tim, (void *)buffer, digimonType * 9, 9);
+	modelData->imagePtr = (uint8_t *)buffer;
 	modelData->imageSize = 0x4800;
 	buffer += modelData->imageSize;
 	concatStrings(path, MAIN_D_8011D484, name);
 	concatStrings(path, path, MAIN_D_801340E4);
 	path[9] = digimonType / 30 + '0';
-	align = (int32_t)buffer & 3;
+	align = buffer & 3;
 	if (align != 0) {
 		buffer += 4 - align;
 	}
-	addFileReadRequestPath(path, buffer, readComplete, 0, 0);
-	modelData->modelPtr = buffer;
+	addFileReadRequestPath(path, (uint8_t *)buffer, readComplete, 0, 0);
+	modelData->modelPtr = (uint8_t *)buffer;
 	modelData->modelSize = lookupFileSize(path);
 	buffer += modelData->modelSize;
 	return buffer;

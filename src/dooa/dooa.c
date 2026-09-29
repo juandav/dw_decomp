@@ -27,7 +27,7 @@
 #include <dw/utils.h>
 #include <dw/world_object.h>
 
-#define DOOA_MMD_BUFFER		((uint8_t *)0x80020000)
+#define DOOA_MMD_BUFFER		0x80020000
 #define DOOA_SHARD_BUFFER	0x80044800
 #define DOOA_SHARD_BUFFER_SIZE	0x5dc0
 #define DOOA_ORDERING_TABLE_0	((GsOT_TAG *)0x8008c000)
@@ -99,13 +99,13 @@ extern int8_t CAMERA_REACHED_TARGET;
 extern int32_t FLASH_INSTANCE;
 
 void DOOA_renderDigimonModel(Entity *entity, uint32_t otPoint);
-int32_t DOOA_renderIrisWindow(Entity *entity, int32_t startFrame, int32_t endFrame, int32_t frame);
+int32_t DOOA_renderIrisWindow(Entity *entity, int32_t startFrame, long endFrame, long frame);
 void DOOA_renderDissolve(int32_t instanceId);
 int32_t getDistance(int32_t x, int32_t y, int32_t z);
-int32_t lerp(int32_t start, int32_t end, int32_t t0, int32_t t1, int32_t t);
+int32_t lerp(long start, long end, int32_t t0, long t1, int32_t t);
 int32_t worldPosToScreenPos(SVECTOR *pos, DVECTOR *out);
-int32_t DOOA_hasIrisClosed(Entity *entity, int32_t startFrame, int32_t endFrame, int32_t frame);
-void DOOA_saveShardClut(u_long *pixels);
+int32_t DOOA_hasIrisClosed(Entity *entity, int32_t startFrame, long endFrame, long frame);
+void DOOA_saveShardClut(int32_t buffer);
 void DOOA_setOtherEntitiesVisible(int32_t restore);
 void DOOA_hideAllButPartner(void);
 void DOOA_getOrbitPosition(VECTOR *outRef, VECTOR *outPos, VECTOR *position, SVECTOR *rotation, int32_t distance, int32_t height);
@@ -122,19 +122,19 @@ int32_t MAIN_func_800DA9F4(void);
 int32_t DOOA_updateShards(int32_t instanceId);
 int32_t DOOA_renderShards(int32_t instanceId);
 int32_t DOOA_initShardEffect(Entity *entity, intptr_t addr, int32_t size);
-void DOOA_saveEntityClut(u_long *pixels, Entity *entity);
-void DOOA_saveModelClut(u_long *pixels);
+void DOOA_saveEntityClut(int32_t buffer, Entity *entity);
+void DOOA_saveModelClut(int32_t buffer);
 void renderDropShadow(Entity *entity);
 void createFlash(void);
 void setMapLayerEnabled(int32_t enabled);
 void DOOA_tickRebirth(int32_t instanceId);
 void calculateBoneMatrix(Entity *entity, int32_t boneId, MATRIX *out);
-void DOOA_spawnBoneShards(DooaShardEffect *effect, int32_t boneIndex, int32_t wireIndex);
+void DOOA_spawnBoneShards(DooaShardEffect *effect, int32_t boneIndex, long wireIndex);
 char *initializeFlashData(char *base);
 void MAIN_func_800D91EC(int32_t messageId, int32_t flag);
 void DOOA_tickDissolve(int32_t instanceId);
 void DOOA_initOrderingTable(void);
-void DOOA_spawnShardWave(int32_t wireIndex);
+void DOOA_spawnShardWave(long wireIndex);
 void MAIN_func_80092B60(POLY_FT4 *prim);
 void addScreenPolyFT3(void *prim, SVECTOR *v0, SVECTOR *v1, SVECTOR *v2);
 int32_t add3DSpritePrim(POLY_FT4 *poly, SVECTOR *v0, SVECTOR *v1, SVECTOR *v2, SVECTOR *v3);
@@ -145,7 +145,7 @@ void MAIN_func_800D9248(void);
 void MAIN_func_800D9B60(int16_t *clut);
 void MAIN_func_800D9BA8(int32_t alpha, int16_t *clut, int32_t mode);
 void MAIN_func_800DA9C8(void);
-void renderParticleFlash(int16_t *params);
+void renderParticleFlash(ParticleFlashData *params);
 
 static void *dooa_functions[] = {
 	DOOA_getSequenceState,
@@ -259,25 +259,29 @@ GARBAGE(DOOA_tickDissolve, 10);
 
 void DOOA_tickDissolve(int32_t instanceId)
 {
+#ifdef __MWERKS__
+	extern void setEntityPosition(int32_t entityId, long x, long y, long z);
+#endif
+	int32_t index;
 	GsRVIEW2 savedView;
-	ShardWaveSchedule wireCounts;
-	DissolveScaleCurve heights;
-	VECTOR startColor;
-	VECTOR endColor;
-	GsIMAGE timInfo;
-	RECT rect;
 	int32_t savedOffsetX;
 	int32_t savedOffsetY;
 	int32_t savedDistance;
-	int16_t height;
-
-	int32_t work;
-	int32_t flashOffset;
-	int32_t wireCount;
-	DooaFlash *flash;
+	ShardWaveSchedule wireCounts;
 	DooaFlash *target;
-	Entity *entity;
+	DissolveScaleCurve heights;
+	DooaFlash *landing;
+	DooaFlash *flash;
+	VECTOR startColor;
+	VECTOR endColor;
+	u_long *tim;
+	u_long *file;
+	GsIMAGE timInfo;
+	RECT rect;
+	VECTOR cameraTarget;
 	DooaSequence *seq;
+	Entity *entity;
+	long work;
 
 	seq = &DOOA_REINCARNATION_SEQ;
 	entity = seq->entity;
@@ -320,9 +324,9 @@ void DOOA_tickDissolve(int32_t instanceId)
 			tickFileReadQueue(0);
 		}
 		DOOA_initShardEffect(entity, DOOA_SHARD_BUFFER, DOOA_SHARD_BUFFER_SIZE);
-		DOOA_saveEntityClut((u_long *)DOOA_SAVED_ENTITY_CLUT, entity);
-		DOOA_saveModelClut((u_long *)DOOA_MODEL_CLUT);
-		DOOA_saveShardClut((u_long *)DOOA_SHARD_CLUT);
+		DOOA_saveEntityClut((int32_t)DOOA_SAVED_ENTITY_CLUT, entity);
+		DOOA_saveModelClut((int32_t)DOOA_MODEL_CLUT);
+		DOOA_saveShardClut((int32_t)DOOA_SHARD_CLUT);
 		MAIN_D_80135348 = DRAWING_OFFSET_X;
 		MAIN_D_8013534C = DRAWING_OFFSET_Y;
 		DOOA_SAVED_VIEW = GS_VIEWPOINT;
@@ -360,8 +364,7 @@ void DOOA_tickDissolve(int32_t instanceId)
 		break;
 	case 1:
 		entity->isOnMap = 2;
-		work = seq->frame;
-		if (work >= 0x56) {
+		if (seq->frame >= 0x56) {
 			seq->phase = 2;
 			seq->phaseInitPending = 1;
 			DOOA_CAMERA_START_VIEW = DOOA_SAVED_VIEW;
@@ -379,7 +382,7 @@ void DOOA_tickDissolve(int32_t instanceId)
 			GsSetRefView2(&GS_VIEWPOINT);
 			GsSetProjection(VIEWPORT_DISTANCE);
 		} else {
-			DOOA_updateCutsceneCamera(&entity->posData->location, entity->posData->rotation.vy, 0x23, 0x55, work);
+			DOOA_updateCutsceneCamera(&entity->posData->location, entity->posData->rotation.vy, 0x23, 0x55, seq->frame);
 			GsSetRefView2(&GS_VIEWPOINT);
 			GsSetProjection(VIEWPORT_DISTANCE);
 		}
@@ -405,13 +408,11 @@ void DOOA_tickDissolve(int32_t instanceId)
 			break;
 		}
 		wireCounts = DOOA_SHARD_WAVE_SCHEDULE;
-		work = seq->frame;
-		if (work < 0x8d) {
-			work -= 0x69;
-			PARTNER_WIREFRAME_TOTAL = (wireCounts.v + work)[0];
-			wireCount = (wireCounts.v + work)[0];
-			if ((work == 0) || ((wireCounts.v + work)[-1] != wireCount)) {
-				DOOA_spawnShardWave(wireCount);
+		if (seq->frame < 0x8d) {
+			work = seq->frame - 0x69;
+			PARTNER_WIREFRAME_TOTAL = wireCounts.v[work];
+			if ((work == 0) || (wireCounts.v[work - 1] != wireCounts.v[work])) {
+				DOOA_spawnShardWave(wireCounts.v[work]);
 			}
 		}
 		if (seq->frame >= 0xbf) {
@@ -427,20 +428,20 @@ void DOOA_tickDissolve(int32_t instanceId)
 		break;
 	case 0x64:
 		heights = DOOA_DISSOLVE_SCALE_CURVE;
-		work = lerp(0, 0x1f, 0xbf, 0xd0, seq->frame);
-		work = height = heights.v[work];
-		work = ((((work - 100) * 200) / 100) + 100);
+		index = lerp(0, 0x1f, 0xbf, 0xd0, seq->frame);
+		work = (((heights.v[index] - 100) * 200) / 100) + 100;
 		entity->posData->scale.vy = (work << 12) / 100;
 		entity->posData->scale.vx = ((10000 / work) << 12) / 100;
 		entity->posData->scale.vx = lerp(entity->posData->scale.vx, entity->posData->scale.vx * 50 / 100, 0xbf, 0xd0, seq->frame);
 		entity->posData->scale.vz = entity->posData->scale.vx;
-		if (height >= 0x12d) {
-			work = height;
+		if (heights.v[index] >= 0x12d) {
+			work = heights.v[index];
 			work = 0x12c - (work - 0x12c);
 			work = ((((work - 100) * 200) / 100) + 100);
 			entity->posData->scale.vy = (work << 12) / 100;
+			landing = &seq->flash;
 			ENTITY_TABLE[1]->anim.animFlag &= 0xfe;
-			entity->posData->location.vy = lerp(entity->posData->location.vy, seq->flash.targetY, seq->frame - 1, seq->frame, seq->frame);
+			entity->posData->location.vy = lerp(entity->posData->location.vy, landing->targetY, seq->frame - 1, seq->frame, seq->frame);
 			setEntityPosition(1, entity->posData->location.vx, entity->posData->location.vy, entity->posData->location.vz);
 			setupEntityMatrix(1);
 		}
@@ -474,9 +475,9 @@ void DOOA_tickDissolve(int32_t instanceId)
 		EFE_PUSH1(VECTOR *, &startColor);
 		EFE_PUSH1(VECTOR *, &endColor);
 		createFlash();
-		flashOffset = _sin(lerp(0, 0x600, 0xd1, 0x135, seq->frame));
-		flashOffset = flashOffset * 10 / 4096;
-		setEFEFlashOffset(FLASH_INSTANCE, flashOffset, 0);
+		work = lerp(0, 0x600, 0xd1, 0x135, seq->frame);
+		work = _sin(work) * 10 / 4096;
+		setEFEFlashOffset(FLASH_INSTANCE, work, 0);
 		if (seq->frame >= 0x135) {
 			seq->phase = 3;
 			DOOA_toggleShardFlicker();
@@ -490,7 +491,8 @@ void DOOA_tickDissolve(int32_t instanceId)
 				tickFileReadQueue(0);
 			}
 			readFile(DOOA_EGG_TIM_PATH, DOO2_D_80071EE4);
-			GsGetTimInfo(&DOO2_D_80071EE4[1], &timInfo);
+			file = tim = DOO2_D_80071EE4;
+			GsGetTimInfo(tim + 1, &timInfo);
 			setRECT(&rect, timInfo.px, timInfo.py, timInfo.pw, timInfo.ph);
 			LoadImage(&rect, timInfo.pixel);
 			GetTPage(timInfo.pmode & 3, 0, timInfo.px, timInfo.py);
@@ -504,23 +506,24 @@ void DOOA_tickDissolve(int32_t instanceId)
 			GsMapModelingData((unsigned long *)DOO2_D_80071EE4 + 1);
 			DOO2_saveModelClut((u_long)DOO2_D_80071BE0);
 		}
-		work = 0x2c4;
-		work -= seq->frame;
+		work = 0x2c4 - seq->frame;
 		DOOA_updateCutsceneCamera(&entity->posData->location, entity->posData->rotation.vy, 0x149, 0x17b, work);
 		break;
 	case 0x66:
 		if ((seq->frame >= 0x185) && (seq->frame < 0x1b8)) {
 			ENTITY_TABLE[2]->isOnMap = 1;
-			DOO2_fadeClut((int16_t *)DOO2_D_80071BE0, entity, DOOA_FADED_CLUT, 0, 0xff, lerp(0xff, 0, 0x185, 0x1b7, seq->frame));
+			work = lerp(0xff, 0, 0x185, 0x1b7, seq->frame);
+			DOO2_fadeClut((int16_t *)DOO2_D_80071BE0, entity, DOOA_FADED_CLUT, 0, 0xff, work);
 		}
 		if (seq->frame >= 0x1b7) {
 			seq->phase = 4;
 		}
 		break;
 	case 4:
+		cameraTarget = DOOA_CAMERA_TARGET_RESET;
 		DRAWING_OFFSET_X = MAIN_D_80135348;
 		DRAWING_OFFSET_Y = MAIN_D_8013534C;
-		CAMERA_TARGET = DOOA_CAMERA_TARGET_RESET;
+		CAMERA_TARGET = cameraTarget;
 		tickCameraMovement(1);
 		CAMERA_REACHED_TARGET = -1;
 		removeObject(0x80b, instanceId);
@@ -532,8 +535,11 @@ void DOOA_tickDissolve(int32_t instanceId)
 
 void DOOA_renderDissolve(int32_t instanceId)
 {
-	DooaSequence *seq = &DOOA_REINCARNATION_SEQ;
+	DooaSequence *seq;
+	Entity *entity;
 
+	seq = &DOOA_REINCARNATION_SEQ;
+	entity = seq->entity;
 	if (seq->frame < 36) {
 		if (ENTITY_TABLE[1]->isOnMap == 0) {
 			DOOA_renderDigimonModel(seq->entity, 0x21);
@@ -550,13 +556,16 @@ void DOOA_initOrderingTable(void)
 	DOOA_ORDERING_TABLE[1].org = DOOA_ORDERING_TABLE_1;
 }
 
-int32_t DOOA_hasIrisClosed(Entity *entity, int32_t startFrame, int32_t endFrame, int32_t frame)
+int32_t DOOA_hasIrisClosed(Entity *entity, int32_t startFrame, long endFrame, long frame)
 {
 	SVECTOR worldPos;
-	DVECTOR screenPos;
 	int32_t size;
+	int32_t projected;
 	int32_t radius;
+	DVECTOR screenPos;
+	int32_t layer;
 	int32_t depth;
+	int32_t result;
 
 	if (endFrame < frame) {
 		frame = endFrame;
@@ -570,21 +579,25 @@ int32_t DOOA_hasIrisClosed(Entity *entity, int32_t startFrame, int32_t endFrame,
 	if (depth <= 0) {
 		return 1;
 	}
-	if (((int32_t)(((uint32_t)(size * VIEWPORT_DISTANCE) / depth) << 12) / 256) >= radius) {
-		return 1;
+	projected = (uint32_t)(size * VIEWPORT_DISTANCE) / depth;
+	if (radius <= ((projected << 12) / 256)) {
+		layer = 0xfa0;
+		result = 1;
+	} else {
+		layer = 0x21;
+		result = 0;
 	}
 
-	return 0;
+	return result;
 }
 
 int32_t DOOA_initShardEffect(Entity *entity, intptr_t addr, int32_t size)
 {
 	DooaShardEffect *effect = &DOOA_SHARD_EFFECT;
-	int32_t rem = addr & 3;
 
-	if (rem != 0) {
-		size -= 4 - rem;
-		addr += 4 - rem;
+	if ((addr & 3) != 0) {
+		size -= 4 - (addr & 3L);
+		addr += 4 - (addr & 3L);
 	}
 
 	effect->state = 0;
@@ -602,32 +615,34 @@ int32_t DOOA_initShardEffect(Entity *entity, intptr_t addr, int32_t size)
 	return addr + size;
 }
 
-void DOOA_saveEntityClut(u_long *pixels, Entity *entity)
+void DOOA_saveEntityClut(int32_t buffer, Entity *entity)
 {
 	ModelComponent *model;
+	TMDModel *tmd;
 	RECT rect;
 
 	model = getEntityModelComponent(entity->type, getEntityType(entity));
+	tmd = model->modelPtr;
 	setRECT(&rect, (model->clutPage & 0x3f) << 4, model->clutPage >> 6, 16, 24);
-	StoreImage(&rect, pixels);
+	StoreImage(&rect, (u_long *)buffer);
 	DrawSync(0);
 }
 
-void DOOA_saveModelClut(u_long *pixels)
+void DOOA_saveModelClut(int32_t buffer)
 {
 	RECT rect;
 
 	setRECT(&rect, 0, 488, 16, 24);
-	StoreImage(&rect, pixels);
+	StoreImage(&rect, (u_long *)buffer);
 	DrawSync(0);
 }
 
-void DOOA_saveShardClut(u_long *pixels)
+void DOOA_saveShardClut(int32_t buffer)
 {
 	RECT rect;
 
 	setRECT(&rect, 48, 488, 32, 24);
-	StoreImage(&rect, pixels);
+	StoreImage(&rect, (u_long *)buffer);
 	DrawSync(0);
 }
 
@@ -671,21 +686,28 @@ void DOOA_updateCutsceneCamera(VECTOR *position, int32_t angle, int32_t startFra
 {
 	VECTOR viewRef;
 	VECTOR viewPos;
+	int32_t offsetY;
+	int32_t start;
+	int32_t height;
+	DooaSequence *seq;
 	SVECTOR worldPos;
 	DVECTOR screenPos;
 	SVECTOR rotation;
-	int32_t midFrame;
-	int32_t height;
-	int32_t offsetY;
+	int32_t distance;
+	int32_t mid;
+	int32_t end;
 
-	midFrame = (startFrame + endFrame) / 2;
-	height = DIGIMON_DATA[DOOA_REINCARNATION_SEQ.entity->type].height;
+	start = startFrame;
+	mid = (startFrame + endFrame) / 2;
+	end = endFrame;
+	seq = &DOOA_REINCARNATION_SEQ;
+	height = DIGIMON_DATA[seq->entity->type].height;
 
 	if ((frame < startFrame) || (frame > endFrame)) {
 		return;
 	}
 
-	if ((frame < startFrame) || (frame > endFrame)) {
+	if ((frame < start) || (frame > end)) {
 		return;
 	}
 
@@ -695,26 +717,27 @@ void DOOA_updateCutsceneCamera(VECTOR *position, int32_t angle, int32_t startFra
 	rotation = MAIN_D_80134BB4;
 	rotation.vy = angle + 0x638;
 
-	DOOA_getOrbitPosition(&viewRef, &viewPos, position, &rotation, (height * 5) + 1200, height);
+	distance = (height * 5) + 1200;
+	DOOA_getOrbitPosition(&viewRef, &viewPos, position, &rotation, distance, height);
 
-	if (frame <= midFrame) {
-		GS_VIEWPOINT.vrx = lerp(DOOA_CAMERA_START_VIEW.vrx, viewRef.vx, startFrame, midFrame, frame);
-		GS_VIEWPOINT.vry = lerp(DOOA_CAMERA_START_VIEW.vry, viewRef.vy, startFrame, midFrame, frame);
-		GS_VIEWPOINT.vrz = lerp(DOOA_CAMERA_START_VIEW.vrz, viewRef.vz, startFrame, midFrame, frame);
+	if (frame <= mid) {
+		GS_VIEWPOINT.vrx = lerp(DOOA_CAMERA_START_VIEW.vrx, viewRef.vx, start, mid, frame);
+		GS_VIEWPOINT.vry = lerp(DOOA_CAMERA_START_VIEW.vry, viewRef.vy, start, mid, frame);
+		GS_VIEWPOINT.vrz = lerp(DOOA_CAMERA_START_VIEW.vrz, viewRef.vz, start, mid, frame);
 		GS_VIEWPOINT.rz = 0;
-		DRAWING_OFFSET_X = lerp(MAIN_D_8013532C, 160, startFrame, midFrame, frame);
-		DRAWING_OFFSET_Y = lerp(MAIN_D_80135330, 120, startFrame, midFrame, frame);
+		DRAWING_OFFSET_X = lerp(MAIN_D_8013532C, 160, start, mid, frame);
+		DRAWING_OFFSET_Y = lerp(MAIN_D_80135330, 120, start, mid, frame);
 		GS_VIEWPOINT.vpx = DOOA_CAMERA_START_VIEW.vpx;
 		GS_VIEWPOINT.vpy = DOOA_CAMERA_START_VIEW.vpy;
 		GS_VIEWPOINT.vpz = DOOA_CAMERA_START_VIEW.vpz;
 		VIEWPORT_DISTANCE = MAIN_D_80135334;
-	} else if (frame <= endFrame) {
-		GS_VIEWPOINT.vpx = lerp(DOOA_CAMERA_START_VIEW.vpx, viewPos.vx, midFrame, endFrame, frame);
-		GS_VIEWPOINT.vpy = lerp(DOOA_CAMERA_START_VIEW.vpy, viewPos.vy, midFrame, endFrame, frame);
-		GS_VIEWPOINT.vpz = lerp(DOOA_CAMERA_START_VIEW.vpz, viewPos.vz, midFrame, endFrame, frame);
+	} else if (frame <= end) {
+		GS_VIEWPOINT.vpx = lerp(DOOA_CAMERA_START_VIEW.vpx, viewPos.vx, mid, end, frame);
+		GS_VIEWPOINT.vpy = lerp(DOOA_CAMERA_START_VIEW.vpy, viewPos.vy, mid, end, frame);
+		GS_VIEWPOINT.vpz = lerp(DOOA_CAMERA_START_VIEW.vpz, viewPos.vz, mid, end, frame);
 		offsetY = lerp(0, 20, 0, 200, height);
-		DRAWING_OFFSET_Y = lerp(120, offsetY + 120, midFrame, endFrame, frame);
-		VIEWPORT_DISTANCE = lerp(MAIN_D_80135334, 1000, midFrame, endFrame, frame);
+		DRAWING_OFFSET_Y = lerp(120, offsetY + 120, mid, end, frame);
+		VIEWPORT_DISTANCE = lerp(MAIN_D_80135334, 1000, mid, end, frame);
 		GS_VIEWPOINT.vrx = viewRef.vx;
 		GS_VIEWPOINT.vry = viewRef.vy;
 		GS_VIEWPOINT.vrz = viewRef.vz;
@@ -722,14 +745,14 @@ void DOOA_updateCutsceneCamera(VECTOR *position, int32_t angle, int32_t startFra
 	}
 }
 
-void DOOA_spawnShardWave(int32_t wireIndex)
+void DOOA_spawnShardWave(long wireIndex)
 {
 	DooaShardEffect *effect;
 	Entity *entity;
 	int32_t boneIndex;
 
 	effect = &DOOA_SHARD_EFFECT;
-	entity = DOOA_SHARD_EFFECT.entity;
+	entity = effect->entity;
 
 	for (boneIndex = 2; boneIndex < DIGIMON_DATA[entity->type].boneCount; boneIndex++) {
 		DOOA_spawnBoneShards(effect, boneIndex, wireIndex);
@@ -738,16 +761,23 @@ void DOOA_spawnShardWave(int32_t wireIndex)
 
 void DOOA_toggleShardFlicker(void)
 {
-	DOOA_SHARD_EFFECT.flash = (DOOA_SHARD_EFFECT.flash + 1) & 1;
+	DooaShardEffect *effect;
+
+	effect = &DOOA_SHARD_EFFECT;
+	effect->flash = (effect->flash + 1) & 1;
 }
 
 void DOOA_renderDigimonModel(Entity *entity, uint32_t otPoint)
 {
 	MATRIX lightMatrix;
-	PositionData *posData;
-	int32_t boneCount;
-	int32_t entityIndex;
+	VECTOR location;
+	SVECTOR rotation;
+	int32_t type;
 	int32_t i;
+	int32_t boneCount;
+	uint8_t animId;
+	PositionData *posData;
+	int32_t entityIndex;
 
 	for (entityIndex = 0; entityIndex < ENTITY_MAX; entityIndex++) {
 		if (ENTITY_TABLE[entityIndex] == entity) {
@@ -762,8 +792,12 @@ void DOOA_renderDigimonModel(Entity *entity, uint32_t otPoint)
 	GsClearOt(0, 2, &DOOA_ORDERING_TABLE[ACTIVE_FRAMEBUFFER]);
 	DOOA_ORDERING_TABLE[ACTIVE_FRAMEBUFFER].point = otPoint;
 
-	boneCount = DIGIMON_DATA[entity->type].boneCount;
+	type = entity->type;
+	animId = entity->anim.animId;
 	posData = entity->posData;
+	boneCount = DIGIMON_DATA[type].boneCount;
+	location = posData->location;
+	rotation = posData->rotation;
 	lightMatrix = GsWSMATRIX;
 
 	for (i = 0; i < boneCount; i++) {
@@ -781,155 +815,163 @@ void DOOA_renderDigimonModel(Entity *entity, uint32_t otPoint)
 	renderDropShadow(entity);
 }
 
-int32_t DOOA_renderIrisWindow(Entity *entity, int32_t startFrame, int32_t endFrame, int32_t frame)
+int32_t DOOA_renderIrisWindow(Entity *entity, int32_t startFrame, long endFrame, long frame)
 {
-	int32_t isVisible;
-	int32_t boxBottom;
-	int32_t rightEdge;
-	int32_t bottomEdge;
-	SVECTOR worldPos;
-	DVECTOR screenPos;
-	int16_t flash[14];
-	POLY_FT4 *prim;
-	int32_t modelSize;
-	int32_t depth;
+	SVECTOR pos;
 	int32_t size;
+	int32_t projected;
+	int32_t radius;
+	DVECTOR screen;
+	int32_t z;
+	int32_t layer;
+	int32_t visible;
+	ParticleFlashData flash;
+	POLY_FT4 *prim;
+	int32_t left;
+	int32_t top;
+	int32_t bottom;
+	int32_t sl;
+	int32_t sr;
+	int32_t st;
+	int32_t sb;
+	int32_t scale;
 	int32_t thickness;
-	int32_t boxTop;
-	int32_t boxRight;
-	int32_t leftEdge;
-	int32_t topEdge;
-	int32_t screenX;
-	int32_t leftX;
-	int32_t leftY;
-	int32_t leftW;
-	int32_t rightX;
-	int32_t rightY;
-	int32_t rightW;
-	int32_t topY;
-	int32_t topW;
-	int32_t topH;
-	int32_t bottomY;
-	int32_t bottomW;
+	int32_t lx;
+	int32_t ly;
+	int32_t lw;
+	int32_t lh;
+	int32_t rx;
+	int32_t ry;
+	int32_t rw;
+	int32_t rh;
+	int32_t tx;
+	int32_t ty;
+	int32_t tw;
+	int32_t th;
+	int32_t bx;
+	int32_t by;
+	int32_t bw;
+	int32_t bh;
+	int32_t right;
 
 	if (endFrame < frame) {
 		frame = endFrame;
 	}
 
-	worldPos.vx = entity->posData->location.vx;
-	worldPos.vy = entity->posData->location.vy - (DIGIMON_DATA[entity->type].height / 2);
-	worldPos.vz = entity->posData->location.vz;
-
-	modelSize = getDistance(DIGIMON_DATA[entity->type].radius * 2, DIGIMON_DATA[entity->type].height, DIGIMON_DATA[entity->type].radius * 2);
-
-	size = (lerp(200, 0, startFrame, endFrame, frame) << 12) / 128;
-
-	depth = worldPosToScreenPos(&worldPos, &screenPos);
-	if (depth <= 0) {
+	pos.vx = entity->posData->location.vx;
+	pos.vy = entity->posData->location.vy - (DIGIMON_DATA[entity->type].height / 2);
+	pos.vz = entity->posData->location.vz;
+	size = getDistance(DIGIMON_DATA[entity->type].radius * 2, DIGIMON_DATA[entity->type].height, DIGIMON_DATA[entity->type].radius * 2);
+	radius = (lerp(200, 0, startFrame, endFrame, frame) << 12) / 128;
+	z = worldPosToScreenPos(&pos, &screen);
+	if (z <= 0) {
 		return 1;
 	}
 
-	if ((((int32_t)((uint32_t)(modelSize * VIEWPORT_DISTANCE) / depth) << 12) / 256) >= size) {
-		isVisible = 1;
+	projected = (uint32_t)(size * VIEWPORT_DISTANCE) / (uint32_t)z;
+	if (radius <= (projected << 12) / 256) {
+		layer = 0xfa0;
+		visible = 1;
 	} else {
-		isVisible = 0;
+		layer = 0x21;
+		visible = 0;
 	}
 
-	flash[0] = screenPos.vx;
-	flash[1] = screenPos.vy;
-	flash[6] = flash[7] = 0x40;
-	flash[8] = 0xdd;
-	((uint8_t *)flash)[0x12] = 0;
-	((uint8_t *)flash)[0x13] = 0x80;
-	flash[10] = 0x79c0;
-	((uint8_t *)flash)[0x16] = 0x80;
-	((uint8_t *)flash)[0x17] = 0x80;
-	((uint8_t *)flash)[0x18] = 0x80;
-	((uint8_t *)flash)[0x19] = 0x80;
-	*(int32_t *)&flash[4] = size;
-	flash[2] = 0x22;
-	renderParticleFlash(flash);
-
+	layer = 0x22;
+	flash.screenPos.vx = screen.vx;
+	flash.screenPos.vy = screen.vy;
+	flash.sizeX = flash.sizeY = 0x40;
+	flash.tpage = getTPage(1, 2, 832, 256);
+	flash.uBase = 0;
+	flash.vBase = 0x80;
+	flash.clut = getClut(0, 487);
+	flash.color.r = 0x80;
+	flash.color.g = 0x80;
+	flash.color.b = 0x80;
+	flash.colorScale = 0x80;
+	flash.scale = radius;
+	flash.depth = layer;
+	renderParticleFlash(&flash);
 	prim = (POLY_FT4 *)GsGetWorkBase();
+	scale = radius;
+	right = (scale << 8) / 4096;
+	left = screen.vx - right;
+	top = screen.vy - right;
+	bottom = screen.vy + right;
+	right = right + ((DVECTOR *)&screen)->vx;
+	sl = left - (0xa0 - DRAWING_OFFSET_X);
+	sr = right - (0xa0 - DRAWING_OFFSET_X);
+	st = top - (0x78 - DRAWING_OFFSET_Y);
+	sb = bottom - (0x78 - DRAWING_OFFSET_Y);
+	thickness = lerp(4, 1, 0x1860, 0, radius);
 
-	/* startFrame reused as iris radius, endFrame as box left edge */
-	startFrame = (size << 8) / 4096;
-	screenX = screenPos.vx;
-	boxTop = screenPos.vy - startFrame;
-	endFrame = screenX - startFrame;
-	boxBottom = screenPos.vy + startFrame;
-	boxRight = startFrame + screenX;
-
-	leftEdge = endFrame - (160 - DRAWING_OFFSET_X);
-	rightEdge = boxRight - (160 - DRAWING_OFFSET_X);
-	topEdge = boxTop - (120 - DRAWING_OFFSET_Y);
-	bottomEdge = boxBottom - (120 - DRAWING_OFFSET_Y);
-
-	thickness = lerp(4, 1, 0x1860, 0, size);
-
-	leftX = endFrame - (leftEdge + 160);
-	leftY = boxTop - ((int32_t)topEdge + 120);
-	leftW = (leftEdge + 160) + thickness;
-	if (leftW > 0) {
+	lx = left - (sl + 0xa0);
+	ly = top - (st + 0x78);
+	lw = (sl + 0xa0) + thickness;
+	if (lw > 0) {
+		lh = 0xf0;
 		SetPolyFT4(prim);
 		SetSemiTrans(prim, 2);
 		prim->r0 = prim->g0 = prim->b0 = 0x80;
 		prim->tpage = getTPage(1, 2, 832, 256);
 		prim->clut = getClut(0, 487);
 		setUVWH(prim, 0, 0x80, 3, 3);
-		setXYWH(prim, leftX, leftY, leftW, 240);
-		AddPrim(ACTIVE_ORDERING_TABLE->org + 0x22, prim++);
+		setXYWH(prim, lx, ly, lw, lh);
+		AddPrim(ACTIVE_ORDERING_TABLE->org + layer, prim++);
 	}
 
-	rightY = boxTop - ((long)topEdge + 120);
-	rightX = boxRight - thickness;
-	rightW = (160 - rightEdge) + thickness;
-	if (rightW > 0) {
+	rx = right - thickness;
+	ry = top - (st + 0x78L);
+	rw = (0xa0 - sr) + thickness;
+	if (rw > 0) {
+		rh = 0xf0;
 		SetPolyFT4(prim);
 		prim->r0 = prim->g0 = prim->b0 = 0x80;
 		SetSemiTrans(prim, 2);
 		prim->tpage = getTPage(1, 2, 832, 256);
 		prim->clut = getClut(0, 487);
 		setUVWH(prim, 0, 0x80, 3, 3);
-		setXYWH(prim, rightX, rightY, rightW, 240);
-		AddPrim(ACTIVE_ORDERING_TABLE->org + 0x22, prim++);
+		setXYWH(prim, rx, ry, rw, rh);
+		AddPrim(ACTIVE_ORDERING_TABLE->org + layer, prim++);
 	}
 
-	topY = boxTop - (topEdge + 120);
-	topW = boxRight - endFrame;
-	if (topW > 0) {
-		topH = (topEdge + 120) + thickness;
-		if (topH > 0) {
+	tx = left;
+	ty = top - ((int32_t)st + 0x78);
+	tw = right - left;
+	if (tw > 0) {
+		th = ((int32_t)st + 0x78) + thickness;
+		if (th > 0) {
 			SetPolyFT4(prim);
 			prim->r0 = prim->g0 = prim->b0 = 0x80;
 			SetSemiTrans(prim, 2);
 			prim->tpage = getTPage(1, 2, 832, 256);
 			prim->clut = getClut(0, 487);
 			setUVWH(prim, 0, 0x80, 3, 3);
-			setXYWH(prim, endFrame, topY, topW, topH);
-			AddPrim(ACTIVE_ORDERING_TABLE->org + 0x22, prim++);
+			setXYWH(prim, tx, ty, tw, th);
+			AddPrim(ACTIVE_ORDERING_TABLE->org + layer, prim++);
 		}
 	}
 
-	bottomW = (long)boxRight - endFrame;
-	bottomY = boxBottom - thickness;
-	if (bottomW > 0) {
-		/* boxRight reused as bottom bar height */
-		boxRight = (120 - bottomEdge) + thickness;
-		if (boxRight > 0) {
+	bx = left;
+	by = bottom - thickness;
+	bw = (int32_t)right - left;
+	if (bw > 0) {
+		bh = (0x78 - sb) + thickness;
+		if (bh > 0) {
 			SetPolyFT4(prim);
 			prim->r0 = prim->g0 = prim->b0 = 0x80;
 			SetSemiTrans(prim, 2);
 			prim->tpage = getTPage(1, 2, 832, 256);
 			prim->clut = getClut(0, 487);
 			setUVWH(prim, 0, 0x80, 3, 3);
-			setXYWH(prim, endFrame, bottomY, bottomW, boxRight);
-			AddPrim(ACTIVE_ORDERING_TABLE->org + 0x22, prim++);
+			setXYWH(prim, bx, by, bw, bh);
+			AddPrim(ACTIVE_ORDERING_TABLE->org + layer, prim++);
 		}
 	}
 
 	GsSetWorkBase((PACKET *)prim);
-	return isVisible;
+
+	return visible;
 }
 
 void DOOA_tickRebirth(int32_t instanceId)
@@ -937,11 +979,11 @@ void DOOA_tickRebirth(int32_t instanceId)
 	VECTOR flashPos;
 	VECTOR colorStart;
 	VECTOR colorEnd;
-	DooaSparkle sparkle;
+	int32_t shardSet;
+	VECTOR offset;
 	DooaSequence *seq;
-	Entity *entity;
 	int32_t level;
-	int32_t frame;
+	Entity *entity;
 
 	seq = &DOOA_REINCARNATION_SEQ;
 	entity = seq->entity;
@@ -975,11 +1017,10 @@ void DOOA_tickRebirth(int32_t instanceId)
 		DOOA_setShardState(3);
 		break;
 	case 0xcd:
-		frame = seq->frame;
-		if (frame >= 130) {
+		if (seq->frame >= 130) {
 			MAIN_D_80135324 = 0x10;
 		} else {
-			MAIN_D_80135324 = lerp(1, 0x10, 100, 132, frame);
+			MAIN_D_80135324 = lerp(1, 0x10, 100, 132, seq->frame);
 		}
 		if (seq->frame < 132) {
 			break;
@@ -993,9 +1034,8 @@ void DOOA_tickRebirth(int32_t instanceId)
 		playSound(8, 6);
 		break;
 	case 0xce:
-		frame = seq->frame;
-		if (frame < 147) {
-			seq->fadeLevel = lerp(5, 0, 132, 150, frame);
+		if (seq->frame < 147) {
+			seq->fadeLevel = lerp(5, 0, 132, 150, seq->frame);
 		}
 		flashPos = DOOA_FLASH_POSITION;
 		EFE_PUSH1(int32_t, 0);
@@ -1033,8 +1073,7 @@ void DOOA_tickRebirth(int32_t instanceId)
 		}
 		break;
 	case 0xcf:
-		frame = seq->frame;
-		if (frame >= 202) {
+		if (seq->frame >= 202) {
 			seq->phase = 0xd0;
 			seq->sparkleIndex = 0;
 			ENTITY_TABLE[1]->isOnMap = 1;
@@ -1047,7 +1086,7 @@ void DOOA_tickRebirth(int32_t instanceId)
 		if (seq->frame < 152) {
 			break;
 		}
-		level = lerp(255, 0, 152, 202, frame);
+		level = lerp(255, 0, 152, 202, seq->frame);
 		MAIN_func_800D9BA8(level, DOOA_SCENE_CLUT, 0);
 		if ((seq->frame & 1) == 0) {
 			DOOA_fadeModelClut(DOOA_MODEL_CLUT, entity, DOOA_FADED_CLUT, 0, 255, level);
@@ -1057,9 +1096,10 @@ void DOOA_tickRebirth(int32_t instanceId)
 		break;
 	case 0xd0:
 		if (seq->sparkleIndex < 47) {
-			sparkle.offset = DOOA_SPARKLE_OFFSET;
-			if ((sparkle.boneId = DOOA_SPARKLE_BONE_IDS[seq->sparkleIndex]) >= 0) {
-				DOO2_buildShardSet(&sparkle.offset, (u_long)DOO2_D_80071EE4, (seq->eggSlot * 6) + sparkle.boneId);
+			offset = DOOA_SPARKLE_OFFSET;
+			if (DOOA_SPARKLE_BONE_IDS[seq->sparkleIndex] >= 0) {
+				shardSet = DOO2_buildShardSet(&offset, (u_long)DOO2_D_80071EE4,
+				                              DOOA_SPARKLE_BONE_IDS[seq->sparkleIndex] + (seq->eggSlot * 6));
 				MAIN_D_80135364[DOOA_SPARKLE_BONE_IDS[seq->sparkleIndex]] = -1;
 				playSound(8, 7);
 			}
@@ -1093,15 +1133,11 @@ void DOOA_renderRebirth(int32_t instanceId)
 	SVECTOR rot;
 	int32_t i;
 	DooaSequence *panel;
-	u_long tmd;
 
 	panel = &DOOA_REINCARNATION_SEQ;
-	i = 0;
-	tmd = (u_long)&DOO2_D_80071EE4[3];
-
-	for (; i < 6; i++) {
+	for (i = 0; i < 6; i++) {
 		if (MAIN_D_80135364[i] == 0) {
-			GsLinkObject4(tmd, &obj, i + (panel->eggSlot * 6));
+			GsLinkObject4((u_long)&DOO2_D_80071EE4[3], &obj, i + (panel->eggSlot * 6));
 			obj.attribute = 0;
 			GsInitCoordinate2(NULL, &coord);
 			obj.coord2 = &coord;
@@ -1130,7 +1166,10 @@ void DOOA_renderRebirth(int32_t instanceId)
 
 void DOOA_setShardState(int16_t state)
 {
-	DOOA_SHARD_EFFECT.state = state;
+	DooaShardEffect *effect;
+
+	effect = &DOOA_SHARD_EFFECT;
+	effect->state = state;
 }
 
 void DOOA_removeShardEffect(void)
@@ -1146,34 +1185,30 @@ void DOOA_showPlayerAndPartner(void)
 
 void DOOA_fadeModelClut(int16_t *srcClut, void *unused, int16_t *dstClut, int32_t startFrame, int32_t endFrame, int32_t frame)
 {
+	RECT rect;
 	int32_t i;
-	int16_t stp;
 	int16_t r;
 	int16_t g;
 	int16_t b;
+	int16_t stp;
+	int16_t *src;
 	int16_t *dst;
-	RECT rect;
 
+	src = srcClut;
 	dst = dstClut;
 	for (i = 0; i < 384; i++) {
-		int32_t den;
-		int32_t num;
-
-		num = endFrame - frame;
-		den = endFrame - startFrame;
-
-		r = *srcClut & 0x1f;
-		g = (*srcClut >> 5) & 0x1f;
-		b = (*srcClut >> 10) & 0x1f;
-		stp = (*srcClut++ >> 15) & 0x1;
+		r = *src & 0x1f;
+		g = (*src >> 5) & 0x1f;
+		b = (*src >> 10) & 0x1f;
+		stp = (*src++ >> 15) & 0x1;
 
 		if (frame != startFrame) {
 			stp = 1;
 		}
 
-		r = r * num / den;
-		g = g * num / den;
-		b = b * num / den;
+		r = (int16_t)r * (endFrame - frame) / (endFrame - startFrame);
+		g = (int16_t)g * (endFrame - frame) / (endFrame - startFrame);
+		b = (int16_t)b * (endFrame - frame) / (endFrame - startFrame);
 
 		*dst = r;
 		*dst += g << 5;
@@ -1188,34 +1223,30 @@ void DOOA_fadeModelClut(int16_t *srcClut, void *unused, int16_t *dstClut, int32_
 
 void DOOA_fadeShardClut(int16_t *srcClut, void *unused, int16_t *dstClut, int32_t startFrame, int32_t endFrame, int32_t frame)
 {
+	RECT rect;
 	int32_t i;
-	int16_t stp;
 	int16_t r;
 	int16_t g;
 	int16_t b;
+	int16_t stp;
+	int16_t *src;
 	int16_t *dst;
-	RECT rect;
 
+	src = srcClut;
 	dst = dstClut;
 	for (i = 0; i < 768; i++) {
-		int32_t den;
-		int32_t num;
-
-		num = endFrame - frame;
-		den = endFrame - startFrame;
-
-		r = *srcClut & 0x1f;
-		g = (*srcClut >> 5) & 0x1f;
-		b = (*srcClut >> 10) & 0x1f;
-		stp = (*srcClut++ >> 15) & 0x1;
+		r = *src & 0x1f;
+		g = (*src >> 5) & 0x1f;
+		b = (*src >> 10) & 0x1f;
+		stp = (*src++ >> 15) & 0x1;
 
 		if (frame != startFrame) {
 			stp = 1;
 		}
 
-		r = r * num / den;
-		g = g * num / den;
-		b = b * num / den;
+		r = (int16_t)r * (endFrame - frame) / (endFrame - startFrame);
+		g = (int16_t)g * (endFrame - frame) / (endFrame - startFrame);
+		b = (int16_t)b * (endFrame - frame) / (endFrame - startFrame);
 
 		*dst = r;
 		*dst += g << 5;
@@ -1232,11 +1263,9 @@ void DOOA_getOrbitPosition(VECTOR *outRef, VECTOR *outPos, VECTOR *position, SVE
 {
 	MATRIX matrix;
 	VECTOR direction;
-	int32_t y;
 
 	outRef->vx = position->vx;
-	y = position->vy;
-	outRef->vy = y - (height / 2);
+	outRef->vy = (int32_t)position->vy - (height / 2);
 	outRef->vz = position->vz;
 	RotMatrixZYX(rotation, &matrix);
 	direction.vx = 0;
@@ -1250,15 +1279,17 @@ void DOOA_getOrbitPosition(VECTOR *outRef, VECTOR *outPos, VECTOR *position, SVE
 
 int32_t DOOA_updateShards(int32_t instanceId)
 {
-	TMD_P_TG4 **cursor;
+	Entity *entity;
+	int32_t minRadius;
+	int32_t maxRadius;
 	DooaShard *shard;
 	DooaShardEffect *effect;
-	int16_t state;
+	TMD_P_TG4 **cursor;
 
 	effect = &DOOA_SHARD_EFFECT;
-
-	cursor = DOOA_SHARD_EFFECT.shardBuffer;
-	if (DOOA_SHARD_EFFECT.flash != 0) {
+	cursor = effect->shardBuffer;
+	entity = effect->entity;
+	if (effect->flash != 0) {
 		effect->colorR = (rand() % 100) + 60;
 		effect->colorG = (rand() % 100) + 60;
 		effect->colorB = (rand() % 100) + 60;
@@ -1266,8 +1297,7 @@ int32_t DOOA_updateShards(int32_t instanceId)
 
 	while (*cursor != NULL) {
 		shard = (DooaShard *)((intptr_t)cursor);
-		state = effect->state;
-		switch (state) {
+		switch (effect->state) {
 		case 0:
 			shard->fallSpeed += 1;
 			if (shard->fallSpeed >= 0x400) {
@@ -1280,9 +1310,6 @@ int32_t DOOA_updateShards(int32_t instanceId)
 			break;
 		case 1:
 			if (effect->state != effect->prevState) {
-				int32_t minRadius;
-				int32_t maxRadius;
-
 				shard->spin = 0;
 				shard->spinMax = (rand() % 0x155) + 0xe3;
 				shard->radius = 0x1000;
@@ -1295,16 +1322,13 @@ int32_t DOOA_updateShards(int32_t instanceId)
 			if ((shard->spinMax / 80) == 0) {
 				shard->spin += 1;
 			} else {
-				int16_t step;
-
-				step = shard->spinMax / 100;
-				shard->spin += step;
+				shard->spin += shard->spinMax / 100;
 			}
 			if (shard->spin > shard->spinMax) {
 				shard->spin = shard->spinMax;
 			}
 			shard->rotY += shard->spin;
-			if (shard->targetRadius > shard->radius) {
+			if (shard->radius < shard->targetRadius) {
 				if ((shard->targetRadius / 80) == 0) {
 					shard->radius++;
 				} else {
@@ -1312,12 +1336,7 @@ int32_t DOOA_updateShards(int32_t instanceId)
 				}
 			}
 			shard->fallSpeed += 1;
-			{
-				int16_t drop;
-
-				drop = shard->fallSpeed >> 3;
-				shard->centerY -= drop;
-			}
+			shard->centerY -= shard->fallSpeed >> 3;
 			if (shard->centerY < -shard->dropDepth) {
 				shard->centerY = -shard->dropDepth;
 			}
@@ -1362,43 +1381,36 @@ int32_t DOOA_updateShards(int32_t instanceId)
 
 int32_t DOOA_renderShards(int32_t instanceId)
 {
+	intptr_t cursor;
+	ModelComponent *model;
+	TMD_P_TG4 *triTmd;
 	SVECTOR triA;
 	SVECTOR triB;
 	SVECTOR triC;
+	SVECTOR triOffset;
+	DooaShard *tri;
 	MATRIX triMatrix;
+	TMD_P_TG4 *quadTmd;
 	SVECTOR quadA;
 	SVECTOR quadB;
 	SVECTOR quadC;
 	SVECTOR quadD;
+	SVECTOR quadOffset;
+	DooaShardQuad *quad;
 	MATRIX quadMatrix;
-	TMD_P_TG4 *tmdPrim;
+	DooaShardEffect *effect;
 	POLY_FT3 *triPrim;
 	POLY_FT4 *quadPrim;
-	DooaShard *tri;
-	DooaShardQuad *quad;
-	DooaShardEffect *effect;
-	intptr_t cursor;
-	ModelComponent *model;
-	int32_t triScale;
-	int32_t quadScale;
-	int16_t triOx;
-	int16_t triOy;
-	int16_t triOz;
-	int16_t quadOx;
-	int16_t quadOy;
-	int16_t quadOz;
-	uint8_t mode;
 
-	cursor = (intptr_t)DOOA_SHARD_EFFECT.shardBuffer;
 	effect = &DOOA_SHARD_EFFECT;
-	model = getEntityModelComponent(DOOA_SHARD_EFFECT.entity->type, 3);
+	cursor = (intptr_t)effect->shardBuffer;
+	model = getEntityModelComponent(effect->entity->type, 3);
 
 	while (*(int32_t *)cursor != 0) {
-		tmdPrim = *(TMD_P_TG4 **)cursor;
-		mode = tmdPrim->cd;
-		switch (mode) {
+		switch ((*(TMD_P_TG4 **)cursor)->cd) {
 		case GPU_COM_TG3:
 		case GPU_COM_TG3 | 2:
+			triTmd = *(TMD_P_TG4 **)cursor;
 			tri = (DooaShard *)cursor;
 			if (tri->delay >= 0) {
 				triPrim = (POLY_FT3 *)GsGetWorkBase();
@@ -1411,23 +1423,21 @@ int32_t DOOA_renderShards(int32_t instanceId)
 				} else {
 					setRGB0(triPrim, effect->colorR, effect->colorB, effect->colorG);
 					triPrim->tpage = model->pixelPage;
-					triPrim->clut = tmdPrim->clut;
-					setUV3(triPrim, tmdPrim->tu0, tmdPrim->tv0, tmdPrim->tu1, tmdPrim->tv1, tmdPrim->tu2, tmdPrim->tv2);
+					triPrim->clut = triTmd->clut;
+					setUV3(triPrim, triTmd->tu0, triTmd->tv0, triTmd->tu1, triTmd->tv1, triTmd->tu2, triTmd->tv2);
 				}
-				triScale = tri->radius;
-				triOx = tri->centerX * triScale / 4096;
-				triOy = tri->centerY;
-				triScale = tri->radius;
-				triOz = tri->centerZ * triScale / 4096;
-				triA.vx = triOx + tri->vertex[0].vx;
-				triA.vy = triOy + tri->vertex[0].vy;
-				triA.vz = triOz + tri->vertex[0].vz;
-				triB.vx = triOx + tri->vertex[1].vx;
-				triB.vy = triOy + tri->vertex[1].vy;
-				triB.vz = triOz + tri->vertex[1].vz;
-				triC.vx = triOx + tri->vertex[2].vx;
-				triC.vy = triOy + tri->vertex[2].vy;
-				triC.vz = triOz + tri->vertex[2].vz;
+				triOffset.vx = tri->centerX * (int32_t)tri->radius / 4096;
+				triOffset.vy = tri->centerY;
+				triOffset.vz = tri->centerZ * tri->radius / 4096;
+				triA.vx = triOffset.vx + tri->vertex[0].vx;
+				triA.vy = triOffset.vy + tri->vertex[0].vy;
+				triA.vz = triOffset.vz + tri->vertex[0].vz;
+				triB.vx = triOffset.vx + tri->vertex[1].vx;
+				triB.vy = triOffset.vy + tri->vertex[1].vy;
+				triB.vz = triOffset.vz + tri->vertex[1].vz;
+				triC.vx = triOffset.vx + tri->vertex[2].vx;
+				triC.vy = triOffset.vy + tri->vertex[2].vy;
+				triC.vz = triOffset.vz + tri->vertex[2].vz;
 				RotMatrixZYX((SVECTOR *)&tri->rotX, &triMatrix);
 				ApplyMatrixSV(&triMatrix, &triA, &triA);
 				ApplyMatrixSV(&triMatrix, &triB, &triB);
@@ -1447,6 +1457,7 @@ int32_t DOOA_renderShards(int32_t instanceId)
 			break;
 		case GPU_COM_TG4:
 		case GPU_COM_TG4 | 2:
+			quadTmd = *(TMD_P_TG4 **)cursor;
 			quad = (DooaShardQuad *)cursor;
 			if (quad->delay >= 0) {
 				quadPrim = (POLY_FT4 *)GsGetWorkBase();
@@ -1459,26 +1470,24 @@ int32_t DOOA_renderShards(int32_t instanceId)
 				} else {
 					setRGB0(quadPrim, effect->colorR, effect->colorB, effect->colorG);
 					quadPrim->tpage = model->pixelPage;
-					quadPrim->clut = tmdPrim->clut;
-					setUV4(quadPrim, tmdPrim->tu0, tmdPrim->tv0, tmdPrim->tu1, tmdPrim->tv1, tmdPrim->tu2, tmdPrim->tv2, tmdPrim->tu3, tmdPrim->tv3);
+					quadPrim->clut = quadTmd->clut;
+					setUV4(quadPrim, quadTmd->tu0, quadTmd->tv0, quadTmd->tu1, quadTmd->tv1, quadTmd->tu2, quadTmd->tv2, quadTmd->tu3, quadTmd->tv3);
 				}
-				quadScale = quad->radius;
-				quadOx = quad->centerX * quadScale / 4096;
-				quadOy = quad->centerY;
-				quadScale = quad->radius;
-				quadOz = quad->centerZ * quadScale / 4096;
-				quadA.vx = quadOx + quad->vertex[0].vx;
-				quadA.vy = quadOy + quad->vertex[0].vy;
-				quadA.vz = quadOz + quad->vertex[0].vz;
-				quadB.vx = quadOx + quad->vertex[1].vx;
-				quadB.vy = quadOy + quad->vertex[1].vy;
-				quadB.vz = quadOz + quad->vertex[1].vz;
-				quadC.vx = quadOx + quad->vertex[2].vx;
-				quadC.vy = quadOy + quad->vertex[2].vy;
-				quadC.vz = quadOz + quad->vertex[2].vz;
-				quadD.vx = quadOx + quad->vertex[3].vx;
-				quadD.vy = quadOy + quad->vertex[3].vy;
-				quadD.vz = quadOz + quad->vertex[3].vz;
+				quadOffset.vx = quad->centerX * (int32_t)quad->radius / 4096;
+				quadOffset.vy = quad->centerY;
+				quadOffset.vz = quad->centerZ * quad->radius / 4096;
+				quadA.vx = quadOffset.vx + quad->vertex[0].vx;
+				quadA.vy = quadOffset.vy + quad->vertex[0].vy;
+				quadA.vz = quadOffset.vz + quad->vertex[0].vz;
+				quadB.vx = quadOffset.vx + quad->vertex[1].vx;
+				quadB.vy = quadOffset.vy + quad->vertex[1].vy;
+				quadB.vz = quadOffset.vz + quad->vertex[1].vz;
+				quadC.vx = quadOffset.vx + quad->vertex[2].vx;
+				quadC.vy = quadOffset.vy + quad->vertex[2].vy;
+				quadC.vz = quadOffset.vz + quad->vertex[2].vz;
+				quadD.vx = quadOffset.vx + quad->vertex[3].vx;
+				quadD.vy = quadOffset.vy + quad->vertex[3].vy;
+				quadD.vz = quadOffset.vz + quad->vertex[3].vz;
 				RotMatrixZYX((SVECTOR *)&quad->rotX, &quadMatrix);
 				ApplyMatrixSV(&quadMatrix, &quadA, &quadA);
 				ApplyMatrixSV(&quadMatrix, &quadB, &quadB);
@@ -1504,32 +1513,41 @@ int32_t DOOA_renderShards(int32_t instanceId)
 	}
 }
 
-void DOOA_spawnBoneShards(DooaShardEffect *effect, int32_t boneIndex, int32_t wireIndex)
+void DOOA_spawnBoneShards(DooaShardEffect *effect, int32_t boneIndex, long wireIndex)
 {
-	MATRIX boneMatrix;
-	SVECTOR rotated;
-	Entity *entity;
-	struct TMD_STRUCT *objs;
-	struct TMD_STRUCT *obj;
-	SVECTOR *src;
-	DooaShardVertex *verts;
-	DooaShard *frag;
-	int32_t objIndex;
-	intptr_t vertOut;
 	intptr_t frags;
-	intptr_t prim;
+	Entity *entity;
+	ModelComponent *model;
+	TMDModel *tmd;
+	TMDModel *header;
+	struct TMD_STRUCT *objects;
+	struct TMD_STRUCT *obj;
+	int32_t objIndex;
+	MATRIX boneMatrix;
 	int32_t i;
+	SVECTOR rotated;
+	intptr_t vertOut;
+	SVECTOR *src;
+	intptr_t prim;
 	int32_t j;
+	intptr_t tri;
+	intptr_t quad;
+	DooaShardVertex *verts;
+	DooaShardQuad *quadShard;
+	DooaShard *triShard;
 
-	entity = effect->entity;
 	frags = (intptr_t)effect->shardWrite;
-	objs = getEntityModelComponent(entity->type, 3)->modelPtr->obj;
+	entity = effect->entity;
+	model = getEntityModelComponent(entity->type, 3);
+	tmd = model->modelPtr;
+	header = tmd;
+	objects = (struct TMD_STRUCT *)((uint32_t)header + 12);
 	objIndex = DIGIMON_SKELETONS[entity->type][boneIndex].objIndex;
 	if (objIndex == -1) {
 		return;
 	}
 
-	obj = &objs[objIndex];
+	obj = &objects[objIndex];
 	vertOut = (intptr_t)GsGetWorkBase();
 	src = (SVECTOR *)obj->vertop;
 	calculateBoneMatrix(entity, boneIndex, &boneMatrix);
@@ -1551,67 +1569,69 @@ void DOOA_spawnBoneShards(DooaShardEffect *effect, int32_t boneIndex, int32_t wi
 			switch (((int8_t *)prim)[3]) {
 			case GPU_COM_TG3:
 			case GPU_COM_TG3 | 2:
-				frag = (DooaShard *)frags;
-				frag->prim = (TMD_P_TG4 *)prim;
-				frag->centerX = (verts[((TMD_P_TG3 *)prim)->v0].vx + verts[((TMD_P_TG3 *)prim)->v1].vx + verts[((TMD_P_TG3 *)prim)->v2].vx) / 3;
-				frag->centerY = (verts[((TMD_P_TG3 *)prim)->v0].vy + verts[((TMD_P_TG3 *)prim)->v1].vy + verts[((TMD_P_TG3 *)prim)->v2].vy) / 3;
-				frag->centerZ = (verts[((TMD_P_TG3 *)prim)->v0].vz + verts[((TMD_P_TG3 *)prim)->v1].vz + verts[((TMD_P_TG3 *)prim)->v2].vz) / 3;
-				frag->vertex[0].vx = verts[((TMD_P_TG3 *)prim)->v0].vx - frag->centerX;
-				frag->vertex[0].vy = verts[((TMD_P_TG3 *)prim)->v0].vy - frag->centerY;
-				frag->vertex[0].vz = verts[((TMD_P_TG3 *)prim)->v0].vz - frag->centerZ;
-				frag->vertex[1].vx = verts[((TMD_P_TG3 *)prim)->v1].vx - frag->centerX;
-				frag->vertex[1].vy = verts[((TMD_P_TG3 *)prim)->v1].vy - frag->centerY;
-				frag->vertex[1].vz = verts[((TMD_P_TG3 *)prim)->v1].vz - frag->centerZ;
-				frag->vertex[2].vx = verts[((TMD_P_TG3 *)prim)->v2].vx - frag->centerX;
-				frag->vertex[2].vy = verts[((TMD_P_TG3 *)prim)->v2].vy - frag->centerY;
-				frag->vertex[2].vz = verts[((TMD_P_TG3 *)prim)->v2].vz - frag->centerZ;
-				frag->centerX -= effect->entity->posData->location.vx;
-				frag->centerY -= MAIN_func_800DA9F4();
-				frag->centerZ -= effect->entity->posData->location.vz;
-				frag->fallSpeed = 0;
-				frag->radius = 0x1000;
-				frag->rotX = 0;
-				frag->rotY = 0;
-				frag->rotZ = 0;
-				frag->axisDistance = getDistance(frag->centerX, 0, frag->centerZ);
-				if (frag->axisDistance == 0) {
-					frag->axisDistance = 1;
+				tri = prim;
+				triShard = (DooaShard *)frags;
+				triShard->prim = (TMD_P_TG4 *)prim;
+				triShard->centerX = (verts[((TMD_P_TG3 *)tri)->v0].vx + verts[((TMD_P_TG3 *)tri)->v1].vx + verts[((TMD_P_TG3 *)tri)->v2].vx) / 3;
+				triShard->centerY = (verts[((TMD_P_TG3 *)tri)->v0].vy + verts[((TMD_P_TG3 *)tri)->v1].vy + verts[((TMD_P_TG3 *)tri)->v2].vy) / 3;
+				triShard->centerZ = (verts[((TMD_P_TG3 *)tri)->v0].vz + verts[((TMD_P_TG3 *)tri)->v1].vz + verts[((TMD_P_TG3 *)tri)->v2].vz) / 3;
+				triShard->vertex[0].vx = verts[((TMD_P_TG3 *)tri)->v0].vx - triShard->centerX;
+				triShard->vertex[0].vy = verts[((TMD_P_TG3 *)tri)->v0].vy - triShard->centerY;
+				triShard->vertex[0].vz = verts[((TMD_P_TG3 *)tri)->v0].vz - triShard->centerZ;
+				triShard->vertex[1].vx = verts[((TMD_P_TG3 *)tri)->v1].vx - triShard->centerX;
+				triShard->vertex[1].vy = verts[((TMD_P_TG3 *)tri)->v1].vy - triShard->centerY;
+				triShard->vertex[1].vz = verts[((TMD_P_TG3 *)tri)->v1].vz - triShard->centerZ;
+				triShard->vertex[2].vx = verts[((TMD_P_TG3 *)tri)->v2].vx - triShard->centerX;
+				triShard->vertex[2].vy = verts[((TMD_P_TG3 *)tri)->v2].vy - triShard->centerY;
+				triShard->vertex[2].vz = verts[((TMD_P_TG3 *)tri)->v2].vz - triShard->centerZ;
+				triShard->centerX -= effect->entity->posData->location.vx;
+				triShard->centerY -= MAIN_func_800DA9F4();
+				triShard->centerZ -= effect->entity->posData->location.vz;
+				triShard->fallSpeed = 0;
+				triShard->radius = 0x1000;
+				triShard->rotX = 0;
+				triShard->rotY = 0;
+				triShard->rotZ = 0;
+				triShard->axisDistance = getDistance(triShard->centerX, 0, triShard->centerZ);
+				if (triShard->axisDistance == 0) {
+					triShard->axisDistance = 1;
 				}
-				frag->delay = 0;
+				triShard->delay = 0;
 				frags += sizeof(DooaShard);
 				break;
 			case GPU_COM_TG4:
 			case GPU_COM_TG4 | 2:
-				frag = (DooaShard *)frags;
-				frag->prim = (TMD_P_TG4 *)prim;
-				frag->centerX = (verts[((TMD_P_TG4 *)prim)->v0].vx + verts[((TMD_P_TG4 *)prim)->v1].vx + verts[((TMD_P_TG4 *)prim)->v2].vx + verts[((TMD_P_TG4 *)prim)->v3].vx) / 4;
-				frag->centerY = (verts[((TMD_P_TG4 *)prim)->v0].vy + verts[((TMD_P_TG4 *)prim)->v1].vy + verts[((TMD_P_TG4 *)prim)->v2].vy + verts[((TMD_P_TG4 *)prim)->v3].vy) / 4;
-				frag->centerZ = (verts[((TMD_P_TG4 *)prim)->v0].vz + verts[((TMD_P_TG4 *)prim)->v1].vz + verts[((TMD_P_TG4 *)prim)->v2].vz + verts[((TMD_P_TG4 *)prim)->v3].vz) / 4;
-				frag->vertex[0].vx = verts[((TMD_P_TG4 *)prim)->v0].vx - frag->centerX;
-				frag->vertex[0].vy = verts[((TMD_P_TG4 *)prim)->v0].vy - frag->centerY;
-				frag->vertex[0].vz = verts[((TMD_P_TG4 *)prim)->v0].vz - frag->centerZ;
-				frag->vertex[1].vx = verts[((TMD_P_TG4 *)prim)->v1].vx - frag->centerX;
-				frag->vertex[1].vy = verts[((TMD_P_TG4 *)prim)->v1].vy - frag->centerY;
-				frag->vertex[1].vz = verts[((TMD_P_TG4 *)prim)->v1].vz - frag->centerZ;
-				frag->vertex[2].vx = verts[((TMD_P_TG4 *)prim)->v2].vx - frag->centerX;
-				frag->vertex[2].vy = verts[((TMD_P_TG4 *)prim)->v2].vy - frag->centerY;
-				frag->vertex[2].vz = verts[((TMD_P_TG4 *)prim)->v2].vz - frag->centerZ;
-				frag->vertex[3].vx = verts[((TMD_P_TG4 *)prim)->v3].vx - frag->centerX;
-				frag->vertex[3].vy = verts[((TMD_P_TG4 *)prim)->v3].vy - frag->centerY;
-				frag->vertex[3].vz = verts[((TMD_P_TG4 *)prim)->v3].vz - frag->centerZ;
-				frag->centerX -= effect->entity->posData->location.vx;
-				frag->centerY -= MAIN_func_800DA9F4();
-				frag->centerZ -= effect->entity->posData->location.vz;
-				frag->fallSpeed = 0;
-				frag->radius = 0x1000;
-				frag->rotX = 0;
-				frag->rotY = 0;
-				frag->rotZ = 0;
-				frag->axisDistance = getDistance(frag->centerX, 0, frag->centerZ);
-				if (frag->axisDistance == 0) {
-					frag->axisDistance = 1;
+				quad = prim;
+				quadShard = (DooaShardQuad *)frags;
+				quadShard->prim = (TMD_P_TG4 *)prim;
+				quadShard->centerX = (verts[((TMD_P_TG4 *)quad)->v0].vx + verts[((TMD_P_TG4 *)quad)->v1].vx + verts[((TMD_P_TG4 *)quad)->v2].vx + verts[((TMD_P_TG4 *)quad)->v3].vx) / 4;
+				quadShard->centerY = (verts[((TMD_P_TG4 *)quad)->v0].vy + verts[((TMD_P_TG4 *)quad)->v1].vy + verts[((TMD_P_TG4 *)quad)->v2].vy + verts[((TMD_P_TG4 *)quad)->v3].vy) / 4;
+				quadShard->centerZ = (verts[((TMD_P_TG4 *)quad)->v0].vz + verts[((TMD_P_TG4 *)quad)->v1].vz + verts[((TMD_P_TG4 *)quad)->v2].vz + verts[((TMD_P_TG4 *)quad)->v3].vz) / 4;
+				quadShard->vertex[0].vx = verts[((TMD_P_TG4 *)quad)->v0].vx - quadShard->centerX;
+				quadShard->vertex[0].vy = verts[((TMD_P_TG4 *)quad)->v0].vy - quadShard->centerY;
+				quadShard->vertex[0].vz = verts[((TMD_P_TG4 *)quad)->v0].vz - quadShard->centerZ;
+				quadShard->vertex[1].vx = verts[((TMD_P_TG4 *)quad)->v1].vx - quadShard->centerX;
+				quadShard->vertex[1].vy = verts[((TMD_P_TG4 *)quad)->v1].vy - quadShard->centerY;
+				quadShard->vertex[1].vz = verts[((TMD_P_TG4 *)quad)->v1].vz - quadShard->centerZ;
+				quadShard->vertex[2].vx = verts[((TMD_P_TG4 *)quad)->v2].vx - quadShard->centerX;
+				quadShard->vertex[2].vy = verts[((TMD_P_TG4 *)quad)->v2].vy - quadShard->centerY;
+				quadShard->vertex[2].vz = verts[((TMD_P_TG4 *)quad)->v2].vz - quadShard->centerZ;
+				quadShard->vertex[3].vx = verts[((TMD_P_TG4 *)quad)->v3].vx - quadShard->centerX;
+				quadShard->vertex[3].vy = verts[((TMD_P_TG4 *)quad)->v3].vy - quadShard->centerY;
+				quadShard->vertex[3].vz = verts[((TMD_P_TG4 *)quad)->v3].vz - quadShard->centerZ;
+				quadShard->centerX -= effect->entity->posData->location.vx;
+				quadShard->centerY -= MAIN_func_800DA9F4();
+				quadShard->centerZ -= effect->entity->posData->location.vz;
+				quadShard->fallSpeed = 0;
+				quadShard->radius = 0x1000;
+				quadShard->rotX = 0;
+				quadShard->rotY = 0;
+				quadShard->rotZ = 0;
+				quadShard->axisDistance = getDistance(quadShard->centerX, 0, quadShard->centerZ);
+				if (quadShard->axisDistance == 0) {
+					quadShard->axisDistance = 1;
 				}
-				frag->delay = 0;
+				quadShard->delay = 0;
 				frags += sizeof(DooaShardQuad);
 				break;
 			}
@@ -1632,13 +1652,19 @@ void DOOA_spawnBoneShards(DooaShardEffect *effect, int32_t boneIndex, int32_t wi
 	effect->shardWrite = (void *)frags;
 }
 
-int32_t DOOA_tick(PartnerEntity *partner, void *buffer, int32_t isInitialized)
+// clang-format off
+int32_t DOOA_tick(partner, buffer, isInitialized)
+	PartnerEntity *partner;
+	void *buffer;
+	int16_t isInitialized;
+// clang-format on
 {
+	int32_t instance;
 	DooaSequence *panel;
-	Entity *player;
 	int32_t messageId;
 
 	panel = &DOOA_REINCARNATION_SEQ;
+	instance = 0;
 	if (isInitialized != 0) {
 		return panel->frame;
 	}
@@ -1651,19 +1677,18 @@ int32_t DOOA_tick(PartnerEntity *partner, void *buffer, int32_t isInitialized)
 	}
 	panel->entity = &partner->digimonEntity.entity;
 	panel->phase = 0;
-	addObject(0x80b, 0, DOOA_tickDissolve, DOOA_renderDissolve);
+	addObject(0x80b, instance, DOOA_tickDissolve, DOOA_renderDissolve);
 	DOOA_CAMERA_START_VIEW = GS_VIEWPOINT;
 	MAIN_D_8013532C = DRAWING_OFFSET_X;
 	MAIN_D_80135330 = DRAWING_OFFSET_Y;
 	MAIN_D_80135334 = VIEWPORT_DISTANCE;
-	player = ENTITY_TABLE[1];
-	DOOA_SAVED_LOCATION = player->posData->location;
-	MAIN_D_80135338 = player->posData->rotation;
+	DOOA_SAVED_LOCATION = ENTITY_TABLE[1]->posData->location;
+	MAIN_D_80135338 = ENTITY_TABLE[1]->posData->rotation;
 	if (partner->lives != 0) {
 		startAnimation(&PARTNER_ENTITY.digimonEntity.entity, 1);
 	}
 	DOOA_initOrderingTable();
-	if ((isTriggerSet(0xdc) == 1) || (isTriggerSet(0xd6) == 1) || (readPStat(1) >= 50)) {
+	if ((isTriggerSet(0xdc) == 1) || (isTriggerSet(0xd6) == 1) || (readPStat(1) >= 50U)) {
 		messageId = 0xcd;
 	} else {
 		messageId = 0xda;
@@ -1673,14 +1698,20 @@ int32_t DOOA_tick(PartnerEntity *partner, void *buffer, int32_t isInitialized)
 	return (intptr_t)buffer;
 }
 
-int32_t DOOA_getSequenceState(int32_t unused, int32_t isInitialized)
+// clang-format off
+int32_t DOOA_getSequenceState(unused, isInitialized)
+	int32_t unused;
+	int16_t isInitialized;
+// clang-format on
 {
-	PartnerEntity *partner;
 	DooaSequence *sequence;
+	int32_t instance;
 	int32_t i;
+	PartnerEntity *partner;
 
-	partner = (PartnerEntity *)DOOA_REINCARNATION_SEQ.entity;
 	sequence = &DOOA_REINCARNATION_SEQ;
+	instance = 0;
+	partner = (PartnerEntity *)sequence->entity;
 
 	if (isInitialized != 0) {
 		return sequence->frame;
@@ -1690,7 +1721,7 @@ int32_t DOOA_getSequenceState(int32_t unused, int32_t isInitialized)
 		sequence->eggSlot = rand() % 4;
 	}
 
-	addObject(0x80c, 0, DOOA_tickRebirth, DOOA_renderRebirth);
+	addObject(0x80c, instance, DOOA_tickRebirth, DOOA_renderRebirth);
 	sequence->phase = 200;
 	sequence->fadeLevel = 0;
 	sequence->frame = 0;
@@ -1700,5 +1731,5 @@ int32_t DOOA_getSequenceState(int32_t unused, int32_t isInitialized)
 		MAIN_D_80135364[i] = 0;
 	}
 
-	return 0;
+	return instance;
 }

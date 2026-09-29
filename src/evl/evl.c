@@ -23,7 +23,7 @@
 
 #include "common.h"
 
-#define EVL_MMD_BUFFER	((uint8_t *)0x80020000)
+#define EVL_MMD_BUFFER	0x80020000
 
 typedef struct {
 	int16_t timer;
@@ -67,7 +67,7 @@ extern int16_t EVL_D_800679E4[];
 extern RGB8 MAIN_D_801349E8;
 extern SVECTOR MAIN_D_801349EC;
 extern uint8_t CURRENT_SCREEN;
-extern uint8_t *MAIN_D_801349E4;
+extern int32_t MAIN_D_801349E4;
 extern VECTOR EVL_D_80068908;
 int32_t getMapSoundId(int32_t mapId);
 void createFlash(void);
@@ -162,7 +162,7 @@ static void *evl_functions[] = {
 	EVL_storeDigimonClut,
 };
 
-uint8_t *MAIN_D_801349E4 = EVL_MMD_BUFFER;
+int32_t MAIN_D_801349E4 = EVL_MMD_BUFFER;
 RGB8 MAIN_D_801349E8 = { 0x0a, 0xff, 0x0a };
 SVECTOR MAIN_D_801349EC = { 0 };
 int8_t MAIN_D_801349F4 = 1;

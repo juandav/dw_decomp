@@ -207,7 +207,7 @@ segments:
       - [0xADD48, .sdata, vs/vs_hud]
       - [0xADD7C, sdata]
       - [0xADDF0, .sdata, doo2/doo2]
-      - [0xADE0C, sdata]
+      - [0xADE0C, .sdata, dooa/dooa]
       - [0xADE20, .sdata, trn/trn_reward]
       - [0xADE28, .sdata, trn/trn_hud]
       - [0xADE38, .sdata, trn/trn_slots]
