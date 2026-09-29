@@ -33,6 +33,12 @@ void callScriptSection(int32_t, int32_t, int32_t);
 void updateMapLightState(void);
 extern int32_t IS_SCRIPT_PAUSED;
 
+// clang-format off
+uint16_t TOURNAMENT_MEDAL_IDS[6] = {
+	0x0000, 0x0001, 0x0002, 0x0003, 0x0004, 0x000c,
+};
+// clang-format on
+
 void updateTournamentRegistration(void)
 {
 	uint8_t i;

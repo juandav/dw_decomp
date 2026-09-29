@@ -17,6 +17,8 @@
 #include <dw/ui.h>
 #include <dw/utils.h>
 
+#define shop_START		((char *)0x80080800)
+
 typedef struct {
 	uint8_t mapId;
 	uint8_t mode;
@@ -70,8 +72,6 @@ void drawEntityTextIcon(int16_t x, int16_t y, uint8_t u, int32_t otOffset);
 int32_t STD_func_800579D8(uint8_t *arg);
 
 extern MapLightUpdateData MAP_LIGHT_UPDATE_DATA[];
-extern char *MAIN_D_8012BA8C[];
-extern void *MAIN_D_8012B96C[];
 extern uint8_t MAIN_D_80127BDC[];
 extern uint8_t MAP_LAYER_ENABLED;
 extern RGB8 TEXT_COLORS[];
@@ -79,7 +79,99 @@ extern uint32_t MAIN_D_80134E70;
 extern uint32_t MAIN_D_80134E74;
 extern uint8_t MAIN_D_80134E78[2];
 extern int32_t MAIN_D_80134E7C;
-extern char MAIN_D_80134430;
+extern char btl_START[];
+extern char dget_START[];
+extern char doo2_START[];
+extern char dooa_START[];
+extern char eab_START[];
+extern char endi_START[];
+extern char evl_START[];
+extern char fish_START[];
+extern char kar_START[];
+extern char mov_START[];
+extern char murd_START[];
+extern char std_START[];
+extern char trn_START[];
+extern char trn2_START[];
+extern char vs_START[];
+
+// clang-format off
+void *MAIN_D_8012B96C[16] = {
+	btl_START,
+	std_START,
+	fish_START,
+	evl_START,
+	kar_START,
+	vs_START,
+	mov_START,
+	doo2_START,
+	dooa_START,
+	trn_START,
+	shop_START,
+	dget_START,
+	trn2_START,
+	murd_START,
+	endi_START,
+	eab_START,
+};
+
+char MAIN_D_8012B9AC[12] = "BTL_REL.BIN";
+
+char MAIN_D_8012B9B8[12] = "STD_REL.BIN";
+
+char MAIN_D_8012B9C4[] = "FISH_REL.BIN";
+
+char MAIN_D_8012B9D4[12] = "EVL_REL.BIN";
+
+char MAIN_D_8012B9E0[12] = "KAR_REL.BIN";
+
+char MAIN_D_8012B9EC[] = "VS_REL.BIN";
+
+char MAIN_D_8012B9F8[12] = "MOV_REL.BIN";
+
+char MAIN_D_8012BA04[] = "DOO2_REL.BIN";
+
+char MAIN_D_8012BA14[] = "DOOA_REL.BIN";
+
+char MAIN_D_8012BA24[12] = "TRN_REL.BIN";
+
+char MAIN_D_8012BA30[] = "SHOP_REL.BIN";
+
+char MAIN_D_8012BA40[] = "DGET_REL.BIN";
+
+char MAIN_D_8012BA50[] = "TRN2_REL.BIN";
+
+char MAIN_D_8012BA60[] = "MURD_REL.BIN";
+
+char MAIN_D_8012BA70[] = "ENDI_REL.BIN";
+
+char MAIN_D_8012BA80[12] = "EAB_REL.BIN";
+
+char *MAIN_D_8012BA8C[16] = {
+	MAIN_D_8012B9AC,
+	MAIN_D_8012B9B8,
+	MAIN_D_8012B9C4,
+	MAIN_D_8012B9D4,
+	MAIN_D_8012B9E0,
+	MAIN_D_8012B9EC,
+	MAIN_D_8012B9F8,
+	MAIN_D_8012BA04,
+	MAIN_D_8012BA14,
+	MAIN_D_8012BA24,
+	MAIN_D_8012BA30,
+	MAIN_D_8012BA40,
+	MAIN_D_8012BA50,
+	MAIN_D_8012BA60,
+	MAIN_D_8012BA70,
+	MAIN_D_8012BA80,
+};
+
+#if defined(VERSION_JP)
+char MAIN_D_80134430[] = "ポーズ";
+#else
+char MAIN_D_80134430[] = "Pause";
+#endif
+// clang-format on
 
 void drawEntityText(int32_t color, int16_t n, int16_t x, int16_t y,
 			int16_t value, int32_t layer)
@@ -353,7 +445,7 @@ void createPauseBox(void)
 	RECT pos;
 
 	if (MAIN_D_80134E7C != 1) {
-		drawString(&MAIN_D_80134430, 0x78, 0xF0);
+		drawString(MAIN_D_80134430, 0x78, 0xF0);
 #if defined(VERSION_JP)
 		setRECT(&pos, -0x1A, -0xE, 0x30, 0x18);
 #else

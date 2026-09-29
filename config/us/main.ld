@@ -581,6 +581,8 @@ SECTIONS
         . = ALIGN(., 4);
         BUILD_DIR/src/main/utils.c.o(.sdata.*);
         . = ALIGN(., 4);
+        BUILD_DIR/src/main/utils2.c.o(.sdata.*);
+        . = ALIGN(., 4);
         BUILD_DIR/src/main/efe_table.c.o(.sdata.*);
         . = ALIGN(., 4);
         BUILD_DIR/src/main/sound_async.c.o(.sdata.*);

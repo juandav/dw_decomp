@@ -164,6 +164,9 @@ SECTIONS
         KEEP(BUILD_DIR/asm/main/data/A6E38.data.s.o(.data .data.*));
         BUILD_DIR/src/main/evolution.c.o(.data .data.*);
         BUILD_DIR/src/main/utils.c.o(.data .data.*);
+        BUILD_DIR/src/main/utils2.c.o(.data .data.*);
+        BUILD_DIR/src/main/tournament.c.o(.data .data.*);
+        BUILD_DIR/src/main/btl.c.o(.data .data.*);
         BUILD_DIR/src/main/efe_table.c.o(.data .data.*);
         BUILD_DIR/src/main/sound_async.c.o(.data .data.*);
         KEEP(BUILD_DIR/asm/main/data/A8AD4.data.s.o(.data .data.*));
@@ -210,7 +213,7 @@ SECTIONS
         . = ALIGN(., 4);
         BUILD_DIR/src/main/graphics2.c.o(.sdata .sdata.*);
         . = ALIGN(., 4);
-        BUILD_DIR/src/main/utils.c.o(.sdata .sdata.*);
+        BUILD_DIR/src/main/utils2.c.o(.sdata .sdata.*);
         . = ALIGN(., 4);
         BUILD_DIR/src/main/efe_table.c.o(.sdata .sdata.*);
         . = ALIGN(., 4);

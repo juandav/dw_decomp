@@ -11,8 +11,6 @@
 #include <dw/ui.h>
 #include <dw/utils.h>
 
-#define shop_START		((char *)0x80080800)
-
 #if defined(VERSION_JP)
 #define DIGIT_WIDTH 12
 #else
@@ -40,21 +38,6 @@ extern int32_t ACTIVE_FRAMEBUFFER;
 extern GsOT GS_ORDERING_TABLE[];
 extern PACKET GS_WORK_BASES[];
 extern char DRAW_OFFSETS[];
-extern char btl_START[];
-extern char dget_START[];
-extern char doo2_START[];
-extern char dooa_START[];
-extern char eab_START[];
-extern char endi_START[];
-extern char evl_START[];
-extern char fish_START[];
-extern char kar_START[];
-extern char mov_START[];
-extern char murd_START[];
-extern char std_START[];
-extern char trn_START[];
-extern char trn2_START[];
-extern char vs_START[];
 
 // clang-format off
 RGB8 TEXT_COLORS[17] = {
@@ -79,111 +62,6 @@ RGB8 TEXT_COLORS[17] = {
 
 /* six 5-byte formats: "%01d" to "%06d" */
 char MAIN_D_8012B94C[32] = "%01d\0%02d\0%03d\0%04d\0%05d\0%06d";
-
-void *MAIN_D_8012B96C[16] = {
-	btl_START,
-	std_START,
-	fish_START,
-	evl_START,
-	kar_START,
-	vs_START,
-	mov_START,
-	doo2_START,
-	dooa_START,
-	trn_START,
-	shop_START,
-	dget_START,
-	trn2_START,
-	murd_START,
-	endi_START,
-	eab_START,
-};
-
-char MAIN_D_8012B9AC[12] = "BTL_REL.BIN";
-
-char MAIN_D_8012B9B8[12] = "STD_REL.BIN";
-
-char MAIN_D_8012B9C4[] = "FISH_REL.BIN";
-
-char MAIN_D_8012B9D4[12] = "EVL_REL.BIN";
-
-char MAIN_D_8012B9E0[12] = "KAR_REL.BIN";
-
-char MAIN_D_8012B9EC[] = "VS_REL.BIN";
-
-char MAIN_D_8012B9F8[12] = "MOV_REL.BIN";
-
-char MAIN_D_8012BA04[] = "DOO2_REL.BIN";
-
-char MAIN_D_8012BA14[] = "DOOA_REL.BIN";
-
-char MAIN_D_8012BA24[12] = "TRN_REL.BIN";
-
-char MAIN_D_8012BA30[] = "SHOP_REL.BIN";
-
-char MAIN_D_8012BA40[] = "DGET_REL.BIN";
-
-char MAIN_D_8012BA50[] = "TRN2_REL.BIN";
-
-char MAIN_D_8012BA60[] = "MURD_REL.BIN";
-
-char MAIN_D_8012BA70[] = "ENDI_REL.BIN";
-
-char MAIN_D_8012BA80[12] = "EAB_REL.BIN";
-
-char *MAIN_D_8012BA8C[16] = {
-	MAIN_D_8012B9AC,
-	MAIN_D_8012B9B8,
-	MAIN_D_8012B9C4,
-	MAIN_D_8012B9D4,
-	MAIN_D_8012B9E0,
-	MAIN_D_8012B9EC,
-	MAIN_D_8012B9F8,
-	MAIN_D_8012BA04,
-	MAIN_D_8012BA14,
-	MAIN_D_8012BA24,
-	MAIN_D_8012BA30,
-	MAIN_D_8012BA40,
-	MAIN_D_8012BA50,
-	MAIN_D_8012BA60,
-	MAIN_D_8012BA70,
-	MAIN_D_8012BA80,
-};
-
-uint16_t TOURNAMENT_MEDAL_IDS[6] = {
-	0x0000, 0x0001, 0x0002, 0x0003, 0x0004, 0x000c,
-};
-
-uint8_t FLEE_BUBBLE_SCALE[10] = {
-	0x64, 0x68, 0x6c, 0x70, 0x74, 0x78, 0x74, 0x70,
-	0x6c, 0x68,
-};
-
-uint8_t BATTLE_MUSIC[48] = {
-	0x02, 0x02, 0x02, 0x02, 0x02, 0x01, 0x02, 0x02,
-	0x02, 0x01, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02,
-	0x02, 0x02, 0x01, 0x02, 0x02, 0x01, 0x01, 0x01,
-	0x01, 0x01, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02,
-	0x02, 0x01, 0x02, 0x02, 0x02, 0x01, 0x01, 0x01,
-	0x02, 0x01, 0x02, 0x02, 0x02, 0x00, 0x00, 0x00,
-};
-
-uint8_t FLEE_CHANCE_TABLE[12] = {
-	0x3c, 0x46, 0x64, 0x50, 0x3c, 0x64, 0x5a, 0x64,
-	0x1e, 0x00, 0x00, 0x00,
-};
-
-uint8_t CONCAVE_SCREENS[18] = {
-	0xa6, 0xa7, 0xd2, 0xd4, 0xdb, 0xe2, 0xe3, 0xe4,
-	0xf7, 0xf8, 0xf9, 0xfd, 0xfe, 0xa1, 0x84, 0x02,
-	0x0d, 0x65,
-};
-
-#if defined(VERSION_JP)
-char MAIN_D_80134430[] = "ポーズ";
-#else
-char MAIN_D_80134430[] = "Pause";
-#endif
 // clang-format on
 
 void pauseFrame(void)

@@ -5,8 +5,6 @@
 
 #define TOURNAMENT_ARRAY_SIZE	30
 
-extern uint16_t TOURNAMENT_MEDAL_IDS[];
-
 extern uint8_t TOURNAMENT_DATA[];
 extern char *TOURNAMENT_GRADES[];
 
