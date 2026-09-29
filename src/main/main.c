@@ -62,16 +62,6 @@ extern int8_t TAMER_START_TILE_Y;
 extern int8_t TAMER_WAYPOINT_COUNT;
 extern int8_t TAMER_WAYPOINT_X[];
 extern int8_t TAMER_WAYPOINT_Y[];
-extern int8_t GAME_STATE;
-extern Entity *MAIN_D_80134D60;
-extern uint8_t MAIN_D_80134D64;
-extern int32_t MAIN_D_80134D74;
-extern int32_t MAIN_D_80134D78;
-extern int16_t MAIN_D_80134D68;
-extern int32_t MAIN_D_80134D7C[2];
-void BTL_getRemainingEnemies(Entity *self, int16_t *out, int16_t *count);
-void BTL_drawCommandShout(uint8_t command);
-extern int32_t MAIN_D_80134F0C;
 extern int16_t FADE_IN_CURRENT;
 extern int32_t CHECKED_MEMORY_CARD;
 extern int32_t CURRENT_MENU;
@@ -98,15 +88,9 @@ void GsSetNearClip(long clip);
 uint16_t MAIN_func_800F19B0(int32_t param_1, int32_t param_2);
 
 extern GsOT *ACTIVE_ORDERING_TABLE;
-extern int16_t MAIN_D_80134F10;
-extern GsF_LIGHT LIGHT_DATA[3];
 
 void renderMainMenuBackground(void);
 void checkShopMap(int32_t mapId);
-void entityLookAtTile(Entity *entity, int32_t tileX, int32_t tileY);
-void getModelTile(VECTOR *pos, int16_t *outTileX, int16_t *outTileY);
-void entityLookAtLocation(Entity *entity, VECTOR *pos);
-void initializeInventoryObject(void);
 uint32_t playSound(int32_t vabId, int32_t val);
 void tickMainMenu(void);
 void renderMainMenu(void);
@@ -122,8 +106,7 @@ void MAIN_func_80100258(int32_t flag);
 #endif
 int32_t newGameStateMachine(void);
 void processInput(void);
-void loadNewgameScene(void);
-void tickNewGameJijimon(int32_t instanceId);
+void loadNewGameScene(void);
 void writePStat(int32_t stat, int32_t value);
 
 void initializeHeap(void);
@@ -135,18 +118,7 @@ void startThrowingItem(void);
 int32_t BTL_addItemParticles(Entity *e);
 void tickThrownItem(int32_t instanceId);
 void renderThrownItem(int32_t instanceId);
-void MAIN_func_800F1794(void);
-int32_t removeBuffModelObject(void);
-void tickPartnerBattle(int32_t instanceId);
-void tickNPCBattle(int32_t instanceId);
 void unloadNewGameScene(void);
-void initializeBuffModel(TMDModel *model);
-void tickBuffModelObject(int32_t instanceId);
-int32_t initializeBuffModelObject(void);
-
-extern int32_t buffModelValue[2];
-extern int32_t buffModelFrame;
-extern TMDModel *BUFF_MODEL[];
 
 void resetInventoryFlags(void);
 void initializeEntityText(void);
@@ -210,31 +182,11 @@ extern int32_t MAIN_D_80134EA8;
 void pollInputGame(void);
 void pollInputMenu(void);
 void renderPressStartToContinue(void);
-void tickTamerBattle(int32_t instanceId);
-void MAIN_func_800F0B2C(void);
 int32_t entityIsOffScreen(Entity *entity, int32_t width, int32_t height);
-void MAIN_func_800F1020(void);
-void MAIN_func_800F179C(int32_t model, int32_t compIdx, int32_t color);
 
 /* Order anchor (reversed): pins symtab/section order to address order.
  * Unreferenced; discarded by --gc-sections. */
 void *main_order_anchor[] = {
-	removeBuffModelObject,
-	initializeBuffModelObject,
-	initializeBuffModel,
-	MAIN_func_800F179C,
-	MAIN_func_800F1794,
-	tickBuffModelObject,
-	unloadNewGameScene,
-	loadNewgameScene,
-	tickNewGameJijimon,
-#if !defined(VERSION_JP)
-	tickNPCBattle,
-	tickPartnerBattle,
-	tickTamerBattle,
-	MAIN_func_800F1020,
-	MAIN_func_800F0B2C,
-#endif
 	handleBuffDisks,
 	renderThrownItem,
 	tickThrownItem,
@@ -6352,7 +6304,7 @@ void newGameScene(void)
 	fadeFromBlack(0x14);
 	writePStat(0xfe, 0);
 	writePStat(0xf3, 0xff);
-	loadNewgameScene();
+	loadNewGameScene();
 
 	do {
 		pollInputGame();
@@ -6960,401 +6912,4 @@ void handleBuffDisks(type)
 	}
 
 	BTL_addBuffDiskEffect(ENTITY_TABLE[1]);
-}
-
-#if !defined(VERSION_JP)
-void MAIN_func_800F0B2C(void)
-{
-	SVECTOR rot;
-	VECTOR target;
-	VECTOR in;
-	VECTOR out;
-	MATRIX m;
-	int16_t enemies[4];
-	int16_t tileX;
-	int16_t tileY;
-	int16_t count;
-	int32_t cmd;
-
-	if (MAIN_D_80134D78 == 1) {
-		return;
-	}
-
-	if (UI_BOX_DATA[0].state != 0) {
-		return;
-	}
-
-	if (COMBAT_DATA_PTR->player.currentCommand[0] == 1) {
-		if ((MAIN_D_80134D68 == 0x14) &&
-		    ((PARTNER_ENTITY.digimonEntity.stats.current.currentHP -
-		      COMBAT_DATA_PTR->fighter[0].hpDamageBuffer) > 0)) {
-			fadeToBlack(0x14);
-		}
-
-		MAIN_func_800F1020();
-		MAIN_D_80134D68 = MAIN_D_80134D68 + 1;
-
-		return;
-	}
-
-	if ((POLLED_INPUT & ~POLLED_INPUT_PREVIOUS) & 0x8000) {
-		playSound(0, 2);
-		COMBAT_DATA_PTR->player.hoveredCommand[0]++;
-
-		if ((MAIN_D_80134D7C[0] != 0) &&
-		    (COMBAT_DATA_PTR->player.hoveredCommand[0] == 1)) {
-			COMBAT_DATA_PTR->player.hoveredCommand[0]++;
-		}
-
-		if ((COMBAT_DATA_PTR->player.numCommands[0] - 1) <
-		    COMBAT_DATA_PTR->player.hoveredCommand[0]) {
-			if (MAIN_D_80134D7C[0] != 0) {
-				COMBAT_DATA_PTR->player.hoveredCommand[0] = 2;
-			} else {
-				COMBAT_DATA_PTR->player.hoveredCommand[0] = 1;
-			}
-		}
-	}
-
-	if ((POLLED_INPUT & ~POLLED_INPUT_PREVIOUS) & 0x2000) {
-		playSound(0, 2);
-		COMBAT_DATA_PTR->player.hoveredCommand[0]--;
-
-		if ((MAIN_D_80134D7C[0] != 0) &&
-		    (COMBAT_DATA_PTR->player.hoveredCommand[0] == 1)) {
-			COMBAT_DATA_PTR->player.hoveredCommand[0]--;
-		}
-
-		if (COMBAT_DATA_PTR->player.hoveredCommand[0] <= 0) {
-			COMBAT_DATA_PTR->player.hoveredCommand[0] =
-				COMBAT_DATA_PTR->player.numCommands[0] - 1;
-		}
-	}
-
-	if ((POLLED_INPUT & ~POLLED_INPUT_PREVIOUS) & 0x40) {
-		playSound(0, 3);
-		BTL_getRemainingEnemies(ENTITY_TABLE[1], enemies, &count);
-
-		if (count == 0) {
-			return;
-		}
-
-		if (ENTITY_TABLE[0]->anim.animId != 0xe) {
-			startAnimation(ENTITY_TABLE[0], 0xe);
-		}
-
-		COMBAT_DATA_PTR->player.bufferedCommand[0] =
-			COMBAT_DATA_PTR->player.availableCommands[0][COMBAT_DATA_PTR->player.hoveredCommand[0]];
-
-		if (PARTNER_PARA.discipline < 0x46) {
-			COMBAT_DATA_PTR->player.commandDelay[0] = 0xa0 - (PARTNER_PARA.discipline / 10);
-		} else {
-			COMBAT_DATA_PTR->player.commandDelay[0] = (0xa - (PARTNER_PARA.discipline / 10)) * 10;
-		}
-
-		COMBAT_DATA_PTR->player.commandDelay[0] = 0;
-		cmd = COMBAT_DATA_PTR->player.bufferedCommand[0];
-
-		if (cmd == 7) {
-			goto changeTarget;
-		}
-
-		if (cmd == 1) {
-			COMBAT_DATA_PTR->player.commandDelay[0] = 0;
-			COMBAT_DATA_PTR->player.currentCommand[0] = 1;
-			getModelTile(&ENTITY_TABLE[0]->posData->location, &tileX, &tileY);
-
-			if ((tileX == TAMER_START_TILE_X) && (tileY == TAMER_START_TILE_Y)) {
-				target.vx = MAP_WARPS.spawnX[CURRENT_EXIT];
-				target.vy = 0;
-				target.vz = MAP_WARPS.spawnZ[CURRENT_EXIT];
-				in.vx = 0;
-				in.vy = 0;
-				in.vz = -0xbb8;
-				rot.vx = 0;
-				rot.vy = (MAP_WARPS.rotation[CURRENT_EXIT] + 0x800) & 0xfff;
-				rot.vz = 0;
-				RotMatrix(&rot, &m);
-				ApplyMatrixLV(&m, &in, &out);
-				target.vx = target.vx + out.vx;
-				target.vz = target.vz + out.vz;
-				entityLookAtLocation(ENTITY_TABLE[0], &target);
-			}
-
-			startAnimation(ENTITY_TABLE[0], 3);
-		}
-
-		goto shout;
-
-	changeTarget:
-		COMBAT_DATA_PTR->player.changeTarget = 1;
-
-	shout:
-		BTL_drawCommandShout(COMBAT_DATA_PTR->player.bufferedCommand[0]);
-	}
-
-	if ((POLLED_INPUT & ~POLLED_INPUT_PREVIOUS) & 0x80) {
-		if (COMBAT_DATA_PTR->fighter[0].finisherProgress ==
-		    COMBAT_DATA_PTR->fighter[0].finisherGoal) {
-			COMBAT_DATA_PTR->player.bufferedCommand[0] = 0xb;
-			playSound(0, 3);
-			COMBAT_DATA_PTR->player.commandDelay[0] = 0;
-			COMBAT_DATA_PTR->player.currentCommand[0] = 0xb;
-			BTL_drawCommandShout(COMBAT_DATA_PTR->player.bufferedCommand[0]);
-		}
-	}
-}
-
-void MAIN_func_800F1020(void)
-{
-	SVECTOR rot;
-	MATRIX m;
-	VECTOR target;
-	VECTOR in;
-	VECTOR out;
-	int16_t tileX;
-	int16_t tileY;
-	int16_t i;
-
-	i = TAMER_WAYPOINT_COUNT - 1;
-	getModelTile(&ENTITY_TABLE[0]->posData->location, &tileX, &tileY);
-
-	if (i >= 0) {
-		entityLookAtTile(ENTITY_TABLE[0], TAMER_WAYPOINT_X[i], TAMER_WAYPOINT_Y[i]);
-
-		if ((tileX == TAMER_WAYPOINT_X[i]) && (tileY == TAMER_WAYPOINT_Y[i])) {
-			TAMER_WAYPOINT_COUNT = TAMER_WAYPOINT_COUNT - 1;
-		}
-
-		return;
-	}
-
-	entityLookAtTile(ENTITY_TABLE[0], TAMER_START_TILE_X, TAMER_START_TILE_Y);
-
-	if ((tileX == TAMER_START_TILE_X) && (tileY == TAMER_START_TILE_Y)) {
-		target.vx = MAP_WARPS.spawnX[CURRENT_EXIT];
-		target.vy = 0;
-		target.vz = MAP_WARPS.spawnZ[CURRENT_EXIT];
-		in.vx = 0;
-		in.vy = 0;
-		in.vz = -0xbb8;
-		rot.vx = 0;
-		rot.vy = (MAP_WARPS.rotation[CURRENT_EXIT] + 0x800) & 0xfff;
-		rot.vz = 0;
-		RotMatrix(&rot, &m);
-		ApplyMatrixLV(&m, &in, &out);
-		target.vx = target.vx + out.vx;
-		target.vz = target.vz + out.vz;
-		entityLookAtLocation(ENTITY_TABLE[0], &target);
-		ENTITY_TABLE[0]->anim.animFlag |= 2;
-	}
-}
-
-void tickTamerBattle(int32_t instanceId)
-{
-	Entity *tamer;
-	Entity *partner;
-	int32_t anim;
-
-	tamer = ENTITY_TABLE[instanceId];
-
-	if (GAME_STATE == 1) {
-		if (((uint8_t *)COMBAT_DATA_PTR)[0x64e] != 1) {
-			partner = ENTITY_TABLE[1];
-
-			if (MAIN_D_80134D78 == 0) {
-				if (((POLLED_INPUT & ~POLLED_INPUT_PREVIOUS) & 0x10) != 0) {
-					initializeInventoryObject();
-				}
-			}
-
-			entityLookAtLocation(tamer, &partner->posData->location);
-
-			if (UI_BOX_DATA[0].state == 0) {
-				if ((MAIN_D_80134D74 == 0) || (MAIN_D_80134D60 != ENTITY_TABLE[1])) {
-					if ((tamer->anim.animId == 6) || ((anim = tamer->anim.animId) == 0xe)) {
-						if ((tamer->anim.animFlag & 1) == 0) {
-							startAnimation(tamer, 1);
-						}
-					} else if (tamer->anim.animId != 1) {
-						startAnimation(tamer, 1);
-					}
-				} else if (tamer->anim.animId != 0xa) {
-					startAnimation(tamer, 0xa);
-				}
-			}
-		}
-
-		if (((POLLED_INPUT & ~POLLED_INPUT_PREVIOUS) & 0x100) != 0) {
-			MAIN_D_80134D64 = (MAIN_D_80134D64 + 1) & 1;
-		}
-
-		MAIN_func_800F0B2C();
-	}
-
-	if (ENTITY_TABLE[0]->anim.animId == 1) {
-		MAIN_D_80134F0C = MAIN_D_80134F0C + 1;
-	} else {
-		MAIN_D_80134F0C = 0;
-	}
-
-	if (MAIN_D_80134F0C >= 0xab) {
-		startAnimation(ENTITY_TABLE[0], 1);
-		MAIN_D_80134F0C = 0;
-	}
-
-	tickAnimation(tamer);
-}
-
-void tickPartnerBattle(int32_t instanceId)
-{
-	tickAnimation(ENTITY_TABLE[instanceId]);
-}
-
-void tickNPCBattle(int32_t instanceId)
-{
-	Entity *entity;
-
-	tickAnimation(ENTITY_TABLE[instanceId]);
-	entity = ENTITY_TABLE[instanceId];
-	if (entity->anim.animFlag & 4) {
-		tickAnimation(entity);
-	}
-}
-#endif
-
-void tickNewGameJijimon(int32_t instanceId)
-{
-	int16_t *p;
-
-	p = &MAIN_D_80134F10;
-	if (*p < 0x7530) {
-		*p += 1;
-	}
-	if (*p == 0x23) {
-		setEntityRotation(2, 0, 0x71, 0);
-		setupEntityMatrix(2);
-		startAnimation(ENTITY_TABLE[2], 0);
-		writePStat(0xf3, 0);
-	}
-	tickAnimation(ENTITY_TABLE[2]);
-}
-
-void loadNewgameScene(void)
-{
-	int32_t result;
-	GsRVIEW2 view;
-
-	thunkLoadMMD(0x75, 0);
-	ENTITY_TABLE[2] = &NPC_ENTITIES[0].digimonEntity.entity;
-	initializeDigimonObject(0x75, 2, tickNewGameJijimon);
-	ENTITY_TABLE[2]->isOnMap = 1;
-	ENTITY_TABLE[2]->isOnScreen = 1;
-	MAIN_D_80134F10 = 0;
-	setEntityPosition(2, 0x320, 0x96, 0);
-	setEntityRotation(2, 0, 0x400, 0);
-	setupEntityMatrix(2);
-	startAnimation(ENTITY_TABLE[2], 2);
-	GsSetProjection(0x3e8);
-	view.vpx = 0;
-	view.vpz = -0x1068;
-	view.vpy = 0;
-	view.vrx = 0;
-	view.vry = 0;
-	view.vrz = 0;
-	view.rz = 0;
-	view.super = NULL;
-	result = GsSetRefView2(&view);
-	DRAWING_OFFSET_X = 0xa0;
-	DRAWING_OFFSET_Y = 0xb9;
-	LIGHT_DATA[0].vx = 0x1e;
-	LIGHT_DATA[0].vy = 0x64;
-	LIGHT_DATA[0].vz = 0x1e;
-	LIGHT_DATA[0].r = 0x40;
-	LIGHT_DATA[0].g = 0x40;
-	LIGHT_DATA[0].b = 0x40;
-	GsSetFlatLight(0, &LIGHT_DATA[0]);
-	LIGHT_DATA[1].vx = -0x1e;
-	LIGHT_DATA[1].vy = 0x64;
-	LIGHT_DATA[1].vz = 0;
-	LIGHT_DATA[1].r = 0x28;
-	LIGHT_DATA[1].g = 0x28;
-	LIGHT_DATA[1].b = 0x28;
-	GsSetFlatLight(1, &LIGHT_DATA[1]);
-	LIGHT_DATA[2].vx = 0;
-	LIGHT_DATA[2].vy = 0x64;
-	LIGHT_DATA[2].vz = -0x1e;
-	LIGHT_DATA[2].r = 0x26;
-	LIGHT_DATA[2].g = 0x26;
-	LIGHT_DATA[2].b = 0x26;
-	GsSetFlatLight(2, &LIGHT_DATA[2]);
-	GsSetAmbient(0x800, 0x800, 0x800);
-}
-
-void unloadNewGameScene(void)
-{
-	removeEntity(0x75, 2);
-	thunkUnloadModel(0x75, 0);
-}
-
-void tickBuffModelObject(int32_t instanceId)
-{
-	MAIN_func_800F179C((int32_t)BUFF_MODEL[0], 5, buffModelValue[buffModelFrame & 1]);
-	buffModelFrame += 1;
-}
-
-void MAIN_func_800F1794(void)
-{
-}
-
-void MAIN_func_800F179C(int32_t model, int32_t compIdx, int32_t color)
-{
-	char *p;
-	int32_t i;
-	int32_t count;
-	struct TMD_STRUCT *obj;
-	uint8_t attr;
-
-	model += 12;
-	obj = (struct TMD_STRUCT *)model;
-	obj += compIdx;
-	count = obj->primn;
-	p = (char *)obj->primtop;
-	for (i = 0; i < count; i++) {
-		attr = *(int32_t *)p >> 24;
-		if (attr & 4) {
-			*(int16_t *)(p + 6) = color;
-			if (attr & 8) {
-				if (!(attr & 0x10)) {
-					p += 0x20;
-				} else {
-					p += 0x2c;
-				}
-			} else if (!(attr & 0x10)) {
-				p += 0x1c;
-			} else {
-				p += 0x24;
-			}
-		}
-	}
-}
-
-void initializeBuffModel(TMDModel *model)
-{
-	BUFF_MODEL[0] = model;
-	GsMapModelingData((unsigned long *)&BUFF_MODEL[0]->flags);
-	buffModelValue[0] = 0x7acc;
-	buffModelValue[1] = 0x7b0c;
-}
-
-int32_t initializeBuffModelObject(void)
-{
-	buffModelFrame = 0;
-	return addObject(0x501, 0, tickBuffModelObject,
-			 (RenderFunction)MAIN_func_800F1794);
-}
-
-int32_t removeBuffModelObject(void)
-{
-	return removeObject(0x501, 0);
 }

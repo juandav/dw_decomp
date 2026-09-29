@@ -120,6 +120,8 @@ segments:
       - [0x842D8, c, bubble]
       - [0x84F04, c, battle_ui]
       - [0x86F48, c, main]
+      - [0x89908, c, new_game]
+      - [0x89C2C, c, buff_model]
       - [0x89E64, rodata]
       - [0x8A654, .rodata, tamer]
       - [0x8A700, .rodata, efe]

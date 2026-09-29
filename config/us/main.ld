@@ -142,6 +142,12 @@ SECTIONS
         . = ALIGN(., 4);
         BUILD_DIR/src/main/main.c.o(.text.*);
         . = ALIGN(., 4);
+        BUILD_DIR/src/main/battle_tick.c.o(.text.*);
+        . = ALIGN(., 4);
+        BUILD_DIR/src/main/new_game.c.o(.text.*);
+        . = ALIGN(., 4);
+        BUILD_DIR/src/main/buff_model.c.o(.text.*);
+        . = ALIGN(., 4);
         BUILD_DIR/src/main/sjis.c.o(.text.*);
         . = ALIGN(., 4);
         BUILD_DIR/src/main/vs.c.o(.text.*);
@@ -361,6 +367,12 @@ SECTIONS
         . = ALIGN(., 4);
         BUILD_DIR/src/main/main.c.o(.rodata.*);
         . = ALIGN(., 4);
+        BUILD_DIR/src/main/battle_tick.c.o(.rodata.*);
+        . = ALIGN(., 4);
+        BUILD_DIR/src/main/new_game.c.o(.rodata.*);
+        . = ALIGN(., 4);
+        BUILD_DIR/src/main/buff_model.c.o(.rodata.*);
+        . = ALIGN(., 4);
         BUILD_DIR/src/main/sjis.c.o(.rodata.*);
         . = ALIGN(., 4);
         BUILD_DIR/src/main/vs.c.o(.rodata.*);
@@ -514,6 +526,12 @@ SECTIONS
         BUILD_DIR/src/main/battle_ui.c.o(.data.*);
         . = ALIGN(., 4);
         BUILD_DIR/src/main/main.c.o(.data.*);
+        . = ALIGN(., 4);
+        BUILD_DIR/src/main/battle_tick.c.o(.data.*);
+        . = ALIGN(., 4);
+        BUILD_DIR/src/main/new_game.c.o(.data.*);
+        . = ALIGN(., 4);
+        BUILD_DIR/src/main/buff_model.c.o(.data.*);
         . = ALIGN(., 4);
         BUILD_DIR/src/main/sjis.c.o(.data.*);
         . = ALIGN(., 4);

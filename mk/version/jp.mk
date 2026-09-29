@@ -35,6 +35,7 @@ MAIN_C_SRC := \
 	src/main/battle_ui.c \
 	src/main/btl.c \
 	src/main/bubble.c \
+	src/main/buff_model.c \
 	src/main/butterfly.c \
 	src/main/clock.c \
 	src/main/door_mapdata.c \
@@ -59,6 +60,7 @@ MAIN_C_SRC := \
 	src/main/map_collision.c \
 	src/main/map_object.c \
 	src/main/math.c \
+	src/main/new_game.c \
 	src/main/overworld_card_text.c \
 	src/main/overworld_evochart_detail.c \
 	src/main/overworld_evochart_text.c \

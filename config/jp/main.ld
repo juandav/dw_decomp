@@ -78,6 +78,8 @@ SECTIONS
         BUILD_DIR/src/main/bubble.c.o(.text .text.*);
         BUILD_DIR/src/main/battle_ui.c.o(.text .text.*);
         BUILD_DIR/src/main/main.c.o(.text .text.*);
+        BUILD_DIR/src/main/new_game.c.o(.text .text.*);
+        BUILD_DIR/src/main/buff_model.c.o(.text .text.*);
         main_TEXT_END = .;
         main_TEXT_SIZE = ABSOLUTE(main_TEXT_END - main_TEXT_START);
 
