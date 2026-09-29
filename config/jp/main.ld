@@ -105,6 +105,7 @@ SECTIONS
         BUILD_DIR/src/main/world_object.c.o(.rodata .rodata.*);
         BUILD_DIR/src/main/file.c.o(.rodata .rodata.*);
         BUILD_DIR/src/main/math.c.o(.rodata .rodata.*);
+        BUILD_DIR/src/main/file_table.c.o(.rodata .rodata.*);
         BUILD_DIR/src/main/font.c.o(.rodata .rodata.*);
         BUILD_DIR/src/main/_psstart.c.o(.rodata .rodata.*);
         BUILD_DIR/src/main/fade.c.o(.rodata .rodata.*);
@@ -137,6 +138,8 @@ SECTIONS
 
         main_DATA_START = .;
         KEEP(BUILD_DIR/asm/main/data/main.data.s.o(.data .data.*));
+        BUILD_DIR/src/main/file_table.c.o(.data .data.*);
+        KEEP(BUILD_DIR/asm/main/data/9855C.data.s.o(.data .data.*));
         BUILD_DIR/src/main/font.c.o(.data .data.*);
         KEEP(BUILD_DIR/asm/main/data/9E298.data.s.o(.data .data.*));
         BUILD_DIR/src/main/tamer.c.o(.data .data.*);
@@ -167,6 +170,8 @@ SECTIONS
 
         main_SDATA_START = .;
         KEEP(BUILD_DIR/asm/main/data/main.sdata.s.o(.sdata .sdata.*));
+        BUILD_DIR/src/main/file_table.c.o(.sdata .sdata.*);
+        . = ALIGN(., 4);
         BUILD_DIR/src/main/font.c.o(.sdata .sdata.*);
         . = ALIGN(., 4);
         KEEP(BUILD_DIR/asm/main/data/AD4C0.sdata.s.o(.sdata .sdata.*));
