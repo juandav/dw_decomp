@@ -9,7 +9,7 @@ MAIN_SBSS := \
 	$(GEN_DIR)/unk_0x8013E0EC.sbss.s \
 	$(GEN_DIR)/unk_0x8013E1B0.sbss.s \
 	$(GEN_DIR)/unk_0x8013E1FC.sbss.s \
-	$(GEN_DIR)/unk_0x8013E228.sbss.s \
+	$(GEN_DIR)/unk_0x8013E26C.sbss.s \
 	$(GEN_DIR)/unk_0x8013E34C.sbss.s \
 	$(GEN_DIR)/unk_0x8013E37C.sbss.s \
 	$(GEN_DIR)/unk_0x8013E438.sbss.s \
@@ -54,6 +54,7 @@ MAIN_C_SRC := \
 	src/main/item.c \
 	src/main/kar.c \
 	src/main/main.c \
+	src/main/main_menu.c \
 	src/main/map_collision.c \
 	src/main/map_object.c \
 	src/main/math.c \

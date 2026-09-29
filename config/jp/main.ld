@@ -72,7 +72,8 @@ SECTIONS
         BUILD_DIR/src/main/sound_async.c.o(.text .text.*);
         KEEP(BUILD_DIR/asm/main/79008.s.o(.text .text.*));
         BUILD_DIR/src/main/butterfly.c.o(.text .text.*);
-        KEEP(BUILD_DIR/asm/main/79D94.s.o(.text .text.*));
+        BUILD_DIR/src/main/main_menu.c.o(.text .text.*);
+        KEEP(BUILD_DIR/asm/main/81E7C.s.o(.text .text.*));
         BUILD_DIR/src/main/bubble.c.o(.text .text.*);
         BUILD_DIR/src/main/battle_ui.c.o(.text .text.*);
         BUILD_DIR/src/main/main.c.o(.text .text.*);
@@ -99,6 +100,8 @@ SECTIONS
         KEEP(BUILD_DIR/asm/main/data/8B584.rodata.s.o(.rodata .rodata.*));
         BUILD_DIR/src/main/graphics2.c.o(.rodata .rodata.*);
         KEEP(BUILD_DIR/asm/main/data/8B6E0.rodata.s.o(.rodata .rodata.*));
+        BUILD_DIR/src/main/main_menu.c.o(.rodata .rodata.*);
+        KEEP(BUILD_DIR/asm/main/data/8B7F8.rodata.s.o(.rodata .rodata.*));
         BUILD_DIR/src/main/battle_ui.c.o(.rodata .rodata.*);
         BUILD_DIR/src/main/main.c.o(.rodata .rodata.*);
         BUILD_DIR/src/main/bubble.c.o(.rodata .rodata.*);
@@ -162,7 +165,8 @@ SECTIONS
         BUILD_DIR/src/main/sound_async.c.o(.data .data.*);
         KEEP(BUILD_DIR/asm/main/data/A8AD4.data.s.o(.data .data.*));
         BUILD_DIR/src/main/butterfly.c.o(.data .data.*);
-        KEEP(BUILD_DIR/asm/main/data/A9A68.data.s.o(.data .data.*));
+        BUILD_DIR/src/main/main_menu.c.o(.data .data.*);
+        KEEP(BUILD_DIR/asm/main/data/AA5D4.data.s.o(.data .data.*));
         BUILD_DIR/src/main/bubble.c.o(.data .data.*);
         BUILD_DIR/src/main/main.c.o(.data .data.*);
         main_DATA_END = .;
@@ -209,7 +213,7 @@ SECTIONS
         . = ALIGN(., 4);
         BUILD_DIR/src/main/sound_async.c.o(.sdata .sdata.*);
         . = ALIGN(., 4);
-        KEEP(BUILD_DIR/asm/main/data/AD7F8.sdata.s.o(.sdata .sdata.*));
+        BUILD_DIR/src/main/main_menu.c.o(.sdata .sdata.*);
         BUILD_DIR/src/main/bubble.c.o(.sdata .sdata.*);
         . = ALIGN(., 4);
         BUILD_DIR/src/main/battle_ui.c.o(.sdata .sdata.*);
@@ -301,7 +305,9 @@ SECTIONS
         . = ALIGN(., 4);
         BUILD_DIR/src/main/sound_async.c.o(.sbss.*);
         . = ALIGN(., 4);
-        BUILD_DIR/generated/unk_0x8013E228.sbss.s.o(.sbss.*);
+        BUILD_DIR/src/main/main_menu.c.o(.sbss.*);
+        . = ALIGN(., 4);
+        BUILD_DIR/generated/unk_0x8013E26C.sbss.s.o(.sbss.*);
         . = ALIGN(., 4);
         BUILD_DIR/src/btl/battle_setup.c.o(.sbss.*);
         . = ALIGN(., 4);
