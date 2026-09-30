@@ -12,7 +12,7 @@ int16_t FADE_IN_CURRENT;
 uint8_t FADE_PROGRESS;
 uint8_t FADE_MODE;
 int32_t FADE_PROTECTION;
-uint8_t MAIN_D_80134CBC;
+uint8_t FADE_OUT_IN_PROGRESS;
 
 int32_t addObject(int16_t objectId, int16_t instanceId, void *tick, void *render);
 int32_t removeObject(int16_t objectId, int16_t instanceId);
@@ -31,7 +31,7 @@ static void __garbage__()
 	FADE_PROGRESS = 0;
 	FADE_MODE = 0;
 	FADE_PROTECTION = 0;
-	MAIN_D_80134CBC = 0;
+	FADE_OUT_IN_PROGRESS = 0;
 }
 
 void initializeFadeData(void)
@@ -155,11 +155,11 @@ void fadeToWhite(int16_t frames)
 	FADE_MODE = 1;
 
 #if defined(VERSION_JP)
-	if (!MAIN_D_80134CBC) {
+	if (!FADE_OUT_IN_PROGRESS) {
 		addObject(4005, 0, 0, renderFadeOut);
 	}
 
-	MAIN_D_80134CBC = 1;
+	FADE_OUT_IN_PROGRESS = 1;
 #else
 	addObject(4005, 0, 0, renderFadeOut);
 #endif
@@ -172,6 +172,6 @@ void fadeFromWhite(int16_t frames)
 	FADE_IN_TARGET = frames + 1;
 	FADE_IN_CURRENT = 1;
 	FADE_MODE = 1;
-	MAIN_D_80134CBC = 0;
+	FADE_OUT_IN_PROGRESS = 0;
 	addObject(4005, 0, 0, renderFadeIn);
 }
