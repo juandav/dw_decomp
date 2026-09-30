@@ -35,8 +35,8 @@ void entityLookAtTile(Entity *entity, int32_t tileX, int32_t tileY);
 void getModelTile(VECTOR *pos, int16_t *outTileX, int16_t *outTileY);
 void initializeInventoryObject(void);
 
-void handleBattleCommandInput(void);
-void tickTamerFlee(void);
+void handleCommands(void);
+void handleFleeing(void);
 void tickTamerBattle(int32_t instanceId);
 void tickPartnerBattle(int32_t instanceId);
 void tickNPCBattle(int32_t instanceId);
@@ -45,11 +45,11 @@ static void *battle_tick_functions[] = {
 	tickNPCBattle,
 	tickPartnerBattle,
 	tickTamerBattle,
-	tickTamerFlee,
-	handleBattleCommandInput,
+	handleFleeing,
+	handleCommands,
 };
 
-void handleBattleCommandInput(void)
+void handleCommands(void)
 {
 	SVECTOR rot;
 	VECTOR target;
@@ -76,7 +76,7 @@ void handleBattleCommandInput(void)
 			fadeToBlack(0x14);
 		}
 
-		tickTamerFlee();
+		handleFleeing();
 		MAIN_D_80134D68++;
 
 		return;
@@ -184,7 +184,7 @@ void handleBattleCommandInput(void)
 	}
 }
 
-void tickTamerFlee(void)
+void handleFleeing(void)
 {
 	SVECTOR rot;
 	MATRIX m;
@@ -274,7 +274,7 @@ void tickTamerBattle(instanceId)
 			MAIN_D_80134D64 = (MAIN_D_80134D64 + 1) & 1;
 		}
 
-		handleBattleCommandInput();
+		handleCommands();
 	}
 
 	if (ENTITY_TABLE[0]->anim.animId == 1) {
