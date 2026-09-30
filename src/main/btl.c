@@ -44,11 +44,11 @@ extern int8_t LOAD_EFE_STATE;
 extern FleeBubbleState FLEE_BUBBLE_DATA[];
 
 int32_t isInvisible(Entity *entity);
-void getEntityTileFromModel(Entity *entity, int8_t *outTileX, int8_t *outTileY);
+void getEntityTile(Entity *entity, int8_t *outTileX, int8_t *outTileY);
 int32_t isLinearPathBlocked(int32_t x1, int32_t y1, int32_t x2, int32_t y2);
 int32_t worldPosToScreenPos(SVECTOR *pos, DVECTOR *out);
 void tickPartnerWaypoints(void);
-void tickPartnerCollision(void);
+void tickCollision(void);
 int32_t entityGetTechFromAnim(Entity *entity, int32_t anim);
 void initializeBuffModel(void *model);
 void initializeBuffModelObject(void);
@@ -267,20 +267,20 @@ int32_t handleBattleStart(id)
 			continue;
 		}
 		if (concave != 0) {
-			getEntityTileFromModel(ENTITY_TABLE[0], &tx0, &ty0);
+			getEntityTile(ENTITY_TABLE[0], &tx0, &ty0);
 #if defined(VERSION_JP)
 			if (0) {
 				ty1 = 0;
 			}
-			getEntityTileFromModel(ENTITY_TABLE[i], &tx1, (int8_t *)ty1);
+			getEntityTile(ENTITY_TABLE[i], &tx1, (int8_t *)ty1);
 #else
-			getEntityTileFromModel(ENTITY_TABLE[i], &tx1, &ty1);
+			getEntityTile(ENTITY_TABLE[i], &tx1, &ty1);
 #endif
 			if (isLinearPathBlocked(tx0, ty0, tx1, ty1)) {
 				setFleeBubble(i, 1);
 				continue;
 			}
-			getEntityTileFromModel(ENTITY_TABLE[1], &tx0, &ty0);
+			getEntityTile(ENTITY_TABLE[1], &tx0, &ty0);
 			if (isLinearPathBlocked(tx0, ty0, tx1, ty1)) {
 				setFleeBubble(i, 1);
 				continue;
@@ -394,7 +394,7 @@ void loadBattleData(int32_t entityId, int32_t count)
 						     .entityIds[i]],
 						     &ENTITY_TABLE[1]->posData->location);
 			}
-			tickPartnerCollision();
+			tickCollision();
 		}
 		loadCombatDataTick();
 	}
@@ -414,7 +414,7 @@ void loadBattleData(int32_t entityId, int32_t count)
 						     .entityIds[i]],
 						     &ENTITY_TABLE[1]->posData->location);
 			}
-			tickPartnerCollision();
+			tickCollision();
 		}
 		loadCombatDataTick();
 	}
@@ -424,30 +424,30 @@ void loadBattleData(int32_t entityId, int32_t count)
 	BTL_initializeFinisherAuraModel(BTL_FINISHER_TIM,
 					BTL_FINISHER_MODEL);
 	if (IS_PREDEFINED_BATTLE != 1) {
-		tickPartnerCollision();
+		tickCollision();
 	}
 	loadCombatDataTick();
 	BTL_initializePoisonBubble();
 	BTL_initializeConfusionEffect(BTL_CONFUSION_MODEL);
 	if (IS_PREDEFINED_BATTLE != 1) {
-		tickPartnerCollision();
+		tickCollision();
 	}
 	loadCombatDataTick();
 	BTL_initializeStunEffect(BTL_STUN_MODEL);
 	if (IS_PREDEFINED_BATTLE != 1) {
-		tickPartnerCollision();
+		tickCollision();
 	}
 	loadCombatDataTick();
 	initializeBuffModel(BTL_BUFF_MODEL);
 	if (IS_PREDEFINED_BATTLE != 1) {
-		tickPartnerCollision();
+		tickCollision();
 	}
 	loadCombatDataTick();
 	initializeBuffModelObject();
 	n = 0;
 	BTL_initializeEFEEngine((char *)GENERAL_BUFFER_PTR);
 	if (IS_PREDEFINED_BATTLE != 1) {
-		tickPartnerCollision();
+		tickCollision();
 	}
 	loadCombatDataTick();
 	for (i = 0; i <= ENEMY_COUNT; i++) {
@@ -476,7 +476,7 @@ void loadBattleData(int32_t entityId, int32_t count)
 				entityLookAtLocation(ENTITY_TABLE[COMBAT_DATA_PTR->player.entityIds[i]],
 						     &ENTITY_TABLE[1]->posData->location);
 			}
-			tickPartnerCollision();
+			tickCollision();
 		}
 		loadCombatDataTick();
 	}

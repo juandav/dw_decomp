@@ -71,7 +71,7 @@ extern int8_t MAP_COLLISION_DATA[];
 extern MATRIX MAIN_D_801B1BC0;
 
 void calculateBoneMatrix(Entity *entity, int32_t boneId, MATRIX *out);
-int32_t MAIN_func_800DA63C(int32_t count, int32_t t, int32_t *keys, int32_t *values, int32_t *slopes);
+int32_t processSomeArenaArrays(int32_t count, int32_t t, int32_t *keys, int32_t *values, int32_t *slopes);
 int32_t lerp(int32_t a, int32_t b, int32_t lo, int32_t hi, int32_t t);
 int32_t getDistance(int32_t x, int32_t y, int32_t z);
 void GsGetTimInfo(unsigned long *tim, GsIMAGE *img);
@@ -154,7 +154,7 @@ void fadeFromBlack(int16_t frames);
 void fadeToBlack(int16_t frames);
 void VS_setVersusModelSceneTimer(int16_t value);
 int32_t customRandom(int32_t lo, int32_t hi);
-void MAIN_func_800DA60C(int32_t count, int32_t arg1, int32_t arg2, int32_t *out);
+void initializeSomeArenaArrays(int32_t count, int32_t arg1, int32_t arg2, int32_t *out);
 
 static void *vs_scene_functions[] = {
 	VS_removeFighterCounter,
@@ -2501,10 +2501,10 @@ void VS_tickCameraIntro(void)
 	off = MAIN_D_80134A84;
 	rot = MAIN_D_80134A8C;
 	rot.vy = VS_D_80071A0C[1];
-	VS_D_80071A0C[2] = MAIN_func_800DA63C(0x16, p[0], VS_D_800706C8, VS_D_80071A30, VS_D_80071A88);
+	VS_D_80071A0C[2] = processSomeArenaArrays(0x16, p[0], VS_D_800706C8, VS_D_80071A30, VS_D_80071A88);
 	VS_setViewpointFromBone(*(Entity **)&p[6], &off, &rot, VS_D_80071A0C[2]);
 	GS_VIEWPOINT.vry = (-DIGIMON_DATA[VS_D_80071A18[0]->type].height * 2) / 3;
-	GS_VIEWPOINT.vpy = -MAIN_func_800DA63C(0x16, p[0], VS_D_800706C8, VS_D_80071AE0, VS_D_80071A88);
+	GS_VIEWPOINT.vpy = -processSomeArenaArrays(0x16, p[0], VS_D_800706C8, VS_D_80071AE0, VS_D_80071A88);
 	p[0]++;
 }
 
@@ -2557,7 +2557,7 @@ void VS_startCameraIntro(Entity *target, Entity *entity)
 		VS_D_80071AE0[i] =
 			customRandom(0x50, DIGIMON_DATA[target->type].height * 180 / 100);
 	}
-	MAIN_func_800DA60C(0x16, (int32_t)VS_D_800706C8, (int32_t)VS_D_80071AE0, VS_D_80071A88);
+	initializeSomeArenaArrays(0x16, (int32_t)VS_D_800706C8, (int32_t)VS_D_80071AE0, VS_D_80071A88);
 
 	d = getDistance(dx, 0, dz) + 0x2bc;
 	VS_D_80071A30[0] = d;

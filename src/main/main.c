@@ -156,7 +156,7 @@ void initializePartner(int32_t type, int32_t posX, int32_t posY,
 		       int32_t posZ, int32_t rotX, int32_t rotY,
 		       int32_t rotZ);
 void setDigimonRaised(uint16_t type);
-void MAIN_func_800D56E0(void);
+void initializeMap(void);
 void runMapHeadScript(int32_t scriptId);
 int32_t readPStat(int32_t id);
 void initializeUIBoxData(void);
@@ -6086,7 +6086,7 @@ int32_t main(void)
 			}
 			initializePartner(partnerId, 0, 0, 0, 0, 0, 0);
 			setDigimonRaised(partnerId);
-			MAIN_func_800D56E0();
+			initializeMap();
 			initializeChest();
 			runMapHeadScript(0xcc);
 			addClock();
@@ -6096,7 +6096,7 @@ int32_t main(void)
 			loadStackedTIMFile(MAIN_D_8012CE8C);
 			initializeTamer(0, 0, 0, 0, 0, 0, 0);
 			initializePartner(MAIN_D_80155670[0], 0, 0, 0, 0, 0, 0);
-			MAIN_func_800D56E0();
+			initializeMap();
 			initializeChest();
 			runMapHeadScript(MAIN_D_80155725[0]);
 			MAIN_func_800EF38C();
@@ -6114,7 +6114,7 @@ int32_t main(void)
 			loadStackedTIMFile(MAIN_D_8012CE8C);
 			initializeTamer(0, 0, 0, 0, 0, 0, 0);
 			initializePartner(MAIN_D_80155670[0], 0, 0, 0, 0, 0, 0);
-			MAIN_func_800D56E0();
+			initializeMap();
 			initializeChest();
 			runMapHeadScript(MAIN_D_80155725[0]);
 			MAIN_func_800EF38C();
@@ -6355,7 +6355,7 @@ typedef struct {
 	int16_t clut;
 } MapTileData;
 extern MapTileData MAP_TILE_DATA[];
-void MAIN_func_800D6A4C(MapTileData *tiles);
+void initializeDrawingOffsets(MapTileData *tiles);
 int32_t entityCheckCollision(Entity *source, Entity *entity, int32_t arg2, int32_t arg3);
 extern uint8_t SAVE_CURRENT_EXIT[];
 extern Stats SAVE_STATS;
@@ -6407,7 +6407,7 @@ void MAIN_func_800EF38C(void)
 
 	STORED_TAMER_POS = TAMER_ENTITY.entity.posData->location = SAVE_TAMER_POS;
 	PARTNER_ENTITY.digimonEntity.entity.posData->location = SAVE_PARTNER_POS;
-	MAIN_func_800D6A4C(MAP_TILE_DATA);
+	initializeDrawingOffsets(MAP_TILE_DATA);
 
 	for (i = 0; i < 8; i++) {
 #if defined(VERSION_JP)
@@ -6482,7 +6482,7 @@ void MAIN_func_800EF38C(void)
 	CAMERA_UPDATE_TILES = 1;
 	createCameraMovement(&TAMER_ENTITY.entity.posData->location, 2);
 	setImmortalHour();
-	MAIN_func_800D6A4C(MAP_TILE_DATA);
+	initializeDrawingOffsets(MAP_TILE_DATA);
 
 	MAP_TILE_X = CAMERA_X[0] / 128;
 	if (MAP_WIDTH[0] < 5) {

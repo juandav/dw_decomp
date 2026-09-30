@@ -66,7 +66,7 @@ extern int16_t EFE_LOAD_STATE[];
 
 void MAIN_func_80092B60(POLY_FT4 *prim);
 void MAIN_func_80092C18(PACKET *prim, RECT *rect);
-int32_t MAIN_func_800DA740(int16_t *rect, DVECTOR *line);
+int32_t doSomethingWithSomePoints(int16_t *rect, DVECTOR *line);
 void MAIN_func_800E4470(MATRIX *m, SVECTOR *out);
 void downloadSomeImage();
 void modifySomeImage(int32_t dim);
@@ -267,7 +267,7 @@ void VS_removeFinisherAura(int32_t i);
 void VS_tickAuraProjectile(int32_t id);
 void VS_renderAuraProjectile(int32_t i);
 char *VS_initializeAuraProjectiles(char *base);
-void setShortWithStride(int16_t *ptr, int16_t value, int32_t count, int32_t stride);
+void setInt16WithStride(int16_t *ptr, int16_t value, int32_t count, int32_t stride);
 int32_t getDistance(int32_t x, int32_t y, int32_t z);
 void createCloudFX(int16_t *pos);
 int32_t addEntityParticleFX(int32_t *typePtr, int32_t timer);
@@ -285,7 +285,7 @@ void renderLinePrimitive(uint32_t color, int32_t x0, int32_t y0, int32_t x1, int
 void calculatePosition(GsCOORDINATE2 *coord, MATRIX *matrix);
 char *initializeFlashData(char *base);
 void addScreenPolyFT3(void *prim, SVECTOR *v0, SVECTOR *v1, SVECTOR *v2);
-int32_t add3DSpritePrim(POLY_FT4 *poly, SVECTOR *v0, SVECTOR *v1, SVECTOR *v2, SVECTOR *v3);
+int32_t addScreenPolyFT4(POLY_FT4 *poly, SVECTOR *v0, SVECTOR *v1, SVECTOR *v2, SVECTOR *v3);
 void setFileReadCallback2(void *callback, int32_t arg);
 void renderTMDModel(uint8_t *buffer, int32_t id, GsCOORDINATE2 *coord, GsCOORDINATE2 *super, VECTOR *trans, SVECTOR *rot, VECTOR *scale);
 void translateConditionFXToEntity(Entity *entity, SVECTOR *out);
@@ -1920,7 +1920,7 @@ void VS_applyLineAttackHit(void)
 		rect[2] = *(int32_t *)((char *)((int32_t *)e)[1] + 0x78) + r;
 		rect[1] = *(int32_t *)((char *)((int32_t *)e)[1] + 0x80) - r;
 		rect[3] = *(int32_t *)((char *)((int32_t *)e)[1] + 0x80) + r;
-		if (MAIN_func_800DA740(rect, line) != -1) {
+		if (doSomethingWithSomePoints(rect, line) != -1) {
 			continue;
 		}
 		if (*(int32_t *)((int32_t)EFE_INSTANCE + 8) < (-DIGIMON_DATA[*(int32_t *)e].height - arg[1])) {
@@ -2495,7 +2495,7 @@ void VS_render3DTexturedQuad(void)
 	prim->tpage = m->pixelPage | semi;
 	prim->clut = GetClut((m->clutPage & 0x3f) << 4, (m->clutPage >> 6) + clutY);
 	setUVWH(prim, m->pixelOffsetX + u0off, m->pixelOffsetY + v0off, du, dv);
-	add3DSpritePrim(prim, &a, &b, &c, &d);
+	addScreenPolyFT4(prim, &a, &b, &c, &d);
 }
 
 void VS_setTransformToBoneMatrix(void)
@@ -4961,7 +4961,7 @@ int32_t VS_runEFEScript(int32_t script)
 
 void VS_resetPoisonBubbles(void)
 {
-	setShortWithStride((int16_t *)VS_D_80072FC0, -1, 0xc, 0xc);
+	setInt16WithStride((int16_t *)VS_D_80072FC0, -1, 0xc, 0xc);
 }
 
 int32_t VS_addPoisonBubble(int32_t arg)
@@ -5138,7 +5138,7 @@ void VS_initializeConfusionEffect(char *base)
 {
 	MAIN_D_801352F4 = (int32_t)base;
 	GsMapModelingData((unsigned long *)((char *)MAIN_D_801352F4 + 4));
-	setShortWithStride((int16_t *)VS_D_80073070, -1, 4, 0x10);
+	setInt16WithStride((int16_t *)VS_D_80073070, -1, 4, 0x10);
 }
 
 int32_t VS_addConfusionEffect(DigimonEntity *digimon)
@@ -5726,7 +5726,7 @@ void VS_renderAuraProjectile(int32_t i)
 	prim->tpage = getTPage(0, 1, 768, 256);
 	prim->clut = getClut(192, 492);
 	setUVWH(prim, ((int16_t *)((char **)p)[7])[5] + 0x60, 0xa0, 7, 7);
-	add3DSpritePrim(prim, &a, &b, &c, &d);
+	addScreenPolyFT4(prim, &a, &b, &c, &d);
 }
 
 char *VS_initializeAuraProjectiles(char *base)

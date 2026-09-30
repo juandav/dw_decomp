@@ -27,7 +27,7 @@ typedef struct {
 	uint16_t trigger;
 } MapLightUpdateData;
 
-void MAIN_func_800D92EC(void);
+void reinitializeAfterTournament(void);
 void MAIN_thunk_func_800D92EC(void);
 void startTournament(void);
 void *allocateArray(uint32_t size);
@@ -477,7 +477,7 @@ void renderPauseBox(instanceId)
 
 void MAIN_thunk_func_800D92EC(void)
 {
-	MAIN_func_800D92EC();
+	reinitializeAfterTournament();
 }
 
 void setMapLayerEnabled(uint8_t enabled)

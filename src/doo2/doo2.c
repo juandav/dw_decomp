@@ -47,7 +47,7 @@ typedef struct {
 
 void MAIN_func_80092B60(POLY_FT4 *prim);
 void addScreenPolyFT3(void *prim, SVECTOR *v0, SVECTOR *v1, SVECTOR *v2);
-int32_t add3DSpritePrim(POLY_FT4 *poly, SVECTOR *v0, SVECTOR *v1, SVECTOR *v2, SVECTOR *v3);
+int32_t addScreenPolyFT4(POLY_FT4 *poly, SVECTOR *v0, SVECTOR *v1, SVECTOR *v2, SVECTOR *v3);
 void DOO2_setScratchTop(int32_t size);
 void DOO2_tickShardSet(int32_t slot);
 void DOO2_releaseShardSet(int32_t slot);
@@ -328,7 +328,7 @@ void DOO2_renderQuadShard(Doo2Shard *fragment, int32_t arg1, int16_t duration,
 	d.vy = pd->vy + fragment->offsetY;
 	d.vz = pd->vz + fragment->offsetZ;
 	prim->code |= 2;
-	add3DSpritePrim(prim, &a, &b, &c, &d);
+	addScreenPolyFT4(prim, &a, &b, &c, &d);
 }
 
 void DOO2_tickEggBox(void)

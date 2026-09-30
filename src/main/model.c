@@ -26,7 +26,7 @@ extern uint8_t TAMER_MODEL_BUFFER[];
 extern GsOT *ACTIVE_ORDERING_TABLE;
 void renderDropShadow(Entity *entity);
 void setRotTransMatrix(MATRIX *m);
-int32_t add3DSpritePrim(POLY_FT4 *poly, SVECTOR *v0, SVECTOR *v1, SVECTOR *v2, SVECTOR *v3);
+int32_t addScreenPolyFT4(POLY_FT4 *poly, SVECTOR *v0, SVECTOR *v1, SVECTOR *v2, SVECTOR *v3);
 void updateTMDTextureData(char *tmd, int32_t clutX, int32_t x, int32_t y, int32_t tpage);
 extern PositionData TAMER_POSITION_DATA[];
 extern PositionData PARTNER_POSITION_DATA[];
@@ -2767,7 +2767,7 @@ void renderFlatDigimon(Entity *entity)
 		out[i].vy += (int16_t)loc->vy;
 		out[i].vz += (int16_t)loc->vz;
 	}
-	add3DSpritePrim(prim, &out[0], &out[1], &out[2], &out[3]);
+	addScreenPolyFT4(prim, &out[0], &out[1], &out[2], &out[3]);
 }
 
 ModelComponent *thunkLoadMMD(int32_t digiType, int32_t modelType)

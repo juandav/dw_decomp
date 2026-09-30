@@ -43,11 +43,11 @@ int32_t getDistance(int32_t x, int32_t y, int32_t z);
 void renderParticleFlash(ParticleFlashData *params);
 void renderDropShadow(Entity *entity);
 
-void MAIN_func_800D91EC(int32_t message, int32_t value);
-void MAIN_func_800D91FC(int32_t value);
-void MAIN_func_800D9248(void);
-void MAIN_func_800D9B60(uint32_t *buffer);
-void MAIN_func_800D9BA8(int32_t level, int16_t *src, int32_t unused);
+void setDeathMap(int32_t message, int32_t value);
+void waitForDeathMapLoading(int32_t value);
+void changeToDeathMap(void);
+void downloadCLUT1(uint32_t *buffer);
+void fadeoutCLUT1(int32_t level, int16_t *src, int32_t unused);
 
 void MURD_tickScene(int32_t instanceId);
 void MURD_renderScene(void);
@@ -188,8 +188,8 @@ void MURD_tickScene(int32_t instanceId)
 			break;
 		}
 		scene->phase = 1;
-		MAIN_func_800D9B60((uint32_t *)MURD_PALETTE_BACKUP);
-		MAIN_func_800D9BA8(0xff, MURD_PALETTE_BACKUP, 0);
+		downloadCLUT1((uint32_t *)MURD_PALETTE_BACKUP);
+		fadeoutCLUT1(0xff, MURD_PALETTE_BACKUP, 0);
 		MURD_setOtherEntitiesVisible(0);
 		MURD_createLivesBox(entity);
 		stopBGM();
@@ -257,8 +257,8 @@ void MURD_tickScene(int32_t instanceId)
 		VECTOR color = MURD_FLASH_HOLD_2;
 
 		MURD_renderFullscreenFade(&color);
-		MAIN_func_800D91FC(0);
-		MAIN_func_800D9248();
+		waitForDeathMapLoading(0);
+		changeToDeathMap();
 		setFullState(0x13, 1);
 		setPartnerState(0xb);
 		ENTITY_TABLE[0]->isOnMap = 1;
@@ -771,7 +771,7 @@ int32_t MURD_tick(partner, isInitialized)
 		} else {
 			message = 0xda;
 		}
-		MAIN_func_800D91EC(message, 1);
+		setDeathMap(message, 1);
 	} else {
 		loadDynamicLibrary(DOOA_REL, NULL, 0, NULL, NULL);
 		MURD_LOADING_COMPLETE = 0;

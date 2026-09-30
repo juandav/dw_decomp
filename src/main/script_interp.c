@@ -79,7 +79,7 @@ extern int16_t SELECTION_CURSOR_WIDTHS[];
 extern uint8_t *CURRENT_SCRIPT_PTR;
 
 void unsetCameraFollowPlayer(void);
-int32_t MAIN_func_800D8E64(int32_t param_1, int32_t param_2, int32_t param_3);
+int32_t scriptTickChangeMap(int32_t param_1, int32_t param_2, int32_t param_3);
 int32_t tickEntityWalkTo(uint8_t scriptId1, uint8_t scriptId2, int32_t targetX, int32_t targetZ, int8_t withCamera);
 int32_t tickRemoveMist(void);
 int32_t tickSaveMachine(void);
@@ -169,11 +169,11 @@ void spawnSpriteAtEntity(int32_t entId, int32_t sprite, int32_t param);
 void setRectImpassible(int16_t x, int16_t y, int8_t w, int8_t h);
 void addEntityText(int32_t a0, int32_t a1, int32_t a2, int32_t a3, int32_t a4);
 void setLoopCountToOne(int32_t a0);
-void MAIN_func_800D9360(int32_t a0);
+void loadTrainingLibrary(int32_t a0);
 int32_t loadTextureFile(char *path, uint32_t *outTPage, uint32_t *outClut);
 void setMapHeadActive(void);
-int32_t tickMoveCameraTo(int32_t x, int32_t y, uint8_t speed);
-int32_t tickMoveCameraToEntity(uint32_t scriptId, uint8_t speed);
+int32_t tickCameraMoveTo(int32_t x, int32_t y, uint8_t speed);
+int32_t tickCameraMoveToEntity(uint32_t scriptId, uint8_t speed);
 int32_t tickMoveObjectTo(uint32_t scriptId1, uint32_t scriptId2, int32_t angle, int32_t targetX, int32_t targetY);
 void initializeScripts(void);
 void initializeLoadedNPCModels(void);
@@ -185,7 +185,7 @@ void GsSortBoxFill(GsBOXF *bp, GsOT *otp, u_short pri);
 void renderHorizontalLine(uint8_t boxId, int16_t x, int16_t y, int32_t w);
 void drawString(char *str, int32_t x, int32_t y);
 int32_t flipTextboxPage(uint8_t boxId);
-void MAIN_func_800D634C(int32_t param_1, int32_t param_2);
+void setupMap(int32_t param_1, int32_t param_2);
 
 static void *script_interp_text_order[] = {
 	renderNamingUnderscore,
@@ -597,7 +597,7 @@ int32_t tickScript(void)
 	MAIN_func_80100258(0);
 	tickScriptedMovements();
 	if (MAIN_D_80134FE9 == 0x4b) {
-		if (MAIN_func_800D8E64((int16_t)MAIN_D_80134FF8,
+		if (scriptTickChangeMap((int16_t)MAIN_D_80134FF8,
 		                       (int16_t)SELECTION_MENU_STATE,
 		                       MAIN_D_80134FA0)) {
 			MAIN_D_80134FF0 = 0;
@@ -1966,7 +1966,7 @@ void scriptInstruction64to7E(int32_t op)
 			readMapTFS(CURRENT_MAP_ID);
 			break;
 		case 0x27:
-			MAIN_func_800D9360(CURRENT_MAP_ID);
+			loadTrainingLibrary(CURRENT_MAP_ID);
 			break;
 		case 0x30:
 			openSaveMachine();
@@ -2446,12 +2446,12 @@ void tickScriptedMovement(int32_t slot)
 		                        0, 0, 1);
 		break;
 	case 6:
-		done = tickMoveCameraTo(movement->posX,
+		done = tickCameraMoveTo(movement->posX,
 		                        movement->posY,
 		                        movement->speed);
 		break;
 	case 7:
-		done = tickMoveCameraToEntity(movement->entityId,
+		done = tickCameraMoveToEntity(movement->entityId,
 		                              movement->speed);
 		break;
 	case 8:
@@ -4839,7 +4839,7 @@ void returnFromScriptFile(void)
 		}
 		if (type == 3) {
 			readMapTFS(CURRENT_MAP_ID);
-			MAIN_func_800D634C(CURRENT_MAP_ID, 0);
+			setupMap(CURRENT_MAP_ID, 0);
 			MAIN_D_80134FEC = 0;
 			script = getScript(CURRENT_SCRIPT_ID);
 			section = getScriptSection(script, 0xfe);

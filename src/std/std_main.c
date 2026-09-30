@@ -324,7 +324,7 @@ int16_t STD_getMostEffectiveMove(int32_t index, int16_t *flags);
 int32_t lerp(int32_t a, int32_t b, int32_t lo, int32_t hi, int32_t t);
 void STD_updateCameraLerp(int32_t t, int32_t flip);
 int32_t STD_func_8005ADFC(int32_t a, int32_t b, int32_t c, int32_t d, int32_t e);
-int32_t MAIN_func_800DA63C(int32_t count, int32_t t, int32_t *keys, int32_t *values, int32_t *slopes);
+int32_t processSomeArenaArrays(int32_t count, int32_t t, int32_t *keys, int32_t *values, int32_t *slopes);
 void STD_tickCameraIntro(void);
 void STD_startCameraChase(Entity *entity, int32_t dx, int32_t side);
 void STD_setCameraToEntity(void);
@@ -341,7 +341,7 @@ void STD_unloadAllEFESlots(void);
 void STD_removeEFEEngine(void);
 int32_t loadSB(void);
 int32_t customRandom(int32_t lo, int32_t hi);
-void MAIN_func_800DA60C(int32_t count, int32_t arg1, int32_t arg2, int32_t *out);
+void initializeSomeArenaArrays(int32_t count, int32_t arg1, int32_t arg2, int32_t *out);
 void STD_func_8005D814(int32_t x, int32_t y, int32_t n, int32_t size);
 void swapByte(uint8_t *a, uint8_t *b);
 void STD_func_8006AD00(int32_t id);
@@ -2499,10 +2499,10 @@ void STD_tickCameraIntro(void)
 	off = MAIN_D_80134838;
 	rot = MAIN_D_80134840;
 	rot.vy = STD_D_8007B9BC[7];
-	STD_D_8007B9BC[8] = MAIN_func_800DA63C(0x16, p[0], STD_D_8007A41C, STD_D_8007B9EC, STD_D_8007BA44);
+	STD_D_8007B9BC[8] = processSomeArenaArrays(0x16, p[0], STD_D_8007A41C, STD_D_8007B9EC, STD_D_8007BA44);
 	STD_setViewpointFromBone(*(Entity **)&p[6], &off, &rot, STD_D_8007B9BC[8]);
 	GS_VIEWPOINT.vry = (-DIGIMON_DATA[STD_D_8007B9D0.target->type].height * 2) / 3;
-	GS_VIEWPOINT.vpy = -MAIN_func_800DA63C(0x16, p[0], STD_D_8007A41C, STD_D_8007BA9C, STD_D_8007BA44);
+	GS_VIEWPOINT.vpy = -processSomeArenaArrays(0x16, p[0], STD_D_8007A41C, STD_D_8007BA9C, STD_D_8007BA44);
 	p[0]++;
 }
 
@@ -2555,7 +2555,7 @@ void STD_func_8005B688(Entity *target, Entity *entity)
 		STD_D_8007BA9C[i] =
 			customRandom(0x50, DIGIMON_DATA[target->type].height * 180 / 100);
 	}
-	MAIN_func_800DA60C(0x16, (int32_t)STD_D_8007A41C, (int32_t)STD_D_8007BA9C, STD_D_8007BA44);
+	initializeSomeArenaArrays(0x16, (int32_t)STD_D_8007A41C, (int32_t)STD_D_8007BA9C, STD_D_8007BA44);
 
 	d = getDistance(dx, 0, dz) + 0x2bc;
 	STD_D_8007B9EC[0] = d;

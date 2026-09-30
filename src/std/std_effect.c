@@ -80,10 +80,10 @@ void setMapLayerEnabled(int32_t enabled);
 void MAIN_func_80092B60(POLY_FT4 *prim);
 void addScreenPolyFT3(void *prim, SVECTOR *v0, SVECTOR *v1, SVECTOR *v2);
 void renderLinePrimitive(uint32_t color, int32_t x0, int32_t y0, int32_t x1, int32_t y1, int32_t layer, int32_t flag);
-int32_t add3DSpritePrim(POLY_FT4 *poly, SVECTOR *v0, SVECTOR *v1, SVECTOR *v2, SVECTOR *v3);
+int32_t addScreenPolyFT4(POLY_FT4 *poly, SVECTOR *v0, SVECTOR *v1, SVECTOR *v2, SVECTOR *v3);
 void renderSprite(GsSPRITE *sprite, int16_t x, int16_t y, int32_t distance, int32_t width, int32_t height);
 void translateConditionFXToEntity(Entity *entity, SVECTOR *out);
-int32_t MAIN_func_800DA740(int16_t *rect, DVECTOR *line);
+int32_t doSomethingWithSomePoints(int16_t *rect, DVECTOR *line);
 char *initializeFlashData(char *base);
 void renderParticleFlash(int16_t *params);
 void calculatePosition(GsCOORDINATE2 *coord, MATRIX *matrix);
@@ -102,7 +102,7 @@ int32_t customRandom(int32_t a, int32_t b);
 int32_t getDistance(int32_t x, int32_t y, int32_t z);
 void createCloudFX(int16_t *pos);
 int32_t addEntityParticleFX(int32_t *typePtr, int32_t timer);
-void setShortWithStride(int16_t *ptr, int16_t value, int32_t count, int32_t stride);
+void setInt16WithStride(int16_t *ptr, int16_t value, int32_t count, int32_t stride);
 void setFileReadCallback2(void *callback, int32_t arg);
 int32_t STD_setupLoadedEFEFile(EfeLoad *load);
 void updateTMDTextureData(char *tmd, int32_t clutX, int32_t x, int32_t y, int32_t tpage);
@@ -2333,7 +2333,7 @@ void STD_applyLineAttackHit(void)
 		rect[2] = *(int32_t *)((char *)((int32_t *)e)[1] + 0x78) + r;
 		rect[1] = *(int32_t *)((char *)((int32_t *)e)[1] + 0x80) - r;
 		rect[3] = *(int32_t *)((char *)((int32_t *)e)[1] + 0x80) + r;
-		if (MAIN_func_800DA740(rect, line) != -1) {
+		if (doSomethingWithSomePoints(rect, line) != -1) {
 			continue;
 		}
 		if (*(int32_t *)((int32_t)EFE_INSTANCE + 8) < (-DIGIMON_DATA[*(int32_t *)e].height - arg[1])) {
@@ -2908,7 +2908,7 @@ void STD_render3DTexturedQuad(void)
 	prim->tpage = m->pixelPage | semi;
 	prim->clut = GetClut((m->clutPage & 0x3f) << 4, (m->clutPage >> 6) + clutY);
 	setUVWH(prim, m->pixelOffsetX + u0off, m->pixelOffsetY + v0off, du, dv);
-	add3DSpritePrim(prim, &a, &b, &c, &d);
+	addScreenPolyFT4(prim, &a, &b, &c, &d);
 }
 
 void STD_setTransformToBoneMatrix(void)
@@ -5371,7 +5371,7 @@ int32_t STD_runEFEScript(int32_t script)
 
 void STD_resetPoisonBubbles(void)
 {
-	setShortWithStride((int16_t *)STD_D_8007FC20, -1, 0xc, 0xc);
+	setInt16WithStride((int16_t *)STD_D_8007FC20, -1, 0xc, 0xc);
 }
 
 int32_t STD_addPoisonBubble(int32_t arg)
@@ -5548,7 +5548,7 @@ void STD_initializeConfusionEffect(char *base)
 {
 	MAIN_D_801351C8 = (int32_t)base;
 	GsMapModelingData((unsigned long *)((char *)MAIN_D_801351C8 + 4));
-	setShortWithStride((int16_t *)STD_D_8007FCD0, -1, 4, 0x10);
+	setInt16WithStride((int16_t *)STD_D_8007FCD0, -1, 4, 0x10);
 }
 
 int32_t STD_addConfusionEffect(int32_t arg)
@@ -6137,7 +6137,7 @@ void STD_renderAuraProjectile(int32_t i)
 	prim->tpage = getTPage(0, 1, 768, 256);
 	prim->clut = getClut(192, 492);
 	setUVWH(prim, ((int16_t *)((char **)p)[7])[5] + 0x60, 0xa0, 7, 7);
-	add3DSpritePrim(prim, &a, &b, &c, &d);
+	addScreenPolyFT4(prim, &a, &b, &c, &d);
 }
 
 char *STD_initializeAuraProjectiles(char *base)

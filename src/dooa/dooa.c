@@ -118,7 +118,7 @@ void DOOA_removeShardEffect(void);
 void DOOA_showPlayerAndPartner(void);
 void DOOA_fadeModelClut(int16_t *srcClut, void *unused, int16_t *dstClut, int32_t startFrame, int32_t endFrame, int32_t frame);
 void DOOA_fadeShardClut(int16_t *srcClut, void *unused, int16_t *dstClut, int32_t startFrame, int32_t endFrame, int32_t frame);
-int32_t MAIN_func_800DA9F4(void);
+int32_t DOOA_getStoredDigimonY(void);
 int32_t DOOA_updateShards(int32_t instanceId);
 int32_t DOOA_renderShards(int32_t instanceId);
 int32_t DOOA_initShardEffect(Entity *entity, intptr_t addr, int32_t size);
@@ -131,20 +131,20 @@ void DOOA_tickRebirth(int32_t instanceId);
 void calculateBoneMatrix(Entity *entity, int32_t boneId, MATRIX *out);
 void DOOA_spawnBoneShards(DooaShardEffect *effect, int32_t boneIndex, long wireIndex);
 char *initializeFlashData(char *base);
-void MAIN_func_800D91EC(int32_t messageId, int32_t flag);
+void setDeathMap(int32_t messageId, int32_t flag);
 void DOOA_tickDissolve(int32_t instanceId);
 void DOOA_initOrderingTable(void);
 void DOOA_spawnShardWave(long wireIndex);
 void MAIN_func_80092B60(POLY_FT4 *prim);
 void addScreenPolyFT3(void *prim, SVECTOR *v0, SVECTOR *v1, SVECTOR *v2);
-int32_t add3DSpritePrim(POLY_FT4 *poly, SVECTOR *v0, SVECTOR *v1, SVECTOR *v2, SVECTOR *v3);
+int32_t addScreenPolyFT4(POLY_FT4 *poly, SVECTOR *v0, SVECTOR *v1, SVECTOR *v2, SVECTOR *v3);
 void tickCameraMovement(int32_t mode);
 void setEFEFlashOffset(int32_t instance, int32_t x, int32_t y);
-void MAIN_func_800D91FC(int32_t mode);
-void MAIN_func_800D9248(void);
-void MAIN_func_800D9B60(int16_t *clut);
-void MAIN_func_800D9BA8(int32_t alpha, int16_t *clut, int32_t mode);
-void MAIN_func_800DA9C8(void);
+void waitForDeathMapLoading(int32_t mode);
+void changeToDeathMap(void);
+void downloadCLUT1(int16_t *clut);
+void fadeoutCLUT1(int32_t alpha, int16_t *clut, int32_t mode);
+void DOOA_storeDigimonY(void);
 void renderParticleFlash(ParticleFlashData *params);
 
 static void *dooa_functions[] = {
@@ -289,7 +289,7 @@ void DOOA_tickDissolve(int32_t instanceId)
 
 	if ((entity->anim.animId == 0xc) && (entity->anim.animFrame == entity->anim.frameCount)) {
 		startAnimation((Entity *)&PARTNER_ENTITY, 1);
-		MAIN_func_800DA9C8();
+		DOOA_storeDigimonY();
 		DOOA_SAVED_LOCATION = entity->posData->location;
 		MAIN_D_80135338 = entity->posData->rotation;
 	}
@@ -306,8 +306,8 @@ void DOOA_tickDissolve(int32_t instanceId)
 		savedOffsetX = DRAWING_OFFSET_X;
 		savedOffsetY = DRAWING_OFFSET_Y;
 		savedDistance = VIEWPORT_DISTANCE;
-		MAIN_func_800D91FC(0);
-		MAIN_func_800D9248();
+		waitForDeathMapLoading(0);
+		changeToDeathMap();
 		stopBGM();
 		loadMapSounds2(0x13);
 		isSoundLoaded(0, 8);
@@ -359,8 +359,8 @@ void DOOA_tickDissolve(int32_t instanceId)
 		seq->phase = 1;
 		setMapLayerEnabled(0);
 		DOOA_hideAllButPartner();
-		MAIN_func_800D9B60(DOOA_SCENE_CLUT);
-		MAIN_func_800D9BA8(0xff, DOOA_SCENE_CLUT, 0);
+		downloadCLUT1(DOOA_SCENE_CLUT);
+		fadeoutCLUT1(0xff, DOOA_SCENE_CLUT, 0);
 		break;
 	case 1:
 		entity->isOnMap = 2;
@@ -396,7 +396,7 @@ void DOOA_tickDissolve(int32_t instanceId)
 				startAnimation((Entity *)&PARTNER_ENTITY, 0xc);
 			}
 			seq->phaseInitPending = 0;
-			MAIN_func_800DA9C8();
+			DOOA_storeDigimonY();
 		}
 		if (seq->frame == 0x69) {
 			playSound2(8, 0);
@@ -419,7 +419,7 @@ void DOOA_tickDissolve(int32_t instanceId)
 			seq->phase = 0x64;
 			DOOA_SAVED_LOCATION.vy = entity->posData->location.vy;
 			target = &seq->flash;
-			target->targetY = MAIN_func_800DA9F4() - (DIGIMON_DATA[entity->type].height + 100);
+			target->targetY = DOOA_getStoredDigimonY() - (DIGIMON_DATA[entity->type].height + 100);
 			target->pos.vx = entity->posData->location.vx;
 			target->pos.vz = entity->posData->location.vz;
 			stopSound();
@@ -1078,7 +1078,7 @@ void DOOA_tickRebirth(int32_t instanceId)
 			seq->sparkleIndex = 0;
 			ENTITY_TABLE[1]->isOnMap = 1;
 			startAnimation((Entity *)&PARTNER_ENTITY, 0x1c);
-			MAIN_func_800D9BA8(0, DOOA_SCENE_CLUT, 0);
+			fadeoutCLUT1(0, DOOA_SCENE_CLUT, 0);
 			DOOA_fadeModelClut(DOOA_MODEL_CLUT, entity, DOOA_FADED_CLUT, 0, 1, 0);
 			DOOA_fadeShardClut(DOOA_SHARD_CLUT, entity, DOOA_FADED_CLUT, 0, 1, 0);
 			break;
@@ -1087,7 +1087,7 @@ void DOOA_tickRebirth(int32_t instanceId)
 			break;
 		}
 		level = lerp(255, 0, 152, 202, seq->frame);
-		MAIN_func_800D9BA8(level, DOOA_SCENE_CLUT, 0);
+		fadeoutCLUT1(level, DOOA_SCENE_CLUT, 0);
 		if ((seq->frame & 1) == 0) {
 			DOOA_fadeModelClut(DOOA_MODEL_CLUT, entity, DOOA_FADED_CLUT, 0, 255, level);
 		} else {
@@ -1357,7 +1357,7 @@ int32_t DOOA_updateShards(int32_t instanceId)
 					shard->radius = 0;
 					shard->delay = -1;
 				}
-				shard->centerY = lerp(-shard->dropDepth, MAIN_func_800DA9F4() - 100, shard->targetRadius, 0, shard->radius);
+				shard->centerY = lerp(-shard->dropDepth, DOOA_getStoredDigimonY() - 100, shard->targetRadius, 0, shard->radius);
 			}
 			shard->rotY += shard->spin;
 			shard->rotY %= 4096;
@@ -1443,13 +1443,13 @@ int32_t DOOA_renderShards(int32_t instanceId)
 				ApplyMatrixSV(&triMatrix, &triB, &triB);
 				ApplyMatrixSV(&triMatrix, &triC, &triC);
 				triA.vx += effect->entity->posData->location.vx;
-				triA.vy += MAIN_func_800DA9F4();
+				triA.vy += DOOA_getStoredDigimonY();
 				triA.vz += effect->entity->posData->location.vz;
 				triB.vx += effect->entity->posData->location.vx;
-				triB.vy += MAIN_func_800DA9F4();
+				triB.vy += DOOA_getStoredDigimonY();
 				triB.vz += effect->entity->posData->location.vz;
 				triC.vx += effect->entity->posData->location.vx;
-				triC.vy += MAIN_func_800DA9F4();
+				triC.vy += DOOA_getStoredDigimonY();
 				triC.vz += effect->entity->posData->location.vz;
 				addScreenPolyFT3(triPrim, &triA, &triB, &triC);
 			}
@@ -1494,18 +1494,18 @@ int32_t DOOA_renderShards(int32_t instanceId)
 				ApplyMatrixSV(&quadMatrix, &quadC, &quadC);
 				ApplyMatrixSV(&quadMatrix, &quadD, &quadD);
 				quadA.vx += effect->entity->posData->location.vx;
-				quadA.vy += MAIN_func_800DA9F4();
+				quadA.vy += DOOA_getStoredDigimonY();
 				quadA.vz += effect->entity->posData->location.vz;
 				quadB.vx += effect->entity->posData->location.vx;
-				quadB.vy += MAIN_func_800DA9F4();
+				quadB.vy += DOOA_getStoredDigimonY();
 				quadB.vz += effect->entity->posData->location.vz;
 				quadC.vx += effect->entity->posData->location.vx;
-				quadC.vy += MAIN_func_800DA9F4();
+				quadC.vy += DOOA_getStoredDigimonY();
 				quadC.vz += effect->entity->posData->location.vz;
 				quadD.vx += effect->entity->posData->location.vx;
-				quadD.vy += MAIN_func_800DA9F4();
+				quadD.vy += DOOA_getStoredDigimonY();
 				quadD.vz += effect->entity->posData->location.vz;
-				add3DSpritePrim(quadPrim, &quadA, &quadB, &quadC, &quadD);
+				addScreenPolyFT4(quadPrim, &quadA, &quadB, &quadC, &quadD);
 			}
 			cursor += sizeof(DooaShardQuad);
 			break;
@@ -1585,7 +1585,7 @@ void DOOA_spawnBoneShards(DooaShardEffect *effect, int32_t boneIndex, long wireI
 				triShard->vertex[2].vy = verts[((TMD_P_TG3 *)tri)->v2].vy - triShard->centerY;
 				triShard->vertex[2].vz = verts[((TMD_P_TG3 *)tri)->v2].vz - triShard->centerZ;
 				triShard->centerX -= effect->entity->posData->location.vx;
-				triShard->centerY -= MAIN_func_800DA9F4();
+				triShard->centerY -= DOOA_getStoredDigimonY();
 				triShard->centerZ -= effect->entity->posData->location.vz;
 				triShard->fallSpeed = 0;
 				triShard->radius = 0x1000;
@@ -1620,7 +1620,7 @@ void DOOA_spawnBoneShards(DooaShardEffect *effect, int32_t boneIndex, long wireI
 				quadShard->vertex[3].vy = verts[((TMD_P_TG4 *)quad)->v3].vy - quadShard->centerY;
 				quadShard->vertex[3].vz = verts[((TMD_P_TG4 *)quad)->v3].vz - quadShard->centerZ;
 				quadShard->centerX -= effect->entity->posData->location.vx;
-				quadShard->centerY -= MAIN_func_800DA9F4();
+				quadShard->centerY -= DOOA_getStoredDigimonY();
 				quadShard->centerZ -= effect->entity->posData->location.vz;
 				quadShard->fallSpeed = 0;
 				quadShard->radius = 0x1000;
@@ -1694,7 +1694,7 @@ int32_t DOOA_tick(partner, buffer, isInitialized)
 		messageId = 0xda;
 	}
 	MAIN_D_80135340 = messageId;
-	MAIN_func_800D91EC(messageId, 1);
+	setDeathMap(messageId, 1);
 	return (intptr_t)buffer;
 }
 

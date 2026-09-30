@@ -22,10 +22,10 @@ void BTL_removeFinisherAura(int32_t arg0);
 int32_t isInvisible(Entity *entity);
 void entityLookAtTile(Entity *entity, int32_t tileX, int32_t tileY);
 void getModelTile(VECTOR *pos, int16_t *outTileX, int16_t *outTileY);
-void tickPartnerCollision(void);
+void tickCollision(void);
 void startBattleIdleAnimation(DigimonEntity *entity, Stats *stats, int32_t flags);
 void playSound(int32_t soundId, uint32_t flag);
-void MAIN_func_800D3ADC(void);
+void clearTamerWaypoints(void);
 
 int16_t MAIN_D_801346D8[4] = { 0, 1024, 2048, 3072 };
 uint8_t MAIN_D_801346E0[5] = { 3, 4, 5, 7, 8 };
@@ -295,7 +295,7 @@ void BTL_handleBattleIntro(void)
 			allOffScreen = 1;
 		}
 		done = BTL_isBattleStartTextFinished();
-		tickPartnerCollision();
+		tickCollision();
 		entityLookAtLocation(&PARTNER_ENTITY.digimonEntity.entity, &ENTITY_TABLE[COMBAT_DATA_PTR->player.entityIds[1]]->posData->location);
 		BTL_battleTickFrame();
 	}
@@ -304,7 +304,7 @@ void BTL_handleBattleIntro(void)
 		TAMER_WAYPOINT_COUNT = wp + 1;
 		TAMER_WAYPOINT_ACTIVE = TAMER_WAYPOINT_COUNT - 1;
 	} else {
-		MAIN_func_800D3ADC();
+		clearTamerWaypoints();
 	}
 
 	if (ENTITY_TABLE[0]->anim.animId != 1) {

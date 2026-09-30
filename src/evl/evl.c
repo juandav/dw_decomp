@@ -72,19 +72,19 @@ extern VECTOR EVL_D_80068908;
 int32_t getMapSoundId(int32_t mapId);
 void createFlash(void);
 void forceUpdateBGM(void);
-void MAIN_func_800D9BA8(int32_t level, int16_t *src, int32_t unused);
-void MAIN_func_800D9F14(int32_t fade, char *src, int32_t unused);
+void fadeoutCLUT1(int32_t level, int16_t *src, int32_t unused);
+void fadeoutCLUT2(int32_t fade, char *src, int32_t unused);
 void setMapLayerEnabled(int32_t enabled);
 
 void initializeEvolvedPartner(int32_t type, int32_t posX, int32_t posY, int32_t posZ,
                               int32_t rotationX, int32_t rotationY, int32_t rotationZ);
-void MAIN_func_800D9B60(int16_t *clut);
-void MAIN_func_800D9E68(char *base);
+void downloadCLUT1(int16_t *clut);
+void downloadCLUT2(char *base);
 char *initializeFlashData(char *base);
 int32_t customRandom(int32_t a, int32_t b);
 void MAIN_func_80092B60(POLY_FT4 *prim);
 void addScreenPolyFT3(void *prim, SVECTOR *v0, SVECTOR *v1, SVECTOR *v2);
-int32_t add3DSpritePrim(POLY_FT4 *poly, SVECTOR *v0, SVECTOR *v1, SVECTOR *v2, SVECTOR *v3);
+int32_t addScreenPolyFT4(POLY_FT4 *poly, SVECTOR *v0, SVECTOR *v1, SVECTOR *v2, SVECTOR *v3);
 void calculateBoneMatrix(Entity *entity, int32_t boneId, MATRIX *out);
 void addTamerLevel(int32_t chance, int32_t amount);
 void learnMove(int32_t moveId);
@@ -336,8 +336,8 @@ void EVL_tickEvoSequence(int32_t instanceId)
 		} else {
 			alpha = 0xff;
 		}
-		MAIN_func_800D9BA8(alpha, EVL_D_80063F3C, 0);
-		MAIN_func_800D9F14(alpha, EVL_D_80064D50, 0);
+		fadeoutCLUT1(alpha, EVL_D_80063F3C, 0);
+		fadeoutCLUT2(alpha, EVL_D_80064D50, 0);
 		if ((frame & 1) == 0) {
 			EVL_fadeClutBank0((int16_t *)EVL_D_80065398, partner, EVL_D_800679E4, 0, 0x20, data->timer);
 		} else {
@@ -514,8 +514,8 @@ shards:
 		DRAWING_OFFSET_X = MAIN_D_801351E4;
 		DRAWING_OFFSET_Y = MAIN_D_801351E8;
 		VIEWPORT_DISTANCE = MAIN_D_801351EC;
-		MAIN_func_800D9BA8(0, EVL_D_80063F3C, 0);
-		MAIN_func_800D9F14(0, EVL_D_80064D50, 0);
+		fadeoutCLUT1(0, EVL_D_80063F3C, 0);
+		fadeoutCLUT2(0, EVL_D_80064D50, 0);
 		EVL_fadeClutBank0((int16_t *)EVL_D_80065398, partner, EVL_D_800679E4, 0, 1, 0);
 		EVL_fadeClutBank1((int16_t *)EVL_D_8006569C, partner, EVL_D_800679E4, 0, 1, 0);
 		EVL_setOtherEntitiesVisible(1);
@@ -1107,7 +1107,7 @@ void EVL_renderQuadShard(EvlModelVertex *drift, int32_t unused1, int16_t speed, 
 	d.vy = v->vy + offset.vy;
 	d.vz = v->vz + offset.vz;
 	prim->code |= 2;
-	add3DSpritePrim(prim, &a, &b, &c, &d);
+	addScreenPolyFT4(prim, &a, &b, &c, &d);
 }
 
 void EVL_tickParticle(int32_t id)
@@ -1242,8 +1242,8 @@ void EVL_initEvoSequence(void)
 	data->unk_0x8 = 0;
 	data->state = 0;
 	copyVector(&EVL_D_80064D40, &partner->digimonEntity.entity.posData->location);
-	MAIN_func_800D9B60(EVL_D_80063F3C);
-	MAIN_func_800D9E68(EVL_D_80064D50);
+	downloadCLUT1(EVL_D_80063F3C);
+	downloadCLUT2(EVL_D_80064D50);
 	EVL_storeDigimonClut((int32_t)EVL_D_80065094, &partner->digimonEntity.entity);
 	EVL_storeClutBank0((int32_t)EVL_D_80065398);
 	EVL_storeClutBank1((int32_t)EVL_D_8006569C);

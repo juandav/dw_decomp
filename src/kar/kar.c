@@ -103,7 +103,7 @@ int32_t KAR_drawHintPagePenguinmon(int32_t idx, int8_t n);
 int32_t KAR_drawHintPageMetalMamemon(int32_t idx, int8_t n);
 void KAR_renderPowerMeter(void);
 int32_t KAR_computeThrowPower(uint32_t a, int32_t b, int32_t c);
-void MAIN_func_800D8AC8(int32_t diffX, int32_t diffY);
+void moveCameraByOffset(int32_t diffX, int32_t diffY);
 void KAR_setOpponentShot(int8_t row, int32_t val, int16_t b, int16_t c);
 void KAR_rotatePoint(SVECTOR *p, int32_t ang);
 int32_t KAR_aimBankShot(KarStone *stone, int32_t x, int32_t z);
@@ -114,7 +114,7 @@ int32_t KAR_aimAtStoneInRing(int32_t player, int32_t key, int16_t *outX, int16_t
 void KAR_renderNamePlates(void);
 void KAR_beginThrow(void);
 
-int32_t tickMoveCameraTo(int16_t x, int16_t z, int32_t speed);
+int32_t tickCameraMoveTo(int16_t x, int16_t z, int32_t speed);
 void uploadMapTileImages();
 void moveCameraByDiff(VECTOR *from, VECTOR *to);
 
@@ -1526,7 +1526,7 @@ void KAR_handleAimScroll(void)
 		dy += 10;
 	}
 	if ((dx != 0) || (dy != 0)) {
-		MAIN_func_800D8AC8(dx, dy);
+		moveCameraByOffset(dx, dy);
 	}
 }
 
@@ -2527,7 +2527,7 @@ int8_t KAR_tickScoreTally(void)
 
 	if (MAIN_D_8013522E == 0) {
 		if (KAR_D_800639C0[MAIN_D_80135256]->ring != KAR_D_800639C0[MAIN_D_80135256]->prevRing) {
-			done = tickMoveCameraTo(KAR_D_800639C0[MAIN_D_80135256]->pos.vx,
+			done = tickCameraMoveTo(KAR_D_800639C0[MAIN_D_80135256]->pos.vx,
 			                        KAR_D_800639C0[MAIN_D_80135256]->pos.vz, 5);
 			if ((CAMERA_Y[0] % 0x80) == 0 || (CAMERA_Y[0] % 0x80) >= 0x6a) {
 				uploadMapTileImages(MAP_TILE_DATA, MAP_TILE_X + MAP_TILE_Y * (int16_t)MAP_WIDTH[0]);
@@ -3232,7 +3232,7 @@ void KAR_tickMatchState(void)
 		}
 		break;
 	case 7:
-		MAIN_D_80135224 = tickMoveCameraTo(
+		MAIN_D_80135224 = tickCameraMoveTo(
 			KAR_D_8005B5A0[MAIN_D_8013523C].row.stones[MAIN_D_8013523A].pos.vx,
 			KAR_D_8005B5A0[MAIN_D_8013523C].row.stones[MAIN_D_8013523A].pos.vz, 0x14);
 		if (((CAMERA_Y[0] % 0x80) == 0) || ((CAMERA_Y[0] % 0x80) >= 0x6A)) {
@@ -3338,7 +3338,7 @@ void KAR_tickMatchState(void)
 		}
 		break;
 	case 0xE:
-		MAIN_D_80135224 = tickMoveCameraTo(0, -0x6A4, 0xA);
+		MAIN_D_80135224 = tickCameraMoveTo(0, -0x6A4, 0xA);
 		if (((CAMERA_Y[0] % 0x80) == 0) || ((CAMERA_Y[0] % 0x80) >= 0x6A)) {
 			uploadMapTileImages(MAP_TILE_DATA, MAP_TILE_X + MAP_TILE_Y * (int16_t)MAP_WIDTH[0]);
 		}
@@ -3359,7 +3359,7 @@ void KAR_tickMatchState(void)
 					KAR_D_8005B5A0[0].row.stones[MAIN_D_8013523A];
 			}
 			if (MAIN_D_80135250 != 0) {
-				MAIN_D_80135224 = tickMoveCameraTo(ENTITY_TABLE[player]->posData->location.vx,
+				MAIN_D_80135224 = tickCameraMoveTo(ENTITY_TABLE[player]->posData->location.vx,
 				                                   ENTITY_TABLE[player]->posData->location.vz, 0x14);
 				if (((CAMERA_Y[0] % 0x80) == 0) || ((CAMERA_Y[0] % 0x80) >= 0x6A)) {
 					uploadMapTileImages(MAP_TILE_DATA, MAP_TILE_X + MAP_TILE_Y * (int16_t)MAP_WIDTH[0]);
@@ -3398,7 +3398,7 @@ void KAR_tickMatchState(void)
 		}
 		break;
 	case 0x10:
-		MAIN_D_80135224 = tickMoveCameraTo(ENTITY_TABLE[player]->posData->location.vx,
+		MAIN_D_80135224 = tickCameraMoveTo(ENTITY_TABLE[player]->posData->location.vx,
 		                                   ENTITY_TABLE[player]->posData->location.vz, 0x14);
 		if (((CAMERA_Y[0] % 0x80) == 0) || ((CAMERA_Y[0] % 0x80) >= 0x6A)) {
 			uploadMapTileImages(MAP_TILE_DATA, MAP_TILE_X + MAP_TILE_Y * (int16_t)MAP_WIDTH[0]);

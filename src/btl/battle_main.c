@@ -45,7 +45,7 @@ extern const uint8_t BTL_D_80072EE8[8][2];
 
 void removeObject(int32_t objectId, int32_t instanceId);
 void addObject(int32_t objectId, int32_t instanceId, void *tick, void *render);
-void getEntityTileFromModel(Entity *entity, int8_t *outTileX, int8_t *outTileY);
+void getEntityTile(Entity *entity, int8_t *outTileX, int8_t *outTileY);
 void startBattleIdleAnimation(DigimonEntity *entity, Stats *stats, int32_t flags);
 void tickObjects(void);
 void renderObjects(void);
@@ -111,10 +111,10 @@ int32_t BTL_handlePartnerMoveCommand(DigimonEntity *digimon, DigimonEntity *targ
 void BTL_tickRangedAttack(DigimonEntity *digimon, DigimonEntity *target, FighterData *fighter, int16_t move);
 int32_t BTL_tickMeleeAttack(DigimonEntity *digimon, DigimonEntity *target, FighterData *fighter, int16_t arg3);
 void BTL_startQueuedMove(DigimonEntity *digimon, DigimonEntity *target, FighterData *fighter);
-void addPartnerWaypoint(int16_t index, int8_t x, int8_t y);
-void MAIN_func_800D39F8(void);
+void setPartnerWaypoint(int16_t index, int8_t x, int8_t y);
+void initializePartnerWaypoint(void);
 void BTL_removeFinisherAura(int32_t arg0);
-int32_t isFiveTileWidePathOpen(int32_t x1, int32_t y1, int32_t x2, int32_t y2);
+int32_t isFiveTileWidePathBlocked(int32_t x1, int32_t y1, int32_t x2, int32_t y2);
 void BTL_addAuraProjectile(Entity *entity);
 void BTL_handleHitReaction(Entity *entity, FighterData *fighter, AttackObject *attack, int16_t index);
 void BTL_retargetAfterHit(DigimonEntity *digimon, FighterData *fighter, AttackObject attack);
@@ -714,12 +714,12 @@ void BTL_tickPartnerWaypointTrail(void)
 	int32_t i;
 #endif
 
-	getEntityTileFromModel(ENTITY_TABLE[1], &partnerTileX, &partnerTileY);
+	getEntityTile(ENTITY_TABLE[1], &partnerTileX, &partnerTileY);
 	if ((partnerTileX != PARTNER_PREVIOUS_TILE_X) || (partnerTileY != PARTNER_PREVIOUS_TILE_Y)) {
-		getEntityTileFromModel(ENTITY_TABLE[0], &tamerTileX, &tamerTileY);
-		if (isFiveTileWidePathOpen(tamerTileX, tamerTileY, partnerTileX, partnerTileY) == 1) {
+		getEntityTile(ENTITY_TABLE[0], &tamerTileX, &tamerTileY);
+		if (isFiveTileWidePathBlocked(tamerTileX, tamerTileY, partnerTileX, partnerTileY) == 1) {
 			if (PARTNER_WAYPOINT_COUNT != 0) {
-				if (isFiveTileWidePathOpen(partnerTileX, partnerTileY, PARTNER_WAYPOINT_X[PARTNER_WAYPOINT_CURRENT], PARTNER_WAYPOINT_Y[PARTNER_WAYPOINT_CURRENT]) == 1) {
+				if (isFiveTileWidePathBlocked(partnerTileX, partnerTileY, PARTNER_WAYPOINT_X[PARTNER_WAYPOINT_CURRENT], PARTNER_WAYPOINT_Y[PARTNER_WAYPOINT_CURRENT]) == 1) {
 #if defined(VERSION_JP)
 					for (n = PARTNER_WAYPOINT_COUNT; n > 0; n--) {
 						src = (PARTNER_WAYPOINT_CURRENT + n - 1) % 30;
@@ -740,14 +740,14 @@ void BTL_tickPartnerWaypointTrail(void)
 						i = j;
 					}
 #endif
-					addPartnerWaypoint(PARTNER_WAYPOINT_CURRENT, PARTNER_PREVIOUS_TILE_X, PARTNER_PREVIOUS_TILE_Y);
+					setPartnerWaypoint(PARTNER_WAYPOINT_CURRENT, PARTNER_PREVIOUS_TILE_X, PARTNER_PREVIOUS_TILE_Y);
 				}
 			} else {
-				MAIN_func_800D39F8();
-				addPartnerWaypoint(PARTNER_WAYPOINT_CURRENT, PARTNER_PREVIOUS_TILE_X, PARTNER_PREVIOUS_TILE_Y);
+				initializePartnerWaypoint();
+				setPartnerWaypoint(PARTNER_WAYPOINT_CURRENT, PARTNER_PREVIOUS_TILE_X, PARTNER_PREVIOUS_TILE_Y);
 			}
 		} else {
-			MAIN_func_800D39F8();
+			initializePartnerWaypoint();
 		}
 	}
 
@@ -1727,7 +1727,7 @@ void BTL_startWalkingAnimation(Entity *entity, Stats *stats, uint16_t flags)
 
 void BTL_initializePartnerTile(void)
 {
-	getEntityTileFromModel(ENTITY_TABLE[1], &PARTNER_PREVIOUS_TILE_X, &PARTNER_PREVIOUS_TILE_Y);
+	getEntityTile(ENTITY_TABLE[1], &PARTNER_PREVIOUS_TILE_X, &PARTNER_PREVIOUS_TILE_Y);
 }
 
 void BTL_initializeEnemyHPBarSprites(void)

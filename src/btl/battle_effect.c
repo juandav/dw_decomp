@@ -72,13 +72,13 @@ void updateTMDTextureData(char *tmd, int32_t clutX, int32_t x, int32_t y, int32_
 void MAIN_func_80092B60(POLY_FT4 *prim);
 void addScreenPolyFT3(void *prim, SVECTOR *v0, SVECTOR *v1, SVECTOR *v2);
 void renderLinePrimitive(uint32_t color, int32_t x0, int32_t y0, int32_t x1, int32_t y1, int32_t layer, int32_t flag);
-int32_t add3DSpritePrim(POLY_FT4 *poly, SVECTOR *v0, SVECTOR *v1, SVECTOR *v2, SVECTOR *v3);
+int32_t addScreenPolyFT4(POLY_FT4 *poly, SVECTOR *v0, SVECTOR *v1, SVECTOR *v2, SVECTOR *v3);
 void renderSprite(GsSPRITE *sprite, int16_t x, int16_t y, int32_t distance, int32_t width, int32_t height);
 void translateConditionFXToEntity(Entity *entity, SVECTOR *out);
 CdlLOC *getEFEDATEntry(int32_t id);
 int32_t addFileReadRequest(char *path, uint8_t *buffer, uint8_t *isRunning, void *callback, void *callbackParam, CdlLOC *loc, int32_t size);
 void BTL_renderPoisonBubble(int32_t i);
-int32_t MAIN_func_800DA740(int16_t *rect, DVECTOR *line);
+int32_t doSomethingWithSomePoints(int16_t *rect, DVECTOR *line);
 void BTL_applyLineAttackHit(void);
 void BTL_renderRadialWaves(void);
 void BTL_renderRibbonStrip(void);
@@ -105,7 +105,7 @@ void MAIN_func_800E4470(MATRIX *m, SVECTOR *out);
 void toEulerAngles(SVECTOR *out, int32_t x, int32_t y, int32_t z);
 void BTL_runEFESlotScript(int32_t i);
 void matrixToEuler2(MATRIX *m, SVECTOR *out);
-void MAIN_func_800D9660(GsRVIEW2 *view);
+void getRViewCopy(GsRVIEW2 *view);
 void getViewportDistanceCopy(int32_t *out);
 int32_t customRandom(int32_t a, int32_t b);
 int32_t BTL_addPoisonBubble(int32_t arg);
@@ -113,7 +113,7 @@ int32_t getDistance(int32_t x, int32_t y, int32_t z);
 void createCloudFX(int16_t *pos);
 void BTL_removeFinisherAura(int32_t index);
 int32_t addEntityParticleFX(int32_t *typePtr, int32_t timer);
-void setShortWithStride(int16_t *ptr, int16_t value, int32_t count, int32_t stride);
+void setInt16WithStride(int16_t *ptr, int16_t value, int32_t count, int32_t stride);
 void setFileReadCallback2(void *callback, int32_t arg);
 int32_t BTL_setupLoadedEFEFile(EfeLoad *load);
 void BTL_stopEFESounds(void);
@@ -2195,7 +2195,7 @@ void BTL_applyLineAttackHit(void)
 		rect[2] = *(int32_t *)((char *)((int32_t *)e)[1] + 0x78) + r;
 		rect[1] = *(int32_t *)((char *)((int32_t *)e)[1] + 0x80) - r;
 		rect[3] = *(int32_t *)((char *)((int32_t *)e)[1] + 0x80) + r;
-		if (MAIN_func_800DA740(rect, line) != -1) {
+		if (doSomethingWithSomePoints(rect, line) != -1) {
 			continue;
 		}
 		if (*(int32_t *)((int32_t)EFE_INSTANCE + 8) < (-DIGIMON_DATA[*(int32_t *)e].height - arg[1])) {
@@ -2770,7 +2770,7 @@ void BTL_render3DTexturedQuad(void)
 	prim->tpage = m->pixelPage | semi;
 	prim->clut = GetClut((m->clutPage & 0x3f) << 4, (m->clutPage >> 6) + clutY);
 	setUVWH(prim, m->pixelOffsetX + u0off, m->pixelOffsetY + v0off, du, dv);
-	add3DSpritePrim(prim, &a, &b, &c, &d);
+	addScreenPolyFT4(prim, &a, &b, &c, &d);
 }
 
 void BTL_setTransformToBoneMatrix(void)
@@ -3014,7 +3014,7 @@ void BTL_restoreCameraView(void)
 	int32_t x;
 	int32_t y;
 
-	MAIN_func_800D9660(&view);
+	getRViewCopy(&view);
 	getViewportDistanceCopy(&dist);
 	getDrawingOffsetCopy(&x, &y);
 	DRAWING_OFFSET_X = x;
@@ -5239,7 +5239,7 @@ int32_t BTL_runEFEScript(int32_t script)
 
 void BTL_resetPoisonBubbles(void)
 {
-	setShortWithStride((int16_t *)BTL_D_80075040, -1, 0xc, 0xc);
+	setInt16WithStride((int16_t *)BTL_D_80075040, -1, 0xc, 0xc);
 }
 
 int32_t BTL_addPoisonBubble(int32_t arg)
@@ -5416,7 +5416,7 @@ void BTL_initializeConfusionEffect(char *base)
 {
 	MAIN_D_801350D4 = (int32_t)base;
 	GsMapModelingData((unsigned long *)((char *)MAIN_D_801350D4 + 4));
-	setShortWithStride((int16_t *)BTL_D_800750F0, -1, 4, 0x10);
+	setInt16WithStride((int16_t *)BTL_D_800750F0, -1, 4, 0x10);
 }
 
 int32_t BTL_addConfusionEffect(int32_t arg)
@@ -6005,7 +6005,7 @@ void BTL_renderAuraProjectile(int32_t i)
 	prim->tpage = getTPage(0, 1, 768, 256);
 	prim->clut = getClut(192, 492);
 	setUVWH(prim, ((int16_t *)((char **)p)[7])[5] + 0x60, 0xa0, 7, 7);
-	add3DSpritePrim(prim, &a, &b, &c, &d);
+	addScreenPolyFT4(prim, &a, &b, &c, &d);
 }
 
 char *BTL_initializeAuraProjectiles(char *base)
@@ -6169,7 +6169,7 @@ void BTL_renderItemParticles(int32_t idx)
 
 void BTL_initializeBattleItemParticles(void)
 {
-	setShortWithStride(&BTL_D_800753AC[0].timer, -1, 4, 0x234);
+	setInt16WithStride(&BTL_D_800753AC[0].timer, -1, 4, 0x234);
 	BTL_initializeItemParticleVelocities();
 }
 
@@ -6408,7 +6408,7 @@ void BTL_renderBuffTrails(int32_t i)
 			prim->clut = getClut(192, 489);
 			setUV4(prim, 0x5f, 0xa0, 0x5f, 0xa7, 0x30, 0xa0, 0x30, 0xa7);
 			setRGB0(prim, r->life * 200 / 8, r->life * 255 / 8, r->life * 180 / 8);
-			add3DSpritePrim(prim, &r->p[0], &r->p[1], &r->p[2], &r->p[3]);
+			addScreenPolyFT4(prim, &r->p[0], &r->p[1], &r->p[2], &r->p[3]);
 		}
 		r++;
 	}
@@ -6594,7 +6594,7 @@ void BTL_initializeUnk2(void)
 	int32_t i;
 	SVECTOR *p;
 
-	setShortWithStride(&BTL_D_80075E0C[0].frame, -1, 1, 0x6c);
+	setInt16WithStride(&BTL_D_80075E0C[0].frame, -1, 1, 0x6c);
 	p = BTL_D_80075E78;
 	for (i = 0; i < 0x10; i++) {
 		v.vx = (rand() % 0x32) + 0x32;

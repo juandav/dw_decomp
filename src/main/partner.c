@@ -82,7 +82,7 @@ void unsetCameraFollowPlayer();
 void tickPartnerWaypoints();
 void entityLookAtLocation(Entity *entity, VECTOR *pos);
 void playSound(int32_t vabId, uint32_t note);
-void tickPartnerCollision();
+void tickCollision();
 void tickPartnerNormal();
 void tickPartnerPoopingMechanic();
 void detectEdiblePoop();
@@ -231,7 +231,7 @@ void tickPartnerOverworld(int32_t instanceId)
 
 void tickNormal(void)
 {
-	tickPartnerCollision();
+	tickCollision();
 	tickPartnerWalking();
 	tickPartnerNormal();
 	tickPartnerPoopingMechanic();

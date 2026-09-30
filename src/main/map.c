@@ -93,39 +93,39 @@ void tickFileReadQueue(int32_t instanceId);
 void tickPartnerNormal();
 void unloadMapParts(void);
 
-void MAIN_func_800D3174(void);
-void MAIN_func_800D32E0(int8_t *fromX, int8_t *fromY, int8_t *toX, int8_t *toY);
-void MAIN_func_800D39F8(void);
-void MAIN_func_800D3A84(void);
-void MAIN_func_800D3ADC(void);
-void MAIN_func_800D56E0(void);
-void MAIN_func_800D634C(void);
-void MAIN_func_800D6A4C(MapTileData *tiles);
-void MAIN_func_800D763C(DVECTOR *current, DVECTOR *previous);
-void MAIN_func_800D8AC8(int32_t diffX, int32_t diffY);
-int32_t MAIN_func_800D8E64(int16_t mapId, int16_t exitId, int32_t showName);
-void MAIN_func_800D91EC(int16_t a, int16_t b);
-int32_t MAIN_func_800D91FC(int32_t flag);
-void MAIN_func_800D9248(void);
-void MAIN_func_800D92EC(void);
-void MAIN_func_800D9360(int32_t mapId);
-void MAIN_func_800D9660(GsRVIEW2 *out);
-void MAIN_func_800D9B60(uint32_t *src);
-void MAIN_func_800D9BA8(long level, int16_t *clut);
-void MAIN_func_800D9E68(u_long *buffer);
-void MAIN_func_800D9F14(long fade, int16_t *clut);
-int32_t MAIN_func_800DA0F4(POLY_FT3 *prim, int32_t order);
+void popPartnerWaypoint(void);
+void getClosestTileOffScreen(int8_t *fromX, int8_t *fromY, int8_t *toX, int8_t *toY);
+void initializePartnerWaypoint(void);
+void initializeTamerWaypoints(void);
+void clearTamerWaypoints(void);
+void initializeMap(void);
+void setupMap(void);
+void initializeDrawingOffsets(MapTileData *tiles);
+void updateDrawingOffsets(DVECTOR *current, DVECTOR *previous);
+void moveCameraByOffset(int32_t diffX, int32_t diffY);
+int32_t scriptTickChangeMap(int16_t mapId, int16_t exitId, int32_t showName);
+void setDeathMap(int16_t a, int16_t b);
+int32_t waitForDeathMapLoading(int32_t flag);
+void changeToDeathMap(void);
+void reinitializeAfterTournament(void);
+void loadTrainingLibrary(int32_t mapId);
+void getRViewCopy(GsRVIEW2 *out);
+void downloadCLUT1(uint32_t *src);
+void fadeoutCLUT1(long level, int16_t *clut);
+void downloadCLUT2(u_long *buffer);
+void fadeoutCLUT2(long fade, int16_t *clut);
+int32_t addPolyFT3Prim(POLY_FT3 *prim, int32_t order);
 void addScreenPolyFT3(void *prim, SVECTOR *v0, SVECTOR *v1, SVECTOR *v2);
 void renderTMDModel(uint8_t *buffer, int32_t id, GsCOORDINATE2 *coord, GsCOORDINATE2 *super, VECTOR *trans, SVECTOR *rot, VECTOR *scale);
-void MAIN_func_800DA60C(int32_t count, int32_t arg1, int32_t arg2, int32_t *out);
-int32_t MAIN_func_800DA63C(int32_t count, int32_t t, int32_t *keys, int32_t *values, int32_t *slopes);
-int32_t MAIN_func_800DA740(int16_t *rect, DVECTOR *line);
-int16_t MAIN_func_800DA9C8(void);
-int16_t MAIN_func_800DA9F4(void);
-int32_t add3DSpritePrim(POLY_FT4 *poly, SVECTOR *v0, SVECTOR *v1, SVECTOR *v2, SVECTOR *v3);
+void initializeSomeArenaArrays(int32_t count, int32_t arg1, int32_t arg2, int32_t *out);
+int32_t processSomeArenaArrays(int32_t count, int32_t t, int32_t *keys, int32_t *values, int32_t *slopes);
+int32_t doSomethingWithSomePoints(int16_t *rect, DVECTOR *line);
+int16_t DOOA_storeDigimonY(void);
+int16_t DOOA_getStoredDigimonY(void);
+int32_t addScreenPolyFT4(POLY_FT4 *poly, SVECTOR *v0, SVECTOR *v1, SVECTOR *v2, SVECTOR *v3);
 void addFXPrim(POLY_FT4 *prim, int16_t x, int16_t y, int16_t width, int16_t height, int32_t depth);
 void addMapNameObject(int32_t mapId);
-void addPartnerWaypoint(int16_t index, int16_t x, int16_t y);
+void setPartnerWaypoint(int16_t index, int16_t x, int16_t y);
 void addTamerWaypoint(int16_t index, int16_t x, int16_t y);
 void buildMapPath(char *out, char *name, int8_t *suffix, int32_t mapId);
 void calculateBoneMatrix(Entity *entity, int32_t boneId, MATRIX *out);
@@ -146,7 +146,7 @@ void entityLookAtLocation(Entity *entity, VECTOR *location);
 void entityMoveForward(Entity *entity);
 void fillTileData(MapTileData *tile, uint8_t *imagePtr, int16_t texU, int16_t texV, int16_t posX, int16_t posY);
 void getDrawingOffsetCopy(int32_t *x, int32_t *y);
-void getEntityTileFromModel(Entity *entity, int8_t *outTileX, int8_t *outTileY);
+void getEntityTile(Entity *entity, int8_t *outTileX, int8_t *outTileY);
 int32_t getFileCityTopMap(void);
 int32_t getMapSoundId(int32_t mapId);
 int32_t getOriginalType(int32_t type);
@@ -154,12 +154,12 @@ void getViewportDistanceCopy(int32_t *out);
 void handleTileUpdate(int32_t input, int32_t force);
 int32_t hasMovedOutsideCombatArea(DVECTOR *a, DVECTOR *b, int16_t w, int16_t h);
 void initializeDaytimeTransition(int32_t timeOfDay);
-int32_t isFiveTileWidePathOpen(int8_t x1, int8_t y1, int8_t x2, int8_t y2);
+int32_t isFiveTileWidePathBlocked(int8_t x1, int8_t y1, int8_t x2, int8_t y2);
 int32_t isInDaytimeTransition(void);
 int32_t isLinearPathBlocked(int8_t x1, int8_t y1, int8_t x2, int8_t y2);
 int32_t isOffScreen(DVECTOR *xy, int16_t w, int16_t h);
 int32_t isRectInRect(RECT *rect, int32_t x1, int32_t y1, int32_t x2, int32_t y2);
-int32_t isTileWithinScreenArea(int8_t tileX, int8_t tileZ);
+int32_t isTileOffScreen(int8_t tileX, int8_t tileZ);
 int32_t lerp(int32_t start, int32_t end, int32_t t0, int32_t t1, int32_t t);
 void loadMap(int32_t mapId);
 int32_t loadMapSetup(int32_t *data);
@@ -171,15 +171,15 @@ void renderMapName(int32_t instanceId);
 void renderSprite(GsSPRITE *sprite, int16_t x, int16_t y, int32_t distance, int32_t width, int32_t height);
 void setCameraFollowPlayer(void);
 void setPosDataMapTile(MapTileData *tile, int16_t camX, int16_t camY, POLY_FT4 *prim);
-void setShortWithStride(int16_t *dest, int16_t value, int16_t count, int16_t stride);
+void setInt16WithStride(int16_t *dest, int16_t value, int16_t count, int16_t stride);
 void storeEntityLocation(int32_t scriptId, VECTOR *out);
 void tickCameraFollowPlayer(void);
 void tickCameraMovement(int32_t instanceId);
 void tickDaytimeTransition(int32_t instanceId);
 void tickMeramonShake(int32_t arg0);
-void tickMoveCameraTo(int32_t x, int32_t z, int32_t arg2);
-int32_t tickMoveCameraToEntity(int32_t scriptId, int32_t speed);
-void tickPartnerCollision(void);
+void tickCameraMoveTo(int32_t x, int32_t z, int32_t arg2);
+int32_t tickCameraMoveToEntity(int32_t scriptId, int32_t speed);
+void tickCollision(void);
 void tickPartnerWaypoints(void);
 void tickTamerWaypoints(void);
 void translateConditionFXToEntity(Entity *entity, SVECTOR *out);
@@ -292,23 +292,23 @@ extern int32_t VIEWPORT_DISTANCE_COPY;
 
 static void *map_functions[] = {
 	renderFXParticle,
-	MAIN_func_800DA9F4,
-	MAIN_func_800DA9C8,
-	MAIN_func_800DA740,
-	MAIN_func_800DA63C,
-	MAIN_func_800DA60C,
+	DOOA_getStoredDigimonY,
+	DOOA_storeDigimonY,
+	doSomethingWithSomePoints,
+	processSomeArenaArrays,
+	initializeSomeArenaArrays,
 	renderTMDModel,
-	setShortWithStride,
+	setInt16WithStride,
 	addFXPrim,
 	renderSprite,
 	worldPosToScreenPos,
-	add3DSpritePrim,
+	addScreenPolyFT4,
 	addScreenPolyFT3,
-	MAIN_func_800DA0F4,
-	MAIN_func_800D9F14,
-	MAIN_func_800D9E68,
-	MAIN_func_800D9BA8,
-	MAIN_func_800D9B60,
+	addPolyFT3Prim,
+	fadeoutCLUT2,
+	downloadCLUT2,
+	fadeoutCLUT1,
+	downloadCLUT1,
 	calculateBoneMatrix,
 	getOriginalType,
 	translateConditionFXToEntity,
@@ -317,33 +317,33 @@ static void *map_functions[] = {
 	cleanupGame,
 	getDrawingOffsetCopy,
 	getViewportDistanceCopy,
-	MAIN_func_800D9660,
+	getRViewCopy,
 	tickMeramonShake,
 	createMeramonShake,
-	MAIN_func_800D9360,
-	MAIN_func_800D92EC,
+	loadTrainingLibrary,
+	reinitializeAfterTournament,
 	renderMapName,
-	MAIN_func_800D9248,
-	MAIN_func_800D91FC,
-	MAIN_func_800D91EC,
+	changeToDeathMap,
+	waitForDeathMapLoading,
+	setDeathMap,
 	changeMap,
 	addMapNameObject,
-	MAIN_func_800D8E64,
+	scriptTickChangeMap,
 	updateTileColumn,
 	updateTileRow,
 	setCameraFollowPlayer,
 	unsetCameraFollowPlayer,
-	MAIN_func_800D8AC8,
+	moveCameraByOffset,
 	moveCameraByDiff,
-	tickMoveCameraToEntity,
-	tickMoveCameraTo,
+	tickCameraMoveToEntity,
+	tickCameraMoveTo,
 	checkCameraMovement,
 	storeEntityLocation,
 	tickCameraMovement,
 	createCameraMovement,
 	cameraIsAtEdge,
 	handleTileUpdate,
-	MAIN_func_800D763C,
+	updateDrawingOffsets,
 	isInDaytimeTransition,
 	tickDaytimeTransition,
 	setPosDataMapTile,
@@ -351,17 +351,17 @@ static void *map_functions[] = {
 	tickCameraFollowPlayer,
 	unloadMap,
 	uploadMapTileImages,
-	MAIN_func_800D6A4C,
+	initializeDrawingOffsets,
 	fillTileData,
 	updateTimeOfDay,
-	MAIN_func_800D634C,
+	setupMap,
 	readMapTFS,
 	getMapSoundId,
 	loadMapSetup,
 	buildMapPath,
 	loadMap,
 	renderMap,
-	MAIN_func_800D56E0,
+	initializeMap,
 	isOffScreen,
 	entityIsOffScreen,
 	entityCheckEntityCollision,
@@ -372,22 +372,22 @@ static void *map_functions[] = {
 	collisionGrace,
 	entityCheckCollision,
 	entityLookAtLocation,
-	addPartnerWaypoint,
-	tickPartnerCollision,
+	setPartnerWaypoint,
+	tickCollision,
 	isLinearPathBlocked,
-	isFiveTileWidePathOpen,
-	getEntityTileFromModel,
-	MAIN_func_800D3ADC,
-	MAIN_func_800D3A84,
-	MAIN_func_800D39F8,
+	isFiveTileWidePathBlocked,
+	getEntityTile,
+	clearTamerWaypoints,
+	initializeTamerWaypoints,
+	initializePartnerWaypoint,
 	hasMovedOutsideCombatArea,
 	isRectInRect,
 	entityCheckCombatArea,
-	MAIN_func_800D32E0,
+	getClosestTileOffScreen,
 	addTamerWaypoint,
 	entityIsInEntity,
-	MAIN_func_800D3174,
-	isTileWithinScreenArea,
+	popPartnerWaypoint,
+	isTileOffScreen,
 };
 // clang-format off
 int8_t COMBAT_AREA_CORNER_OFFSETS[8] = {
@@ -3285,7 +3285,7 @@ int16_t ORIGINAL_TYPE[180] = {
 };
 // clang-format on
 
-void MAIN_func_800D39F8(void)
+void initializePartnerWaypoint(void)
 {
 	int16_t tileX;
 	int16_t tileY;
@@ -3301,7 +3301,7 @@ void MAIN_func_800D39F8(void)
 	}
 }
 
-void MAIN_func_800D3174(void)
+void popPartnerWaypoint(void)
 {
 	PARTNER_WAYPOINT_COUNT--;
 	PARTNER_WAYPOINT_CURRENT++;
@@ -3315,7 +3315,7 @@ void addTamerWaypoint(int16_t index, int16_t x, int16_t y)
 	TAMER_WAYPOINT_COUNT++;
 }
 
-void MAIN_func_800D32E0(int8_t *outX, int8_t *outY, int8_t *targetX,
+void getClosestTileOffScreen(int8_t *outX, int8_t *outY, int8_t *targetX,
 			int8_t *targetY)
 {
 	int16_t rem;
@@ -3359,7 +3359,7 @@ void MAIN_func_800D32E0(int8_t *outX, int8_t *outY, int8_t *targetX,
 			} else {
 				x--;
 			}
-			if (isTileWithinScreenArea(x, y) != 0) {
+			if (isTileOffScreen(x, y) != 0) {
 				*outX = x;
 				*outY = y;
 				return;
@@ -3390,7 +3390,7 @@ void MAIN_func_800D32E0(int8_t *outX, int8_t *outY, int8_t *targetX,
 			} else {
 				y--;
 			}
-			if (isTileWithinScreenArea(x, y) != 0) {
+			if (isTileOffScreen(x, y) != 0) {
 				*outX = x;
 				*outY = y;
 				return;
@@ -3470,7 +3470,7 @@ int32_t hasMovedOutsideCombatArea(DVECTOR *previousv, DVECTOR *currentv,
 	return 0;
 }
 
-void MAIN_func_800D3A84(void)
+void initializeTamerWaypoints(void)
 {
 	int16_t tileX;
 	int16_t tileY;
@@ -3485,14 +3485,14 @@ void MAIN_func_800D3A84(void)
 	TAMER_WAYPOINT_ACTIVE = 0;
 }
 
-void MAIN_func_800D3ADC(void)
+void clearTamerWaypoints(void)
 {
 	TAMER_WAYPOINT_CURRENT = 0;
 	TAMER_WAYPOINT_COUNT = 0;
 	TAMER_WAYPOINT_ACTIVE = 0;
 }
 
-int32_t isFiveTileWidePathOpen(int8_t x1, int8_t y1, int8_t x2, int8_t y2)
+int32_t isFiveTileWidePathBlocked(int8_t x1, int8_t y1, int8_t x2, int8_t y2)
 {
 	long i;
 
@@ -3626,11 +3626,11 @@ int32_t isLinearPathBlocked(int8_t x1, int8_t y1, int8_t x2, int8_t y2)
 	return 0;
 }
 
-void tickPartnerCollision(void)
+void tickCollision(void)
 {
 #ifdef __MWERKS__
-	int32_t isFiveTileWidePathOpen(int8_t x1, int8_t y1, int8_t x2, int8_t y2);
-	int32_t isTileWithinScreenArea(int8_t tileX, int8_t tileZ);
+	int32_t isFiveTileWidePathBlocked(int8_t x1, int8_t y1, int8_t x2, int8_t y2);
+	int32_t isTileOffScreen(int8_t tileX, int8_t tileZ);
 #endif
 	int16_t last;
 	int16_t modelTileX;
@@ -3646,32 +3646,32 @@ void tickPartnerCollision(void)
 	int32_t posX;
 	int32_t posZ;
 
-	getEntityTileFromModel(ENTITY_TABLE[0], &tamerTileX, &tamerTileY);
+	getEntityTile(ENTITY_TABLE[0], &tamerTileX, &tamerTileY);
 	if ((tamerTileX != PARTNER_TAMER_PREVIOUS_TILE_X) ||
 	    (tamerTileY != PARTNER_TAMER_PREVIOUS_TILE_Y)) {
-		getEntityTileFromModel(ENTITY_TABLE[1], &partnerTileX, &partnerTileY);
-		if (isFiveTileWidePathOpen(tamerTileX, tamerTileY, partnerTileX, partnerTileY) == 1) {
+		getEntityTile(ENTITY_TABLE[1], &partnerTileX, &partnerTileY);
+		if (isFiveTileWidePathBlocked(tamerTileX, tamerTileY, partnerTileX, partnerTileY) == 1) {
 			if (PARTNER_WAYPOINT_COUNT != 0) {
 				last = (PARTNER_WAYPOINT_CURRENT + PARTNER_WAYPOINT_COUNT - 1) % 30;
-				if (isFiveTileWidePathOpen(tamerTileX, tamerTileY, PARTNER_WAYPOINT_X[last], PARTNER_WAYPOINT_Y[last]) == 1) {
-					addPartnerWaypoint((int16_t)((PARTNER_WAYPOINT_CURRENT + PARTNER_WAYPOINT_COUNT) % 30),
+				if (isFiveTileWidePathBlocked(tamerTileX, tamerTileY, PARTNER_WAYPOINT_X[last], PARTNER_WAYPOINT_Y[last]) == 1) {
+					setPartnerWaypoint((int16_t)((PARTNER_WAYPOINT_CURRENT + PARTNER_WAYPOINT_COUNT) % 30),
 							   PARTNER_TAMER_PREVIOUS_TILE_X,
 							   PARTNER_TAMER_PREVIOUS_TILE_Y);
 				}
 			} else {
-				MAIN_func_800D39F8();
-				addPartnerWaypoint(PARTNER_WAYPOINT_CURRENT, PARTNER_TAMER_PREVIOUS_TILE_X,
+				initializePartnerWaypoint();
+				setPartnerWaypoint(PARTNER_WAYPOINT_CURRENT, PARTNER_TAMER_PREVIOUS_TILE_X,
 						   PARTNER_TAMER_PREVIOUS_TILE_Y);
 			}
 		} else {
-			MAIN_func_800D39F8();
+			initializePartnerWaypoint();
 		}
 	}
 
 	if (PARTNER_WAYPOINT_COUNT >= 2) {
 		for (i = 0; i < 3; i++) {
 			index = (PARTNER_WAYPOINT_CURRENT + PARTNER_WAYPOINT_COUNT - 2 - i) % 30;
-			if (isFiveTileWidePathOpen(tamerTileX, tamerTileY, PARTNER_WAYPOINT_X[index], PARTNER_WAYPOINT_Y[index]) == 0) {
+			if (isFiveTileWidePathBlocked(tamerTileX, tamerTileY, PARTNER_WAYPOINT_X[index], PARTNER_WAYPOINT_Y[index]) == 0) {
 				PARTNER_WAYPOINT_COUNT -= (int8_t)(i + 1);
 				break;
 			}
@@ -3683,7 +3683,7 @@ void tickPartnerCollision(void)
 
 	if (PARTNER_WAYPOINT_COUNT != 0) {
 		GsSetLsMatrix(&GsWSMATRIX);
-		if (isTileWithinScreenArea(PARTNER_WAYPOINT_X[PARTNER_WAYPOINT_CURRENT], PARTNER_WAYPOINT_Y[PARTNER_WAYPOINT_CURRENT]) != 0) {
+		if (isTileOffScreen(PARTNER_WAYPOINT_X[PARTNER_WAYPOINT_CURRENT], PARTNER_WAYPOINT_Y[PARTNER_WAYPOINT_CURRENT]) != 0) {
 			if (ENTITY_TABLE[1]->isOnScreen == 0) {
 				posX = (PARTNER_WAYPOINT_X[PARTNER_WAYPOINT_CURRENT] - 50) * 100 + 50;
 				posZ = (50 - PARTNER_WAYPOINT_Y[PARTNER_WAYPOINT_CURRENT]) * 100 - 50;
@@ -3691,7 +3691,7 @@ void tickPartnerCollision(void)
 				ENTITY_TABLE[1]->posData->location.vz = posZ;
 				ENTITY_TABLE[1]->anim.locX = posX << 15;
 				ENTITY_TABLE[1]->anim.locZ = posZ << 15;
-				MAIN_func_800D3174();
+				popPartnerWaypoint();
 			}
 		}
 	}
@@ -3706,7 +3706,7 @@ void tickPartnerCollision(void)
 					 PARTNER_WAYPOINT_Y[PARTNER_WAYPOINT_CURRENT]);
 			if ((modelTileX == PARTNER_WAYPOINT_X[PARTNER_WAYPOINT_CURRENT]) &&
 			    (modelTileY == PARTNER_WAYPOINT_Y[PARTNER_WAYPOINT_CURRENT])) {
-				MAIN_func_800D3174();
+				popPartnerWaypoint();
 			}
 		} else {
 			entityLookAtLocation(ENTITY_TABLE[1],
@@ -3734,7 +3734,7 @@ void tickPartnerCollision(void)
 	PARTNER_TAMER_PREVIOUS_TILE_Y = tamerTileY;
 }
 
-void addPartnerWaypoint(int16_t index, int16_t tileX, int16_t tileY)
+void setPartnerWaypoint(int16_t index, int16_t tileX, int16_t tileY)
 {
 	PARTNER_WAYPOINT_X[index] = tileX;
 	PARTNER_WAYPOINT_Y[index] = tileY;
@@ -3895,7 +3895,7 @@ void tickTamerWaypoints(void)
 	int8_t tileX;
 	int8_t tileY;
 
-	getEntityTileFromModel(ENTITY_TABLE[0], &tileX, &tileY);
+	getEntityTile(ENTITY_TABLE[0], &tileX, &tileY);
 
 	if ((tileX != TAMER_PREVIOUS_TILE_X) || (tileY != TAMER_PREVIOUS_TILE_Y)) {
 		if (isLinearPathBlocked(tileX, tileY, TAMER_START_TILE_X, TAMER_START_TILE_Y) != 0) {
@@ -3912,7 +3912,7 @@ void tickTamerWaypoints(void)
 						 TAMER_PREVIOUS_TILE_Y);
 			}
 		} else {
-			MAIN_func_800D3ADC();
+			clearTamerWaypoints();
 		}
 	}
 
@@ -3936,7 +3936,7 @@ void tickTamerWaypoints(void)
 	TAMER_PREVIOUS_TILE_Y = tileY;
 }
 
-void getEntityTileFromModel(Entity *entity, int8_t *outTileX,
+void getEntityTile(Entity *entity, int8_t *outTileX,
 			    int8_t *outTileY)
 {
 	int16_t tileX;
@@ -3950,7 +3950,7 @@ void getEntityTileFromModel(Entity *entity, int8_t *outTileX,
 void tickPartnerWaypoints(void)
 {
 #ifdef __MWERKS__
-	int32_t isTileWithinScreenArea(int8_t tileX, int8_t tileZ);
+	int32_t isTileOffScreen(int8_t tileX, int8_t tileZ);
 #endif
 	int16_t tamerTileX;
 	int16_t tamerTileY;
@@ -3977,7 +3977,7 @@ void tickPartnerWaypoints(void)
 
 	for (count = PARTNER_WAYPOINT_COUNT; count > 0; count--) {
 		index = ((PARTNER_WAYPOINT_CURRENT + count) - 1) % 30;
-		if (isTileWithinScreenArea(PARTNER_WAYPOINT_X[index],
+		if (isTileOffScreen(PARTNER_WAYPOINT_X[index],
 					   PARTNER_WAYPOINT_Y[index]) != 0) {
 			toX = PARTNER_WAYPOINT_X[index];
 			toY = PARTNER_WAYPOINT_Y[index];
@@ -3987,16 +3987,16 @@ void tickPartnerWaypoints(void)
 
 	if (count != 0) {
 		while (PARTNER_WAYPOINT_CURRENT != index) {
-			MAIN_func_800D3174();
+			popPartnerWaypoint();
 		}
-		MAIN_func_800D3174();
+		popPartnerWaypoint();
 	}
 
 	getModelTile(&ENTITY_TABLE[1]->posData->location,
 		     &partnerTileX, &partnerTileY);
 	toX = partnerTileX;
 	toY = partnerTileY;
-	MAIN_func_800D32E0(&fromX, &fromY, &toX, &toY);
+	getClosestTileOffScreen(&fromX, &fromY, &toX, &toY);
 
 	if (fromX != -1) {
 		posX = ((fromX - 50) * 100) + 50;
@@ -4008,7 +4008,7 @@ void tickPartnerWaypoints(void)
 	}
 }
 
-int32_t isTileWithinScreenArea(int8_t tileX, int8_t tileZ)
+int32_t isTileOffScreen(int8_t tileX, int8_t tileZ)
 {
 	DVECTOR screen;
 	SVECTOR world;
@@ -4281,7 +4281,7 @@ int32_t isOffScreen(DVECTOR *pos, int16_t width, int16_t height)
 	return 0;
 }
 
-void MAIN_func_800D56E0(void)
+void initializeMap(void)
 {
 	int32_t i;
 
@@ -4479,8 +4479,8 @@ void loadMap(int32_t mapId)
 
 	CURRENT_SCREEN = mapId;
 
-	MAIN_func_800D39F8();
-	MAIN_func_800D3A84();
+	initializePartnerWaypoint();
+	initializeTamerWaypoints();
 	checkFishingMap(CURRENT_SCREEN, 0);
 	checkCurlingMap(CURRENT_SCREEN);
 	checkShopMap(CURRENT_SCREEN);
@@ -4617,7 +4617,7 @@ void readMapTFS(int32_t mapId)
 	readFile(path, GENERAL_BUFFER_PTR);
 }
 
-void MAIN_func_800D634C(void)
+void setupMap(void)
 {
 	u_long *data;
 	MapTileData *tile;
@@ -4666,7 +4666,7 @@ void MAIN_func_800D634C(void)
 	PLAYER_OFFSET_X = DRAWING_OFFSET_X = 160;
 	PLAYER_OFFSET_Y = DRAWING_OFFSET_Y = 120;
 
-	MAIN_func_800D6A4C(MAP_TILE_DATA);
+	initializeDrawingOffsets(MAP_TILE_DATA);
 
 	MAP_TILE_X = CAMERA_X[0] / 128;
 	if (MAP_WIDTH[0] < 5) {
@@ -4747,7 +4747,7 @@ void fillTileData(MapTileData *tile, uint8_t *imagePtr,
 	tile->texV = texV;
 }
 
-void MAIN_func_800D6A4C(MapTileData *tiles)
+void initializeDrawingOffsets(MapTileData *tiles)
 {
 	SVECTOR viewRef;
 	SVECTOR tamerPos;
@@ -4885,7 +4885,7 @@ void tickCameraFollowPlayer(void)
 		oldCameraY = CAMERA_Y[0];
 		CAMERA_X[0] += screenEnd.vx - screenStart.vx;
 		CAMERA_Y[0] += screenEnd.vy - screenStart.vy;
-		MAIN_func_800D763C((DVECTOR *)&screenStart,
+		updateDrawingOffsets((DVECTOR *)&screenStart,
 				   (DVECTOR *)&screenEnd);
 		handleTileUpdate(POLLED_INPUT, 0);
 	}
@@ -5008,7 +5008,7 @@ int32_t isInDaytimeTransition(void)
 	}
 }
 
-void MAIN_func_800D763C(DVECTOR *current, DVECTOR *previous)
+void updateDrawingOffsets(DVECTOR *current, DVECTOR *previous)
 {
 	int32_t atEdgeX;
 	int32_t atEdgeY;
@@ -5508,7 +5508,7 @@ out:
 }
 
 // clang-format off
-void tickMoveCameraTo(x, z, arg2)
+void tickCameraMoveTo(x, z, arg2)
 	int16_t x;
 	int16_t z;
 	int16_t arg2;
@@ -5522,7 +5522,7 @@ void tickMoveCameraTo(x, z, arg2)
 }
 
 // clang-format off
-int32_t tickMoveCameraToEntity(scriptId, speed)
+int32_t tickCameraMoveToEntity(scriptId, speed)
 	uint8_t scriptId;
 	int16_t speed;
 // clang-format on
@@ -5571,12 +5571,12 @@ void moveCameraByDiff(VECTOR *from, VECTOR *to)
 		flags |= 0x4000;
 	}
 
-	MAIN_func_800D763C((DVECTOR *)&fromScreen, (DVECTOR *)&toScreen);
+	updateDrawingOffsets((DVECTOR *)&fromScreen, (DVECTOR *)&toScreen);
 	handleTileUpdate(flags, 0);
 }
 
 // clang-format off
-void MAIN_func_800D8AC8(diffX, diffY)
+void moveCameraByOffset(diffX, diffY)
 	int16_t diffX;
 	int16_t diffY;
 // clang-format on
@@ -5685,7 +5685,7 @@ void updateTileColumn(right)
 	}
 }
 
-int32_t MAIN_func_800D8E64(int16_t mapId, int16_t exitId, int32_t showName)
+int32_t scriptTickChangeMap(int16_t mapId, int16_t exitId, int32_t showName)
 {
 	switch (SCRIPT_MAP_CHANGE_STATE) {
 	case 0:
@@ -5808,14 +5808,14 @@ void changeMap(int16_t mapId, int16_t exitId)
 	runMapHeadScript(mapId & 0xff);
 }
 
-void MAIN_func_800D91EC(int16_t a, int16_t b)
+void setDeathMap(int16_t a, int16_t b)
 {
 	MAIN_D_801343B0 = a;
 	MAIN_D_801343B2 = b;
 	MAIN_D_801343B4 = 0;
 }
 
-int32_t MAIN_func_800D91FC(int32_t flag)
+int32_t waitForDeathMapLoading(int32_t flag)
 {
 	if (flag == 0) {
 		while (MAIN_D_801343B4 != 0) {
@@ -5828,7 +5828,7 @@ int32_t MAIN_func_800D91FC(int32_t flag)
 	}
 }
 
-void MAIN_func_800D9248(void)
+void changeToDeathMap(void)
 {
 	changeMap(MAIN_D_801343B0, MAIN_D_801343B2);
 }
@@ -5850,7 +5850,7 @@ void renderMapName(mapId)
 #endif
 }
 
-void MAIN_func_800D92EC(void)
+void reinitializeAfterTournament(void)
 {
 	addObject(0xfa2, 0, tickGameClock, renderGameClock);
 	addObject(0xfa0, 0, NULL, renderMap);
@@ -5862,7 +5862,7 @@ void MAIN_func_800D92EC(void)
 	setPartnerState(1);
 }
 
-void MAIN_func_800D9360(int32_t mapId)
+void loadTrainingLibrary(int32_t mapId)
 {
 	if ((mapId == 0x70) || (mapId == 0x4E) || (mapId == 0x77)) {
 		loadDynamicLibrary(10, (uint8_t *)&TRN_LOADING_COMPLETE,
@@ -5949,7 +5949,7 @@ void tickMeramonShake(int32_t arg0)
 	}
 }
 
-void MAIN_func_800D9660(GsRVIEW2 *out)
+void getRViewCopy(GsRVIEW2 *out)
 {
 	*out = GS_VIEWPOINT_COPY;
 }
@@ -6121,7 +6121,7 @@ void calculateBoneMatrix(Entity *entity, int32_t boneId, MATRIX *out)
 	calculatePosition(bone, out);
 }
 
-void MAIN_func_800D9B60(uint32_t *buffer)
+void downloadCLUT1(uint32_t *buffer)
 {
 	RECT rect;
 
@@ -6130,7 +6130,7 @@ void MAIN_func_800D9B60(uint32_t *buffer)
 	DrawSync(0);
 }
 
-void MAIN_func_800D9BA8(long level, int16_t *clut)
+void fadeoutCLUT1(long level, int16_t *clut)
 {
 	int16_t buffer[1792];
 	RECT rect;
@@ -6173,7 +6173,7 @@ void MAIN_func_800D9BA8(long level, int16_t *clut)
 	DrawSync(0);
 }
 
-void MAIN_func_800D9E68(u_long *buffer)
+void downloadCLUT2(u_long *buffer)
 {
 	RECT rect;
 
@@ -6186,7 +6186,7 @@ void MAIN_func_800D9E68(u_long *buffer)
 	DrawSync(0);
 }
 
-void MAIN_func_800D9F14(long fade, int16_t *clut)
+void fadeoutCLUT2(long fade, int16_t *clut)
 {
 	int16_t pixels[416];
 	RECT rect;
@@ -6222,7 +6222,7 @@ void MAIN_func_800D9F14(long fade, int16_t *clut)
 	DrawSync(0);
 }
 
-int32_t MAIN_func_800DA0F4(POLY_FT3 *prim, int32_t order)
+int32_t addPolyFT3Prim(POLY_FT3 *prim, int32_t order)
 {
 	if ((order >= 33) && (order < 0x1000)) {
 		AddPrim(&ACTIVE_ORDERING_TABLE->org[order], prim);
@@ -6246,10 +6246,10 @@ void addScreenPolyFT3(void *prim, SVECTOR *v0, SVECTOR *v1, SVECTOR *v2)
 			    (long *)((char *)prim + 0x18),
 			    &p, &flag);
 	otz = otz >> 2;
-	MAIN_func_800DA0F4(prim, otz);
+	addPolyFT3Prim(prim, otz);
 }
 
-int32_t add3DSpritePrim(POLY_FT4 *poly, SVECTOR *v0, SVECTOR *v1, SVECTOR *v2,
+int32_t addScreenPolyFT4(POLY_FT4 *poly, SVECTOR *v0, SVECTOR *v1, SVECTOR *v2,
 			SVECTOR *v3)
 {
 	int32_t otz;
@@ -6333,7 +6333,7 @@ void addFXPrim(POLY_FT4 *prim, int16_t posX, int16_t posY, int16_t width,
 	}
 }
 
-void setShortWithStride(int16_t *dest, int16_t value, int16_t count,
+void setInt16WithStride(int16_t *dest, int16_t value, int16_t count,
 			int16_t stride)
 {
 	int16_t i;
@@ -6378,7 +6378,7 @@ void renderTMDModel(buffer, id, coord, super, trans, rot, scale)
 	GsSortObject4(&obj, ACTIVE_ORDERING_TABLE, 2, getScratchAddr(0));
 }
 
-void MAIN_func_800DA60C(int32_t count, int32_t arg1, int32_t arg2,
+void initializeSomeArenaArrays(int32_t count, int32_t arg1, int32_t arg2,
 			int32_t *out)
 {
 	int32_t i;
@@ -6388,7 +6388,7 @@ void MAIN_func_800DA60C(int32_t count, int32_t arg1, int32_t arg2,
 	}
 }
 
-int32_t MAIN_func_800DA63C(int32_t count, int32_t t, int32_t *keys,
+int32_t processSomeArenaArrays(int32_t count, int32_t t, int32_t *keys,
 			   int32_t *values, int32_t *slopes)
 {
 	uint32_t off;
@@ -6445,7 +6445,7 @@ int32_t MAIN_func_800DA63C(int32_t count, int32_t t, int32_t *keys,
 #endif
 }
 
-int32_t MAIN_func_800DA740(int16_t *rect, DVECTOR *line)
+int32_t doSomethingWithSomePoints(int16_t *rect, DVECTOR *line)
 {
 	int16_t *c;
 	DVECTOR *p;
@@ -6515,14 +6515,14 @@ int32_t MAIN_func_800DA740(int16_t *rect, DVECTOR *line)
 	return 0;
 }
 
-int16_t MAIN_func_800DA9C8(void)
+int16_t DOOA_storeDigimonY(void)
 {
 	MAIN_D_80134DFC = ENTITY_TABLE[1]->posData->location.vy;
 
 	return MAIN_D_80134DFC;
 }
 
-int16_t MAIN_func_800DA9F4(void)
+int16_t DOOA_getStoredDigimonY(void)
 {
 	return MAIN_D_80134DFC;
 }

@@ -134,7 +134,7 @@ static void *efe_data_order[] = {
 	MAIN_D_80123370,
 };
 
-void setShortWithStride();
+void setInt16WithStride();
 void getDrawingOffsetCopy(int32_t *x, int32_t *y);
 int32_t isTamerOnScreen(void);
 int32_t lerp(int32_t start, int32_t end, int32_t t0, int32_t t1, int32_t t);
@@ -243,7 +243,7 @@ void initializeParticleFX(void)
 	SVECTOR vec;
 	MATRIX m;
 
-	setShortWithStride(MAIN_D_801387B8, -1, 4, 0x34);
+	setInt16WithStride(MAIN_D_801387B8, -1, 4, 0x34);
 	for (i = 0; i < 0x32; i++) {
 		ang.vx = (((rand() & 0x7F) - 0x40) << 12) / 64;
 		ang.vy = (((rand() & 0x7F) - 0x40) << 12) / 64;
@@ -509,7 +509,7 @@ int32_t addEntityParticleFX(Entity *owner, int32_t timer)
 
 void initializeEntityParticleFX(void)
 {
-	setShortWithStride(MAIN_D_801389B4, -1, 0x14, 0xC);
+	setInt16WithStride(MAIN_D_801389B4, -1, 0x14, 0xC);
 }
 
 void tickEntityParticleFX(int32_t id)
@@ -569,7 +569,7 @@ void removeEntityParticleFX(int32_t id)
 
 void initializeCloudFXData(void)
 {
-	setShortWithStride(MAIN_D_80138AA4, -1, 0x3C, 6);
+	setInt16WithStride(MAIN_D_80138AA4, -1, 0x3C, 6);
 }
 
 void removeAllCloudFX(void)
@@ -901,7 +901,7 @@ void findEFEDATFile(void)
 
 void initializeEFE(void)
 {
-	setShortWithStride(EFE_LOADED_MOVE_DATA, -1, 0x11, 2);
+	setInt16WithStride(EFE_LOADED_MOVE_DATA, -1, 0x11, 2);
 	EFE_DATA_STACK = EFE_SCRIPT_MEM1_DATA;
 	findEFEDATFile();
 }

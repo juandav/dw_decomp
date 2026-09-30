@@ -38,7 +38,7 @@ typedef struct {
 	Entity *entity;
 } ConditionBubble;
 
-void setShortWithStride(int16_t* ptr, int16_t value, int32_t count,
+void setInt16WithStride(int16_t* ptr, int16_t value, int32_t count,
 			int32_t stride);
 int32_t lerp(int32_t start, int32_t end, int32_t tMin, int32_t tMax,
 	     int32_t tCurrent);
@@ -420,7 +420,7 @@ ConditionIcon *CONDITION_TYPE_ICONS[8] = {
 
 void initializeConditionBubbles(void)
 {
-	setShortWithStride((int16_t *)CONDITION_BUBBLES, -1,
+	setInt16WithStride((int16_t *)CONDITION_BUBBLES, -1,
 			   NUM_CONDITION_BUBBLES, sizeof(ConditionBubble));
 }
 
