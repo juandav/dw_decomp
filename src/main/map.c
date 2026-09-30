@@ -685,8 +685,7 @@ int8_t MAP_FILE_EXT_MAP[] = ".MAP";
 
 int8_t MAP_FILE_EXT_TFS[] = ".TFS";
 
-// mwcc aligns every array to four, so the two-byte separator can only be a scalar
-int16_t MAP_PATH_SEPARATOR = '\\';
+char MAP_PATH_SEPARATOR[] = "\\";
 
 int16_t MAIN_D_801343B0 = 0xffff;
 
@@ -4505,7 +4504,7 @@ void buildMapPath(out, name, suffix, mapId)
 
 	prefix = MAP_PATH_PREFIX;
 	digits = MAP_PATH_DIGITS;
-	separator = (char *)&MAP_PATH_SEPARATOR;
+	separator = MAP_PATH_SEPARATOR;
 
 	while (*prefix != '\0') {
 		*out++ = *prefix++;
