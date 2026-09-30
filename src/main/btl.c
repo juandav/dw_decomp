@@ -287,7 +287,7 @@ int32_t handleBattleStart(id)
 			}
 		}
 
-		chance = random(100);
+		chance = randomLimit(100);
 		hasB = 0;
 		hasA = 0;
 		for (j = 0; j < INVENTORY.size; j++) {
@@ -317,7 +317,7 @@ int32_t handleBattleStart(id)
 				flag = 0;
 			}
 		} else {
-			if (random(100) < 0x46) {
+			if (randomLimit(100) < 0x46) {
 				COMBAT_DATA_PTR->player.entityIds[++count] = i;
 				flag = 0;
 			}

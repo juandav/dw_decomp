@@ -93,7 +93,7 @@ void renderItemMenuScrollBar(ItemMenuBox *box);
 void renderItemMenuItemList(ItemMenuBox *box, int16_t x1, int16_t y1, int16_t x2, int16_t y2, int32_t flag);
 void renderSelectionCursor(int32_t x, int32_t y, int16_t w, int16_t h, int32_t layer);
 void setPosDataPolyFT4(POLY_FT4 *prim, int32_t x, int32_t y, int32_t w, int32_t h);
-int32_t random(int32_t limit);
+int32_t randomLimit(int32_t limit);
 void *allocateArray(uint32_t size);
 void freeArray(uint32_t *array);
 uint8_t *padWithSpaces(uint8_t *str, int32_t width, int32_t used);
@@ -1004,7 +1004,7 @@ void scriptInstruction10to27(int32_t op)
 		break;
 	case SCRIPT_OP_STORE_RANDOM:
 		skipOnePollTwoScriptBytes(&pstat, &value);
-		writePStat(pstat, random(value + 1));
+		writePStat(pstat, randomLimit(value + 1));
 		break;
 	case SCRIPT_OP_STORE_DATE:
 		pollNextScriptUByte(&pstat);
@@ -2933,7 +2933,7 @@ uint8_t rollCard(void)
 	uint8_t i;
 	uint32_t rarity;
 
-	rarity = (uint8_t)random(100);
+	rarity = (uint8_t)randomLimit(100);
 	if (rarity == 0) {
 		rarity = 0;
 	} else if (rarity < 5) {
@@ -2956,7 +2956,7 @@ uint8_t rollCard(void)
 		}
 	}
 
-	rarity = (uint8_t)random(count);
+	rarity = (uint8_t)randomLimit(count);
 	i = cards[rarity];
 	freeArray((uint32_t *)cards);
 

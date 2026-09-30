@@ -373,7 +373,7 @@ int32_t VS_rollAttackOutcome(DigimonEntity *attacker, DigimonEntity *defender, i
 		if (COMBAT_DATA_PTR->player.finisherChargeup[0] >= 0x29) {
 			dmg = dmg * COMBAT_DATA_PTR->player.finisherChargeup[0] / 40;
 		}
-		dmg = dmg * (random(0x15) + 0x5a) / 100;
+		dmg = dmg * (randomLimit(0x15) + 0x5a) / 100;
 	} else {
 		diff = atk - def;
 		if (diff >= 0x1f5) {
@@ -382,7 +382,7 @@ int32_t VS_rollAttackOutcome(DigimonEntity *attacker, DigimonEntity *defender, i
 		if (diff < -0x1f4) {
 			diff = -0x1f4;
 		}
-		dmg = (eff[2] + (eff[0] + eff[1])) * (MOVE_DATA[move].power + diff * MOVE_DATA[move].power / 500) / 30 * (random(0x15) + 0x5a) / 100;
+		dmg = (eff[2] + (eff[0] + eff[1])) * (MOVE_DATA[move].power + diff * MOVE_DATA[move].power / 500) / 30 * (randomLimit(0x15) + 0x5a) / 100;
 	}
 
 	if (dmg <= 0) {
@@ -464,7 +464,7 @@ void VS_applyMoveStatus(DigimonEntity *digimon, FighterData *fighter, int32_t mo
 	}
 
 	chance = MOVE_DATA[move].statusChance;
-	if (random(100) < chance) {
+	if (randomLimit(100) < chance) {
 		switch (MOVE_DATA[move].status) {
 		case 1:
 			if (!(fighter->flags & 1)) {
@@ -476,7 +476,7 @@ void VS_applyMoveStatus(DigimonEntity *digimon, FighterData *fighter, int32_t mo
 		case 2:
 			if (!(fighter->flags & 2)) {
 				fighter->flags |= 2;
-				fighter->confusionTimer = random(0x65) + 200;
+				fighter->confusionTimer = randomLimit(0x65) + 200;
 				VS_addConfusionStatusVisual(digimon, fighter);
 				VS_resetFighterAction(fighter);
 			}
@@ -484,7 +484,7 @@ void VS_applyMoveStatus(DigimonEntity *digimon, FighterData *fighter, int32_t mo
 		case 3:
 			if (!(fighter->flags & 4)) {
 				fighter->flags |= 4;
-				fighter->stunTimer = random(0x29) + 200;
+				fighter->stunTimer = randomLimit(0x29) + 200;
 				VS_addStunStatusVisual(digimon, fighter);
 				VS_resetFighterAction(fighter);
 			}
@@ -612,11 +612,11 @@ void VS_resolveAttack(void)
 			MAIN_D_80134D74 = 0;
 			MAIN_D_80134D60 = NULL;
 		}
-		if (random(100) < chance) {
+		if (randomLimit(100) < chance) {
 			if (MAIN_D_80135268 == 6 && MOVE_DATA[tech].range == 1) {
 				goto skipViewpoint;
 			}
-			VS_setRandomViewpoint(entity, random(4));
+			VS_setRandomViewpoint(entity, randomLimit(4));
 skipViewpoint:
 			dmg = VS_rollAttackOutcome((DigimonEntity *)attacker, (DigimonEntity *)entity, tech);
 			fighter->hpDamageBuffer += dmg;
@@ -640,7 +640,7 @@ skipViewpoint:
 					break;
 				}
 				if ((moves[j] != 0xff) && (DIGIMON_DATA[entity->type].moves[moves[j] - 0x2e] == 0x2d)) {
-					if (random(100) < (((DigimonEntity *)entity)->stats.base.speed / DIGIMON_DATA[entity->type].level)) {
+					if (randomLimit(100) < (((DigimonEntity *)entity)->stats.base.speed / DIGIMON_DATA[entity->type].level)) {
 						fighter->queuedAnim = moves[j];
 						fighter->targetId = VS_getFighterSlot(attack.casterId);
 						fighter->moveRange = 1;
@@ -664,7 +664,7 @@ skipViewpoint:
 		}
 		if (MOVE_DATA[tech].range == 1) {
 			dmg = VS_rollAttackOutcome((DigimonEntity *)attacker, (DigimonEntity *)entity, tech);
-			dmg = dmg * (random(0x15) + 0xa) / 100;
+			dmg = dmg * (randomLimit(0x15) + 0xa) / 100;
 			if (dmg <= 0) {
 				dmg = 1;
 			}
@@ -983,7 +983,7 @@ void VS_playMoveEffect(DigimonEntity *digimon, DigimonEntity *target, FighterDat
 		n = 5;
 	}
 
-	VS_selectRandomCamera(digimon, random(n), MOVE_DATA[tech].range);
+	VS_selectRandomCamera(digimon, randomLimit(n), MOVE_DATA[tech].range);
 }
 
 void VS_removeMoveEffect(DigimonEntity *digimon, FighterData *fighter)
@@ -1177,7 +1177,7 @@ void VS_applyMoveResult(void)
 			}
 			if (fighter->poisonTimer == 0) {
 				fighter->poisonTimer = 100;
-				dmg = stats->base.hp * (random(3) + 1) / 100;
+				dmg = stats->base.hp * (randomLimit(3) + 1) / 100;
 				fighter->hpDamageBuffer += dmg;
 				if (fighter->hpDamageBuffer >= 0x2710) {
 					fighter->hpDamageBuffer = 0x270f;
@@ -1256,7 +1256,7 @@ void VS_applyMoveResult(void)
 				break;
 			case 0:
 				fighter->flags |= 8;
-				fighter->flatTimer = random(0x51) + 0xe0;
+				fighter->flatTimer = randomLimit(0x51) + 0xe0;
 				stats->current.isHit = 0;
 				fighter->flags &= 0xffbf;
 				break;
@@ -1336,7 +1336,7 @@ int16_t VS_getRandomUsableMove(int16_t *flags)
 		}
 	}
 
-	return picked[random(count)];
+	return picked[randomLimit(count)];
 }
 
 // clang-format off
@@ -1668,7 +1668,7 @@ void VS_selectPartnerMove(DigimonEntity *digimon, FighterData *fighter, int16_t 
 		total += weights[i];
 	}
 
-	pick = random(total);
+	pick = randomLimit(total);
 	total = 0;
 	for (i = 0; i < 3; i++) {
 		if (weights[i] != 0) {
@@ -1738,7 +1738,7 @@ void VS_queueRandomMove(DigimonEntity *digimon, FighterData *fighter, int32_t te
 {
 	int16_t flags[4];
 
-	if (random(10) < 7) {
+	if (randomLimit(10) < 7) {
 		fighter->targetId = 0xff;
 	} else {
 		if (&digimon->entity == ENTITY_TABLE[1]) {

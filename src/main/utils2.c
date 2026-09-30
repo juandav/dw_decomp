@@ -627,7 +627,7 @@ void startTournament(void)
 			*p++ = pool[i];
 		}
 		for (i = count; i < 7; i++) {
-			*p++ = pool[random(count)];
+			*p++ = pool[randomLimit(count)];
 		}
 	} else {
 		id = PARTNER_ENTITY.digimonEntity.entity.type;
@@ -639,7 +639,7 @@ void startTournament(void)
 			}
 		}
 		for (i = 0; i < 7; i++) {
-			id = (uint8_t)random(count) + 1;
+			id = (uint8_t)randomLimit(count) + 1;
 			w = pool;
 			while (id != 0) {
 				if (*w++ != 0xff) {

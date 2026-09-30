@@ -874,7 +874,7 @@ int32_t handleSpecialEvolutions(mode, entity)
   evotimer = PARTNER_PARA.evoTimer;
   battles = PARTNER_PARA.battles;
   tiredness = PARTNER_PARA.tiredness;
-  rand = random(100);
+  rand = randomLimit(100);
   evoTarget = -1;
 
   switch (mode) {

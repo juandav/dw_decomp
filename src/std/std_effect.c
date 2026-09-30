@@ -1174,7 +1174,7 @@ void STD_func_8006C6DC(void)
 	}
 
 	for (i = 0; i < 0x20; i++) {
-		swapByte(&STD_D_8007FA5C[i], &STD_D_8007FA5C[random(0x20)]);
+		swapByte(&STD_D_8007FA5C[i], &STD_D_8007FA5C[randomLimit(0x20)]);
 	}
 
 	MAIN_D_801351A4 = 0;

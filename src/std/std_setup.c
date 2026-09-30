@@ -298,12 +298,12 @@ void STD_func_80056E2C(int16_t type, int16_t slot, uint8_t tier)
 		break;
 	}
 	stats = &NPC_ENTITIES[slot].digimonEntity.stats;
-	stats->base.off = mul * (base + base * (0x1e - random(0x3d)) / 100) / div;
-	stats->base.def = mul * (base + base * (0x1e - random(0x3d)) / 100) / div;
-	stats->base.speed = mul * (base + base * (0x1e - random(0x3d)) / 100) / div;
-	stats->base.brain = mul * (base + base * (0x1e - random(0x3d)) / 100) / div;
-	stats->base.hp = mul * (base * 10 + base * 10 * (0x1e - random(0x3d)) / 100) / div;
-	stats->base.mp = mul * (base * 10 + base * 10 * (0x1e - random(0x3d)) / 100) / div;
+	stats->base.off = mul * (base + base * (0x1e - randomLimit(0x3d)) / 100) / div;
+	stats->base.def = mul * (base + base * (0x1e - randomLimit(0x3d)) / 100) / div;
+	stats->base.speed = mul * (base + base * (0x1e - randomLimit(0x3d)) / 100) / div;
+	stats->base.brain = mul * (base + base * (0x1e - randomLimit(0x3d)) / 100) / div;
+	stats->base.hp = mul * (base * 10 + base * 10 * (0x1e - randomLimit(0x3d)) / 100) / div;
+	stats->base.mp = mul * (base * 10 + base * 10 * (0x1e - randomLimit(0x3d)) / 100) / div;
 #if defined(VERSION_JP)
 	stats->current.currentHP = stats->base.hp;
 	stats->current.currentMP = stats->base.mp;
@@ -353,7 +353,7 @@ void STD_func_80056E2C(int16_t type, int16_t slot, uint8_t tier)
 	}
 	if (nb != 0) {
 		for (i = 0; i < nb; i++) {
-			swapByte(&listB[i], &listB[random(nb)]);
+			swapByte(&listB[i], &listB[randomLimit(nb)]);
 		}
 		for (i = 0; i < 3; i++) {
 			stats->base.moves[i] = 0xff;
@@ -368,9 +368,9 @@ void STD_func_80056E2C(int16_t type, int16_t slot, uint8_t tier)
 	}
 	if (na != 0) {
 		for (i = 0; i < na; i++) {
-			swapByte(&listA[i], &listA[random(na)]);
+			swapByte(&listA[i], &listA[randomLimit(na)]);
 		}
-		if (random(0xa) == 0) {
+		if (randomLimit(0xa) == 0) {
 			stats->base.moves[3] = listA[0] + 0x2e;
 		}
 	}

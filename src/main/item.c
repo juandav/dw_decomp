@@ -875,11 +875,11 @@ int32_t handleMedicineHealing(int16_t injuryChance, int16_t sicknessChance)
 {
 	int16_t roll;
 
-	if (((PARTNER_PARA.condition & CONDITION_INJURED) != 0) && (roll = random(3), roll < injuryChance)) {
+	if (((PARTNER_PARA.condition & CONDITION_INJURED) != 0) && (roll = randomLimit(3), roll < injuryChance)) {
 		PARTNER_PARA.condition &= ~CONDITION_INJURED;
 		PARTNER_PARA.injuryTimer = 0;
 	}
-	if (((PARTNER_PARA.condition & CONDITION_SICK) != 0) && (roll = random(10), roll < sicknessChance)) {
+	if (((PARTNER_PARA.condition & CONDITION_SICK) != 0) && (roll = randomLimit(10), roll < sicknessChance)) {
 		PARTNER_PARA.condition &= ~CONDITION_SICK;
 		PARTNER_PARA.sicknessTimer = 0;
 		PARTNER_PARA.areaEffectTimer = 0;
@@ -979,7 +979,7 @@ void handleItemSickness(int16_t chance)
 	char buf[0x18];
 #endif
 
-	r = random(0x64);
+	r = randomLimit(0x64);
 	isSick = PARTNER_PARA.condition & CONDITION_SICK;
 	if ((r < chance) && (!isSick)) {
 		PARTNER_PARA.condition |= CONDITION_SICK;

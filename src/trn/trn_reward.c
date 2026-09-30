@@ -167,7 +167,7 @@ void TRN_createCloudFXLine(int16_t a, int16_t b, int16_t x, int16_t z, int16_t d
 		}
 		d = (a / 120) * b;
 		for (i = 0; i < n; i++) {
-			r = random(100);
+			r = randomLimit(100);
 			pos[0] = (x + d) - r;
 			pos[1] = 0;
 			pos[2] = (z + d) - r;
@@ -892,7 +892,7 @@ int32_t TRN_tryLearnMove(int32_t type)
 		best = weight[2];
 	}
 
-	r = random(100);
+	r = randomLimit(100);
 	if (best > r) {
 		learnMove(move);
 		drawString(MOVE_NAMES[move], 0, 0x78);

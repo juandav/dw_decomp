@@ -112,7 +112,7 @@ void setFishingDisabled();
 void handleEatingPoop();
 int16_t entityCheckCollision(Entity *source, Entity *entity, int32_t arg2,
 			     int32_t arg3);
-int32_t random(int32_t limit);
+int32_t randomLimit(int32_t limit);
 void writePStat(int32_t id, int32_t value);
 uint8_t readPStat(int32_t id);
 void addTamerLevel(int32_t chance, int32_t amount);
@@ -868,7 +868,7 @@ void tickPartnerWalking(void)
 				anim->loopCount = 1;
 			}
 			if ((anim->loopCount == 0) || (collision == 0)) {
-				EMOTION_ANIM_TIMEOUT = random(5) + 1;
+				EMOTION_ANIM_TIMEOUT = randomLimit(5) + 1;
 				setPartnerIdle();
 #if defined(VERSION_JP)
 				PARTNER_IS_STANDING_STILL = 0;
@@ -886,13 +886,13 @@ void tickPartnerWalking(void)
 
 		if ((anim->animId >= 5) && (anim->animId < 8) &&
 		    ((anim->animFlag & 1) != 1)) {
-			EMOTION_ANIM_TIMEOUT = random(5) + 1;
+			EMOTION_ANIM_TIMEOUT = randomLimit(5) + 1;
 			setPartnerIdle();
 			STOP_DISTANCE_TIMER = 0;
 		}
 		else if ((anim->animId != 0) && (anim->animId != 1)) {
 			if ((anim->animFlag & 1) != 1) {
-				EMOTION_ANIM_TIMEOUT = random(5) + 1;
+				EMOTION_ANIM_TIMEOUT = randomLimit(5) + 1;
 				setPartnerIdle();
 				STOP_DISTANCE_TIMER = 0;
 			}

@@ -1444,7 +1444,7 @@ void handleItemLoss(void)
 			k++;
 		}
 
-		slot = pool[random(count)];
+		slot = pool[randomLimit(count)];
 		recycleId = INVENTORY.types.array[slot];
 		recycleId = getRecycleId(recycleId);
 		if (recycleId != 0xff) {
@@ -1489,7 +1489,7 @@ void dailyPStatTrigger(void)
 	}
 	for (i = 0; i < 6; i++) {
 retry:
-		r = random(0x40);
+		r = randomLimit(0x40);
 		r++;
 		if (r == 4) {
 			goto retry;
@@ -2556,7 +2556,7 @@ state2:
 		i++;
 	}
 
-	pick = random(j);
+	pick = randomLimit(j);
 	pick = pool[pick];
 	unlearnMove(pick);
 	writePStat(0xf3, pick);

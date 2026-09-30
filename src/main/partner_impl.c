@@ -561,7 +561,7 @@ void setSleepTimes(PartnerPara *para, int32_t type)
 			awakeTimeBase = 7;
 		}
 
-		roll = random(1);
+		roll = randomLimit(1);
 		para->sleepyHour = (HOUR + (awakeTimeBase + roll)) % 24;
 		para->sleepyMinute = 0;
 		para->wakeupHour =
@@ -988,7 +988,7 @@ void tickUnhappinessMechanics(void)
 		if (PARTNER_PARA.happiness < 0)
 			happiness = -PARTNER_PARA.happiness;
 
-		randomValue = random(100);
+		randomValue = randomLimit(100);
 		if (randomValue < happiness - PARTNER_PARA.discipline)
 			PARTNER_PARA.condition |= 0x10;
 	}
@@ -1197,7 +1197,7 @@ int32_t createPoopPile(int16_t tileX, int16_t tileY)
 		if ((tileX == WORLD_POOP[i].x) &&
 		    (tileY == WORLD_POOP[i].y) &&
 		    (CURRENT_SCREEN == WORLD_POOP[i].map)) {
-			direction = random(4);
+			direction = randomLimit(4);
 			if (direction == 0)
 				tileX--;
 			else if (direction == 1)
@@ -1293,7 +1293,7 @@ void sleepRegen(void)
 
 	maxHP = PARTNER_ENTITY.digimonEntity.stats.base.hp;
 	maxMP = PARTNER_ENTITY.digimonEntity.stats.base.mp;
-	healRoll = random(10);
+	healRoll = randomLimit(10);
 	PARTNER_ENTITY.digimonEntity.stats.current.currentHP +=
 		(int16_t)(sleepFactor * (maxHP * (healRoll + 70) / 100) /
 			  100);
@@ -1301,7 +1301,7 @@ void sleepRegen(void)
 		(int16_t)(sleepFactor * (maxMP * (healRoll + 70) / 100) /
 			  100);
 
-	healRoll = random(20);
+	healRoll = randomLimit(20);
 	PARTNER_PARA.tiredness -=
 		(int16_t)(sleepFactor *
 			  (PARTNER_PARA.tiredness * (healRoll + 80) / 100) /
@@ -1375,7 +1375,7 @@ int32_t partnerWillRefuseItem(void)
 	PARTNER_PARA.refusedFavFood = 0;
 	type = PARTNER_ENTITY.digimonEntity.entity.type;
 	condition = PARTNER_PARA.condition;
-	chance = random(10);
+	chance = randomLimit(10);
 	item = TAMER_ITEM.worldItem.type;
 
 	if ((item >= 0x73) && (item != 0x79) && (item != 0x7A) &&
@@ -1407,9 +1407,9 @@ int32_t partnerWillRefuseItem(void)
 		return 0;
 	}
 	if ((0 <= item) && (item < 0x26)) {
-		disciplineChance = random(100);
+		disciplineChance = randomLimit(100);
 		if (disciplineChance < 110 -
-		    (PARTNER_PARA.discipline + (random(10) + 10))) {
+		    (PARTNER_PARA.discipline + (randomLimit(10) + 10))) {
 			ITEM_SCOLD_FLAG = 1;
 			return 1;
 		}
@@ -1681,7 +1681,7 @@ void handlePoopWeightLoss(int32_t type)
 {
 	int32_t r;
 
-	r = random(4);
+	r = randomLimit(4);
 
 	PARTNER_PARA.weight -= (r + RAISE_DATA[type].poopSize) / 4;
 	if (PARTNER_PARA.weight < 1) {
@@ -1744,7 +1744,7 @@ void handleEatingPoop(void)
 		PARTNER_PARA.weight = 99;
 	}
 
-	r = random(100);
+	r = randomLimit(100);
 	if (r < healingChance) {
 		if ((PARTNER_PARA.condition & 0x20) != 0) {
 			PARTNER_PARA.condition &= ~0x20;
@@ -1778,7 +1778,7 @@ void tickSicknessMechanics(void)
 		PARTNER_PARA.sicknessTries++;
 		chance = (PARTNER_PARA.sicknessTries - 10) * 5 +
 			 (PARTNER_PARA.tiredness - 50);
-		roll = random(100);
+		roll = randomLimit(100);
 		if (roll < chance) {
 			PARTNER_PARA.condition |= 0x40;
 			PARTNER_PARA.timesBeingSick++;

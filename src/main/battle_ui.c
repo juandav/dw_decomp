@@ -142,7 +142,7 @@ void battleStatsGainsAndDrops(uint8_t *droppedItems)
 			STATS_GAINS[stat] = ((den + (enemyStat * STAT_GAIN_FACTORS[ENEMY_COUNT - 1])) - 1) / den;
 		} else {
 			chance = ((enemyStat * STAT_GAIN_FACTORS[ENEMY_COUNT - 1]) * 100) / den;
-			if (random(100) < chance) {
+			if (randomLimit(100) < chance) {
 				STATS_GAINS[stat] = 1;
 			}
 		}
@@ -171,7 +171,7 @@ void battleStatsGainsAndDrops(uint8_t *droppedItems)
 			break;
 		}
 
-		if (random(100) < chance) {
+		if (randomLimit(100) < chance) {
 			STATS_GAINS[i] = 1;
 		}
 	}
@@ -184,7 +184,7 @@ void battleStatsGainsAndDrops(uint8_t *droppedItems)
 			}
 
 #if defined(VERSION_JP)
-			if (DIGIMON_DATA[ENTITY_TABLE[COMBAT_DATA_PTR->player.entityIds[i + 1]]->type].dropChance > random(100)) {
+			if (DIGIMON_DATA[ENTITY_TABLE[COMBAT_DATA_PTR->player.entityIds[i + 1]]->type].dropChance > randomLimit(100)) {
 				droppedItems[i] = DIGIMON_DATA[ENTITY_TABLE[COMBAT_DATA_PTR->player.entityIds[i + 1]]->type].dropItem;
 				continue;
 			}
@@ -192,7 +192,7 @@ void battleStatsGainsAndDrops(uint8_t *droppedItems)
 			type = ENTITY_TABLE[(COMBAT_DATA_PTR->player.entityIds + 1)[i]]->type;
 
 			chance = DIGIMON_DATA[type].dropChance;
-			if (random(100) < chance) {
+			if (randomLimit(100) < chance) {
 				droppedItems[i] = DIGIMON_DATA[type].dropItem;
 				continue;
 			}
@@ -210,7 +210,7 @@ void handleBattleInjury(void)
 
 	hpRatio = (100 * PARTNER_ENTITY.digimonEntity.stats.current.currentHP) / PARTNER_ENTITY.digimonEntity.stats.base.hp;
 	chance = PARTNER_PARA.tiredness - hpRatio;
-	roll = random(100);
+	roll = randomLimit(100);
 	if (roll < chance) {
 		PARTNER_PARA.condition |= 0x20;
 	}
@@ -257,7 +257,7 @@ void battleMoveLearning(void)
 			continue;
 		}
 
-		if (MOVE_LEARN_CHANCES[moveId][foundIdx] > random(100)) {
+		if (MOVE_LEARN_CHANCES[moveId][foundIdx] > randomLimit(100)) {
 			learnableMoves[count++] = moveId;
 		}
 	}
@@ -266,7 +266,7 @@ void battleMoveLearning(void)
 		return;
 	}
 
-	moveId = learnableMoves[random(count)];
+	moveId = learnableMoves[randomLimit(count)];
 	learnMove(moveId);
 	BTL_appendMoveLearnedText(moveId);
 }

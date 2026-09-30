@@ -874,7 +874,7 @@ void BTL_shuffleBattleStartTextPieces(void)
 	int32_t r;
 
 	for (i = 0; i < 0x9b; i++) {
-		r = random(0x9b);
+		r = randomLimit(0x9b);
 		swapByte(&BTL_D_800742A0[i][0x11], &BTL_D_800742A0[r][0x11]);
 	}
 }
@@ -895,28 +895,28 @@ void BTL_initializeBattleStartText(void)
 	for (i = 0; i < 0x9b; i++, p++) {
 		(*p)[0x11] = i;
 		(*p)[0x12] = 0x18;
-		(*p)[0x13] = random(3);
+		(*p)[0x13] = randomLimit(3);
 	}
 
 	BTL_shuffleBattleStartTextPieces();
 
 	p = BTL_D_800742A0;
 	for (i = 0; i < 0x9b; i++, p++) {
-		if (random(2) == 1) {
+		if (randomLimit(2) == 1) {
 			sgn = 1;
 		} else {
 			sgn = -1;
 		}
 		((int16_t *)*p)[5] = BTL_D_80073014[i][1];
-		((int8_t *)*p)[0x10] = -sgn * ((random(3) + 1) << 5);
+		((int8_t *)*p)[0x10] = -sgn * ((randomLimit(3) + 1) << 5);
 		if ((0 <= i) && (i < 0x33)) {
-			((int16_t *)*p)[4] = (sgn * 500) + random(100) - 50;
+			((int16_t *)*p)[4] = (sgn * 500) + randomLimit(100) - 50;
 		} else if ((0x33 <= i) && (i < 0x65)) {
-			((int16_t *)*p)[4] = (sgn * 600) + random(100) - 50;
+			((int16_t *)*p)[4] = (sgn * 600) + randomLimit(100) - 50;
 		} else {
-			((int16_t *)*p)[4] = (sgn * 700) + random(100) - 50;
+			((int16_t *)*p)[4] = (sgn * 700) + randomLimit(100) - 50;
 		}
-		r = random(5);
+		r = randomLimit(5);
 #if defined(VERSION_JP)
 		((int16_t *)*p)[6] = (r + 8) * BTL_D_80073014[i][0] / 8;
 		((int16_t *)*p)[7] = (r + 8) * BTL_D_80073014[i][1] / 8;

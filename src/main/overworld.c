@@ -269,7 +269,7 @@ void spawnSpriteAtLocation(int16_t x, int16_t y, int16_t z, int16_t sprite,
 void loadMapImage1(u_long *tim);
 void loadMapImage2(u_long *tim, int32_t id);
 void renderNinjamonEffect(int32_t instanceId);
-int32_t random(int32_t max);
+int32_t randomLimit(int32_t max);
 int32_t _atan(int32_t dy, int32_t dx);
 void createNinjamonEffect(void);
 void calcMapObjectOrder(LocalMapObjectInstance *instances);
@@ -3993,9 +3993,9 @@ void loadMapObjects(LocalMapObjectInstance *mapObjects, uint8_t *data,
 		     (mapId >= 0x84 && mapId < 0x88)) &&
 		    k < 0x23) {
 			if (k >= 0x14) {
-				obj->x = random(320);
+				obj->x = randomLimit(320);
 			}
-			obj->y = random(240);
+			obj->y = randomLimit(240);
 			obj->flag |= 0x80;
 		}
 		obj++;
@@ -4341,7 +4341,7 @@ void buildSnowflakePrim(POLY_FT4 *prim, LocalMapObjectInstance *inst,
 		fallSpeed = 10;
 	}
 
-	randomValue = horizontalMovement = random(randomRange);
+	randomValue = horizontalMovement = randomLimit(randomRange);
 	if ((randomValue > (randomRange / 2)) != 0) {
 		horizontalMovement = -(horizontalMovement % (randomRange / 2));
 	}
@@ -4370,7 +4370,7 @@ void buildSnowflakePrim(POLY_FT4 *prim, LocalMapObjectInstance *inst,
 
 	inst->y = inst->y + fallSpeed;
 	if ((inst->y >= 0x83) && (inst->animSprites[0] != 2)) {
-		chance = random(10);
+		chance = randomLimit(10);
 		if ((chance < 2) && (inst->currentFrame == 0)) {
 			inst->currentFrame++;
 			inst->timer = 0;
@@ -4439,8 +4439,8 @@ void createNinjamonEffect(void)
 	NPC_ACTIVE_ANIM = 0;
 	storeMapObjectPosition(MAIN_D_8013CA38, MAIN_D_8013CA8C, 0, 0x29);
 	for (i = 0; i < 0x29; i++) {
-		MAIN_D_8013CAE0[i] = random(10) + 12;
-		MAIN_D_8013CB0C[i] = random(10) + 3;
+		MAIN_D_8013CAE0[i] = randomLimit(10) + 12;
+		MAIN_D_8013CB0C[i] = randomLimit(10) + 3;
 	}
 	addObject(0xfba, 0, NULL, renderNinjamonEffect);
 }
@@ -4472,8 +4472,8 @@ void renderNinjamonEffect(int32_t instanceId)
 		if (data->x > 0xa0) {
 			data->x = MAIN_D_8013CA38[i];
 			data->y = MAIN_D_8013CA8C[i];
-			MAIN_D_8013CAE0[i] = random(10) + 12;
-			MAIN_D_8013CB0C[i] = random(10) + 3;
+			MAIN_D_8013CAE0[i] = randomLimit(10) + 12;
+			MAIN_D_8013CB0C[i] = randomLimit(10) + 3;
 		}
 		data->orderValue = 10;
 		data++;

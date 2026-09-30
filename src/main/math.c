@@ -2,7 +2,7 @@
 
 #include <dw/math.h>
 
-int32_t random(int32_t limit)
+int32_t randomLimit(int32_t limit)
 {
     int32_t result;
 

@@ -2179,7 +2179,7 @@ void VS_selectRandomCamera(DigimonEntity *entity, int32_t mode, int32_t sub)
 	CameraPreset *p;
 
 	if (mode != 5) {
-		if (random(3) != 0) {
+		if (randomLimit(3) != 0) {
 			return;
 		}
 	}
@@ -2188,7 +2188,7 @@ void VS_selectRandomCamera(DigimonEntity *entity, int32_t mode, int32_t sub)
 	if (sub != 3) {
 		p = &VS_D_8007063C[mode];
 	} else {
-		p = &VS_D_8007063C[random(3) + 6];
+		p = &VS_D_8007063C[randomLimit(3) + 6];
 	}
 	VS_setCameraParams(p->unk0, p->unk2, p->unk4, p->unk6, p->unk8, p->unkA);
 	if (mode < 5) {
@@ -2205,7 +2205,7 @@ void VS_setRandomViewpoint(Entity *entity, int32_t idx)
 	VECTOR out;
 	MATRIX m;
 
-	if (random(3) != 0) {
+	if (randomLimit(3) != 0) {
 		return;
 	}
 	if (MAIN_D_80135268 == 7) {

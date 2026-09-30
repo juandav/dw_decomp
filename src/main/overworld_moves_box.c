@@ -62,7 +62,7 @@ void renderDigimonMovesSelected(int16_t panel);
 int32_t drawMoveViewHelpStrings(void);
 void removeTriangleMenu(void);
 void removeUIBox1(void);
-int32_t random(int32_t max);
+int32_t randomLimit(int32_t max);
 void removeStaticUIBox(int16_t id);
 void removeObject(int32_t objectId, int32_t arg1);
 
@@ -107,9 +107,9 @@ static void renderDigimonMoveBox__garbage__(LocalMapObjectInstance *mapObjects,
 		     (mapId >= 0x84 && mapId < 0x88)) &&
 		    k < 0x23) {
 			if (k >= 0x14) {
-				obj->x = random(320);
+				obj->x = randomLimit(320);
 			}
-			obj->y = random(240);
+			obj->y = randomLimit(240);
 			obj->flag |= 0x80;
 		}
 		obj++;

@@ -1268,7 +1268,7 @@ void addTamerLevel(chance, amount)
 {
 	int32_t r;
 
-	r = random(100);
+	r = randomLimit(100);
 	if (r < chance) {
 		TAMER_ENTITY.tamerLevel += amount;
 		if ((0 <= TAMER_ENTITY.tamerLevel) &&

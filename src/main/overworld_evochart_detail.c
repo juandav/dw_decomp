@@ -100,7 +100,7 @@ void renderLinePrimitive(int32_t color, int32_t x0, int32_t y0, int32_t x1,
 int32_t strlen(char *s);
 void renderInsetBox(int16_t a, int16_t b, int16_t c, int16_t d, int32_t otz);
 void renderEvoChartDetail(void);
-int32_t random(int32_t max);
+int32_t randomLimit(int32_t max);
 
 static void renderEvoChartDetail__garbage__(LocalMapObjectInstance *mapObjects,
 					    uint8_t *data, int32_t mapId)
@@ -141,9 +141,9 @@ static void renderEvoChartDetail__garbage__(LocalMapObjectInstance *mapObjects,
 		     (mapId >= 0x84 && mapId < 0x88)) &&
 		    k < 0x23) {
 			if (k >= 0x14) {
-				obj->x = random(320);
+				obj->x = randomLimit(320);
 			}
-			obj->y = random(240);
+			obj->y = randomLimit(240);
 			obj->flag |= 0x80;
 		}
 		obj++;

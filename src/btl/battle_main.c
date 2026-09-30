@@ -329,7 +329,7 @@ void BTL_tickPartnerAI(void)
 		if (stats->current.currentHP > fighter->hpDamageBuffer) {
 			if (stats->base.brain < 0x12d) {
 				if ((MAIN_D_80134D66 % (((stats->base.brain / 2) + 1) * 20)) == 0) {
-					if ((0x46 - PARTNER_PARA.discipline) > random(100)) {
+					if ((0x46 - PARTNER_PARA.discipline) > randomLimit(100)) {
 						*flagsPtr |= 0x2000;
 						fighter->senileTimer = 100;
 					}
@@ -436,7 +436,7 @@ void BTL_tickPartnerAI(void)
 	}
 
 	if ((*flagsPtr & 8) && ((MAIN_D_80134D66 % 100) == 0)) {
-		fighter->targetId = enemies[random(count)];
+		fighter->targetId = enemies[randomLimit(count)];
 	}
 
 	if (*flagsPtr & 0x40) {
@@ -544,7 +544,7 @@ void BTL_tickEnemyAI(void)
 			if (stats->current.currentHP > fighter->hpDamageBuffer) {
 				if (stats->base.brain < 0x12d) {
 					if ((MAIN_D_80134D66 % (((stats->base.brain / 2) + 1) * 20)) == 0) {
-						if (((0x12c - stats->base.brain) / 4) > random(100)) {
+						if (((0x12c - stats->base.brain) / 4) > randomLimit(100)) {
 							*flagsPtr |= 0x2000;
 							fighter->senileTimer = 100;
 						}
@@ -638,7 +638,7 @@ void BTL_tickEnemyAI(void)
 		if (isOffScreen(&out, 0xc8, 0xa0) == 1) {
 			stats->current.chargeMode = 2;
 		} else {
-			stats->current.chargeMode = random(2);
+			stats->current.chargeMode = randomLimit(2);
 		}
 		BTL_selectEnemyMove((DigimonEntity *)entity, fighter, i);
 	}
@@ -1069,7 +1069,7 @@ void BTL_tickConfusedState(DigimonEntity *digimon, DigimonEntity *target, Fighte
 		if (fighter->flags & 0x20) {
 			return;
 		}
-		if (random(100) >= 5) {
+		if (randomLimit(100) >= 5) {
 			return;
 		}
 		handleBattleIdle(digimon, &digimon->stats, fighter->flags);
@@ -1606,9 +1606,9 @@ void BTL_confusedRotate(Entity *entity)
 {
 	int16_t *rot;
 
-	if (random(0xa) >= 8) {
+	if (randomLimit(0xa) >= 8) {
 		rot = &entity->posData->rotation.vy;
-		*rot += random(0x400) - 0x200;
+		*rot += randomLimit(0x400) - 0x200;
 		if (*rot < 0) {
 			*rot += 0x1000;
 		} else {
@@ -1836,7 +1836,7 @@ common:
 		return;
 	}
 
-	*rot = cand[0] + random(0x400);
+	*rot = cand[0] + randomLimit(0x400);
 	if (entityCheckCollision(NULL, entity, 0x118, 0xc8) != -1) {
 		*rot = orig;
 		collisionGrace(NULL, entity, 0x118, 0xc8);
@@ -1995,7 +1995,7 @@ int16_t BTL_calculateHitChance(DigimonEntity *attacker, DigimonEntity *defender,
 void BTL_retargetAfterHit(DigimonEntity *digimon, FighterData *fighter, AttackObject attack)
 {
 	if (digimon == (DigimonEntity *)ENTITY_TABLE[1]) {
-		if (((MAIN_D_801346E8[digimon->stats.current.chargeMode] - PARTNER_PARA.discipline) <= random(100)) && (BTL_isFighterDefeated(fighter->targetId) == 0)) {
+		if (((MAIN_D_801346E8[digimon->stats.current.chargeMode] - PARTNER_PARA.discipline) <= randomLimit(100)) && (BTL_isFighterDefeated(fighter->targetId) == 0)) {
 			return;
 		}
 		BTL_selectFighterTarget(digimon, fighter, BTL_getFighterSlot(attack.casterId), 1);
@@ -2035,7 +2035,7 @@ int32_t BTL_calculateDamage(DigimonEntity *attacker, DigimonEntity *defender, in
 		if (diff < -0x1f4) {
 			diff = -0x1f4;
 		}
-		dmg = (mult[0] + mult[1] + mult[2]) * (MOVE_DATA[move].power + diff * MOVE_DATA[move].power / 500) / 30 * (random(0x15) + 0x5a) / 100;
+		dmg = (mult[0] + mult[1] + mult[2]) * (MOVE_DATA[move].power + diff * MOVE_DATA[move].power / 500) / 30 * (randomLimit(0x15) + 0x5a) / 100;
 	}
 	if ((move >= 0x3a) && (move < 0x71)) {
 		if ((Entity *)attacker == ENTITY_TABLE[1]) {
@@ -2043,9 +2043,9 @@ int32_t BTL_calculateDamage(DigimonEntity *attacker, DigimonEntity *defender, in
 				dmg = dmg * COMBAT_DATA_PTR->player.finisherChargeup[0] / 40;
 			}
 		} else {
-			dmg = dmg * (random(0x65) + 0x64) / 100;
+			dmg = dmg * (randomLimit(0x65) + 0x64) / 100;
 		}
-		dmg = dmg * (random(0x15) + 0x5a) / 100;
+		dmg = dmg * (randomLimit(0x15) + 0x5a) / 100;
 	}
 	if (dmg <= 0) {
 		dmg = 1;
@@ -2156,7 +2156,7 @@ void BTL_tickAttackHits(void)
 			MAIN_D_80134D74 = 0;
 			MAIN_D_80134D60 = NULL;
 		}
-		if (random(100) < hit) {
+		if (randomLimit(100) < hit) {
 			BTL_retargetAfterHit((DigimonEntity *)entity, fighter, attack);
 			dmg = BTL_calculateDamage((DigimonEntity *)attacker, (DigimonEntity *)entity, tech);
 			MAIN_D_80134D70 = 1;
@@ -2186,7 +2186,7 @@ void BTL_tickAttackHits(void)
 					break;
 				}
 				if ((moves[j] != 0xff) && (DIGIMON_DATA[entity->type].moves[moves[j] - 0x2e] == 0x2d)) {
-					if (random(100) < (((DigimonEntity *)entity)->stats.base.speed / DIGIMON_DATA[entity->type].level)) {
+					if (randomLimit(100) < (((DigimonEntity *)entity)->stats.base.speed / DIGIMON_DATA[entity->type].level)) {
 						fighter->queuedAnim = moves[j];
 						fighter->targetId = BTL_getFighterSlot(attack.casterId);
 						fighter->moveRange = 1;
@@ -2210,7 +2210,7 @@ void BTL_tickAttackHits(void)
 		}
 		if (MOVE_DATA[tech].range == 1) {
 			dmg = BTL_calculateDamage((DigimonEntity *)attacker, (DigimonEntity *)entity, tech);
-			dmg = dmg * (random(0x15) + 0xa) / 100;
+			dmg = dmg * (randomLimit(0x15) + 0xa) / 100;
 			if (dmg <= 0) {
 				dmg = 1;
 			}
@@ -2814,7 +2814,7 @@ void BTL_tickStatusEffects(void)
 			}
 			if (fighter->poisonTimer == 0) {
 				fighter->poisonTimer = 100;
-				dmg = stats->base.hp * (random(3) + 1) / 100;
+				dmg = stats->base.hp * (randomLimit(3) + 1) / 100;
 				fighter->hpDamageBuffer += dmg;
 				if (fighter->hpDamageBuffer >= 0x2710) {
 					fighter->hpDamageBuffer = 0x270f;
@@ -2898,7 +2898,7 @@ void BTL_tickStatusEffects(void)
 				break;
 			case 0:
 				fighter->flags |= 8;
-				fighter->flatTimer = random(0x51) + 0xe0;
+				fighter->flatTimer = randomLimit(0x51) + 0xe0;
 				stats->current.isHit = 0;
 				fighter->flags &= 0xffbf;
 				break;
@@ -3046,7 +3046,7 @@ int16_t BTL_getRandomUsableMove(int16_t *flags)
 		}
 	}
 
-	return picked[random(count)];
+	return picked[randomLimit(count)];
 }
 
 // clang-format off
@@ -3178,7 +3178,7 @@ void BTL_applyMoveStatus(DigimonEntity *digimon, FighterData *fighter, int32_t m
 	}
 
 	chance = MOVE_DATA[move].statusChance;
-	if (random(100) < chance) {
+	if (randomLimit(100) < chance) {
 		switch (MOVE_DATA[move].status) {
 		case 1:
 			if (!(fighter->flags & 1)) {
@@ -3190,7 +3190,7 @@ void BTL_applyMoveStatus(DigimonEntity *digimon, FighterData *fighter, int32_t m
 		case 2:
 			if (!(fighter->flags & 2)) {
 				fighter->flags |= 2;
-				fighter->confusionTimer = random(0x65) + 200;
+				fighter->confusionTimer = randomLimit(0x65) + 200;
 				BTL_addConfusionStatusVisual(digimon, fighter);
 				BTL_resetFighterAction(fighter);
 			}
@@ -3198,7 +3198,7 @@ void BTL_applyMoveStatus(DigimonEntity *digimon, FighterData *fighter, int32_t m
 		case 3:
 			if (!(fighter->flags & 4)) {
 				fighter->flags |= 4;
-				fighter->stunTimer = random(0x29) + 200;
+				fighter->stunTimer = randomLimit(0x29) + 200;
 				BTL_addStunStatusVisual(digimon, fighter);
 				BTL_resetFighterAction(fighter);
 			}
@@ -3567,7 +3567,7 @@ void BTL_selectPartnerMove(DigimonEntity *digimon, FighterData *fighter, int16_t
 		total += weights[i];
 	}
 
-	pick = random(total);
+	pick = randomLimit(total);
 	total = 0;
 	for (i = 0; i < 3; i++) {
 		if (weights[i] != 0) {
@@ -3637,11 +3637,11 @@ void BTL_selectConfusedMove(DigimonEntity *digimon, FighterData *fighter, long i
 {
 	TargetChoice choice;
 
-	if (random(10) < 7) {
+	if (randomLimit(10) < 7) {
 		fighter->targetId = 0xff;
 	} else {
 		BTL_getRemainingEnemies(&digimon->entity, choice.enemies, &choice.count);
-		fighter->targetId = choice.enemies[random(choice.count)];
+		fighter->targetId = choice.enemies[randomLimit(choice.count)];
 	}
 
 	if (BTL_getUsableMoves(choice.flags, index) == 0) {
@@ -3716,7 +3716,7 @@ void BTL_selectFighterTarget(DigimonEntity *digimon, FighterData *fighter, uint8
 	if (((arg3 != 0) && (digimon == (DigimonEntity *)ENTITY_TABLE[1])) || (digimon != (DigimonEntity *)ENTITY_TABLE[1])) {
 		if (target != 0xff) {
 			if (digimon != (DigimonEntity *)ENTITY_TABLE[1]) {
-				if ((NPC_ENTITIES[BTL_getNpcEntityIndex(&digimon->entity)].unk1 == 1) || (random(100) >= 0x47)) {
+				if ((NPC_ENTITIES[BTL_getNpcEntityIndex(&digimon->entity)].unk1 == 1) || (randomLimit(100) >= 0x47)) {
 					fighter->targetId = 0;
 					return;
 				}
@@ -3746,7 +3746,7 @@ void BTL_selectFighterTarget(DigimonEntity *digimon, FighterData *fighter, uint8
 	if (brain >= 0x12c) {
 		BTL_getStatusAfflictedEnemies(&digimon->entity, enemies, &count);
 		if (count >= 2) {
-			fighter->targetId = enemies[random(count)];
+			fighter->targetId = enemies[randomLimit(count)];
 			return;
 		}
 		if (count == 1) {
@@ -3873,7 +3873,7 @@ void BTL_selectEnemyMove(DigimonEntity *digimon, FighterData *fighter, int16_t i
 		total += weights[i];
 	}
 
-	pick = random(total);
+	pick = randomLimit(total);
 	total = 0;
 	for (i = 0; i < 4; i++) {
 		if (weights[i] != 0) {

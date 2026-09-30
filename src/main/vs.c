@@ -1271,7 +1271,7 @@ void VS__tickDigimonAi(uint8_t fighterId)
 		if ((stats->current.currentHP > data->hpDamageBuffer) &&
 		    (stats->base.brain <= 300) &&
 		    (MAIN_D_80134D66 % ((stats->base.brain / 2 + 1) * 20) == 0) &&
-		    (70 - MAIN_D_80135278[id] > random(100))) {
+		    (70 - MAIN_D_80135278[id] > randomLimit(100))) {
 			*flags |= 0x2000;
 			data->senileTimer = 100;
 		}
@@ -1482,10 +1482,10 @@ void VS__tickBattle(void)
 				MAIN_D_80135268 = 1;
 			}
 		}
-		if ((MAIN_D_80134D66 % 600) == 0 && random(2) == 1) {
+		if ((MAIN_D_80134D66 % 600) == 0 && randomLimit(2) == 1) {
 			MAIN_D_80135268 = 6;
 			VS_setRandomViewpoint(ENTITY_TABLE[1], 4);
-			MAIN_D_8013529C = random(0x29) + 0x3c;
+			MAIN_D_8013529C = randomLimit(0x29) + 0x3c;
 		}
 	}
 
@@ -1928,7 +1928,7 @@ void VS__tickDigimonConfusion(DigimonEntity *entity, DigimonEntity *other,
 			return;
 		}
 
-		if (random(100) < 5) {
+		if (randomLimit(100) < 5) {
 			handleBattleIdle(entity, &entity->stats, data->flags);
 			VS_startFighterMove(entity, other, data);
 		}
@@ -2521,13 +2521,13 @@ void VS__confusedRotate(Entity *entity)
 {
 	int16_t *rotationY;
 
-	if (random(10) < 8) {
+	if (randomLimit(10) < 8) {
 		return;
 	}
 
 	rotationY = &entity->posData->rotation.vy;
 
-	*rotationY += random(0x400) - 0x200;
+	*rotationY += randomLimit(0x400) - 0x200;
 	if (*rotationY < 0) {
 		*rotationY += 4096;
 	} else {
@@ -2720,7 +2720,7 @@ void VS__tickDigimonRotationKeepDistanceCollision(Entity *entity, int16_t *rotat
 			*rotationY = oldRotation;
 			collisionGrace(0, entity, 0x118, 0xc8);
 		} else {
-			*rotationY = angles[0] + random(0x400);
+			*rotationY = angles[0] + randomLimit(0x400);
 			if (entityCheckCollision(NULL, entity, 0x118, 0xc8) == -1) {
 				return;
 			}
