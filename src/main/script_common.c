@@ -386,68 +386,68 @@ char MAIN_D_801345E8[] = "Palmon";
 
 char MAIN_D_801345F0[] = ";1";
 
-char MAIN_D_8012F6D0[] = "Non Bewildering Forest Theme";
-char MAIN_D_8012F6F0[] = "Non Bewildering Forest Night Theme";
-char MAIN_D_8012F714[] = "Tropical Theme";
-char MAIN_D_8012F724[] = "Tropical Night Theme";
-char MAIN_D_8012F73C[] = "Mt. Panorama Theme";
-char MAIN_D_8012F750[] = "Mt. Panorama Night Theme";
-char MAIN_D_8012F76C[] = "Drill Tunnel Theme";
-char MAIN_D_8012F780[20] = "Ogre Fortress Theme";
-char MAIN_D_8012F794[24] = "Overdell Cemetary Theme";
-char MAIN_D_8012F7AC[] = "Canyon Theme";
-char MAIN_D_8012F7BC[20] = "Ogremon Theme No. 2";
-char MAIN_D_8012F7D0[] = "Everything Shop Theme";
-char MAIN_D_8012F7E8[] = "Ogremon ThemeNo. 3";
-char MAIN_D_8012F7FC[16] = "Lava Cave Theme";
-char MAIN_D_8012F80C[] = "Dark Aristcrat's Mansion Theme";
-char MAIN_D_8012F82C[] = "Underground Lab Theme";
-char MAIN_D_8012F844[] = "Gear Savanna Theme";
-char MAIN_D_8012F858[] = "Gear Savanna Night Theme";
-char MAIN_D_8012F874[] = "Leomon Theme";
-char MAIN_D_8012F884[] = "Amida Forest Theme";
-char MAIN_D_8012F898[] = "Amida Forest Night Theme";
-char MAIN_D_8012F8B4[] = "The Ancient Region of Dino Speedy Time Zone Theme";
-char MAIN_D_8012F8E8[56] = "The Ancient Region of Dino Speedy Time Zone Night Theme";
-char MAIN_D_8012F920[] = "The Ancient Region of Dino Glacial Time Zone Theme";
-char MAIN_D_8012F954[] = "The Ancient Region of Dino Glacial Time Zone Night Theme";
-char MAIN_D_8012F990[] = "Freezeland Theme";
-char MAIN_D_8012F9A4[] = "Freezeland Night Theme";
-char MAIN_D_8012F9BC[12] = "Igloo Theme";
-char MAIN_D_8012F9C8[] = "Curling Theme";
-char MAIN_D_8012F9D8[16] = "Sanctuary Theme";
-char MAIN_D_8012F9E8[] = "Sanctuary Below Theme";
-char MAIN_D_8012FA00[] = "Gecko Swamp Theme";
-char MAIN_D_8012FA14[24] = "Gecko Swamp Night Theme";
-char MAIN_D_8012FA2C[] = "Misty Trees Theme";
-char MAIN_D_8012FA40[24] = "Misty Trees Night Theme";
-char MAIN_D_8012FA58[20] = "WaruMonzaemon Theme";
-char MAIN_D_8012FA6C[] = "Toy Town Theme";
-char MAIN_D_8012FA7C[] = "Theme of Factorial";
-char MAIN_D_8012FA90[] = "Factorial Night Theme";
-char MAIN_D_8012FAA8[12] = "Sewer Theme";
-char MAIN_D_8012FAB4[] = "Trash Mountain Theme";
-char MAIN_D_8012FACC[] = "Trash Mountain Night Theme";
-char MAIN_D_8012FAE8[] = "Beatland Theme";
-char MAIN_D_8012FAF8[] = "Beatland Night Theme";
-char MAIN_D_8012FB10[24] = "Secret Beach Cave Theme";
-char MAIN_D_8012FB28[16] = "Last Room Theme";
-char MAIN_D_8012FB38[16] = "File City Theme";
-char MAIN_D_8012FB48[] = "File City Night Theme";
-char MAIN_D_8012FB60[24] = "Tornament Opening Theme";
-char MAIN_D_8012FB78[] = "Tornament Progress Theme";
-char MAIN_D_8012FB94[] = "Tornament Championship Theme";
-char MAIN_D_8012FBB4[] = "Partner's Entrance Theme";
-char MAIN_D_8012FBD0[] = "Competition Battle Opponent's Entrance Theme";
-char MAIN_D_8012FC00[] = "Arena Battle Theme No. 1";
-char MAIN_D_8012FC1C[20] = "Partner's Win Theme";
-char MAIN_D_8012FC30[] = "Partner's Loss Theme";
-char MAIN_D_8012FC48[] = "Arena Battle Theme No. 2";
-char MAIN_D_8012FC64[] = "Arena Battle Theme No. 3";
-char MAIN_D_8012FC80[] = "Event Battle Theme";
-char MAIN_D_8012FC94[20] = "Normal Battle Theme";
-char MAIN_D_8012FCA8[] = "Normal Battle  Theme No.2";
-char MAIN_D_8012FCC4[] = "Last Battle Theme";
+char STR_BGM_TRACK_NON_BEWILDERING_FOREST_THEME[] = "Non Bewildering Forest Theme";
+char STR_BGM_TRACK_NON_BEWILDERING_FOREST_NIGHT_THEME[] = "Non Bewildering Forest Night Theme";
+char STR_BGM_TRACK_TROPICAL_THEME[] = "Tropical Theme";
+char STR_BGM_TRACK_TROPICAL_NIGHT_THEME[] = "Tropical Night Theme";
+char STR_BGM_TRACK_MT_PANORAMA_THEME[] = "Mt. Panorama Theme";
+char STR_BGM_TRACK_MT_PANORAMA_NIGHT_THEME[] = "Mt. Panorama Night Theme";
+char STR_BGM_TRACK_DRILL_TUNNEL_THEME[] = "Drill Tunnel Theme";
+char STR_BGM_TRACK_OGRE_FORTRESS_THEME[20] = "Ogre Fortress Theme";
+char STR_BGM_TRACK_OVERDELL_CEMETARY_THEME[24] = "Overdell Cemetary Theme";
+char STR_BGM_TRACK_CANYON_THEME[] = "Canyon Theme";
+char STR_BGM_TRACK_OGREMON_THEME_NO_2[20] = "Ogremon Theme No. 2";
+char STR_BGM_TRACK_EVERYTHING_SHOP_THEME[] = "Everything Shop Theme";
+char STR_BGM_TRACK_OGREMON_THEMENO_3[] = "Ogremon ThemeNo. 3";
+char STR_BGM_TRACK_LAVA_CAVE_THEME[16] = "Lava Cave Theme";
+char STR_BGM_TRACK_DARK_ARISTCRATS_MANSION_THEME[] = "Dark Aristcrat's Mansion Theme";
+char STR_BGM_TRACK_UNDERGROUND_LAB_THEME[] = "Underground Lab Theme";
+char STR_BGM_TRACK_GEAR_SAVANNA_THEME[] = "Gear Savanna Theme";
+char STR_BGM_TRACK_GEAR_SAVANNA_NIGHT_THEME[] = "Gear Savanna Night Theme";
+char STR_BGM_TRACK_LEOMON_THEME[] = "Leomon Theme";
+char STR_BGM_TRACK_AMIDA_FOREST_THEME[] = "Amida Forest Theme";
+char STR_BGM_TRACK_AMIDA_FOREST_NIGHT_THEME[] = "Amida Forest Night Theme";
+char STR_BGM_TRACK_THE_ANCIENT_REGION_OF_DINO_SPEEDY_TIME_ZONE_THEME[] = "The Ancient Region of Dino Speedy Time Zone Theme";
+char STR_BGM_TRACK_THE_ANCIENT_REGION_OF_DINO_SPEEDY_TIME_ZONE_NIGHT_THEME[56] = "The Ancient Region of Dino Speedy Time Zone Night Theme";
+char STR_BGM_TRACK_THE_ANCIENT_REGION_OF_DINO_GLACIAL_TIME_ZONE_THEME[] = "The Ancient Region of Dino Glacial Time Zone Theme";
+char STR_BGM_TRACK_THE_ANCIENT_REGION_OF_DINO_GLACIAL_TIME_ZONE_NIGHT_THEME[] = "The Ancient Region of Dino Glacial Time Zone Night Theme";
+char STR_BGM_TRACK_FREEZELAND_THEME[] = "Freezeland Theme";
+char STR_BGM_TRACK_FREEZELAND_NIGHT_THEME[] = "Freezeland Night Theme";
+char STR_BGM_TRACK_IGLOO_THEME[12] = "Igloo Theme";
+char STR_BGM_TRACK_CURLING_THEME[] = "Curling Theme";
+char STR_BGM_TRACK_SANCTUARY_THEME[16] = "Sanctuary Theme";
+char STR_BGM_TRACK_SANCTUARY_BELOW_THEME[] = "Sanctuary Below Theme";
+char STR_BGM_TRACK_GECKO_SWAMP_THEME[] = "Gecko Swamp Theme";
+char STR_BGM_TRACK_GECKO_SWAMP_NIGHT_THEME[24] = "Gecko Swamp Night Theme";
+char STR_BGM_TRACK_MISTY_TREES_THEME[] = "Misty Trees Theme";
+char STR_BGM_TRACK_MISTY_TREES_NIGHT_THEME[24] = "Misty Trees Night Theme";
+char STR_BGM_TRACK_WARUMONZAEMON_THEME[20] = "WaruMonzaemon Theme";
+char STR_BGM_TRACK_TOY_TOWN_THEME[] = "Toy Town Theme";
+char STR_BGM_TRACK_THEME_OF_FACTORIAL[] = "Theme of Factorial";
+char STR_BGM_TRACK_FACTORIAL_NIGHT_THEME[] = "Factorial Night Theme";
+char STR_BGM_TRACK_SEWER_THEME[12] = "Sewer Theme";
+char STR_BGM_TRACK_TRASH_MOUNTAIN_THEME[] = "Trash Mountain Theme";
+char STR_BGM_TRACK_TRASH_MOUNTAIN_NIGHT_THEME[] = "Trash Mountain Night Theme";
+char STR_BGM_TRACK_BEATLAND_THEME[] = "Beatland Theme";
+char STR_BGM_TRACK_BEATLAND_NIGHT_THEME[] = "Beatland Night Theme";
+char STR_BGM_TRACK_SECRET_BEACH_CAVE_THEME[24] = "Secret Beach Cave Theme";
+char STR_BGM_TRACK_LAST_ROOM_THEME[16] = "Last Room Theme";
+char STR_BGM_TRACK_FILE_CITY_THEME[16] = "File City Theme";
+char STR_BGM_TRACK_FILE_CITY_NIGHT_THEME[] = "File City Night Theme";
+char STR_BGM_TRACK_TORNAMENT_OPENING_THEME[24] = "Tornament Opening Theme";
+char STR_BGM_TRACK_TORNAMENT_PROGRESS_THEME[] = "Tornament Progress Theme";
+char STR_BGM_TRACK_TORNAMENT_CHAMPIONSHIP_THEME[] = "Tornament Championship Theme";
+char STR_BGM_TRACK_PARTNERS_ENTRANCE_THEME[] = "Partner's Entrance Theme";
+char STR_BGM_TRACK_COMPETITION_BATTLE_OPPONENTS_ENTRANCE_THEME[] = "Competition Battle Opponent's Entrance Theme";
+char STR_BGM_TRACK_ARENA_BATTLE_THEME_NO_1[] = "Arena Battle Theme No. 1";
+char STR_BGM_TRACK_PARTNERS_WIN_THEME[20] = "Partner's Win Theme";
+char STR_BGM_TRACK_PARTNERS_LOSS_THEME[] = "Partner's Loss Theme";
+char STR_BGM_TRACK_ARENA_BATTLE_THEME_NO_2[] = "Arena Battle Theme No. 2";
+char STR_BGM_TRACK_ARENA_BATTLE_THEME_NO_3[] = "Arena Battle Theme No. 3";
+char STR_BGM_TRACK_EVENT_BATTLE_THEME[] = "Event Battle Theme";
+char STR_BGM_TRACK_NORMAL_BATTLE_THEME[20] = "Normal Battle Theme";
+char STR_BGM_TRACK_NORMAL_BATTLE__THEME_NO2[] = "Normal Battle  Theme No.2";
+char STR_BGM_TRACK_LAST_BATTLE_THEME[] = "Last Battle Theme";
 char STR_TOURNAMENT_NAME_VERSION_1_CUP[] = "Version 1 Cup";
 char STR_TOURNAMENT_NAME_VERSION_2_CUP[] = "Version 2 Cup";
 char STR_TOURNAMENT_NAME_VERSION_3_CUP[] = "Version 3 Cup";
@@ -538,70 +538,70 @@ uint8_t MAIN_D_8012FE78[78] = {
 	0x77, 0x78, 0x79, 0x7a, 0x7b, 0x7c,
 };
 
-char *MAIN_D_8012FEC8[63] = {
-	MAIN_D_8012F6D0,
-	MAIN_D_8012F6F0,
-	MAIN_D_8012F714,
-	MAIN_D_8012F724,
-	MAIN_D_8012F73C,
-	MAIN_D_8012F750,
-	MAIN_D_8012F76C,
-	MAIN_D_8012F780,
-	MAIN_D_8012F794,
-	MAIN_D_8012F7AC,
-	MAIN_D_8012F7BC,
-	MAIN_D_8012F7D0,
-	MAIN_D_8012F7E8,
-	MAIN_D_8012F7FC,
-	MAIN_D_8012F80C,
-	MAIN_D_8012F82C,
-	MAIN_D_8012F844,
-	MAIN_D_8012F858,
-	MAIN_D_8012F874,
-	MAIN_D_8012F884,
-	MAIN_D_8012F898,
-	MAIN_D_8012F8B4,
-	MAIN_D_8012F8E8,
-	MAIN_D_8012F920,
-	MAIN_D_8012F954,
-	MAIN_D_8012F990,
-	MAIN_D_8012F9A4,
-	MAIN_D_8012F9BC,
-	MAIN_D_8012F9C8,
-	MAIN_D_8012F9D8,
-	MAIN_D_8012F9E8,
-	MAIN_D_8012FA00,
-	MAIN_D_8012FA14,
-	MAIN_D_8012FA2C,
-	MAIN_D_8012FA40,
-	MAIN_D_8012FA58,
-	MAIN_D_8012FA6C,
-	MAIN_D_8012FA7C,
-	MAIN_D_8012FA90,
-	MAIN_D_8012FAA8,
-	MAIN_D_8012FAB4,
-	MAIN_D_8012FACC,
-	MAIN_D_8012FAE8,
-	MAIN_D_8012FAF8,
-	MAIN_D_8012FB10,
-	MAIN_D_8012F73C,
-	MAIN_D_8012FB28,
-	MAIN_D_8012FB38,
-	MAIN_D_8012FB48,
-	MAIN_D_8012FB60,
-	MAIN_D_8012FB78,
-	MAIN_D_8012FB94,
-	MAIN_D_8012FBB4,
-	MAIN_D_8012FBD0,
-	MAIN_D_8012FC00,
-	MAIN_D_8012FC1C,
-	MAIN_D_8012FC30,
-	MAIN_D_8012FC48,
-	MAIN_D_8012FC64,
-	MAIN_D_8012FC80,
-	MAIN_D_8012FC94,
-	MAIN_D_8012FCA8,
-	MAIN_D_8012FCC4,
+char *BGM_TRACK_NAMES[63] = {
+	STR_BGM_TRACK_NON_BEWILDERING_FOREST_THEME,
+	STR_BGM_TRACK_NON_BEWILDERING_FOREST_NIGHT_THEME,
+	STR_BGM_TRACK_TROPICAL_THEME,
+	STR_BGM_TRACK_TROPICAL_NIGHT_THEME,
+	STR_BGM_TRACK_MT_PANORAMA_THEME,
+	STR_BGM_TRACK_MT_PANORAMA_NIGHT_THEME,
+	STR_BGM_TRACK_DRILL_TUNNEL_THEME,
+	STR_BGM_TRACK_OGRE_FORTRESS_THEME,
+	STR_BGM_TRACK_OVERDELL_CEMETARY_THEME,
+	STR_BGM_TRACK_CANYON_THEME,
+	STR_BGM_TRACK_OGREMON_THEME_NO_2,
+	STR_BGM_TRACK_EVERYTHING_SHOP_THEME,
+	STR_BGM_TRACK_OGREMON_THEMENO_3,
+	STR_BGM_TRACK_LAVA_CAVE_THEME,
+	STR_BGM_TRACK_DARK_ARISTCRATS_MANSION_THEME,
+	STR_BGM_TRACK_UNDERGROUND_LAB_THEME,
+	STR_BGM_TRACK_GEAR_SAVANNA_THEME,
+	STR_BGM_TRACK_GEAR_SAVANNA_NIGHT_THEME,
+	STR_BGM_TRACK_LEOMON_THEME,
+	STR_BGM_TRACK_AMIDA_FOREST_THEME,
+	STR_BGM_TRACK_AMIDA_FOREST_NIGHT_THEME,
+	STR_BGM_TRACK_THE_ANCIENT_REGION_OF_DINO_SPEEDY_TIME_ZONE_THEME,
+	STR_BGM_TRACK_THE_ANCIENT_REGION_OF_DINO_SPEEDY_TIME_ZONE_NIGHT_THEME,
+	STR_BGM_TRACK_THE_ANCIENT_REGION_OF_DINO_GLACIAL_TIME_ZONE_THEME,
+	STR_BGM_TRACK_THE_ANCIENT_REGION_OF_DINO_GLACIAL_TIME_ZONE_NIGHT_THEME,
+	STR_BGM_TRACK_FREEZELAND_THEME,
+	STR_BGM_TRACK_FREEZELAND_NIGHT_THEME,
+	STR_BGM_TRACK_IGLOO_THEME,
+	STR_BGM_TRACK_CURLING_THEME,
+	STR_BGM_TRACK_SANCTUARY_THEME,
+	STR_BGM_TRACK_SANCTUARY_BELOW_THEME,
+	STR_BGM_TRACK_GECKO_SWAMP_THEME,
+	STR_BGM_TRACK_GECKO_SWAMP_NIGHT_THEME,
+	STR_BGM_TRACK_MISTY_TREES_THEME,
+	STR_BGM_TRACK_MISTY_TREES_NIGHT_THEME,
+	STR_BGM_TRACK_WARUMONZAEMON_THEME,
+	STR_BGM_TRACK_TOY_TOWN_THEME,
+	STR_BGM_TRACK_THEME_OF_FACTORIAL,
+	STR_BGM_TRACK_FACTORIAL_NIGHT_THEME,
+	STR_BGM_TRACK_SEWER_THEME,
+	STR_BGM_TRACK_TRASH_MOUNTAIN_THEME,
+	STR_BGM_TRACK_TRASH_MOUNTAIN_NIGHT_THEME,
+	STR_BGM_TRACK_BEATLAND_THEME,
+	STR_BGM_TRACK_BEATLAND_NIGHT_THEME,
+	STR_BGM_TRACK_SECRET_BEACH_CAVE_THEME,
+	STR_BGM_TRACK_MT_PANORAMA_THEME,
+	STR_BGM_TRACK_LAST_ROOM_THEME,
+	STR_BGM_TRACK_FILE_CITY_THEME,
+	STR_BGM_TRACK_FILE_CITY_NIGHT_THEME,
+	STR_BGM_TRACK_TORNAMENT_OPENING_THEME,
+	STR_BGM_TRACK_TORNAMENT_PROGRESS_THEME,
+	STR_BGM_TRACK_TORNAMENT_CHAMPIONSHIP_THEME,
+	STR_BGM_TRACK_PARTNERS_ENTRANCE_THEME,
+	STR_BGM_TRACK_COMPETITION_BATTLE_OPPONENTS_ENTRANCE_THEME,
+	STR_BGM_TRACK_ARENA_BATTLE_THEME_NO_1,
+	STR_BGM_TRACK_PARTNERS_WIN_THEME,
+	STR_BGM_TRACK_PARTNERS_LOSS_THEME,
+	STR_BGM_TRACK_ARENA_BATTLE_THEME_NO_2,
+	STR_BGM_TRACK_ARENA_BATTLE_THEME_NO_3,
+	STR_BGM_TRACK_EVENT_BATTLE_THEME,
+	STR_BGM_TRACK_NORMAL_BATTLE_THEME,
+	STR_BGM_TRACK_NORMAL_BATTLE__THEME_NO2,
+	STR_BGM_TRACK_LAST_BATTLE_THEME,
 };
 
 int32_t MAIN_D_8012FFC4[5] = {
@@ -2759,8 +2759,8 @@ void layoutBgmTrackRow(ItemMenuBox *box, uint8_t row, int32_t isLast)
 	out = intToStringSJIS(out, type + 1, 2, 0);
 	*out++ = 0xf;
 	*out++ = 0;
-	strcpy(out, MAIN_D_8012FEC8[type]);
-	len = strlen(MAIN_D_8012FEC8[type]);
+	strcpy(out, BGM_TRACK_NAMES[type]);
+	len = strlen(BGM_TRACK_NAMES[type]);
 	out += len;
 	out = padWithSpaces(out, 0xc, len);
 	terminateString(out, isLast);
@@ -4075,9 +4075,8 @@ top: {
 			ctrl = *MAIN_D_80134FDC++;
 			{
 				ctrl = readPStat(ctrl);
-				strcpy(out,
-				       MAIN_D_8012FEC8[ctrl]);
-				lines = strlen(MAIN_D_8012FEC8[ctrl]);
+				strcpy(out, BGM_TRACK_NAMES[ctrl]);
+				lines = strlen(BGM_TRACK_NAMES[ctrl]);
 				out += lines;
 				col = (col + ((lines >> 1) & 0xffff)) & 0xffff;
 			}
