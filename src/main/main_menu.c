@@ -59,7 +59,6 @@ typedef struct {
 	char location[24];
 } SaveSlotPreview;
 
-/* Serialized 0xF00-byte payload map established by the retail load/write pair. */
 typedef struct {
 	int32_t mainState;
 	VECTOR tamerPosition;
@@ -334,8 +333,7 @@ char MAIN_D_80134680[] = "を";
 
 char MAIN_D_80134684[] = "登録名";
 
-/* Species */
-char STR_SHUZOKU[] = "種族";
+char MAIN_D_8013D814[] = "種族";
 
 char MAIN_D_80134694[] = "ＨＰ";
 
@@ -351,8 +349,7 @@ char MAIN_D_80131448[] = "技２";
 
 char MAIN_D_80131454[] = "技３";
 
-/* To number */
-char STR_BAN_NI[] = "番に";
+char MAIN_D_8013D854[] = "番に";
 
 char MAIN_D_801346B4[] = "（";
 
@@ -482,11 +479,9 @@ char MAIN_D_801312D0[] = "できないのでご注意ください。";
 
 char MAIN_D_801312E4[] = "本体の電源を切ったり、リセットすると";
 
-/* The adventure will be lost. */
-char STR_BOUKEN_NO_NAIYOU_WA_KIETE_SHIMAIMASU[] = "冒険の内容は消えてしまいます。";
+char MAIN_D_80139DF4[] = "冒険の内容は消えてしまいます。";
 
-/* Yes/No (the two words overlap) */
-char STR_HAIIE[] = "はいいえ";
+char MAIN_D_80139E14[] = "はいいえ";
 
 char MAIN_D_80131340[] = "使用されていません";
 
@@ -512,18 +507,15 @@ char MAIN_D_80131400[] = "対戦用デジモンデータの入った";
 
 char MAIN_D_8013141C[] = "メモリーカードをさしてください";
 
-/* Yes No */
-char STR_HAI_IIE[] = "はいいいえ";
+char MAIN_D_80139F6C[] = "はいいいえ";
 
 char MAIN_D_80131460[] = "このデジモンを登録しますか？はいいえ";
 
 char MAIN_D_8013147C[] = "登録番号を選んでください";
 
-/* Will be registered */
-char STR_WO_TOUROKU_SHIMASU[] = "を登録します";
+char MAIN_D_80139FBC[] = "を登録します";
 
-/* Is that all right? Yes/No */
-char STR_YOROSHII_DESU_KA_HAIIE[] = "よろしいですか？　　　　　　　　はいいえ";
+char MAIN_D_80139FCC[] = "よろしいですか？　　　　　　　　はいいえ";
 
 char MAIN_D_801314B0[] = "対戦デジモンの登録をすると同時に";
 
@@ -539,8 +531,7 @@ char MAIN_D_80131580[] = "幼年期のデジモンなので、メモリーカー
 
 char MAIN_D_801315A0[] = "対戦用に登録できません";
 
-/* Six dashes (an empty slot) */
-char STR_DASHES[] = "−−−−−−";
+char MAIN_D_8013A0EC[] = "−−−−−−";
 #else
 char MAIN_D_80131008[] = "NEW GAME";
 
@@ -2960,9 +2951,9 @@ void drawMainMenuStrings(int32_t menu)
 		DrawSync(0);
 		drawString(MAIN_D_801312E4, 0, 0x30);
 		DrawSync(0);
-		drawString(STR_BOUKEN_NO_NAIYOU_WA_KIETE_SHIMAIMASU, 0, 0x3c);
+		drawString(MAIN_D_80139DF4, 0, 0x3c);
 		DrawSync(0);
-		drawString(STR_HAIIE, 0, 0xf0);
+		drawString(MAIN_D_80139E14, 0, 0xf0);
 		break;
 	case 7:
 		drawString(SLOT_ACTION_TITLES[MAIN_MENU_ACTION], 0, 0);
@@ -2988,7 +2979,7 @@ void drawMainMenuStrings(int32_t menu)
 		DrawSync(0);
 		drawString(MAIN_D_80131328, 0, 0x18);
 		DrawSync(0);
-		drawString(STR_HAIIE, 0, 0xf0);
+		drawString(MAIN_D_80139E14, 0, 0xf0);
 		break;
 	case 8:
 		drawString(SLOT_ACTION_TITLES[MAIN_MENU_ACTION], 0, 0);
@@ -3012,7 +3003,7 @@ void drawMainMenuStrings(int32_t menu)
 		DrawSync(0);
 		drawString(SLOT_ACTION_QUESTIONS[MAIN_MENU_ACTION], 0x18, 0x30);
 		DrawSync(0);
-		drawString(STR_HAIIE, 0, 0xf0);
+		drawString(MAIN_D_80139E14, 0, 0xf0);
 		if (MAIN_MENU_ACTION == 2) {
 			MENU_HIGHLIGHTS[view].pos = 1;
 		}
@@ -3063,7 +3054,7 @@ void drawMainMenuStrings(int32_t menu)
 			drawString(MEMORY_CARD_ERROR_MESSAGES[MEMORY_CARD_ERROR], 0, 0x30);
 			DrawSync(0);
 		}
-		drawString(STR_HAIIE, 0, 0xf0);
+		drawString(MAIN_D_80139E14, 0, 0xf0);
 		break;
 	case 13:
 		drawString(SLOT_ACTION_TITLES[5], 0, 0);
@@ -3074,7 +3065,7 @@ void drawMainMenuStrings(int32_t menu)
 		DrawSync(0);
 		drawString(MAIN_D_8013141C, 0, 0x24);
 		DrawSync(0);
-		drawString(STR_HAI_IIE, 0, 0xf0);
+		drawString(MAIN_D_80139F6C, 0, 0xf0);
 		if (VS_PLAYER_INDEX == 1) {
 			drawString(MAIN_D_80134674, 0x30, 0xc);
 			drawString(MAIN_D_80134674, 0x84, 0xc);
@@ -3086,7 +3077,7 @@ void drawMainMenuStrings(int32_t menu)
 		drawString(MAIN_D_80134684, 0, 0xc);
 		drawString(PARTNER_ENTITY.name, 0x2a, 0xc);
 		DrawSync(0);
-		drawString(STR_SHUZOKU, 6, 0x18);
+		drawString(MAIN_D_8013D814, 6, 0x18);
 		drawString(DIGIMON_DATA[PARTNER_ENTITY.digimonEntity.entity.type].name, 0x2a, 0x18);
 		DrawSync(0);
 		drawString(MAIN_D_80134694, 6, 0x24);
@@ -3125,12 +3116,12 @@ void drawMainMenuStrings(int32_t menu)
 		DrawSync(0);
 		drawString(&MAIN_D_80131658[(BATTLE_REGISTRATION_SLOT + 1) % 10][2], 0xc, 0xc);
 		DrawSync(0);
-		strcpy(buf, STR_BAN_NI);
+		strcpy(buf, MAIN_D_8013D854);
 		strcat(buf, PARTNER_ENTITY.name);
-		strcat(buf, STR_WO_TOUROKU_SHIMASU);
+		strcat(buf, MAIN_D_80139FBC);
 		drawString(buf, 0x18, 0xc);
 		DrawSync(0);
-		drawString(STR_YOROSHII_DESU_KA_HAIIE, 0, 0x18);
+		drawString(MAIN_D_80139FCC, 0, 0x18);
 		DrawSync(0);
 		drawString(MAIN_D_801314B0, 0, 0x24);
 		DrawSync(0);
@@ -3144,7 +3135,7 @@ void drawMainMenuStrings(int32_t menu)
 	case 18:
 		drawString(MAIN_D_80131568, 0, 0);
 		DrawSync(0);
-		drawString(STR_HAIIE, 0, 0xc);
+		drawString(MAIN_D_80139E14, 0, 0xc);
 		break;
 	case 19:
 		strcpy(buf, PARTNER_ENTITY.name);
@@ -3531,7 +3522,7 @@ void drawRegisteredBattleSlots(int32_t slot)
 		} else {
 			setTextColor(9);
 #if defined(VERSION_JP)
-			drawString(STR_DASHES, 0x1e, y);
+			drawString(MAIN_D_8013A0EC, 0x1e, y);
 #else
 			drawString(MAIN_D_801346C0[0], 0x1E, y);
 #endif
