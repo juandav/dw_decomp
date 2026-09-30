@@ -7,9 +7,9 @@ extern int32_t buffModelValue[2];
 extern int32_t buffModelFrame;
 extern TMDModel *BUFF_MODEL[];
 
-void tickBuffModelObject(int32_t instanceId);
-void MAIN_func_800F1794(void);
-void MAIN_func_800F179C(int32_t model, int32_t compIdx, int32_t color);
+void tickBuffModel(int32_t instanceId);
+void renderBuffModel(void);
+void morphBuffModel(int32_t model, int32_t compIdx, int32_t color);
 void initializeBuffModel(TMDModel *model);
 int32_t initializeBuffModelObject(void);
 int32_t removeBuffModelObject(void);
@@ -18,22 +18,22 @@ static void *buff_model_functions[] = {
 	removeBuffModelObject,
 	initializeBuffModelObject,
 	initializeBuffModel,
-	MAIN_func_800F179C,
-	MAIN_func_800F1794,
-	tickBuffModelObject,
+	morphBuffModel,
+	renderBuffModel,
+	tickBuffModel,
 };
 
-void tickBuffModelObject(int32_t instanceId)
+void tickBuffModel(int32_t instanceId)
 {
-	MAIN_func_800F179C((int32_t)BUFF_MODEL[0], 5, buffModelValue[buffModelFrame & 1]);
+	morphBuffModel((int32_t)BUFF_MODEL[0], 5, buffModelValue[buffModelFrame & 1]);
 	buffModelFrame += 1;
 }
 
-void MAIN_func_800F1794(void)
+void renderBuffModel(void)
 {
 }
 
-void MAIN_func_800F179C(int32_t model, int32_t compIdx, int32_t color)
+void morphBuffModel(int32_t model, int32_t compIdx, int32_t color)
 {
 	char *p;
 	int32_t i;
@@ -76,8 +76,8 @@ void initializeBuffModel(TMDModel *model)
 int32_t initializeBuffModelObject(void)
 {
 	buffModelFrame = 0;
-	return addObject(0x501, 0, tickBuffModelObject,
-			 (RenderFunction)MAIN_func_800F1794);
+	return addObject(0x501, 0, tickBuffModel,
+			 (RenderFunction)renderBuffModel);
 }
 
 int32_t removeBuffModelObject(void)
