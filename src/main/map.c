@@ -406,45 +406,45 @@ int16_t COLLISION_GRACE_ROTATION[8][4] = {
 };
 
 #if defined(VERSION_JP)
-char MAIN_D_80128A34[] = "迷わずの森";
+char STR_MAP_NAME_NATIVE_FOREST[] = "迷わずの森";
 
-char MAIN_D_80128A50[] = "シーラ岬";
+char STR_MAP_NAME_COELA_POINT[] = "シーラ岬";
 
-char MAIN_D_80128A6C[] = "竜の目の湖ほとり";
+char STR_MAP_NAME_DRAGON_EYE_LAKE[] = "竜の目の湖ほとり";
 
-char MAIN_D_80128A88[] = "ドリルトンネル入り口";
+char STR_MAP_NAME_DRILL_TUNNEL_ENTRANCE[] = "ドリルトンネル入り口";
 
-char MAIN_D_80128AA4[] = "デジブリッジ";
+char STR_MAP_NAME_DIGIMON_BRIDGE[] = "デジブリッジ";
 
-char MAIN_D_80128AC0[] = "トロピカジャングル";
+char STR_MAP_NAME_TROPICAL_JUNGLE[] = "トロピカジャングル";
 
-char MAIN_D_80128ADC[] = "マングローブ域";
+char STR_MAP_NAME_MANGROVE_REGION[] = "マングローブ域";
 
-char MAIN_D_80128AF8[] = "ミハラシ山道";
+char STR_MAP_NAME_PATH_THRU_MT_PANORAMA[] = "ミハラシ山道";
 
-char MAIN_D_80128B14[] = "はじまりの街入り口";
+char STR_MAP_NAME_ENTRANCE_TO_FILE_CITY[] = "はじまりの街入り口";
 
-char MAIN_D_80128B30[] = "ミハラシ台";
+char STR_MAP_NAME_MT_PANORAMA_PLAINS[] = "ミハラシ台";
 
-char MAIN_D_80128B4C[] = "ミハラシすそ野";
+char STR_MAP_NAME_FOOT_OF_MT_PANORAMA[] = "ミハラシすそ野";
 
-char MAIN_D_80128B68[] = "ミハラシ山・ホウシ域";
+char STR_MAP_NAME_MT_PANORAMA_SPORE_AREA[] = "ミハラシ山・ホウシ域";
 
-char MAIN_D_80128B84[] = "ドリルトンネル";
+char STR_MAP_NAME_DRILL_TUNNEL[] = "ドリルトンネル";
 
-char MAIN_D_80128BA0[] = "ドリルトンネル地下２階";
+char STR_MAP_NAME_DRILL_TUNNEL_2ND_FLOOR[] = "ドリルトンネル地下２階";
 
-char MAIN_D_80128BBC[] = "ドリルトンネル地下３階";
+char STR_MAP_NAME_DRILL_TUNNEL_3RD_FLOOR[] = "ドリルトンネル地下３階";
 
-char MAIN_D_80128BD8[] = "ドリモゲモン居住区";
+char STR_MAP_NAME_RESIDENTIAL_AREA[] = "ドリモゲモン居住区";
 
-char MAIN_D_80128BF4[] = "地底湖";
+char STR_MAP_NAME_UNDERGROUND_POND[] = "地底湖";
 
-char MAIN_D_80128C10[] = "溶岩洞";
+char STR_MAP_NAME_LAVA_CAVE[] = "溶岩洞";
 
-char MAIN_D_80128C2C[] = "オーバーデル";
+char STR_MAP_NAME_OVERDELL[] = "オーバーデル";
 
-char MAIN_D_80128C48[] = "オーバーデル墓地";
+char STR_MAP_NAME_OVERDELL_CEMETERY[] = "オーバーデル墓地";
 
 char MAIN_D_80128C64[] = "グレートキャニオン入り口";
 
@@ -462,7 +462,7 @@ char MAIN_D_80128D0C[] = "モノクロ店";
 
 char MAIN_D_80128D28[] = "闇貴族の館";
 
-char MAIN_D_80128D44[] = "闇貴族の館地下";
+char STR_MAP_NAME_MANSION_BASEMENT[] = "闇貴族の館地下";
 
 char MAIN_D_80128D60[] = "地下実験場";
 
@@ -536,8 +536,7 @@ char MAIN_D_80129118[] = "闇貴族の館・２階";
 
 char MAIN_D_80129134[] = "闇貴族の館・てんじょう裏";
 
-/* Grey Lord's Mansion, basement */
-char STR_MAP_NAME_YAMI_KIZOKU_NO_YAKATA_CHIKA[] = "闇貴族の館・地下";
+char STR_MAP_NAME_MANSION_DOT_BASEMENT[] = "闇貴族の館・地下";
 
 char MAIN_D_80129150[] = "裏次元";
 
@@ -545,45 +544,45 @@ char MAIN_D_8012916C[] = "クネモンのねどこ";
 
 char MAIN_D_80129188[] = "あみだ森";
 #else
-char MAIN_D_80128A34[] = "      Native Forest     ";
+char STR_MAP_NAME_NATIVE_FOREST[] = "      Native Forest     ";
 
-char MAIN_D_80128A50[] = "       Coela Point      ";
+char STR_MAP_NAME_COELA_POINT[] = "       Coela Point      ";
 
-char MAIN_D_80128A6C[] = "     Dragon Eye Lake    ";
+char STR_MAP_NAME_DRAGON_EYE_LAKE[] = "     Dragon Eye Lake    ";
 
-char MAIN_D_80128A88[] = "  Drill Tunnel Entrance ";
+char STR_MAP_NAME_DRILL_TUNNEL_ENTRANCE[] = "  Drill Tunnel Entrance ";
 
-char MAIN_D_80128AA4[] = "      Digimon Bridge    ";
+char STR_MAP_NAME_DIGIMON_BRIDGE[] = "      Digimon Bridge    ";
 
-char MAIN_D_80128AC0[] = "     Tropical Jungle    ";
+char STR_MAP_NAME_TROPICAL_JUNGLE[] = "     Tropical Jungle    ";
 
-char MAIN_D_80128ADC[] = "     Mangrove Region    ";
+char STR_MAP_NAME_MANGROVE_REGION[] = "     Mangrove Region    ";
 
-char MAIN_D_80128AF8[] = " Path Thru Mt. Panorama ";
+char STR_MAP_NAME_PATH_THRU_MT_PANORAMA[] = " Path Thru Mt. Panorama ";
 
-char MAIN_D_80128B14[] = "  Entrance to File City ";
+char STR_MAP_NAME_ENTRANCE_TO_FILE_CITY[] = "  Entrance to File City ";
 
-char MAIN_D_80128B30[] = "  Mt. Panorama Plains   ";
+char STR_MAP_NAME_MT_PANORAMA_PLAINS[] = "  Mt. Panorama Plains   ";
 
-char MAIN_D_80128B4C[] = "  Foot of Mt. Panorama  ";
+char STR_MAP_NAME_FOOT_OF_MT_PANORAMA[] = "  Foot of Mt. Panorama  ";
 
-char MAIN_D_80128B68[] = "Mt. Panorama Spore Area ";
+char STR_MAP_NAME_MT_PANORAMA_SPORE_AREA[] = "Mt. Panorama Spore Area ";
 
-char MAIN_D_80128B84[] = "      Drill Tunnel      ";
+char STR_MAP_NAME_DRILL_TUNNEL[] = "      Drill Tunnel      ";
 
-char MAIN_D_80128BA0[] = " Drill Tunnel 2nd floor ";
+char STR_MAP_NAME_DRILL_TUNNEL_2ND_FLOOR[] = " Drill Tunnel 2nd floor ";
 
-char MAIN_D_80128BBC[] = " Drill Tunnel 3rd floor ";
+char STR_MAP_NAME_DRILL_TUNNEL_3RD_FLOOR[] = " Drill Tunnel 3rd floor ";
 
-char MAIN_D_80128BD8[] = "    Residential Area    ";
+char STR_MAP_NAME_RESIDENTIAL_AREA[] = "    Residential Area    ";
 
-char MAIN_D_80128BF4[] = "    Underground Pond    ";
+char STR_MAP_NAME_UNDERGROUND_POND[] = "    Underground Pond    ";
 
-char MAIN_D_80128C10[] = "        Lava Cave       ";
+char STR_MAP_NAME_LAVA_CAVE[] = "        Lava Cave       ";
 
-char MAIN_D_80128C2C[] = "        Overdell        ";
+char STR_MAP_NAME_OVERDELL[] = "        Overdell        ";
 
-char MAIN_D_80128C48[] = "    Overdell Cemetery   ";
+char STR_MAP_NAME_OVERDELL_CEMETERY[] = "    Overdell Cemetery   ";
 
 char MAIN_D_80128C64[] = "  Great Canyon Entrance ";
 
@@ -601,7 +600,7 @@ char MAIN_D_80128D0C[] = "     Monochrome Shop    ";
 
 char MAIN_D_80128D28[] = "   Grey Lord's Mansion  ";
 
-char MAIN_D_80128D44[] = "    Mansion Basement    ";
+char STR_MAP_NAME_MANSION_BASEMENT[] = "    Mansion Basement    ";
 
 char MAIN_D_80128D60[] = "     Underground Lab    ";
 
@@ -706,26 +705,26 @@ char MAP_PATH_PREFIX[] = "\\MAP\\MAP";
 char MAP_PATH_DIGITS[] = "0123456789";
 
 char *MAP_NAME_PTR[70] = {
-	MAIN_D_80128A34,
-	MAIN_D_80128A50,
-	MAIN_D_80128A6C,
-	MAIN_D_80128A88,
-	MAIN_D_80128AA4,
-	MAIN_D_80128AC0,
-	MAIN_D_80128ADC,
-	MAIN_D_80128AF8,
-	MAIN_D_80128B14,
-	MAIN_D_80128B30,
-	MAIN_D_80128B4C,
-	MAIN_D_80128B68,
-	MAIN_D_80128B84,
-	MAIN_D_80128BA0,
-	MAIN_D_80128BBC,
-	MAIN_D_80128BD8,
-	MAIN_D_80128BF4,
-	MAIN_D_80128C10,
-	MAIN_D_80128C2C,
-	MAIN_D_80128C48,
+	STR_MAP_NAME_NATIVE_FOREST,
+	STR_MAP_NAME_COELA_POINT,
+	STR_MAP_NAME_DRAGON_EYE_LAKE,
+	STR_MAP_NAME_DRILL_TUNNEL_ENTRANCE,
+	STR_MAP_NAME_DIGIMON_BRIDGE,
+	STR_MAP_NAME_TROPICAL_JUNGLE,
+	STR_MAP_NAME_MANGROVE_REGION,
+	STR_MAP_NAME_PATH_THRU_MT_PANORAMA,
+	STR_MAP_NAME_ENTRANCE_TO_FILE_CITY,
+	STR_MAP_NAME_MT_PANORAMA_PLAINS,
+	STR_MAP_NAME_FOOT_OF_MT_PANORAMA,
+	STR_MAP_NAME_MT_PANORAMA_SPORE_AREA,
+	STR_MAP_NAME_DRILL_TUNNEL,
+	STR_MAP_NAME_DRILL_TUNNEL_2ND_FLOOR,
+	STR_MAP_NAME_DRILL_TUNNEL_3RD_FLOOR,
+	STR_MAP_NAME_RESIDENTIAL_AREA,
+	STR_MAP_NAME_UNDERGROUND_POND,
+	STR_MAP_NAME_LAVA_CAVE,
+	STR_MAP_NAME_OVERDELL,
+	STR_MAP_NAME_OVERDELL_CEMETERY,
 	MAIN_D_80128C64,
 	MAIN_D_80128C80,
 	MAIN_D_80128C9C,
@@ -734,7 +733,7 @@ char *MAP_NAME_PTR[70] = {
 	MAIN_D_80128CF0,
 	MAIN_D_80128D0C,
 	MAIN_D_80128D28,
-	MAIN_D_80128D44,
+	STR_MAP_NAME_MANSION_BASEMENT,
 	MAIN_D_80128D60,
 	MAIN_D_80128D7C,
 	MAIN_D_80128D98,
@@ -773,9 +772,9 @@ char *MAP_NAME_PTR[70] = {
 	MAIN_D_80129118,
 	MAIN_D_80129134,
 #if defined(VERSION_JP)
-	STR_MAP_NAME_YAMI_KIZOKU_NO_YAKATA_CHIKA,
+	STR_MAP_NAME_MANSION_DOT_BASEMENT,
 #else
-	MAIN_D_80128D44,
+	STR_MAP_NAME_MANSION_BASEMENT,
 #endif
 	MAIN_D_80129150,
 	MAIN_D_8012916C,
