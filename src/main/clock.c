@@ -1,5 +1,4 @@
 #include <libgs.h>
-#include <libgte.h>
 
 #include <dw/clock.h>
 #include <dw/params.h>
@@ -210,7 +209,7 @@ void initializeClockData(void)
 	CLOCK_SPRITE.r = CLOCK_SPRITE.g = CLOCK_SPRITE.b = 0x80;
 	CLOCK_SPRITE.mx = 3;
 	CLOCK_SPRITE.my = 13;
-	CLOCK_SPRITE.scalex = CLOCK_SPRITE.scaley = ONE;
+	CLOCK_SPRITE.scalex = CLOCK_SPRITE.scaley = 0x1000;
 	CLOCK_SPRITE.rotate = MINUTE * 0x6000;
 	IS_GAMETIME_RUNNING = 1;
 }
