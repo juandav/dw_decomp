@@ -14,8 +14,6 @@ typedef struct {
 
 extern int32_t MAIN_D_80139BA0[];
 
-void MAIN_func_80092A44(DISPENV *disp, int32_t x, int32_t y, int32_t w, int32_t h);
-
 void MOV_initEnvironment(MovieEnv *env, int32_t x0, int32_t y0, int32_t x1, int32_t y1);
 void MOV_onSliceDecoded(void);
 void MOV_startStream(CdlFILE *file, void (*callback)(), MovieEntry *movie);
@@ -232,7 +230,7 @@ int32_t MOV_playMovie(int32_t movieId)
 		MOV_waitForFlip(&MOV_ENV, 0);
 		VSync(0);
 		dispFrame = (MOV_ENV.frameIndex != 0) ? 0 : 1;
-		MAIN_func_80092A44(&disp, 0, dispFrame * 240, 0x1e0, 0xf0);
+		SetDefDispEnv(&disp, 0, dispFrame * 240, 0x1e0, 0xf0);
 		disp.isrgb24 = 1;
 		disp.disp.w = (disp.disp.w * 2) / 3;
 		PutDispEnv(&disp);

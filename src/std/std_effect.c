@@ -77,7 +77,6 @@ extern int16_t EFE_LOAD_STATE[];
 
 void entityLookAtLocation(Entity *entity, VECTOR *pos);
 void setMapLayerEnabled(int32_t enabled);
-void MAIN_func_80092B60(POLY_FT4 *prim);
 void addScreenPolyFT3(void *prim, SVECTOR *v0, SVECTOR *v1, SVECTOR *v2);
 void renderLinePrimitive(uint32_t color, int32_t x0, int32_t y0, int32_t x1, int32_t y1, int32_t layer, int32_t flag);
 int32_t addScreenPolyFT4(POLY_FT4 *poly, SVECTOR *v0, SVECTOR *v1, SVECTOR *v2, SVECTOR *v3);
@@ -87,7 +86,6 @@ int32_t doSomethingWithSomePoints(int16_t *rect, DVECTOR *line);
 char *initializeFlashData(char *base);
 void renderParticleFlash(int16_t *params);
 void calculatePosition(GsCOORDINATE2 *coord, MATRIX *matrix);
-void MAIN_func_80092C18(PACKET *prim, RECT *rect);
 int32_t lerp(int32_t start, int32_t end, int32_t t0, int32_t t1, int32_t t);
 void STD_renderFinisherAura(int32_t idx);
 void renderTMDModel(uint8_t *buffer, int32_t id, GsCOORDINATE2 *coord, GsCOORDINATE2 *super, VECTOR *trans, SVECTOR *rot, VECTOR *scale);
@@ -2655,18 +2653,18 @@ void STD_addClutLoadPrim(void)
 	char *src;
 	int32_t y;
 	int32_t z;
-	PACKET *prim;
+	DR_LOAD *prim;
 
 	idx = EFE_POP1(int32_t);
 	src = EFE_POP1(char *);
 	y = EFE_POP1(int32_t);
 	z = EFE_POP1(int32_t);
 	src += idx * 2;
-	prim = GsGetWorkBase();
-	GsSetWorkBase(prim + 0x44);
+	prim = (DR_LOAD *)GsGetWorkBase();
+	GsSetWorkBase((PACKET *)(prim + 1));
 	setRECT(&rect, (((uint16_t *)MAIN_D_80134D0C[6])[9] & 0x3f) << 4, ((((uint16_t *)MAIN_D_80134D0C[6])[9] >> 6) & 0x1ff) + y, 0x10, 1);
-	MAIN_func_80092C18(prim, &rect);
-	memcpy(prim + 0x10, src, 0x20);
+	SetDrawLoad(prim, &rect);
+	memcpy(prim->p, src, 0x20);
 	AddPrim(ACTIVE_ORDERING_TABLE->org + (z >> 4), prim);
 }
 
@@ -5937,13 +5935,13 @@ void STD_renderFinisherAura(int32_t id)
 
 void STD_func_80078BBC(char *pos, int32_t scale, SVECTOR *dir, uint8_t *col)
 {
-	POLY_FT4 *prim;
+	POLY_FT3 *prim;
 	SVECTOR c;
 	SVECTOR a;
 	SVECTOR b;
 
-	prim = (POLY_FT4 *)GsGetWorkBase();
-	MAIN_func_80092B60(prim);
+	prim = (POLY_FT3 *)GsGetWorkBase();
+	SetPolyFT3(prim);
 	SetSemiTrans(prim, 1);
 	setRGB0(prim, col[0], col[1], col[2]);
 	prim->tpage = getTPage(0, 1, 768, 256);

@@ -201,7 +201,7 @@ extern char *MAP_NAME_PTR[];
 
 int8_t getFileCityTopMap(void);
 void renderUIBoxBorder(int16_t *rect, int32_t flag);
-void MAIN_func_80092B9C(POLY_G4 *prim);
+void SetPolyG4(POLY_G4 *prim);
 void recalculatePPandArena(void);
 uint8_t readPStat(int32_t index);
 void writePStat(int32_t index, uint8_t value);
@@ -2398,7 +2398,7 @@ void renderMenuBox(int32_t x, int32_t y, int32_t w, int32_t h)
 	rect[3] = h;
 	renderUIBoxBorder(rect, 0);
 	prim = (POLY_G4 *)GsGetWorkBase();
-	MAIN_func_80092B9C(prim);
+	SetPolyG4(prim);
 	setRGB0(prim, 0, 0, 0x70);
 	setRGB1(prim, 0, 0, 0x50);
 	setRGB2(prim, 0, 0, 0x30);

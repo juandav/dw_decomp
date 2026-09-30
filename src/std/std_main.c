@@ -285,7 +285,7 @@ void STD_func_80060998(void);
 void STD_selectConfusedMove(DigimonEntity *digimon, FighterData *fighter, int32_t tech);
 void renderString(int32_t a, int32_t b, int32_t c, int32_t d, int32_t e, int32_t f, int32_t g, int32_t h, int32_t i);
 void STD_func_80063300(int32_t id);
-void MAIN_func_80092BB0(POLY_GT4 *prim);
+void SetPolyGT4(POLY_GT4 *prim);
 uint32_t playSound(int32_t vabId, int32_t val);
 void STD_func_80061F44(DigimonEntity *entity, DigimonEntity *other, FighterData *data, int16_t move);
 void STD_func_80059658(int32_t id);
@@ -1641,7 +1641,7 @@ void STD_func_80058A60(int16_t x, int16_t y, int16_t size, uint8_t character)
 
 	prim = (POLY_GT4 *)GsGetWorkBase();
 
-	MAIN_func_80092BB0(prim);
+	SetPolyGT4(prim);
 	prim->tpage = getTPage(0, 0, 768, 0);
 	prim->clut = GetClut(0, 0x1e0);
 	setRGB0(prim, STD_D_8007A370[MAIN_D_8013513C * 3], (&STD_D_8007A370[1])[MAIN_D_8013513C * 3], (&STD_D_8007A370[2])[MAIN_D_8013513C * 3]);

@@ -114,7 +114,7 @@ void setPosDataPolyFT4(POLY_FT4 *prim, int32_t posX, int32_t posY,
                        int32_t width, int32_t height);
 void createPauseBox(void);
 void MAIN_func_800E642C(void);
-void MAIN_func_80092BB0(POLY_GT4 *prim);
+void SetPolyGT4(POLY_GT4 *prim);
 void handleBattleIdle(DigimonEntity *entity, Stats *stats, int32_t flags);
 int32_t entityGetTechFromAnim(Entity *entity, int32_t anim);
 void collisionGrace(Entity *target, Entity *entity, int32_t dx, int32_t dy);
@@ -626,7 +626,7 @@ void VS__renderIntroNameChar(int16_t x, int16_t y, int16_t size,
 
 	prim = (POLY_GT4 *)GsGetWorkBase();
 
-	MAIN_func_80092BB0(prim);
+	SetPolyGT4(prim);
 	prim->tpage = getTPage(0, 0, 768, 0);
 	setClut(prim, 0, 480);
 	setRGB0(prim, MAIN_D_8012F438[MAIN_D_80134F28].r, MAIN_D_8012F438[MAIN_D_80134F28].g, MAIN_D_8012F438[MAIN_D_80134F28].b);

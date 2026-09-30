@@ -82,7 +82,6 @@ void downloadCLUT1(int16_t *clut);
 void downloadCLUT2(char *base);
 char *initializeFlashData(char *base);
 int32_t customRandom(int32_t a, int32_t b);
-void MAIN_func_80092B60(POLY_FT4 *prim);
 void addScreenPolyFT3(void *prim, SVECTOR *v0, SVECTOR *v1, SVECTOR *v2);
 int32_t addScreenPolyFT4(POLY_FT4 *poly, SVECTOR *v0, SVECTOR *v1, SVECTOR *v2, SVECTOR *v3);
 void calculateBoneMatrix(Entity *entity, int32_t boneId, MATRIX *out);
@@ -864,14 +863,14 @@ void EVL_renderTriShard(EvlModelVertex *drift, int32_t unused1, int16_t speed, i
 	SVECTOR a;
 	SVECTOR b;
 	SVECTOR c;
-	POLY_FT4 *prim;
+	POLY_FT3 *prim;
 	EvlModelVertex *v;
 	TMD_P_TG3 *tri;
 	SVECTOR offset;
 
 	tri = (TMD_P_TG3 *)MAIN_D_80135210;
-	prim = (POLY_FT4 *)GsGetWorkBase();
-	MAIN_func_80092B60(prim);
+	prim = (POLY_FT3 *)GsGetWorkBase();
+	SetPolyFT3(prim);
 	SetSemiTrans(prim, 1);
 	setRGB0(prim, MAIN_D_80135218[0], MAIN_D_80135218[1], MAIN_D_80135218[2]);
 	prim->tpage = model->pixelPage;
@@ -1175,7 +1174,7 @@ void EVL_renderSparkStreak(int32_t id)
 	SVECTOR a;
 	SVECTOR b;
 	SVECTOR c;
-	POLY_FT4 *prim;
+	POLY_FT3 *prim;
 	EvlSpark *e;
 	int32_t lenSq;
 	int32_t scale;
@@ -1201,8 +1200,8 @@ void EVL_renderSparkStreak(int32_t id)
 	c.vx = b.vx + customRandom(-0x50, 0x50);
 	c.vy = b.vy + customRandom(-0x50, 0x50);
 	c.vz = b.vz + customRandom(-0x50, 0x50);
-	prim = (POLY_FT4 *)GsGetWorkBase();
-	MAIN_func_80092B60(prim);
+	prim = (POLY_FT3 *)GsGetWorkBase();
+	SetPolyFT3(prim);
 	SetSemiTrans(prim, 1);
 	prim->tpage = getTPage(0, 1, 768, 256);
 	prim->clut = getClut(192, 489);

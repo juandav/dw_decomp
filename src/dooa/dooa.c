@@ -135,7 +135,6 @@ void setDeathMap(int32_t messageId, int32_t flag);
 void DOOA_tickDissolve(int32_t instanceId);
 void DOOA_initOrderingTable(void);
 void DOOA_spawnShardWave(long wireIndex);
-void MAIN_func_80092B60(POLY_FT4 *prim);
 void addScreenPolyFT3(void *prim, SVECTOR *v0, SVECTOR *v1, SVECTOR *v2);
 int32_t addScreenPolyFT4(POLY_FT4 *poly, SVECTOR *v0, SVECTOR *v1, SVECTOR *v2, SVECTOR *v3);
 void tickCameraMovement(int32_t mode);
@@ -1414,7 +1413,7 @@ int32_t DOOA_renderShards(int32_t instanceId)
 			tri = (DooaShard *)cursor;
 			if (tri->delay >= 0) {
 				triPrim = (POLY_FT3 *)GsGetWorkBase();
-				MAIN_func_80092B60((POLY_FT4 *)triPrim);
+				SetPolyFT3(triPrim);
 				if (effect->flash != 0) {
 					setRGB0(triPrim, effect->colorR, effect->colorG, effect->colorB);
 					triPrim->tpage = getTPage(1, 0, 832, 256);
