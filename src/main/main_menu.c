@@ -205,7 +205,7 @@ void MAIN_func_80092B9C(POLY_G4 *prim);
 void recalculatePPandArena(void);
 uint8_t readPStat(int32_t index);
 void writePStat(int32_t index, uint8_t value);
-void VS__initializeVSMode(char *namesP1, char *namesP2);
+void VS__initialize(char *namesP1, char *namesP2);
 void renderMainMenuBackground(void);
 
 void renderTitleMenuView();
@@ -4412,7 +4412,7 @@ void tickMainMenu(void)
 			removeObject(0x1388, 0);
 			removeObject(0xFA3, 0);
 			loadDynamicLibrary(VS_REL, &loadComplete, 0, 0, 0);
-			VS__initializeVSMode((char *)VS_SAVE_DATA,
+			VS__initialize((char *)VS_SAVE_DATA,
 					     (char *)VS_SAVE_DATA + 0xA00);
 			addObject(0xFA3, 0, NULL, (RenderFunction)renderMainMenuBackground);
 			addObject(0x1388, 0, (TickFunction)tickMainMenu,

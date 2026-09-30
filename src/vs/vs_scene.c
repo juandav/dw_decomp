@@ -79,7 +79,7 @@ void readFile(char *path, void *dest);
 void convertValueToDigits(int32_t n, int32_t value, int32_t *outCount, int32_t *digits);
 void setPosDataPolyFT4(POLY_FT4 *prim, int32_t posX, int32_t posY, int32_t width, int32_t height);
 void setUVDataPolyFT4(POLY_FT4 *prim, int32_t uvX, int32_t uvY, int32_t width, int32_t height);
-void VS__tickInput(void);
+void VS__tickVSInput(void);
 void VS_resetMatchState(void);
 void VS_loadVSAssets(int32_t arena);
 void VS_addInputObjects(void);
@@ -139,7 +139,7 @@ void VS__tickDigimonP1(int32_t instanceId);
 void VS__tickDigimonP2(int32_t instanceId);
 int32_t loadVSSounds(void);
 int32_t loadDigimonSounds(int32_t vabId, int32_t type);
-void VS__func_800F23D0(int32_t stage);
+void VS__runIntro(int32_t stage);
 int32_t VS__combatMain(void);
 void initializeBuffModel(TMDModel *model);
 void VS_loadStageModels(void);
@@ -1170,7 +1170,7 @@ void VS_initializeVS(void)
 		loadDigimonSounds(5, ENTITY_TABLE[2]->type);
 		VS_setVSPhase(0xa);
 		VS_addArenaRenderers();
-		VS__func_800F23D0(VS_D_800716A8[10]);
+		VS__runIntro(VS_D_800716A8[10]);
 		MAIN_D_80135268 = 1;
 		result = VS__combatMain();
 		VS_removeCameraIntro();
@@ -1263,8 +1263,8 @@ void VS_loadVSAssets(int32_t arena)
 
 void VS_addInputObjects(void)
 {
-	addObject(0x1b2, 0, (TickFunction)VS__tickInput, NULL);
-	addObject(0x1b2, 1, (TickFunction)VS__tickInput, NULL);
+	addObject(0x1b2, 0, (TickFunction)VS__tickVSInput, NULL);
+	addObject(0x1b2, 1, (TickFunction)VS__tickVSInput, NULL);
 	PLAYTIME_FRAMES = 0;
 	addObject(0xfb9, 0, (TickFunction)VS_tickPlaytime, NULL);
 }

@@ -41,8 +41,8 @@ void VS_renderTargetCursor(uint8_t id);
 void VS_tickTargetCursor(uint8_t id);
 void VS_removeTargetCursor(uint8_t index);
 #if defined(VERSION_JP)
-void VS__tickPlayerInput(int32_t player);
-void VS__tickInput(int32_t instanceId);
+void VS___tickVSInput(int32_t player);
+void VS__tickVSInput(int32_t instanceId);
 void VS__tickDigimonP1(int32_t instanceId);
 void VS__tickDigimonP2(int32_t instanceId);
 #endif
@@ -105,8 +105,8 @@ static void *vs_hud_functions[] = {
 #if defined(VERSION_JP)
 	VS__tickDigimonP2,
 	VS__tickDigimonP1,
-	VS__tickInput,
-	VS__tickPlayerInput,
+	VS__tickVSInput,
+	VS___tickVSInput,
 	VS_removeTargetCursor,
 	VS_renderTargetCursor,
 	VS_tickTargetCursor,
@@ -617,7 +617,7 @@ void VS_removeTargetCursor(uint8_t index)
 }
 
 #if defined(VERSION_JP)
-void VS__tickPlayerInput(int32_t player)
+void VS___tickVSInput(int32_t player)
 {
 	uint32_t input;
 	uint32_t previous;
@@ -665,12 +665,12 @@ void VS__tickPlayerInput(int32_t player)
 }
 
 // clang-format off
-void VS__tickInput(instanceId)
+void VS__tickVSInput(instanceId)
 	int16_t instanceId;
 // clang-format on
 {
 	if (GAME_STATE == 4) {
-		VS__tickPlayerInput(instanceId);
+		VS___tickVSInput(instanceId);
 	}
 }
 

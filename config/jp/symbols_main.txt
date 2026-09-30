@@ -65,4 +65,4 @@ BTL_battleTickFrame = 0x8005FCE8;
 BTL_END_BOX_TEXTBUFFER = 0x8007C6D8; // size:0x400
 DOO2_openEggBox = 0x800724C4;
 DOO2_tickEggInput = 0x8007257C;
-VS__initializeVSMode = 0x80057394;
+VS__initialize = 0x80057394;
