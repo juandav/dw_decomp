@@ -100,7 +100,6 @@ static void ENDI_downloadClut(u_long clut)
 	DrawSync(0);
 }
 
-
 static void ENDI_setModelSemiTrans(Entity *entity, int32_t arg1)
 {
 	int32_t i;
@@ -317,16 +316,16 @@ static void ENDI_releaseParticles(int32_t index)
 		if (p->active >= 0) {
 			calculateBoneMatrix(p->entity, p->boneIndex, &boneMatrix);
 
-			vec.vx = (p->pos.vx * p->entity->posData->scale.vx) / ONE;
-			vec.vy = (p->pos.vy * p->entity->posData->scale.vy) / ONE;
-			vec.vz = (p->pos.vz * p->entity->posData->scale.vz) / ONE;
+			vec.vx = (p->pos.vx * p->entity->posData->scale.vx) / 0x1000;
+			vec.vy = (p->pos.vy * p->entity->posData->scale.vy) / 0x1000;
+			vec.vz = (p->pos.vz * p->entity->posData->scale.vz) / 0x1000;
 			ApplyMatrixSV(&boneMatrix, &vec, &vec);
 
 			vec.vx += boneMatrix.t[0];
 			vec.vy += boneMatrix.t[1];
 			vec.vz += boneMatrix.t[2];
 
-			p->pos.vx = vec.vx - (int16_t)ENDI_DATA.base.vx;
+			p->pos.vx = vec.vx - ENDI_DATA.base.vx;
 			p->pos.vy = vec.vy - ENDI_DATA.base.vy;
 			p->pos.vz = vec.vz - ENDI_DATA.base.vz;
 		}
@@ -376,13 +375,13 @@ static void ENDI_renderParticles(int32_t objectId)
 			color = ENDI_PARTICLE_COLOR;
 			if (ENDI_DATA.flag != 0) {
 				boneMatrix = p->entity->posData[p->boneIndex].posMatrix.workm;
-				vec.vx = (p->pos.vx * p->entity->posData->scale.vx) / ONE;
-				vec.vy = (p->pos.vy * p->entity->posData->scale.vy) / ONE;
-				vec.vz = (p->pos.vz * p->entity->posData->scale.vz) / ONE;
+				vec.vx = (p->pos.vx * p->entity->posData->scale.vx) / 0x1000;
+				vec.vy = (p->pos.vy * p->entity->posData->scale.vy) / 0x1000;
+				vec.vz = (p->pos.vz * p->entity->posData->scale.vz) / 0x1000;
 				ApplyMatrixSV(&boneMatrix, &vec, &vec);
-				vec.vx += (int16_t)boneMatrix.t[0];
-				vec.vy += (int16_t)boneMatrix.t[1];
-				vec.vz += (int16_t)boneMatrix.t[2];
+				vec.vx += boneMatrix.t[0];
+				vec.vy += boneMatrix.t[1];
+				vec.vz += boneMatrix.t[2];
 				copyVector(&p->worldPos, &vec);
 			} else {
 				p->worldPos.vx = p->pos.vx + ENDI_DATA.base.vx;
