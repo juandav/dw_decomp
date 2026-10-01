@@ -446,103 +446,103 @@ char STR_MAP_NAME_OVERDELL[] = "オーバーデル";
 
 char STR_MAP_NAME_OVERDELL_CEMETERY[] = "オーバーデル墓地";
 
-char MAIN_D_80128C64[] = "グレートキャニオン入り口";
+char STR_MAP_NAME_GREAT_CANYON_ENTRANCE[] = "グレートキャニオン入り口";
 
-char MAIN_D_80128C80[] = "グレートキャニオン上層";
+char STR_MAP_NAME_GREAT_CANYON_TOP_AREA[] = "グレートキャニオン上層";
 
-char MAIN_D_80128C9C[] = "グレ大橋";
+char STR_MAP_NAME_GREAT_CANYON_BRIDGE[] = "グレ大橋";
 
-char MAIN_D_80128CB8[] = "トリデ入り口";
+char STR_MAP_NAME_FORTRESS_ENTRANCE[] = "トリデ入り口";
 
-char MAIN_D_80128CD4[] = "グレートキャニオン下層";
+char STR_MAP_NAME_GREAT_CANYON_BOT_AREA[] = "グレートキャニオン下層";
 
-char MAIN_D_80128CF0[] = "オーガトリデ";
+char STR_MAP_NAME_OGRE_FORTRESS[] = "オーガトリデ";
 
-char MAIN_D_80128D0C[] = "モノクロ店";
+char STR_MAP_NAME_MONOCHROME_SHOP[] = "モノクロ店";
 
-char MAIN_D_80128D28[] = "闇貴族の館";
+char STR_MAP_NAME_GREY_LORDS_MANSION[] = "闇貴族の館";
 
 char STR_MAP_NAME_MANSION_BASEMENT[] = "闇貴族の館地下";
 
-char MAIN_D_80128D60[] = "地下実験場";
+char STR_MAP_NAME_UNDERGROUND_LAB[] = "地下実験場";
 
-char MAIN_D_80128D7C[] = "ギアサバンナ";
+char STR_MAP_NAME_GEAR_SAVANNA[] = "ギアサバンナ";
 
-char MAIN_D_80128D98[] = "ダイノ古代境入り口";
+char STR_MAP_NAME_ANCIENT_DINO_REGION[] = "ダイノ古代境入り口";
 
-char MAIN_D_80128DB4[] = "ダイノ古代境時静域";
+char STR_MAP_NAME_ANCIENT_GLACIAL_REGION[] = "ダイノ古代境時静域";
 
-char MAIN_D_80128DD0[] = "ダイノ古代境時急域";
+char STR_MAP_NAME_ANCIENT_SPEEDY_REGION[] = "ダイノ古代境時急域";
 
-char MAIN_D_80128DEC[] = "フリーズランド";
+char STR_MAP_NAME_FREEZELAND[] = "フリーズランド";
 
-char MAIN_D_80128E08[] = "アイスサンクチュアリ";
+char STR_MAP_NAME_ICE_SANCTUARY[] = "アイスサンクチュアリ";
 
-char MAIN_D_80128E24[] = "グリーンジム";
+char STR_MAP_NAME_GREEN_GYM[] = "グリーンジム";
 
-char MAIN_D_80128E40[] = "レオモン先祖の洞くつ";
+char STR_MAP_NAME_LEOMON_ANCESTORS_CAVE[] = "レオモン先祖の洞くつ";
 
-char MAIN_D_80128E5C[] = "ミスティツリーズ";
+char STR_MAP_NAME_MISTY_TREES[] = "ミスティツリーズ";
 
-char MAIN_D_80128E78[] = "グレートキャニオン";
+char STR_MAP_NAME_GREAT_CANYON[] = "グレートキャニオン";
 
-char MAIN_D_80128E94[] = "ゲッコー湿地";
+char STR_MAP_NAME_GEKO_SWAMP[] = "ゲッコー湿地";
 
-char MAIN_D_80128EB0[] = "ダイオン郷";
+char STR_MAP_NAME_VOLUME_VILLA[] = "ダイオン郷";
 
-char MAIN_D_80128ECC[] = "はじまりの街";
+char STR_MAP_NAME_FILE_CITY[] = "はじまりの街";
 
-char MAIN_D_80128EE8[] = "預り屋";
+char STR_MAP_NAME_ITEM_KEEPER[] = "預り屋";
 
-char MAIN_D_80128F04[] = "ケンタル医院";
+char STR_MAP_NAME_CENTAR_CLINIC[] = "ケンタル医院";
 
-char MAIN_D_80128F20[] = "レストラン";
+char STR_MAP_NAME_RESTAURANT[] = "レストラン";
 
-char MAIN_D_80128F3C[] = "アイテムショップ";
+char STR_MAP_NAME_ITEM_SHOP[] = "アイテムショップ";
 
-char MAIN_D_80128F58[] = "ジジモンの家";
+char STR_MAP_NAME_JIJIMONS_HOUSE[] = "ジジモンの家";
 
-char MAIN_D_80128F74[] = "ひみつアイテムショップ";
+char STR_MAP_NAME_SECRET_ITEM_SHOP[] = "ひみつアイテムショップ";
 
-char MAIN_D_80128F90[] = "おもちゃのまち";
+char STR_MAP_NAME_TOY_TOWN[] = "おもちゃのまち";
 
-char MAIN_D_80128FAC[] = "ひみつの海岸洞";
+char STR_MAP_NAME_SECRET_BEACH_CAVE[] = "ひみつの海岸洞";
 
-char MAIN_D_80128FC8[] = "ファクトリアルタウン";
+char STR_MAP_NAME_FACTORIAL_TOWN[] = "ファクトリアルタウン";
 
-char MAIN_D_80128FE4[] = "バードラ運送";
+char STR_MAP_NAME_BIRDRA_TRANSPORT[] = "バードラ運送";
 
-char MAIN_D_80129000[] = "闘技場ロビー";
+char STR_MAP_NAME_ARENA_LOBBY[] = "闘技場ロビー";
 
-char MAIN_D_8012901C[] = "宝探し屋";
+char STR_MAP_NAME_TREASURE_HUNT[] = "宝探し屋";
 
-char MAIN_D_80129038[] = "ゴミの山";
+char STR_MAP_NAME_TRASH_MOUNTAIN[] = "ゴミの山";
 
-char MAIN_D_80129054[] = "下水道";
+char STR_MAP_NAME_SEWER[] = "下水道";
 
-char MAIN_D_80129070[] = "ビートランド";
+char STR_MAP_NAME_BEETLE_LAND[] = "ビートランド";
 
-char MAIN_D_8012908C[] = "ムゲンマウンテン";
+char STR_MAP_NAME_MT_INFINITY[] = "ムゲンマウンテン";
 
-char MAIN_D_801290A8[] = "デジモンカーリング場";
+char STR_MAP_NAME_DIGIMON_CURLING[] = "デジモンカーリング場";
 
-char MAIN_D_801290C4[] = "おもちゃ館";
+char STR_MAP_NAME_TOY_MANSION[] = "おもちゃ館";
 
-char MAIN_D_801290E0[] = "ぬいぐるみハウス";
+char STR_MAP_NAME_COSTUME_HOUSE[] = "ぬいぐるみハウス";
 
-char MAIN_D_801290FC[] = "ロボットハウス";
+char STR_MAP_NAME_ROBOT_HOUSE[] = "ロボットハウス";
 
-char MAIN_D_80129118[] = "闇貴族の館・２階";
+char STR_MAP_NAME_MANSION_2ND_FLOOR[] = "闇貴族の館・２階";
 
-char MAIN_D_80129134[] = "闇貴族の館・てんじょう裏";
+char STR_MAP_NAME_MANSION_ATTIC[] = "闇貴族の館・てんじょう裏";
 
 char STR_MAP_NAME_MANSION_DOT_BASEMENT[] = "闇貴族の館・地下";
 
-char MAIN_D_80129150[] = "裏次元";
+char STR_MAP_NAME_BACK_DIMENSION[] = "裏次元";
 
-char MAIN_D_8012916C[] = "クネモンのねどこ";
+char STR_MAP_NAME_KUNEMONS_BED[] = "クネモンのねどこ";
 
-char MAIN_D_80129188[] = "あみだ森";
+char STR_MAP_NAME_AMIDA_FOREST[] = "あみだ森";
 #else
 char STR_MAP_NAME_NATIVE_FOREST[] = "      Native Forest     ";
 
@@ -584,101 +584,101 @@ char STR_MAP_NAME_OVERDELL[] = "        Overdell        ";
 
 char STR_MAP_NAME_OVERDELL_CEMETERY[] = "    Overdell Cemetery   ";
 
-char MAIN_D_80128C64[] = "  Great Canyon Entrance ";
+char STR_MAP_NAME_GREAT_CANYON_ENTRANCE[] = "  Great Canyon Entrance ";
 
-char MAIN_D_80128C80[] = "  Great Canyon Top Area ";
+char STR_MAP_NAME_GREAT_CANYON_TOP_AREA[] = "  Great Canyon Top Area ";
 
-char MAIN_D_80128C9C[] = "   Great Canyon Bridge  ";
+char STR_MAP_NAME_GREAT_CANYON_BRIDGE[] = "   Great Canyon Bridge  ";
 
-char MAIN_D_80128CB8[] = "    Fortress Entrance   ";
+char STR_MAP_NAME_FORTRESS_ENTRANCE[] = "    Fortress Entrance   ";
 
-char MAIN_D_80128CD4[] = " Great Canyon Bot. Area ";
+char STR_MAP_NAME_GREAT_CANYON_BOT_AREA[] = " Great Canyon Bot. Area ";
 
-char MAIN_D_80128CF0[] = "      Ogre Fortress     ";
+char STR_MAP_NAME_OGRE_FORTRESS[] = "      Ogre Fortress     ";
 
-char MAIN_D_80128D0C[] = "     Monochrome Shop    ";
+char STR_MAP_NAME_MONOCHROME_SHOP[] = "     Monochrome Shop    ";
 
-char MAIN_D_80128D28[] = "   Grey Lord's Mansion  ";
+char STR_MAP_NAME_GREY_LORDS_MANSION[] = "   Grey Lord's Mansion  ";
 
 char STR_MAP_NAME_MANSION_BASEMENT[] = "    Mansion Basement    ";
 
-char MAIN_D_80128D60[] = "     Underground Lab    ";
+char STR_MAP_NAME_UNDERGROUND_LAB[] = "     Underground Lab    ";
 
-char MAIN_D_80128D7C[] = "      Gear Savanna      ";
+char STR_MAP_NAME_GEAR_SAVANNA[] = "      Gear Savanna      ";
 
-char MAIN_D_80128D98[] = "   Ancient Dino Region  ";
+char STR_MAP_NAME_ANCIENT_DINO_REGION[] = "   Ancient Dino Region  ";
 
-char MAIN_D_80128DB4[] = " Ancient Glacial Region ";
+char STR_MAP_NAME_ANCIENT_GLACIAL_REGION[] = " Ancient Glacial Region ";
 
-char MAIN_D_80128DD0[] = " Ancient Speedy Region  ";
+char STR_MAP_NAME_ANCIENT_SPEEDY_REGION[] = " Ancient Speedy Region  ";
 
-char MAIN_D_80128DEC[] = "       Freezeland       ";
+char STR_MAP_NAME_FREEZELAND[] = "       Freezeland       ";
 
-char MAIN_D_80128E08[] = "      Ice Sanctuary     ";
+char STR_MAP_NAME_ICE_SANCTUARY[] = "      Ice Sanctuary     ";
 
-char MAIN_D_80128E24[] = "        Green Gym       ";
+char STR_MAP_NAME_GREEN_GYM[] = "        Green Gym       ";
 
-char MAIN_D_80128E40[] = " Leomon Ancestor's Cave ";
+char STR_MAP_NAME_LEOMON_ANCESTORS_CAVE[] = " Leomon Ancestor's Cave ";
 
-char MAIN_D_80128E5C[] = "       Misty Trees      ";
+char STR_MAP_NAME_MISTY_TREES[] = "       Misty Trees      ";
 
-char MAIN_D_80128E78[] = "      Great Canyon      ";
+char STR_MAP_NAME_GREAT_CANYON[] = "      Great Canyon      ";
 
-char MAIN_D_80128E94[] = "        Geko Swamp      ";
+char STR_MAP_NAME_GEKO_SWAMP[] = "        Geko Swamp      ";
 
-char MAIN_D_80128EB0[] = "      Volume Villa      ";
+char STR_MAP_NAME_VOLUME_VILLA[] = "      Volume Villa      ";
 
-char MAIN_D_80128ECC[] = "        File City       ";
+char STR_MAP_NAME_FILE_CITY[] = "        File City       ";
 
-char MAIN_D_80128EE8[] = "      Item Keeper       ";
+char STR_MAP_NAME_ITEM_KEEPER[] = "      Item Keeper       ";
 
-char MAIN_D_80128F04[] = "      Centar Clinic     ";
+char STR_MAP_NAME_CENTAR_CLINIC[] = "      Centar Clinic     ";
 
-char MAIN_D_80128F20[] = "       Restaurant       ";
+char STR_MAP_NAME_RESTAURANT[] = "       Restaurant       ";
 
-char MAIN_D_80128F3C[] = "        Item Shop       ";
+char STR_MAP_NAME_ITEM_SHOP[] = "        Item Shop       ";
 
-char MAIN_D_80128F58[] = "      Jijimon's house   ";
+char STR_MAP_NAME_JIJIMONS_HOUSE[] = "      Jijimon's house   ";
 
-char MAIN_D_80128F74[] = "    Secret Item Shop    ";
+char STR_MAP_NAME_SECRET_ITEM_SHOP[] = "    Secret Item Shop    ";
 
-char MAIN_D_80128F90[] = "        Toy Town        ";
+char STR_MAP_NAME_TOY_TOWN[] = "        Toy Town        ";
 
-char MAIN_D_80128FAC[] = "    Secret Beach Cave   ";
+char STR_MAP_NAME_SECRET_BEACH_CAVE[] = "    Secret Beach Cave   ";
 
-char MAIN_D_80128FC8[] = "     Factorial Town     ";
+char STR_MAP_NAME_FACTORIAL_TOWN[] = "     Factorial Town     ";
 
-char MAIN_D_80128FE4[] = "     Birdra Transport   ";
+char STR_MAP_NAME_BIRDRA_TRANSPORT[] = "     Birdra Transport   ";
 
-char MAIN_D_80129000[] = "       Arena Lobby      ";
+char STR_MAP_NAME_ARENA_LOBBY[] = "       Arena Lobby      ";
 
-char MAIN_D_8012901C[] = "      Treasure Hunt     ";
+char STR_MAP_NAME_TREASURE_HUNT[] = "      Treasure Hunt     ";
 
-char MAIN_D_80129038[] = "     Trash Mountain     ";
+char STR_MAP_NAME_TRASH_MOUNTAIN[] = "     Trash Mountain     ";
 
-char MAIN_D_80129054[] = "          Sewer         ";
+char STR_MAP_NAME_SEWER[] = "          Sewer         ";
 
-char MAIN_D_80129070[] = "      Beetle Land       ";
+char STR_MAP_NAME_BEETLE_LAND[] = "      Beetle Land       ";
 
-char MAIN_D_8012908C[] = "      Mt. Infinity      ";
+char STR_MAP_NAME_MT_INFINITY[] = "      Mt. Infinity      ";
 
-char MAIN_D_801290A8[] = "     Digimon Curling    ";
+char STR_MAP_NAME_DIGIMON_CURLING[] = "     Digimon Curling    ";
 
-char MAIN_D_801290C4[] = "       Toy Mansion      ";
+char STR_MAP_NAME_TOY_MANSION[] = "       Toy Mansion      ";
 
-char MAIN_D_801290E0[] = "      Costume House     ";
+char STR_MAP_NAME_COSTUME_HOUSE[] = "      Costume House     ";
 
-char MAIN_D_801290FC[] = "       Robot House      ";
+char STR_MAP_NAME_ROBOT_HOUSE[] = "       Robot House      ";
 
-char MAIN_D_80129118[] = "    Mansion 2nd floor   ";
+char STR_MAP_NAME_MANSION_2ND_FLOOR[] = "    Mansion 2nd floor   ";
 
-char MAIN_D_80129134[] = "      Mansion Attic     ";
+char STR_MAP_NAME_MANSION_ATTIC[] = "      Mansion Attic     ";
 
-char MAIN_D_80129150[] = "     Back Dimension     ";
+char STR_MAP_NAME_BACK_DIMENSION[] = "     Back Dimension     ";
 
-char MAIN_D_8012916C[] = "      Kunemon's Bed     ";
+char STR_MAP_NAME_KUNEMONS_BED[] = "      Kunemon's Bed     ";
 
-char MAIN_D_80129188[] = "      Amida Forest      ";
+char STR_MAP_NAME_AMIDA_FOREST[] = "      Amida Forest      ";
 #endif
 
 int8_t MAP_FILE_EXT_MAP[] = ".MAP";
@@ -724,60 +724,60 @@ char *MAP_NAME_PTR[70] = {
 	STR_MAP_NAME_LAVA_CAVE,
 	STR_MAP_NAME_OVERDELL,
 	STR_MAP_NAME_OVERDELL_CEMETERY,
-	MAIN_D_80128C64,
-	MAIN_D_80128C80,
-	MAIN_D_80128C9C,
-	MAIN_D_80128CB8,
-	MAIN_D_80128CD4,
-	MAIN_D_80128CF0,
-	MAIN_D_80128D0C,
-	MAIN_D_80128D28,
+	STR_MAP_NAME_GREAT_CANYON_ENTRANCE,
+	STR_MAP_NAME_GREAT_CANYON_TOP_AREA,
+	STR_MAP_NAME_GREAT_CANYON_BRIDGE,
+	STR_MAP_NAME_FORTRESS_ENTRANCE,
+	STR_MAP_NAME_GREAT_CANYON_BOT_AREA,
+	STR_MAP_NAME_OGRE_FORTRESS,
+	STR_MAP_NAME_MONOCHROME_SHOP,
+	STR_MAP_NAME_GREY_LORDS_MANSION,
 	STR_MAP_NAME_MANSION_BASEMENT,
-	MAIN_D_80128D60,
-	MAIN_D_80128D7C,
-	MAIN_D_80128D98,
-	MAIN_D_80128DB4,
-	MAIN_D_80128DD0,
-	MAIN_D_80128DEC,
-	MAIN_D_80128E08,
-	MAIN_D_80128E24,
-	MAIN_D_80128E40,
-	MAIN_D_80128E5C,
-	MAIN_D_80128E78,
-	MAIN_D_80128DEC,
-	MAIN_D_80128E94,
-	MAIN_D_80128EB0,
-	MAIN_D_80128ECC,
-	MAIN_D_80128EE8,
-	MAIN_D_80128F04,
-	MAIN_D_80128F20,
-	MAIN_D_80128F3C,
-	MAIN_D_80128F58,
-	MAIN_D_80128F74,
-	MAIN_D_80128F90,
-	MAIN_D_80128FAC,
-	MAIN_D_80128FC8,
-	MAIN_D_80128FE4,
-	MAIN_D_80129000,
-	MAIN_D_8012901C,
-	MAIN_D_80129038,
-	MAIN_D_80129054,
-	MAIN_D_80129070,
-	MAIN_D_8012908C,
-	MAIN_D_801290A8,
-	MAIN_D_801290C4,
-	MAIN_D_801290E0,
-	MAIN_D_801290FC,
-	MAIN_D_80129118,
-	MAIN_D_80129134,
+	STR_MAP_NAME_UNDERGROUND_LAB,
+	STR_MAP_NAME_GEAR_SAVANNA,
+	STR_MAP_NAME_ANCIENT_DINO_REGION,
+	STR_MAP_NAME_ANCIENT_GLACIAL_REGION,
+	STR_MAP_NAME_ANCIENT_SPEEDY_REGION,
+	STR_MAP_NAME_FREEZELAND,
+	STR_MAP_NAME_ICE_SANCTUARY,
+	STR_MAP_NAME_GREEN_GYM,
+	STR_MAP_NAME_LEOMON_ANCESTORS_CAVE,
+	STR_MAP_NAME_MISTY_TREES,
+	STR_MAP_NAME_GREAT_CANYON,
+	STR_MAP_NAME_FREEZELAND,
+	STR_MAP_NAME_GEKO_SWAMP,
+	STR_MAP_NAME_VOLUME_VILLA,
+	STR_MAP_NAME_FILE_CITY,
+	STR_MAP_NAME_ITEM_KEEPER,
+	STR_MAP_NAME_CENTAR_CLINIC,
+	STR_MAP_NAME_RESTAURANT,
+	STR_MAP_NAME_ITEM_SHOP,
+	STR_MAP_NAME_JIJIMONS_HOUSE,
+	STR_MAP_NAME_SECRET_ITEM_SHOP,
+	STR_MAP_NAME_TOY_TOWN,
+	STR_MAP_NAME_SECRET_BEACH_CAVE,
+	STR_MAP_NAME_FACTORIAL_TOWN,
+	STR_MAP_NAME_BIRDRA_TRANSPORT,
+	STR_MAP_NAME_ARENA_LOBBY,
+	STR_MAP_NAME_TREASURE_HUNT,
+	STR_MAP_NAME_TRASH_MOUNTAIN,
+	STR_MAP_NAME_SEWER,
+	STR_MAP_NAME_BEETLE_LAND,
+	STR_MAP_NAME_MT_INFINITY,
+	STR_MAP_NAME_DIGIMON_CURLING,
+	STR_MAP_NAME_TOY_MANSION,
+	STR_MAP_NAME_COSTUME_HOUSE,
+	STR_MAP_NAME_ROBOT_HOUSE,
+	STR_MAP_NAME_MANSION_2ND_FLOOR,
+	STR_MAP_NAME_MANSION_ATTIC,
 #if defined(VERSION_JP)
 	STR_MAP_NAME_MANSION_DOT_BASEMENT,
 #else
 	STR_MAP_NAME_MANSION_BASEMENT,
 #endif
-	MAIN_D_80129150,
-	MAIN_D_8012916C,
-	MAIN_D_80129188,
+	STR_MAP_NAME_BACK_DIMENSION,
+	STR_MAP_NAME_KUNEMONS_BED,
+	STR_MAP_NAME_AMIDA_FOREST,
 };
 
 MapEntry MAP_ENTRIES[255] = {
