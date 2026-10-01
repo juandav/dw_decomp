@@ -60,6 +60,6 @@ segments:
     subalign: 4
     subsegments:
       - [0x40, c, endi]
-      - [0x12DC, .data, endi]
+      - [0x12DC, .data, endi_bss_jp]
 
   - [0x1A78]

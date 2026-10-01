@@ -94,6 +94,7 @@ SECTIONS
 			BUILD_DIR/src/endi/endi.c.o(.text .text.*);
 			BUILD_DIR/src/endi/endi.c.o(.rodata .rodata.*);
 			BUILD_DIR/src/endi/endi.c.o(.data .data.*);
+			BUILD_DIR/src/endi/endi_bss_jp.c.o(.data .data.*);
 		}
 	}
 

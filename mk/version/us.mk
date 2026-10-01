@@ -136,7 +136,8 @@ EAB_C_SRC := \
 $(eval $(call overlay,EAB,eab))
 
 ENDI_C_SRC := \
-	src/endi/endi.c
+	src/endi/endi.c \
+	src/endi/endi_bss_us.c
 
 $(eval $(call overlay,ENDI,endi))
 

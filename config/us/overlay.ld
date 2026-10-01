@@ -211,6 +211,9 @@ SECTIONS
 
 			BUILD_DIR/src/endi/endi.c.o(.bss.*);
 			. = ALIGN(., 4);
+
+			BUILD_DIR/src/endi/endi_bss_us.c.o(.data.*);
+			. = ALIGN(., 4);
 		}
 	}
 
