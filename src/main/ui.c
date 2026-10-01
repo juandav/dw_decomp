@@ -47,25 +47,25 @@ uint8_t MAIN_D_80134334[4] = {
 };
 
 #if defined(VERSION_JP)
-char MAIN_D_80134338[] = "バグ";
+char STR_MOVE_NAME_BUG[] = "バグ";
 
-char MAIN_D_8013433C[] = "ウンチ";
+char STR_MOVE_NAME_TREMAR[] = "ウンチ";
 
-char MAIN_D_80134344[] = "覇王拳";
+char STR_MOVE_NAME_WAR_CRY[] = "覇王拳";
 
-char MAIN_D_8013434C[] = "獣王拳";
+char STR_MOVE_NAME_COUNTER[] = "獣王拳";
 
-char MAIN_D_80134354[] = "あわ";
+char STR_MOVE_NAME_BUBBLE[] = "あわ";
 #else
-char MAIN_D_80134338[4] = "Bug";
+char STR_MOVE_NAME_BUG[4] = "Bug";
 
-char MAIN_D_8013433C[] = "Tremar";
+char STR_MOVE_NAME_TREMAR[] = "Tremar";
 
-char MAIN_D_80134344[8] = "War Cry";
+char STR_MOVE_NAME_WAR_CRY[8] = "War Cry";
 
-char MAIN_D_8013434C[8] = "Counter";
+char STR_MOVE_NAME_COUNTER[8] = "Counter";
 
-char MAIN_D_80134354[] = "Bubble";
+char STR_MOVE_NAME_BUBBLE[] = "Bubble";
 #endif
 // clang-format on
 
